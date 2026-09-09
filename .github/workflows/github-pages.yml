@@ -50,6 +50,13 @@ jobs:
       - name: Contrôle de conformité AMF
         run: pnpm test:compliance
 
+      # Chiffre chaque page derrière un écran de mot de passe. Sans le secret PREVIEW_PASSWORD,
+      # l'étape échoue : rien n'est publié sans protection.
+      - name: Protection par mot de passe
+        run: node scripts/encrypt-preview.mjs
+        env:
+          PREVIEW_PASSWORD: ${{ secrets.PREVIEW_PASSWORD }}
+
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

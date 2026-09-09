@@ -148,3 +148,20 @@ Revenus · Souscrire · CORUM · Risques · Documents · FAQ · Notes.
 - Domaine : r-start.com (URL canonique https://r-start.com).
 - Directeur de la publication (Anne Carrizo, d'après corum.fr) et police de marque.
 - Validation Conformité CLE de l'ensemble des textes (`src/content/fr/*.ts`) avant mise en ligne.
+
+## Prévisualisation protégée (GitHub Pages)
+
+La branche `main` du dépôt GitHub publie une prévisualisation à l'adresse
+`https://martinphlippoteau-ui.github.io/r-start-public/`, avec deux garde-fous :
+
+- **Non indexable** : `PUBLIC_NOINDEX=true` (robots.txt en `Disallow: /`, balise `noindex` sur chaque
+  page, plan du site retiré).
+- **Mot de passe** : `scripts/encrypt-preview.mjs` chiffre chaque page (AES-GCM, clé dérivée par
+  PBKDF2, 250 000 itérations) et la remplace par un écran de saisie autonome. Le mot de passe vient du
+  secret `PREVIEW_PASSWORD` (Settings → Secrets and variables → Actions). Sans ce secret, le workflow
+  échoue : rien n'est publié sans protection. Le mot de passe saisi est mémorisé pour la session
+  (navigation entre pages sans ressaisie).
+
+Limite assumée : les fichiers servis tels quels (PDF, images, CSS, JS) restent téléchargeables par leur
+adresse exacte. Une protection complète demande une authentification en amont (Cloudflare Access,
+App Service, etc.).
