@@ -350,3 +350,18 @@ export const documentsExtra = [
     version: 'Version 2.1, avril 2026',
   },
 ] as const;
+
+/**
+ * Univers d'investissement de R Start (DIC p.1) : les États membres du Conseil de l'Europe et le Canada.
+ * Liste des 46 États membres relevée sur coe.int le 09/09/2026 (codes ISO 3166-1 alpha-3), utilisée par
+ * scripts/make-map.mjs pour la carte de la section Stratégie. Aucun pays hors de cette liste n'y figure.
+ */
+export const investmentUniverse = {
+  source: 'Conseil de l’Europe, liste des États membres consultée le 9 septembre 2026 ; DIC du 20 mai 2026',
+  canada: ['CAN'],
+  councilOfEurope: [
+    'ALB', 'AND', 'ARM', 'AUT', 'AZE', 'BEL', 'BIH', 'BGR', 'HRV', 'CYP', 'CZE', 'DNK', 'EST', 'FIN', 'FRA',
+    'GEO', 'DEU', 'GRC', 'HUN', 'ISL', 'IRL', 'ITA', 'LVA', 'LIE', 'LTU', 'LUX', 'MLT', 'MDA', 'MCO', 'MNE',
+    'NLD', 'MKD', 'NOR', 'POL', 'PRT', 'ROU', 'SMR', 'SRB', 'SVK', 'SVN', 'ESP', 'SWE', 'CHE', 'TUR', 'UKR', 'GBR',
+  ],
+} as const;

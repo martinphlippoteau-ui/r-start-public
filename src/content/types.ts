@@ -170,7 +170,14 @@ export interface StrategyContent {
   /** Surtitre du bloc des piliers (ex. « Trois piliers »). */
   pillarsTitle?: string;
   pillars: StrategyPillar[];
-  zone: { title: string; description: string; countriesLabel: string; risk: string };
+  zone: {
+    title: string;
+    description: string;
+    countriesLabel: string;
+    risk: string;
+    /** Libellés des deux volets de la carte (Canada, Conseil de l’Europe) et de sa légende. */
+    mapLabels?: { canada: string; europe: string; legend: string };
+  };
   /** Libellé de la liste des types d'actifs (ex. « Types d'actifs visés »). */
   assetTypesLabel?: string;
   assetTypes: string[];
