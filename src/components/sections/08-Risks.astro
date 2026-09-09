@@ -1,0 +1,87 @@
+---
+/**
+ * Section 8 — Risques (id « risques »). Contre-poids global de la page : section pleine sur fond ink
+ * avec le même poids typographique que les sections avantages (H2 text-display-lg, intro text-lead).
+ * Six risques en grille (titre text-display-sm, description text-lead), puis l'avertissement du
+ * bulletin de souscription et celui du DIC en blocs texte pleine taille (RiskNote text-lead) et les
+ * trois puces de la commission d'arbitrage en liste.
+ * Motion (src/scripts/motion.ts) :
+ *  - transition de chapitre en rideau (`data-curtain` sur la section) : la section Confiance (07) est
+ *    épinglée quand son bas touche le bas du viewport pendant que cette section monte par-dessus (coins
+ *    arrondis et ombre posés par la CSS `[data-curtain]`). Comme 07 contient des [data-risk], le moteur
+ *    n'applique ni recul ni atténuation à la section recouverte : pin + recouvrement seuls ;
+ *  - les six intitulés de risques (H3) entrent par un `fade-up` court (12 px au lieu des 28 px d'un
+ *    titre : la description sous chacun est visible d'emblée, le titre ne doit pas la chevaucher), en
+ *    cascade par rangée (la deuxième colonne suit la première de 0,1 s) ; les descriptions ne sont
+ *    jamais animées ;
+ *  - rien d'autre ne bouge : ni le H2, ni l'intro, ni les avertissements du bulletin, du DIC et de la
+ *    commission d'arbitrage (titres compris), toujours visibles.
+ * Sans JS ou en reduced-motion : aucun pin, aucun rideau, tout est visible et stable.
+ * Contenu : src/content/fr/risks.ts (textes réglementaires reproduits à l'identique depuis legal.ts) ;
+ * les appels de note des risques viennent du contenu (item.noteId).
+ * Le surtitre est rendu ici en teal-200 (contraste AA sur ink) plutôt que par SectionHeading.
+ */
+import Container from '@/components/ui/Container.astro';
+import NoteRef from '@/components/ui/NoteRef.astro';
+import RiskNote from '@/components/ui/RiskNote.astro';
+import Section from '@/components/ui/Section.astro';
+import SectionHeading from '@/components/ui/SectionHeading.astro';
+import { sections } from '@/config/sections';
+import { risks } from '@/content/fr/risks';
+
+const id = sections.risks.id;
+/** Décalage de la deuxième colonne de la grille des risques sur la première (secondes). */
+const TITLE_STAGGER = 0.1;
+/** Colonnes de la grille des risques à partir de sm (cascade par rangée). */
+const COLUMNS = 2;
+/** Amplitude du fade-up des intitulés (px) : la description sous chacun est visible d'emblée. */
+const TITLE_Y = 12;
+---
+
+<!-- data-curtain : la section monte par-dessus 07-Trust épinglée (voir src/scripts/motion/scroll.ts). -->
+<Section id={id} tone="ink" data-curtain="">
+  <Container size="wide" class="relative">
+    <p class="text-eyebrow mb-4 text-teal-200">{risks.eyebrow}</p>
+    <SectionHeading id={id} title={risks.title} intro={risks.intro} />
+
+    <!-- Six risques : seul l'intitulé entre en cascade (fade-up court), la description est visible d'emblée. -->
+    <ul class="mt-16 grid gap-x-12 gap-y-12 sm:grid-cols-2 lg:mt-24 lg:gap-x-16 lg:gap-y-16">
+      {
+        risks.items.map((item, i) => (
+          <li class="border-t border-white/25 pt-6 sm:pt-8">
+            <h3
+              class="text-display-sm text-white"
+              data-animate="fade-up"
+              data-animate-y={String(TITLE_Y)}
+              data-animate-delay={String((i % COLUMNS) * TITLE_STAGGER)}
+            >
+              {item.title}
+              {item.noteId && <NoteRef id={item.noteId} />}
+            </h3>
+            <p class="mt-4 text-lead text-white">{item.description}</p>
+          </li>
+        ))
+      }
+    </ul>
+
+    <!-- Avertissement du bulletin de souscription (in extenso, jamais animé) -->
+    <div class="mt-16 rounded-3xl border border-white/25 bg-white/5 p-6 sm:p-10 lg:mt-24 lg:p-12">
+      {risks.bulletinWarningTitle && <h3 class="text-display-sm text-sand">{risks.bulletinWarningTitle}</h3>}
+      <RiskNote text={risks.bulletinWarning} tone="dark" size="lead" class="mt-6" />
+    </div>
+
+    <!-- Avertissement du DIC et commission d'arbitrage (jamais animés) -->
+    <div class="mt-6 grid gap-6 lg:grid-cols-2">
+      <div class="rounded-3xl border border-white/25 bg-white/5 p-6 sm:p-10 lg:p-12">
+        {risks.dicWarningTitle && <h3 class="text-display-sm text-sand">{risks.dicWarningTitle}</h3>}
+        <RiskNote text={risks.dicWarning} tone="dark" size="lead" class="mt-6" />
+      </div>
+      <div class="rounded-3xl border border-white/25 bg-white/5 p-6 sm:p-10 lg:p-12">
+        {risks.arbitrageTitle && <p class="text-lead font-medium text-sand">{risks.arbitrageTitle}</p>}
+        <ul class="mt-5 list-disc space-y-4 pl-6 text-lead text-white marker:text-sand">
+          {risks.arbitrageBullets.map((bullet) => <li class="pl-1">{bullet}</li>)}
+        </ul>
+      </div>
+    </div>
+  </Container>
+</Section>

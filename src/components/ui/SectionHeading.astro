@@ -1,0 +1,18 @@
+---
+/** En-tête de section façon page produit : surtitre court, H2 très grand, introduction en texte lead. */
+interface Props {
+  id: string;
+  eyebrow?: string;
+  title: string;
+  intro?: string;
+  align?: 'left' | 'center';
+  class?: string;
+}
+const { id, eyebrow, title, intro, align = 'left', class: className = '' } = Astro.props;
+---
+
+<header class:list={['max-w-4xl', align === 'center' && 'mx-auto text-center', className]}>
+  {eyebrow && <p class="mb-4 text-sm font-semibold uppercase tracking-[0.18em] text-teal-700 in-[.text-white]:text-teal-200">{eyebrow}</p>}
+  <h2 id={id + '-title'} class="text-display-lg">{title}</h2>
+  {intro && <p class="mt-6 text-lead opacity-90">{intro}</p>}
+</header>

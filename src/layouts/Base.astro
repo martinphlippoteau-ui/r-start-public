@@ -1,0 +1,49 @@
+---
+import '@/styles/global.css';
+import Seo from '@/components/Seo.astro';
+import Consent from '@/components/Consent.astro';
+import JsonLd from '@/components/JsonLd.astro';
+import { nav } from '@/content/fr/nav';
+import { withBase } from '@/lib/href';
+
+interface Props {
+  title: string;
+  description: string;
+  path?: string;
+  noindex?: boolean;
+  ogImage?: string;
+  ogImageAlt?: string;
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+  bodyClass?: string;
+}
+
+const { title, description, path, noindex, ogImage, ogImageAlt, jsonLd, bodyClass = '' } = Astro.props;
+---
+
+<!doctype html>
+<!-- `intro` : cascade d'entrée CSS des [data-intro] (global.css), décidée avant tout rendu — sans script inline (CSP). -->
+<html lang="fr" dir="ltr" class="intro">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <Seo {title} {description} {path} {noindex} {ogImage} {ogImageAlt} />
+    <link rel="icon" href={withBase('/favicon.ico')} sizes="32x32" />
+    <link rel="icon" href={withBase('/favicon.svg')} type="image/svg+xml" />
+    <link rel="apple-touch-icon" href={withBase('/apple-touch-icon.png')} />
+    <meta name="theme-color" content="#024b67" />
+    <meta name="color-scheme" content="light" />
+    <link rel="sitemap" href={withBase('/sitemap-index.xml')} />
+    {jsonLd && <JsonLd data={jsonLd} />}
+    <slot name="head" />
+  </head>
+  <body class:list={['min-h-svh bg-paper text-ink', bodyClass]}>
+    <a href="#contenu" class="skip-link">{nav.skipLink}</a>
+    <slot />
+    <Consent />
+    <script>
+      import '@/scripts/consent';
+      import '@/scripts/analytics';
+      import '@/scripts/motion';
+    </script>
+  </body>
+</html>

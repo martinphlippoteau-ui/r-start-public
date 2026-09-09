@@ -1,0 +1,529 @@
+---
+/**
+ * Page /frais (périmètre v2, plan §12) : version complète de la section « Frais » de l'accueil.
+ * Header (tone dark, posé en absolu sur le PageHero sombre) → fil d'Ariane (slot du PageHero, décalé sous
+ * le Header) → PageHero (H1, intro, ligne risques visible sans scroller, jamais animée) → sections :
+ *  1. les trois « 0 % » et leur contre-poids dans le même bloc (data-advantage + RiskNote, text-lead) ;
+ *  2. le barème en quatre tableaux accessibles (caption = titre H3 + introduction, th scope="col" /
+ *     scope="row", nature du frais en pastille depuis FeeRow.kind, assiette et précisions repliées sous le
+ *     libellé aux largeurs étroites, taux jamais coupé : `valueShort` sous 640 px) ;
+ *  3. la commission de retrait : frise des cinq paliers (10-7-5-3-0), cas d'exonération (avantage) et
+ *     leur note (risque), même taille ;
+ *  4. sur fond ink : mécanisme de réserve en cas de moins-value (avantage en paragraphes + RiskNote),
+ *     puis l'encadré « Une innovation, pas une révolution » et l'avertissement commission d'arbitrage,
+ *     reproduits à l'identique depuis legal.ts, jamais animés ;
+ *  5. l'incidence des coûts du DIC (trois durées, méthode, risque : coûts, jamais de performance) ;
+ *  6. le tableau comparatif de la brochure p.6, rendu uniquement si SHOW_MARKET_COMPARISON et
+ *     marketComparison.enabled (aucune donnée livrée en l'état) ;
+ *  7. le document de référence (carte PDF data-doc, ou lien externe vers corum.fr tant que le DIC est en
+ *     attente : rel noopener noreferrer, mention « nouvelle fenêtre ») ;
+ *  8. la FAQ en accordéons natifs <details data-faq> (JSON-LD FAQPage émis par la page) ;
+ *  9. la précision HT = TTC et le CTA tunnel (position « frais ») ;
+ * puis les notes de la page (feesPage.notes, appels de note locaux FeesNoteRef) et le Footer.
+ * Animations déclaratives sobres uniquement (data-animate clip / stagger / fade-up) ; aucun [data-risk],
+ * aucun avertissement et aucun H1 sous un data-animate.
+ * Contenu : src/content/fr/feesPage.ts (aucun texte en dur ; micro-textes dans feesPage.labels).
+ */
+import Base from '@/layouts/Base.astro';
+import Header from '@/components/Header.astro';
+import Footer from '@/components/Footer.astro';
+import LegalNotes from '@/components/LegalNotes.astro';
+import Breadcrumb from '@/components/ui/Breadcrumb.astro';
+import Button from '@/components/ui/Button.astro';
+import Card from '@/components/ui/Card.astro';
+import Container from '@/components/ui/Container.astro';
+import PageHero from '@/components/ui/PageHero.astro';
+import Pill from '@/components/ui/Pill.astro';
+import RiskNote from '@/components/ui/RiskNote.astro';
+import Section from '@/components/ui/Section.astro';
+import FeesNoteRef from '@/components/pages/frais/FeesNoteRef.astro';
+import { pages } from '@/config/pages';
+import { feesPage, notes, SHOW_MARKET_COMPARISON } from '@/content/fr/feesPage';
+import { breadcrumbJsonLd, faqJsonLd, organizationJsonLd, webPageJsonLd } from '@/lib/seo';
+import { withBase } from '@/lib/href';
+
+const page = pages.fees;
+const {
+  seo,
+  hero,
+  labels,
+  zeroHighlights,
+  counterweight,
+  groups,
+  withdrawal,
+  lossMechanism,
+  arbitrageWarning,
+  innovationBox,
+  costImpact,
+  marketComparison,
+  simulationDoc,
+  faq,
+  htNote,
+  cta,
+} = feesPage;
+
+const jsonLd = [
+  organizationJsonLd(),
+  webPageJsonLd({ path: page.path, title: seo.title, description: seo.description }),
+  breadcrumbJsonLd('fees'),
+  faqJsonLd(faq.items),
+];
+
+/** Ancres des sections de la page (ids HTML, pas des textes affichés). */
+const ids = {
+  zero: 'zero-frais',
+  schedule: 'bareme',
+  withdrawal: 'retrait',
+  loss: 'moins-value',
+  cost: 'incidence-des-couts',
+  comparison: 'comparatif',
+  document: 'document-de-reference',
+  faq: 'faq-frais',
+  cta: 'souscrire-frais',
+};
+
+/** Frise de retrait : le dernier palier (0 %) est mis en avant. */
+const lastStep = withdrawal.steps.length - 1;
+
+/** FAQ : découpage avantage / risque de chaque réponse (item.riskFrom), comme sur l'accueil. */
+const faqItems = faq.items.map((item) => {
+  const from = Math.min(Math.max(item.riskFrom ?? item.answer.length, 0), item.answer.length);
+  return { ...item, advantage: item.answer.slice(0, from), risks: item.answer.slice(from) };
+});
+
+/** Document de référence : PDF hébergé (data-doc, type application/pdf) ou lien externe (corum.fr). */
+const docIsPdf = /\.pdf$/i.test(simulationDoc.file);
+const docKey = simulationDoc.key ?? simulationDoc.file.replace(/^.*\//, '').replace(/\.pdf$/i, '');
+const kbFormat = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 });
+const docHint = docIsPdf
+  ? [labels?.fileTypeLabel, labels?.newTabHint].filter(Boolean).join(', ')
+  : (labels?.newTabHint ?? '');
+const docHintId = `${ids.document}-hint`;
+
+/** Tableau comparatif (brochure p.6) : rendu conditionnel, drapeau + données présentes. */
+const showComparison = SHOW_MARKET_COMPARISON && marketComparison.enabled && marketComparison.rows.length > 0;
+---
+
+<Base title={seo.title} description={seo.description} path={page.path} jsonLd={jsonLd}>
+  <Header tone="dark" />
+  <main id="contenu">
+    <PageHero eyebrow={hero.eyebrow} title={hero.title} intro={hero.intro} riskLine={hero.riskLine}>
+      <Breadcrumb slot="breadcrumb" key="fees" tone="dark" class="pt-8 lg:pt-4" />
+    </PageHero>
+
+    <!-- 1. Les trois 0 % et leur contre-poids, dans le même bloc -->
+    <Section id={ids.zero} tone="white" labelledBy={ids.zero + '-title'}>
+      <Container size="wide">
+        <h2 id={ids.zero + '-title'} class="visually-hidden">{labels?.zeroHighlights}</h2>
+        <ul role="list" aria-label={labels?.zeroHighlights} class="grid gap-10 sm:grid-cols-3 sm:gap-8 lg:gap-12">
+          {
+            zeroHighlights.map((item, i) => (
+              <li class="flex flex-col gap-3 border-t border-navy/15 pt-6 sm:pt-8">
+                <p class="flex flex-col gap-3">
+                  <span class="text-stat text-navy" data-animate="clip" data-animate-delay={String(i * 0.12)}>
+                    {item.value}
+                  </span>
+                  <span class="text-lead font-medium text-ink">{item.label}</span>
+                </p>
+                <p class="text-base leading-relaxed text-slate-700">{item.base}</p>
+              </li>
+            ))
+          }
+        </ul>
+        <div class="mt-10 grid gap-6 border-t border-navy/15 pt-8 lg:mt-14 lg:grid-cols-2 lg:gap-12 lg:pt-10">
+          <p data-advantage class="text-lead">
+            {counterweight.advantage}<span class="whitespace-nowrap"><FeesNoteRef id="frais-page-distributeur" /></span>
+          </p>
+          <RiskNote text={counterweight.risk} size="lead" />
+        </div>
+      </Container>
+    </Section>
+
+    <!-- 2. Le barème complet, en quatre tableaux -->
+    <Section id={ids.schedule} tone="paper" labelledBy={ids.schedule + '-title'}>
+      <Container size="wide">
+        <h2 id={ids.schedule + '-title'} class="text-display-lg max-w-4xl">{labels?.eyebrows.schedule}</h2>
+
+        <div class="mt-14 space-y-16 lg:mt-20 lg:space-y-24">
+          {
+            groups.map((group) => (
+              <div class="overflow-x-auto">
+                <table class="w-full border-collapse text-left">
+                  <caption class="mb-6 text-left sm:mb-8">
+                    <h3 class="text-display-sm text-ink">
+                      {group.title}
+                      {group.noteId && (
+                        <span class="whitespace-nowrap">
+                          <FeesNoteRef id={group.noteId} />
+                        </span>
+                      )}
+                    </h3>
+                    {group.intro && <p class="text-lead mt-3 max-w-3xl text-ink">{group.intro}</p>}
+                  </caption>
+                  {labels && (
+                    <thead>
+                      <tr class="border-b border-navy/20 text-caption font-semibold uppercase tracking-[0.12em] text-slate-700">
+                        <th scope="col" class="py-3 pr-4">
+                          {labels.columns.fee}
+                        </th>
+                        <th scope="col" class="hidden py-3 pr-4 sm:table-cell">
+                          {labels.columns.base}
+                        </th>
+                        <th scope="col" class="py-3 text-right">
+                          {labels.columns.value}
+                        </th>
+                        <th scope="col" class="hidden py-3 pl-6 lg:table-cell">
+                          {labels.columns.detail}
+                        </th>
+                      </tr>
+                    </thead>
+                  )}
+                  <tbody>
+                    {group.rows.map((row) => (
+                      <tr class="border-b border-navy/10 align-top" data-kind={row.kind}>
+                        <th scope="row" class="py-4 pr-4 font-normal sm:py-5 lg:w-72">
+                          <span class="block text-base font-semibold text-ink sm:text-xl">{row.label}</span>
+                          {labels && (
+                            <Pill tone="outline" class="mt-2 text-teal-700">
+                              {labels.kinds[row.kind]}
+                            </Pill>
+                          )}
+                          <span class="mt-2 block text-base leading-relaxed text-slate-700 sm:hidden">{row.base}</span>
+                          {row.detail && (
+                            <span class="mt-2 block text-base leading-relaxed text-slate-700 lg:hidden">{row.detail}</span>
+                          )}
+                        </th>
+                        <td class="hidden py-4 pr-4 text-base leading-relaxed text-slate-700 sm:table-cell sm:py-5 lg:w-64">
+                          {row.base}
+                        </td>
+                        <td class="py-4 pl-3 text-right text-lg leading-tight font-bold tracking-tight whitespace-nowrap text-navy tabular-nums max-sm:w-[7.25rem] sm:py-5 sm:text-3xl">
+                          {row.valueShort ? (
+                            <>
+                              <span class="sm:hidden">{row.valueShort}</span>
+                              <span class="hidden sm:inline">{row.value}</span>
+                            </>
+                          ) : (
+                            row.value
+                          )}
+                        </td>
+                        <td class="hidden py-4 pl-6 text-base leading-relaxed text-slate-700 lg:table-cell lg:py-5">{row.detail}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ))
+          }
+        </div>
+      </Container>
+    </Section>
+
+    <!-- 3. Commission de retrait dégressive, exonérations -->
+    <Section id={ids.withdrawal} tone="white" labelledBy={ids.withdrawal + '-title'}>
+      <Container size="wide">
+        {labels?.eyebrows.withdrawal && <p class="text-eyebrow mb-4 text-teal-700">{labels.eyebrows.withdrawal}</p>}
+        <h2 id={ids.withdrawal + '-title'} class="text-display-lg max-w-4xl">{withdrawal.title}</h2>
+        <p class="text-lead mt-6 max-w-3xl">
+          {withdrawal.intro}<span class="whitespace-nowrap"><FeesNoteRef id="frais-page-retrait" /></span>
+        </p>
+        <ol aria-label={labels?.steps} class="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-5 sm:gap-5 lg:gap-6" data-animate="stagger">
+          {
+            withdrawal.steps.map((step, i) => {
+              const last = i === lastStep;
+              return (
+                <li
+                  class:list={[
+                    'flex flex-col justify-between gap-6 rounded-3xl p-6 lg:p-8',
+                    last ? 'bg-navy text-white shadow-float max-sm:col-span-2' : 'bg-paper text-ink ring-1 ring-navy/5',
+                  ]}
+                >
+                  <span class:list={['text-display-md tabular-nums', last ? 'text-sand' : 'text-navy']}>{step.rate}</span>
+                  <span class:list={['text-base leading-snug font-medium', last ? 'text-white' : 'text-ink']}>{step.period}</span>
+                </li>
+              );
+            })
+          }
+        </ol>
+
+        <div class="mt-14 grid gap-6 border-t border-navy/15 pt-8 lg:mt-20 lg:grid-cols-2 lg:gap-12 lg:pt-10">
+          <div data-advantage class="text-lead">
+            <h3 class="text-display-sm text-ink">
+              {withdrawal.exemptionsTitle}<span class="whitespace-nowrap"><FeesNoteRef id="frais-page-exoneration-retrait" /></span>
+            </h3>
+            <ul role="list" class="mt-4 space-y-3">
+              {withdrawal.exemptions.map((item) => <li>{item}</li>)}
+            </ul>
+          </div>
+          <RiskNote text={withdrawal.note} size="lead" class="lg:mt-1" />
+        </div>
+      </Container>
+    </Section>
+
+    <!-- 4. Moins-value, encadré et avertissement (jamais animés) -->
+    <Section id={ids.loss} tone="ink" labelledBy={ids.loss + '-title'} class="brand-halo grain overflow-hidden">
+      <Container size="wide" class="relative">
+        {labels?.eyebrows.lossMechanism && <p class="text-eyebrow mb-4 text-teal-200">{labels.eyebrows.lossMechanism}</p>}
+        <h2 id={ids.loss + '-title'} class="text-display-lg max-w-4xl text-white">
+          {lossMechanism.title}<span class="whitespace-nowrap"><FeesNoteRef id="frais-page-moins-value" /></span>
+        </h2>
+        <div class="mt-10 grid gap-8 lg:mt-14 lg:grid-cols-2 lg:gap-12">
+          <div data-advantage class="text-lead space-y-5 text-white">
+            {lossMechanism.body.map((paragraph) => <p>{paragraph}</p>)}
+          </div>
+          <RiskNote text={lossMechanism.risk} tone="dark" size="lead" />
+        </div>
+
+        <div class="mt-16 grid gap-6 lg:mt-24 lg:grid-cols-2">
+          <Card lift={false} class="lg:p-10">
+            <h3 class="text-display-sm">{innovationBox.title}</h3>
+            <RiskNote text={innovationBox.body} size="lead" class="mt-5" />
+          </Card>
+          <Card lift={false} class="lg:p-10">
+            <p class="text-lead font-medium">
+              {arbitrageWarning.title}<span class="whitespace-nowrap"><FeesNoteRef id="frais-page-commission-arbitrage" tone="light" /></span>
+            </p>
+            <ul class="mt-5 list-disc space-y-4 pl-6 text-lead marker:text-coral">
+              {arbitrageWarning.bullets.map((bullet) => <li class="pl-1">{bullet}</li>)}
+            </ul>
+          </Card>
+        </div>
+      </Container>
+    </Section>
+
+    <!-- 5. Incidence des coûts selon le DIC (coûts, jamais de performance) -->
+    <Section id={ids.cost} tone="paper" labelledBy={ids.cost + '-title'}>
+      <Container size="wide">
+        {labels?.eyebrows.costImpact && <p class="text-eyebrow mb-4 text-teal-700">{labels.eyebrows.costImpact}</p>}
+        <h2 id={ids.cost + '-title'} class="text-display-lg max-w-4xl">
+          {costImpact.title}<span class="whitespace-nowrap"><FeesNoteRef id="frais-page-incidence-dic" /></span>
+        </h2>
+        <div class="mt-6">
+          <p data-advantage class="text-lead max-w-3xl">{costImpact.intro}</p>
+          <ol class="mt-12 grid gap-4 sm:grid-cols-3 sm:gap-5 lg:gap-6" data-animate="stagger">
+            {
+              costImpact.rows.map((row) => (
+                <li class="flex flex-col justify-between gap-6 rounded-3xl bg-white p-6 shadow-card lg:p-8">
+                  <span class="text-base leading-snug font-medium text-ink">{row.period}</span>
+                  <span class="text-display-md text-navy tabular-nums">
+                    {labels?.costColumns.impact && <span class="visually-hidden">{labels.costColumns.impact} : </span>}
+                    {row.impact}
+                  </span>
+                </li>
+              ))
+            }
+          </ol>
+          <p class="mt-8 max-w-4xl text-base leading-relaxed text-slate-700">{costImpact.note}</p>
+          <RiskNote text={costImpact.risk} size="lead" class="mt-8 max-w-4xl" />
+        </div>
+      </Container>
+    </Section>
+
+    <!-- 6. Tableau comparatif (brochure p.6) : rendu uniquement derrière le drapeau et si des données existent -->
+    {
+      showComparison && (
+        <Section id={ids.comparison} tone="white" labelledBy={ids.comparison + '-title'}>
+          <Container size="wide">
+            <h2 id={ids.comparison + '-title'} class="text-display-lg max-w-4xl">
+              {marketComparison.title}
+            </h2>
+            <p class="text-lead mt-6 max-w-3xl">{marketComparison.intro}</p>
+            <div class="mt-10 overflow-x-auto">
+              <table class="w-full border-collapse text-left">
+                <caption class="visually-hidden">{marketComparison.title}</caption>
+                <thead>
+                  <tr class="border-b border-navy/20 text-caption font-semibold uppercase tracking-[0.12em] text-slate-700">
+                    <th scope="col" class="py-3 pr-4">
+                      {labels?.columns.fee}
+                    </th>
+                    <th scope="col" class="py-3 pr-4 text-right">
+                      {marketComparison.columns[0]}
+                    </th>
+                    <th scope="col" class="py-3 text-right">
+                      {marketComparison.columns[1]}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {marketComparison.rows.map((row) => (
+                    <tr class="border-b border-navy/10 align-top">
+                      <th scope="row" class="py-4 pr-4 text-base font-semibold text-ink sm:text-xl">
+                        {row.label}
+                      </th>
+                      <td class="py-4 pr-4 text-right text-lg font-bold whitespace-nowrap text-slate-700 tabular-nums sm:text-2xl">{row.other}</td>
+                      <td class="py-4 text-right text-lg font-bold whitespace-nowrap text-navy tabular-nums sm:text-2xl">{row.rstart}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div class="mt-8 grid gap-6 lg:grid-cols-2 lg:gap-12">
+              <p data-advantage class="text-lead">
+                {marketComparison.perimeter}
+              </p>
+              <RiskNote text={marketComparison.risk} size="lead" />
+            </div>
+          </Container>
+        </Section>
+      )
+    }
+
+    <!-- 7. Document de référence -->
+    <Section id={ids.document} tone="white" labelledBy={ids.document + '-title'}>
+      <Container size="wide">
+        {labels?.eyebrows.document && <p class="text-eyebrow mb-6 text-teal-700">{labels.eyebrows.document}</p>}
+        {docHint && <span id={docHintId} hidden>{docHint}</span>}
+        <article class="group relative flex flex-col gap-5 rounded-3xl bg-paper p-6 ring-1 ring-navy/5 transition-shadow duration-300 hover:shadow-card focus-within:shadow-card sm:flex-row sm:gap-8 sm:p-8 lg:p-10">
+          <span
+            aria-hidden="true"
+            class="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-teal-100 text-navy transition-colors duration-300 group-hover:bg-navy group-hover:text-white"
+          >
+            <svg class="size-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z"></path>
+              <path d="M14 3v5h5"></path>
+              <path d="M9 13h6M9 17h6"></path>
+            </svg>
+          </span>
+          <div class="flex min-w-0 flex-1 flex-col">
+            <h2 id={ids.document + '-title'} class="text-display-sm mt-3">
+              <a
+                href={withBase(simulationDoc.file)}
+                data-doc={docIsPdf ? docKey : undefined}
+                target="_blank"
+                rel={docIsPdf ? 'noopener' : 'noopener noreferrer'}
+                type={docIsPdf ? 'application/pdf' : undefined}
+                aria-describedby={docHint ? docHintId : undefined}
+                class="text-ink no-underline after:absolute after:inset-0 after:rounded-3xl group-hover:text-navy focus-visible:shadow-none focus-visible:outline-none focus-visible:after:outline-3 focus-visible:after:outline-offset-2 focus-visible:after:outline-navy"
+              >
+                {simulationDoc.title}
+              </a>
+            </h2>
+            <p class="text-caption order-first flex flex-wrap items-center gap-x-2 gap-y-1 font-semibold tracking-wider text-slate-700">
+              {docIsPdf && labels?.fileTypeLabel && <span class="uppercase">{labels.fileTypeLabel}</span>}
+              {
+                docIsPdf && simulationDoc.kb !== undefined && (
+                  <>
+                    <span aria-hidden="true">·</span>
+                    <span class="tabular-nums">
+                      {kbFormat.format(simulationDoc.kb)}
+                      {labels?.sizeUnit && <> {labels.sizeUnit}</>}
+                    </span>
+                  </>
+                )
+              }
+              {!docIsPdf && labels?.newTabHint && (
+                <span aria-hidden="true" class="normal-case">
+                  {labels.newTabHint}
+                </span>
+              )}
+            </p>
+            <p class="mt-3 text-base leading-relaxed text-ink">{simulationDoc.description}</p>
+            <p class="mt-4 flex items-center justify-between gap-4 text-sm text-slate-700">
+              <span class="relative z-10">
+                {simulationDoc.version}
+                <FeesNoteRef id="frais-page-sources" />
+              </span>
+              <svg
+                aria-hidden="true"
+                class="size-5 shrink-0 text-navy transition-transform duration-300 group-hover:translate-x-1"
+                viewBox="0 0 20 20"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M4 10h12M11 5l5 5-5 5"></path>
+              </svg>
+            </p>
+          </div>
+        </article>
+      </Container>
+    </Section>
+
+    <!-- 8. FAQ frais -->
+    <Section id={ids.faq} tone="paper" labelledBy={ids.faq + '-title'}>
+      <Container size="wide">
+        <div class="grid gap-12 lg:grid-cols-12 lg:gap-16">
+          <div class="lg:col-span-5">
+            <div class="lg:sticky lg:top-24">
+              {labels?.eyebrows.faq && <p class="text-eyebrow mb-4 text-teal-700">{labels.eyebrows.faq}</p>}
+              <h2 id={ids.faq + '-title'} class="text-display-lg">{faq.title}</h2>
+            </div>
+          </div>
+          <div class="lg:col-span-7">
+            <ul role="list" aria-label={labels?.faqList} class="border-t border-navy/15">
+              {
+                faqItems.map((item, i) => (
+                  <li class="border-b border-navy/15">
+                    <details name="faq-frais" data-faq={item.question} class="faq-item group">
+                      <summary class="block cursor-pointer list-none py-6 [&::-webkit-details-marker]:hidden sm:py-8" data-animate="fade-up">
+                        <h3 class="flex items-start justify-between gap-5 text-display-sm text-ink transition-colors duration-200 group-hover:text-navy sm:gap-8">
+                          <span class="flex min-w-0 flex-col gap-2 sm:flex-row sm:gap-6">
+                            <span aria-hidden="true" class="text-eyebrow pt-1.5 text-teal-700 tabular-nums sm:pt-2">
+                              {String(i + 1).padStart(2, '0')}
+                            </span>
+                            <span>{item.question}</span>
+                          </span>
+                          <span
+                            aria-hidden="true"
+                            class="mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-full border border-navy/40 text-navy transition-[transform,background-color,border-color,color] duration-300 ease-out-expo group-hover:border-navy group-hover:bg-navy group-hover:text-white group-open:rotate-180 group-open:border-navy group-open:bg-navy group-open:text-white motion-reduce:transition-none sm:mt-1 sm:size-12"
+                          >
+                            <svg class="size-5 sm:size-6" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+                              <path d="m5 8 5 5 5-5" stroke-linecap="round" stroke-linejoin="round"></path>
+                            </svg>
+                          </span>
+                        </h3>
+                      </summary>
+                      <div class="faq-answer max-w-3xl space-y-5 pb-8 sm:pb-10 sm:pl-12">
+                        {item.advantage.map((paragraph) => (
+                          <p data-advantage class="text-lead text-ink">
+                            {paragraph}
+                          </p>
+                        ))}
+                        {item.risks.map((risk) => (
+                          <RiskNote text={risk} size="lead" />
+                        ))}
+                      </div>
+                    </details>
+                  </li>
+                ))
+              }
+            </ul>
+          </div>
+        </div>
+      </Container>
+    </Section>
+
+    <!-- 9. HT = TTC et CTA -->
+    <Section id={ids.cta} tone="white" spacing="compact" labelledBy={ids.cta + '-title'}>
+      <Container size="wide">
+        <h2 id={ids.cta + '-title'} class="visually-hidden">{cta.label}</h2>
+        <div class="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between lg:gap-12">
+          <p class="max-w-2xl text-base leading-relaxed text-slate-700">
+            {htNote}<span class="whitespace-nowrap"><FeesNoteRef id="frais-page-ht" /></span>
+          </p>
+          <div class="flex flex-wrap items-center gap-3 sm:gap-4">
+            <Button position={cta.position} size="lg">{cta.label}</Button>
+          </div>
+        </div>
+      </Container>
+    </Section>
+
+    <LegalNotes notes={notes} />
+  </main>
+  <Footer />
+</Base>
+
+<style>
+  /* Glissement de la réponse à l'ouverture (transform uniquement, opacité constante ; rien en reduced-motion). */
+  @media (prefers-reduced-motion: no-preference) {
+    .faq-item[open] > .faq-answer {
+      animation: faq-reveal 450ms var(--ease-out-expo) both;
+    }
+    @keyframes faq-reveal {
+      from {
+        transform: translateY(-6px);
+      }
+    }
+  }
+</style>

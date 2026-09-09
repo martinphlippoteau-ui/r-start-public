@@ -1,0 +1,256 @@
+---
+/**
+ * Section 7 — Confiance (id « corum », libellé de sous-nav « Confiance »). Deux bandes contrastées avec les
+ * voisines (06 white, 08 ink) : une bande ink (en-tête + cadre réglementaire en cartes label / valeur,
+ * réserve AMF et RiskNote), puis une bande white (avis Trustpilot en grand chiffre compteur + lien externe
+ * + périmètre en RiskNote ; chiffres du groupe CORUM en quatre compteurs 2 × 2, RiskNote puis source ;
+ * gamme des cinq SCPI avec logos ; rémunération de CORUM sur les ventes). Les cinq blocs sont des H3 de
+ * même niveau sous le H2.
+ * Aucun logo AMF, aucune étoile ni logo Trustpilot, aucune photo (droits media.corum non confirmés).
+ * Les chiffres viennent de trust.stats (corum.stats n'est pas rendu ici pour ne pas doubler).
+ * Équilibre AMF : chaque bloc avantage ([data-advantage]) partage son parent avec son contre-poids
+ * ([data-risk]) rendu à la même taille de texte visible (text-lead face aux valeurs des cartes, aux libellés
+ * de Stat et aux descriptions) ; ni le H2, ni les blocs risque, ni la réserve AMF ne portent data-animate.
+ * Motion (src/scripts/motion.ts) :
+ *  - les titres H3 des cinq blocs entrent par `fade-up` : 28 px (valeur titre) quand un bloc animé suit
+ *    (cadre AMF, avis, chiffres), 12 px seulement quand le paragraphe sous le titre est visible d'emblée
+ *    (gamme, rémunération) pour ne pas chevaucher sa première ligne ;
+ *  - les cinq cartouches du cadre réglementaire entrent par `fade-up`, chacune à sa propre entrée dans le
+ *    viewport, avec un délai relatif à sa rangée lg (0 / 0,08 / 0,16 s puis 0 / 0,08 s) : cascade quand une
+ *    rangée entre ensemble, quasi immédiat sur mobile où elles entrent une à une ;
+ *  - la note Trustpilot est un compteur (`<Stat numeric>` → data-counter) qui monte de 0 à la note en
+ *    1,4 s avec une décimale, dans un bloc qui entre par `fade-up` ; le périmètre / risque à côté reste
+ *    visible d'emblée ;
+ *  - les chiffres du groupe cascadent (`stagger` serré, 0,06 s, pour que chaque chiffre soit visible dès
+ *    que son compteur démarre) et comptent depuis 0 avec une durée proportionnelle à l'ordre de grandeur
+ *    (1,4 s pour 9,6 → 2,2 s pour 160 000) : les grands nombres finissent en dernier ;
+ *  - les logos de la gamme cascadent (`stagger`, pas de 0,08 s).
+ *  Jamais animés : la réserve AMF et sa RiskNote, le périmètre Trustpilot, le contre-poids des chiffres,
+ *  la source, le disclaimer de la gamme et le paragraphe équilibré sur la rémunération.
+ *  Cette section précède le rideau de 08-Risques : elle y est épinglée (pin, sans recul ni atténuation
+ *  puisqu'elle contient des [data-risk]) pendant que la section Risques monte par-dessus.
+ * Surtitre via SectionHeading (teal-200 sous l'ancêtre .text-white de la bande ink, AA). Dans la bande
+ * white, NoteRef reçoit tone="light" car l'ancêtre Section porte text-white.
+ * Notes (corum.notes, ordre de lecture) : cadre réglementaire (confiance-agrement), carte Société de gestion
+ * (item.noteId → corum-agrement), réserve visa (confiance-visa), avis (confiance-trustpilot), chiffres
+ * (confiance-chiffres), gamme (corum-gamme), rémunération (corum-compensation).
+ * Contenu : src/content/fr/trust.ts et src/content/fr/corum.ts.
+ */
+import Card from '@/components/ui/Card.astro';
+import Container from '@/components/ui/Container.astro';
+import NoteRef from '@/components/ui/NoteRef.astro';
+import RiskNote from '@/components/ui/RiskNote.astro';
+import Section from '@/components/ui/Section.astro';
+import SectionHeading from '@/components/ui/SectionHeading.astro';
+import Stat from '@/components/ui/Stat.astro';
+import { sections } from '@/config/sections';
+import { corum } from '@/content/fr/corum';
+import { trust } from '@/content/fr/trust';
+import { product } from '@/content/fr/facts';
+
+const id = sections.corum.id;
+const { amf, trustpilot, stats } = trust;
+
+/** Gamme en texte (décision du 09/09/2026 : seuls les logos R Start et CORUM L'Épargne sont utilisés sur le site). */
+const range = corum.range.scpiNames.map((name) => ({ name, current: name === product.name }));
+
+/** Décimales du compteur : 1 pour une valeur non entière (ex. 9,6), sinon aucune. */
+const decimalsOf = (n?: number): number | undefined => (n === undefined || Number.isInteger(n) ? undefined : 1);
+const hint = trustpilot.externalLinkHint;
+
+/** Décalage de cascade entre deux cartouches d'une même rangée du cadre réglementaire (secondes). */
+const AMF_STAGGER = 0.08;
+/** Cartouches par rangée sur lg (trois en col-span-2, puis deux en col-span-3). */
+const AMF_FIRST_ROW = 3;
+/** Délai d'une cartouche relatif à sa rangée lg : le premier de chaque rangée part sans délai. */
+const amfDelay = (i: number): number => (i < AMF_FIRST_ROW ? i : i - AMF_FIRST_ROW) * AMF_STAGGER;
+/** Compteur Trustpilot : départ à 0, 1,4 s (une décimale via decimalsOf). */
+const TRUSTPILOT_COUNTER = { from: 0, duration: 1.4 };
+/** Pas de cascade des quatre chiffres du groupe (secondes) : serré, les compteurs partent à 85 % du viewport. */
+const STATS_STAGGER = 0.06;
+/** Pas de cascade des logos de la gamme (secondes). */
+const LOGO_STAGGER = 0.08;
+/** Amplitude du fade-up d'un H3 suivi d'un paragraphe visible d'emblée (px), au lieu des 28 px d'un titre. */
+const QUIET_TITLE_Y = 12;
+/**
+ * Durée d'un compteur du groupe, proportionnelle à l'ordre de grandeur : 1,2 s + 0,2 s par puissance de
+ * dix (9,6 → 1,4 s ; 250 → 1,7 s ; 2 500 → 1,9 s ; 160 000 → 2,2 s). Les grands nombres finissent en dernier.
+ */
+const counterDuration = (n?: number): number | undefined =>
+  n === undefined ? undefined : Math.round((1.2 + 0.2 * Math.min(5, Math.log10(Math.abs(n) + 1))) * 100) / 100;
+---
+
+<Section id={id} tone="ink" spacing="none">
+  <!-- Bande ink : en-tête + cadre réglementaire -->
+  <div class="py-section">
+    <Container size="wide">
+      <SectionHeading id={id} eyebrow={trust.eyebrow} title={trust.title} intro={trust.intro} />
+
+      <div class="mt-16 lg:mt-24">
+        <h3 class="text-display-sm text-white" data-animate="fade-up">
+          {amf.title}
+          <NoteRef id="confiance-agrement" />
+        </h3>
+
+        <div class="mt-8 lg:mt-10">
+          <!-- Chaque cartouche se révèle à sa propre entrée dans le viewport, délai relatif à sa rangée lg (fond ink uni : pas de flou d'arrière-plan). -->
+          <dl data-advantage class="grid gap-4 sm:grid-cols-2 lg:grid-cols-6 lg:gap-6">
+            {
+              amf.items.map((item, i) => (
+                <div
+                  class:list={[
+                    'rounded-3xl border border-white/15 bg-white/10 p-6 sm:p-8',
+                    i < AMF_FIRST_ROW ? 'lg:col-span-2' : 'lg:col-span-3',
+                  ]}
+                  data-animate="fade-up"
+                  data-animate-y="28"
+                  data-animate-delay={String(amfDelay(i))}
+                >
+                  <dt class="text-eyebrow text-teal-200">{item.label}</dt>
+                  <!-- Même taille de texte (text-lead) que la réserve AMF et le RiskNote qui suivent. -->
+                  <dd class="mt-3 text-lead font-medium text-white">
+                    {item.value}
+                    {item.noteId && <NoteRef id={item.noteId} />}
+                  </dd>
+                </div>
+              ))
+            }
+          </dl>
+
+          <!-- Réserve AMF et contre-poids risque (text-lead comme les valeurs des cartes, jamais animés) -->
+          <div class="mt-6 rounded-3xl border border-white/25 bg-white/5 p-6 sm:p-8 lg:p-10">
+            <p class="text-lead text-white">
+              {amf.disclaimer}
+              <NoteRef id="confiance-visa" />
+            </p>
+            <RiskNote text={amf.risk} tone="dark" size="lead" class="mt-5" />
+          </div>
+        </div>
+      </div>
+    </Container>
+  </div>
+
+  <!-- Bande white : avis clients + groupe CORUM -->
+  <div class="bg-white py-section text-ink">
+    <Container size="wide">
+      <!-- Avis clients -->
+      <div class="grid gap-8 lg:grid-cols-12 lg:gap-16">
+        <h3 class="text-display-sm lg:col-span-12" data-animate="fade-up">
+          {trustpilot.title}
+          <NoteRef id="confiance-trustpilot" tone="light" />
+        </h3>
+        <!-- Le bloc note + lien entre en fade-up et la note compte de 0 à 4,5 ; le périmètre (RiskNote) à côté reste visible. -->
+        <div data-advantage class="lg:col-span-5" data-animate="fade-up">
+          <Stat
+            value={trustpilot.scoreLabel}
+            numeric={trustpilot.score}
+            decimals={decimalsOf(trustpilot.score)}
+            suffix={trustpilot.scoreSuffix}
+            from={TRUSTPILOT_COUNTER.from}
+            duration={TRUSTPILOT_COUNTER.duration}
+            label={`${trustpilot.reviewsLabel} ${trustpilot.dateLabel}`}
+          />
+          <a
+            href={trustpilot.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="mt-6 inline-flex items-center gap-2 text-base font-semibold text-teal-700 no-underline hover:text-navy hover:underline"
+          >
+            {trustpilot.linkLabel}
+            {hint && <span class="visually-hidden">({hint})</span>}
+            <svg aria-hidden="true" class="size-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M4 12 12 4M6 4h6v6" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+          </a>
+        </div>
+        <RiskNote text={trustpilot.scope} size="lead" class="lg:col-span-7 lg:self-center" />
+      </div>
+
+      <!-- Le groupe CORUM en chiffres -->
+      <div class="mt-16 border-t border-mist pt-16 lg:mt-24 lg:pt-24">
+        <h3 class="text-display-sm" data-animate="fade-up">
+          {stats.title}
+          <NoteRef id="confiance-chiffres" tone="light" />
+        </h3>
+        <!--
+          Grille 2 × 2 sur 8/12 : en 4 colonnes, « 160 000 » en text-stat déborde de sa cellule (texte dégradé
+          tronqué) ; sur 7/12, « 9,6 Md€ » (328 px à 1440 px) dépasse la cellule de 325 px et se replie sur deux lignes.
+        -->
+        <div class="mt-10 grid gap-10 lg:mt-12 lg:grid-cols-12 lg:gap-16">
+          <!-- Cascade serrée des quatre chiffres, chacun comptant depuis 0 avec une durée liée à son ordre de grandeur. -->
+          <ul
+            role="list"
+            data-advantage
+            class="grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:col-span-8"
+            data-animate="stagger"
+            data-animate-stagger={String(STATS_STAGGER)}
+          >
+            {
+              stats.items.map((s) => (
+                <li>
+                  <Stat
+                    value={s.value}
+                    numeric={s.numeric}
+                    decimals={decimalsOf(s.numeric)}
+                    suffix={s.suffix}
+                    from={s.numeric === undefined ? undefined : 0}
+                    duration={counterDuration(s.numeric)}
+                    label={s.label}
+                  />
+                </li>
+              ))
+            }
+          </ul>
+          <!-- Contre-poids lu en premier (text-lead comme les libellés de Stat), source ensuite, colonne centrée sur la grille. -->
+          <div class="lg:col-span-4 lg:self-center">
+            <RiskNote text={stats.risk} size="lead" />
+            <p class="text-caption mt-4 text-slate-700">{stats.source}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- La gamme -->
+      <div class="mt-16 grid gap-10 lg:mt-24 lg:grid-cols-12 lg:gap-16">
+        <div class="lg:col-span-5">
+          <!-- Titre suivi d'un paragraphe visible d'emblée : fade-up court pour ne pas chevaucher sa première ligne. -->
+          <h3 class="text-display-sm" data-animate="fade-up" data-animate-y={String(QUIET_TITLE_Y)}>
+            {corum.range.title}
+            <NoteRef id="corum-gamme" tone="light" />
+          </h3>
+          <p class="mt-4 text-lead">{corum.range.description}</p>
+        </div>
+        <div class="lg:col-span-7">
+          <ul role="list" class="grid grid-cols-2 gap-4 sm:grid-cols-3" data-animate="stagger" data-animate-stagger={String(LOGO_STAGGER)}>
+            {
+              range.map(({ name, current }) => (
+                <li
+                  class:list={[
+                    'flex min-h-24 items-center justify-center rounded-2xl border p-5 text-center text-lg font-semibold sm:p-6',
+                    current ? 'border-teal-400 bg-teal-100 text-navy' : 'border-mist bg-paper text-navy',
+                  ]}
+                  aria-current={current ? 'true' : undefined}
+                >
+                  {name}
+                </li>
+              ))
+            }
+          </ul>
+          <RiskNote text={corum.disclaimer} size="lead" class="mt-6" />
+        </div>
+      </div>
+
+      <!-- Rémunération de CORUM sur les ventes (paragraphe équilibré : avantage et effets de seuil, jamais animé ; seul le titre entre) -->
+      {
+        corum.alignmentTitle && (
+          <Card tone="paper" lift={false} class="mt-16 lg:mt-24 lg:p-12">
+            <h3 class="text-display-sm" data-animate="fade-up" data-animate-y={String(QUIET_TITLE_Y)}>
+              {corum.alignmentTitle}
+              <NoteRef id="corum-compensation" tone="light" />
+            </h3>
+            <p class="mt-4 max-w-4xl text-lead">{corum.intro}</p>
+          </Card>
+        )
+      }
+    </Container>
+  </div>
+</Section>

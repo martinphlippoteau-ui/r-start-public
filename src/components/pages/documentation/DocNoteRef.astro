@@ -1,0 +1,37 @@
+---
+/**
+ * Appel de note légale de la page /documentation : même rendu que ui/NoteRef.astro, mais numéroté
+ * d'après les notes propres à la page (documentation.notes, rendues par <LegalNotes notes={…} />) et non
+ * d'après le registre de l'accueil. Une note absente (ex. « documentation-dic » une fois le DIC publié)
+ * ne rend rien. Couleur : teal-700 par défaut, teal-200 sous un ancêtre `.text-white` (AA sur les deux).
+ * aria-label « Voir la note n » depuis nav.ts.
+ */
+import { sections } from '@/config/sections';
+import { notes } from '@/content/fr/documentation';
+import { nav } from '@/content/fr/nav';
+
+interface Props {
+  id: string;
+  /** Force la couleur ; sans valeur, elle suit le fond (ancêtre `.text-white` → teal-200). */
+  tone?: 'light' | 'dark';
+}
+const { id, tone } = Astro.props;
+const index = notes.findIndex((n) => n.id === id);
+const n = index === -1 ? null : index + 1;
+const label = nav.noteRefLabel && n !== null ? `${nav.noteRefLabel} ${n}` : undefined;
+const colors = {
+  auto: 'text-teal-700 in-[.text-white]:text-teal-200',
+  light: 'text-teal-700',
+  dark: 'text-teal-200',
+};
+---
+
+{
+  n !== null && (
+    <a
+      href={'#' + sections.notes.id + '-' + n}
+      class:list={['ml-0.5 align-super text-[0.65em] font-semibold no-underline hover:underline', colors[tone ?? 'auto']]}
+      aria-label={label}
+    >{n}</a>
+  )
+}

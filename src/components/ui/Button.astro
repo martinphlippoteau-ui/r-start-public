@@ -1,0 +1,57 @@
+---
+import { subscribeHref } from '@/config/site';
+import { withBase } from '@/lib/href';
+import type { CtaPosition } from '@/content/types';
+
+/**
+ * Bouton / lien. Sans `href`, c'est un CTA vers le tunnel de souscription :
+ * URL centralisée (config/site.ts), data-cta pour l'analytics, ouverture dans le même onglet.
+ * Variantes : primary (navy), secondary (contour navy, fond clair), ghost (texte), light (blanc,
+ * fond sombre), outline-light (contour blanc, fond sombre).
+ * Tailles : sm (40 px de haut, cible tactile minimale), md (48 px), lg (60 px).
+ * Micro-interactions (utilitaire `btn-motion`, global.css) : légère élévation + halo doux au survol,
+ * scale 0.98 à l'appui, 150-200 ms ; halo coloré par variante (`--btn-halo`) ; rien en reduced-motion.
+ */
+interface Props {
+  href?: string;
+  position?: CtaPosition;
+  variant?: 'primary' | 'secondary' | 'ghost' | 'light' | 'outline-light';
+  size?: 'sm' | 'md' | 'lg';
+  class?: string;
+  ariaLabel?: string;
+}
+const { href, position = 'hero', variant = 'primary', size = 'md', class: className = '', ariaLabel } = Astro.props;
+const isSubscribe = !href;
+// Un lien interne est préfixé par le chemin de base ; les ancres et les URL absolues passent telles
+// quelles. Sans `href`, c'est le tunnel de souscription (URL externe complète).
+const finalHref = href ? withBase(href) : subscribeHref(position);
+const variants = {
+  primary: 'bg-navy text-white hover:bg-teal-700 [--btn-halo:rgb(20_164_186/0.22)]',
+  // Contour navy à 60 % : ≥ 3:1 sur blanc (WCAG 1.4.11), le texte navy reste le repère principal.
+  secondary:
+    'border border-navy/60 text-navy hover:border-navy hover:bg-navy hover:text-white [--btn-halo:rgb(2_75_103/0.14)]',
+  ghost: 'text-navy hover:text-teal-700 underline-offset-4 hover:underline px-2',
+  light: 'bg-white text-navy hover:bg-teal-100 [--btn-halo:rgb(255_255_255/0.22)]',
+  'outline-light': 'border border-white/40 text-white hover:border-white hover:bg-white/10 [--btn-halo:rgb(255_255_255/0.16)]',
+};
+const sizes = { sm: 'px-4 py-2.5 text-sm', md: 'px-6 py-3 text-base', lg: 'px-8 py-4 text-lg' };
+---
+
+<a
+  href={finalHref}
+  class:list={[
+    'inline-flex items-center justify-center gap-2 rounded-full font-semibold no-underline',
+    // `btn-motion` définit sa propre transition (transform, ombre, couleurs) : ne pas la doubler par
+    // `transition-colors`, qui l'écraserait (même spécificité) et figerait l'élévation au survol.
+    variant === 'ghost' ? 'transition-colors duration-200' : 'btn-motion',
+    variants[variant],
+    variant !== 'ghost' && sizes[size],
+    className,
+  ]}
+  data-cta={isSubscribe ? 'souscrire' : undefined}
+  data-cta-position={isSubscribe ? position : undefined}
+  rel={isSubscribe ? 'noopener' : undefined}
+  aria-label={ariaLabel}
+>
+  <slot />
+</a>

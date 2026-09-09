@@ -1,0 +1,58 @@
+---
+/**
+ * Pages légales (/mentions-legales, /politique-de-confidentialite, /cookies) générées depuis
+ * src/content/fr/pages.ts (legalPages). Mise en page sobre : Header clair, fil d'Ariane, H1, sections H2.
+ * /cookies est en noindex (plan §7). Aucun texte en dur.
+ */
+import type { GetStaticPaths } from 'astro';
+import Base from '@/layouts/Base.astro';
+import Header from '@/components/Header.astro';
+import Footer from '@/components/Footer.astro';
+import Breadcrumb from '@/components/ui/Breadcrumb.astro';
+import Container from '@/components/ui/Container.astro';
+import { legalPages } from '@/content/fr/pages';
+import { consent } from '@/content/fr/consent';
+import { pages, type PageKey } from '@/config/pages';
+import { breadcrumbJsonLd, organizationJsonLd, webPageJsonLd } from '@/lib/seo';
+
+export const getStaticPaths = (() =>
+  legalPages.map((page) => ({ params: { slug: page.path.replace(/^\//, '') }, props: { page } }))) satisfies GetStaticPaths;
+
+const { page } = Astro.props;
+const pageKey = ((Object.keys(pages) as PageKey[]).find((k) => pages[k].path === page.path) ?? 'legal') as PageKey;
+const noindex = pageKey === 'cookies';
+const jsonLd = [
+  organizationJsonLd(),
+  webPageJsonLd({ path: page.path, title: page.title, description: page.description }),
+  breadcrumbJsonLd(pageKey),
+];
+---
+
+<Base title={page.title} description={page.description} path={page.path} noindex={noindex} jsonLd={jsonLd}>
+  <Header tone="light" />
+  <main id="contenu" class="bg-paper">
+    <Container size="narrow" class="py-10 sm:py-14">
+      <Breadcrumb key={pageKey} tone="light" />
+      <h1 class="text-display-md mt-8">{page.title}</h1>
+      <p class="text-lead mt-4 text-slate-700">{page.description}</p>
+      <div class="mt-12 space-y-12">
+        {page.sections.map((section) => (
+          <section aria-labelledby={'s-' + section.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}>
+            <h2 id={'s-' + section.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')} class="text-display-sm">{section.title}</h2>
+            <div class="mt-4 space-y-4 text-base leading-relaxed">
+              {section.paragraphs.map((p) => <p>{p}</p>)}
+            </div>
+          </section>
+        ))}
+      </div>
+      {pageKey === 'cookies' && (
+        <p class="mt-12">
+          <button type="button" data-consent-open class="rounded-full border border-navy px-5 py-2.5 text-sm font-semibold text-navy transition hover:bg-navy hover:text-white">
+            {consent.manageLabel}
+          </button>
+        </p>
+      )}
+    </Container>
+  </main>
+  <Footer />
+</Base>

@@ -1,0 +1,179 @@
+---
+/**
+ * Sous-navigation locale sticky (façon « iPhone 17 Pro | Aperçu · Caractéristiques · Acheter »).
+ * Placée juste après le hero dans la page : elle apparaît naturellement une fois le hero passé.
+ * Sticky en CSS pur ; l'état actif est calculé par un IntersectionObserver (script de composant).
+ * Sous « sm », la marque (déjà portée par le logo du header et le H1) est masquée pour laisser
+ * toute la largeur à la liste des sections, qui défile horizontalement jusqu'au bord gauche de
+ * l'écran (marge du Container compensée) avec des espacements resserrés. La liste garde une marge
+ * interne (compensée en négatif) pour que l'anneau de focus des liens ne soit pas rogné par son
+ * `overflow`. Le CTA utilise le libellé court `nav.subnavCtaLabel` (« Souscrire ») pour que quatre
+ * entrées de la liste restent visibles à 375 px ; à défaut, `nav.cta.label`.
+ * Motion : barre de progression de lecture (`data-progress`, 2 px, scaleX piloté par le moteur sur
+ * <main>), indicateur actif « pill » (`data-subnav-pill`, positionné par le script ci-dessous ;
+ * transitions CSS sur transform et width : elle glisse et se morphe à la largeur du lien, et apparaît
+ * sur place, sans glisser depuis le bord, la première fois), CTA compacté après 40 % de la page
+ * (`data-compact-at` → attribut `data-compact` → `transform: scale(0.92)` : aucune propriété de mise
+ * en page animée). Tout est neutre en reduced-motion (barre masquée, transitions coupées, CTA inchangé).
+ * Entrées : sections `inNav` de src/config/sections.ts ; textes : src/content/fr/nav.ts.
+ */
+import { Image } from 'astro:assets';
+import brandLogo from '@/assets/logos/r-start-couleur.svg';
+import Button from '@/components/ui/Button.astro';
+import Container from '@/components/ui/Container.astro';
+import { navSections, sections } from '@/config/sections';
+import { nav } from '@/content/fr/nav';
+---
+
+<nav
+  aria-label={nav.sectionsLabel ?? nav.brand}
+  data-subnav
+  data-compact-at="0.4"
+  class="surface-glass sticky top-0 z-40 border-b border-navy/10 transition-shadow duration-300 data-[stuck]:shadow-nav"
+>
+  <Container size="wide" class="flex h-subnav items-center gap-2 sm:gap-8">
+    <a
+      href={'#' + sections.hero.id}
+      class="hidden shrink-0 no-underline sm:block"
+      aria-label={nav.homeLinkLabel ?? nav.brand}
+    >
+      <Image
+        src={brandLogo}
+        alt={nav.brand}
+        width={290}
+        height={89}
+        loading="eager"
+        decoding="async"
+        data-brand-target
+        class="h-7 w-auto"
+      />
+    </a>
+    <ul
+      data-subnav-list
+      class="scrollbar-none scroll-fade-x relative -my-2 -ml-5 -mr-2 flex min-w-0 flex-1 items-center gap-0.5 overflow-x-auto py-2 pr-2 pl-5 sm:-mx-2 sm:justify-end sm:gap-1 sm:px-2"
+      role="list"
+    >
+      <li aria-hidden="true" data-subnav-pill class="subnav-pill"></li>
+      {
+        navSections.map((s) => (
+          <li class="relative shrink-0">
+            <a
+              href={'#' + s.id}
+              data-subnav-link={s.id}
+              class="block rounded-full px-2 py-1.5 text-sm text-slate-700 no-underline transition-colors hover:text-navy aria-[current]:font-semibold aria-[current]:text-navy sm:px-3"
+            >
+              {s.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+    <Button position="nav" variant="primary" size="sm" class="subnav-cta shrink-0 max-sm:px-3">
+      {nav.subnavCtaLabel ?? nav.cta.label}
+    </Button>
+  </Container>
+  <span aria-hidden="true" data-progress class="bg-brand-gradient pointer-events-none absolute inset-x-0 bottom-[-1px] h-[2px] origin-left scale-x-0"
+  ></span>
+</nav>
+
+<script>
+  /* État actif : la section qui traverse le tiers supérieur du viewport. */
+  const nav = document.querySelector<HTMLElement>('[data-subnav]');
+  if (nav) {
+    const links = Array.from(nav.querySelectorAll<HTMLAnchorElement>('[data-subnav-link]'));
+    const list = nav.querySelector<HTMLElement>('[data-subnav-list]');
+    const pill = nav.querySelector<HTMLElement>('[data-subnav-pill]');
+    const byId = new Map(links.map((l) => [l.dataset.subnavLink as string, l]));
+    let current: string | null = null;
+
+    /* Pill glissante : position et taille du lien actif (lectures groupées, puis écritures). */
+    const placePill = () => {
+      if (!pill) return;
+      const active = current ? byId.get(current) : null;
+      if (!active) {
+        pill.style.opacity = '0';
+        return;
+      }
+      const item = active.parentElement as HTMLElement;
+      const { offsetLeft, offsetTop, offsetWidth, offsetHeight } = item;
+      // Première apparition (ou retour après disparition) : placée sans transition de position/largeur,
+      // seul le fondu joue ; ensuite elle glisse et se morphe d'un lien à l'autre.
+      const appearing = pill.style.opacity !== '1';
+      if (appearing) pill.style.transitionProperty = 'opacity';
+      pill.style.width = offsetWidth + 'px';
+      pill.style.height = offsetHeight + 'px';
+      pill.style.top = offsetTop + 'px';
+      pill.style.transform = `translateX(${offsetLeft}px)`;
+      pill.style.opacity = '1';
+      if (appearing) {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            pill.style.transitionProperty = '';
+          });
+        });
+      }
+    };
+
+    const setActive = (id: string | null) => {
+      if (id === current) return;
+      current = id;
+      for (const l of links) {
+        if (l.dataset.subnavLink === id) l.setAttribute('aria-current', 'location');
+        else l.removeAttribute('aria-current');
+      }
+      placePill();
+      // Sur mobile, centre le lien actif dans la liste (défilement horizontal de la liste seule,
+      // jamais de la page).
+      const active = id ? byId.get(id) : null;
+      if (active && list && list.scrollWidth > list.clientWidth) {
+        const left = active.offsetLeft - (list.clientWidth - active.offsetWidth) / 2;
+        list.scrollTo({ left: Math.max(0, left), behavior: 'smooth' });
+      }
+    };
+
+    const targets = links
+      .map((l) => document.getElementById(l.dataset.subnavLink as string))
+      .filter((el): el is HTMLElement => el !== null);
+
+    if ('IntersectionObserver' in window && targets.length) {
+      const visible = new Map<string, number>();
+      const io = new IntersectionObserver(
+        (entries) => {
+          for (const e of entries) {
+            if (e.isIntersecting) visible.set(e.target.id, e.intersectionRatio);
+            else visible.delete(e.target.id);
+          }
+          // Parmi les sections présentes dans la bande, la première dans l'ordre du document ;
+          // aucune section navigable à l'écran (hero, sections hors nav, notes, pied de page) → aucun
+          // lien actif.
+          const first = targets.find((t) => visible.has(t.id));
+          setActive(first ? first.id : null);
+        },
+        { rootMargin: '-25% 0px -60% 0px', threshold: [0, 0.01, 0.25, 0.5, 1] },
+      );
+      targets.forEach((t) => io.observe(t));
+    }
+
+    // Ombre portée une fois collée en haut (sentinelle : le nav lui-même à top:-1px).
+    if ('IntersectionObserver' in window) {
+      const stuck = new IntersectionObserver(
+        ([e]) => {
+          if (!e) return;
+          if (e.intersectionRatio < 1 && e.boundingClientRect.top <= 0) nav.setAttribute('data-stuck', '');
+          else nav.removeAttribute('data-stuck');
+        },
+        { threshold: [1], rootMargin: '-1px 0px 0px 0px' },
+      );
+      stuck.observe(nav);
+    }
+
+    // La pill suit le lien actif quand la largeur change (polices, rotation, redimensionnement).
+    let raf = 0;
+    const replace = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(placePill);
+    };
+    window.addEventListener('resize', replace, { passive: true });
+    document.fonts?.ready.then(replace);
+  }
+</script>

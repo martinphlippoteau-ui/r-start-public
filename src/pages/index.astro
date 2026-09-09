@@ -1,0 +1,47 @@
+---
+/**
+ * Page d'accueil : Header → main#contenu (Hero, SubNav sticky, sections 02-10, Notes) → Footer.
+ * Les sections sont assemblées automatiquement depuis src/components/sections/NN-Nom.astro, dans l'ordre
+ * des préfixes numériques (contrat : src/config/sections.ts). Métadonnées et JSON-LD depuis seo.ts,
+ * legal.ts, facts.ts et faq.ts via src/lib/seo.ts (rien en dur).
+ * Le visuel du hero (LCP) est préchargé avec exactement le srcset/sizes de sa balise <img>.
+ */
+import { getImage } from 'astro:assets';
+import Base from '@/layouts/Base.astro';
+import Header from '@/components/Header.astro';
+import SubNav from '@/components/SubNav.astro';
+import LegalNotes from '@/components/LegalNotes.astro';
+import Footer from '@/components/Footer.astro';
+import { seo } from '@/content/fr/seo';
+import { faq } from '@/content/fr/faq';
+import { faqJsonLd, organizationJsonLd, webPageJsonLd } from '@/lib/seo';
+import { heroImageFormat, heroImageSizes, heroImageWidths, loadHeroImage } from '@/lib/hero-image';
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const modules = import.meta.glob<{ default: any }>('/src/components/sections/*.astro', { eager: true });
+const all = Object.entries(modules)
+  .sort(([a], [b]) => a.localeCompare(b))
+  .map(([path, mod]) => ({ path, Component: mod.default }));
+const hero = all.find((s) => /\/01-/.test(s.path));
+const rest = all.filter((s) => s !== hero);
+
+const heroLcp = await getImage({ src: await loadHeroImage(), widths: heroImageWidths, format: heroImageFormat });
+
+const jsonLd = [
+  organizationJsonLd(),
+  webPageJsonLd({ path: '/', title: seo.title, description: seo.description, keywords: seo.keywords }),
+  faqJsonLd(faq.items),
+];
+---
+
+<Base title={seo.title} description={seo.description} path="/" ogImageAlt={seo.ogImageAlt} jsonLd={jsonLd}>
+  <link slot="head" rel="preload" as="image" imagesrcset={heroLcp.srcSet.attribute} imagesizes={heroImageSizes} fetchpriority="high" />
+  <Header tone="dark" />
+  <main id="contenu">
+    {hero && <hero.Component />}
+    <SubNav />
+    {rest.map(({ Component }) => <Component />)}
+    <LegalNotes />
+  </main>
+  <Footer />
+</Base>

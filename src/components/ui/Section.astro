@@ -1,0 +1,35 @@
+---
+/**
+ * Enveloppe standard d'une section de la page : ancre, data-section (analytics), rythme vertical.
+ * tone : 'paper' (clair), 'white', 'ink' (sombre), 'brand' (dégradé).
+ * spacing : 'default' (py-section), 'compact' (py-section-sm), 'none' (la section gère ses marges).
+ * Les attributs `data-*` sont transmis à la balise <section> (vocabulaire motion : data-in-view,
+ * data-curtain, data-scene…).
+ */
+interface Props {
+  id: string;
+  tone?: 'paper' | 'white' | 'ink' | 'brand';
+  spacing?: 'default' | 'compact' | 'none';
+  class?: string;
+  labelledBy?: string;
+  [key: `data-${string}`]: string | undefined;
+}
+const { id, tone = 'paper', spacing = 'default', class: className = '', labelledBy, ...rest } = Astro.props;
+const tones = {
+  paper: 'bg-paper text-ink',
+  white: 'bg-white text-ink',
+  ink: 'bg-ink text-white',
+  brand: 'bg-brand-gradient-dark text-white',
+};
+const spacings = { default: 'py-section', compact: 'py-section-sm', none: '' };
+---
+
+<section
+  id={id}
+  data-section={id}
+  aria-labelledby={labelledBy ?? id + '-title'}
+  class:list={['relative', spacings[spacing], tones[tone], className]}
+  {...rest}
+>
+  <slot />
+</section>

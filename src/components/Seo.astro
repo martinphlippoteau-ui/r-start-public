@@ -1,0 +1,56 @@
+---
+import { site } from '@/config/site';
+import { withBase } from '@/lib/href';
+import { PUBLIC_NOINDEX } from 'astro:env/client';
+
+/** Prévisualisation : aucune page n'est indexable, quelle que soit la valeur passée par la page. */
+const preview = PUBLIC_NOINDEX === 'true';
+
+interface Props {
+  title: string;
+  description: string;
+  /** Chemin canonique (ex. "/"). Par défaut : chemin courant. */
+  path?: string;
+  noindex?: boolean;
+  ogImage?: string;
+  ogImageAlt?: string;
+  type?: 'website' | 'article';
+}
+
+const {
+  title,
+  description,
+  path = Astro.url.pathname,
+  noindex = false,
+  ogImage = site.ogImagePath,
+  ogImageAlt = site.name + ' — ' + site.publisher,
+  type = 'website',
+} = Astro.props;
+
+const canonical = new URL(withBase(path), site.url + '/').toString().replace(/\/$/, '') || site.url;
+const ogImageUrl = new URL(withBase(ogImage), site.url + '/').toString();
+---
+
+<title>{title}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+<link rel="alternate" hreflang="fr" href={canonical} />
+<link rel="alternate" hreflang="x-default" href={canonical} />
+<meta name="robots" content={noindex || preview ? 'noindex, nofollow' : 'index, follow, max-image-preview:large'} />
+
+<meta property="og:type" content={type} />
+<meta property="og:site_name" content={site.name} />
+<meta property="og:locale" content={site.locale} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:image" content={ogImageUrl} />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content={ogImageAlt} />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={ogImageUrl} />
+<meta name="twitter:image:alt" content={ogImageAlt} />

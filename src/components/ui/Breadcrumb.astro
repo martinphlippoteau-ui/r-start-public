@@ -1,0 +1,48 @@
+---
+/**
+ * Fil d'Ariane d'une sous-page : Accueil › Page (src/config/pages.ts → breadcrumb(key)).
+ * Liste ordonnée dans un <nav aria-label> (libellé : nav.breadcrumbLabel) ; la page courante porte
+ * aria-current="page" et n'est pas un lien. Le séparateur est décoratif (aria-hidden).
+ * Le JSON-LD BreadcrumbList correspondant vient de src/lib/seo.ts (breadcrumbJsonLd).
+ */
+import { breadcrumb, type PageKey } from '@/config/pages';
+import { nav } from '@/content/fr/nav';
+import { withBase } from '@/lib/href';
+
+interface Props {
+  key: PageKey;
+  tone?: 'dark' | 'light';
+  class?: string;
+}
+const { key, tone = 'dark', class: className = '' } = Astro.props;
+const items = breadcrumb(key);
+const dark = tone === 'dark';
+---
+
+<nav aria-label={nav.breadcrumbLabel ?? nav.brand} class:list={['text-sm', dark ? 'text-white/85' : 'text-slate-700', className]}>
+  <ol class="flex flex-wrap items-center gap-x-2 gap-y-1" role="list">
+    {
+      items.map((p, i) => {
+        const last = i === items.length - 1;
+        return (
+          <li class="flex items-center gap-x-2">
+            {last ? (
+              <span aria-current="page" class:list={['font-semibold', dark ? 'text-white' : 'text-navy']}>
+                {p.label}
+              </span>
+            ) : (
+              <a href={withBase(p.path)} class:list={['nav-link', dark ? 'hover:text-white' : 'hover:text-navy']}>
+                {p.label}
+              </a>
+            )}
+            {!last && (
+              <svg aria-hidden="true" class="size-3.5 opacity-70" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M6 3.5 10.5 8 6 12.5" stroke-linecap="round" stroke-linejoin="round"></path>
+              </svg>
+            )}
+          </li>
+        );
+      })
+    }
+  </ol>
+</nav>

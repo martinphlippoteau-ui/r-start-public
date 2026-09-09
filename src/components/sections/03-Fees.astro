@@ -1,0 +1,275 @@
+---
+/**
+ * Section 3 — Frais en bref (id « frais »). Fond paper (alternance avec Points forts, blanc, et
+ * Stratégie, ink). Version « chapitre » de la page /frais.
+ * 1. Scène épinglée (data-scene, fin à +110 % du viewport : les quatre entrées restent lisibles à
+ *    scrub 0,6 sans que le cadre paraisse creux, départ sous la sous-nav sticky) :
+ *    les trois « 0 % » (text-stat en navy uni, AA sur paper) sont chacun un [data-step][data-step-stay]
+ *    et arrivent un à un au fil du défilement, le premier visible d'emblée — son chiffre reçoit un simple
+ *    accent d'échelle à l'entrée (span inline-block data-animate="scale" : opacité + scale 0,95, 0,8 s).
+ *    JAMAIS de compteur sur un taux réglementaire qui partirait d'une valeur fausse (un « 10 % » lisible
+ *    à l'écran serait une information inexacte et suggérerait une comparaison non sourcée) ; puis un
+ *    quatrième step (data-step-stay, aria-hidden : données du barème répétées, purement décoratives,
+ *    marge resserrée sous les 0 % pour que le cadre épinglé soit rempli dès le premier step) fait
+ *    « basculer » vers le contre-poids : 15 % de gestion, commission sur les cessions, commission de
+ *    retrait. Le vrai contre-poids — avantage (data-advantage,
+ *    qui porte l'appel de la note « incidence des coûts du DIC ») + RiskNote, même taille (text-lead) —
+ *    est HORS des steps, dans la scène : visible du premier au dernier instant, à côté de chaque avantage
+ *    (aucun step ne contient de [data-risk] ; le moteur refuserait de l'animer). Les steps ne sont pas
+ *    superposés (pas de `scene-stack`) : ils gardent leur place en flux, la scène tient dans un viewport
+ *    à 375 × 812 comme à 1440 × 900 (trois colonnes dès le mobile ; sous 640 px, assiette en text-sm et
+ *    contre-poids — avantage ET risque, toujours la même taille — en text-base). Départ du pin sous la
+ *    sous-nav sticky (3,5 rem) : data-scene-start="top 72px" (ScrollTrigger ne lit pas les rem).
+ *    Sans JS / reduced-motion : aucun pin, tout est visible et statique.
+ * 2. Tableau compact du barème complet, groupé par nature de frais (FeeRow.kind → libellé de groupe) :
+ *    caption visible, th scope="col" / scope="rowgroup" ; une ligne par frais (libellé, assiette, taux :
+ *    le texte long `FeeRow.detail` est réservé à la page /frais) ; l'assiette rejoint la première colonne
+ *    sur mobile, le taux ne se coupe jamais (`valueShort` sous 640 px quand le contenu en fournit une).
+ *    Révélation ligne par ligne : data-animate="stagger" sur chaque tbody (aucune ligne ne contient
+ *    d'avertissement ; si c'était le cas, le moteur la laisserait visible).
+ * 3. Frise de la commission de retrait dégressive : barre décorative qui court de gauche à droite à
+ *    l'entrée (data-draw="width", révélation unique : scaleX 0 → 1, 1,2 s expo.out à 85 % du viewport)
+ *    dans le même mouvement que l'ol de cinq paliers en grille (deux colonnes sur mobile, le dernier
+ *    palier en pleine largeur ; cinq colonnes dès 640 px — aucun défilement, donc rien à rendre
+ *    focalisable) en cascade (data-animate="stagger" 0,09 s ≈ 0,45 s : un seul rythme pour la
+ *    composition, la barre n'étant pas alignée sur les colonnes des paliers), chiffres en navy uni,
+ *    suivie du rappel « rachat non garanti » en RiskNote (jamais animé).
+ * 4. Encadré « Une innovation, pas une révolution » (Card blanche, jamais animé) et les trois puces de la
+ *    commission d'arbitrage (liste, jamais animées), reproduits à l'identique depuis legal.ts.
+ * 5. Précision HT = TTC (corps de texte, statique), CTA tunnel (position « frais ») et lien vers la page
+ *    /frais, rendu uniquement lorsque src/pages/frais.astro existe (vérification au build : pas de lien
+ *    mort tant que la page n'est pas livrée).
+ * L'en-tête est rendu ici (surtitre en teal-700, AA sur paper ; H2 mot à mot via data-reveal-text) plutôt
+ * que par SectionHeading. Les appels de note des lignes du tableau viennent du contenu (row.noteId).
+ * Chaque <NoteRef> est collé à son mot et enveloppé dans un span `whitespace-nowrap` : le gabarit de
+ * NoteRef émet un blanc avant le numéro, qui sinon peut passer seul à la ligne (ex. légende du tableau à
+ * 375 px).
+ * Contenu : src/content/fr/fees.ts.
+ */
+import Button from '@/components/ui/Button.astro';
+import Card from '@/components/ui/Card.astro';
+import Container from '@/components/ui/Container.astro';
+import NoteRef from '@/components/ui/NoteRef.astro';
+import RiskNote from '@/components/ui/RiskNote.astro';
+import Section from '@/components/ui/Section.astro';
+import { sections } from '@/config/sections';
+import { fees } from '@/content/fr/fees';
+import type { FeeKind, FeeRow } from '@/content/types';
+
+const id = sections.fees.id;
+const titleId = id + '-title';
+const { zeroHighlights, counterweight, table, withdrawal, innovationBox, arbitrageWarning } = fees;
+
+/** Lignes du barème regroupées par nature de frais, dans l'ordre d'apparition des `kind`. */
+const groups = fees.rows.reduce<{ kind: FeeKind; rows: FeeRow[] }[]>((acc, row) => {
+  const group = acc.find((g) => g.kind === row.kind);
+  if (group) group.rows.push(row);
+  else acc.push({ kind: row.kind, rows: [row] });
+  return acc;
+}, []);
+
+/**
+ * Contre-poids décoratif de la scène : les frais non nuls perçus après l'entrée (gestion, cessions,
+ * retrait), lus dans le barème — données répétées (le contre-poids réel est le texte qui suit), donc
+ * aria-hidden.
+ */
+const isZero = (value: string): boolean => /^0\s*%$/.test(value);
+const counterRows = fees.rows.filter((row) => row.kind !== 'entree' && row.kind !== 'investissement' && !isZero(row.value));
+
+/** Frise de retrait : le dernier palier (0 %) est mis en avant. */
+const lastStep = withdrawal.steps.length - 1;
+
+/**
+ * Le lien « Tous les frais en détail » n'est rendu que si la page /frais existe (src/pages/frais.astro,
+ * livrée par un autre sous-lot) : la liste des fichiers est résolue au build, sans import.
+ */
+const feesPageExists = Object.keys(import.meta.glob('/src/pages/frais.astro')).length > 0;
+const detailsLink = feesPageExists ? fees.detailsLink : undefined;
+---
+
+<Section id={id} tone="paper">
+  <Container size="wide">
+    <header class="max-w-4xl">
+      <p data-animate="fade-up" class="text-eyebrow mb-4 text-teal-700">{fees.eyebrow}</p>
+      <h2 id={titleId} class="text-display-lg" data-reveal-text>{fees.title}</h2>
+      <p data-animate="fade-up" data-animate-delay="0.15" class="mt-6 text-lead opacity-90">{fees.intro}</p>
+    </header>
+
+    <!-- Scène épinglée : les trois 0 %, un à un, puis leur contre-poids — RiskNote hors des steps, toujours visible -->
+    <div data-scene data-scene-start="top 72px" data-scene-end="+=110%" class="mt-12 sm:mt-16 lg:mt-24">
+      <ul
+        role="list"
+        aria-label={fees.zeroHighlightsLabel}
+        class="grid grid-cols-3 gap-3 sm:gap-8 lg:gap-12"
+      >
+        {
+          zeroHighlights.map((item, i) => (
+            <li data-step data-step-stay class="flex flex-col gap-1.5 border-t border-navy/15 pt-3 sm:gap-3 sm:pt-8">
+              <p class="flex flex-col gap-1.5 sm:gap-3">
+                <span class="text-stat text-navy">
+                  {/* Premier chiffre : accent d'échelle seulement (inline-block : une transform ne s'applique pas à un inline) ; valeur statique, jamais de compteur */}
+                  {i === 0 ? (
+                    <span data-animate="scale" class="inline-block">
+                      {item.value}
+                    </span>
+                  ) : (
+                    item.value
+                  )}
+                </span>
+                <span class="text-base leading-snug font-medium text-ink sm:text-lead">{item.label}</span>
+              </p>
+              <p class="text-sm leading-snug text-slate-700 sm:text-base sm:leading-relaxed">{item.base}</p>
+            </li>
+          ))
+        }
+      </ul>
+
+      <ul data-step data-step-stay aria-hidden="true" class="mt-4 grid grid-cols-3 gap-3 sm:mt-6 sm:gap-8 lg:mt-8 lg:gap-12">
+        {
+          counterRows.map((row) => (
+            <li class="flex flex-col gap-1 border-t border-coral/40 pt-2 sm:gap-2 sm:pt-5">
+              <span class="text-display-sm text-coral-700 tabular-nums">
+                {row.valueShort ? (
+                  <>
+                    <span class="sm:hidden">{row.valueShort}</span>
+                    <span class="hidden sm:inline">{row.value}</span>
+                  </>
+                ) : (
+                  row.value
+                )}
+              </span>
+              <span class="text-caption leading-snug text-slate-700">{row.label}</span>
+            </li>
+          ))
+        }
+      </ul>
+
+      <div class="mt-4 grid gap-3 border-t border-navy/15 pt-4 sm:mt-10 sm:gap-6 sm:pt-8 lg:mt-14 lg:grid-cols-2 lg:gap-12 lg:pt-10">
+        <p data-advantage class="text-lead max-sm:text-base">
+          {counterweight.advantage}<span class="whitespace-nowrap"><NoteRef id="frais-incidence-dic" /></span>
+        </p>
+        <RiskNote text={counterweight.risk} size="lead" class="max-sm:text-base" />
+      </div>
+    </div>
+
+    <!-- Barème complet -->
+    {
+      table && (
+        <div class="mt-section-sm">
+          <table class="w-full border-collapse text-left">
+            <caption data-animate="fade-up" class="text-display-sm mb-6 text-left text-ink sm:mb-8">
+              {table.caption}<span class="whitespace-nowrap"><NoteRef id="frais-sources" /></span>
+            </caption>
+            <thead>
+              <tr class="border-b border-navy/20 text-caption font-semibold uppercase tracking-[0.12em] text-slate-700">
+                <th scope="col" class="py-3 pr-4">
+                  {table.columns.fee}
+                </th>
+                <th scope="col" class="hidden py-3 pr-4 sm:table-cell">
+                  {table.columns.base}
+                </th>
+                <th scope="col" class="py-3 text-right">
+                  {table.columns.value}
+                </th>
+              </tr>
+            </thead>
+            {groups.map((group) => (
+              <tbody class="border-b border-navy/10" data-animate="stagger" data-animate-stagger="0.08" data-animate-y="14">
+                <tr>
+                  <th scope="rowgroup" colspan="3" class="pt-7 pb-2 text-eyebrow text-teal-700">
+                    {table.groups[group.kind]}
+                  </th>
+                </tr>
+                {group.rows.map((row) => (
+                  <tr class="border-t border-navy/10 align-top">
+                    <th scope="row" class="py-4 pr-4 font-normal sm:py-5">
+                      <span class="block text-base font-semibold text-ink sm:text-xl">
+                        {row.label}{row.noteId && <span class="whitespace-nowrap"><NoteRef id={row.noteId} /></span>}
+                      </span>
+                      <span class="mt-1 block text-base leading-relaxed text-slate-700 sm:hidden">{row.base}</span>
+                    </th>
+                    <td class="hidden py-4 pr-4 text-base text-slate-700 sm:table-cell sm:py-5 lg:w-72">{row.base}</td>
+                    <td class="py-4 pl-3 text-right text-lg leading-tight font-bold tracking-tight whitespace-nowrap text-navy tabular-nums max-sm:w-[7.25rem] sm:py-5 sm:text-3xl">
+                      {row.valueShort ? (
+                        <>
+                          <span class="sm:hidden">{row.valueShort}</span>
+                          <span class="hidden sm:inline">{row.value}</span>
+                        </>
+                      ) : (
+                        row.value
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            ))}
+          </table>
+        </div>
+      )
+    }
+
+    <!-- Commission de retrait dégressive -->
+    <div class="mt-section-sm">
+      <h3 class="text-display-sm" data-reveal-text>{withdrawal.title}</h3>
+      <p class="text-lead mt-4 max-w-3xl" data-animate="fade-up">{withdrawal.intro}</p>
+      <div aria-hidden="true" class="mt-10 h-1.5 rounded-full bg-gradient-to-r from-coral via-teal-500 to-navy" data-draw="width"></div>
+      <ol
+        aria-label={withdrawal.stepsLabel}
+        class="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-5 sm:gap-5 lg:gap-6"
+        data-animate="stagger"
+        data-animate-stagger="0.09"
+      >
+        {
+          withdrawal.steps.map((step, i) => {
+            const last = i === lastStep;
+            return (
+              <li
+                class:list={[
+                  'flex flex-col justify-between gap-6 rounded-3xl p-6 lg:p-8',
+                  last ? 'bg-navy text-white shadow-float max-sm:col-span-2' : 'bg-white text-ink shadow-card',
+                ]}
+              >
+                <span class:list={['text-display-md tabular-nums', last ? 'text-sand' : 'text-navy']}>{step.rate}</span>
+                <span class:list={['text-base leading-snug font-medium', last ? 'text-white' : 'text-ink']}>{step.period}</span>
+              </li>
+            );
+          })
+        }
+      </ol>
+      <RiskNote text={withdrawal.note} size="lead" class="mt-10 max-w-4xl" />
+    </div>
+
+    <!-- Encadré et avertissement (jamais animés) -->
+    <div class="mt-section-sm grid gap-6 lg:grid-cols-2">
+      <Card class="lg:p-10">
+        <h3 class="text-display-sm">{innovationBox.title}</h3>
+        <RiskNote text={innovationBox.body} size="lead" class="mt-5" />
+      </Card>
+      <Card class="lg:p-10">
+        <p class="text-lead font-medium">
+          {arbitrageWarning.title}<span class="whitespace-nowrap"><NoteRef id="frais-commission-arbitrage" /></span>
+        </p>
+        <ul class="mt-5 list-disc space-y-4 pl-6 text-lead marker:text-coral">
+          {arbitrageWarning.bullets.map((bullet) => <li class="pl-1">{bullet}</li>)}
+        </ul>
+      </Card>
+    </div>
+
+    <!-- HT = TTC, CTA et lien vers la page Frais -->
+    <div class="mt-12 flex flex-col gap-8 border-t border-navy/15 pt-8 lg:mt-16 lg:flex-row lg:items-end lg:justify-between lg:gap-12">
+      <p class="max-w-2xl text-base leading-relaxed text-slate-700">
+        {fees.htNote}<span class="whitespace-nowrap"><NoteRef id="frais-ht" /></span>
+      </p>
+      <div class="flex flex-wrap items-center gap-3 sm:gap-4" data-animate="fade-up">
+        <Button position={fees.cta.position} size="lg">{fees.cta.label}</Button>
+        {
+          detailsLink && (
+            <Button href={detailsLink.href} variant="secondary" size="lg">
+              {detailsLink.label}
+            </Button>
+          )
+        }
+      </div>
+    </div>
+  </Container>
+</Section>

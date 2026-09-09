@@ -1,0 +1,21 @@
+---
+import RiskNote from './RiskNote.astro';
+/**
+ * Paire avantage / risque : l'avantage et son contre-poids sont rendus dans le même bloc,
+ * avec la même taille de texte. `advantage` est marqué data-advantage pour le contrôle automatisé.
+ */
+interface Props {
+  advantage: string;
+  risk: string;
+  class?: string;
+  tone?: 'light' | 'dark';
+  /** Taille du texte des deux membres de la paire (identique par construction). */
+  size?: 'base' | 'lead';
+}
+const { advantage, risk, class: className = '', tone = 'light', size = 'base' } = Astro.props;
+---
+
+<div class:list={['space-y-3', className]}>
+  <p data-advantage class:list={[size === 'lead' ? 'text-lead' : 'text-base', 'leading-relaxed']}>{advantage}</p>
+  <RiskNote text={risk} {tone} {size} />
+</div>

@@ -1,0 +1,53 @@
+---
+/**
+ * Page /presse — Espace presse : Header (tone dark, posé sur le PageHero sombre) → main#contenu
+ * (PageHero avec le fil d'Ariane dans son slot, ligne risques visible sans scroller → Communiqués →
+ * Revue de presse → Contacts presse → Kit média → Notes propres à la page) → Footer.
+ * Métadonnées (title, description, canonical) depuis press.seo, chemin depuis src/config/pages.ts ;
+ * JSON-LD Organization + WebPage + BreadcrumbList via src/lib/seo.ts. Aucun texte en dur.
+ * Le fil d'Ariane est décalé sous le Header absolu (h-16 / h-20) : le PageHero, calibré pour un
+ * Header dans le flux, ne réserve pas cet espace.
+ */
+import Base from '@/layouts/Base.astro';
+import Header from '@/components/Header.astro';
+import Footer from '@/components/Footer.astro';
+import LegalNotes from '@/components/LegalNotes.astro';
+import Breadcrumb from '@/components/ui/Breadcrumb.astro';
+import PageHero from '@/components/ui/PageHero.astro';
+import Releases from '@/components/pages/presse/Releases.astro';
+import Coverage from '@/components/pages/presse/Coverage.astro';
+import Contacts from '@/components/pages/presse/Contacts.astro';
+import MediaKit from '@/components/pages/presse/MediaKit.astro';
+import { pages } from '@/config/pages';
+import { press } from '@/content/fr/press';
+import { breadcrumbJsonLd, organizationJsonLd, webPageJsonLd } from '@/lib/seo';
+
+const path = pages.press.path;
+const jsonLd = [
+  organizationJsonLd(),
+  webPageJsonLd({ path, title: press.seo.title, description: press.seo.description }),
+  breadcrumbJsonLd('press'),
+];
+---
+
+<Base title={press.seo.title} description={press.seo.description} path={path} jsonLd={jsonLd}>
+  <Header tone="dark" />
+  <main id="contenu">
+    <PageHero
+      eyebrow={press.hero.eyebrow}
+      title={press.hero.title}
+      intro={press.hero.intro}
+      riskLine={press.hero.riskLine}
+    >
+      <div slot="breadcrumb" class="pt-10 sm:pt-9 lg:pt-6">
+        <Breadcrumb key="press" tone="dark" />
+      </div>
+    </PageHero>
+    <Releases />
+    <Coverage />
+    <Contacts />
+    <MediaKit />
+    <LegalNotes notes={press.notes} />
+  </main>
+  <Footer />
+</Base>

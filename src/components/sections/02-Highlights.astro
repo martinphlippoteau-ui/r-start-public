@@ -1,0 +1,141 @@
+---
+/**
+ * Section 2 — Points forts (id « points-forts »). Fond blanc (alternance avec le hero et la Stratégie).
+ * En-tête centré façon page produit, puis quatre cartes. L'en-tête est rendu ici (et non par
+ * SectionHeading) pour poser les attributs motion sur le H2.
+ * Motion (src/scripts/motion.ts) — modèle « l'avantage s'anime seul, jamais son enveloppe » :
+ *  - H2 mot à mot (data-reveal-text ; H1 interdit, H2 autorisé), surtitre et intro en fade-up ;
+ *  - dans chaque carte, seul le bloc picto 3D + valeur (H3) arrive en cascade (data-animate="tilt",
+ *    rotation 3D légère) ; la description (data-advantage) suit d'un fade-up propre, un peu après ;
+ *    chaque carte ayant son propre déclencheur, le délai dépend de la COLONNE (0 / 0,09 s), pas de
+ *    l'index : en 2e rangée desktop comme sur mobile (une colonne), une carte qui entre seule n'attend
+ *    pas la cascade des précédentes (la RiskNote, non animée, ne reste jamais sous un trou vide) ; la
+ *    RiskNote est leur sœur dans la carte, jamais enveloppée par un élément animé : aucun ancêtre d'un
+ *    [data-risk] n'est animé (règle AMF « aucun avertissement masqué ») — la carte elle-même (li) ne
+ *    porte donc aucun attribut motion ;
+ *  - pictos 3D en parallaxe douce et bornée par la carte : un seul facteur, même sens pour toute la
+ *    rangée (data-parallax 0.03 ≈ 27 px à 900 px de haut, 24 px à 812 = padding mobile de la carte),
+ *    déclencheur = parent (le bloc tilt : course identique pour les deux cartes d'une rangée, aucun
+ *    picto ne sort de l'arrondi ni ne chevauche le titre de la carte voisine) ;
+ *  - valeurs : chiffre qui « claque » par compteur (data-counter, valeur finale dans le HTML, largeur
+ *    réservée, 1,8 s : la part du comptage jouée après le fondu du bloc tilt reste perceptible) pour
+ *    les valeurs numériques, mot à mot (data-reveal-text) pour les valeurs en toutes lettres. Le
+ *    compteur vit dans un span interne : le span de ligne garde son flex/min-h (alignement des cartes
+ *    par rangée).
+ * Sans JS / reduced-motion : HTML complet et statique, valeurs exactes.
+ * Valeur chiffrée en text-stat, valeur en toutes lettres en text-display-md (tient sur une ligne).
+ * Contenu : src/content/fr/highlights.ts ; pictos : src/content/fr/media.ts.
+ */
+import { Image } from 'astro:assets';
+import Card from '@/components/ui/Card.astro';
+import Container from '@/components/ui/Container.astro';
+import NoteRef from '@/components/ui/NoteRef.astro';
+import RiskNote from '@/components/ui/RiskNote.astro';
+import Section from '@/components/ui/Section.astro';
+import { sections } from '@/config/sections';
+import { highlights } from '@/content/fr/highlights';
+import { pictos, type PictoKey } from '@/content/fr/media';
+import { resolveImage } from '@/lib/images';
+
+/** « 200 € » → préfixe, nombre (fr : virgule décimale), suffixe — pour le compteur ; null si non numérique. */
+const parseNumeric = (value: string): { prefix: string; target: number; decimals: number; suffix: string } | null => {
+  const m = value.match(/^([^\d]*)(\d+(?:[.,]\d+)?)([^\d]*)$/);
+  if (!m) return null;
+  const [, prefix, raw, suffix] = m as [string, string, string, string];
+  const decimals = raw.includes(',') || raw.includes('.') ? raw.split(/[.,]/)[1]!.length : 0;
+  return { prefix, target: Number(raw.replace(',', '.')), decimals, suffix };
+};
+
+const cards = await Promise.all(
+  highlights.cards.map(async (card) => {
+    const picto = pictos[card.icon as PictoKey];
+    if (!picto) throw new Error(`Pictogramme inconnu dans highlights.ts : ${card.icon}`);
+    const numeric = parseNumeric(card.value);
+    return { ...card, picto: await resolveImage(picto.src), numeric };
+  })
+);
+/** Décalage de la cascade entre les deux colonnes d'une rangée (secondes) ; la seconde colonne suit la première. */
+const STAGGER = 0.09;
+/** Colonnes de la grille dès `sm` : le délai se calcule par colonne, pas par carte. */
+const COLUMNS = 2;
+/** Décalage supplémentaire de la description après le bloc tilt (secondes). */
+const DESCRIPTION_DELAY = 0.1;
+/** Parallaxe des pictos : douce, un seul facteur et un seul sens (≤ 0,03 : bornée par le padding de la carte). */
+const PARALLAX = 0.03;
+/** Durée du compteur (s) : plus longue que le fondu du bloc tilt (0,85 s + délai) pour rester visible. */
+const COUNTER_DURATION = 1.8;
+const titleId = sections.highlights.id + '-title';
+---
+
+<Section id={sections.highlights.id} tone="white">
+  <Container size="wide">
+    <header class="mx-auto max-w-4xl text-center">
+      <p data-animate="fade-up" class="mb-4 text-sm font-semibold uppercase tracking-[0.18em] text-teal-700">
+        {highlights.eyebrow}
+      </p>
+      <h2 id={titleId} class="text-display-lg" data-reveal-text>{highlights.title}</h2>
+      <p data-animate="fade-up" data-animate-delay="0.15" class="mt-6 text-lead opacity-90">{highlights.intro}</p>
+    </header>
+
+    <ul role="list" class="mt-block grid gap-5 sm:grid-cols-2 lg:gap-6">
+      {
+        cards.map((card, i) => (
+          <Card as="li" tone="paper" class="flex flex-col ring-1 ring-navy/5 lg:p-10">
+            <div data-animate="tilt" data-animate-delay={String((i % COLUMNS) * STAGGER)}>
+              <Image
+                src={card.picto}
+                alt=""
+                aria-hidden="true"
+                width={128}
+                height={128}
+                densities={[1, 2]}
+                format="webp"
+                loading="lazy"
+                decoding="async"
+                data-parallax={String(PARALLAX)}
+                data-parallax-trigger="parent"
+                class="size-24 object-contain object-left-bottom sm:size-28 lg:size-32"
+              />
+              <h3 class="mt-6 flex flex-col gap-1 sm:mt-8">
+                {/* min-h = clamp de text-stat : la ligne de valeur a la même hauteur sur toutes les cartes, libellés et descriptions restent alignés par rangée */}
+                <span
+                  class:list={[
+                    'flex min-h-[clamp(2.75rem,6vw,5.5rem)] items-end text-navy',
+                    card.numeric ? 'text-stat' : 'text-display-md',
+                  ]}
+                >
+                  {card.numeric ? (
+                    <span
+                      data-counter={String(card.numeric.target)}
+                      data-counter-prefix={card.numeric.prefix || undefined}
+                      data-counter-suffix={card.numeric.suffix || undefined}
+                      data-counter-decimals={card.numeric.decimals ? String(card.numeric.decimals) : undefined}
+                      data-counter-duration={String(COUNTER_DURATION)}
+                    >
+                      {card.value}
+                    </span>
+                  ) : (
+                    <span data-reveal-text>{card.value}</span>
+                  )}
+                </span>
+                <span class="text-lead font-medium text-ink">
+                  {card.label}
+                  {card.noteId && <NoteRef id={card.noteId} />}
+                </span>
+              </h3>
+            </div>
+            <p
+              data-advantage
+              data-animate="fade-up"
+              data-animate-delay={String((i % COLUMNS) * STAGGER + DESCRIPTION_DELAY)}
+              class="mt-5 text-base leading-relaxed text-ink sm:mt-6"
+            >
+              {card.description}
+            </p>
+            <RiskNote text={card.risk} class="mt-4 border-t border-navy/10 pt-4" />
+          </Card>
+        ))
+      }
+    </ul>
+  </Container>
+</Section>

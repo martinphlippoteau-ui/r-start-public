@@ -1,0 +1,37 @@
+---
+/**
+ * Navigation d'ancres interne de la page /documentation : un lien par groupe de documents publié
+ * (#reglementaire, #frais, #formulaire), dans une barre collante translucide sous le hero. Le
+ * `scroll-padding-top` global (global.css) laisse la place à la barre lors du saut d'ancre.
+ * Libellés : titres des groupes ; aria-label : documentation.labels.anchorsLabel (barre non rendue sans lui).
+ */
+import Container from '@/components/ui/Container.astro';
+import type { DocumentationContent } from '@/content/types-v2';
+
+interface Props {
+  groups: DocumentationContent['groups'];
+  label?: string;
+}
+const { groups, label } = Astro.props;
+---
+
+{
+  label && groups.length > 0 && (
+    <nav aria-label={label} class="surface-glass sticky top-0 z-20 border-b border-mist">
+      <Container size="wide">
+        <ul role="list" class="scrollbar-none flex h-14 items-center gap-1 overflow-x-auto sm:gap-2">
+          {groups.map((group) => (
+            <li class="shrink-0">
+              <a
+                href={'#' + group.key}
+                class="nav-link inline-flex items-center rounded-full px-3.5 py-2 text-sm font-semibold whitespace-nowrap text-navy no-underline transition-colors hover:bg-teal-100 sm:text-base"
+              >
+                {group.title}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </Container>
+    </nav>
+  )
+}

@@ -1,0 +1,45 @@
+---
+import { noteNumber } from '@/content/fr/notes';
+import { sections } from '@/config/sections';
+import { nav } from '@/content/fr/nav';
+/**
+ * Appel de note légale numérotée pointant vers la section Notes.
+ * Couleur auto-adaptative au fond (AA sur les deux) :
+ *  - teal-700 par défaut (4,98:1 sur blanc, ≥ 4,5:1 sur paper) ;
+ *  - teal-200 dès qu'un ancêtre porte `text-white` (sections tone 'ink' / 'brand', cartes « glass ») :
+ *    9,6:1 sur ink, via la variante Tailwind `in-[.text-white]`.
+ * La prop optionnelle `tone` force la couleur ('light' → teal-700, 'dark' → teal-200) pour les rares
+ * cas où l'ancêtre ne porte pas la classe attendue (ex. carte claire posée dans une section sombre).
+ * aria-label « Voir la note n » depuis nav.ts.
+ * `interactive={false}` : marqueur visuel seul (span, sans lien) — pour un usage à l'intérieur d'un
+ * ancêtre déjà interactif (ex. <summary>), où un <a> imbriqué serait une violation d'accessibilité
+ * (« nested-interactive »). Le lien accessible équivalent doit alors exister ailleurs dans le contenu
+ * (ex. FAQ : marqueur décoratif dans la question, lien réel dans la réponse).
+ */
+interface Props {
+  id: string;
+  /** Force la couleur ; sans valeur, elle suit le fond (ancêtre `.text-white` → teal-200). */
+  tone?: 'light' | 'dark';
+  interactive?: boolean;
+}
+const { id, tone, interactive = true } = Astro.props;
+const n = noteNumber(id);
+const label = nav.noteRefLabel ? `${nav.noteRefLabel} ${n}` : undefined;
+const colors = {
+  auto: 'text-teal-700 in-[.text-white]:text-teal-200',
+  light: 'text-teal-700',
+  dark: 'text-teal-200',
+};
+const classes = ['ml-0.5 align-super text-[0.65em] font-semibold no-underline hover:underline', colors[tone ?? 'auto']];
+---
+
+{
+  n !== null && interactive && (
+    <a href={'#' + sections.notes.id + '-' + n} class:list={classes} aria-label={label}>{n}</a>
+  )
+}
+{
+  n !== null && !interactive && (
+    <span class:list={classes} aria-hidden="true">{n}</span>
+  )
+}

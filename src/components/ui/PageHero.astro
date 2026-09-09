@@ -1,0 +1,45 @@
+---
+/**
+ * En-tête de sous-page (/frais, /documentation, /presse) : fond ink + halo de marque, sans image.
+ * Surtitre, H1 (text-display-lg), intro (text-lead) et ligne risques dans la même taille (RiskNote
+ * size 'lead', jamais animée), le tout visible sans scroller à 375×812 comme à 1440×900.
+ * Le fil d'Ariane se place dans le slot « breadcrumb » (au-dessus du surtitre).
+ * Rythme vertical calibré pour le Header en tone 'light' (bandeau blanc dans le flux, non superposé) :
+ * padding haut modéré (pt-12 → lg:pt-20) afin que le bloc titre ne paraisse pas « tombé » dans le cadre.
+ * Contenu : props issues du fichier de contenu de la page (PageHero de types-v2.ts).
+ */
+import RiskNote from '@/components/ui/RiskNote.astro';
+import Container from '@/components/ui/Container.astro';
+
+interface Props {
+  eyebrow: string;
+  title: string;
+  intro: string;
+  riskLine: string;
+  tone?: 'ink' | 'brand';
+  /** Ancre de la section (par défaut « en-tete »). */
+  id?: string;
+  class?: string;
+}
+const { eyebrow, title, intro, riskLine, tone = 'ink', id = 'en-tete', class: className = '' } = Astro.props;
+const titleId = id + '-title';
+const tones = { ink: 'bg-ink', brand: 'bg-brand-gradient-dark' };
+---
+
+<section
+  id={id}
+  data-section={id}
+  aria-labelledby={titleId}
+  class:list={['brand-halo grain relative overflow-hidden text-white', tones[tone], 'pt-12 pb-14 sm:pt-16 sm:pb-20 lg:pt-20 lg:pb-24', className]}
+>
+  <Container size="wide" class="relative">
+    <slot name="breadcrumb" />
+    <div class="mt-6 max-w-4xl sm:mt-8">
+      {eyebrow.trim() !== '' && <p class="text-eyebrow mb-4 text-teal-200">{eyebrow}</p>}
+      <h1 id={titleId} class="text-display-lg text-white">{title}</h1>
+      <p class="text-lead mt-5 max-w-3xl text-pretty text-white sm:mt-6">{intro}</p>
+      <RiskNote text={riskLine} tone="dark" size="lead" class="mt-4 max-w-3xl sm:mt-5" />
+    </div>
+    <slot />
+  </Container>
+</section>

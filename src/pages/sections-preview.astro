@@ -1,0 +1,32 @@
+---
+/**
+ * Page de prévisualisation (développement) : assemble automatiquement toutes les sections présentes dans
+ * src/components/sections dans l'ordre de leur nom de fichier (NN-Nom.astro). Non indexée, hors sitemap.
+ * Les lots de construction l'utilisent pour se relire sans toucher à index.astro. Supprimée à l'intégration.
+ */
+import Base from '@/layouts/Base.astro';
+import Header from '@/components/Header.astro';
+import SubNav from '@/components/SubNav.astro';
+import LegalNotes from '@/components/LegalNotes.astro';
+import Footer from '@/components/Footer.astro';
+import { seo } from '@/content/fr/seo';
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const modules = import.meta.glob<{ default: any }>('/src/components/sections/*.astro', { eager: true });
+const all = Object.entries(modules)
+  .sort(([a], [b]) => a.localeCompare(b))
+  .map(([path, mod]) => ({ path, Component: mod.default }));
+const hero = all.find((s) => /\/01-/.test(s.path));
+const rest = all.filter((s) => s !== hero);
+---
+
+<Base title="Prévisualisation des sections R Start" description={seo.description} path="/sections-preview" noindex>
+  <Header tone="dark" />
+  <main id="contenu">
+    {hero && <hero.Component />}
+    <SubNav />
+    {rest.map(({ Component }) => <Component />)}
+    <LegalNotes />
+  </main>
+  <Footer />
+</Base>

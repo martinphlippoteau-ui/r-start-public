@@ -1,0 +1,108 @@
+---
+/**
+ * FAQ de la page /documentation (id « faq ») : questions importées de faq.ts via documentation.faq
+ * (la question sur les risques est retirée tant que le DIC à jour n'est pas publié, voir documentation.ts).
+ * Même construction que la section FAQ de l'accueil : en-tête collant face aux accordéons natifs
+ * <details name="faq" data-faq> (un seul ouvert à la fois), chevron animé en CSS, réponse en text-lead.
+ * Dans chaque réponse, les paragraphes « avantage » (data-advantage) sont suivis, dans le même bloc et la
+ * même taille, de leur contre-poids RiskNote (data-risk) : la coupure vient du contenu (item.riskFrom),
+ * l'appel de note aussi (item.noteId, numéroté par DocNoteRef sur les notes de la page).
+ * Animation déclarative : seul chaque <summary> porte un fade-up ; aucun ancêtre des RiskNote n'est animé.
+ * Le JSON-LD FAQPage n'est pas émis ici (réservé à l'accueil et à /frais, plan §12).
+ * Contenu : documentation.faq et documentation.labels.
+ */
+import Container from '@/components/ui/Container.astro';
+import RiskNote from '@/components/ui/RiskNote.astro';
+import Section from '@/components/ui/Section.astro';
+import type { DocumentationContent, DocumentationLabels } from '@/content/types-v2';
+import DocNoteRef from './DocNoteRef.astro';
+
+interface Props {
+  faq: DocumentationContent['faq'];
+  labels: DocumentationLabels;
+  tone?: 'paper' | 'white';
+}
+const { faq, labels, tone = 'paper' } = Astro.props;
+const id = 'faq';
+const items = faq.items.map((item) => {
+  const from = Math.min(Math.max(item.riskFrom ?? item.answer.length, 0), item.answer.length);
+  return { ...item, advantage: item.answer.slice(0, from), risks: item.answer.slice(from) };
+});
+---
+
+<Section id={id} tone={tone}>
+  <Container size="wide">
+    <div class="grid gap-12 lg:grid-cols-12 lg:gap-16">
+      <!-- En-tête collant -->
+      <div class="lg:col-span-5">
+        <div class="lg:sticky lg:top-24">
+          {labels.faqEyebrow && <p class="text-eyebrow mb-4 text-teal-700">{labels.faqEyebrow}</p>}
+          <h2 id={id + '-title'} class="text-display-md">{faq.title}</h2>
+        </div>
+      </div>
+
+      <!-- Questions -->
+      <div class="lg:col-span-7">
+        <ul role="list" aria-label={labels.faqListLabel} class="border-t border-navy/15">
+          {
+            items.map((item, i) => (
+              <li class="border-b border-navy/15">
+                <details name="faq" data-faq={item.question} class="faq-item group">
+                  <summary
+                    class="block cursor-pointer list-none py-6 [&::-webkit-details-marker]:hidden sm:py-8"
+                    data-animate="fade-up"
+                  >
+                    <h3 class="flex items-start justify-between gap-5 text-display-sm text-ink transition-colors duration-200 group-hover:text-navy sm:gap-8">
+                      <span class="flex min-w-0 flex-col gap-2 sm:flex-row sm:gap-6">
+                        <span aria-hidden="true" class="text-eyebrow pt-1.5 text-teal-700 tabular-nums sm:pt-2">
+                          {String(i + 1).padStart(2, '0')}
+                        </span>
+                        <span>
+                          {item.question}
+                          {item.noteId && <DocNoteRef id={item.noteId} />}
+                        </span>
+                      </span>
+                      <span
+                        aria-hidden="true"
+                        class="mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-full border border-navy/40 text-navy transition-[transform,background-color,border-color,color] duration-300 ease-out-expo group-hover:border-navy group-hover:bg-navy group-hover:text-white group-open:rotate-180 group-open:border-navy group-open:bg-navy group-open:text-white motion-reduce:transition-none sm:mt-1 sm:size-12"
+                      >
+                        <svg class="size-5 sm:size-6" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+                          <path d="m5 8 5 5 5-5" stroke-linecap="round" stroke-linejoin="round"></path>
+                        </svg>
+                      </span>
+                    </h3>
+                  </summary>
+                  <div class="faq-answer max-w-3xl space-y-5 pb-8 sm:pb-10 sm:pl-12">
+                    {item.advantage.map((paragraph) => (
+                      <p data-advantage class="text-lead text-ink">
+                        {paragraph}
+                      </p>
+                    ))}
+                    {item.risks.map((risk) => (
+                      <RiskNote text={risk} size="lead" />
+                    ))}
+                  </div>
+                </details>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+  </Container>
+</Section>
+
+<style>
+  /* Glissement de la réponse à l'ouverture (transform uniquement : l'opacité des RiskNote reste à 1 ;
+     désactivé si l'utilisateur préfère réduire les animations). */
+  @media (prefers-reduced-motion: no-preference) {
+    .faq-item[open] > .faq-answer {
+      animation: faq-reveal 450ms var(--ease-out-expo) both;
+    }
+    @keyframes faq-reveal {
+      from {
+        transform: translateY(-6px);
+      }
+    }
+  }
+</style>

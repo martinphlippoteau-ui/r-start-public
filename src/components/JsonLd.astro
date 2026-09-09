@@ -1,0 +1,10 @@
+---
+/** Injecte un bloc JSON-LD. Le type ld+json n'est pas exécuté : compatible CSP stricte. */
+interface Props {
+  data: Record<string, unknown> | Record<string, unknown>[];
+}
+const { data } = Astro.props;
+const json = JSON.stringify(data).replace(/</g, '\u003c');
+---
+
+<script type="application/ld+json" is:inline set:html={json}></script>

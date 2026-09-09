@@ -1,0 +1,173 @@
+---
+/**
+ * Section 10 — FAQ (id « faq »). Fond paper (alternance avec Documents).
+ * Deux colonnes sur grand écran : en-tête collant (surtitre, H2, introduction) face à la liste des
+ * dix questions en accordéons natifs <details name="faq"> (un seul ouvert à la fois), chevron animé
+ * en CSS, réponse en paragraphes text-lead. Dans chaque réponse, les paragraphes « avantage »
+ * (data-advantage) sont suivis, dans le même bloc et la même taille, de leur contre-poids risque
+ * (RiskNote, data-risk) : la coupure vient du contenu (item.riskFrom), l'appel de note aussi
+ * (item.noteId). Le CTA tunnel ferme la colonne des questions. Le JSON-LD FAQPage est émis par la
+ * page (src/lib/seo.ts), pas ici.
+ *
+ * L'en-tête est rendu ici (et non par SectionHeading) pour poser les attributs motion sur le H2 ; le
+ * surtitre est en teal-700 (AA sur paper).
+ *
+ * Motion (src/scripts/motion.ts, attributs seulement) — même signature que 02-Highlights / 05-Income :
+ *  - en-tête, dans son enveloppe collante (les attributs sont sur les enfants, jamais sur l'élément
+ *    sticky) : surtitre en fade-up, H2 mot à mot (data-reveal-text, titre court), intro en fade-up
+ *    décalée de 0,15 s ;
+ *  - questions : chaque <summary> porte un fade-up SANS délai. Chaque summary (~100 px de haut) a son
+ *    propre déclencheur à 88 % du viewport : le défilement produit la cascade de lui-même, au rythme du
+ *    lecteur ; un délai par rang donnait « cascade puis paquet » sur grand écran (rangs au-delà du plafond
+ *    arrivant ensemble) et un retard aux questions qui entrent seules sur mobile. Ni le H2, ni la liste,
+ *    ni aucun ancêtre des RiskNote n'est animé (règle « aucun [data-risk] sous un [data-animate] ») : un
+ *    `stagger` sur la liste serait refusé par le moteur, chaque réponse contenant un risque ;
+ *  - chevron : rotation 180° et inversion des couleurs en CSS à l'ouverture (transform, couleurs) ;
+ *  - ouverture / fermeture d'une réponse : transition de hauteur en CSS pur, sans JS, sur le pseudo-élément
+ *    `::details-content` (grille `grid-template-rows` 0fr → 1fr sous `@supports selector(::details-content)`,
+ *    `content-visibility` en transition discrète pour rester peint pendant la fermeture). L'enfant direct
+ *    de <details> (.faq-answer, l'élément de grille) ne porte NI padding NI marge : avec `min-height: 0`,
+ *    la rangée 0fr vaut alors exactement 0 px (un padding sur l'élément de grille lui donnait un plancher
+ *    de 32-40 px : plateau puis saut de 40 px à la fin de chaque fermeture). L'espacement (pb, pl, space-y)
+ *    est porté par un enfant intérieur. Aucune opacité ni transform sur la réponse : les RiskNote sont à
+ *    opacité 1 à tout instant et, une fois la réponse ouverte, plus rien ne bouge. Navigateurs sans
+ *    `::details-content` : ouverture instantanée native. Rien de tout cela en reduced-motion (@media).
+ * Le <summary> a pour unique enfant un H3 (modèle de contenu de summary) : le numéro d'ordre et le
+ * chevron y sont des spans décoratifs (aria-hidden). <summary> a un rôle interactif implicite : un
+ * <NoteRef> (lien) n'y est jamais imbriqué (violation d'accessibilité « nested-interactive », HTML
+ * invalide de surcroît). Quand item.noteId est défini, la question porte un marqueur décoratif
+ * (`interactive={false}`, span non focusable) et le lien réel équivalent est accolé au dernier
+ * paragraphe risque de la réponse (RiskNote `noteId`), toujours présent quel que soit item.riskFrom —
+ * accessible dès l'ouverture, jamais en même temps que le marqueur de la question.
+ * Contenu : src/content/fr/faq.ts.
+ */
+import Button from '@/components/ui/Button.astro';
+import Container from '@/components/ui/Container.astro';
+import NoteRef from '@/components/ui/NoteRef.astro';
+import RiskNote from '@/components/ui/RiskNote.astro';
+import Section from '@/components/ui/Section.astro';
+import { sections } from '@/config/sections';
+import { faq } from '@/content/fr/faq';
+
+const id = sections.faq.id;
+/** id du H2, référencé par aria-labelledby sur la section (convention de Section / SectionHeading). */
+const titleId = id + '-title';
+const items = faq.items.map((item) => {
+  const from = Math.min(Math.max(item.riskFrom ?? item.answer.length, 0), item.answer.length);
+  return { ...item, advantage: item.answer.slice(0, from), risks: item.answer.slice(from) };
+});
+---
+
+<Section id={id} tone="paper">
+  <Container size="wide">
+    <div class="grid gap-12 lg:grid-cols-12 lg:gap-16">
+      <!-- En-tête collant -->
+      <div class="lg:col-span-5">
+        <header class="max-w-4xl lg:sticky lg:top-24">
+          <p class="text-eyebrow mb-4 text-teal-700" data-animate="fade-up">{faq.eyebrow}</p>
+          <h2 id={titleId} class="text-display-lg" data-reveal-text>{faq.title}</h2>
+          <p class="mt-6 text-lead opacity-90" data-animate="fade-up" data-animate-delay="0.15">{faq.intro}</p>
+        </header>
+      </div>
+
+      <!-- Questions -->
+      <div class="lg:col-span-7">
+        <ul role="list" aria-label={faq.listLabel} class="border-t border-navy/15">
+          {
+            items.map((item, i) => (
+              <li class="border-b border-navy/15">
+                <details name="faq" data-faq={item.question} class="faq-item group">
+                  <summary
+                    class="block cursor-pointer list-none py-6 [&::-webkit-details-marker]:hidden sm:py-8"
+                    data-animate="fade-up"
+                  >
+                    <h3 class="flex items-start justify-between gap-5 text-display-sm text-ink transition-colors duration-200 group-hover:text-navy sm:gap-8">
+                      <span class="flex min-w-0 flex-col gap-2 sm:flex-row sm:gap-6">
+                        <span
+                          aria-hidden="true"
+                          class="text-eyebrow pt-1.5 text-teal-700 tabular-nums sm:pt-2"
+                        >
+                          {String(i + 1).padStart(2, '0')}
+                        </span>
+                        <span>
+                          {item.question}
+                          {item.noteId && <NoteRef id={item.noteId} interactive={false} />}
+                        </span>
+                      </span>
+                      <span
+                        aria-hidden="true"
+                        class="faq-chevron mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-full border border-navy/40 text-navy transition-[transform,background-color,border-color,color] duration-300 ease-out-expo group-hover:border-navy group-hover:bg-navy group-hover:text-white group-open:rotate-180 group-open:border-navy group-open:bg-navy group-open:text-white motion-reduce:transition-none sm:mt-1 sm:size-12"
+                      >
+                        <svg
+                          class="size-5 sm:size-6"
+                          viewBox="0 0 20 20"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="1.8"
+                        >
+                          <path d="m5 8 5 5 5-5" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                      </span>
+                    </h3>
+                  </summary>
+                  {/* .faq-answer = élément de la grille ::details-content : aucun padding ni marge ici (voir en-tête) */}
+                  <div class="faq-answer">
+                    <div class="max-w-3xl space-y-5 pb-8 sm:pb-10 sm:pl-12">
+                      {item.advantage.map((paragraph) => (
+                        <p data-advantage class="text-lead text-ink">
+                          {paragraph}
+                        </p>
+                      ))}
+                      {item.risks.map((risk, i) => (
+                        <RiskNote
+                          text={risk}
+                          size="lead"
+                          noteId={item.noteId && i === item.risks.length - 1 ? item.noteId : undefined}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </details>
+              </li>
+            ))
+          }
+        </ul>
+
+        <!-- CTA -->
+        <div class="mt-10 flex flex-col items-stretch sm:mt-12 sm:flex-row sm:items-center">
+          <Button position={faq.cta.position} variant="primary" size="lg">{faq.cta.label}</Button>
+        </div>
+      </div>
+    </div>
+  </Container>
+</Section>
+
+<style>
+  /* Ouverture / fermeture de la réponse : transition de hauteur en CSS pur (aucun JS), sur le pseudo-élément
+     ::details-content qui enveloppe le contenu hors summary. Grille à une rangée 0fr → 1fr (la hauteur
+     « auto » n'est pas interpolable sans interpolate-size) ; `content-visibility` en transition discrète pour
+     que le contenu reste peint pendant la fermeture. `overflow-y: clip` (pas un conteneur de défilement,
+     l'axe horizontal reste visible : anneaux de focus intacts sur les côtés). L'élément de grille
+     (.faq-answer) a `min-height: 0` et ne porte aucun padding ni marge (l'espacement est sur son enfant) :
+     la rangée 0fr descend jusqu'à 0 px, la fermeture est continue, sans plateau ni saut final. Aucune
+     opacité ni transform : les RiskNote de la réponse restent à opacité 1 à tout instant, et rien ne bouge
+     une fois la réponse ouverte. Sans ::details-content ou en reduced-motion : ouverture instantanée native. */
+  @media (prefers-reduced-motion: no-preference) {
+    @supports selector(::details-content) {
+      .faq-item::details-content {
+        display: grid;
+        grid-template-rows: 0fr;
+        overflow-y: clip;
+        transition:
+          grid-template-rows 420ms var(--ease-out-expo),
+          content-visibility 420ms allow-discrete;
+      }
+      .faq-item[open]::details-content {
+        grid-template-rows: 1fr;
+      }
+      .faq-item > .faq-answer {
+        min-height: 0;
+      }
+    }
+  }
+</style>

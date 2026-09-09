@@ -1,0 +1,72 @@
+---
+/**
+ * Page Presse — Contacts presse (id « contacts-presse »). Fond paper (alternance avec Revue de presse).
+ * Une carte par contact : organisation (surtitre), nom (H3), rôle, puis une liste de définitions
+ * téléphone (lien tel: sans espaces dans le href, numéro insécable) et e-mail (lien mailto:, ligne rendue
+ * seulement si le contenu porte un e-mail confirmé). Source des contacts en dessous, avec son appel de note.
+ * Animation : révélation en cascade des cartes.
+ * Contenu : src/content/fr/press.ts (contacts, labels).
+ */
+import Container from '@/components/ui/Container.astro';
+import Section from '@/components/ui/Section.astro';
+import PressNoteRef from '@/components/pages/presse/PressNoteRef.astro';
+import { press } from '@/content/fr/press';
+
+const id = 'contacts-presse';
+const { contacts } = press;
+const labels = press.labels ?? {};
+
+/** href tel: : indicatif et chiffres seulement (ex. « +33 6 99 60 10 25 » → « +33699601025 »). */
+const telHref = (phone: string) => 'tel:' + phone.replace(/[^\d+]/g, '');
+---
+
+<Section id={id} tone="paper">
+  <Container size="wide">
+    <header class="max-w-4xl">
+      <h2 id={id + '-title'} class="text-display-md text-ink">{contacts.title}</h2>
+    </header>
+
+    <ul
+      role="list"
+      aria-label={labels.contactsListLabel}
+      class="mt-10 grid gap-5 sm:grid-cols-2 lg:mt-14 lg:gap-6"
+      data-animate="stagger"
+    >
+      {
+        contacts.items.map((c) => (
+          <li class="card-lift flex flex-col gap-4 rounded-3xl bg-white p-6 shadow-card sm:p-8 lg:p-10">
+            <p class="text-eyebrow text-teal-700">{c.organisation}</p>
+            <div>
+              <h3 class="text-display-sm text-ink">{c.name}</h3>
+              <p class="mt-1 text-base leading-relaxed text-slate-700">{c.role}</p>
+            </div>
+            <dl class="mt-2 grid gap-3 border-t border-navy/10 pt-5 text-base leading-relaxed">
+              <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+                {labels.phoneLabel && <dt class="text-caption w-24 shrink-0 font-semibold uppercase tracking-wider text-slate-700">{labels.phoneLabel}</dt>}
+                <dd class="min-w-0">
+                  <a href={telHref(c.phone)} class="whitespace-nowrap font-semibold text-navy underline-offset-4 hover:text-teal-700 hover:underline">
+                    {c.phone.replace(/ /g, ' ')}
+                  </a>
+                </dd>
+              </div>
+              {c.email && (
+                <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+                  {labels.emailLabel && <dt class="text-caption w-24 shrink-0 font-semibold uppercase tracking-wider text-slate-700">{labels.emailLabel}</dt>}
+                  <dd class="min-w-0 break-all">
+                    <a href={'mailto:' + c.email} class="font-semibold text-navy underline-offset-4 hover:text-teal-700 hover:underline">
+                      {c.email}
+                    </a>
+                  </dd>
+                </div>
+              )}
+            </dl>
+          </li>
+        ))
+      }
+    </ul>
+
+    <p class="mt-8 max-w-4xl text-base leading-relaxed text-slate-700 lg:mt-10">
+      {contacts.source}<span class="whitespace-nowrap"><PressNoteRef id="presse-contacts" /></span>
+    </p>
+  </Container>
+</Section>

@@ -1,0 +1,41 @@
+---
+/**
+ * Page 404 (dist/404.html). Servie avec un vrai code 404 par nginx (docker/nginx.conf) et par
+ * Azure Static Web Apps (public/staticwebapp.config.json). En noindex, hors sitemap.
+ * Contenu : src/content/fr/notFound.ts.
+ */
+import Base from '@/layouts/Base.astro';
+import Header from '@/components/Header.astro';
+import Footer from '@/components/Footer.astro';
+import Container from '@/components/ui/Container.astro';
+import { notFound } from '@/content/fr/notFound';
+import { withBase } from '@/lib/href';
+---
+
+<Base title={notFound.seo.title} description={notFound.seo.description} path="/404" noindex>
+  <Header tone="light" />
+  <main id="contenu" class="bg-paper">
+    <Container size="narrow" class="flex min-h-[60svh] flex-col justify-center py-16 sm:py-24">
+      <p class="text-eyebrow text-teal-700">{notFound.code}</p>
+      <h1 class="text-display-md mt-4">{notFound.title}</h1>
+      <p class="text-lead mt-4 text-slate-700">{notFound.intro}</p>
+      <nav aria-label={notFound.linksLabel} class="mt-10">
+        <ul class="flex flex-wrap gap-3" role="list">
+          {
+            notFound.links.map((link) => (
+              <li>
+                <a
+                  href={withBase(link.href)}
+                  class="inline-flex rounded-full border border-navy/25 px-5 py-2.5 font-semibold text-navy no-underline transition-colors hover:border-navy hover:bg-navy hover:text-white"
+                >
+                  {link.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+    </Container>
+  </main>
+  <Footer />
+</Base>

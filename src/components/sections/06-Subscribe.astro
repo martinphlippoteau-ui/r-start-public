@@ -1,0 +1,203 @@
+---
+/**
+ * Section 6 — Souscrire (id « souscrire »). Fond white.
+ * Stepper vertical en quatre étapes numérotées (liste ordonnée, ligne de progression) face à la photo
+ * (collante sur grand écran), deux options facultatives en cartes (versements programmés avec le
+ * minimum confirmé, réinvestissement des dividendes) rendues en paire avantage / risque, rappels
+ * « lisez le DIC » et commission de retrait en RiskNote pleine largeur (jamais animés), puis le CTA
+ * vers le tunnel de souscription. Les appels de note des étapes viennent du contenu (step.noteId).
+ * Le surtitre est rendu ici en teal-700 (AA sur white) plutôt que par SectionHeading.
+ * Motion (src/scripts/motion.ts) :
+ *  - la ligne de progression du stepper est découpée en segments : chaque étape (sauf la dernière)
+ *    porte un petit SVG vertical qui va du centre de sa pastille au centre de la suivante (hauteur
+ *    100 % + espacement de la liste), tracé au fil du défilement (`data-draw` + `data-draw-scrub`, de
+ *    « haut à 75 % » à « bas à 75 % » : la pointe du trait suit toujours la même hauteur d'écran et
+ *    le tracé s'arrête exactement sur la dernière pastille). Dégradé continu navy → teal-700 →
+ *    teal-500 (bornes de `text-brand-gradient`, lisibles sur white) réparti sur les segments : la
+ *    pointe reste visible jusqu'au bout ;
+ *  - chaque étape entre par `fade-up` à son arrivée dans le viewport, avec un léger décalage par rang
+ *    (cascade si plusieurs entrent ensemble), et sa pastille numérotée « s'allume » par `scale` juste
+ *    après, au moment où le trait la rejoint ;
+ *  - la photo se dévoile par `clip` (média) puis zoome légèrement pendant la traversée de la grille
+ *    (`data-scrub`, enveloppe interne, comme le hero) ;
+ *  - les options : chaque carte contient sa RiskPair, donc la carte elle-même n'est jamais animée ;
+ *    seul son bloc titre + badge entre par un `fade-up` court (12 px, modèle 02-Highlights : l'avantage
+ *    seul) — pas de `tilt`, réservé aux cartes entières ;
+ *  - le CTA entre par `fade-up`. Les deux RiskNote « avant de souscrire » restent intouchées.
+ * Sans JS ou en reduced-motion : ligne dessinée, photo et cartes visibles, rien ne bouge.
+ * Contenu : src/content/fr/subscribe.ts et media.ts (photo media.subscribe + crédit).
+ */
+import { Picture } from 'astro:assets';
+import Button from '@/components/ui/Button.astro';
+import Card from '@/components/ui/Card.astro';
+import Container from '@/components/ui/Container.astro';
+import NoteRef from '@/components/ui/NoteRef.astro';
+import Pill from '@/components/ui/Pill.astro';
+import RiskNote from '@/components/ui/RiskNote.astro';
+import RiskPair from '@/components/ui/RiskPair.astro';
+import Section from '@/components/ui/Section.astro';
+import SectionHeading from '@/components/ui/SectionHeading.astro';
+import { sections } from '@/config/sections';
+import { media } from '@/content/fr/media';
+import { subscribe } from '@/content/fr/subscribe';
+import { resolveImage } from '@/lib/images';
+
+const id = sections.subscribe.id;
+const photo = await resolveImage(media.subscribe.src);
+const OptionTitle = subscribe.optionsTitle ? 'h4' : 'h3';
+/** Identifiant du dégradé SVG du segment de ligne d'une étape (unique dans la page). */
+const lineGradientId = (i: number): string => `${id}-stepper-line-${i}`;
+/**
+ * Couleurs du dégradé de la ligne, une par pastille (la dernière est répétée au-delà) : le segment i va
+ * de la couleur i à la couleur i + 1, ce qui donne un dégradé continu sur toute la ligne. Bornes de
+ * `text-brand-gradient` (global.css) : teal-500 est la teinte la plus claire admise sur white.
+ */
+const LINE_COLORS = ['var(--color-navy)', 'var(--color-teal-700)', 'var(--color-teal-500)'];
+const lineColor = (i: number): string => LINE_COLORS[Math.min(i, LINE_COLORS.length - 1)] as string;
+const lastStep = subscribe.steps.length - 1;
+/** Sélecteur de la grille stepper + photo : traversée qui pilote le zoom de la photo collante. */
+const gridSelector = '[data-subscribe-grid]';
+/** Décalage de cascade entre deux étapes qui entreraient ensemble (secondes). */
+const STEP_STAGGER = 0.06;
+/** Délai de la pastille après l'entrée de son étape (secondes). */
+const BADGE_DELAY = 0.12;
+/** Décalage de cascade entre les deux cartes options (secondes). */
+const OPTION_STAGGER = 0.1;
+/** Amplitude du fade-up du bloc titre des options (px) : court, la carte autour est immobile. */
+const OPTION_Y = 12;
+---
+
+<Section id={id} tone="white">
+  <Container size="wide">
+    <p class="text-eyebrow mb-4 text-teal-700">{subscribe.eyebrow}</p>
+    <SectionHeading id={id} title={subscribe.title} intro={subscribe.intro} />
+
+    <div data-subscribe-grid class="mt-16 grid gap-12 lg:mt-24 lg:grid-cols-12 lg:gap-16">
+      <!-- Stepper -->
+      <ol aria-label={subscribe.stepsLabel} class="relative space-y-10 sm:space-y-14 lg:col-span-7">
+        {
+          subscribe.steps.map((step, i) => (
+            <li class="relative flex gap-5 sm:gap-8" data-animate="fade-up" data-animate-delay={String(i * STEP_STAGGER)}>
+              {/* Segment de la ligne de progression : du centre de cette pastille (top-6) au centre de la suivante
+                  (hauteur 100 % + espacement space-y-10 / sm:space-y-14 de la liste), tracé au scroll
+                  (stroke-dashoffset), entièrement dessiné sans JS. Absent sur la dernière étape : la ligne s'y arrête. */}
+              {i < lastStep && (
+                <svg
+                  aria-hidden="true"
+                  class="pointer-events-none absolute top-6 left-6 h-[calc(100%+2.5rem)] w-px sm:h-[calc(100%+3.5rem)]"
+                  width="1"
+                  data-draw
+                  data-draw-scrub
+                  data-draw-start="top 75%"
+                  data-draw-end="bottom 75%"
+                >
+                  <defs>
+                    <linearGradient id={lineGradientId(i)} gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="100%">
+                      <stop offset="0" style={`stop-color: ${lineColor(i)}`}></stop>
+                      <stop offset="1" style={`stop-color: ${lineColor(i + 1)}`}></stop>
+                    </linearGradient>
+                  </defs>
+                  <line x1="0.5" y1="0" x2="0.5" y2="100%" stroke={`url(#${lineGradientId(i)})`} stroke-width="1"></line>
+                </svg>
+              )}
+              <span
+                aria-hidden="true"
+                class="relative z-10 flex size-12 shrink-0 items-center justify-center rounded-full bg-navy text-lg font-bold text-white tabular-nums shadow-card ring-4 ring-white"
+                data-animate="scale"
+                data-animate-delay={String(BADGE_DELAY + i * STEP_STAGGER)}
+              >
+                {i + 1}
+              </span>
+              <div class="pt-2">
+                <h3 class="text-display-sm">
+                  {subscribe.stepPrefix && (
+                    <span class="visually-hidden">
+                      {subscribe.stepPrefix} {i + 1} :{' '}
+                    </span>
+                  )}
+                  {step.title}
+                  {step.noteId && <NoteRef id={step.noteId} />}
+                </h3>
+                <p class="mt-3 max-w-xl text-base leading-relaxed sm:text-lg">{step.description}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+
+      <!-- Photo -->
+      <figure class="self-start lg:sticky lg:top-24 lg:col-span-5" data-animate="clip">
+        <div class="img-frame aspect-[4/3] lg:aspect-[4/5]">
+          <div
+            class="h-full w-full"
+            data-scrub="scale:1,1.06"
+            data-scrub-trigger={gridSelector}
+            data-scrub-start="top bottom"
+            data-scrub-end="bottom top"
+          >
+            <Picture
+              src={photo}
+              alt={media.subscribe.alt}
+              widths={[480, 800, 1200, 1600]}
+              sizes="(min-width: 64rem) 34rem, 100vw"
+              formats={['webp']}
+              loading="lazy"
+              decoding="async"
+              pictureAttributes={{ class: 'block h-full w-full' }}
+              class="h-full w-full object-cover"
+            />
+          </div>
+        </div>
+        {media.subscribe.credit && <figcaption class="text-caption mt-3 text-slate-700">{media.subscribe.credit}</figcaption>}
+      </figure>
+    </div>
+
+    <!-- Options facultatives -->
+    <div class="mt-16 lg:mt-24">
+      {
+        subscribe.optionsTitle && (
+          <h3 class="text-display-sm" data-animate="fade-up">
+            {subscribe.optionsTitle}
+            <NoteRef id="souscrire-non-eligible" />
+          </h3>
+        )
+      }
+      <!-- Chaque carte contient sa RiskPair : la carte n'est jamais animée, seul son bloc titre entre (fade-up court). -->
+      <ul class="mt-8 grid gap-6 sm:grid-cols-2">
+        {
+          subscribe.options.map((option, i) => (
+            <Card as="li" tone="paper" class="lg:p-10">
+              <div
+                class="flex flex-wrap items-center gap-x-4 gap-y-2"
+                data-animate="fade-up"
+                data-animate-y={String(OPTION_Y)}
+                data-animate-delay={String(i * OPTION_STAGGER)}
+              >
+                <OptionTitle class="text-xl font-semibold tracking-tight sm:text-2xl">{option.title}</OptionTitle>
+                {option.badge && <Pill tone="teal">{option.badge}</Pill>}
+              </div>
+              {option.risk ? (
+                <RiskPair advantage={option.description} risk={option.risk} class="mt-4" />
+              ) : (
+                <p class="mt-4 text-base leading-relaxed">{option.description}</p>
+              )}
+            </Card>
+          ))
+        }
+      </ul>
+    </div>
+
+    <!-- Avant de souscrire (jamais animé) -->
+    <div class="mt-16 rounded-3xl bg-paper p-6 sm:p-10 lg:mt-24 lg:p-12">
+      <div class="divide-y divide-mist">
+        <RiskNote text={subscribe.beforeYouSubscribe} size="lead" class="pb-6 sm:pb-8" />
+        <RiskNote text={subscribe.withdrawalReminder} size="lead" class="pt-6 sm:pt-8" />
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="mt-10 flex flex-col items-stretch sm:mt-12 sm:flex-row sm:items-center" data-animate="fade-up">
+      <Button position={subscribe.cta.position} variant="primary" size="lg">{subscribe.cta.label}</Button>
+    </div>
+  </Container>
+</Section>

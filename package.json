@@ -1,0 +1,48 @@
+{
+  "name": "r-start-site",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Site one-page de présentation de la SCPI R Start (CORUM L'Épargne)",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro check && astro build",
+    "preview": "astro preview --host 127.0.0.1 --port 4321",
+    "check": "astro check",
+    "format": "prettier --write .",
+    "images": "node scripts/prepare-images.mjs",
+    "test:html": "html-validate \"dist/**/*.html\"",
+    "test:compliance": "node scripts/check-compliance.mjs",
+    "test:e2e": "playwright test",
+    "test:lhci": "lhci autorun",
+    "verify": "pnpm build && pnpm test:html && pnpm test:compliance && pnpm test:e2e && pnpm test:lhci"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.7.0",
+    "@fontsource-variable/plus-jakarta-sans": "^5.3.0",
+    "astro": "^7.3.0",
+    "gsap": "^3.15.0",
+    "sharp": "^0.35.0"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "@axe-core/playwright": "^4.13.0",
+    "@lhci/cli": "^0.15.1",
+    "@playwright/test": "^1.63.0",
+    "@tailwindcss/vite": "^4.3.0",
+    "html-validate": "^11.0.0",
+    "prettier": "^3.5.0",
+    "prettier-plugin-astro": "^0.14.1",
+    "tailwindcss": "^4.3.0",
+    "typescript": "^5.8.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "sharp",
+      "esbuild"
+    ]
+  }
+}

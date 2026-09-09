@@ -1,0 +1,63 @@
+---
+/**
+ * Page /documentation (périmètre v2, plan §12) : centre de documents de R Start.
+ * Header (tone dark, posé sur le hero sombre) → main#contenu : PageHero (fil d'Ariane, H1, intro, ligne
+ * risques visible sans scroller) → navigation d'ancres collante → un groupe de documents par section
+ * (#reglementaire, #frais, #formulaire ; seuls les groupes publiant au moins un document existent) →
+ * guide de souscription en quatre étapes → FAQ → mention 2 + renvoi corum.fr + CTA → notes de la page →
+ * Footer. Métadonnées et JSON-LD (Organization, WebPage, BreadcrumbList) depuis documentation.ts,
+ * config/pages.ts et src/lib/seo.ts : aucun texte en dur.
+ * Les notes légales sont celles de la page (documentation.notes), numérotées par DocNoteRef.
+ */
+import Base from '@/layouts/Base.astro';
+import Header from '@/components/Header.astro';
+import Footer from '@/components/Footer.astro';
+import LegalNotes from '@/components/LegalNotes.astro';
+import Breadcrumb from '@/components/ui/Breadcrumb.astro';
+import PageHero from '@/components/ui/PageHero.astro';
+import DocumentGroup from '@/components/pages/documentation/DocumentGroup.astro';
+import DocumentationFaq from '@/components/pages/documentation/DocumentationFaq.astro';
+import DocumentsMention from '@/components/pages/documentation/DocumentsMention.astro';
+import DocumentsNav from '@/components/pages/documentation/DocumentsNav.astro';
+import HowTo from '@/components/pages/documentation/HowTo.astro';
+import { pages } from '@/config/pages';
+import { documentation } from '@/content/fr/documentation';
+import { breadcrumbJsonLd, organizationJsonLd, webPageJsonLd } from '@/lib/seo';
+
+const { seo, hero, groups, howTo, faq, corumLink, mention, cta, notes } = documentation;
+const labels = documentation.labels ?? {};
+const path = pages.documentation.path;
+
+const jsonLd = [
+  organizationJsonLd(),
+  webPageJsonLd({ path, title: seo.title, description: seo.description }),
+  breadcrumbJsonLd('documentation'),
+];
+
+/** Détail lu par les lecteurs d'écran après le titre de chaque lien de document (ex. « PDF, nouvelle fenêtre »). */
+const linkHint = [labels.fileTypeLabel, labels.newTabHint].filter(Boolean).join(', ');
+const linkHintId = linkHint ? 'documentation-link-hint' : undefined;
+---
+
+<Base title={seo.title} description={seo.description} path={path} jsonLd={jsonLd}>
+  <Header tone="dark" />
+  <main id="contenu">
+    <PageHero eyebrow={hero.eyebrow} title={hero.title} intro={hero.intro} riskLine={hero.riskLine}>
+      <!-- Le Header (tone dark) est posé en absolu au-dessus du hero : le fil d'Ariane passe sous sa hauteur. -->
+      <div slot="breadcrumb" class="pt-16 sm:pt-20">
+        <Breadcrumb key="documentation" tone="dark" />
+      </div>
+    </PageHero>
+
+    <DocumentsNav groups={groups} label={labels.anchorsLabel} />
+    {linkHintId && <span id={linkHintId} hidden>{linkHint}</span>}
+
+    {groups.map((group, i) => <DocumentGroup group={group} tone={i % 2 === 0 ? 'paper' : 'white'} labels={labels} hintId={linkHintId} />)}
+
+    <HowTo howTo={howTo} labels={labels} tone={groups.length % 2 === 0 ? 'paper' : 'white'} />
+    <DocumentationFaq faq={faq} labels={labels} tone={groups.length % 2 === 0 ? 'white' : 'paper'} />
+    <DocumentsMention mention={mention} corumLink={corumLink} cta={cta} newTabHint={labels.newTabHint} />
+    <LegalNotes notes={notes} />
+  </main>
+  <Footer />
+</Base>

@@ -1,0 +1,233 @@
+---
+/**
+ * Barre supérieure fine, non sticky, avec le menu entre pages (src/config/pages.ts → menuPages).
+ * Posée en absolu au-dessus du hero (transparente sur le fond sombre, tone 'dark') ; sur une page
+ * claire (tone 'light'), elle devient un bandeau blanc dans le flux.
+ *  - ≥ lg : liens inline (aria-current="page" d'après Astro.url.pathname, soulignement animé par
+ *    scaleX via l'utilitaire `nav-link`, plein sur la page courante) + CTA.
+ *  - < lg : bouton « Menu » (aria-expanded / aria-controls) ouvrant un panneau plein écran (fond
+ *    ink translucide) avec les liens, le CTA et un bouton de fermeture. Échap ferme, le focus revient
+ *    sur le bouton d'ouverture ; Tab reste dans le panneau tant qu'il est ouvert.
+ * Textes : src/content/fr/nav.ts. Aucun texte en dur.
+ */
+import { Image } from 'astro:assets';
+import logoWhite from '@/assets/logos/r-start-blanc.svg';
+import logoColor from '@/assets/logos/r-start-couleur.svg';
+import Button from '@/components/ui/Button.astro';
+import Container from '@/components/ui/Container.astro';
+import { menuPages, pages } from '@/config/pages';
+import { sections } from '@/config/sections';
+import { nav } from '@/content/fr/nav';
+import { withBase } from '@/lib/href';
+
+interface Props {
+  tone?: 'dark' | 'light';
+}
+const { tone = 'dark' } = Astro.props as Props;
+const dark = tone === 'dark';
+
+/** Chemin courant normalisé (sans barre finale) pour l'état actif du menu. */
+const currentPath = Astro.url.pathname.replace(/\/+$/, '') || '/';
+const isCurrent = (path: string) => (path.replace(/\/+$/, '') || '/') === currentPath;
+const onHome = isCurrent(pages.home.path);
+/** Sur l'accueil, le logo remonte en haut de page ; ailleurs il ramène à l'accueil. */
+const logoHref = onHome ? '#' + sections.hero.id : withBase(pages.home.path);
+
+const panelId = 'menu-panel';
+const menuLabel = nav.menuLabel ?? nav.brand;
+const closeLabel = nav.closeLabel ?? menuLabel;
+const menuAriaLabel = nav.menuAriaLabel ?? menuLabel;
+---
+
+<header
+  data-header
+  class:list={[
+    'z-30 w-full',
+    dark ? 'absolute inset-x-0 top-0 text-white' : 'relative border-b border-mist bg-white text-ink',
+  ]}
+>
+  <Container size="wide" class="flex h-16 items-center justify-between gap-4 sm:h-20">
+    <a
+      href={logoHref}
+      class="flex shrink-0 items-center gap-3 no-underline"
+      aria-label={nav.homeLinkLabel ?? nav.brand}
+      data-brand-rest
+    >
+      <Image
+        src={dark ? logoWhite : logoColor}
+        alt={nav.brand}
+        height={34}
+        width={111}
+        loading="eager"
+        decoding="async"
+        class="h-8 w-auto sm:h-[34px]"
+      />
+      <span class:list={['hidden text-sm sm:inline', dark ? 'text-white/85' : 'text-slate']}>{nav.brandSuffix}</span>
+    </a>
+
+    <nav aria-label={menuAriaLabel} class="hidden min-w-0 flex-1 items-center justify-center lg:flex">
+      <ul class="flex items-center gap-1" role="list">
+        {
+          menuPages.map((p) => (
+            <li>
+              <a
+                href={withBase(p.path)}
+                aria-current={isCurrent(p.path) ? 'page' : undefined}
+                class:list={[
+                  'nav-link block rounded-full px-3.5 py-2 text-base transition-colors aria-[current=page]:font-semibold',
+                  dark ? 'text-white/85 hover:text-white aria-[current=page]:text-white' : 'text-slate-700 hover:text-navy aria-[current=page]:text-navy',
+                ]}
+              >
+                {p.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="flex shrink-0 items-center gap-2 sm:gap-3">
+      <div class="hidden sm:block">
+        <Button position="nav" variant={dark ? 'light' : 'primary'} size="sm" class="sm:px-5 sm:text-base">
+          {nav.cta.label}
+        </Button>
+      </div>
+      <button
+        type="button"
+        data-menu-open
+        aria-expanded="false"
+        aria-controls={panelId}
+        class:list={[
+          'inline-flex h-10 items-center gap-2 rounded-full px-3 text-sm font-semibold transition-colors lg:hidden',
+          dark ? 'text-white hover:bg-white/10' : 'text-navy hover:bg-navy/8',
+        ]}
+      >
+        <svg aria-hidden="true" class="size-5" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+          <path d="M3 5.5h14M3 10h14M3 14.5h14"></path>
+        </svg>
+        <span>{menuLabel}</span>
+      </button>
+    </div>
+  </Container>
+
+  <div
+    id={panelId}
+    data-menu-panel
+    role="dialog"
+    aria-modal="true"
+    aria-label={menuAriaLabel}
+    class="surface-glass-dark fixed inset-0 z-50 flex flex-col overflow-y-auto text-white lg:hidden"
+    hidden
+  >
+    <Container size="wide" class="flex h-16 shrink-0 items-center justify-between gap-4 sm:h-20">
+      <a href={logoHref} class="flex items-center gap-3 no-underline" aria-label={nav.homeLinkLabel ?? nav.brand} data-menu-close>
+        <Image src={logoWhite} alt={nav.brand} height={34} width={111} loading="lazy" decoding="async" class="h-8 w-auto sm:h-[34px]" />
+        <span class="hidden text-sm text-white/85 sm:inline">{nav.brandSuffix}</span>
+      </a>
+      <button
+        type="button"
+        data-menu-close
+        class="inline-flex h-10 items-center gap-2 rounded-full px-3 text-sm font-semibold text-white transition-colors hover:bg-white/10"
+      >
+        <span>{closeLabel}</span>
+        <svg aria-hidden="true" class="size-5" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+          <path d="M4.5 4.5l11 11M15.5 4.5l-11 11"></path>
+        </svg>
+      </button>
+    </Container>
+
+    <Container size="wide" class="flex flex-1 flex-col justify-center py-10">
+      <nav aria-label={menuAriaLabel + ' (' + (nav.menuLabel ?? 'menu') + ')'}>
+        <ul class="flex flex-col gap-2" role="list" aria-label={nav.pagesLabel}>
+          {
+            menuPages.map((p) => (
+              <li>
+                <a
+                  href={withBase(p.path)}
+                  data-menu-close
+                  aria-current={isCurrent(p.path) ? 'page' : undefined}
+                  class="text-display-sm block rounded-2xl px-3 py-3 text-white/85 no-underline transition-colors hover:text-white aria-[current=page]:text-white aria-[current=page]:underline aria-[current=page]:decoration-2 aria-[current=page]:underline-offset-8"
+                >
+                  {p.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+      <div class="mt-10 flex flex-col gap-3 sm:flex-row">
+        <Button position="nav" variant="light" size="lg" class="w-full sm:w-auto">{nav.cta.label}</Button>
+      </div>
+    </Container>
+  </div>
+</header>
+
+<script>
+  /* Menu mobile : ouverture / fermeture, Échap, retour du focus, piège à tabulation, verrou du scroll. */
+  const header = document.querySelector<HTMLElement>('[data-header]');
+  const opener = header?.querySelector<HTMLButtonElement>('[data-menu-open]');
+  const panel = header?.querySelector<HTMLElement>('[data-menu-panel]');
+  if (header && opener && panel) {
+    const focusables = () =>
+      Array.from(
+        panel.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'),
+      ).filter((el) => !el.hidden && el.offsetParent !== null);
+
+    const isOpen = () => !panel.hidden;
+
+    const open = () => {
+      if (isOpen()) return;
+      panel.hidden = false;
+      opener.setAttribute('aria-expanded', 'true');
+      document.documentElement.style.overflow = 'hidden';
+      panel.querySelector<HTMLElement>('[data-menu-close]:not(a)')?.focus();
+    };
+
+    const close = (restoreFocus = true) => {
+      if (!isOpen()) return;
+      panel.hidden = true;
+      opener.setAttribute('aria-expanded', 'false');
+      document.documentElement.style.overflow = '';
+      if (restoreFocus) opener.focus();
+    };
+
+    opener.addEventListener('click', () => (isOpen() ? close() : open()));
+
+    panel.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement | null;
+      const closer = target?.closest<HTMLElement>('[data-menu-close]');
+      if (!closer) return;
+      // Lien : on laisse la navigation se faire (ancre ou page) sans renvoyer le focus sur le bouton.
+      close(closer.tagName !== 'A');
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (!isOpen()) return;
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        close();
+        return;
+      }
+      if (e.key === 'Tab') {
+        const items = focusables();
+        if (!items.length) return;
+        const first = items[0] as HTMLElement;
+        const last = items[items.length - 1] as HTMLElement;
+        const active = document.activeElement as HTMLElement | null;
+        if (e.shiftKey && (active === first || !panel.contains(active))) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && (active === last || !panel.contains(active))) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    });
+
+    // Le panneau n'existe qu'en dessous de « lg » : on le referme si la fenêtre s'élargit.
+    const desktop = window.matchMedia('(min-width: 64rem)');
+    desktop.addEventListener('change', (e) => {
+      if (e.matches) close(false);
+    });
+  }
+</script>

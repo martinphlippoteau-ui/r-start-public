@@ -1,0 +1,234 @@
+---
+/**
+ * Section 5 — Revenus (id « revenus »). Fond paper.
+ * Distribution mensuelle des dividendes potentiels (grand chiffre + paire avantage/risque), entrée en
+ * jouissance (frise « mois 1 → mois 6 » en pastilles, la 6e mise en avant, + paire avantage/risque),
+ * indicateur synthétique de risque (jauge 1 → 7, segment actif) et durée de placement recommandée.
+ * Aucune donnée de performance.
+ * Motion (src/scripts/motion.ts, tout par attributs) :
+ *  - en-tête : surtitre et introduction en fade-up, H2 mot à mot (data-reveal-text) ;
+ *  - photo : cadre révélé par clip (data-animate="clip", média) et parallaxe douce dans le cadre
+ *    (data-parallax sur un élément surdimensionné de ±14 %, le bord n'est jamais découvert) ;
+ *  - « Chaque mois » mot à mot (data-reveal-text ; le dégradé est posé sur chaque mot animé, un
+ *    enfant transformé sous `background-clip: text` du parent ne serait pas peint), libellé en fade-up ;
+ *  - frise de l'entrée en jouissance : filet continu qui s'étire de la 1re à la 6e pastille
+ *    (data-draw="width", d'un centre de colonne à l'autre) pendant que les pastilles arrivent en
+ *    cascade (stagger) ; pastilles de taille fixe pour que le filet passe par leur centre ;
+ *  - jauge SRI : les segments 1 → 4 (niveau de R Start) se remplissent depuis la gauche (data-fill,
+ *    axe x, valeur = 4/7) ; l'état statique est la vérité, le grand « 4 » n'est pas animé ;
+ *  - horizon : valeur statique (durée de placement recommandée = information liée au risque, jamais animée).
+ * Les blocs risque ([data-risk]) et les paires avantage / risque ne sont jamais animés ni enveloppés
+ * dans un élément animé (les Cards qui en contiennent restent statiques).
+ * Accessibilité : le surtitre est rendu ici en teal-700 (AA sur paper) ; la valeur du SRI et la durée
+ * recommandée (informations de risque) sont en navy uni, pas en dégradé.
+ * La paire avantage / risque de la distribution est composée en text-lead (data-advantage + RiskNote
+ * size="lead", même taille) faute de prop `size` sur RiskPair.
+ * Contenu : src/content/fr/income.ts et media.ts (photo media.income + crédit).
+ */
+import { Picture } from 'astro:assets';
+import Card from '@/components/ui/Card.astro';
+import Container from '@/components/ui/Container.astro';
+import NoteRef from '@/components/ui/NoteRef.astro';
+import RiskNote from '@/components/ui/RiskNote.astro';
+import RiskPair from '@/components/ui/RiskPair.astro';
+import Section from '@/components/ui/Section.astro';
+import { sections } from '@/config/sections';
+import { income } from '@/content/fr/income';
+import { media } from '@/content/fr/media';
+import { resolveImage } from '@/lib/images';
+
+const id = sections.income.id;
+const titleId = id + '-title';
+const photo = await resolveImage(media.income.src);
+const { distribution, enjoyment, sri, horizon } = income;
+
+/** Frise de l'entrée en jouissance : une pastille par mois, la dernière mise en avant. */
+const timeline = enjoyment.timeline;
+const months = timeline ? Array.from({ length: timeline.count }, (_, i) => i + 1) : [];
+/**
+ * Filet de la frise : d'un centre de colonne à l'autre. Avec N colonnes égales et un écart g (gap-x-4 =
+ * 1rem à partir de sm), le centre de la 1re colonne est à W/(2N) − g(N−1)/(2N) du bord.
+ */
+const timelineInset = timeline
+  ? `calc(${(100 / (2 * timeline.count)).toFixed(3)}% - ${((timeline.count - 1) / (2 * timeline.count)).toFixed(4)}rem)`
+  : '0';
+
+/** Jauge SRI : un segment par niveau, seul le niveau de R Start est actif ; les niveaux 1 → valeur se remplissent. */
+const segments = Array.from({ length: sri.max }, (_, i) => i + 1);
+const filled = segments.filter((n) => n <= sri.value);
+const rest = segments.filter((n) => n > sri.value);
+const gaugeLabel = sri.ariaLabel ?? `${sri.label} : ${sri.value} / ${sri.max}`;
+const fillRatio = (sri.value / sri.max).toFixed(3);
+
+/** Horizon : compteur si la valeur commence par un nombre (« 10 ans » → 10 + « ans »). */
+const horizonMatch = horizon.value.match(/^(\d+)(\D.*)?$/);
+const horizonNumeric = horizonMatch ? horizonMatch[1] : undefined;
+const horizonSuffix = horizonMatch ? horizonMatch[2] : undefined;
+---
+
+<Section id={id} tone="paper">
+  <Container size="wide">
+    <header class="max-w-4xl">
+      <p class="text-eyebrow mb-4 text-teal-700" data-animate="fade-up">{income.eyebrow}</p>
+      <h2 id={titleId} class="text-display-lg" data-reveal-text>{income.title}</h2>
+      <p class="mt-6 text-lead opacity-90" data-animate="fade-up" data-animate-delay="0.15">{income.intro}</p>
+    </header>
+
+    <!-- Photo : cadre révélé par clip, parallaxe douce à l'intérieur -->
+    <figure class="mt-12 lg:mt-16" data-animate="clip">
+      <div class="img-frame aspect-[4/3] sm:aspect-[16/9] lg:aspect-[21/9]">
+        <div class="absolute inset-x-0 -top-[14%] h-[128%]" data-parallax="0.04" data-parallax-trigger="parent">
+          <Picture
+            src={photo}
+            alt={media.income.alt}
+            widths={[480, 800, 1200, 1600, 2400]}
+            sizes="(min-width: 80rem) 80rem, 100vw"
+            formats={['webp']}
+            loading="lazy"
+            decoding="async"
+            pictureAttributes={{ class: 'block h-full w-full' }}
+            class="h-full w-full object-cover"
+          />
+        </div>
+      </div>
+      {media.income.credit && <figcaption class="text-caption mt-3 text-slate-700">{media.income.credit}</figcaption>}
+    </figure>
+
+    <!-- Distribution mensuelle -->
+    <div class="mt-16 grid gap-8 lg:mt-24 lg:grid-cols-2 lg:items-end lg:gap-16">
+      <div>
+        <p class="text-stat text-brand-gradient [&_.reveal-word]:text-brand-gradient" data-reveal-text>{distribution.value}</p>
+        <h3 class="text-lead mt-3 font-medium" data-animate="fade-up" data-animate-delay="0.2">
+          {distribution.label}<NoteRef id="revenus-dividendes" />
+        </h3>
+      </div>
+      <div class="space-y-4">
+        <p data-advantage class="text-lead">{distribution.advantage}</p>
+        <RiskNote text={distribution.risk} size="lead" />
+      </div>
+    </div>
+
+    <!-- Entrée en jouissance -->
+    <Card class="mt-16 lg:mt-24 lg:p-12">
+      <div class="grid gap-10 lg:grid-cols-12 lg:gap-14">
+        <div class="lg:col-span-5">
+          <p class="text-display-md text-brand-gradient" data-animate="fade-up">{enjoyment.value}</p>
+          <h3 class="text-lead mt-3 font-medium">
+            {enjoyment.label}<NoteRef id="revenus-jouissance" />
+          </h3>
+          <RiskPair advantage={enjoyment.advantage} risk={enjoyment.risk} class="mt-6" />
+        </div>
+
+        {
+          timeline && (
+            <div class="lg:col-span-7 lg:self-center">
+              <div class="relative">
+                <span
+                  aria-hidden="true"
+                  data-draw="width"
+                  class="absolute top-9 hidden h-px bg-mist sm:block lg:top-10"
+                  style={`left: ${timelineInset}; right: ${timelineInset};`}
+                />
+                <ol
+                  aria-label={timeline.label}
+                  class="relative grid grid-cols-3 gap-x-3 gap-y-6 sm:grid-cols-6 sm:gap-x-4"
+                  data-animate="stagger"
+                  data-animate-stagger="0.1"
+                >
+                  {months.map((m) => {
+                    const last = m === timeline.count;
+                    return (
+                      <li class="flex flex-col items-center gap-3 text-center">
+                        <div class="flex w-full justify-center">
+                          <span
+                            aria-hidden="true"
+                            class:list={[
+                              'relative flex size-18 items-center justify-center rounded-full font-bold tabular-nums transition-transform lg:size-20',
+                              last
+                                ? 'bg-brand-gradient text-white shadow-float ring-4 ring-teal-100 text-3xl sm:scale-110'
+                                : 'border border-mist bg-paper text-navy text-2xl',
+                            ]}
+                          >
+                            {m}
+                          </span>
+                        </div>
+                        <span class:list={['text-sm font-semibold', last ? 'text-navy' : 'text-slate-700']}>
+                          {timeline.monthPrefix} {m}
+                        </span>
+                      </li>
+                    );
+                  })}
+                </ol>
+              </div>
+              <div class="mt-5 flex justify-between gap-6 border-t border-mist pt-4">
+                <p class="text-caption max-w-40 text-slate-700">{timeline.startCaption}</p>
+                <p class="text-caption max-w-48 text-right font-semibold text-navy">{timeline.endCaption}</p>
+              </div>
+            </div>
+          )
+        }
+      </div>
+    </Card>
+
+    <!-- SRI et horizon -->
+    <div class="mt-6 grid gap-6 lg:grid-cols-2">
+      <Card class="lg:p-12">
+        <h3 class="text-lead font-medium">
+          {sri.label}<NoteRef id="revenus-sri" />
+        </h3>
+        <p class="mt-3 flex items-baseline gap-2">
+          <span class="text-stat text-navy">{sri.value}</span>
+          <span class="text-display-sm text-slate-700">/ {sri.max}</span>
+        </p>
+        <div class="mt-8" role="img" aria-label={gaugeLabel}>
+          <div class="grid gap-1.5 sm:gap-2" style={`grid-template-columns: repeat(${sri.max}, minmax(0, 1fr))`}>
+            <div
+              class="grid gap-1.5 sm:gap-2"
+              style={`grid-column: span ${filled.length}; grid-template-columns: repeat(${filled.length}, minmax(0, 1fr))`}
+              data-fill={fillRatio}
+            >
+              {
+                filled.map((n) => (
+                  <span
+                    class:list={[
+                      'flex h-12 items-center justify-center rounded-xl text-base font-bold tabular-nums sm:h-14',
+                      n === sri.value ? 'scale-y-110 bg-navy text-white shadow-card ring-4 ring-teal-100' : 'bg-teal-100 text-navy',
+                    ]}
+                  >
+                    {n}
+                  </span>
+                ))
+              }
+            </div>
+            {
+              rest.map((n) => (
+                <span class="flex h-12 items-center justify-center rounded-xl bg-mist text-base font-bold tabular-nums text-slate-700 sm:h-14">
+                  {n}
+                </span>
+              ))
+            }
+          </div>
+        </div>
+        {
+          (sri.scaleLow || sri.scaleHigh) && (
+            <div class="mt-3 flex justify-between gap-6 text-caption text-slate-700">
+              <span>{segments[0]} · {sri.scaleLow}</span>
+              <span class="text-right">{sri.max} · {sri.scaleHigh}</span>
+            </div>
+          )
+        }
+        <p class="mt-6 text-base leading-relaxed">{sri.description}</p>
+      </Card>
+
+      <Card class="lg:p-12">
+        <h3 class="text-lead font-medium">{horizon.label}</h3>
+        <p
+          class="text-stat mt-3 text-navy"
+        >
+          {horizon.value}
+        </p>
+        <p class="mt-6 text-base leading-relaxed">{horizon.description}</p>
+      </Card>
+    </div>
+  </Container>
+</Section>

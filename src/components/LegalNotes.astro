@@ -1,0 +1,37 @@
+---
+/**
+ * Section « Notes » : liste ordonnée des notes légales (sources, dates, définitions), numérotées
+ * dans l'ordre des sections. Chaque item porte l'ancre `${sections.notes.id}-${n}` ciblée par NoteRef.
+ * Prop optionnelle `notes` : une sous-page rend ses propres notes (export `notes` de son fichier de
+ * contenu, numérotées par son appel de note local) ; sans prop, le registre de l'accueil (allNotes).
+ */
+import Container from '@/components/ui/Container.astro';
+import Section from '@/components/ui/Section.astro';
+import { sections } from '@/config/sections';
+import { footer } from '@/content/fr/footer';
+import { allNotes } from '@/content/fr/notes';
+import type { LegalNote } from '@/content/types';
+
+interface Props {
+  notes?: LegalNote[];
+}
+const { notes = allNotes } = Astro.props;
+
+const id = sections.notes.id;
+const title = footer.notesTitle ?? sections.notes.label;
+---
+
+<Section id={id} tone="paper" spacing="compact">
+  <Container>
+    <h2 id={id + '-title'} class="text-lg font-semibold tracking-tight text-navy">{title}</h2>
+    <ol class="mt-6 max-w-4xl list-decimal space-y-3 pl-6 text-sm leading-relaxed text-slate-700 marker:font-semibold marker:text-navy">
+      {
+        notes.map((note, i) => (
+          <li id={id + '-' + (i + 1)} class="scroll-mt-24 pl-1">
+            {note.text}
+          </li>
+        ))
+      }
+    </ol>
+  </Container>
+</Section>

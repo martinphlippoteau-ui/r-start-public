@@ -1,0 +1,43 @@
+---
+/**
+ * Clôture de la page /documentation : mention 2 (legal.documentsNotice via documentation.mention, texte
+ * normal, jamais animée), renvoi vers corum.fr (nouvel onglet, rel noopener noreferrer, mention lue par
+ * les lecteurs d'écran) et CTA vers le tunnel de souscription (position « souscrire »).
+ * Bloc sans titre propre : simple région de page, pas une <Section> (qui exige un H2).
+ * Contenu : documentation.mention, corumLink, cta et labels.newTabHint.
+ */
+import Button from '@/components/ui/Button.astro';
+import Container from '@/components/ui/Container.astro';
+import type { Cta } from '@/content/types';
+
+interface Props {
+  mention: string;
+  corumLink: { label: string; href: string };
+  cta: Cta;
+  newTabHint?: string;
+}
+const { mention, corumLink, cta, newTabHint } = Astro.props;
+---
+
+<div id="mention" data-section="mention" class="bg-white py-section-sm text-ink">
+  <Container size="wide">
+    <div class="rounded-3xl bg-paper p-6 sm:p-10 lg:p-12">
+      <p class="text-lead max-w-4xl">{mention}</p>
+      <div class="mt-8 flex flex-col items-stretch gap-4 sm:flex-row sm:flex-wrap sm:items-center">
+        <Button position={cta.position} variant="primary" size="lg">{cta.label}</Button>
+        <a
+          href={corumLink.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="nav-link inline-flex items-center gap-2 self-center px-2 py-2 text-base font-semibold text-navy underline-offset-4 hover:text-teal-700 hover:underline sm:text-lg"
+        >
+          {corumLink.label}
+          <svg aria-hidden="true" class="size-4 shrink-0" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M6 3h7v7M13 3 4 12" stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg>
+          {newTabHint && <span class="visually-hidden">({newTabHint})</span>}
+        </a>
+      </div>
+    </div>
+  </Container>
+</div>

@@ -1,0 +1,132 @@
+---
+/**
+ * Section 1 — Hero (id « apercu »). Référence visuelle des autres sections.
+ * Fond ink + halo de marque (dérive lente en CSS), H1 porté par le logo R Start (le texte du titre
+ * reste dans le H1 en visually-hidden ; l'image est décorative, aria-hidden), sous-titre en trois
+ * phrases, ligne risques dans la même taille (jamais animée), deux CTA, puis le grand visuel
+ * (LCP : eager + fetchpriority high ; préchargé depuis index.astro via src/lib/hero-image.ts).
+ * Le logo porte `data-brand-flight` : au défilement il rejoint la sous-navigation sticky
+ * (src/scripts/motion/brandflight.ts). La place du logo est réservée en CSS (`hero-logo-wrap`) :
+ * aucun décalage quand l'image passe dans son calque fixe.
+ * Motion (src/scripts/motion.ts) :
+ *  - cascade d'entrée `data-intro` (CSS pur, jouée au premier rendu, aucun flash) sur le surtitre,
+ *    l'accroche, le sous-titre et les CTA — jamais sur le H1 ni sur la RiskNote, affichés d'emblée.
+ *    Le sous-titre est le candidat LCP à 375 px : il entre par transform seul (`data-intro-move`,
+ *    opacité intacte) pour ne pas retarder le LCP ;
+ *  - au scroll, les mêmes blocs (enveloppes `data-scrub`, séparées des éléments `data-intro` pour ne
+ *    pas partager la même propriété) passent à 35 % d'opacité en quittant le viewport par le haut ;
+ *    la RiskNote est hors de ces enveloppes : elle reste à opacité 1 ;
+ *  - l'image n'est jamais transformée par JS avant le LCP : dézoom CSS 1.04 → 1 via la classe posée à
+ *    `load` (`data-on-load`), puis léger zoom (`data-scrub` sur l'enveloppe) et parallaxe (figure)
+ *    pilotés par le défilement de la section, à partir de la position 0 (aucune transformation au
+ *    chargement) ;
+ *  - la dérive du halo (`brand-halo-drift`) ne tourne que quand la section est à l'écran
+ *    (`data-in-view` → classe `is-in-view`).
+ * Le bloc texte + risques + CTA tient dans le premier viewport (à 375 × 812, la ligne risques garde
+ * ≥ 24 px au-dessus du bandeau de consentement : espacements mobiles resserrés) ; l'image peut
+ * dépasser sous la ligne de flottaison. Contenu : src/content/fr/hero.ts et media.ts.
+ */
+import { Image } from 'astro:assets';
+import brandLogo from '@/assets/logos/r-start-blanc.svg';
+import Button from '@/components/ui/Button.astro';
+import Container from '@/components/ui/Container.astro';
+import RiskNote from '@/components/ui/RiskNote.astro';
+import Section from '@/components/ui/Section.astro';
+import { sections } from '@/config/sections';
+import { hero } from '@/content/fr/hero';
+import { media } from '@/content/fr/media';
+import { heroImageFormat, heroImageSizes, heroImageWidths, loadHeroImage } from '@/lib/hero-image';
+
+const heroImage = await loadHeroImage();
+const titleId = sections.hero.id + '-title';
+/** Surtitre informatif court (hero.ts) : affiché dès qu'il n'est pas vide. */
+const showEyebrow = hero.eyebrow.trim() !== '';
+/** Sélecteur de la section : les effets au scroll partent de sa position 0 (aucun état initial transformé). */
+const sectionSelector = '#' + sections.hero.id;
+const copySelector = '[data-hero-copy]';
+/** Fondu du texte quand il sort par le haut : de « haut du bloc en haut du viewport » à sa sortie. */
+const copyScrub = {
+  'data-scrub': 'opacity:1,0.35',
+  'data-scrub-trigger': copySelector,
+  'data-scrub-start': 'top top',
+  'data-scrub-end': 'bottom top',
+};
+---
+
+<Section
+  id={sections.hero.id}
+  tone="ink"
+  spacing="none"
+  labelledBy={titleId}
+  data-in-view="is-in-view"
+  class="brand-halo brand-halo-drift grain flex min-h-svh flex-col overflow-hidden pt-18 sm:pt-32 lg:pt-28"
+>
+  <Container size="wide" class="relative flex flex-1 flex-col">
+    <div data-hero-copy class="mx-auto flex max-w-4xl flex-col items-center text-center">
+      {
+        showEyebrow && (
+          <div {...copyScrub} class="mb-2 sm:mb-4">
+            <p data-intro="1" class="text-eyebrow text-teal-200 max-sm:tracking-wider">
+              {hero.eyebrow}
+            </p>
+          </div>
+        )
+      }
+      <h1 id={titleId} class="hero-logo-wrap">
+        <span class="visually-hidden">{hero.title}</span>
+        <span class="hero-logo-stack" aria-hidden="true" data-brand-flight>
+          <Image src={brandLogo} alt="" width={290} height={89} loading="eager" decoding="async" />
+        </span>
+      </h1>
+      <div {...copyScrub} class="flex flex-col items-center">
+        <p data-intro="2" class="text-display-sm mt-2 text-sand sm:mt-4">{hero.tagline}</p>
+        <p data-intro="3" data-intro-move class="text-lead mt-3 max-w-3xl text-pretty text-white sm:mt-6">{hero.subtitle}</p>
+      </div>
+      <RiskNote
+        text={hero.riskLine}
+        tone="dark"
+        size="lead"
+        class="mx-auto mt-3 max-w-3xl justify-center text-left sm:mt-5"
+      />
+      <div {...copyScrub} class="mt-6 w-full sm:mt-7 sm:w-auto">
+        <div data-intro="4" class="flex w-full flex-col items-stretch gap-3 sm:w-auto sm:flex-row sm:items-center">
+          <Button position={hero.primaryCta.position} variant="light" size="lg">{hero.primaryCta.label}</Button>
+          <Button href={hero.secondaryCta.href} variant="outline-light" size="lg">{hero.secondaryCta.label}</Button>
+        </div>
+      </div>
+    </div>
+
+    <figure
+      class="mx-auto mt-12 w-full max-w-7xl pb-12 sm:pb-16 lg:pb-20"
+      data-parallax="0.08"
+      data-parallax-trigger={sectionSelector}
+      data-parallax-start="top top"
+      data-parallax-end="bottom top"
+    >
+      <div class="img-frame aspect-[4/3] sm:aspect-[16/9] lg:aspect-[21/9]">
+        <div
+          class="h-full w-full"
+          data-scrub="scale:1,1.06"
+          data-scrub-trigger={sectionSelector}
+          data-scrub-start="top top"
+          data-scrub-end="bottom top"
+        >
+          <Image
+            src={heroImage}
+            alt={media.hero.main.alt}
+            widths={heroImageWidths}
+            sizes={heroImageSizes}
+            format={heroImageFormat}
+            loading="eager"
+            fetchpriority="high"
+            decoding="async"
+            data-on-load="is-loaded"
+            class="hero-media h-full w-full object-cover"
+          />
+        </div>
+        <div aria-hidden="true" class="absolute inset-0 bg-gradient-to-t from-ink/45 via-transparent to-transparent"></div>
+      </div>
+      {media.hero.main.credit && <figcaption class="text-caption mt-3 text-white/90">{media.hero.main.credit}</figcaption>}
+    </figure>
+  </Container>
+</Section>

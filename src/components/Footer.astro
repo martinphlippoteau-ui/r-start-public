@@ -1,0 +1,83 @@
+---
+/**
+ * Pied de page réglementaire : une navigation unique (colonnes de liens titrées), « Gérer les
+ * cookies » (data-consent-open), puis le bloc légal en texte normal (≥ 0.875rem, contraste AA sur
+ * fond blanc). Textes : footer.ts (qui assemble les mentions de legal.ts à l'identique).
+ * Logos R Start et CORUM L'Épargne ; aucun logo AMF.
+ */
+import { Image } from 'astro:assets';
+import brandLogo from '@/assets/logos/r-start-couleur.svg';
+import publisherLogo from '@/assets/logos/corum-lepargne-couleur.svg';
+import Container from '@/components/ui/Container.astro';
+import { footer } from '@/content/fr/footer';
+import { withBase } from '@/lib/href';
+
+const hint = footer.externalLinkHint;
+---
+
+<footer class="border-t border-mist bg-white text-ink">
+  <Container size="wide" class="py-section-sm">
+    <div class="flex flex-wrap items-center gap-x-10 gap-y-6">
+      <Image src={brandLogo} alt={footer.logos?.brandAlt ?? ''} height={40} width={130} class="h-10 w-auto" />
+      <Image src={publisherLogo} alt={footer.logos?.publisherAlt ?? ''} height={40} width={130} class="h-10 w-auto" />
+    </div>
+
+    <nav aria-label={footer.navLabel} class="mt-12 grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+      {
+        footer.columns.map((col) => (
+          <div>
+            <h2 class="text-sm font-semibold text-navy">{col.title}</h2>
+            <ul class="mt-4 space-y-2.5" role="list">
+              {col.links.map((link) => (
+                <li>
+                  <a
+                    href={link.external ? link.href : withBase(link.href)}
+                    class="nav-link inline-flex items-center gap-1 text-sm text-slate-700 hover:text-navy"
+                    target={link.external ? '_blank' : undefined}
+                    rel={link.external ? 'noopener noreferrer' : undefined}
+                  >
+                    {link.label}
+                    {link.external && (
+                      <>
+                        <svg aria-hidden="true" class="size-3.5 text-slate" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+                          <path d="M6 3h7v7M13 3 4 12" stroke-linecap="round" stroke-linejoin="round"></path>
+                        </svg>
+                        {hint && <span class="visually-hidden">({hint})</span>}
+                      </>
+                    )}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+    </nav>
+
+    <div class="mt-10 border-t border-mist pt-8">
+      <button
+        type="button"
+        data-consent-open
+        class="nav-link inline-flex items-center gap-2 rounded-full border border-navy/60 px-4 py-2.5 text-sm font-medium text-navy hover:border-navy hover:bg-navy hover:text-white"
+      >
+        {footer.manageCookiesLabel}
+      </button>
+    </div>
+
+    <section class="mt-10 max-w-4xl space-y-6 text-sm leading-relaxed text-slate-700" aria-labelledby="footer-legal-title">
+      <h2 id="footer-legal-title" class="visually-hidden">{footer.legalTitle ?? ''}</h2>
+      {
+        (footer.legalBlocks ?? []).map((block) => (
+          <div>
+            <h3 class="font-semibold text-navy">{block.title}</h3>
+            {block.paragraphs.map((p) => (
+              <p class="mt-1.5">{p}</p>
+            ))}
+          </div>
+        ))
+      }
+    </section>
+
+    <p class="mt-10 text-sm text-slate-700">{footer.copyright}</p>
+  </Container>
+</footer>

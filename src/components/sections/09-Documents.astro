@@ -1,0 +1,217 @@
+---
+/**
+ * Section 9 — Documents (id « documents »). Fond white, après la section Risques (fond ink).
+ * Photo de second plan (collante sur grand écran) face à la liste des documents réglementaires publiés
+ * (statuts exclus tant que le PDF fourni est tronqué, voir documents.ts) : chaque carte est un lien vers
+ * le PDF (ouverture dans un nouvel onglet, rel noopener, type application/pdf, data-doc pour l'analytics
+ * document_download) avec sa description, sa version et son poids en kilooctets (media.manifest.json).
+ * Puis la mention 2 (legal.documentsNotice, texte normal, jamais animée) et les deux renvois : la page
+ * Documentation (config/pages.ts) et corum.fr (nouvel onglet, mention lue par les lecteurs d'écran).
+ * Aucun avantage vanté ici : pas de paire avantage / risque à rendre.
+ * L'en-tête est rendu ici (et non par SectionHeading) pour poser les attributs motion sur le H2 et
+ * le surtitre en teal-700 (AA sur white).
+ *
+ * Motion (src/scripts/motion.ts, attributs seulement) — même signature que 02-Highlights / 05-Income :
+ *  - en-tête : surtitre en fade-up, H2 mot à mot (data-reveal-text, titre court), intro en fade-up
+ *    décalée de 0,15 s ;
+ *  - la photo se dévoile par le bas (`data-animate="clip"`, réservé aux médias) ;
+ *  - cartes en cascade avec bascule 3D légère (`data-animate="tilt"` sur chaque carte, délai
+ *    incrémental CARD_STAGGER) ; le survol ne change que l'ombre (transition-shadow), jamais le transform,
+ *    pour ne pas concurrencer la révélation GSAP ;
+ *  - le pictogramme PDF n'est pas tracé (pas de data-draw) : la durée par défaut du tracé (1,4 s +
+ *    cascade, pensée pour la carte 04-Strategy) dépassait d'une seconde l'arrivée de la carte sur un
+ *    picto de 28 px — la cascade des cartes suffit, comme dans 02-Highlights ;
+ *  - le bloc mention 2 + renvois ne porte aucun attribut : visible d'emblée, jamais animé.
+ * Sans JS ou en reduced-motion, tout est visible (l'état final est dans le HTML).
+ *
+ * Accessibilité des cartes :
+ *  - le lien-titre (h3) précède les métadonnées « PDF · 155 ko » dans le DOM (ordre de tabulation et de
+ *    lecture : titre → poids → version) ; la ligne de métadonnées est remontée visuellement par `order-first` ;
+ *  - le nom du h3 reste le seul intitulé du document : « PDF, nouvelle fenêtre » est porté par
+ *    aria-describedby vers un span `hidden` unique (lu comme description, absent de la lecture linéaire) ;
+ *  - l'anneau de focus clavier entoure toute la carte : il est posé sur le pseudo-élément ::after qui étend
+ *    la zone cliquable (variantes `focus-visible:after:*`, compilées en `:focus-visible::after`), l'anneau
+ *    global et son halo blanc étant retirés du texte du titre (`focus-visible:outline-none shadow-none`).
+ * Contenu : src/content/fr/documents.ts et media.ts (photo optionnelle media.documents + crédit).
+ */
+import { Picture } from 'astro:assets';
+import Button from '@/components/ui/Button.astro';
+import Container from '@/components/ui/Container.astro';
+import NoteRef from '@/components/ui/NoteRef.astro';
+import Section from '@/components/ui/Section.astro';
+import { sections } from '@/config/sections';
+import { documents } from '@/content/fr/documents';
+import { media } from '@/content/fr/media';
+import { resolveImage } from '@/lib/images';
+import { withBase } from '@/lib/href';
+
+const id = sections.documents.id;
+/** id du H2, référencé par aria-labelledby sur la section (convention de Section / SectionHeading). */
+const titleId = id + '-title';
+const photo = media.documents ? await resolveImage(media.documents.src) : null;
+
+/** Poids en kilooctets, formaté en français (ex. « 2 232 »). */
+const kbFormat = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 });
+
+/** Clé analytics d'un document : sa clé de facts.ts, à défaut le nom du fichier sans extension. */
+const docKey = (file: string, key?: string) => key ?? file.replace(/^.*\//, '').replace(/\.pdf$/i, '');
+
+/** Détail du fichier lu par les lecteurs d'écran après le titre du lien (ex. « PDF, nouvelle fenêtre »). */
+const linkHint = [documents.fileTypeLabel, documents.newTabHint].filter(Boolean).join(', ');
+/** id du span masqué portant ce détail, référencé par aria-describedby sur chaque lien de document. */
+const linkHintId = `${id}-link-hint`;
+
+/** Décalage de la cascade entre deux cartes (secondes). */
+const CARD_STAGGER = 0.1;
+---
+
+<Section id={id} tone="white">
+  <Container size="wide">
+    <header class="max-w-4xl">
+      <p class="text-eyebrow mb-4 text-teal-700" data-animate="fade-up">{documents.eyebrow}</p>
+      <h2 id={titleId} class="text-display-lg" data-reveal-text>{documents.title}</h2>
+      <p class="mt-6 text-lead opacity-90" data-animate="fade-up" data-animate-delay="0.15">{documents.intro}</p>
+    </header>
+    {linkHint && <span id={linkHintId} hidden>{linkHint}</span>}
+
+    <div class="mt-16 grid gap-12 lg:mt-24 lg:grid-cols-12 lg:gap-16">
+      <!-- Photo -->
+      {
+        photo && media.documents && (
+          <figure class="order-last self-start lg:order-first lg:sticky lg:top-24 lg:col-span-5" data-animate="clip">
+            <div class="img-frame aspect-[4/3] lg:aspect-[4/5]">
+              <Picture
+                src={photo}
+                alt={media.documents.alt}
+                widths={[480, 800, 1200, 1600]}
+                sizes="(min-width: 64rem) 34rem, 100vw"
+                formats={['webp']}
+                loading="lazy"
+                decoding="async"
+                pictureAttributes={{ class: 'block h-full w-full' }}
+                class="h-full w-full object-cover"
+              />
+            </div>
+            {media.documents.credit && <figcaption class="text-caption mt-3 text-slate-700">{media.documents.credit}</figcaption>}
+          </figure>
+        )
+      }
+
+      <!-- Documents -->
+      <ul
+        role="list"
+        aria-label={documents.listLabel}
+        class:list={['grid gap-5 lg:gap-6', photo ? 'lg:col-span-7' : 'lg:col-span-12 sm:grid-cols-2']}
+      >
+        {
+          documents.items.map((item, i) => (
+            <li
+              class="group relative flex flex-col gap-5 rounded-3xl bg-paper p-6 ring-1 ring-navy/5 transition-shadow duration-300 hover:shadow-card focus-within:shadow-card sm:flex-row sm:gap-8 sm:p-8 lg:p-10"
+              data-animate="tilt"
+              data-animate-delay={String(i * CARD_STAGGER)}
+            >
+              <span
+                aria-hidden="true"
+                class="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-teal-100 text-navy transition-colors duration-300 group-hover:bg-navy group-hover:text-white"
+              >
+                <svg
+                  class="size-7"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.6"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z"></path>
+                  <path d="M14 3v5h5"></path>
+                  <path d="M9 13h6M9 17h6"></path>
+                </svg>
+              </span>
+
+              <div class="flex min-w-0 flex-1 flex-col">
+                <h3 class="text-display-sm mt-3">
+                  <a
+                    href={withBase(item.file)}
+                    data-doc={docKey(item.file, item.key)}
+                    target="_blank"
+                    rel="noopener"
+                    type="application/pdf"
+                    aria-describedby={linkHint ? linkHintId : undefined}
+                    class="text-ink no-underline after:absolute after:inset-0 after:rounded-3xl group-hover:text-navy focus-visible:shadow-none focus-visible:outline-none focus-visible:after:outline-3 focus-visible:after:outline-offset-2 focus-visible:after:outline-navy"
+                  >
+                    {item.title}
+                  </a>
+                </h3>
+
+                <p class="text-caption order-first flex flex-wrap items-center gap-x-2 gap-y-1 font-semibold tracking-wider text-slate-700">
+                  {documents.fileTypeLabel && <span class="uppercase">{documents.fileTypeLabel}</span>}
+                  {item.kb !== undefined && (
+                    <>
+                      <span aria-hidden="true">·</span>
+                      <span class="relative z-10 tabular-nums">
+                        {kbFormat.format(item.kb)}
+                        {documents.sizeUnit && <> {documents.sizeUnit}</>}
+                        <NoteRef id="documents-poids" />
+                      </span>
+                    </>
+                  )}
+                </p>
+
+                <p class="mt-3 text-base leading-relaxed text-ink">{item.description}</p>
+
+                <p class="mt-4 flex items-center justify-between gap-4 text-sm text-slate-700">
+                  <span class="relative z-10">
+                    {item.version}
+                    <NoteRef id="documents-versions" />
+                  </span>
+                  <svg
+                    aria-hidden="true"
+                    class="size-5 shrink-0 text-navy transition-transform duration-300 group-hover:translate-x-1 motion-reduce:transition-none"
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M4 10h12M11 5l5 5-5 5"></path>
+                  </svg>
+                </p>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    <!-- Mention 2 (texte normal, jamais animée) et renvois -->
+    <div class="mt-16 rounded-3xl bg-paper p-6 sm:p-10 lg:mt-24 lg:p-12">
+      <p class="text-lead max-w-4xl">{documents.mention}</p>
+      <div class="mt-8 flex flex-col items-stretch gap-4 sm:flex-row sm:flex-wrap sm:items-center">
+        {
+          documents.allDocumentsLink && (
+            <Button href={documents.allDocumentsLink.href} variant="primary" size="lg">
+              {documents.allDocumentsLink.label}
+            </Button>
+          )
+        }
+        <span class="inline-flex items-center">
+          <a
+            href={documents.corumLink.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="nav-link inline-flex items-center gap-2 px-2 py-2 text-base font-semibold text-navy underline-offset-4 hover:text-teal-700 hover:underline sm:text-lg"
+          >
+            {documents.corumLink.label}
+            <svg aria-hidden="true" class="size-4 shrink-0" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M6 3h7v7M13 3 4 12" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+            {documents.newTabHint && <span class="visually-hidden">({documents.newTabHint})</span>}
+          </a>
+          <NoteRef id="documents-corum" />
+        </span>
+      </div>
+    </div>
+  </Container>
+</Section>

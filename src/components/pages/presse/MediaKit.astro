@@ -1,0 +1,132 @@
+---
+/**
+ * Page Presse — Kit média (id « kit-media »). Fond white (alternance avec Contacts presse).
+ * 1. Logos (press.mediaKit.logos, servis depuis public/presse) : une carte par fichier avec un aperçu
+ *    <img> du SVG (le SVG de même nom sert d'aperçu à un PNG ; un logo « blanc » est présenté sur fond
+ *    ink), le libellé en lien de téléchargement (attribut download, data-doc pour l'analytics), le format
+ *    (extension) et le poids résolus au build. Les fichiers absents de public/ ne sont pas rendus.
+ * 2. Chiffres clés : liste de définitions (dt / dd) dans une carte blanche, suivie, dans la même taille de
+ *    texte, du rappel des risques (RiskNote, jamais animé, hors de tout conteneur animé).
+ * 3. Texte de présentation de CORUM L'Épargne (boilerplate), reproduit tel quel, en carte collante.
+ * Animation : cascade sur la grille des logos seulement.
+ * Contenu : src/content/fr/press.ts (mediaKit, labels).
+ */
+import Container from '@/components/ui/Container.astro';
+import RiskNote from '@/components/ui/RiskNote.astro';
+import Section from '@/components/ui/Section.astro';
+import PressNoteRef from '@/components/pages/presse/PressNoteRef.astro';
+import { press } from '@/content/fr/press';
+import { fileExtension, fileName, kbFormat, publicFileExists, publicFileKb } from '@/components/pages/presse/public-files';
+import { withBase } from '@/lib/href';
+
+const id = 'kit-media';
+const { mediaKit } = press;
+const labels = press.labels ?? {};
+
+const logos = mediaKit.logos
+  .filter((l) => publicFileExists(l.file))
+  .map((l) => {
+    const svg = l.file.replace(/\.[a-z0-9]+$/i, '.svg');
+    const preview = publicFileExists(svg) ? svg : l.file;
+    return {
+      ...l,
+      preview,
+      format: fileExtension(l.file),
+      kb: publicFileKb(l.file),
+      dark: /blanc/i.test(l.file),
+    };
+  });
+---
+
+<Section id={id} tone="white">
+  <Container size="wide">
+    <header class="max-w-4xl">
+      <h2 id={id + '-title'} class="text-display-md text-ink">{mediaKit.title}</h2>
+      <p class="text-lead mt-5 text-pretty text-slate-700 sm:mt-6">{mediaKit.intro}</p>
+    </header>
+
+    <!-- Logos -->
+    {
+      logos.length > 0 && (
+        <div class="mt-10 lg:mt-14">
+          <h3 id={id + '-logos'} class="text-display-sm text-ink">
+            {labels.logosTitle}<span class="whitespace-nowrap"><PressNoteRef id="presse-kit" /></span>
+          </h3>
+          <ul
+            role="list"
+            aria-label={labels.logosListLabel}
+            class="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6"
+            data-animate="stagger"
+          >
+            {logos.map((l) => (
+              <li class="group relative flex flex-col overflow-hidden rounded-3xl bg-paper ring-1 ring-navy/5 transition-shadow duration-300 hover:shadow-card focus-within:shadow-card">
+                <div class:list={['flex aspect-[16/9] items-center justify-center p-8', l.dark ? 'bg-ink' : 'bg-white']}>
+                  <img src={l.preview} alt="" width="200" height="60" loading="lazy" decoding="async" class="h-12 w-auto max-w-full sm:h-14" />
+                </div>
+                <div class="flex flex-1 flex-col gap-2 p-6">
+                  <p class="text-caption flex flex-wrap items-center gap-x-2 font-semibold tracking-wider text-slate-700">
+                    {l.format && <span class="uppercase">{l.format}</span>}
+                    {l.kb !== undefined && (
+                      <>
+                        <span aria-hidden="true">·</span>
+                        <span class="tabular-nums">
+                          {kbFormat.format(l.kb)}
+                          {labels.sizeUnit && <> {labels.sizeUnit}</>}
+                        </span>
+                      </>
+                    )}
+                  </p>
+                  <p class="text-lg font-semibold leading-snug text-ink">
+                    <a
+                      href={withBase(l.file)}
+                      download
+                      data-doc={fileName(l.file)}
+                      class="text-ink no-underline after:absolute after:inset-0 after:rounded-3xl group-hover:text-navy focus-visible:shadow-none focus-visible:outline-none focus-visible:after:outline-3 focus-visible:after:outline-offset-2 focus-visible:after:outline-navy"
+                    >
+                      {l.label}
+                    </a>
+                  </p>
+                  {labels.downloadLabel && (
+                    <p aria-hidden="true" class="mt-auto flex items-center gap-2 pt-2 text-sm font-semibold text-navy">
+                      {labels.downloadLabel}
+                      <svg class="size-4 shrink-0 transition-transform duration-300 group-hover:translate-y-0.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M8 2v9M4 7l4 4 4-4M3 14h10"></path>
+                      </svg>
+                    </p>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )
+    }
+
+    <!-- Chiffres clés et présentation -->
+    <div class="mt-12 grid gap-8 lg:mt-16 lg:grid-cols-12 lg:gap-10">
+      <div class="lg:col-span-7">
+        <h3 id={id + '-chiffres'} class="text-display-sm text-ink">
+          {labels.keyFactsTitle}<span class="whitespace-nowrap"><PressNoteRef id="presse-chiffres-cles" /></span>
+        </h3>
+        <dl class="mt-6 divide-y divide-navy/10 rounded-3xl bg-paper px-6 ring-1 ring-navy/5 sm:px-8">
+          {
+            mediaKit.keyFacts.map((f) => (
+              <div class="grid gap-1 py-4 text-base leading-relaxed sm:grid-cols-[minmax(0,13rem)_1fr] sm:gap-6 sm:py-5">
+                <dt class="font-semibold text-navy">{f.label}</dt>
+                <dd class="text-ink">{f.value}</dd>
+              </div>
+            ))
+          }
+        </dl>
+        {mediaKit.riskLine && <RiskNote text={mediaKit.riskLine} class="mt-6 px-1" />}
+      </div>
+
+      <div class="lg:col-span-5">
+        <div class="rounded-3xl bg-ink p-6 text-white sm:p-8 lg:sticky lg:top-24 lg:p-10">
+          <h3 class="text-display-sm text-white">{mediaKit.boilerplate.title}</h3>
+          <p class="mt-4 text-base leading-relaxed text-white/90 sm:mt-5">{mediaKit.boilerplate.body}</p>
+        </div>
+      </div>
+    </div>
+  </Container>
+</Section>

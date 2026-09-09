@@ -1,0 +1,83 @@
+---
+/**
+ * Page Presse — Revue de presse (id « revue-de-presse »). Fond white (alternance avec Communiqués).
+ * Introduction (qui rappelle que R Start n'est pas une SCPI sans frais) et avertissement de fin
+ * (facts.press.coverageDisclaimer) en texte normal, jamais animés. Entre les deux, une grille de
+ * cartes : média (surtitre), titre de l'article en lien externe (nouvel onglet, rel noopener noreferrer,
+ * mention « nouvelle fenêtre » portée par aria-describedby vers un span caché commun, comme les
+ * communiqués, pour que le nom accessible du H3 reste le titre seul), date si le contenu en porte une.
+ * Chaque carte étend son lien-titre à toute sa surface (::after) comme les cartes Documents de l'accueil.
+ * Animation : révélation en cascade de la grille seulement.
+ * Contenu : src/content/fr/press.ts (coverage, labels).
+ */
+import Container from '@/components/ui/Container.astro';
+import Section from '@/components/ui/Section.astro';
+import PressNoteRef from '@/components/pages/presse/PressNoteRef.astro';
+import { press } from '@/content/fr/press';
+
+const id = 'revue-de-presse';
+const { coverage } = press;
+const labels = press.labels ?? {};
+
+/** Mention lue par les lecteurs d'écran après le titre de chaque lien (ex. « nouvelle fenêtre »). */
+const linkHint = labels.newTabHint ?? '';
+const linkHintId = `${id}-link-hint`;
+---
+
+<Section id={id} tone="white">
+  <Container size="wide">
+    <header class="max-w-4xl">
+      <h2 id={id + '-title'} class="text-display-md text-ink">{coverage.title}</h2>
+      <p class="text-lead mt-5 text-pretty text-slate-700 sm:mt-6">
+        {coverage.intro}<span class="whitespace-nowrap"><PressNoteRef id="presse-revue" /></span>
+      </p>
+    </header>
+    {coverage.items.length > 0 && linkHint && <span id={linkHintId} hidden>{linkHint}</span>}
+
+    <ul
+      role="list"
+      aria-label={labels.coverageListLabel}
+      class="mt-10 grid gap-5 sm:grid-cols-2 lg:mt-14 lg:grid-cols-3 lg:gap-6"
+      data-animate="stagger"
+    >
+      {
+        coverage.items.map((item) => (
+          <li class="group relative flex flex-col gap-4 rounded-3xl bg-paper p-6 ring-1 ring-navy/5 transition-shadow duration-300 hover:shadow-card focus-within:shadow-card sm:p-8">
+            <p class="text-eyebrow text-teal-700">{item.media}</p>
+            <h3 class="text-xl font-semibold leading-snug tracking-tight text-ink sm:text-2xl">
+              <a
+                href={item.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-describedby={linkHint ? linkHintId : undefined}
+                class="text-ink no-underline after:absolute after:inset-0 after:rounded-3xl group-hover:text-navy focus-visible:shadow-none focus-visible:outline-none focus-visible:after:outline-3 focus-visible:after:outline-offset-2 focus-visible:after:outline-navy"
+              >
+                {item.title}
+              </a>
+            </h3>
+            <p class="mt-auto flex items-center justify-between gap-4 pt-2 text-sm text-slate-700">
+              <span>{item.date && item.dateIso ? <time datetime={item.dateIso}>{item.date}</time> : item.date}</span>
+              <svg
+                aria-hidden="true"
+                class="size-5 shrink-0 text-navy transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                viewBox="0 0 20 20"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.6"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M7 4h9v9M16 4 4 16"></path>
+              </svg>
+            </p>
+          </li>
+        ))
+      }
+    </ul>
+
+    <!-- Avertissement (texte normal, jamais animé) -->
+    <div class="mt-12 rounded-3xl bg-paper p-6 sm:p-10 lg:mt-16 lg:p-12">
+      <p class="text-lead max-w-4xl text-ink">{coverage.disclaimer}</p>
+    </div>
+  </Container>
+</Section>

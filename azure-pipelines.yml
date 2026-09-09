@@ -1,0 +1,149 @@
+# Azure Pipelines — site public R Start (Astro, statique, servi par nginx dans un conteneur).
+#
+# Étape « Build » : fonctionne sans aucune configuration (valeurs de repli d'astro.config.mjs).
+# Étape « Deploy » : construit l'image Docker, la pousse sur le registre ACR, puis met à jour
+# l'App Service. Elle ne se déclenche que sur main et seulement si DEPLOY_ENABLED vaut 'true'.
+#
+# Variables à définir dans le pipeline (Edit → Variables), sans groupe de variables :
+#   DEPLOY_ENABLED            true
+#   AZURE_SERVICE_CONNECTION  nom de la connexion de service ARM du projet
+#                             (Project settings → Service connections)
+#   ACR_NAME                  nom du registre de conteneurs, sans .azurecr.io
+#   APP_SERVICE_NAME          app-corumacademy-poc-001
+#   PUBLIC_SITE_URL           URL publique du site (https://r-start.com à terme)
+#   PUBLIC_SUBSCRIBE_URL      URL du tunnel de souscription réglementé
+#   PUBLIC_GTM_ID             GTM-XXXXXXX (vide = aucune mesure d'audience)
+trigger:
+  branches:
+    include:
+      - main
+
+pr:
+  branches:
+    include:
+      - main
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  - name: PUBLIC_SITE_URL
+    value: 'https://r-start.com'
+  # Même valeur de repli que astro.config.mjs tant que l'URL réelle du tunnel n'est pas fournie.
+  - name: PUBLIC_SUBSCRIBE_URL
+    value: 'https://www.corum.fr/?tunnel=r-start#placeholder'
+  - name: PUBLIC_GTM_ID
+    value: ''
+  # Passer à 'true' une fois la connexion de service, le registre et l'App Service renseignés.
+  - name: DEPLOY_ENABLED
+    value: 'false'
+  - name: AZURE_SERVICE_CONNECTION
+    value: ''
+  - name: ACR_NAME
+    value: ''
+  - name: APP_SERVICE_NAME
+    value: 'app-corumacademy-poc-001'
+  - name: IMAGE_REPO
+    value: 'r-start-site'
+  - name: IMAGE_TAG
+    value: '$(Build.BuildId)'
+
+stages:
+  - stage: Build
+    displayName: Build et contrôles
+    jobs:
+      - job: build
+        displayName: Astro, validation HTML, conformité AMF
+        steps:
+          - task: UseNode@1
+            displayName: Node 22
+            inputs:
+              version: '22.x'
+
+          - script: corepack enable && corepack prepare pnpm@10 --activate
+            displayName: pnpm
+
+          - script: pnpm install --frozen-lockfile
+            displayName: Installation
+
+          - script: pnpm build
+            displayName: Build
+            env:
+              PUBLIC_SITE_URL: $(PUBLIC_SITE_URL)
+              PUBLIC_SUBSCRIBE_URL: $(PUBLIC_SUBSCRIBE_URL)
+              PUBLIC_GTM_ID: $(PUBLIC_GTM_ID)
+
+          - script: pnpm test:html
+            displayName: Validation HTML
+
+          - script: pnpm test:compliance
+            displayName: Contrôle de conformité AMF
+
+          - publish: dist
+            artifact: dist
+            displayName: Artefact dist
+
+  - stage: Deploy
+    displayName: Image Docker et App Service
+    dependsOn: Build
+    condition: |
+      and(
+        succeeded(),
+        eq(variables['Build.SourceBranch'], 'refs/heads/main'),
+        eq(variables['DEPLOY_ENABLED'], 'true')
+      )
+    jobs:
+      - job: deploy
+        displayName: Build, push et déploiement de l'image
+        steps:
+          - task: AzureCLI@2
+            displayName: Connexion au registre
+            inputs:
+              azureSubscription: $(AZURE_SERVICE_CONNECTION)
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                set -euo pipefail
+                az acr login --name "$(ACR_NAME)"
+
+          - task: Docker@2
+            displayName: Build et push de l'image
+            inputs:
+              command: buildAndPush
+              repository: $(IMAGE_REPO)
+              dockerfile: Dockerfile
+              containerRegistry: $(AZURE_SERVICE_CONNECTION)
+              buildContext: .
+              tags: |
+                $(IMAGE_TAG)
+                latest
+              arguments: >-
+                --build-arg PUBLIC_SITE_URL=$(PUBLIC_SITE_URL)
+                --build-arg PUBLIC_SUBSCRIBE_URL=$(PUBLIC_SUBSCRIBE_URL)
+                --build-arg PUBLIC_GTM_ID=$(PUBLIC_GTM_ID)
+
+          - task: AzureWebAppContainer@1
+            displayName: Déploiement sur l'App Service
+            inputs:
+              azureSubscription: $(AZURE_SERVICE_CONNECTION)
+              appName: $(APP_SERVICE_NAME)
+              containers: $(ACR_NAME).azurecr.io/$(IMAGE_REPO):$(IMAGE_TAG)
+
+          - task: AzureCLI@2
+            displayName: Vérification de la page d'accueil
+            inputs:
+              azureSubscription: $(AZURE_SERVICE_CONNECTION)
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                set -euo pipefail
+                URL=$(az webapp show --name "$(APP_SERVICE_NAME)" --resource-group "$(az webapp list --query "[?name=='$(APP_SERVICE_NAME)'].resourceGroup" -o tsv)" --query defaultHostName -o tsv)
+                echo "Site : https://$URL"
+                for i in $(seq 1 20); do
+                  CODE=$(curl -s -o /dev/null -w '%{http_code}' "https://$URL/" || true)
+                  echo "tentative $i : $CODE"
+                  [ "$CODE" = "200" ] && exit 0
+                  sleep 15
+                done
+                echo "La page d'accueil ne répond pas 200 après le déploiement." >&2
+                exit 1

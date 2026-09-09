@@ -1,0 +1,914 @@
+{
+  "generatedFrom": "C:\\Users\\martin.phlippoteau\\Downloads\\Assets R Start",
+  "images": [
+    {
+      "set": "immeubles",
+      "file": "immeubles/althea.jpg",
+      "source": "althea.jpg",
+      "width": 1700,
+      "height": 850,
+      "orientation": "paysage",
+      "kb": 63
+    },
+    {
+      "set": "immeubles",
+      "file": "immeubles/anis.jpg",
+      "source": "anis.jpg",
+      "width": 1920,
+      "height": 2560,
+      "orientation": "portrait",
+      "kb": 675
+    },
+    {
+      "set": "immeubles",
+      "file": "immeubles/arboretum.jpg",
+      "source": "arboretum.jpg",
+      "width": 2400,
+      "height": 1600,
+      "orientation": "paysage",
+      "kb": 647
+    },
+    {
+      "set": "immeubles",
+      "file": "immeubles/arbre-blanc-1.jpg",
+      "source": "arbre-blanc-1.jpg",
+      "width": 1700,
+      "height": 1000,
+      "orientation": "paysage",
+      "kb": 221
+    },
+    {
+      "set": "immeubles",
+      "file": "immeubles/arbre-blanc-2.jpg",
+      "source": "arbre-blanc-2.jpg",
+      "width": 1700,
+      "height": 1200,
+      "orientation": "paysage",
+      "kb": 145
+    },
+    {
+      "set": "immeubles",
+      "file": "immeubles/arbre-blanc-3.jpg",
+      "source": "arbre-blanc-3.jpg",
+      "width": 1700,
+      "height": 1000,
+      "orientation": "paysage",
+      "kb": 385
+    },
+    {
+      "set": "immeubles",
+      "file": "immeubles/atelier-arsenal-1.jpg",
+      "source": "atelier-arsenal-1.jpg",
+      "width": 1700,
+      "height": 1000,
+      "orientation": "paysage",
+      "kb": 379
+    },
+    {
+      "set": "immeubles",
+      "file": "immeubles/atelier-arsenal-2.jpg",
+      "source": "atelier-arsenal-2.jpg",
+      "width": 1700,
+      "height": 1400,
+      "orientation": "paysage",
+      "kb": 311
+    },
+    {
+      "set": "immeubles",
+      "file": "immeubles/begles-1.jpg",
+      "source": "begles-1.jpg",
+      "width": 1700,
+      "height": 1000,
+      "orientation": "paysage",
+      "kb": 310
+    },
+    {
+      "set": "immeubles",
+      "file": "immeubles/begles-2.jpg",
+      "source": "begles-2.jpg",
+      "width": 1700,
+      "height": 1000,
+      "orientation": "paysage",
+      "kb": 320
+    },
+    {
+      "set": "immeubles",
+      "file": "immeubles/bem.jpg",
+      "source": "bem.jpg",
+      "width": 2400,
+      "height": 1600,
+      "orientation": "paysage",
+      "kb": 669
+    },
+    {
+      "set": "immeubles",
+      "file": "immeubles/brazza.jpg",
+      "source": "brazza.jpg",
+      "width": 2400,
+      "height": 1200,
+      "orientation": "paysage",
+      "kb": 465
+    },
+    {
+      "set": "immeubles",
+      "file": "immeubles/cambaceres-1.jpg",
+      "source": "cambaceres-1.jpg",
+      "width": 1700,
+      "height": 1000,
+      "orientation": "paysage",
+      "kb": 255
+    },
+    {
+      "set": "immeubles",
+      "file": "immeubles/cambaceres-2.jpg",
+      "source": "cambaceres-2.jpg",
+      "width": 1700,
+      "height": 1000,
+      "orientation": "paysage",
+      "kb": 410
+    },
+    {
+      "set": "immeubles",
+      "file": "immeubles/cambaceres-3.jpg",
+      "source": "cambaceres-3.jpg",
+      "width": 1700,
+      "height": 1000,
+      "orientation": "paysage",
+      "kb": 388
+    },
+    {
+      "set": "immeubles",
+      "file": "immeubles/cartoucherie-1.jpg",
+      "source": "cartoucherie-1.jpg",
+      "width": 1700,
+      "height": 1000,
+      "orientation": "paysage",
+      "kb": 403
+    },
+    {
+      "set": "immeubles",
+      "file": "immeubles/cartoucherie-2.jpg",
+      "source": "cartoucherie-2.jpg",
+      "width": 1700,
+      "height": 1000,
+      "orientation": "paysage",
+      "kb": 386
+    },
+    {
+      "set": "immeubles",
+      "file": "immeubles/chartres.jpg",
+      "source": "chartres.jpg",
+      "width": 1333,
+      "height": 2000,
+      "orientation": "portrait",
+      "kb": 192
+    },
+    {
+      "set": "immeubles",
+      "file": "immeubles/cheval-blanc.jpg",
+      "source": "cheval-blanc.jpg",
+      "width": 2000,
+      "height": 1334,
+      "orientation": "paysage",
+      "kb": 354
+    },
+    {
+      "set": "immeubles",
+      "file": "immeubles/clichy-batignolles.jpg",
+      "source": "clichy-batignolles.jpg",
+      "width": 1700,
+      "height": 1000,
+      "orientation": "paysage",
+      "kb": 310
+    },
+    {
+      "set": "immeubles",
+      "file": "immeubles/couverture-generique.jpg",
+      "source": "couverture-generique.jpg",
+      "width": 2400,
+      "height": 1597,
+      "orientation": "paysage",
+      "kb": 447
+    },
+    {
+      "set": "immeubles",
+      "file": "immeubles/dream-velizy.jpg",
+      "source": "dream-velizy.jpg",
+      "width": 2400,
+      "height": 1600,
+      "orientation": "paysage",
+      "kb": 465
+    },
+    {
+      "set": "immeubles",
+      "file": "immeubles/huninghe-1.jpg",
+      "source": "huninghe-1.jpg",
+      "width": 1501,
+      "height": 2000,
+      "orientation": "portrait",
+      "kb": 357
+    },
+    {
+      "set": "immeubles",
+      "file": "immeubles/huninghe-2.jpg",
+      "source": "huninghe-2.jpg",
+      "width": 1333,
+      "height": 2000,
+      "orientation": "portrait",
+      "kb": 204
+    },
+    {
+      "set": "immeubles",
+      "file": "immeubles/huninghe-3.jpg",
+      "source": "huninghe-3.jpg",
+      "width": 2000,
+      "height": 1500,
+      "orientation": "paysage",
+      "kb": 300
+    },
+    {
+      "set": "immeubles",
+      "file": "immeubles/immeuble-03.jpg",
+      "source": "immeuble-03.jpg",
+      "width": 2400,
+      "height": 1350,
+      "orientation": "paysage",
+      "kb": 500
+    },
+    {
+      "set": "immeubles",
+      "file": "immeubles/immeuble-05.jpg",
+      "source": "immeuble-05.jpg",
+      "width": 2155,
+      "height": 1212,
+      "orientation": "paysage",
+      "kb": 250
+    },
+    {
+      "set": "immeubles",
+      "file": "immeubles/immeuble-06.jpg",
+      "source": "immeuble-06.jpg",
+      "width": 2400,
+      "height": 1351,
+      "orientation": "paysage",
+      "kb": 611
+    },
+    {
+      "set": "immeubles",
+      "file": "immeubles/immeuble-1bd.jpg",
+      "source": "immeuble-1bd.jpg",
+      "width": 1214,
+      "height": 1011,
+      "orientation": "paysage",
+      "kb": 185
+    },
+    {
+      "set": "immeubles",
+      "file": "immeubles/immeuble-modern.jpg",
+      "source": "immeuble-modern.jpg",
+      "width": 1500,
+      "height": 1000,
+      "orientation": "paysage",
+      "kb": 176
+    },
+    {
+      "set": "immeubles",
+      "file": "immeubles/lan-agence.jpg",
+      "source": "lan-agence.jpg",
+      "width": 2400,
+      "height": 1359,
+      "orientation": "paysage",
+      "kb": 371
+    },
+    {
+      "set": "immeubles",
+      "file": "immeubles/love-table-1.jpg",
+      "source": "love-table-1.jpg",
+      "width": 2000,
+      "height": 1333,
+      "orientation": "paysage",
+      "kb": 198
+    },
+    {
+      "set": "immeubles",
+      "file": "immeubles/love-table-2.jpg",
+      "source": "love-table-2.jpg",
+      "width": 768,
+      "height": 1168,
+      "orientation": "portrait",
+      "kb": 76
+    },
+    {
+      "set": "immeubles",
+      "file": "immeubles/maillon.jpg",
+      "source": "maillon.jpg",
+      "width": 2400,
+      "height": 1350,
+      "orientation": "paysage",
+      "kb": 279
+    },
+    {
+      "set": "immeubles",
+      "file": "immeubles/marseille.jpg",
+      "source": "marseille.jpg",
+      "width": 1000,
+      "height": 1170,
+      "orientation": "portrait",
+      "kb": 128
+    },
+    {
+      "set": "immeubles",
+      "file": "immeubles/meridien-bordeaux.jpg",
+      "source": "meridien-bordeaux.jpg",
+      "width": 2000,
+      "height": 1291,
+      "orientation": "paysage",
+      "kb": 602
+    },
+    {
+      "set": "immeubles",
+      "file": "immeubles/moment-studio.jpg",
+      "source": "moment-studio.jpg",
+      "width": 2400,
+      "height": 1800,
+      "orientation": "paysage",
+      "kb": 584
+    },
+    {
+      "set": "immeubles",
+      "file": "immeubles/nice-meridia.jpg",
+      "source": "nice-meridia.jpg",
+      "width": 1700,
+      "height": 1000,
+      "orientation": "paysage",
+      "kb": 284
+    },
+    {
+      "set": "immeubles",
+      "file": "immeubles/nicolas-laisne.jpg",
+      "source": "nicolas-laisne.jpg",
+      "width": 1700,
+      "height": 1000,
+      "orientation": "paysage",
+      "kb": 151
+    },
+    {
+      "set": "immeubles",
+      "file": "immeubles/nolistra.jpg",
+      "source": "nolistra.jpg",
+      "width": 2400,
+      "height": 1350,
+      "orientation": "paysage",
+      "kb": 495
+    },
+    {
+      "set": "immeubles",
+      "file": "immeubles/palermo.jpg",
+      "source": "palermo.jpg",
+      "width": 1700,
+      "height": 1000,
+      "orientation": "paysage",
+      "kb": 298
+    },
+    {
+      "set": "immeubles",
+      "file": "immeubles/pavillon-des-fleurs.jpg",
+      "source": "pavillon-des-fleurs.jpg",
+      "width": 1700,
+      "height": 1000,
+      "orientation": "paysage",
+      "kb": 379
+    },
+    {
+      "set": "immeubles",
+      "file": "immeubles/perspective-1.jpg",
+      "source": "perspective-1.jpg",
+      "width": 1700,
+      "height": 1000,
+      "orientation": "paysage",
+      "kb": 265
+    },
+    {
+      "set": "immeubles",
+      "file": "immeubles/perspective-2.jpg",
+      "source": "perspective-2.jpg",
+      "width": 1700,
+      "height": 1000,
+      "orientation": "paysage",
+      "kb": 338
+    },
+    {
+      "set": "immeubles",
+      "file": "immeubles/perspective-3.jpg",
+      "source": "perspective-3.jpg",
+      "width": 1700,
+      "height": 1100,
+      "orientation": "paysage",
+      "kb": 151
+    },
+    {
+      "set": "immeubles",
+      "file": "immeubles/perspective-4.jpg",
+      "source": "perspective-4.jpg",
+      "width": 1700,
+      "height": 1000,
+      "orientation": "paysage",
+      "kb": 251
+    },
+    {
+      "set": "immeubles",
+      "file": "immeubles/projet-241028-1.jpg",
+      "source": "projet-241028-1.jpg",
+      "width": 2400,
+      "height": 1351,
+      "orientation": "paysage",
+      "kb": 419
+    },
+    {
+      "set": "immeubles",
+      "file": "immeubles/projet-241028-2.jpg",
+      "source": "projet-241028-2.jpg",
+      "width": 2400,
+      "height": 1351,
+      "orientation": "paysage",
+      "kb": 550
+    },
+    {
+      "set": "immeubles",
+      "file": "immeubles/rehabilitation-urban.jpg",
+      "source": "rehabilitation-urban.jpg",
+      "width": 1600,
+      "height": 1067,
+      "orientation": "paysage",
+      "kb": 179
+    },
+    {
+      "set": "immeubles",
+      "file": "immeubles/saclay.jpg",
+      "source": "saclay.jpg",
+      "width": 1000,
+      "height": 1267,
+      "orientation": "portrait",
+      "kb": 106
+    },
+    {
+      "set": "immeubles",
+      "file": "immeubles/saint-ouen-bureaux.jpg",
+      "source": "saint-ouen-bureaux.jpg",
+      "width": 1024,
+      "height": 869,
+      "orientation": "paysage",
+      "kb": 129
+    },
+    {
+      "set": "immeubles",
+      "file": "immeubles/saint-urbain.jpg",
+      "source": "saint-urbain.jpg",
+      "width": 1000,
+      "height": 1334,
+      "orientation": "portrait",
+      "kb": 130
+    },
+    {
+      "set": "immeubles",
+      "file": "immeubles/soprema.jpg",
+      "source": "soprema.jpg",
+      "width": 2000,
+      "height": 1332,
+      "orientation": "paysage",
+      "kb": 580
+    },
+    {
+      "set": "immeubles",
+      "file": "immeubles/toul-kimmo.jpg",
+      "source": "toul-kimmo.jpg",
+      "width": 2400,
+      "height": 1602,
+      "orientation": "paysage",
+      "kb": 323
+    },
+    {
+      "set": "immeubles",
+      "file": "immeubles/woodwork-1.jpg",
+      "source": "woodwork-1.jpg",
+      "width": 1707,
+      "height": 2560,
+      "orientation": "portrait",
+      "kb": 616
+    },
+    {
+      "set": "immeubles",
+      "file": "immeubles/woodwork-2.jpg",
+      "source": "woodwork-2.jpg",
+      "width": 2400,
+      "height": 1600,
+      "orientation": "paysage",
+      "kb": 426
+    },
+    {
+      "set": "immeubles",
+      "file": "immeubles/woodwork-3.jpg",
+      "source": "woodwork-3.jpg",
+      "width": 2400,
+      "height": 1599,
+      "orientation": "paysage",
+      "kb": 506
+    },
+    {
+      "set": "ambiance",
+      "file": "ambiance/ait-stein-group.jpg",
+      "source": "ait-stein-group.webp",
+      "width": 2400,
+      "height": 1600,
+      "orientation": "paysage",
+      "kb": 380
+    },
+    {
+      "set": "ambiance",
+      "file": "ambiance/assurance-vie-per-1.jpg",
+      "source": "assurance-vie-per-1.jpg",
+      "width": 1500,
+      "height": 1000,
+      "orientation": "paysage",
+      "kb": 222
+    },
+    {
+      "set": "ambiance",
+      "file": "ambiance/assurance-vie-per-2.jpg",
+      "source": "assurance-vie-per-2.jpeg",
+      "width": 1600,
+      "height": 1068,
+      "orientation": "paysage",
+      "kb": 204
+    },
+    {
+      "set": "ambiance",
+      "file": "ambiance/assurance-vie-per-3.jpg",
+      "source": "assurance-vie-per-3.webp",
+      "width": 2400,
+      "height": 1600,
+      "orientation": "paysage",
+      "kb": 429
+    },
+    {
+      "set": "ambiance",
+      "file": "ambiance/assurance-vie-per-4.jpg",
+      "source": "assurance-vie-per-4.webp",
+      "width": 1728,
+      "height": 2592,
+      "orientation": "portrait",
+      "kb": 326
+    },
+    {
+      "set": "ambiance",
+      "file": "ambiance/assurance-vie-per-5.jpg",
+      "source": "assurance-vie-per-5.webp",
+      "width": 2000,
+      "height": 1074,
+      "orientation": "paysage",
+      "kb": 141
+    },
+    {
+      "set": "ambiance",
+      "file": "ambiance/assurance-vie-per-6.jpg",
+      "source": "assurance-vie-per-6.webp",
+      "width": 1500,
+      "height": 1125,
+      "orientation": "paysage",
+      "kb": 117
+    },
+    {
+      "set": "ambiance",
+      "file": "ambiance/blue-solutions.jpg",
+      "source": "blue-solutions.jpg",
+      "width": 2048,
+      "height": 1373,
+      "orientation": "paysage",
+      "kb": 307
+    },
+    {
+      "set": "ambiance",
+      "file": "ambiance/bollore-quimper.jpg",
+      "source": "bollore-quimper.webp",
+      "width": 2400,
+      "height": 1600,
+      "orientation": "paysage",
+      "kb": 331
+    },
+    {
+      "set": "ambiance",
+      "file": "ambiance/btl-roissy.jpg",
+      "source": "btl-roissy.webp",
+      "width": 2400,
+      "height": 1600,
+      "orientation": "paysage",
+      "kb": 280
+    },
+    {
+      "set": "ambiance",
+      "file": "ambiance/epc-groupe-telt.jpg",
+      "source": "epc-groupe-telt.webp",
+      "width": 2400,
+      "height": 1240,
+      "orientation": "paysage",
+      "kb": 636
+    },
+    {
+      "set": "ambiance",
+      "file": "ambiance/fibre-excellence.jpg",
+      "source": "fibre-excellence.webp",
+      "width": 2400,
+      "height": 1600,
+      "orientation": "paysage",
+      "kb": 372
+    },
+    {
+      "set": "ambiance",
+      "file": "ambiance/fm-logistic-milan.jpg",
+      "source": "fm-logistic-milan.webp",
+      "width": 2400,
+      "height": 1600,
+      "orientation": "paysage",
+      "kb": 469
+    },
+    {
+      "set": "ambiance",
+      "file": "ambiance/fm-logistic-ukraine.jpg",
+      "source": "fm-logistic-ukraine.webp",
+      "width": 2048,
+      "height": 1533,
+      "orientation": "paysage",
+      "kb": 255
+    },
+    {
+      "set": "ambiance",
+      "file": "ambiance/guangzhou.jpg",
+      "source": "guangzhou.webp",
+      "width": 2048,
+      "height": 1389,
+      "orientation": "paysage",
+      "kb": 401
+    },
+    {
+      "set": "ambiance",
+      "file": "ambiance/hero-a-propos.jpg",
+      "source": "hero-a-propos.jpg",
+      "width": 2000,
+      "height": 1336,
+      "orientation": "paysage",
+      "kb": 245
+    },
+    {
+      "set": "ambiance",
+      "file": "ambiance/indigo-group.jpg",
+      "source": "indigo-group.jpg",
+      "width": 2400,
+      "height": 1600,
+      "orientation": "paysage",
+      "kb": 215
+    },
+    {
+      "set": "ambiance",
+      "file": "ambiance/matthieu-meyer.jpg",
+      "source": "matthieu-meyer.webp",
+      "width": 2400,
+      "height": 1600,
+      "orientation": "paysage",
+      "kb": 299
+    },
+    {
+      "set": "ambiance",
+      "file": "ambiance/michelin.jpg",
+      "source": "michelin.webp",
+      "width": 2400,
+      "height": 1600,
+      "orientation": "paysage",
+      "kb": 423
+    },
+    {
+      "set": "ambiance",
+      "file": "ambiance/pont-de-vaux.jpg",
+      "source": "pont-de-vaux.jpg",
+      "width": 2048,
+      "height": 1381,
+      "orientation": "paysage",
+      "kb": 419
+    },
+    {
+      "set": "ambiance",
+      "file": "ambiance/poznan.jpg",
+      "source": "poznan.jpg",
+      "width": 2048,
+      "height": 1370,
+      "orientation": "paysage",
+      "kb": 301
+    },
+    {
+      "set": "ambiance",
+      "file": "ambiance/rhd.jpg",
+      "source": "rhd.webp",
+      "width": 2048,
+      "height": 1366,
+      "orientation": "paysage",
+      "kb": 444
+    },
+    {
+      "set": "ambiance",
+      "file": "ambiance/site-industriel.jpg",
+      "source": "site-industriel.webp",
+      "width": 2400,
+      "height": 1242,
+      "orientation": "paysage",
+      "kb": 414
+    },
+    {
+      "set": "ambiance",
+      "file": "ambiance/tarmac.jpg",
+      "source": "tarmac.webp",
+      "width": 2400,
+      "height": 1600,
+      "orientation": "paysage",
+      "kb": 394
+    },
+    {
+      "set": "ambiance",
+      "file": "ambiance/thirard.jpg",
+      "source": "thirard.webp",
+      "width": 2048,
+      "height": 1401,
+      "orientation": "paysage",
+      "kb": 306
+    },
+    {
+      "set": "ambiance",
+      "file": "ambiance/tmf-limay.jpg",
+      "source": "tmf-limay.jpg",
+      "width": 2048,
+      "height": 1366,
+      "orientation": "paysage",
+      "kb": 417
+    },
+    {
+      "set": "ambiance",
+      "file": "ambiance/tmf.jpg",
+      "source": "tmf.webp",
+      "width": 2400,
+      "height": 1600,
+      "orientation": "paysage",
+      "kb": 395
+    },
+    {
+      "set": "ambiance",
+      "file": "ambiance/total-qatar.jpg",
+      "source": "total-qatar.webp",
+      "width": 2048,
+      "height": 1366,
+      "orientation": "paysage",
+      "kb": 209
+    },
+    {
+      "set": "ambiance",
+      "file": "ambiance/wttj-collaborateur.jpg",
+      "source": "wttj-collaborateur.jpg",
+      "width": 2000,
+      "height": 1336,
+      "orientation": "paysage",
+      "kb": 157
+    },
+    {
+      "set": "ambiance",
+      "file": "ambiance/wttj-salon.jpg",
+      "source": "wttj-salon.jpg",
+      "width": 2000,
+      "height": 1336,
+      "orientation": "paysage",
+      "kb": 375
+    },
+    {
+      "set": "pictos",
+      "file": "pictos/3d-casual-life-banknotes-with-coins.webp",
+      "source": "3d-casual-life-banknotes-with-coins.png",
+      "width": 1200,
+      "height": 1169,
+      "orientation": "paysage",
+      "kb": 116
+    },
+    {
+      "set": "pictos",
+      "file": "pictos/3d-casual-life-document-with-checkmark.webp",
+      "source": "3d-casual-life-document-with-checkmark.png",
+      "width": 1200,
+      "height": 1201,
+      "orientation": "portrait",
+      "kb": 53
+    },
+    {
+      "set": "pictos",
+      "file": "pictos/3d-casual-life-document-with-clock-icon.webp",
+      "source": "3d-casual-life-document-with-clock-icon.png",
+      "width": 1200,
+      "height": 1461,
+      "orientation": "portrait",
+      "kb": 57
+    },
+    {
+      "set": "pictos",
+      "file": "pictos/3d-casual-life-group-of-young-people-discussing-something-while-working.webp",
+      "source": "3d-casual-life-group-of-young-people-discussing-something-while-working.png",
+      "width": 1200,
+      "height": 1082,
+      "orientation": "paysage",
+      "kb": 191
+    },
+    {
+      "set": "pictos",
+      "file": "pictos/3d-casual-life-man-holding-binoculars-and-map.webp",
+      "source": "3d-casual-life-man-holding-binoculars-and-map.png",
+      "width": 1200,
+      "height": 1258,
+      "orientation": "portrait",
+      "kb": 68
+    },
+    {
+      "set": "pictos",
+      "file": "pictos/3d-casual-life-ringing-bell-on-blue.webp",
+      "source": "3d-casual-life-ringing-bell-on-blue.png",
+      "width": 1200,
+      "height": 1213,
+      "orientation": "portrait",
+      "kb": 62
+    },
+    {
+      "set": "pictos",
+      "file": "pictos/hands-passing-bar-and-pie-chart-card-business-analytics-and-kpi-dashboard.webp",
+      "source": "hands-passing-bar-and-pie-chart-card-business-analytics-and-kpi-dashboard.png",
+      "width": 1200,
+      "height": 1200,
+      "orientation": "paysage",
+      "kb": 61
+    }
+  ],
+  "logos": [
+    "logos/r-start-couleur.svg",
+    "logos/r-start-blanc.svg",
+    "logos/corum-lepargne-couleur.svg",
+    "logos/globe.svg"
+  ],
+  "publicFiles": [
+    "favicon.ico",
+    "favicon.svg",
+    "apple-touch-icon.png"
+  ],
+  "documents": [
+    {
+      "file": "documents/r-start-dic.pdf",
+      "kb": 155,
+      "source": "7 - Documents/R- Start - DIC - V7.pdf"
+    },
+    {
+      "file": "documents/r-start-note-information.pdf",
+      "kb": 2232,
+      "source": "7 - Documents/R Start - Note d'information - projet V8 24022026 V2.1-20260407T113945 (1).pdf"
+    },
+    {
+      "file": "documents/r-start-statuts.pdf",
+      "kb": 60,
+      "source": "7 - Documents/R Start - Statuts à jour V3.pdf"
+    },
+    {
+      "file": "documents/r-start-bulletin-souscription.pdf",
+      "kb": 268,
+      "source": "7 - Documents/R Start - Bulletin de souscription partenaire - 2026.05.pdf"
+    },
+    {
+      "file": "documents/r-start-simulation-frais-ex-ante.pdf",
+      "kb": 81,
+      "source": "7 - Documents/R Start - Simulation des frais ex-ante 2026 V2-20260327T174149.pdf"
+    },
+    {
+      "file": "documents/r-start-adhesion-plan-epargne-immobilier.pdf",
+      "kb": 271,
+      "source": "7 - Documents/CORUM Start - Plan épargne immobilier V2.5.pdf"
+    },
+    {
+      "file": "documents/r-start-adhesion-reinvestissement-dividendes.pdf",
+      "kb": 335,
+      "source": "7 - Documents/CORUM Start - Réinvestissement des dividendes V2.5.pdf"
+    },
+    {
+      "file": "documents/r-start-mandat-prelevement.pdf",
+      "kb": 102,
+      "source": "7 - Documents/R Start- Mandat de prélèvement V2.1-20260414T141237.pdf"
+    },
+    {
+      "file": "documents/corum-am-formulaire-retrait-parts.pdf",
+      "kb": 217,
+      "source": "7 - Documents/CORUM AM - Formulaire de retrait de parts_2026 V2.2-20260414T141131.pdf"
+    },
+    {
+      "file": "documents/corum-am-formulaire-changement-coordonnees-bancaires.pdf",
+      "kb": 171,
+      "source": "7 - Documents/CORUM AM - Formulaire de changement de coordonnées bancaires V2.1-20260414T141049.pdf"
+    }
+  ]
+}

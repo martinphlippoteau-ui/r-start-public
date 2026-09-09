@@ -1,0 +1,46 @@
+---
+import { riskPrefix } from '@/content/fr/legal';
+import NoteRef from '@/components/ui/NoteRef.astro';
+
+/**
+ * Contre-poids risque d'un avantage. Même corps de texte et même couleur d'encre que le texte
+ * qu'il accompagne (règle AMF : avantages et risques dans une taille et une forme identiques).
+ * Ne jamais l'animer, ne jamais le réduire en note de bas de page.
+ * `size` : 'base' (corps de texte) ou 'lead' (même taille que le sous-titre du hero, text-lead).
+ * Le préfixe lu par les lecteurs d'écran (« Risque : ») vient de legal.ts.
+ * `noteId` optionnel : appel de note accolé au texte (lien réel, seulement utile si le RiskNote n'est
+ * pas lui-même dans un ancêtre interactif).
+ */
+interface Props {
+  text: string;
+  class?: string;
+  tone?: 'light' | 'dark';
+  size?: 'base' | 'lead';
+  noteId?: string;
+}
+const { text, class: className = '', tone = 'light', size = 'base', noteId } = Astro.props;
+---
+
+<p
+  data-risk
+  class:list={[
+    'flex gap-3',
+    size === 'lead' ? 'text-lead' : 'text-base leading-relaxed',
+    tone === 'dark' ? 'text-white' : 'text-ink',
+    className,
+  ]}
+>
+  <svg
+    aria-hidden="true"
+    class:list={['mt-1 shrink-0', size === 'lead' ? 'size-6' : 'size-5', tone === 'dark' ? 'text-sand' : 'text-coral']}
+    viewBox="0 0 20 20"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="1.8"
+  >
+    <path d="M10 3 2.5 16h15L10 3Z" stroke-linejoin="round"></path>
+    <path d="M10 8v4" stroke-linecap="round"></path>
+    <circle cx="10" cy="14" r=".6" fill="currentColor"></circle>
+  </svg>
+  <span><span class="visually-hidden">{riskPrefix}</span>{text}{noteId && <NoteRef id={noteId} tone={tone === 'dark' ? 'dark' : 'light'} />}</span>
+</p>

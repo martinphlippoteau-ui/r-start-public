@@ -1,0 +1,584 @@
+/* Feuille de style globale — Tailwind 4 + design tokens R Start.
+   Tokens dérivés du logo R Start (dégradé #024b68 → #14a4ba, encre #024b67) et de la brochure 2026. */
+@import 'tailwindcss';
+@import '@fontsource-variable/plus-jakarta-sans';
+
+@theme {
+  --font-sans: 'Plus Jakarta Sans Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Plus Jakarta Sans Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  /* Marque */
+  --color-navy: #024b67;
+  --color-navy-900: #023a50;
+  --color-teal-700: #0b7a93;
+  --color-teal-500: #1198af;
+  --color-teal-400: #14a4ba;
+  --color-teal-200: #a9dde6;
+  --color-teal-100: #dcf1f5;
+  --color-teal-50: #eef8fa;
+
+  /* Fonds sombres (brochure) */
+  --color-ink: #0d2e3d;
+  --color-ink-800: #123b4d;
+  --color-ink-700: #1a4a5e;
+
+  /* Accents */
+  --color-sand: #f3e6cf;
+  --color-sand-200: #f8f0e2;
+  --color-coral: #c4695a;
+  --color-coral-700: #a8503f;
+  --color-coral-100: #f7e4e0;
+
+  /* Neutres */
+  --color-paper: #f7f9fa;
+  --color-mist: #e6edf0;
+  --color-slate: #4a5f6b;
+  --color-slate-700: #34474f;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
+
+  --shadow-card: 0 1px 2px rgb(2 75 103 / 0.06), 0 12px 32px -12px rgb(2 75 103 / 0.18);
+  --shadow-float: 0 24px 64px -24px rgb(2 75 103 / 0.35);
+  --shadow-nav: 0 1px 0 rgb(2 75 103 / 0.08), 0 8px 24px -16px rgb(2 75 103 / 0.25);
+
+  /* Rythme vertical des sections (utilisables en py-section, pt-section-sm, gap-block…). */
+  --spacing-section: clamp(5rem, 10vw, 9rem);
+  --spacing-section-sm: clamp(3.5rem, 6vw, 5.5rem);
+  --spacing-block: clamp(2rem, 4vw, 3.5rem);
+  --spacing-subnav: 3.5rem;
+}
+
+@layer base {
+  html {
+    /* Hauteur de la sous-navigation sticky + marge : les ancres ne passent jamais dessous. */
+    scroll-padding-top: calc(var(--spacing-subnav) + 1.5rem);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+  body {
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    overflow-x: clip;
+  }
+  ::selection {
+    background-color: var(--color-teal-100);
+    color: var(--color-navy);
+  }
+  /* Anneau de focus double : navy (9,5:1 sur blanc) doublé d'un liseré blanc (14:1 sur ink), lisible
+     sur fond clair comme sur fond sombre ou photo — WCAG 1.4.11 (≥ 3:1) sur toutes les surfaces. */
+  :focus-visible {
+    outline: 3px solid var(--color-navy);
+    outline-offset: 3px;
+    box-shadow: 0 0 0 5px #fff;
+    border-radius: 0.25rem;
+  }
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+  p {
+    text-wrap: pretty;
+  }
+  strong {
+    font-weight: 600;
+  }
+  /* Liens : soulignement fin décalé, transition douce ; les composants (boutons, nav) le retirent. */
+  a {
+    color: inherit;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+    transition: color 150ms ease, opacity 150ms ease, background-color 150ms ease;
+  }
+  figcaption,
+  small {
+    text-wrap: pretty;
+  }
+  img,
+  svg {
+    display: block;
+    max-width: 100%;
+  }
+  /* Titres de niveau 5-6 et libellés : héritent de la police display. */
+  h5,
+  h6 {
+    font-family: var(--font-display);
+    letter-spacing: -0.01em;
+  }
+}
+
+/* --- Utilitaires de marque --- */
+@utility bg-brand-gradient {
+  background-image: linear-gradient(135deg, #024b68 0%, #0b7a93 32%, #1198af 57%, #14a4ba 71%, #2fb6c9 100%);
+}
+@utility bg-brand-gradient-dark {
+  background-image: linear-gradient(160deg, #0d2e3d 0%, #024b68 45%, #0b7a93 100%);
+}
+/* Texte en dégradé (grands chiffres, Stat) : bornes navy → teal-700 → teal-500. La borne claire s'arrête
+   à #1198af (3,4:1 sur blanc, 3,2:1 sur paper) : un grand texte (≥ 24 px gras) reste AA (≥ 3:1) sur
+   toute sa longueur ; #14a4ba (2,98:1 sur blanc) est réservé aux fonds sombres. */
+@utility text-brand-gradient {
+  background-image: linear-gradient(135deg, #024b68 0%, #0b7a93 55%, #1198af 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+/* Typographie fluide façon page produit */
+@utility text-display-xl {
+  /* Plancher 60 px : sur mobile le H1 doit rester plus grand que l'accroche (24 px) — façon iPhone. */
+  font-size: clamp(3.75rem, 8vw, 7.5rem);
+  line-height: 0.95;
+  letter-spacing: -0.035em;
+  font-weight: 700;
+}
+@utility text-display-lg {
+  font-size: clamp(2.5rem, 5.5vw, 5rem);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  font-weight: 700;
+}
+@utility text-display-md {
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  font-weight: 700;
+}
+@utility text-display-sm {
+  font-size: clamp(1.5rem, 2.6vw, 2.25rem);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  font-weight: 600;
+}
+@utility text-lead {
+  font-size: clamp(1.125rem, 1.6vw, 1.5rem);
+  line-height: 1.5;
+  font-weight: 400;
+}
+@utility text-stat {
+  font-size: clamp(2.75rem, 6vw, 5.5rem);
+  line-height: 1;
+  letter-spacing: -0.04em;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Lien d'évitement */
+@utility skip-link {
+  position: absolute;
+  left: 1rem;
+  top: -100%;
+  z-index: 100;
+  padding: 0.75rem 1.25rem;
+  border-radius: 9999px;
+  background: var(--color-navy);
+  color: white;
+  font-weight: 600;
+  transition: top 150ms;
+  &:focus-visible {
+    top: 1rem;
+  }
+}
+
+/* Surtitre court façon page produit */
+@utility text-eyebrow {
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+/* Légende / crédit photo : petit mais lisible (≥ 0.875rem) */
+@utility text-caption {
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+/* Surface translucide (sous-navigation sticky, barres) */
+@utility surface-glass {
+  background-color: rgb(255 255 255 / 0.78);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  backdrop-filter: saturate(180%) blur(20px);
+  @supports not (backdrop-filter: blur(1px)) {
+    background-color: rgb(255 255 255 / 0.96);
+  }
+}
+@utility surface-glass-dark {
+  background-color: rgb(13 46 61 / 0.72);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  backdrop-filter: saturate(180%) blur(20px);
+  @supports not (backdrop-filter: blur(1px)) {
+    background-color: rgb(13 46 61 / 0.96);
+  }
+}
+
+/* Halo de marque (hero) : deux lueurs teal et une touche sable sur fond ink. À poser sur un parent
+   `relative overflow-hidden` ; le contenu doit être `relative` pour passer devant. */
+@utility brand-halo {
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+      radial-gradient(55% 45% at 18% 8%, rgb(20 164 186 / 0.5) 0%, transparent 65%),
+      radial-gradient(45% 40% at 88% 22%, rgb(17 152 175 / 0.32) 0%, transparent 65%),
+      radial-gradient(40% 30% at 50% 100%, rgb(243 230 207 / 0.09) 0%, transparent 70%);
+  }
+}
+
+/* Grain léger optionnel (SVG turbulence en data URI, mode overlay, ~4 % d'opacité). */
+@utility grain {
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.045;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 160px 160px;
+  }
+}
+
+/* Cadre image façon page produit : coins arrondis, ombre portée douce, débordement masqué */
+@utility img-frame {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1.5rem;
+  box-shadow: var(--shadow-float);
+  isolation: isolate;
+  @media (width >= 40rem) {
+    border-radius: 2rem;
+  }
+}
+
+/* Défilement horizontal sans barre visible (sous-navigation sur mobile) */
+@utility scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Fondu latéral signalant un défilement horizontal (mobile) ; neutre dès que tout tient. */
+@utility scroll-fade-x {
+  @media (width < 40rem) {
+    mask-image: linear-gradient(to right, transparent 0, black 0.75rem, black calc(100% - 1.5rem), transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, transparent 0, black 0.75rem, black calc(100% - 1.5rem), transparent 100%);
+  }
+}
+
+/* Lien de navigation (menu de l'en-tête) : soulignement dessiné par scaleX au survol / au focus, plein
+   pour la page courante (aria-current="page") ; sans transition en reduced-motion. */
+@utility nav-link {
+  position: relative;
+  text-decoration: none;
+  &::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0.875rem;
+    bottom: 0.35rem;
+    height: 2px;
+    border-radius: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: 0 50%;
+    transition: transform 220ms var(--ease-out-expo);
+  }
+  &:hover::after,
+  &:focus-visible::after,
+  &[aria-current='page']::after {
+    transform: scaleX(1);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    &::after {
+      transition: none;
+    }
+  }
+}
+
+/* Contenu masqué visuellement (lecteurs d'écran) */
+@utility visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* --- Micro-interactions (CSS pur, transform/opacity/ombre, coupées en reduced-motion) --- */
+
+/* Boutons : élévation + halo doux au survol, scale 0.98 à l'appui. `--btn-halo` posé par variante. */
+@utility btn-motion {
+  --btn-halo: rgb(20 164 186 / 0.2);
+  @media (prefers-reduced-motion: no-preference) {
+    transition:
+      transform 180ms var(--ease-out-expo),
+      box-shadow 180ms ease,
+      background-color 200ms ease,
+      border-color 200ms ease,
+      color 200ms ease;
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow:
+        0 0 0 4px var(--btn-halo),
+        0 10px 24px -12px rgb(2 75 103 / 0.45);
+    }
+    &:active {
+      transform: scale(0.98);
+      transition-duration: 90ms;
+      box-shadow: 0 0 0 2px var(--btn-halo);
+    }
+  }
+}
+
+/* Cartes : légère montée + ombre plus profonde au survol. */
+@utility card-lift {
+  @media (prefers-reduced-motion: no-preference) {
+    transition:
+      transform 220ms var(--ease-out-expo),
+      box-shadow 220ms ease;
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-float);
+    }
+  }
+}
+
+/* Sous-navigation : pill glissante derrière le lien actif — elle glisse (transform) et se
+   « morphe » à la largeur du lien (width, élément absolu vide : coût nul ; hauteur et position
+   verticale posées sans transition) — et CTA compacté après 40 % de la page par transform seul
+   (scale 0.92, origine à droite : aucune propriété de mise en page animée, aucun relayout). */
+@utility subnav-pill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 0;
+  width: 0;
+  height: 0;
+  border-radius: 9999px;
+  background: rgb(2 75 103 / 0.08);
+  opacity: 0;
+  pointer-events: none;
+  @media (prefers-reduced-motion: no-preference) {
+    transition:
+      transform 320ms var(--ease-out-expo),
+      width 320ms var(--ease-out-expo),
+      opacity 200ms ease;
+  }
+}
+@utility subnav-cta {
+  transform-origin: 100% 50%;
+  @media (prefers-reduced-motion: no-preference) {
+    [data-compact] & {
+      transform: scale(0.92);
+    }
+    [data-compact] &:hover {
+      transform: scale(0.92) translateY(-1px);
+    }
+    [data-compact] &:active {
+      transform: scale(0.9);
+    }
+  }
+}
+
+/* Barre de lecture : purement décorative, absente en reduced-motion (aucun scrub). */
+@media (prefers-reduced-motion: reduce) {
+  [data-progress] {
+    display: none;
+  }
+}
+
+/* --- Hero --- */
+
+/* Image du hero : dézoom 1.04 → 1 en CSS une fois la page chargée (classe posée par data-on-load) ;
+   jamais transformée par JS avant le LCP. En reduced-motion : aucune transformation. */
+.hero-media {
+  transform: scale(1.04);
+  transform-origin: 50% 50%;
+  @media (prefers-reduced-motion: no-preference) {
+    transition: transform 1400ms var(--ease-out-expo);
+  }
+  &.is-loaded {
+    transform: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    transform: none;
+  }
+}
+
+/* Halo de marque animé : dérive lente (20 s, transform uniquement) des lueurs, coupée en reduced-motion.
+   En pause tant que le hero n'est pas à l'écran (classe `is-in-view` posée par `data-in-view`) : aucune
+   couche animée pendant la lecture du reste de la page. Pas de will-change permanent (l'animation crée
+   déjà sa couche le temps de tourner). */
+@utility brand-halo-drift {
+  @media (prefers-reduced-motion: no-preference) {
+    &::before {
+      inset: -8%;
+      animation: halo-drift 20s ease-in-out infinite alternate;
+      animation-play-state: paused;
+    }
+    &.is-in-view::before {
+      animation-play-state: running;
+    }
+  }
+}
+@keyframes halo-drift {
+  from {
+    transform: translate3d(-2%, -1.5%, 0) rotate(-1.5deg) scale(1.02);
+  }
+  50% {
+    transform: translate3d(1.5%, 2%, 0) rotate(0.5deg) scale(1.06);
+  }
+  to {
+    transform: translate3d(2.5%, -1%, 0) rotate(1.5deg) scale(1.03);
+  }
+}
+
+/* --- Scènes (data-scene) : superposition des steps, seulement quand le moteur tourne --- */
+@media (prefers-reduced-motion: no-preference) {
+  html.motion .scene-stack {
+    display: grid;
+  }
+  html.motion .scene-stack > [data-step] {
+    grid-area: 1 / 1;
+  }
+}
+
+/* --- Rideau (data-curtain) : la section passe devant la précédente épinglée --- */
+[data-curtain] {
+  position: relative;
+  z-index: 2;
+  @media (prefers-reduced-motion: no-preference) {
+    border-start-start-radius: 1.5rem;
+    border-start-end-radius: 1.5rem;
+    box-shadow: 0 -24px 48px -24px rgb(13 46 61 / 0.45);
+    @media (width >= 40rem) {
+      border-start-start-radius: 2.5rem;
+      border-start-end-radius: 2.5rem;
+    }
+  }
+}
+
+/* Mot animé (data-reveal-text) : inline-block pour être transformable, sans casser le retour à la ligne.
+   Le span visuel (aria-hidden) n'est pas sélectionnable : la copie ne renvoie que le texte original. */
+.reveal-words {
+  user-select: none;
+  -webkit-user-select: none;
+}
+.reveal-word {
+  display: inline-block;
+}
+
+/* --- Cascade d'entrée (data-intro) : CSS pur, jouée au premier rendu ---
+   La classe `intro` est rendue côté serveur sur <html> (Base.astro) : la décision est prise avant tout
+   rendu, sans script, donc sans flash quel que soit le réseau ou le CPU (la CSP interdit l'inline).
+   `backwards` : état de départ pendant le délai seulement, aucune valeur résiduelle ensuite (pas de
+   couche conservée). Rang 1 → 6 via data-intro="n" (70 ms par rang, 500 ms, expo.out) ; au-delà de 6,
+   même délai que 6. `data-intro-move` : transform seul (LCP intact). Rien en reduced-motion. */
+@media (prefers-reduced-motion: no-preference) {
+  html.intro [data-intro] {
+    animation: intro-in 500ms var(--ease-out-expo) backwards;
+    animation-delay: calc(var(--intro-i, 0) * 70ms);
+  }
+  html.intro [data-intro][data-intro-move] {
+    animation-name: intro-move;
+  }
+  html.intro [data-intro='2'] {
+    --intro-i: 1;
+  }
+  html.intro [data-intro='3'] {
+    --intro-i: 2;
+  }
+  html.intro [data-intro='4'] {
+    --intro-i: 3;
+  }
+  html.intro [data-intro='5'] {
+    --intro-i: 4;
+  }
+  html.intro [data-intro='6'] {
+    --intro-i: 5;
+  }
+}
+@keyframes intro-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+}
+@keyframes intro-move {
+  from {
+    transform: translateY(14px);
+  }
+}
+
+/* --- Marque du hero (H1) et son vol vers la sous-navigation (data-brand-flight) ---
+   Le H1 réserve la place du logo : l'image peut passer dans son calque fixe sans décaler la page. */
+.hero-logo-wrap {
+  display: block;
+  width: min(52vw, 16rem);
+  margin-inline: auto;
+  aspect-ratio: 290 / 89;
+}
+@media (width >= 40rem) {
+  .hero-logo-wrap {
+    width: min(56vw, 26rem);
+  }
+}
+@media (width >= 64rem) {
+  .hero-logo-wrap {
+    width: min(46vw, 32rem);
+  }
+}
+
+/* Calque du logo pendant le vol : hors de tout ancêtre transformé, jamais cliquable.
+   Sous la sous-navigation (z 40) : la barre le recouvre en arrivant, le relais se fait en fondu. */
+.brand-flyer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 35;
+  transform-origin: 0 0;
+  pointer-events: none;
+  will-change: transform;
+}
+.brand-flyer img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Bloc logo du hero : déplacé tel quel dans le calque pendant le vol. */
+.hero-logo-stack {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.hero-logo-stack img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Le logo du header ferait double emploi avec le logo du hero et son calque : masqué dès le rendu
+   serveur sur les pages qui portent le vol de la marque (aucun scintillement au chargement), et
+   rétabli là où le vol n'a pas lieu (petits écrans, reduced-motion). */
+@media (prefers-reduced-motion: no-preference) and (width >= 40rem) {
+  body:has([data-brand-flight]) [data-brand-rest] {
+    visibility: hidden;
+  }
+}

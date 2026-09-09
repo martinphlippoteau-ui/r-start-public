@@ -1,0 +1,28 @@
+---
+/**
+ * Carte : coins très arrondis, quatre tons. Micro-interaction au survol (utilitaire `card-lift`,
+ * global.css) : translateY −4 px + ombre portée plus profonde, 220 ms, rien en reduced-motion.
+ * `lift={false}` pour un encadré statique (ex. bloc réglementaire, texte long).
+ */
+interface Props {
+  class?: string;
+  tone?: 'white' | 'paper' | 'ink' | 'glass';
+  as?: 'div' | 'article' | 'li';
+  lift?: boolean;
+}
+const props = Astro.props as Props;
+const className = props.class ?? '';
+const tone = props.tone ?? 'white';
+const Tag = props.as ?? 'div';
+const lift = props.lift ?? true;
+const tones: Record<NonNullable<Props['tone']>, string> = {
+  white: 'bg-white text-ink shadow-card',
+  paper: 'bg-paper text-ink',
+  ink: 'bg-ink-800 text-white',
+  glass: 'bg-white/10 text-white backdrop-blur-md border border-white/15',
+};
+---
+
+<Tag class:list={['rounded-3xl p-6 sm:p-8', tones[tone], lift && 'card-lift', className]}>
+  <slot />
+</Tag>

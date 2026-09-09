@@ -1,0 +1,36 @@
+---
+/**
+ * Grand chiffre façon page produit, avec compteur animé optionnel (valeur finale toujours dans le
+ * HTML ; `numeric` déclenche `data-counter` : ease power3, format fr-FR, préfixe/suffixe/décimales,
+ * départ à 85 % du viewport, une seule fois — voir src/scripts/motion.ts). Le moteur réserve la
+ * largeur finale du chiffre pendant le comptage (aucun décalage autour).
+ * `from` : valeur de départ du compteur (défaut 0) ; `duration` : secondes (défaut 1,6).
+ */
+interface Props {
+  value: string;
+  label: string;
+  numeric?: number;
+  prefix?: string;
+  suffix?: string;
+  decimals?: number;
+  from?: number;
+  duration?: number;
+  class?: string;
+}
+const { value, label, numeric, prefix, suffix, decimals, from, duration, class: className = '' } = Astro.props;
+---
+
+<div class:list={['flex flex-col gap-2', className]}>
+  <span
+    class="text-stat text-brand-gradient"
+    data-counter={numeric}
+    data-counter-prefix={prefix}
+    data-counter-suffix={suffix}
+    data-counter-decimals={decimals}
+    data-counter-from={from}
+    data-counter-duration={duration}
+  >
+    {value}
+  </span>
+  <span class="text-lead font-medium">{label}</span>
+</div>
