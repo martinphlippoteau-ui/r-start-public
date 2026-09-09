@@ -1,0 +1,65 @@
+---
+/**
+ * Fenêtre « la souscription arrive bientôt ». Rendue uniquement quand l'URL du tunnel n'est pas
+ * encore configurée (Base.astro teste `site.subscribeIsPlaceholder`) : le jour où la vraie URL est
+ * fournie, le composant disparaît et les boutons reprennent leur navigation normale.
+ *
+ * Élément <dialog> natif : piège à focus, fermeture par Échap et retour du focus au bouton d'origine
+ * assurés par le navigateur. Sans JavaScript, le lien conserve son comportement d'origine.
+ * Contenu : src/content/fr/subscribeSoon.ts.
+ */
+import { withBase } from '@/lib/href';
+import { subscribeSoon } from '@/content/fr/subscribeSoon';
+---
+
+<dialog
+  id="subscribe-soon"
+  data-subscribe-soon
+  aria-labelledby="subscribe-soon-title"
+  class="m-auto w-[min(32rem,calc(100vw-2rem))] rounded-3xl border border-mist bg-white p-0 text-ink shadow-float backdrop:bg-ink/60 backdrop:backdrop-blur-sm"
+>
+  <div class="p-6 sm:p-8">
+    <p class="text-eyebrow text-teal-700">{subscribeSoon.eyebrow}</p>
+    <h2 id="subscribe-soon-title" class="text-display-sm mt-3">{subscribeSoon.title}</h2>
+    <div class="mt-4 space-y-3 text-base leading-relaxed text-slate-700">
+      {subscribeSoon.body.map((p) => <p>{p}</p>)}
+    </div>
+    <div class="mt-7 flex flex-wrap gap-3">
+      <a
+        href={withBase(subscribeSoon.documentsHref)}
+        class="btn-motion inline-flex items-center justify-center rounded-full bg-navy px-6 py-3 font-semibold text-white no-underline transition-colors hover:bg-teal-700"
+      >
+        {subscribeSoon.documentsLabel}
+      </a>
+      <button
+        type="button"
+        data-subscribe-soon-close
+        class="btn-motion inline-flex items-center justify-center rounded-full border border-navy/25 px-6 py-3 font-semibold text-navy transition-colors hover:border-navy hover:bg-navy hover:text-white"
+      >
+        {subscribeSoon.closeLabel}
+      </button>
+    </div>
+  </div>
+</dialog>
+
+<script>
+  /* Intercepte les boutons « Souscrire » tant que le tunnel n'est pas configuré. */
+  const dialog = document.querySelector<HTMLDialogElement>('[data-subscribe-soon]');
+  if (dialog && typeof dialog.showModal === 'function') {
+    document.addEventListener('click', (event) => {
+      const target = event.target as HTMLElement | null;
+      const cta = target?.closest<HTMLAnchorElement>('[data-cta="souscrire"]');
+      if (!cta) return;
+      event.preventDefault();
+      const dataLayer = ((window as unknown as { dataLayer?: unknown[] }).dataLayer ??= []);
+      dataLayer.push({ event: 'souscription_indisponible', cta_position: cta.dataset.ctaPosition || 'unknown' });
+      if (!dialog.open) dialog.showModal();
+    });
+
+    dialog.addEventListener('click', (event) => {
+      const target = event.target as HTMLElement | null;
+      // Bouton de fermeture, ou clic sur l'arrière-plan (la cible est alors le <dialog> lui-même).
+      if (target?.closest('[data-subscribe-soon-close]') || target === dialog) dialog.close();
+    });
+  }
+</script>

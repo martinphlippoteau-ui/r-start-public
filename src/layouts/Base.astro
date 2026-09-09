@@ -2,6 +2,8 @@
 import '@/styles/global.css';
 import Seo from '@/components/Seo.astro';
 import Consent from '@/components/Consent.astro';
+import SubscribeSoon from '@/components/SubscribeSoon.astro';
+import { site } from '@/config/site';
 import JsonLd from '@/components/JsonLd.astro';
 import { nav } from '@/content/fr/nav';
 import { withBase } from '@/lib/href';
@@ -40,6 +42,7 @@ const { title, description, path, noindex, ogImage, ogImageAlt, jsonLd, bodyClas
     <a href="#contenu" class="skip-link">{nav.skipLink}</a>
     <slot />
     <Consent />
+    {site.subscribeIsPlaceholder && <SubscribeSoon />}
     <script>
       import '@/scripts/consent';
       import '@/scripts/analytics';
