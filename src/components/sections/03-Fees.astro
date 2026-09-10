@@ -128,7 +128,9 @@ const detailsLink = feesPageExists ? fees.detailsLink : undefined;
         {
           counterRows.map((row) => (
             <li class="flex flex-col gap-1 border-t border-coral/40 pt-2 sm:gap-2 sm:pt-5">
-              <span class="text-display-sm text-coral-700 tabular-nums">
+              {/* Même taille que les « 0 % » ci-dessus : l'AMF a relevé sur la brochure qu'un frais ne
+                  peut pas être affiché dans une police plus petite que les autres. */}
+              <span class="text-stat text-coral-700 tabular-nums">
                 {row.valueShort ? (
                   <>
                     <span class="sm:hidden">{row.valueShort}</span>
@@ -138,7 +140,7 @@ const detailsLink = feesPageExists ? fees.detailsLink : undefined;
                   row.value
                 )}
               </span>
-              <span class="text-caption leading-snug text-slate-700">{row.label}</span>
+              <span class="text-base leading-snug font-medium text-ink sm:text-lead">{row.label}</span>
             </li>
           ))
         }

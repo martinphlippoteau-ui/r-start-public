@@ -22,3 +22,6 @@ Thumbs.db
 .vscode/*
 !.vscode/extensions.json
 *.log
+
+# Sources de rédaction, jamais publiées (brochure réservée aux professionnels)
+Assets R Start/

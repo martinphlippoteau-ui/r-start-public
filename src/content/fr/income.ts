@@ -1,5 +1,5 @@
 import type { IncomeContent, LegalNote } from '@/content/types';
-import { income as incomeFacts, product, risk, fees } from '@/content/fr/facts';
+import { income as incomeFacts, risk, fees } from '@/content/fr/facts';
 
 /**
  * Section « Revenus » (id : revenus).
@@ -22,7 +22,7 @@ export const notes: LegalNote[] = [
   },
   {
     id: 'revenus-sri',
-    text: `Indicateur synthétique de risque (SRI) : échelle de 1 (risque le plus faible) à ${risk.sriMax} (risque le plus élevé). Il est calculé sur l’hypothèse d’une détention de ${risk.recommendedHoldingLabel}. Source : document d’informations clés du ${product.dicDate.label}.`,
+    text: `Indicateur synthétique de risque (SRI) : échelle de 1 (risque le plus faible) à ${risk.sriMax} (risque le plus élevé). Il est calculé sur l’hypothèse d’une détention de ${risk.recommendedHoldingLabel}. Niveau communiqué par CORUM Asset Management ; le document d’informations clés fait foi.`,
   },
 ];
 

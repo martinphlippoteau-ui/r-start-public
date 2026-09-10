@@ -88,8 +88,10 @@ export const fees = {
     after5Years: '4,09 %',
     after10Years: '2,84 %',
   }, // DIC p.3
+  // Correction demandée par l'AMF sur la brochure (09/2026) : les frais sur cessions immobilières sont
+  // exprimés TTC. La commission de retrait anticipé l'est également (bulletin de souscription, CGV).
   vatNote:
-    "Les frais mentionnés sont exprimés hors taxes (HT). R Start étant exonérée de TVA, le montant hors taxes est égal au montant toutes taxes comprises (TTC).", // brochure p.4
+    "Les frais mentionnés sont exprimés hors taxes (HT), à l'exception des frais sur cessions immobilières et de la commission de retrait anticipé, exprimés toutes taxes comprises (TTC). R Start étant exonérée de TVA, le montant hors taxes est égal au montant toutes taxes comprises.",
   distributorRemuneration: '0,85 % des encours', // bulletin CGV (rémunération récurrente des intermédiaires)
 } as const;
 
@@ -103,7 +105,10 @@ export const income = {
 } as const;
 
 export const risk = {
-  sri: 4, // Confirmé par CORUM le 08/09/2026 (brochure p.3) ; DIC hébergé V7 (3/7) à remplacer par la version à jour
+  // Valeur communiquée par la société de gestion (brochure p.3), confirmée par CORUM le 08/09/2026 et
+  // maintenue par décision client le 10/09/2026. ATTENTION : le DIC V7 hébergé indique 3 sur 7 et l'AMF
+  // a relevé cet écart dans ses retours sur la brochure. À aligner dès réception du DIC en vigueur.
+  sri: 4,
   sriMax: 7,
   sriLabel: '4 sur 7',
   sriClass: 'classe de risque moyenne', // DIC p.2

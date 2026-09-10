@@ -71,8 +71,9 @@ export const managementCompany = {
   legalForm: 'Société par actions simplifiée au capital social de 600 000 €',
   rcs: 'RCS Paris 531 636 546',
   address: '1 rue Euler, 75008 Paris',
+  // « agréée et réglementée » : formulation demandée par l'AMF dans ses retours sur la brochure (09/2026).
   amfApproval:
-    "Société de gestion de portefeuille agréée par l'AMF sous le numéro GP-11000012 le 14 avril 2011, agrément AIFM en date du 10 juillet 2014 au titre de la directive 2011/61/UE.",
+    "Société de gestion de portefeuille agréée et réglementée par l'AMF sous le numéro GP-11000012 le 14 avril 2011, agrément AIFM en date du 10 juillet 2014 au titre de la directive 2011/61/UE.",
   amfAddress: 'Autorité des marchés financiers, 17 place de la Bourse, 75082 Paris Cedex 02',
   complaintsEmail: 'conformite@corum-am.com',
   complaintsPolicyUrl: 'https://www.corumbutler.com/mentions-legales',

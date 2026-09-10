@@ -79,7 +79,7 @@ const rawNotes: LegalNote[] = [
   },
   {
     id: 'faq-sri',
-    text: `Indicateur synthétique de risque (SRI) : échelle de 1 (risque le plus faible) à ${risk.sriMax} (risque le plus élevé), établie en supposant que vous conservez le produit ${risk.recommendedHoldingLabel}. Source : DIC R Start du ${product.dicDate.label}.`,
+    text: `Indicateur synthétique de risque (SRI) : échelle de 1 (risque le plus faible) à ${risk.sriMax} (risque le plus élevé), établie en supposant que vous conservez le produit ${risk.recommendedHoldingLabel}. Niveau communiqué par ${managementCompany.name} ; le document d’informations clés fait foi.`,
   },
   {
     id: 'faq-corum-source',
@@ -148,7 +148,7 @@ const rawItems: FaqContent['items'] = [
     answer: [
       'R Start est un investissement immobilier de long terme. Le capital investi n’est pas garanti : la valeur de vos parts peut baisser, et vous pourriez perdre tout ou partie de votre investissement. Les revenus ne sont pas garantis et varient selon le marché immobilier et le cours des devises.',
       `S’y ajoutent trois risques spécifiques. Le risque de liquidité : le rachat des parts n’est pas garanti. Le risque de change : R Start peut investir hors zone euro, sans couverture systématique. L’effet de levier : R Start peut recourir à l’endettement jusqu’à ${risk.maxLeverage} de la valeur d’expertise de ses actifs, ce qui amplifie les variations à la hausse comme à la baisse.`,
-      `Le DIC classe R Start en ${risk.sriLabel} sur l’indicateur synthétique de risque, une ${risk.sriClass}, qui tient compte de son caractère récent. Cet indicateur n’intègre ni le risque de change, ni le risque de liquidité, ni l’effet de levier. Enfin, la commission d’arbitrage a des effets de seuil et peut capter une partie significative de la plus-value. Durée de placement recommandée : ${risk.recommendedHoldingLabel}.`,
+      `${managementCompany.name} classe R Start en ${risk.sriLabel} sur l’indicateur synthétique de risque, une ${risk.sriClass}, qui tient compte de son caractère récent. Cet indicateur n’intègre ni le risque de change, ni le risque de liquidité, ni l’effet de levier. Enfin, la commission d’arbitrage a des effets de seuil et peut capter une partie significative de la plus-value. Durée de placement recommandée : ${risk.recommendedHoldingLabel}.`,
     ],
   },
   {

@@ -84,7 +84,7 @@ export const strategy = {
       icon: 'exploration',
       title: 'Une zone d’investissement étendue',
       description:
-        'R Start investira là où ses équipes identifient des opportunités. Elle peut le faire dans les pays du Conseil de l’Europe et au Canada, tous secteurs confondus.',
+        'Selon l’analyse de CORUM Asset Management, R Start investira là où sa société de gestion identifie des opportunités. Elle peut le faire dans les pays du Conseil de l’Europe et au Canada, tous secteurs confondus.',
       risk: 'Le patrimoine se constitue au fil des collectes. Au démarrage, il peut être concentré sur peu d’immeubles, de pays ou de secteurs, ce qui accroît le risque.',
     },
   ],
