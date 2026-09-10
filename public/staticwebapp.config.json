@@ -44,6 +44,10 @@
   },
   "navigationFallback": {
     "rewrite": "/404.html",
-    "exclude": ["/_astro/*", "/documents/*", "/*.{css,js,png,jpg,jpeg,webp,avif,svg,ico,woff2,xml,txt,json}"]
+    "exclude": [
+      "/_astro/*",
+      "/documents/*",
+      "/*.{css,js,png,jpg,jpeg,webp,avif,svg,ico,woff2,xml,txt,json}"
+    ]
   }
 }

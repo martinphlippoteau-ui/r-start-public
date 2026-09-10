@@ -2,7 +2,18 @@
  * Types du périmètre v2 (08/09/2026) : blocs de confiance, page Frais, page Documentation, page Presse.
  * Fichier séparé de types.ts pour ne pas interférer avec le lot design ; fusion prévue à l'intégration.
  */
-import type { AdvantageRisk, Cta, DocumentItem, FaqItem, FeeKind, FeeRow, LegalNote, StatItem, StepItem, WithdrawalStep } from '@/content/types';
+import type {
+  AdvantageRisk,
+  Cta,
+  DocumentItem,
+  FaqItem,
+  FeeKind,
+  FeeRow,
+  LegalNote,
+  StatItem,
+  StepItem,
+  WithdrawalStep,
+} from '@/content/types';
 
 export interface PageSeo {
   /** ≤ 60 caractères, contient « R Start » et « CORUM ». */
@@ -83,7 +94,11 @@ export interface DifferenceContent {
    * et son contre-poids chiffré : frais de gestion, commission sur les cessions, commission de retrait,
    * coût total inconnu à la souscription (risk).
    */
-  counterweight: AdvantageRisk & { title?: string; noteId?: string };
+  /**
+   * `pedagogy` : les deux phrases sur le moment du prélèvement, descendues du hero par l'audit UX.
+   * Elles sont rendues dans le même bloc que `advantage` et partagent son contre-poids `risk`.
+   */
+  counterweight: AdvantageRisk & { title?: string; noteId?: string; pedagogy?: string[] };
   /** Mécanisme de réserve en cas de moins-value, résumé en deux phrases (brochure partenaires 2026, p.4). */
   lossMechanism: { title: string; body: string[]; risk: string; noteId?: string };
   /** Lien interne vers la page Frais : ce n'est pas un CTA de souscription, il ne porte pas de `position`. */
@@ -178,7 +193,14 @@ export interface FeesPageLabels {
   /** En-têtes des deux colonnes de l'incidence des coûts (durée, incidence annuelle). */
   costColumns: { period: string; impact: string };
   /** Surtitres des blocs de la page. */
-  eyebrows: { schedule: string; withdrawal: string; lossMechanism: string; costImpact: string; document: string; faq: string };
+  eyebrows: {
+    schedule: string;
+    withdrawal: string;
+    lossMechanism: string;
+    costImpact: string;
+    document: string;
+    faq: string;
+  };
   /** Libellé du type de fichier du document de référence (ex. « PDF »). */
   fileTypeLabel: string;
   /** Unité du poids affiché après le nombre (ex. « ko »). */
@@ -202,13 +224,26 @@ export interface FeesPageContent {
    */
   counterweightRates: { value: string; label: string }[];
   groups: FeeGroup[];
-  withdrawal: { title: string; intro: string; steps: WithdrawalStep[]; exemptionsTitle: string; exemptions: string[]; note: string };
+  withdrawal: {
+    title: string;
+    intro: string;
+    steps: WithdrawalStep[];
+    exemptionsTitle: string;
+    exemptions: string[];
+    note: string;
+  };
   /** Mécanisme de réserve en cas de moins-value (brochure p.4). */
   lossMechanism: { title: string; body: string[]; risk: string };
   arbitrageWarning: { title: string; bullets: string[] };
   innovationBox: { title: string; body: string };
   /** Incidence des coûts du DIC (coûts, jamais de rendement). */
-  costImpact: { title: string; intro: string; rows: { period: string; impact: string }[]; note: string; risk: string };
+  costImpact: {
+    title: string;
+    intro: string;
+    rows: { period: string; impact: string }[];
+    note: string;
+    risk: string;
+  };
   /** Bascule pédagogique des frais (brochure p.6) ; enabled=false pour la retirer en une ligne. */
   marketComparison: FeeComparison;
   simulationDoc: DocumentItem;
@@ -230,6 +265,13 @@ export interface DocumentationLabels {
   newTabHint?: string;
   /** aria-label de la navigation d'ancres vers les groupes de documents (ex. « Groupes de documents »). */
   anchorsLabel?: string;
+  /** Décompte d'un groupe dans le sommaire de l'en-tête. `{n}` : nombre ; `{s}` : marque du pluriel. */
+  anchorsCountLabel?: string;
+  /**
+   * Nom du sommaire rendu dans l'en-tête. Distinct de `anchorsLabel` (la barre d'ancres collante) :
+   * deux repères de navigation d'une même page ne peuvent pas porter le même nom accessible.
+   */
+  anchorsAsideLabel?: string;
   /** Surtitre commun des groupes de documents (ex. « Documents »). */
   groupsEyebrow?: string;
   /** Surtitre du guide de souscription (ex. « Souscrire »). */
@@ -242,6 +284,8 @@ export interface DocumentationLabels {
   faqEyebrow?: string;
   /** aria-label de la liste des questions (ex. « Questions fréquentes sur R Start »). */
   faqListLabel?: string;
+  /** Amorce du lien de note placé sous la réponse (le marqueur de la question n'est pas focusable). */
+  faqNoteLead?: string;
 }
 
 export interface DocumentationContent {
@@ -253,7 +297,16 @@ export interface DocumentationContent {
    * contre-poids rendu en RiskNote dans le même bloc et la même taille (jamais animé).
    */
   howTo: { title: string; intro: string; risk?: string; steps: StepItem[] };
-  faq: { title: string; items: FaqItem[] };
+  /**
+   * FAQ de la page : seulement les questions dont le sujet est un document ou la souscription (la
+   * sélection est faite dans documentation.ts). `fullFaqLink` renvoie vers la foire aux questions
+   * complète de l'accueil, où les autres questions restent lisibles — elles ne sont plus dupliquées.
+   */
+  faq: {
+    title: string;
+    items: FaqItem[];
+    fullFaqLink?: { intro: string; label: string; href: string };
+  };
   corumLink: { label: string; href: string };
   mention: string;
   cta: Cta;

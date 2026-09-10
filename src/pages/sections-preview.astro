@@ -11,7 +11,9 @@ import Footer from '@/components/Footer.astro';
 import { seo } from '@/content/fr/seo';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const modules = import.meta.glob<{ default: any }>('/src/components/sections/*.astro', { eager: true });
+const modules = import.meta.glob<{ default: any }>('/src/components/sections/*.astro', {
+  eager: true,
+});
 const all = Object.entries(modules)
   .sort(([a], [b]) => a.localeCompare(b))
   .map(([path, mod]) => ({ path, Component: mod.default }));
@@ -19,7 +21,12 @@ const hero = all.find((s) => /\/01-/.test(s.path));
 const rest = all.filter((s) => s !== hero);
 ---
 
-<Base title="Prévisualisation des sections R Start" description={seo.description} path="/sections-preview" noindex>
+<Base
+  title="Prévisualisation des sections R Start"
+  description={seo.description}
+  path="/sections-preview"
+  noindex
+>
   <SiteNav sections />
   <main id="contenu">
     {hero && <hero.Component />}

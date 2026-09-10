@@ -4,6 +4,17 @@
  * dans l'ordre des sections. Chaque item porte l'ancre `${sections.notes.id}-${n}` ciblée par NoteRef.
  * Prop optionnelle `notes` : une sous-page rend ses propres notes (export `notes` de son fichier de
  * contenu, numérotées par son appel de note local) ; sans prop, le registre de l'accueil (allNotes).
+ *
+ * La liste est repliée dans un <details> : sur l'accueil elle occupait à elle seule plusieurs écrans
+ * de défilement pour un contenu que l'on consulte note par note, depuis un appel de note. Rien n'est
+ * retiré — le texte reste dans le document, lisible sans JavaScript (le lecteur déplie), indexable, et
+ * accessible aux lecteurs d'écran.
+ *
+ * Suivre un appel de note reste immédiat : le script ci-dessous déplie le bloc quand l'adresse cible
+ * une ancre de note (`#notes-n`), au chargement comme à chaque changement de fragment (clic sur un
+ * appel de note dans la page), puis laisse le navigateur défiler. Les <li> portent `tabindex="-1"` et
+ * reçoivent le focus : au clavier, la note visée est lue immédiatement, pas seulement affichée.
+ * Sans JavaScript, l'ancre reste atteignable une fois le bloc déplié à la main.
  */
 import Container from '@/components/ui/Container.astro';
 import Section from '@/components/ui/Section.astro';
@@ -19,19 +30,78 @@ const { notes = allNotes } = Astro.props;
 
 const id = sections.notes.id;
 const title = footer.notesTitle ?? sections.notes.label;
+/** Libellé du <summary> : le titre de la section, suivi du nombre de notes de la page. */
+const toggleLabel = (footer.notesToggleLabel ?? '{n}').replace('{n}', String(notes.length));
 ---
 
 <Section id={id} tone="paper" spacing="compact">
   <Container>
-    <h2 id={id + '-title'} class="text-lg font-semibold tracking-tight text-navy">{title}</h2>
-    <ol class="mt-6 max-w-4xl list-decimal space-y-3 pl-6 text-sm leading-relaxed text-slate-700 marker:font-semibold marker:text-navy">
-      {
-        notes.map((note, i) => (
-          <li id={id + '-' + (i + 1)} class="scroll-mt-24 pl-1">
-            {note.text}
-          </li>
-        ))
-      }
-    </ol>
+    <h2 id={id + '-title'} class="visually-hidden">{title}</h2>
+    <details class="legal-notes" data-legal-notes>
+      <summary
+        class="cursor-pointer list-none text-lg font-semibold tracking-tight text-navy underline underline-offset-4 hover:text-teal-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-navy"
+      >
+        {toggleLabel}
+      </summary>
+      <ol
+        class="mt-6 max-w-4xl list-decimal space-y-3 pl-6 text-sm leading-relaxed text-slate-700 marker:font-semibold marker:text-navy"
+      >
+        {
+          notes.map((note, i) => (
+            <li
+              id={id + '-' + (i + 1)}
+              tabindex="-1"
+              class="scroll-mt-24 pl-1 focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-navy"
+            >
+              {note.text}
+            </li>
+          ))
+        }
+      </ol>
+    </details>
   </Container>
 </Section>
+
+<style>
+  /* Marqueur maison : le triangle natif est retiré par `list-none` (et par la règle WebKit ci-dessous). */
+  .legal-notes > summary::-webkit-details-marker {
+    display: none;
+  }
+  .legal-notes > summary::after {
+    content: ' +';
+    font-variant-numeric: tabular-nums;
+  }
+  .legal-notes[open] > summary::after {
+    content: ' −';
+  }
+</style>
+
+<script>
+  /**
+   * Déplie le bloc des notes quand l'adresse vise une note, puis donne le focus à la note visée.
+   * Appelé au chargement (arrivée par un lien externe portant déjà le fragment) et à chaque
+   * `hashchange` (clic sur un appel de note dans la page). Le défilement reste celui du navigateur :
+   * `scroll-mt-24` sur les <li> place la note sous la barre collée.
+   */
+  const openTargetedNote = (): void => {
+    const hash = location.hash;
+    if (!hash || hash.length < 2) return;
+    let target: Element | null = null;
+    try {
+      target = document.querySelector(hash);
+    } catch {
+      return; // fragment non conforme à un sélecteur CSS : rien à ouvrir
+    }
+    const details = target?.closest<HTMLDetailsElement>('[data-legal-notes]');
+    if (!details || !target) return;
+    if (!details.open) {
+      details.open = true;
+      // Le bloc vient de s'ouvrir : le navigateur avait déjà renoncé à défiler vers une cible masquée.
+      target.scrollIntoView({ block: 'start', behavior: 'auto' });
+    }
+    (target as HTMLElement).focus({ preventScroll: true });
+  };
+
+  window.addEventListener('hashchange', openTargetedNote);
+  openTargetedNote();
+</script>

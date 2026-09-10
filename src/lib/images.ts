@@ -4,7 +4,9 @@ import type { ImageMetadata } from 'astro';
  * Résout un chemin de media.ts (relatif à src/assets/images) vers les métadonnées astro:assets.
  * Import paresseux : seules les images réellement utilisées sont traitées au build.
  */
-const images = import.meta.glob<{ default: ImageMetadata }>('/src/assets/images/**/*.{jpg,jpeg,png,webp,avif}');
+const images = import.meta.glob<{ default: ImageMetadata }>(
+  '/src/assets/images/**/*.{jpg,jpeg,png,webp,avif}'
+);
 
 export async function resolveImage(src: string): Promise<ImageMetadata> {
   const key = '/src/assets/images/' + src.replace(/^\/+/, '');

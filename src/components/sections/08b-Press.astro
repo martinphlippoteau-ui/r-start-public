@@ -34,12 +34,20 @@ const QUOTE_STAGGER = 0.12;
     <header class="max-w-4xl">
       <p data-animate="fade-up" class="text-eyebrow mb-4 text-teal-700">{pressHome.eyebrow}</p>
       <h2 id={id + '-title'} class="text-display-lg" data-reveal-text>{pressHome.title}</h2>
-      <p data-animate="fade-up" data-animate-delay="0.15" class="text-lead mt-6 max-w-3xl opacity-90">
+      <p
+        data-animate="fade-up"
+        data-animate-delay="0.15"
+        class="text-lead mt-6 max-w-3xl opacity-90"
+      >
         {pressHome.intro}<span class="whitespace-nowrap"><NoteRef id={pressHome.noteId} /></span>
       </p>
     </header>
 
-    <ul role="list" aria-label={pressHome.quotesListLabel} class="mt-12 grid gap-6 lg:mt-16 lg:grid-cols-2 lg:gap-8">
+    <ul
+      role="list"
+      aria-label={pressHome.quotesListLabel}
+      class="mt-12 grid gap-6 lg:mt-16 lg:grid-cols-2 lg:gap-8"
+    >
       {
         pressHome.quotes.map((quote, i) => (
           <li
@@ -60,10 +68,14 @@ const QUOTE_STAGGER = 0.12;
       }
     </ul>
 
-    <div class="mt-10 grid gap-8 border-t border-navy/15 pt-8 lg:mt-14 lg:grid-cols-[1fr_auto] lg:items-start lg:gap-12">
+    <div
+      class="mt-10 grid gap-8 border-t border-navy/15 pt-8 lg:mt-14 lg:grid-cols-[1fr_auto] lg:items-start lg:gap-12"
+    >
       <RiskNote text={pressHome.disclaimer} size="lead" class="max-w-4xl" />
       <div data-animate="fade-up" class="lg:pt-1">
-        <Button href={pressHome.link.href} variant="secondary" size="lg">{pressHome.link.label}</Button>
+        <Button href={pressHome.link.href} variant="secondary" size="lg"
+          >{pressHome.link.label}</Button
+        >
       </div>
     </div>
   </Container>

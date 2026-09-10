@@ -17,7 +17,9 @@ import { all, allowed, num, onceTrigger, onceVars } from './shared';
 const SHAPES = 'path, line, polyline, polygon, circle, ellipse, rect';
 
 const shapesOf = (el: HTMLElement): SVGGeometryElement[] => {
-  const list = el.matches(SHAPES) ? [el as unknown as SVGGeometryElement] : Array.from(el.querySelectorAll<SVGGeometryElement>(SHAPES));
+  const list = el.matches(SHAPES)
+    ? [el as unknown as SVGGeometryElement]
+    : Array.from(el.querySelectorAll<SVGGeometryElement>(SHAPES));
   return list.filter((s) => typeof s.getTotalLength === 'function');
 };
 
@@ -39,7 +41,13 @@ export const setupDraw = (): void => {
       gsap.fromTo(
         el,
         { scaleX: 0, transformOrigin: '0% 50%' },
-        { scaleX: 1, duration: 1.2, ease: scrub ? 'none' : 'expo.out', scrollTrigger, ...onceVars(el, 'transform') },
+        {
+          scaleX: 1,
+          duration: 1.2,
+          ease: scrub ? 'none' : 'expo.out',
+          scrollTrigger,
+          ...onceVars(el, 'transform'),
+        }
       );
       return;
     }
@@ -48,7 +56,9 @@ export const setupDraw = (): void => {
     if (!shapes.length) return;
     // Longueurs lues en une passe (lecture), puis écritures : pas d'alternance lecture/écriture.
     const lengths = shapes.map((s) => Math.ceil(s.getTotalLength()) + 1);
-    shapes.forEach((s, i) => gsap.set(s, { strokeDasharray: lengths[i], strokeDashoffset: lengths[i] }));
+    shapes.forEach((s, i) =>
+      gsap.set(s, { strokeDasharray: lengths[i], strokeDashoffset: lengths[i] })
+    );
     gsap.to(shapes, {
       strokeDashoffset: 0,
       duration: 1.4,
@@ -65,7 +75,9 @@ export const setupFill = (): void => {
     if (!allowed(el, 'data-fill')) return;
     const value = gsap.utils.clamp(0, 1, num(el.dataset.fill, 1));
     const vertical = el.dataset.fillAxis === 'y';
-    const from = vertical ? { scaleY: 0, transformOrigin: '50% 100%' } : { scaleX: 0, transformOrigin: '0% 50%' };
+    const from = vertical
+      ? { scaleY: 0, transformOrigin: '50% 100%' }
+      : { scaleX: 0, transformOrigin: '0% 50%' };
     const to = vertical ? { scaleY: 1 } : { scaleX: 1 };
     gsap.fromTo(el, from, {
       ...to,

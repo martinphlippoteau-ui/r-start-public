@@ -27,7 +27,11 @@ export const setupRevealText = (): (() => void) => {
     const words = text.split(/\s+/).filter(Boolean);
     if (words.length < 2) return;
     if (words.length > MAX_WORDS) {
-      refuse(el, 'data-reveal-text', `réservé aux titres courts (≤ ${MAX_WORDS} mots), pas aux paragraphes`);
+      refuse(
+        el,
+        'data-reveal-text',
+        `réservé aux titres courts (≤ ${MAX_WORDS} mots), pas aux paragraphes`
+      );
       return;
     }
     const original = Array.from(el.childNodes);
@@ -63,7 +67,7 @@ export const setupRevealText = (): (() => void) => {
             end: el.dataset.revealEnd || 'bottom 55%',
             scrub: 0.4,
           },
-        },
+        }
       );
     } else {
       gsap.from(spans, {

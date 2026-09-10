@@ -30,16 +30,23 @@ const colors = {
   light: 'text-teal-700',
   dark: 'text-teal-200',
 };
-const classes = ['ml-0.5 align-super text-[0.65em] font-semibold no-underline hover:underline', colors[tone ?? 'auto']];
+const classes = [
+  'ml-0.5 align-super text-[0.65em] font-semibold no-underline hover:underline',
+  colors[tone ?? 'auto'],
+];
 ---
 
 {
   n !== null && interactive && (
-    <a href={'#' + sections.notes.id + '-' + n} class:list={classes} aria-label={label}>{n}</a>
+    <a href={'#' + sections.notes.id + '-' + n} class:list={classes} aria-label={label}>
+      {n}
+    </a>
   )
 }
 {
   n !== null && !interactive && (
-    <span class:list={classes} aria-hidden="true">{n}</span>
+    <span class:list={classes} aria-hidden="true">
+      {n}
+    </span>
   )
 }

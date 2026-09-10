@@ -20,6 +20,9 @@ export default defineConfig({
     // WebKit binaire indisponible (téléchargement impossible dans cet environnement) :
     // repli sur Chromium + émulation Pixel 5 pour le projet mobile.
     { name: 'mobile', use: { ...devices['Pixel 5'] } },
-    { name: 'desktop', use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } } },
+    {
+      name: 'desktop',
+      use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } },
+    },
   ],
 });

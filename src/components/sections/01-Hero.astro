@@ -83,10 +83,14 @@ const copyScrub = {
         </span>
       </h1>
       <div {...copyScrub} class="flex flex-col items-center">
-        <p data-intro="2" class="text-display-sm mt-1 text-sand sm:mt-3">{hero.tagline}</p>
+        <p data-intro="2" class="text-display-sm mt-0.5 text-sand sm:mt-3">{hero.tagline}</p>
         {
           hero.definition && (
-            <p data-intro="3" data-intro-move class="text-lead mt-1.5 max-w-3xl text-pretty text-white max-sm:text-base max-sm:leading-snug sm:mt-4">
+            <p
+              data-intro="3"
+              data-intro-move
+              class="text-lead mt-1 max-w-3xl text-pretty text-white max-sm:text-base max-sm:leading-snug sm:mt-4"
+            >
               {hero.definition}
               {hero.definitionNoteId && (
                 <span class="whitespace-nowrap">
@@ -97,24 +101,40 @@ const copyScrub = {
           )
         }
         {
-          hero.pedagogy && hero.pedagogy.length > 0 && (
-            <p data-intro="4" data-intro-move class="text-lead mt-1.5 max-w-3xl text-pretty text-white/90 max-sm:text-base max-sm:leading-snug sm:mt-3">
-              {hero.pedagogy.join(' ')}
-            </p>
-          )
+          /* Les deux phrases pédagogiques sont descendues dans « Ce qui change vraiment » (audit UX) :
+            elles coûtaient trois lignes avant même que le lecteur sache ce qu'est R Start, et
+            repoussaient les CTA sous le bandeau cookies sur mobile. */
         }
-        <p data-intro="5" data-intro-move class="text-lead mt-1.5 max-w-3xl text-pretty text-white max-sm:text-base max-sm:leading-snug sm:mt-4">{hero.subtitle}</p>
+        <p
+          data-intro="4"
+          data-intro-move
+          class="text-lead mt-1 max-w-3xl text-pretty text-white max-sm:text-base max-sm:leading-snug sm:mt-4"
+        >
+          {hero.subtitle}
+        </p>
       </div>
       <RiskNote
         text={hero.riskLine}
         tone="dark"
         size="lead"
-        class="mx-auto mt-1.5 max-w-3xl justify-center text-left max-sm:text-base max-sm:leading-snug sm:mt-4"
+        class="mx-auto mt-1 max-w-3xl justify-center text-left max-sm:text-base max-sm:leading-snug sm:mt-4"
       />
-      <div {...copyScrub} class="mt-4 w-full sm:mt-7 sm:w-auto">
-        <div data-intro="6" class="flex w-full flex-col items-stretch gap-3 sm:w-auto sm:flex-row sm:items-center">
-          <Button position={hero.primaryCta.position} variant="light" size="lg">{hero.primaryCta.label}</Button>
-          <Button href={hero.secondaryCta.href} variant="outline-light" size="lg">{hero.secondaryCta.label}</Button>
+      <div {...copyScrub} class="mt-2.5 w-full sm:mt-7 sm:w-auto">
+        {
+          /* `data-hero-cta` : repère stable pour la mesure et pour le test « les CTA du hero sont
+            visibles sans scroller » — il ne dépend pas du rang dans la cascade d'entrée. */
+        }
+        <div
+          data-hero-cta
+          data-intro="5"
+          class="flex w-full flex-col items-stretch gap-2 sm:w-auto sm:flex-row sm:items-center sm:gap-3"
+        >
+          <Button position={hero.primaryCta.position} variant="light" size="lg"
+            >{hero.primaryCta.label}</Button
+          >
+          <Button href={hero.secondaryCta.href} variant="outline-light" size="lg"
+            >{hero.secondaryCta.label}</Button
+          >
         </div>
       </div>
     </div>
@@ -147,9 +167,17 @@ const copyScrub = {
             class="hero-media h-full w-full object-cover"
           />
         </div>
-        <div aria-hidden="true" class="absolute inset-0 bg-gradient-to-t from-ink/45 via-transparent to-transparent"></div>
+        <div
+          aria-hidden="true"
+          class="absolute inset-0 bg-gradient-to-t from-ink/45 via-transparent to-transparent"
+        >
+        </div>
       </div>
-      {media.hero.main.credit && <figcaption class="text-caption mt-3 text-white/90">{media.hero.main.credit}</figcaption>}
+      {
+        media.hero.main.credit && (
+          <figcaption class="text-caption mt-3 text-white/90">{media.hero.main.credit}</figcaption>
+        )
+      }
     </figure>
   </Container>
 </Section>

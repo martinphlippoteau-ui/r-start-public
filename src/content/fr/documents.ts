@@ -27,7 +27,7 @@ export const publishedDocuments = documentFacts.filter((d) => !EXCLUDED_KEYS.inc
 
 /** Poids (ko) des PDF indexé par chemin public, depuis le manifeste des médias (`documents[].kb`). */
 const kbByFile = new Map<string, number>(
-  manifest.documents.map((d) => ['/' + d.file.replace(/^\/+/, ''), d.kb] as const),
+  manifest.documents.map((d) => ['/' + d.file.replace(/^\/+/, ''), d.kb] as const)
 );
 
 export const notes: LegalNote[] = [

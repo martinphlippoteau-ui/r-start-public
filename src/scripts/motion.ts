@@ -3,11 +3,17 @@
  * Tout se pilote par attributs dans le HTML ; aucune section n'écrit de code GSAP.
  *
  * Ce fichier est le point d'entrée LÉGER (sans GSAP, dans le chunk principal avec consent/analytics) :
- * classes d'état (data-on-load, data-in-view), puis chargement du moteur GSAP (motion/engine.ts) en
- * chunk séparé via `import()` — au premier temps d'inactivité (requestIdleCallback, 1 s maximum),
- * jamais en `prefers-reduced-motion: reduce` (GSAP n'est alors pas téléchargé). GSAP core +
- * ScrollTrigger ≈ 45 Ko gzip, moteur ≈ 4 Ko : hors du chemin critique (pas de modulepreload, requête
- * après le chunk principal), mais le budget « < 40 Ko gzip » n'est pas atteignable avec ScrollTrigger.
+ * classes d'état (data-on-load, data-in-view), puis chargement d'un moteur en chunk séparé via
+ * `import()` — au premier temps d'inactivité (requestIdleCallback, 1 s maximum), jamais en
+ * `prefers-reduced-motion: reduce` (rien n'est alors téléchargé).
+ * DEUX MOTEURS, un seul par page, choisi d'après ce que la page déclare :
+ *  - motion/engine.ts (GSAP + ScrollTrigger, ≈ 45 Ko gzip + 4 Ko) dès qu'un effet de la liste
+ *    BESOIN_GSAP est présent — épinglage, défilement lié, tracé, compteur, texte mot à mot, barre de
+ *    progression, vol de la marque. Aujourd'hui : l'accueil ;
+ *  - motion/lite.ts (≈ 1 Ko, IntersectionObserver + transitions CSS) sinon : il rend les révélations
+ *    `data-animate` avec les mêmes types, les mêmes durées et LES MÊMES GARDE-FOUS. Les sous-pages ne
+ *    déclarent que cela : elles ne téléchargent plus GSAP.
+ * Les deux ne cohabitent jamais : aucune double animation possible.
  *
  * ┌ VOCABULAIRE ─────────────────────────────────────────────────────────────────────────────────┐
  * │ Chargement (CSS pur, sans GSAP)                                                               │
@@ -69,6 +75,26 @@ import { setupLoadedClasses } from './motion/loaded';
 
 const IDLE_TIMEOUT = 1000;
 
+/**
+ * Effets qui exigent GSAP + ScrollTrigger : épinglage, défilement lié, tracé, compteur, découpe de
+ * texte, barre de progression, vol de la marque. Une page qui n'en déclare aucun n'a besoin que des
+ * révélations `data-animate`, rendues par le moteur léger (motion/lite.ts) : elle ne télécharge pas
+ * les 45 Ko gzip de la bibliothèque. Aujourd'hui, seul l'accueil déclare ces effets.
+ */
+const BESOIN_GSAP = [
+  '[data-scene]',
+  '[data-curtain]',
+  '[data-pin]',
+  '[data-parallax]',
+  '[data-scrub]',
+  '[data-draw]',
+  '[data-fill]',
+  '[data-counter]',
+  '[data-reveal-text]',
+  '[data-progress]',
+  '[data-brand-flight]',
+].join(',');
+
 const boot = () => {
   setupLoadedClasses();
   setupInView();
@@ -77,10 +103,19 @@ const boot = () => {
   if (import.meta.env.DEV) all('[data-intro]').forEach((el) => allowed(el, 'data-intro', true));
 
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const besoinGsap = document.querySelector(BESOIN_GSAP) !== null;
   let engine: Promise<void> | undefined;
-  const load = () => (engine ??= import('./motion/engine').then((m) => m.start()));
+  // Deux fonctions distinctes, et non un ternaire à l'intérieur d'un seul `import()` : sinon le
+  // bundler réunit les dépendances des deux branches et précharge GSAP même quand la page prend le
+  // moteur léger. Vérifié par tests/performance.spec.ts (aucune requête vers engine.*.js).
+  const chargerMoteur = (): Promise<void> => import('./motion/engine').then((m) => m.start());
+  const chargerLeger = (): Promise<void> => import('./motion/lite').then((m) => m.setupLite());
+  const load = () => (engine ??= besoinGsap ? chargerMoteur() : chargerLeger());
   const schedule = () => {
-    const idle = typeof window.requestIdleCallback === 'function' ? window.requestIdleCallback.bind(window) : undefined;
+    const idle =
+      typeof window.requestIdleCallback === 'function'
+        ? window.requestIdleCallback.bind(window)
+        : undefined;
     if (document.readyState === 'complete') void load();
     else if (idle) idle(() => void load(), { timeout: IDLE_TIMEOUT });
     else window.setTimeout(() => void load(), 50);

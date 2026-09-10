@@ -17,7 +17,9 @@
  *  - pastille active glissante (`data-subnav-pill`, transform + width, aucune propriété de mise en
  *    page animée) : elle suit la section active sur l'accueil, la page courante sur une sous-page ;
  *  - état actif des sections par IntersectionObserver (aria-current="location") ;
- *  - barre de progression de lecture (`data-progress`, scaleX piloté par le moteur sur <main>) ;
+ *  - barre de progression de lecture (`data-progress`, scaleX piloté par le moteur sur <main>),
+ *    rendue sur l'accueil seulement : ailleurs la page tient en quelques écrans et l'attribut
+ *    forcerait le chargement de GSAP ;
  *  - CTA compacté après 40 % de la page (`data-compact-at` → `data-compact` → scale 0.92).
  * Reprise de l'ancien en-tête :
  *  - logo, suffixe de marque et CTA ;
@@ -71,9 +73,14 @@ const homeEntries: Entry[] = [
   ...navSections.map((s) =>
     s.key === 'fees'
       ? { key: 'fees', label: pageLabel('fees'), href: withBase(pages.fees.path), current: false }
-      : { key: s.id, label: s.label, href: '#' + s.id, sectionId: s.id, current: false },
+      : { key: s.id, label: s.label, href: '#' + s.id, sectionId: s.id, current: false }
   ),
-  ...pagesWithoutSection.map((p) => ({ key: p.key, label: pageLabel(p.key), href: withBase(p.path), current: false })),
+  ...pagesWithoutSection.map((p) => ({
+    key: p.key,
+    label: pageLabel(p.key),
+    href: withBase(p.path),
+    current: false,
+  })),
 ];
 
 /** Sous-page : les pages du menu, retour à l'accueil compris. */
@@ -104,7 +111,11 @@ const linkClass =
     class="surface-glass relative border-b border-navy/10 transition-shadow duration-300 data-[stuck]:shadow-nav"
   >
     <Container size="wide" class="flex h-subnav items-center gap-2 sm:gap-4">
-      <a href={logoHref} class="flex shrink-0 items-center gap-2.5 no-underline" aria-label={homeLinkLabel}>
+      <a
+        href={logoHref}
+        class="flex shrink-0 items-center gap-2.5 no-underline"
+        aria-label={homeLinkLabel}
+      >
         <Image
           src={brandLogo}
           alt={nav.brand}
@@ -118,7 +129,9 @@ const linkClass =
         {
           /* Sur l'accueil, la liste des sections prend toute la largeur : le suffixe de marque n'est
              gardé que sur les sous-pages (et dans le panneau, où la place ne manque pas). */
-          !withSections && <span class="hidden text-sm text-slate-700 lg:inline">{nav.brandSuffix}</span>
+          !withSections && (
+            <span class="hidden text-sm text-slate-700 lg:inline">{nav.brandSuffix}</span>
+          )
         }
       </a>
 
@@ -169,10 +182,21 @@ const linkClass =
         <span class="max-sm:sr-only">{menuLabel}</span>
       </button>
     </Container>
-    <span
-      aria-hidden="true"
-      data-progress
-      class="bg-brand-gradient pointer-events-none absolute inset-x-0 bottom-[-1px] h-[2px] origin-left scale-x-0"></span>
+    {
+      /* Barre de progression de lecture : réservée à l'accueil. Elle n'a de sens que sur une page très
+        longue, et elle est le seul effet des sous-pages qui exigeait GSAP : sans elle, /frais,
+        /documentation, /presse et /salle-de-presse prennent le moteur léger et ne téléchargent plus
+        les 45 Ko de la bibliothèque (src/scripts/motion.ts, BESOIN_GSAP). */
+    }
+    {
+      onHome && (
+        <span
+          aria-hidden="true"
+          data-progress
+          class="bg-brand-gradient pointer-events-none absolute inset-x-0 bottom-[-1px] h-[2px] origin-left scale-x-0"
+        />
+      )
+    }
   </div>
 
   <div
@@ -185,8 +209,21 @@ const linkClass =
     hidden
   >
     <Container size="wide" class="flex h-subnav shrink-0 items-center justify-between gap-4">
-      <a href={logoHref} class="flex items-center gap-2.5 no-underline" aria-label={homeLinkLabel} data-menu-close>
-        <Image src={logoWhite} alt={nav.brand} width={290} height={89} loading="lazy" decoding="async" class="h-7 w-auto" />
+      <a
+        href={logoHref}
+        class="flex items-center gap-2.5 no-underline"
+        aria-label={homeLinkLabel}
+        data-menu-close
+      >
+        <Image
+          src={logoWhite}
+          alt={nav.brand}
+          width={290}
+          height={89}
+          loading="lazy"
+          decoding="async"
+          class="h-7 w-auto"
+        />
         <span class="hidden text-sm text-white/85 sm:inline">{nav.brandSuffix}</span>
       </a>
       <button
@@ -228,7 +265,9 @@ const linkClass =
         }
       </ul>
       <div class="mt-10 flex flex-col gap-3 sm:flex-row">
-        <Button position="nav" variant="light" size="lg" class="w-full sm:w-auto">{nav.cta.label}</Button>
+        <Button position="nav" variant="light" size="lg" class="w-full sm:w-auto"
+          >{nav.cta.label}</Button
+        >
       </div>
     </Container>
   </div>
@@ -245,7 +284,9 @@ const linkClass =
     const list = root.querySelector<HTMLElement>('[data-sitenav-list]');
     const pill = root.querySelector<HTMLElement>('[data-subnav-pill]');
     /* Liens de section : dans la barre et dans le panneau (le même identifiant peut porter deux liens). */
-    const sectionLinks = Array.from(root.querySelectorAll<HTMLAnchorElement>('[data-sitenav-link]'));
+    const sectionLinks = Array.from(
+      root.querySelectorAll<HTMLAnchorElement>('[data-sitenav-link]')
+    );
     const barById = new Map<string, HTMLAnchorElement>();
     for (const link of sectionLinks) {
       const id = link.dataset.sitenavLink as string;
@@ -308,7 +349,9 @@ const linkClass =
     };
 
     const ids = [...new Set(sectionLinks.map((l) => l.dataset.sitenavLink as string))];
-    const targets = ids.map((id) => document.getElementById(id)).filter((el): el is HTMLElement => el !== null);
+    const targets = ids
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => el !== null);
 
     if ('IntersectionObserver' in window && targets.length) {
       const visible = new Map<string, number>();
@@ -323,7 +366,7 @@ const linkClass =
           const first = targets.find((t) => visible.has(t.id));
           setActive(first ? first.id : null);
         },
-        { rootMargin: '-25% 0px -60% 0px', threshold: [0, 0.01, 0.25, 0.5, 1] },
+        { rootMargin: '-25% 0px -60% 0px', threshold: [0, 0.01, 0.25, 0.5, 1] }
       );
       targets.forEach((t) => io.observe(t));
     }
@@ -339,7 +382,7 @@ const linkClass =
       () => {
         if (!stuckFrame) stuckFrame = requestAnimationFrame(syncStuck);
       },
-      { passive: true },
+      { passive: true }
     );
 
     /* La pastille et le fondu suivent les changements de largeur (polices, rotation, fenêtre). */
@@ -363,7 +406,9 @@ const linkClass =
     if (opener && panel) {
       const focusables = () =>
         Array.from(
-          panel.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'),
+          panel.querySelectorAll<HTMLElement>(
+            'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+          )
         ).filter((el) => !el.hidden && el.offsetParent !== null);
 
       const isOpen = () => !panel.hidden;

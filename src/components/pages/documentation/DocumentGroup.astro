@@ -14,7 +14,11 @@
  */
 import Container from '@/components/ui/Container.astro';
 import Section from '@/components/ui/Section.astro';
-import type { DocumentationContent, DocumentationLabels, DocumentGroupKey } from '@/content/types-v2';
+import type {
+  DocumentationContent,
+  DocumentationLabels,
+  DocumentGroupKey,
+} from '@/content/types-v2';
 import DocNoteRef from './DocNoteRef.astro';
 import { withBase } from '@/lib/href';
 
@@ -38,7 +42,8 @@ const introNoteIds: Record<DocumentGroupKey, string[]> = {
 /** Poids en kilooctets, formaté en français (ex. « 2 232 »). */
 const kbFormat = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 });
 /** Clé analytics d'un document : sa clé de facts.ts, à défaut le nom du fichier sans extension. */
-const docKey = (file: string, key?: string) => key ?? file.replace(/^.*\//, '').replace(/\.pdf$/i, '');
+const docKey = (file: string, key?: string) =>
+  key ?? file.replace(/^.*\//, '').replace(/\.pdf$/i, '');
 
 /** Cartes en contraste avec le fond de la section. */
 const cardTone = tone === 'paper' ? 'bg-white shadow-card' : 'bg-paper ring-1 ring-navy/5';
@@ -50,21 +55,32 @@ const cardTone = tone === 'paper' ? 'bg-white shadow-card' : 'bg-paper ring-1 ri
       <!-- En-tête collant -->
       <div class="lg:col-span-5">
         <header class="lg:sticky lg:top-24">
-          {labels.groupsEyebrow && <p class="text-eyebrow mb-4 text-teal-700">{labels.groupsEyebrow}</p>}
+          {
+            labels.groupsEyebrow && (
+              <p class="text-eyebrow mb-4 text-teal-700">{labels.groupsEyebrow}</p>
+            )
+          }
           <h2 id={id + '-title'} class="text-display-md">{group.title}</h2>
           <p class="text-lead mt-6 text-ink">
             {group.intro}
-            {introNoteIds[group.key].map((noteId) => (
-              <span class="whitespace-nowrap">
-                <DocNoteRef id={noteId} />
-              </span>
-            ))}
+            {
+              introNoteIds[group.key].map((noteId) => (
+                <span class="whitespace-nowrap">
+                  <DocNoteRef id={noteId} />
+                </span>
+              ))
+            }
           </p>
         </header>
       </div>
 
       <!-- Documents -->
-      <ul role="list" aria-label={group.title} class="grid gap-5 lg:col-span-7 lg:gap-6" data-animate="stagger">
+      <ul
+        role="list"
+        aria-label={group.title}
+        class="grid gap-5 lg:col-span-7 lg:gap-6"
+        data-animate="stagger"
+      >
         {
           group.items.map((item) => (
             <li
@@ -77,10 +93,18 @@ const cardTone = tone === 'paper' ? 'bg-white shadow-card' : 'bg-paper ring-1 ri
                 aria-hidden="true"
                 class="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-teal-100 text-navy transition-colors duration-300 group-hover:bg-navy group-hover:text-white"
               >
-                <svg class="size-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z"></path>
-                  <path d="M14 3v5h5"></path>
-                  <path d="M9 13h6M9 17h6"></path>
+                <svg
+                  class="size-7"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.6"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z" />
+                  <path d="M14 3v5h5" />
+                  <path d="M9 13h6M9 17h6" />
                 </svg>
               </span>
 
@@ -130,7 +154,7 @@ const cardTone = tone === 'paper' ? 'bg-white shadow-card' : 'bg-paper ring-1 ri
                     stroke-linecap="round"
                     stroke-linejoin="round"
                   >
-                    <path d="M4 10h12M11 5l5 5-5 5"></path>
+                    <path d="M4 10h12M11 5l5 5-5 5" />
                   </svg>
                 </p>
               </div>

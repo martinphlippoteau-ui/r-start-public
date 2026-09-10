@@ -23,8 +23,18 @@ const TOLERANCE = 1.1; // simplification, en unités du viewBox
 const MIN_RING_AREA = 14; // anneaux (îlots) plus petits ignorés
 
 const panels = [
-  { key: 'canada', center: [-96, 62], rect: [0, 0, 580, VIEW_H], highlight: new Set(investmentUniverse.canada) },
-  { key: 'europe', center: [18, 54], rect: [620, 0, 580, VIEW_H], highlight: new Set(investmentUniverse.councilOfEurope) },
+  {
+    key: 'canada',
+    center: [-96, 62],
+    rect: [0, 0, 580, VIEW_H],
+    highlight: new Set(investmentUniverse.canada),
+  },
+  {
+    key: 'europe',
+    center: [18, 54],
+    rect: [620, 0, 580, VIEW_H],
+    highlight: new Set(investmentUniverse.councilOfEurope),
+  },
 ];
 
 const rad = (d) => (d * Math.PI) / 180;
@@ -37,7 +47,10 @@ const laea = (lon, lat, [lon0, lat0]) => {
   const cosc = Math.sin(p1) * Math.sin(p) + Math.cos(p1) * Math.cos(p) * Math.cos(l);
   if (cosc <= -0.98) return null;
   const k = Math.sqrt(2 / (1 + cosc));
-  return [k * Math.cos(p) * Math.sin(l), k * (Math.cos(p1) * Math.sin(p) - Math.sin(p1) * Math.cos(p) * Math.cos(l))];
+  return [
+    k * Math.cos(p) * Math.sin(l),
+    k * (Math.cos(p1) * Math.sin(p) - Math.sin(p1) * Math.cos(p) * Math.cos(l)),
+  ];
 };
 
 /** Douglas-Peucker. */
@@ -85,7 +98,10 @@ const ringsOf = (geometry) => {
 };
 
 const bbox = (pts) => {
-  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  let x0 = Infinity,
+    y0 = Infinity,
+    x1 = -Infinity,
+    y1 = -Infinity;
   for (const [x, y] of pts) {
     if (x < x0) x0 = x;
     if (y < y0) y0 = y;
@@ -108,7 +124,9 @@ const panelSvg = (panel) => {
       .filter((r) => r.length > 3),
   }));
   // 2. Échelle : les pays de l'univers tiennent dans le volet, marges comprises.
-  const focusPts = projected.filter((f) => panel.highlight.has(f.id)).flatMap((f) => f.rings.flat());
+  const focusPts = projected
+    .filter((f) => panel.highlight.has(f.id))
+    .flatMap((f) => f.rings.flat());
   const [bx0, by0, bx1, by1] = bbox(focusPts);
   const scale = Math.min((rw - 2 * PAD) / (bx1 - bx0), (rh - 2 * PAD) / (by1 - by0));
   const cx = rx + rw / 2;
@@ -135,17 +153,32 @@ const panelSvg = (panel) => {
       if (isFocus) missing.push(f.id);
       continue;
     }
-    const d = rings.map((pts) => 'M' + pts.map(([x, y]) => fmt(x) + ' ' + fmt(y)).join('L') + 'Z').join('');
+    const d = rings
+      .map((pts) => 'M' + pts.map(([x, y]) => fmt(x) + ' ' + fmt(y)).join('L') + 'Z')
+      .join('');
     (isFocus ? paths.focus : paths.context).push(d);
   }
   const absent = [...panel.highlight].filter((id) => !geo.features.some((f) => f.id === id));
-  return { rect: panel.rect, key: panel.key, focus: paths.focus.join(''), context: paths.context.join(''), missing, absent };
+  return {
+    rect: panel.rect,
+    key: panel.key,
+    focus: paths.focus.join(''),
+    context: paths.context.join(''),
+    missing,
+    absent,
+  };
 };
 
 const built = panels.map(panelSvg);
 for (const p of built) {
-  if (p.absent.length) console.log(`  ${p.key} : absents du jeu de données (micro-États, invisibles à cette échelle) : ${p.absent.join(', ')}`);
-  if (p.missing.length) console.log(`  ${p.key} : présents mais trop petits pour être tracés : ${p.missing.join(', ')}`);
+  if (p.absent.length)
+    console.log(
+      `  ${p.key} : absents du jeu de données (micro-États, invisibles à cette échelle) : ${p.absent.join(', ')}`
+    );
+  if (p.missing.length)
+    console.log(
+      `  ${p.key} : présents mais trop petits pour être tracés : ${p.missing.join(', ')}`
+    );
 }
 
 const panelMarkup = (p) => {
@@ -218,4 +251,6 @@ ${clipDefs}
 
 await fs.writeFile(OUT, astro, 'utf8');
 const kb = Math.round(Buffer.byteLength(astro, 'utf8') / 1024);
-console.log(`Carte générée : ${path.relative(ROOT, OUT)} (${kb} Ko, ${built.map((p) => p.key).join(' + ')})`);
+console.log(
+  `Carte générée : ${path.relative(ROOT, OUT)} (${kb} Ko, ${built.map((p) => p.key).join(' + ')})`
+);

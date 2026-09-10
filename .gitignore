@@ -15,6 +15,7 @@ playwright-report/
 test-results/
 .lighthouseci/
 tests/screenshots/
+tests/mesures/
 
 # os / editors
 .DS_Store

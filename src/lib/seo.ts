@@ -23,7 +23,8 @@ const CONTEXT = 'https://schema.org';
 export const organizationId = externalLinks.corum + '#organization';
 
 /** URL absolue d'un chemin du site (« / » → site.url, « /frais » → site.url/frais). */
-export const absoluteUrl = (path: string): string => new URL(withBase(path), site.url + '/').toString();
+export const absoluteUrl = (path: string): string =>
+  new URL(withBase(path), site.url + '/').toString();
 
 export function organizationJsonLd(): JsonLd {
   return {

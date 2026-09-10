@@ -77,7 +77,11 @@ const OPTION_Y = 12;
       <ol aria-label={subscribe.stepsLabel} class="relative space-y-10 sm:space-y-14 lg:col-span-7">
         {
           subscribe.steps.map((step, i) => (
-            <li class="relative flex gap-5 sm:gap-8" data-animate="fade-up" data-animate-delay={String(i * STEP_STAGGER)}>
+            <li
+              class="relative flex gap-5 sm:gap-8"
+              data-animate="fade-up"
+              data-animate-delay={String(i * STEP_STAGGER)}
+            >
               {/* Segment de la ligne de progression : du centre de cette pastille (top-6) au centre de la suivante
                   (hauteur 100 % + espacement space-y-10 / sm:space-y-14 de la liste), tracé au scroll
                   (stroke-dashoffset), entièrement dessiné sans JS. Absent sur la dernière étape : la ligne s'y arrête. */}
@@ -92,12 +96,26 @@ const OPTION_Y = 12;
                   data-draw-end="bottom 75%"
                 >
                   <defs>
-                    <linearGradient id={lineGradientId(i)} gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="100%">
-                      <stop offset="0" style={`stop-color: ${lineColor(i)}`}></stop>
-                      <stop offset="1" style={`stop-color: ${lineColor(i + 1)}`}></stop>
+                    <linearGradient
+                      id={lineGradientId(i)}
+                      gradientUnits="userSpaceOnUse"
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="100%"
+                    >
+                      <stop offset="0" style={`stop-color: ${lineColor(i)}`} />
+                      <stop offset="1" style={`stop-color: ${lineColor(i + 1)}`} />
                     </linearGradient>
                   </defs>
-                  <line x1="0.5" y1="0" x2="0.5" y2="100%" stroke={`url(#${lineGradientId(i)})`} stroke-width="1"></line>
+                  <line
+                    x1="0.5"
+                    y1="0"
+                    x2="0.5"
+                    y2="100%"
+                    stroke={`url(#${lineGradientId(i)})`}
+                    stroke-width="1"
+                  />
                 </svg>
               )}
               <span
@@ -148,7 +166,13 @@ const OPTION_Y = 12;
             />
           </div>
         </div>
-        {media.subscribe.credit && <figcaption class="text-caption mt-3 text-slate-700">{media.subscribe.credit}</figcaption>}
+        {
+          media.subscribe.credit && (
+            <figcaption class="text-caption mt-3 text-slate-700">
+              {media.subscribe.credit}
+            </figcaption>
+          )
+        }
       </figure>
     </div>
 
@@ -173,7 +197,9 @@ const OPTION_Y = 12;
                 data-animate-y={String(OPTION_Y)}
                 data-animate-delay={String(i * OPTION_STAGGER)}
               >
-                <OptionTitle class="text-xl font-semibold tracking-tight sm:text-2xl">{option.title}</OptionTitle>
+                <OptionTitle class="text-xl font-semibold tracking-tight sm:text-2xl">
+                  {option.title}
+                </OptionTitle>
                 {option.badge && <Pill tone="teal">{option.badge}</Pill>}
               </div>
               {option.risk ? (
@@ -196,8 +222,13 @@ const OPTION_Y = 12;
     </div>
 
     <!-- CTA -->
-    <div class="mt-10 flex flex-col items-stretch sm:mt-12 sm:flex-row sm:items-center" data-animate="fade-up">
-      <Button position={subscribe.cta.position} variant="primary" size="lg">{subscribe.cta.label}</Button>
+    <div
+      class="mt-10 flex flex-col items-stretch sm:mt-12 sm:flex-row sm:items-center"
+      data-animate="fade-up"
+    >
+      <Button position={subscribe.cta.position} variant="primary" size="lg"
+        >{subscribe.cta.label}</Button
+      >
     </div>
   </Container>
 </Section>

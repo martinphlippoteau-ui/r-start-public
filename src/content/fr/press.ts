@@ -91,7 +91,9 @@ export const press = {
 
   coverage: {
     title: 'La revue de presse',
-    intro: nb(`Au lancement de R Start, ${articles.length} articles de la presse économique et financière, avec leur média et leur date. Les titres sont ceux des articles, reproduits tels quels. R Start n’est pas une SCPI sans frais : ${nb(fees.management.label)} de frais de gestion sur les loyers HT, commissions sur les cessions d’immeubles et commission de retrait avant ${fees.withdrawal.zeroAfterYears} ans s’appliquent.`),
+    intro: nb(
+      `Au lancement de R Start, ${articles.length} articles de la presse économique et financière, avec leur média et leur date. Les titres sont ceux des articles, reproduits tels quels. R Start n’est pas une SCPI sans frais : ${nb(fees.management.label)} de frais de gestion sur les loyers HT, commissions sur les cessions d’immeubles et commission de retrait avant ${fees.withdrawal.zeroAfterYears} ans s’appliquent.`
+    ),
     items: articles,
     disclaimer: pressFacts.coverageDisclaimer,
   },

@@ -16,6 +16,8 @@ const { advantage, risk, class: className = '', tone = 'light', size = 'base' } 
 ---
 
 <div class:list={['space-y-3', className]}>
-  <p data-advantage class:list={[size === 'lead' ? 'text-lead' : 'text-base', 'leading-relaxed']}>{advantage}</p>
+  <p data-advantage class:list={[size === 'lead' ? 'text-lead' : 'text-base', 'leading-relaxed']}>
+    {advantage}
+  </p>
   <RiskNote text={risk} {tone} {size} />
 </div>

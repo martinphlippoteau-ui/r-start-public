@@ -30,7 +30,11 @@ export const setupScenes = (): void => {
     if (steps.length < 2) return;
     const animated = steps.filter((step) => {
       if (!containsProtected(step)) return true;
-      refuse(step, 'data-step (entrée/sortie)', 'contient un [data-risk] : reste visible du début à la fin — placer la RiskNote hors des [data-step]');
+      refuse(
+        step,
+        'data-step (entrée/sortie)',
+        'contient un [data-risk] : reste visible du début à la fin — placer la RiskNote hors des [data-step]'
+      );
       return false;
     });
 
@@ -65,7 +69,8 @@ export const setupScenes = (): void => {
         visibleAt.push(at + 0.65);
       }
       const last = i === steps.length - 1;
-      if (!stay && !last) tl.to(step, { autoAlpha: 0, y: -24, duration: 0.5, ease: 'power2.in' }, i);
+      if (!stay && !last)
+        tl.to(step, { autoAlpha: 0, y: -24, duration: 0.5, ease: 'power2.in' }, i);
     });
     tl.to({}, { duration: 0.6 });
 

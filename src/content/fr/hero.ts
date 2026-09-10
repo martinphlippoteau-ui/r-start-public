@@ -20,11 +20,15 @@ const nb = (s: string): string => s.replace(/ ([%€:;?!])/g, ' $1');
 export const notes: LegalNote[] = [
   {
     id: 'hero-definition',
-    text: nb(`${product.definitionScope} Les cinq SCPI concernées : ${corumGroup.scpiNames.join(', ')}.`),
+    text: nb(
+      `${product.definitionScope} Les cinq SCPI concernées : ${corumGroup.scpiNames.join(', ')}.`
+    ),
   },
   {
     id: 'hero-prix-de-part',
-    text: nb(`Prix de souscription : ${share.priceLabel} par part, soit ${share.nominal} € de valeur nominale et ${share.premium} € de prime d’émission, dont 0 € de commission de souscription. Minimum de souscription : ${share.minimumShares} part. Source : bulletin de souscription R Start, conditions générales de vente, mai 2026.`),
+    text: nb(
+      `Prix de souscription : ${share.priceLabel} par part, soit ${share.nominal} € de valeur nominale et ${share.premium} € de prime d’émission, dont 0 € de commission de souscription. Minimum de souscription : ${share.minimumShares} part. Source : bulletin de souscription R Start, conditions générales de vente, mai 2026.`
+    ),
   },
   {
     id: 'hero-visa',
@@ -50,11 +54,6 @@ export const hero = {
   /** Allégation de rang autorisée, au périmètre du groupe CORUM : jamais affichée sans son appel de note. */
   definition: product.definition,
   definitionNoteId: 'hero-definition',
-  /** Les deux phrases fournies par l'équipe produit : quand les frais sont prélevés, et quand ils ne le sont pas. */
-  pedagogy: [
-    nb('Payer des frais si notre travail vous fait gagner de l’argent : oui.'),
-    nb('Payer avant même qu’on ait commencé à travailler : non.'),
-  ],
   subtitle: nb(
     `R Start prélève ${fees.management.label} de frais de gestion sur les loyers. S’y ajoutent une commission sur les cessions d’immeubles (${fees.disposal.label}) et une commission de retrait avant ${fees.withdrawal.zeroAfterYears} ans. À partir de ${share.minimumLabel}.`
   ),

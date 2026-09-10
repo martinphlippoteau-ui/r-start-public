@@ -14,6 +14,9 @@ for (const [src, base] of [
 ]) {
   const svg = await fs.readFile(path.join(LOGOS, src));
   await fs.writeFile(path.join(OUT, `${base}.svg`), svg);
-  await sharp(svg, { density: 300 }).resize({ width: 2400 }).png().toFile(path.join(OUT, `${base}.png`));
+  await sharp(svg, { density: 300 })
+    .resize({ width: 2400 })
+    .png()
+    .toFile(path.join(OUT, `${base}.png`));
   console.log(`+ presse/${base}.svg, presse/${base}.png`);
 }

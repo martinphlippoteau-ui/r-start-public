@@ -41,8 +41,13 @@ const overlay = Buffer.from(`
 
 let base = sharp(overlay).png();
 if (photo) {
-  const img = await sharp(photo).resize(W, H, { fit: 'cover' }).modulate({ brightness: 0.55, saturation: 0.8 }).toBuffer();
-  base = sharp(img).composite([{ input: await sharp(overlay).png().toBuffer(), blend: 'multiply' }]);
+  const img = await sharp(photo)
+    .resize(W, H, { fit: 'cover' })
+    .modulate({ brightness: 0.55, saturation: 0.8 })
+    .toBuffer();
+  base = sharp(img).composite([
+    { input: await sharp(overlay).png().toBuffer(), blend: 'multiply' },
+  ]);
 }
 const buf = await base.png().toBuffer();
 await fs.mkdir(path.dirname(OUT), { recursive: true });

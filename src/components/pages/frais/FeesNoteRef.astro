@@ -30,8 +30,13 @@ const colors = {
   n !== null && (
     <a
       href={'#' + sections.notes.id + '-' + n}
-      class:list={['ml-0.5 align-super text-[0.65em] font-semibold no-underline hover:underline', colors[tone ?? 'auto']]}
+      class:list={[
+        'ml-0.5 align-super text-[0.65em] font-semibold no-underline hover:underline',
+        colors[tone ?? 'auto'],
+      ]}
       aria-label={label}
-    >{n}</a>
+    >
+      {n}
+    </a>
   )
 }

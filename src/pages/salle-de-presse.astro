@@ -34,7 +34,12 @@ const jsonLd = [
 const { coverageLink } = pressRoom;
 ---
 
-<Base title={pressRoom.seo.title} description={pressRoom.seo.description} path={path} jsonLd={jsonLd}>
+<Base
+  title={pressRoom.seo.title}
+  description={pressRoom.seo.description}
+  path={path}
+  jsonLd={jsonLd}
+>
   <SiteNav />
   <main id="contenu">
     <PageHero
@@ -42,19 +47,52 @@ const { coverageLink } = pressRoom;
       title={pressRoom.hero.title}
       intro={pressRoom.hero.intro}
       riskLine={pressRoom.hero.riskLine}
+      asideOnLarge
     >
       <Breadcrumb slot="breadcrumb" key="pressRoom" tone="dark" />
+      {
+        /* Les contacts presse, remontés dans l'en-tête sur grand écran : c'est ce qu'un journaliste
+          vient chercher, il n'a plus à faire défiler pour savoir à qui écrire. Le lien mène à la
+          section complète (téléphone, e-mail). Sous `lg`, cette section suit immédiatement : l'aside
+          n'y est pas rendu. */
+      }
+      <nav slot="aside" aria-label={pressRoom.labels?.contactsListLabel}>
+        <ul role="list" class="rounded-3xl bg-white/10 p-4 ring-1 ring-white/15 backdrop-blur-sm">
+          {
+            pressRoom.contacts.items.map((contact) => (
+              <li class="border-b border-white/15 last:border-0">
+                <a
+                  href="#contacts-presse"
+                  class="nav-link block rounded-2xl px-4 py-3 text-white no-underline transition-colors hover:bg-white/10"
+                >
+                  <span class="block text-base font-semibold sm:text-lg">{contact.name}</span>
+                  <span class="block text-base text-white/80">{contact.organisation}</span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
     </PageHero>
     <Releases />
     <Contacts tone="white" />
     <MediaKit />
 
     <!-- Renvoi vers « La presse en parle », dans le menu principal -->
-    <Section id="revue-de-presse-renvoi" tone="paper" spacing="compact" labelledBy="revue-de-presse-renvoi-title">
+    <Section
+      id="revue-de-presse-renvoi"
+      tone="paper"
+      spacing="compact"
+      labelledBy="revue-de-presse-renvoi-title"
+    >
       <Container size="wide">
-        <div class="flex flex-col gap-5 rounded-3xl bg-white p-6 shadow-card sm:p-8 lg:flex-row lg:items-center lg:justify-between lg:gap-10 lg:p-10">
+        <div
+          class="flex flex-col gap-5 rounded-3xl bg-white p-6 shadow-card sm:p-8 lg:flex-row lg:items-center lg:justify-between lg:gap-10 lg:p-10"
+        >
           <div class="max-w-2xl">
-            <h2 id="revue-de-presse-renvoi-title" class="text-display-sm text-ink">{coverageLink.title}</h2>
+            <h2 id="revue-de-presse-renvoi-title" class="text-display-sm text-ink">
+              {coverageLink.title}
+            </h2>
             <p class="text-lead mt-3 text-slate-700">{coverageLink.body}</p>
           </div>
           <a

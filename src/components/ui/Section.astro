@@ -14,7 +14,14 @@ interface Props {
   labelledBy?: string;
   [key: `data-${string}`]: string | undefined;
 }
-const { id, tone = 'paper', spacing = 'default', class: className = '', labelledBy, ...rest } = Astro.props;
+const {
+  id,
+  tone = 'paper',
+  spacing = 'default',
+  class: className = '',
+  labelledBy,
+  ...rest
+} = Astro.props;
 const tones = {
   paper: 'bg-paper text-ink',
   white: 'bg-white text-ink',

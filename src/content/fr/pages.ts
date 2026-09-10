@@ -48,7 +48,9 @@ export const legalPages: LegalPage[] = [
       },
       {
         title: 'Direction de la publication',
-        paragraphs: [`La direction de la publication est assurée par ${publisher.publicationDirector}.`],
+        paragraphs: [
+          `La direction de la publication est assurée par ${publisher.publicationDirector}.`,
+        ],
       },
       {
         title: 'Société de gestion de R Start',

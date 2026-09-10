@@ -26,8 +26,20 @@ const collapsible = legalBlocks.slice(1);
 <footer class="border-t border-mist bg-white text-ink">
   <Container size="wide" class="py-section-sm">
     <div class="flex flex-wrap items-center gap-x-10 gap-y-6">
-      <Image src={brandLogo} alt={footer.logos?.brandAlt ?? ''} height={40} width={130} class="h-10 w-auto" />
-      <Image src={publisherLogo} alt={footer.logos?.publisherAlt ?? ''} height={40} width={130} class="h-10 w-auto" />
+      <Image
+        src={brandLogo}
+        alt={footer.logos?.brandAlt ?? ''}
+        height={40}
+        width={130}
+        class="h-10 w-auto"
+      />
+      <Image
+        src={publisherLogo}
+        alt={footer.logos?.publisherAlt ?? ''}
+        height={40}
+        width={130}
+        class="h-10 w-auto"
+      />
     </div>
 
     <nav aria-label={footer.navLabel} class="mt-12 grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
@@ -47,8 +59,19 @@ const collapsible = legalBlocks.slice(1);
                     {link.label}
                     {link.external && (
                       <>
-                        <svg aria-hidden="true" class="size-3.5 text-slate" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
-                          <path d="M6 3h7v7M13 3 4 12" stroke-linecap="round" stroke-linejoin="round"></path>
+                        <svg
+                          aria-hidden="true"
+                          class="size-3.5 text-slate"
+                          viewBox="0 0 16 16"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="1.5"
+                        >
+                          <path
+                            d="M6 3h7v7M13 3 4 12"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
                         </svg>
                         {hint && <span class="visually-hidden">({hint})</span>}
                       </>
@@ -72,9 +95,14 @@ const collapsible = legalBlocks.slice(1);
       </button>
     </div>
 
-    <section class="mt-10 max-w-4xl text-sm leading-relaxed text-slate-700" aria-labelledby="footer-legal-title">
+    <section
+      class="mt-10 max-w-4xl text-sm leading-relaxed text-slate-700"
+      aria-labelledby="footer-legal-title"
+    >
       <h2 id="footer-legal-title" class="visually-hidden">{footer.legalTitle ?? ''}</h2>
-      {/* Toujours déplié : mentions obligatoires (caractère commercial, documents à consulter) et visa AMF. */}
+      {
+        /* Toujours déplié : mentions obligatoires (caractère commercial, documents à consulter) et visa AMF. */
+      }
       {
         alwaysVisible.map((block) => (
           <div>
@@ -85,9 +113,11 @@ const collapsible = legalBlocks.slice(1);
           </div>
         ))
       }
-      {/* Replié par défaut : identité de l'éditeur, de la société de gestion, RGPD, médiation, hébergeur.
+      {
+        /* Replié par défaut : identité de l'éditeur, de la société de gestion, RGPD, médiation, hébergeur.
           Rien n'est retiré — <details> garde le texte dans le document, lisible par les moteurs et les
-          lecteurs d'écran, et la page reste utilisable sans JavaScript. */}
+          lecteurs d'écran, et la page reste utilisable sans JavaScript. */
+      }
       {
         collapsible.length > 0 && (
           <details class="footer-legal mt-6 border-t border-mist pt-6">

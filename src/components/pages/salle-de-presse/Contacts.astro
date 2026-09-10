@@ -48,18 +48,32 @@ const telHref = (phone: string) => 'tel:' + phone.replace(/[^\d+]/g, '');
             </div>
             <dl class="mt-2 grid gap-3 border-t border-navy/10 pt-5 text-base leading-relaxed">
               <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1">
-                {labels.phoneLabel && <dt class="text-caption w-24 shrink-0 font-semibold uppercase tracking-wider text-slate-700">{labels.phoneLabel}</dt>}
+                {labels.phoneLabel && (
+                  <dt class="text-caption w-24 shrink-0 font-semibold uppercase tracking-wider text-slate-700">
+                    {labels.phoneLabel}
+                  </dt>
+                )}
                 <dd class="min-w-0">
-                  <a href={telHref(c.phone)} class="whitespace-nowrap font-semibold text-navy underline-offset-4 hover:text-teal-700 hover:underline">
+                  <a
+                    href={telHref(c.phone)}
+                    class="whitespace-nowrap font-semibold text-navy underline-offset-4 hover:text-teal-700 hover:underline"
+                  >
                     {c.phone.replace(/ /g, ' ')}
                   </a>
                 </dd>
               </div>
               {c.email && (
                 <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1">
-                  {labels.emailLabel && <dt class="text-caption w-24 shrink-0 font-semibold uppercase tracking-wider text-slate-700">{labels.emailLabel}</dt>}
+                  {labels.emailLabel && (
+                    <dt class="text-caption w-24 shrink-0 font-semibold uppercase tracking-wider text-slate-700">
+                      {labels.emailLabel}
+                    </dt>
+                  )}
                   <dd class="min-w-0 break-all">
-                    <a href={'mailto:' + c.email} class="font-semibold text-navy underline-offset-4 hover:text-teal-700 hover:underline">
+                    <a
+                      href={'mailto:' + c.email}
+                      class="font-semibold text-navy underline-offset-4 hover:text-teal-700 hover:underline"
+                    >
                       {c.email}
                     </a>
                   </dd>
@@ -72,7 +86,9 @@ const telHref = (phone: string) => 'tel:' + phone.replace(/[^\d+]/g, '');
     </ul>
 
     <p class="mt-8 max-w-4xl text-base leading-relaxed text-slate-700 lg:mt-10">
-      {contacts.source}<span class="whitespace-nowrap"><PressRoomNoteRef id="salle-presse-contacts" /></span>
+      {contacts.source}<span class="whitespace-nowrap"
+        ><PressRoomNoteRef id="salle-presse-contacts" /></span
+      >
     </p>
   </Container>
 </Section>

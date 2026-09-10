@@ -83,7 +83,8 @@ export const subscribe = {
     },
     {
       title: subscription.options.rd.name,
-      description: 'Tout ou partie de vos dividendes potentiels est automatiquement réinvesti en parts de R Start.',
+      description:
+        'Tout ou partie de vos dividendes potentiels est automatiquement réinvesti en parts de R Start.',
       risk: 'Vous ne percevez pas ces revenus et vous augmentez votre exposition à une SCPI dont le capital n’est pas garanti. Les parts ainsi acquises sont soumises aux mêmes risques de perte en capital et de liquidité limitée.',
     },
   ],

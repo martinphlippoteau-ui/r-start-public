@@ -26,14 +26,18 @@ const candidates = [path.resolve(process.cwd(), 'public'), moduleRelativePublicD
 );
 const found = candidates.find((d) => existsSync(d));
 if (!found) {
-  throw new Error(`public-files : dossier public/ introuvable (candidats : ${candidates.join(' ; ')})`);
+  throw new Error(
+    `public-files : dossier public/ introuvable (candidats : ${candidates.join(' ; ')})`
+  );
 }
 const publicDir: string = found;
 
-const resolvePublic = (file: string): string => path.join(publicDir, ...file.replace(/^\/+/, '').split('/'));
+const resolvePublic = (file: string): string =>
+  path.join(publicDir, ...file.replace(/^\/+/, '').split('/'));
 
 /** Vrai si le chemin public (ex. « /presse/r-start-logo-couleur.svg ») correspond à un fichier présent. */
-export const publicFileExists = (file: string): boolean => file.trim() !== '' && existsSync(resolvePublic(file));
+export const publicFileExists = (file: string): boolean =>
+  file.trim() !== '' && existsSync(resolvePublic(file));
 
 /** Poids du fichier en kilooctets (arrondi), ou `undefined` s'il est absent. */
 export const publicFileKb = (file: string): number | undefined =>
@@ -46,7 +50,8 @@ export const fileExtension = (file: string): string => {
 };
 
 /** Clé analytics d'un PDF (data-doc) : nom du fichier sans extension, comme la section Documents. */
-export const fileKey = (file: string): string => file.replace(/^.*\//, '').replace(/\.[a-z0-9]+$/i, '');
+export const fileKey = (file: string): string =>
+  file.replace(/^.*\//, '').replace(/\.[a-z0-9]+$/i, '');
 
 /** Clé analytics d'un logo (data-doc) : nom du fichier avec son extension (un même logo existe en SVG et en PNG). */
 export const fileName = (file: string): string => file.replace(/^.*\//, '');

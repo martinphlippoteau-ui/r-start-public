@@ -854,11 +854,7 @@
     "logos/corum-lepargne-couleur.svg",
     "logos/globe.svg"
   ],
-  "publicFiles": [
-    "favicon.ico",
-    "favicon.svg",
-    "apple-touch-icon.png"
-  ],
+  "publicFiles": ["favicon.ico", "favicon.svg", "apple-touch-icon.png"],
   "documents": [
     {
       "file": "documents/r-start-dic.pdf",

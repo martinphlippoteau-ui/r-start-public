@@ -92,7 +92,8 @@ export const strategy = {
     mapLabels: {
       canada: 'Canada',
       europe: 'États membres du Conseil de l’Europe',
-      legend: 'Pays où R Start peut investir. Carte simplifiée, sans lien avec un patrimoine existant.',
+      legend:
+        'Pays où R Start peut investir. Carte simplifiée, sans lien avec un patrimoine existant.',
     },
     description:
       'R Start peut investir dans les pays du Conseil de l’Europe, en zone euro ou non, et au Canada. Le choix des pays dépend de leur position dans le cycle immobilier et économique.',

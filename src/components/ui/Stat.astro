@@ -17,7 +17,17 @@ interface Props {
   duration?: number;
   class?: string;
 }
-const { value, label, numeric, prefix, suffix, decimals, from, duration, class: className = '' } = Astro.props;
+const {
+  value,
+  label,
+  numeric,
+  prefix,
+  suffix,
+  decimals,
+  from,
+  duration,
+  class: className = '',
+} = Astro.props;
 ---
 
 <div class:list={['flex flex-col gap-2', className]}>

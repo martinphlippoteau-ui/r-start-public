@@ -28,7 +28,11 @@ export const refuse = (el: Element, attr: string, why: string): false => {
 export const allowed = (el: Element, attr: string, deep = false): boolean => {
   if (isProtected(el)) return refuse(el, attr, 'H1, [data-risk] ou [data-no-motion]');
   if (deep && containsProtected(el)) {
-    return refuse(el, attr, 'contient un H1 ou un [data-risk] : animer l’avantage seul, jamais son enveloppe');
+    return refuse(
+      el,
+      attr,
+      'contient un H1 ou un [data-risk] : animer l’avantage seul, jamais son enveloppe'
+    );
   }
   return true;
 };
@@ -44,7 +48,8 @@ export const all = (selector: string, root: ParentNode = document): HTMLElement[
   Array.from(root.querySelectorAll<HTMLElement>(selector));
 
 /** Classes (séparées par des espaces) lues dans un attribut. */
-export const classList = (value: string | undefined): string[] => (value || '').split(/\s+/).filter(Boolean);
+export const classList = (value: string | undefined): string[] =>
+  (value || '').split(/\s+/).filter(Boolean);
 
 /**
  * Élément déclencheur d'un effet au scroll : `data-*-trigger` accepte un sélecteur CSS (cherché

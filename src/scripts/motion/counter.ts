@@ -10,7 +10,10 @@ import { gsap } from 'gsap';
 import { all, allowed, num, onceTrigger } from './shared';
 
 const format = (decimals: number) =>
-  new Intl.NumberFormat('fr-FR', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+  new Intl.NumberFormat('fr-FR', {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  });
 
 export const setupCounters = (): (() => void) => {
   const items = all('[data-counter]')

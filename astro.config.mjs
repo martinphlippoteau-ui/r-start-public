@@ -30,7 +30,8 @@ export default defineConfig({
   },
   integrations: [
     sitemap({
-      filter: (page) => !page.includes('/404') && !page.includes('/cookies') && !page.includes('/sections-preview'),
+      filter: (page) =>
+        !page.includes('/404') && !page.includes('/cookies') && !page.includes('/sections-preview'),
       changefreq: 'weekly',
       priority: 0.8,
     }),

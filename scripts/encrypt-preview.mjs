@@ -28,7 +28,9 @@ if (!PASSWORD) {
 const enc = new TextEncoder();
 
 const deriveKey = async (salt) => {
-  const material = await webcrypto.subtle.importKey('raw', enc.encode(PASSWORD), 'PBKDF2', false, ['deriveKey']);
+  const material = await webcrypto.subtle.importKey('raw', enc.encode(PASSWORD), 'PBKDF2', false, [
+    'deriveKey',
+  ]);
   return webcrypto.subtle.deriveKey(
     { name: 'PBKDF2', salt, iterations: ITERATIONS, hash: 'SHA-256' },
     material,
@@ -39,7 +41,9 @@ const deriveKey = async (salt) => {
 };
 
 // Logo intégré au fichier : l'écran de saisie ne dépend d'aucune ressource externe.
-const LOGO = (await fs.readFile(path.join(ROOT, 'src', 'assets', 'logos', 'r-start-blanc.svg'), 'utf8'))
+const LOGO = (
+  await fs.readFile(path.join(ROOT, 'src', 'assets', 'logos', 'r-start-blanc.svg'), 'utf8')
+)
   .replace(/<\?xml[^>]*\?>/, '')
   .replace(/<svg /, '<svg role="img" aria-label="R Start" class="logo" ')
   .trim();
@@ -150,7 +154,9 @@ for await (const file of htmlFiles(DIST)) {
   const salt = webcrypto.getRandomValues(new Uint8Array(16));
   const iv = webcrypto.getRandomValues(new Uint8Array(12));
   const key = await deriveKey(salt);
-  const cipher = new Uint8Array(await webcrypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, enc.encode(html)));
+  const cipher = new Uint8Array(
+    await webcrypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, enc.encode(html))
+  );
   await fs.writeFile(
     file,
     gate({
@@ -169,4 +175,6 @@ for (const name of ['sitemap-index.xml', 'sitemap-0.xml']) {
 }
 
 console.log(`Prévisualisation protégée : ${count} page(s) chiffrée(s), plan du site retiré.`);
-console.log('Rappel : les fichiers PDF, images et scripts restent accessibles par adresse directe.');
+console.log(
+  'Rappel : les fichiers PDF, images et scripts restent accessibles par adresse directe.'
+);

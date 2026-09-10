@@ -74,6 +74,8 @@ export const footer = {
   manageCookiesLabel: 'Gérer les cookies',
   copyright: `© 2026 ${publisher.name}. Tous droits réservés.`,
   notesTitle: 'Notes et sources',
+  /** `{n}` : nombre de notes de la page, calculé par LegalNotes.astro. */
+  notesToggleLabel: 'Notes et sources ({n})',
   legalTitle: 'Mentions légales',
   externalLinkHint: 'nouvelle fenêtre',
   logos: { brandAlt: product.name, publisherAlt: publisher.name },

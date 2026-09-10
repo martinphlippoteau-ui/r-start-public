@@ -4,11 +4,32 @@
  */
 import { gsap } from 'gsap';
 
-export { PROTECTED, all, allowed, classList, containsProtected, isProtected, num, refuse, resolveTrigger } from './dom';
+export {
+  PROTECTED,
+  all,
+  allowed,
+  classList,
+  containsProtected,
+  isProtected,
+  num,
+  refuse,
+  resolveTrigger,
+} from './dom';
 import { refuse } from './dom';
 
 /** Propriétés autorisées dans les mini-syntaxes (transform et opacity uniquement, jamais de layout). */
-const SCRUB_PROPS = new Set(['x', 'y', 'xPercent', 'yPercent', 'scale', 'scaleX', 'scaleY', 'rotate', 'rotation', 'opacity']);
+const SCRUB_PROPS = new Set([
+  'x',
+  'y',
+  'xPercent',
+  'yPercent',
+  'scale',
+  'scaleX',
+  'scaleY',
+  'rotate',
+  'rotation',
+  'opacity',
+]);
 
 export interface FromTo {
   from: Record<string, number>;
@@ -50,9 +71,17 @@ export const onceVars = (targets: gsap.TweenTarget, props: string): gsap.TweenVa
 });
 
 /** Pour un effet piloté par le scroll : `will-change` seulement quand le déclencheur est actif. */
-export const scrubWillChange = (targets: gsap.TweenTarget, props: string): Partial<ScrollTrigger.Vars> => ({
-  onToggle: (self) => gsap.set(targets, self.isActive ? { willChange: props } : { clearProps: 'willChange' }),
+export const scrubWillChange = (
+  targets: gsap.TweenTarget,
+  props: string
+): Partial<ScrollTrigger.Vars> => ({
+  onToggle: (self) =>
+    gsap.set(targets, self.isActive ? { willChange: props } : { clearProps: 'willChange' }),
 });
 
 /** Déclencheur standard des révélations uniques : à 88 % du viewport, une seule fois. */
-export const onceTrigger = (trigger: Element, start = 'top 88%'): ScrollTrigger.Vars => ({ trigger, start, once: true });
+export const onceTrigger = (trigger: Element, start = 'top 88%'): ScrollTrigger.Vars => ({
+  trigger,
+  start,
+  once: true,
+});

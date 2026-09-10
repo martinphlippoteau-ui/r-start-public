@@ -21,7 +21,16 @@
  *    le LCP. Pour une entrée au chargement, utiliser data-intro (CSS).
  */
 import { gsap } from 'gsap';
-import { all, allowed, containsProtected, isProtected, num, onceTrigger, onceVars, refuse } from './shared';
+import {
+  all,
+  allowed,
+  containsProtected,
+  isProtected,
+  num,
+  onceTrigger,
+  onceVars,
+  refuse,
+} from './shared';
 
 const TITLE = 'h2, h3, [class*="text-display"]';
 const MEDIA = 'img, picture, svg, video, figure';
@@ -29,12 +38,18 @@ const MEDIA = 'img, picture, svg, video, figure';
 const staggerTargets = (el: HTMLElement): Element[] =>
   Array.from(el.children).filter((child) => {
     if (!isProtected(child) && !containsProtected(child)) return true;
-    refuse(child, 'data-animate="stagger" (enfant)', 'contient un [data-risk] : reste visible, les autres cascadent');
+    refuse(
+      child,
+      'data-animate="stagger" (enfant)',
+      'contient un [data-risk] : reste visible, les autres cascadent'
+    );
     return false;
   });
 
 export const setupReveals = (): void => {
-  const els = all('[data-animate]').filter((el) => allowed(el, 'data-animate', el.dataset.animate !== 'stagger'));
+  const els = all('[data-animate]').filter((el) =>
+    allowed(el, 'data-animate', el.dataset.animate !== 'stagger')
+  );
   // Lectures groupées avant toute écriture : les éléments déjà à l'écran ne sont pas touchés.
   const vh = window.innerHeight;
   const onScreen = els.map((el) => {
@@ -69,7 +84,14 @@ export const setupReveals = (): void => {
         gsap.from(el, { ...base, opacity: 0, scale: 0.95, duration: 0.8 });
         break;
       case 'tilt':
-        gsap.from(el, { ...base, opacity: 0, y: Math.max(y, 32), rotationX: 6, transformPerspective: 900, duration: 0.85 });
+        gsap.from(el, {
+          ...base,
+          opacity: 0,
+          y: Math.max(y, 32),
+          rotationX: 6,
+          transformPerspective: 900,
+          duration: 0.85,
+        });
         break;
       case 'clip':
         gsap.from(el, { ...base, clipPath: 'inset(0 0 100% 0)', duration: 1, ease: 'expo.out' });

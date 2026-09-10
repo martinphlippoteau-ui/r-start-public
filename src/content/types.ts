@@ -64,8 +64,6 @@ export interface HeroContent {
   definition?: string;
   /** Id de la LegalNote qui porte le périmètre de la définition (facts.product.definitionScope). */
   definitionNoteId?: string;
-  /** Deux phrases pédagogiques sur le moment où les frais sont prélevés (une phrase par élément). */
-  pedagogy?: string[];
   subtitle: string;
   /** Ligne risques visible sans scroller, même taille que subtitle. Jamais animée. */
   riskLine: string;
@@ -125,6 +123,11 @@ export interface FeesContent {
   zeroHighlights: { value: string; label: string; base: string }[];
   /** aria-label de la liste des trois « 0 % » (ex. « Les trois frais à 0 % »). */
   zeroHighlightsLabel?: string;
+  /**
+   * Libellé accessible de la rangée des frais réellement prélevés, face aux « 0 % ». Depuis le
+   * retrait du barème complet de l'accueil, cette rangée n'est plus une répétition : elle est lue.
+   */
+  counterRowsLabel?: string;
   /** Contre-poids immédiat des 0 % (même taille). */
   counterweight: AdvantageRisk;
   rows: FeeRow[];
@@ -445,6 +448,11 @@ export interface FooterContent {
   copyright: string;
   /** Titre H2 de la section Notes (ex. « Notes et sources »). */
   notesTitle?: string;
+  /**
+   * Libellé du repli de la liste des notes. `{n}` est remplacé par le nombre de notes de la page.
+   * Le titre reste `notesTitle` ; ce libellé n'ajoute que le décompte.
+   */
+  notesToggleLabel?: string;
   /** Titre (masqué visuellement) du bloc de mentions légales du pied de page. */
   legalTitle?: string;
   /** Libellé du <summary> qui replie les blocs d'identité (le premier bloc reste déplié). */

@@ -66,7 +66,9 @@ const items = faq.items.map((item) => {
         <header class="max-w-4xl lg:sticky lg:top-24">
           <p class="text-eyebrow mb-4 text-teal-700" data-animate="fade-up">{faq.eyebrow}</p>
           <h2 id={titleId} class="text-display-lg" data-reveal-text>{faq.title}</h2>
-          <p class="mt-6 text-lead opacity-90" data-animate="fade-up" data-animate-delay="0.15">{faq.intro}</p>
+          <p class="mt-6 text-lead opacity-90" data-animate="fade-up" data-animate-delay="0.15">
+            {faq.intro}
+          </p>
         </header>
       </div>
 
@@ -122,7 +124,9 @@ const items = faq.items.map((item) => {
                         <RiskNote
                           text={risk}
                           size="lead"
-                          noteId={item.noteId && i === item.risks.length - 1 ? item.noteId : undefined}
+                          noteId={
+                            item.noteId && i === item.risks.length - 1 ? item.noteId : undefined
+                          }
                         />
                       ))}
                     </div>

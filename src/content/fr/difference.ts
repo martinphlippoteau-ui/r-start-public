@@ -63,6 +63,16 @@ export const difference = {
   ],
   counterweight: {
     title: 'Une rémunération conditionnée aux résultats',
+    /**
+     * Les deux phrases de l'équipe produit, descendues du hero par l'audit UX : elles ouvraient la page
+     * avant même que le lecteur sache ce qu'est R Start, et repoussaient les CTA sous le bandeau cookies
+     * sur mobile. Elles sont à leur place ici, où le sujet est justement le moment du prélèvement, et
+     * partagent le contre-poids chiffré du bloc (`risk` ci-dessous), dans la même taille.
+     */
+    pedagogy: [
+      nb('Payer des frais si notre travail vous fait gagner de l’argent : oui.'),
+      nb('Payer avant même qu’on ait commencé à travailler : non.'),
+    ],
     advantage: nb(
       'Aucune commission n’est prélevée à votre souscription, ni à l’achat des immeubles, ni sur les travaux. En d’autres termes : nous ne touchons rien tant que vous n’avez pas gagné d’argent.'
     ),

@@ -13,7 +13,8 @@ const DIST = path.join(ROOT, 'dist');
 // portent, pas l'arborescence de dist. On le retire avant de vérifier l'existence des fichiers.
 const BASE_SEGMENTS = (process.env.PUBLIC_BASE_PATH || '').split('/').filter(Boolean);
 const BASE_PREFIX = BASE_SEGMENTS.length ? '/' + BASE_SEGMENTS[BASE_SEGMENTS.length - 1] : '';
-const stripBase = (p) => (BASE_PREFIX && p.startsWith(BASE_PREFIX + '/') ? p.slice(BASE_PREFIX.length) : p);
+const stripBase = (p) =>
+  BASE_PREFIX && p.startsWith(BASE_PREFIX + '/') ? p.slice(BASE_PREFIX.length) : p;
 const errors = [];
 const warnings = [];
 
@@ -33,14 +34,21 @@ const norm = (s) =>
 const stripPressQuotes = (html) =>
   html.replace(/<([a-z]+)[^>]*\sdata-press-quote[^>]*>[\s\S]*?<\/\1>/gi, ' ');
 
-const toText = (html) => norm(html.replace(/<script[\s\S]*?<\/script>/gi, ' ').replace(/<style[\s\S]*?<\/style>/gi, ' ').replace(/<[^>]+>/g, ' '));
+const toText = (html) =>
+  norm(
+    html
+      .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+      .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+      .replace(/<[^>]+>/g, ' ')
+  );
 
 async function readHtml(rel) {
   return fs.readFile(path.join(DIST, rel), 'utf8');
 }
 
 function requirePhrase(text, phrase, label, file) {
-  if (!text.toLowerCase().includes(norm(phrase).toLowerCase())) errors.push(`${file} : mention absente — ${label}`);
+  if (!text.toLowerCase().includes(norm(phrase).toLowerCase()))
+    errors.push(`${file} : mention absente — ${label}`);
 }
 
 const FORBIDDEN = [
@@ -49,16 +57,33 @@ const FORBIDDEN = [
     label: '« sans frais »',
     // Autorisé : le démenti de la brochure, un « sans frais » immédiatement qualifié (de souscription,
     // d'entrée sur les achats d'immeubles), et l'allégation de rang bornée au groupe CORUM.
-    allow: /n'est pas une scpi sans frais|frais de souscription|premi[èe]re scpi du groupe corum sans frais d['’]entrée/i,
+    allow:
+      /n'est pas une scpi sans frais|frais de souscription|premi[èe]re scpi du groupe corum sans frais d['’]entrée/i,
   },
   { re: /\bgratuit/gi, label: '« gratuit »', allow: /saisir gratuitement le médiateur/i },
-  { re: /\bgaranti(e|s|es)?\b/gi, label: '« garanti »', allow: /(non|pas|aucune|ni)\s+(de\s+)?garanti|ne (sont|est) pas garanti|ne garantit pas|aucune garantie|sans garantie|n'offrent aucune garantie|ne présagent|garantie en capital/i },
-  { re: /sécuris/gi, label: '« sécurisé »', allow: /sécurisé(e)? par (https|tls)|connexion sécurisée/i },
+  {
+    re: /\bgaranti(e|s|es)?\b/gi,
+    label: '« garanti »',
+    allow:
+      /(non|pas|aucune|ni)\s+(de\s+)?garanti|ne (sont|est) pas garanti|ne garantit pas|aucune garantie|sans garantie|n'offrent aucune garantie|ne présagent|garantie en capital/i,
+  },
+  {
+    re: /sécuris/gi,
+    label: '« sécurisé »',
+    allow: /sécurisé(e)? par (https|tls)|connexion sécurisée/i,
+  },
   { re: /protection du capital|capital protégé/gi, label: '« protection du capital »' },
   { re: /meilleures? scpi/gi, label: '« meilleure SCPI »' },
   { re: /en toute confiance/gi, label: '« en toute confiance »' },
-  { re: /taux de distribution|\bTRI\b|rendement (cible|garanti|attendu|estimé|annuel)|objectif de rendement/g, label: 'indicateur de performance', allow: /(pas|aucun|sans)\s+(d'|de\s)?(objectif de rendement|taux de distribution)/i },
-  { re: /\d+(?:[,.]\d+)?\s?%\s?(?:de\s)?(?:rendement|performance|par an|annuel)/gi, label: 'pourcentage de performance' },
+  {
+    re: /taux de distribution|\bTRI\b|rendement (cible|garanti|attendu|estimé|annuel)|objectif de rendement/g,
+    label: 'indicateur de performance',
+    allow: /(pas|aucun|sans)\s+(d'|de\s)?(objectif de rendement|taux de distribution)/i,
+  },
+  {
+    re: /\d+(?:[,.]\d+)?\s?%\s?(?:de\s)?(?:rendement|performance|par an|annuel)/gi,
+    label: 'pourcentage de performance',
+  },
   { re: /\bcrédit\b/gi, label: 'mention du crédit', allow: /carte de crédit/i },
   { re: /objectifs? tenus?/gi, label: '« objectifs tenus » (allégation de performance)' },
   {
@@ -90,17 +115,23 @@ async function checkIndex() {
 
   // Mentions obligatoires
   requirePhrase(text, legal.commercialNotice, 'mention 1 (caractère commercial)', file);
-  requirePhrase(text, legal.documentsNotice.replace(/\.$/, ''), 'mention 2 (documents d\'information)', file);
+  requirePhrase(
+    text,
+    legal.documentsNotice.replace(/\.$/, ''),
+    "mention 2 (documents d'information)",
+    file
+  );
   requirePhrase(text, 'visa S.C.P.I. n° 26-06 en date du 4 mars 2026', 'visa AMF', file);
   requirePhrase(text, legal.shortRiskLine, 'ligne risques courte', file);
   requirePhrase(text, legal.bulletinWarning.slice(0, 120), 'avertissement du bulletin', file);
   requirePhrase(text, legal.dicWarning, 'avertissement du DIC', file);
-  for (const b of legal.arbitrageWarningBullets) requirePhrase(text, b.slice(0, 100), 'puce commission d\'arbitrage', file);
+  for (const b of legal.arbitrageWarningBullets)
+    requirePhrase(text, b.slice(0, 100), "puce commission d'arbitrage", file);
   requirePhrase(text, legal.gdpr.dpoEmail, 'e-mail DPO', file);
   requirePhrase(text, product.definition, 'ligne de définition du hero', file);
   requirePhrase(text, 'groupe CORUM', 'périmètre de l’allégation de rang', file);
   requirePhrase(text, 'GP-11000012', 'agrément AMF de la société de gestion', file);
-  requirePhrase(text, legal.publisher.rcs, 'RCS de l\'éditeur', file);
+  requirePhrase(text, legal.publisher.rcs, "RCS de l'éditeur", file);
   requirePhrase(text, '15 %', 'frais de gestion 15 %', file);
 
   checkForbidden(text, file);
@@ -108,10 +139,12 @@ async function checkIndex() {
   // Structure
   const h1 = html.match(/<h1\b[^>]*>/gi) || [];
   if (h1.length !== 1) errors.push(`${file} : ${h1.length} balise(s) <h1> (attendu : 1)`);
-  if (h1[0] && /data-animate/i.test(h1[0])) errors.push(`${file} : le H1 est animé (data-animate interdit)`);
+  if (h1[0] && /data-animate/i.test(h1[0]))
+    errors.push(`${file} : le H1 est animé (data-animate interdit)`);
   if (!/<html[^>]*\blang="fr"/i.test(html)) errors.push(`${file} : lang="fr" absent`);
   if (!/<link[^>]+rel="canonical"/i.test(html)) errors.push(`${file} : canonical absent`);
-  if (!/<meta[^>]+name="description"/i.test(html)) errors.push(`${file} : meta description absente`);
+  if (!/<meta[^>]+name="description"/i.test(html))
+    errors.push(`${file} : meta description absente`);
 
   const heroMatch = html.match(/<section[^>]*id="apercu"[^>]*>[\s\S]*?<\/section>/i);
   if (!heroMatch) errors.push(`${file} : section #apercu introuvable`);
@@ -119,11 +152,17 @@ async function checkIndex() {
     const hero = heroMatch[0];
     const risk = hero.match(/<p[^>]*data-risk[^>]*>/i);
     if (!risk) errors.push(`${file} : aucune ligne risques ([data-risk]) dans le hero`);
-    else if (/data-animate/i.test(risk[0])) errors.push(`${file} : la ligne risques du hero est animée`);
-    if (!/data-cta="souscrire"/i.test(hero)) errors.push(`${file} : aucun CTA de souscription dans le hero`);
+    else if (/data-animate/i.test(risk[0]))
+      errors.push(`${file} : la ligne risques du hero est animée`);
+    if (!/data-cta="souscrire"/i.test(hero))
+      errors.push(`${file} : aucun CTA de souscription dans le hero`);
   }
-  const risksAnimated = html.match(/<p[^>]*data-risk[^>]*data-animate[^>]*>|<p[^>]*data-animate[^>]*data-risk[^>]*>/gi) || [];
-  if (risksAnimated.length) errors.push(`${file} : ${risksAnimated.length} bloc(s) risque animé(s)`);
+  const risksAnimated =
+    html.match(
+      /<p[^>]*data-risk[^>]*data-animate[^>]*>|<p[^>]*data-animate[^>]*data-risk[^>]*>/gi
+    ) || [];
+  if (risksAnimated.length)
+    errors.push(`${file} : ${risksAnimated.length} bloc(s) risque animé(s)`);
   const nAdv = (html.match(/data-advantage/g) || []).length;
   const nRisk = (html.match(/data-risk/g) || []).length;
   if (nAdv > nRisk) errors.push(`${file} : ${nAdv} avantages pour ${nRisk} risques`);
@@ -156,7 +195,6 @@ async function checkIndex() {
   }
 }
 
-
 /** Sous-pages produit : mêmes interdits, ligne risques dans l'en-tête, mentions obligatoires, structure. */
 async function checkSubPages() {
   for (const p of ['frais', 'documentation', 'presse', 'salle-de-presse']) {
@@ -178,14 +216,25 @@ async function checkSubPages() {
     const h1 = html.match(/<h1\b[^>]*>/gi) || [];
     if (h1.length !== 1) errors.push(file + ' : ' + h1.length + ' balise(s) <h1> (attendu : 1)');
     if (!/<link[^>]+rel="canonical"/i.test(html)) errors.push(file + ' : canonical absent');
-    const risksAnimated = html.match(/<p[^>]*data-risk[^>]*data-animate[^>]*>|<p[^>]*data-animate[^>]*data-risk[^>]*>/gi) || [];
-    if (risksAnimated.length) errors.push(file + ' : ' + risksAnimated.length + ' bloc(s) risque animé(s)');
-    if (p === 'frais' && !/15\s?%/.test(text)) errors.push(file + ' : frais de gestion 15 % absents');
+    const risksAnimated =
+      html.match(
+        /<p[^>]*data-risk[^>]*data-animate[^>]*>|<p[^>]*data-animate[^>]*data-risk[^>]*>/gi
+      ) || [];
+    if (risksAnimated.length)
+      errors.push(file + ' : ' + risksAnimated.length + ' bloc(s) risque animé(s)');
+    if (p === 'frais' && !/15\s?%/.test(text))
+      errors.push(file + ' : frais de gestion 15 % absents');
     if (p === 'presse') {
       // Les titres et citations reproduits ne valent que couverts par l'avertissement fourni.
-      requirePhrase(text, pressFacts.coverageDisclaimer.slice(0, 120), 'avertissement de la revue de presse', file);
+      requirePhrase(
+        text,
+        pressFacts.coverageDisclaimer.slice(0, 120),
+        'avertissement de la revue de presse',
+        file
+      );
       const quoted = (html.match(/data-press-quote/g) || []).length;
-      if (!quoted) errors.push(file + ' : aucune citation marquée data-press-quote (contrôle inopérant)');
+      if (!quoted)
+        errors.push(file + ' : aucune citation marquée data-press-quote (contrôle inopérant)');
     }
     if (p === 'frais') {
       // Bascule des frais : une SCPI du panel ne peut être citée que dans le périmètre de l'analyse,
@@ -193,12 +242,24 @@ async function checkSubPages() {
       const lower = text.toLowerCase();
       const named = marketComparison.panel.filter((n) => lower.includes(norm(n).toLowerCase()));
       if (named.length) {
-        requirePhrase(text, marketComparison.perimeterLead.slice(0, 80), 'périmètre du comparatif', file);
-        requirePhrase(text, legal.innovationNotRevolution.title, 'encadré « Une innovation, pas une révolution »', file);
+        requirePhrase(
+          text,
+          marketComparison.perimeterLead.slice(0, 80),
+          'périmètre du comparatif',
+          file
+        );
+        requirePhrase(
+          text,
+          legal.innovationNotRevolution.title,
+          'encadré « Une innovation, pas une révolution »',
+          file
+        );
         requirePhrase(text, marketComparison.source.slice(0, 40), 'source du comparatif', file);
       }
     }
-    for (const [, body] of html.matchAll(/<script type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/gi)) {
+    for (const [, body] of html.matchAll(
+      /<script type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/gi
+    )) {
       try {
         JSON.parse(body);
       } catch (e) {

@@ -1,11 +1,26 @@
 ---
 /**
- * En-tête de sous-page (/frais, /documentation, /presse) : fond ink + halo de marque, sans image.
- * Surtitre, H1 (text-display-lg), intro (text-lead) et ligne risques dans la même taille (RiskNote
- * size 'lead', jamais animée), le tout visible sans scroller à 375×812 comme à 1440×900.
+ * En-tête de sous-page (/frais, /documentation, /presse, /salle-de-presse) : fond ink + halo de marque,
+ * sans image. Surtitre, H1 (text-display-lg), intro (text-lead) et ligne risques dans la même taille
+ * (RiskNote size 'lead', jamais animée), le tout visible sans scroller à 375×812 comme à 1440×900.
  * Le fil d'Ariane se place dans le slot « breadcrumb » (au-dessus du surtitre).
- * Rythme vertical calibré pour le Header en tone 'light' (bandeau blanc dans le flux, non superposé) :
- * padding haut modéré (pt-12 → lg:pt-20) afin que le bloc titre ne paraisse pas « tombé » dans le cadre.
+ *
+ * SLOT « aside » (audit UX) : le texte est borné à 4xl pour rester lisible, ce qui laissait la moitié
+ * droite de l'écran vide sur grand écran — un demi-écran de dégradé avant le premier contenu utile.
+ * À partir de `lg`, la grille passe à 12 colonnes : le texte en occupe 7, l'aside 5, aligné en bas sur
+ * la ligne risques. L'aside ne dit rien de neuf : il remonte une information déjà présente plus bas
+ * dans la page (repère chiffré, sommaire, médias, contacts), jamais un texte inventé pour l'occasion.
+ * Sous `lg`, il passe sous le texte — ou n'est simplement pas fourni par la page quand l'information
+ * se trouve juste en dessous (cas de /documentation et /salle-de-presse, où la barre d'ancres et la
+ * section contacts suivent immédiatement).
+ * L'aside n'est jamais animé : sur /frais il porte des valeurs de frais, qui ne peuvent ni bouger ni
+ * apparaître dans une taille différente les unes des autres.
+ *
+ * Rythme vertical calibré pour la navigation collée (bandeau blanc dans le flux, non superposé).
+ * Sous `sm`, les marges hautes sont resserrées et l'introduction comme la ligne risques passent
+ * ensemble à `text-base` : avec le bandeau cookies déplié au premier chargement, la ligne risques
+ * passait dessous sur plusieurs sous-pages. Les deux changent de taille ENSEMBLE — l'égalité entre le
+ * texte équilibré et son contre-poids est une exigence AMF, et le test la vérifie.
  * Contenu : props issues du fichier de contenu de la page (PageHero de types-v2.ts).
  */
 import RiskNote from '@/components/ui/RiskNote.astro';
@@ -19,26 +34,71 @@ interface Props {
   tone?: 'ink' | 'brand';
   /** Ancre de la section (par défaut « en-tete »). */
   id?: string;
+  /**
+   * `true` : l'aside n'est rendu qu'à partir de `lg`. À réserver aux pages dont l'information de
+   * l'aside se trouve immédiatement sous l'en-tête sur petit écran (barre d'ancres de /documentation,
+   * section contacts de /salle-de-presse) : l'y répéter ferait défiler deux fois la même chose.
+   */
+  asideOnLarge?: boolean;
   class?: string;
 }
-const { eyebrow, title, intro, riskLine, tone = 'ink', id = 'en-tete', class: className = '' } = Astro.props;
+const {
+  eyebrow,
+  title,
+  intro,
+  riskLine,
+  tone = 'ink',
+  id = 'en-tete',
+  asideOnLarge = false,
+  class: className = '',
+} = Astro.props;
 const titleId = id + '-title';
 const tones = { ink: 'bg-ink', brand: 'bg-brand-gradient-dark' };
+const hasAside = Astro.slots.has('aside');
 ---
 
 <section
   id={id}
   data-section={id}
   aria-labelledby={titleId}
-  class:list={['brand-halo grain relative overflow-hidden text-white', tones[tone], 'pt-12 pb-14 sm:pt-16 sm:pb-20 lg:pt-20 lg:pb-24', className]}
+  class:list={[
+    'brand-halo grain relative overflow-hidden text-white',
+    tones[tone],
+    'pt-3 pb-10 sm:pt-14 sm:pb-20 lg:pt-20 lg:pb-24',
+    className,
+  ]}
 >
   <Container size="wide" class="relative">
     <slot name="breadcrumb" />
-    <div class="mt-6 max-w-4xl sm:mt-8">
-      {eyebrow.trim() !== '' && <p class="text-eyebrow mb-4 text-teal-200">{eyebrow}</p>}
-      <h1 id={titleId} class="text-display-lg text-white">{title}</h1>
-      <p class="text-lead mt-5 max-w-3xl text-pretty text-white sm:mt-6">{intro}</p>
-      <RiskNote text={riskLine} tone="dark" size="lead" class="mt-4 max-w-3xl sm:mt-5" />
+    <div
+      class:list={['mt-2 sm:mt-8', hasAside && 'lg:grid lg:grid-cols-12 lg:items-end lg:gap-12']}
+    >
+      <div class:list={['max-w-4xl', hasAside && 'lg:col-span-7 lg:max-w-none']}>
+        {
+          eyebrow.trim() !== '' && (
+            <p class="text-eyebrow mb-1.5 text-teal-200 sm:mb-4">{eyebrow}</p>
+          )
+        }
+        <h1 id={titleId} class="text-display-lg text-white">{title}</h1>
+        <p
+          class="text-lead mt-3 max-w-3xl text-pretty text-white max-sm:text-base max-sm:leading-snug sm:mt-6"
+        >
+          {intro}
+        </p>
+        <RiskNote
+          text={riskLine}
+          tone="dark"
+          size="lead"
+          class="mt-2 max-w-3xl max-sm:text-base max-sm:leading-snug sm:mt-5"
+        />
+      </div>
+      {
+        hasAside && (
+          <div class:list={[asideOnLarge ? 'max-lg:hidden' : 'mt-10', 'lg:col-span-5 lg:mt-0']}>
+            <slot name="aside" />
+          </div>
+        )
+      }
     </div>
     <slot />
   </Container>

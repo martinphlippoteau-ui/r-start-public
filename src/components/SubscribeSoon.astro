@@ -52,7 +52,10 @@ import { subscribeSoon } from '@/content/fr/subscribeSoon';
       if (!cta) return;
       event.preventDefault();
       const dataLayer = ((window as unknown as { dataLayer?: unknown[] }).dataLayer ??= []);
-      dataLayer.push({ event: 'souscription_indisponible', cta_position: cta.dataset.ctaPosition || 'unknown' });
+      dataLayer.push({
+        event: 'souscription_indisponible',
+        cta_position: cta.dataset.ctaPosition || 'unknown',
+      });
       if (!dialog.open) dialog.showModal();
     });
 

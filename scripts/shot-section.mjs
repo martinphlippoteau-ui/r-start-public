@@ -7,7 +7,8 @@ import { chromium } from '@playwright/test';
 
 const args = Object.fromEntries(
   process.argv.slice(2).reduce((acc, a, i, arr) => {
-    if (a.startsWith('--')) acc.push([a.slice(2), arr[i + 1] && !arr[i + 1].startsWith('--') ? arr[i + 1] : 'true']);
+    if (a.startsWith('--'))
+      acc.push([a.slice(2), arr[i + 1] && !arr[i + 1].startsWith('--') ? arr[i + 1] : 'true']);
     return acc;
   }, [])
 );
@@ -17,7 +18,11 @@ const height = Number(args.height || 900);
 if (!args.out) throw new Error('--out requis');
 
 const browser = await chromium.launch();
-const context = await browser.newContext({ viewport: { width, height }, deviceScaleFactor: 1, locale: 'fr-FR' });
+const context = await browser.newContext({
+  viewport: { width, height },
+  deviceScaleFactor: 1,
+  locale: 'fr-FR',
+});
 const origin = new URL(url).origin;
 await context.addCookies([{ name: 'rstart_consent', value: 'denied', url: origin }]);
 const page = await context.newPage();
@@ -38,11 +43,15 @@ if (args.id) {
   await page.waitForTimeout(700);
   await el.screenshot({ path: args.out });
   const box = await el.boundingBox();
-  console.log(`OK ${args.out} (#${args.id} ${Math.round(box?.width ?? 0)}×${Math.round(box?.height ?? 0)})`);
+  console.log(
+    `OK ${args.out} (#${args.id} ${Math.round(box?.width ?? 0)}×${Math.round(box?.height ?? 0)})`
+  );
 } else {
   await page.screenshot({ path: args.out, fullPage: args.full === 'true' });
   console.log(`OK ${args.out}`);
 }
-const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+const overflow = await page.evaluate(
+  () => document.documentElement.scrollWidth - document.documentElement.clientWidth
+);
 if (overflow > 1) console.log(`⚠ débordement horizontal : ${overflow}px`);
 await browser.close();

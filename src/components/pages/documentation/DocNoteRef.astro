@@ -14,8 +14,15 @@ interface Props {
   id: string;
   /** Force la couleur ; sans valeur, elle suit le fond (ancêtre `.text-white` → teal-200). */
   tone?: 'light' | 'dark';
+  /**
+   * `false` : marqueur visuel seul (span, sans lien), pour un usage à l'intérieur d'un ancêtre déjà
+   * interactif — un <summary> notamment, où un <a> imbriqué est une violation d'accessibilité
+   * (« nested-interactive ») et du modèle de contenu HTML. Le lien réel équivalent doit alors exister
+   * ailleurs dans le contenu (ici : accolé au dernier paragraphe risque de la réponse).
+   */
+  interactive?: boolean;
 }
-const { id, tone } = Astro.props;
+const { id, tone, interactive = true } = Astro.props;
 const index = notes.findIndex((n) => n.id === id);
 const n = index === -1 ? null : index + 1;
 const label = nav.noteRefLabel && n !== null ? `${nav.noteRefLabel} ${n}` : undefined;
@@ -27,11 +34,26 @@ const colors = {
 ---
 
 {
-  n !== null && (
+  n !== null && interactive && (
     <a
       href={'#' + sections.notes.id + '-' + n}
-      class:list={['ml-0.5 align-super text-[0.65em] font-semibold no-underline hover:underline', colors[tone ?? 'auto']]}
+      class:list={[
+        'ml-0.5 align-super text-[0.65em] font-semibold no-underline hover:underline',
+        colors[tone ?? 'auto'],
+      ]}
       aria-label={label}
-    >{n}</a>
+    >
+      {n}
+    </a>
+  )
+}
+{
+  n !== null && !interactive && (
+    <span
+      class:list={['ml-0.5 align-super text-[0.65em] font-semibold', colors[tone ?? 'auto']]}
+      aria-hidden="true"
+    >
+      {n}
+    </span>
   )
 }

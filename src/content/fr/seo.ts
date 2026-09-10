@@ -39,8 +39,7 @@ export const seo = {
    */
   description:
     'R Start, SCPI CORUM : 0 % de frais de souscription, 15 % de gestion, commissions sur cessions et retraits. Perte en capital et revenus non garantis.',
-  ogImageAlt:
-    `Logo R Start, ${lowerFirst(product.tagline)} de CORUM, sur un dégradé bleu marine et turquoise.`,
+  ogImageAlt: `Logo R Start, ${lowerFirst(product.tagline)} de CORUM, sur un dégradé bleu marine et turquoise.`,
   /**
    * Requêtes cibles, formulées comme les internautes les tapent, dans le respect du vocabulaire autorisé.
    * Usage : JSON-LD WebPage.keywords et suivi de positionnement. Google ignore <meta name="keywords">.

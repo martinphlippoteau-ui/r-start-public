@@ -22,7 +22,8 @@ export const product = {
    * 10/09/2026). La version marché (« la première SCPI… » sans le groupe CORUM) reste interdite tant
    * que la Conformité ne l'a pas validée. Toujours affichée avec l'appel de note `definitionScope`.
    */
-  definition: 'La première SCPI du groupe CORUM sans frais d’entrée ni frais sur les achats d’immeubles', // brochure partenaires 2026, p.4 et p.6
+  definition:
+    'La première SCPI du groupe CORUM sans frais d’entrée ni frais sur les achats d’immeubles', // brochure partenaires 2026, p.4 et p.6
   definitionScope:
     'Périmètre : la gamme du groupe CORUM, soit cinq SCPI gérées par CORUM Asset Management depuis 2012. R Start est la première à ne prélever ni commission de souscription, ni frais sur les achats d’immeubles. Cette comparaison ne porte pas sur l’ensemble du marché des SCPI. Source : brochure partenaires 2026, p. 4, p. 6 et p. 7.',
   visa: { number: '26-06', date: '4 mars 2026', dateIso: '2026-03-04' }, // bulletin, brochure p.8
@@ -138,23 +139,44 @@ export const marketComparison = {
   /** Note de bas de tableau de la brochure p.6 (astérisque des frais d'agent immobilier). */
   brokerFootnote:
     'Frais d’agent immobilier (brokerage) appliqués par deux des neuf SCPI du panel, Iroko et Elevation Tertium.',
-  source: 'Brochure partenaires R Start 2026, page 6 ; moyennes arrêtées à la date de cette brochure.',
+  source:
+    'Brochure partenaires R Start 2026, page 6 ; moyennes arrêtées à la date de cette brochure.',
   /**
    * Moyennes de marché, dans l'ordre du parcours de l'épargnant. `timing` reprend le moment du
    * prélèvement indiqué par la brochure ; aucune valeur de R Start dans cet objet.
    */
   averages: {
-    subscription: { label: '0 %', base: 'prélevés sur le montant investi', timing: 'Frais unique à l’entrée' },
-    acquisition: { label: '4 %', base: 'prélevés sur le prix d’achat', timing: 'Frais récurrent à chaque acquisition' },
+    subscription: {
+      label: '0 %',
+      base: 'prélevés sur le montant investi',
+      timing: 'Frais unique à l’entrée',
+    },
+    acquisition: {
+      label: '4 %',
+      base: 'prélevés sur le prix d’achat',
+      timing: 'Frais récurrent à chaque acquisition',
+    },
     // Brochure p.6 : « 0 - 5 % », borne basse et borne haute du panel.
     broker: {
       label: '0 à 5 %',
       base: 'prélevés sur le prix d’acquisition de l’immeuble en cas d’achat sans intermédiaire',
       timing: 'Frais récurrent',
     },
-    management: { label: '14 %', base: 'prélevés sur les loyers encaissés', timing: 'Frais récurrent' },
-    works: { label: '4 %', base: 'prélevés sur le montant total des travaux', timing: 'Frais ponctuels' },
-    disposal: { label: '2,5 %', base: 'prélevés sur le prix de vente de l’immeuble', timing: 'Frais ponctuels' },
+    management: {
+      label: '14 %',
+      base: 'prélevés sur les loyers encaissés',
+      timing: 'Frais récurrent',
+    },
+    works: {
+      label: '4 %',
+      base: 'prélevés sur le montant total des travaux',
+      timing: 'Frais ponctuels',
+    },
+    disposal: {
+      label: '2,5 %',
+      base: 'prélevés sur le prix de vente de l’immeuble',
+      timing: 'Frais ponctuels',
+    },
     withdrawal: {
       label: '5 %',
       base: 'prélevés sur la valeur de retrait, en cas de sortie avant 3 ou 5 ans selon la SCPI',
@@ -208,7 +230,8 @@ export const strategy = {
     'loisirs',
   ], // DIC p.1
   targetAssetSize: 'immeubles de taille intermédiaire', // brochure p.3
-  acquisitionModes: 'immeubles acquis construits ou en état futur d’achèvement, détenus directement ou indirectement', // DIC p.1
+  acquisitionModes:
+    'immeubles acquis construits ou en état futur d’achèvement, détenus directement ou indirectement', // DIC p.1
 } as const;
 
 export const subscription = {
@@ -218,7 +241,8 @@ export const subscription = {
   options: {
     pei: {
       name: 'Plan Épargne Immobilier',
-      description: 'Versements programmés (fréquence mensuelle, trimestrielle, semestrielle ou annuelle)',
+      description:
+        'Versements programmés (fréquence mensuelle, trimestrielle, semestrielle ou annuelle)',
       minimum: 50, // € — adhésion PEI 04/2026 (tous frais inclus), prélèvement le 25 du mois
       minimumLabel: '50 €',
       minimumMonthlyLabel: '50 € par mois',
@@ -238,19 +262,27 @@ export const subscription = {
     "Relevé d'identité bancaire",
     "Justificatif d'origine des fonds",
   ], // bulletin p.1
-  coolingOff: "En cas de démarchage bancaire ou financier, délai de réflexion de 48 heures (art. L. 341-16 IV du Code monétaire et financier)", // bulletin CGV
+  coolingOff:
+    'En cas de démarchage bancaire ou financier, délai de réflexion de 48 heures (art. L. 341-16 IV du Code monétaire et financier)', // bulletin CGV
 } as const;
 
 export const corumGroup = {
   /** Chiffres groupe : corum.fr (« Qui sommes-nous »), consulté le 08/09/2026 ; recoupés avec la brochure 2026. Date officielle à fournir. */
   stats: [
-    { value: '9,6 Md€', numeric: 9.6, suffix: ' Md€', prefix: '', label: "d'épargne gérée par le groupe" },
+    {
+      value: '9,6 Md€',
+      numeric: 9.6,
+      suffix: ' Md€',
+      prefix: '',
+      label: "d'épargne gérée par le groupe",
+    },
     // « + » devant le nombre d'épargnants : brochure partenaires 2026, p. 7 ; la valeur vient de corum.fr.
     { value: '160 000', numeric: 160000, suffix: '', prefix: '+ ', label: 'épargnants' },
     { value: '2 500', numeric: 2500, suffix: '', prefix: '', label: 'partenaires professionnels' },
     { value: '250', numeric: 250, suffix: '', prefix: '', label: 'collaborateurs dans 7 pays' },
   ],
-  statsSource: 'Source : CORUM L’Épargne, corum.fr, consulté le 8 septembre 2026. Chiffres du groupe CORUM, sans lien avec les résultats futurs de R Start.',
+  statsSource:
+    'Source : CORUM L’Épargne, corum.fr, consulté le 8 septembre 2026. Chiffres du groupe CORUM, sans lien avec les résultats futurs de R Start.',
   statsDate: { label: '8 septembre 2026', iso: '2026-09-08' },
   employees: 250, // corum.fr
   countries: 7, // corum.fr
@@ -277,14 +309,16 @@ export const documents = [
   {
     key: 'dic',
     title: "Document d'informations clés (DIC)",
-    description: 'Objectifs, risques, coûts et scénarios de performance réglementaires. Lecture obligatoire avant toute souscription.',
+    description:
+      'Objectifs, risques, coûts et scénarios de performance réglementaires. Lecture obligatoire avant toute souscription.',
     file: '/documents/r-start-dic.pdf',
     version: 'Version du 20 mai 2026',
   },
   {
     key: 'note',
     title: "Note d'information",
-    description: 'Document visé par l’AMF (visa SCPI n° 26-06 du 4 mars 2026) : fonctionnement, frais, modalités de souscription et de retrait.',
+    description:
+      'Document visé par l’AMF (visa SCPI n° 26-06 du 4 mars 2026) : fonctionnement, frais, modalités de souscription et de retrait.',
     file: '/documents/r-start-note-information.pdf',
     version: 'Visa AMF n° 26-06 du 4 mars 2026',
   },
@@ -321,9 +355,11 @@ export const trust = {
     disclaimer:
       'Le visa de l’AMF n’implique ni approbation de l’opportunité de l’opération ni authentification des éléments comptables et financiers présentés.', // formulation standard AMF — à valider par la Conformité
     depositary: 'Société Générale', // DIC p.1
-    depositarySentence: 'Les actifs de R Start sont conservés par un dépositaire indépendant, Société Générale.', // DIC p.1-2
+    depositarySentence:
+      'Les actifs de R Start sont conservés par un dépositaire indépendant, Société Générale.', // DIC p.1-2
     sfdrLabel: 'Article 8 du règlement SFDR', // DIC p.4
-    supervisorNote: 'L’AMF est chargée du contrôle de CORUM Asset Management en ce qui concerne le document d’informations clés.', // DIC p.1
+    supervisorNote:
+      'L’AMF est chargée du contrôle de CORUM Asset Management en ce qui concerne le document d’informations clés.', // DIC p.1
   },
   trustpilot: {
     company: "CORUM L'Épargne",
@@ -360,8 +396,18 @@ export const press = {
   contactsSource: 'corum.fr, rubrique Contacts presse, consultée le 8 septembre 2026',
   /** Communiqués officiels : fichiers à fournir par CORUM (aucun PDF disponible dans les assets). */
   releases: [
-    { title: 'CORUM L’Épargne lance R Start, sa cinquième SCPI', date: { label: '20 mai 2026', iso: '2026-05-20' }, file: '', available: false },
-    { title: 'R Start obtient le visa de l’AMF', date: { label: '4 mars 2026', iso: '2026-03-04' }, file: '', available: false },
+    {
+      title: 'CORUM L’Épargne lance R Start, sa cinquième SCPI',
+      date: { label: '20 mai 2026', iso: '2026-05-20' },
+      file: '',
+      available: false,
+    },
+    {
+      title: 'R Start obtient le visa de l’AMF',
+      date: { label: '4 mars 2026', iso: '2026-03-04' },
+      file: '',
+      available: false,
+    },
   ],
   /**
    * Revue de presse « La presse en parle » : sélection livrée par CORUM le 10/09/2026, neuf articles,
@@ -372,15 +418,63 @@ export const press = {
    * sont attendues de CORUM (README, « Points en attente »).
    */
   coverage: [
-    { media: 'Les Echos', title: 'Immobilier : CORUM, le géant des SCPI, joue à son tour la carte du « sans frais d’entrée »', date: { label: 'Mai 2026', iso: '2026-05' }, url: '' },
-    { media: 'Investir / Les Echos', title: 'Immobilier : les critères pour bien choisir ses SCPI', date: { label: 'Mai 2026', iso: '2026-05' }, url: '' },
-    { media: 'Le Particulier / Le Figaro', title: 'Avec R Start, sa SCPI sans frais de souscription ni d’acquisition, CORUM AM confirme son statut d’électron libre de la pierre papier', date: { label: '20 mai 2026', iso: '2026-05-20' }, url: '' },
-    { media: 'Business Immo', title: 'Quand Corum innove sur le marché des SCPI', date: { label: '21 mai 2026', iso: '2026-05-21' }, url: '' },
-    { media: 'Tout sur mes finances', title: 'R Start : la nouvelle SCPI de Corum qui supprime aussi les frais d’acquisition', date: { label: '21 mai 2026', iso: '2026-05-21' }, url: 'https://www.toutsurmesfinances.com/actualites/a/r-start-la-nouvelle-scpi-de-corum-qui-supprime-aussi-les-frais-d-acquisition' },
-    { media: 'MeilleureSCPI.com', title: 'R Start (Corum) : la première SCPI sans frais de souscription de Corum lancée en 2026', date: { label: 'Mise à jour juillet 2026', iso: '2026-07' }, url: 'https://www.meilleurescpi.com/actualites/r-start-corum-lance-officiellement-sa-premiere-scpi-sans-frais-de-souscription/' },
-    { media: 'Profession CGP', title: 'Corum lance la SCPI R Start', date: { label: 'Mai 2026', iso: '2026-05' }, url: '' },
-    { media: 'Investissements Conseils', title: 'Une SCPI qui veut bousculer les codes…', date: { label: 'Mai 2026', iso: '2026-05' }, url: '' },
-    { media: 'CFNews Immo', title: 'La nouvelle proposition de valeur que formule R Start aux épargnants', date: { label: 'Mai 2026', iso: '2026-05' }, url: '' },
+    {
+      media: 'Les Echos',
+      title:
+        'Immobilier : CORUM, le géant des SCPI, joue à son tour la carte du « sans frais d’entrée »',
+      date: { label: 'Mai 2026', iso: '2026-05' },
+      url: '',
+    },
+    {
+      media: 'Investir / Les Echos',
+      title: 'Immobilier : les critères pour bien choisir ses SCPI',
+      date: { label: 'Mai 2026', iso: '2026-05' },
+      url: '',
+    },
+    {
+      media: 'Le Particulier / Le Figaro',
+      title:
+        'Avec R Start, sa SCPI sans frais de souscription ni d’acquisition, CORUM AM confirme son statut d’électron libre de la pierre papier',
+      date: { label: '20 mai 2026', iso: '2026-05-20' },
+      url: '',
+    },
+    {
+      media: 'Business Immo',
+      title: 'Quand Corum innove sur le marché des SCPI',
+      date: { label: '21 mai 2026', iso: '2026-05-21' },
+      url: '',
+    },
+    {
+      media: 'Tout sur mes finances',
+      title: 'R Start : la nouvelle SCPI de Corum qui supprime aussi les frais d’acquisition',
+      date: { label: '21 mai 2026', iso: '2026-05-21' },
+      url: 'https://www.toutsurmesfinances.com/actualites/a/r-start-la-nouvelle-scpi-de-corum-qui-supprime-aussi-les-frais-d-acquisition',
+    },
+    {
+      media: 'MeilleureSCPI.com',
+      title:
+        'R Start (Corum) : la première SCPI sans frais de souscription de Corum lancée en 2026',
+      date: { label: 'Mise à jour juillet 2026', iso: '2026-07' },
+      url: 'https://www.meilleurescpi.com/actualites/r-start-corum-lance-officiellement-sa-premiere-scpi-sans-frais-de-souscription/',
+    },
+    {
+      media: 'Profession CGP',
+      title: 'Corum lance la SCPI R Start',
+      date: { label: 'Mai 2026', iso: '2026-05' },
+      url: '',
+    },
+    {
+      media: 'Investissements Conseils',
+      title: 'Une SCPI qui veut bousculer les codes…',
+      date: { label: 'Mai 2026', iso: '2026-05' },
+      url: '',
+    },
+    {
+      media: 'CFNews Immo',
+      title: 'La nouvelle proposition de valeur que formule R Start aux épargnants',
+      date: { label: 'Mai 2026', iso: '2026-05' },
+      url: '',
+    },
   ],
   /**
    * Articles identifiés le 08/09/2026 mais hors de la sélection livrée le 10/09/2026 : adresses
@@ -388,18 +482,42 @@ export const press = {
    * publient par ailleurs des avis de plateforme de distribution, pas des articles d'information).
    */
   coverageArchive: [
-    { media: 'Pierre Papier', title: 'Corum propose un nouveau modèle de frais avec la SCPI R Start', url: 'https://www.pierrepapier.fr/scpi/corum-propose-un-nouveau-modele-de-frais-avec-la-scpi-r-start/' },
-    { media: 'Idéal Investisseur', title: 'SCPI R Start : analyse complète', url: 'https://www.ideal-investisseur.fr/scpi-avis/corum-r-start-10164.html' },
-    { media: 'Rock-n-Data', title: 'SCPI R Start : Corum lance son offre sans frais', url: 'https://www.rock-n-data.io/fr/scpi-r-start-corum-lance-son-offre-sans-frais/' },
+    {
+      media: 'Pierre Papier',
+      title: 'Corum propose un nouveau modèle de frais avec la SCPI R Start',
+      url: 'https://www.pierrepapier.fr/scpi/corum-propose-un-nouveau-modele-de-frais-avec-la-scpi-r-start/',
+    },
+    {
+      media: 'Idéal Investisseur',
+      title: 'SCPI R Start : analyse complète',
+      url: 'https://www.ideal-investisseur.fr/scpi-avis/corum-r-start-10164.html',
+    },
+    {
+      media: 'Rock-n-Data',
+      title: 'SCPI R Start : Corum lance son offre sans frais',
+      url: 'https://www.rock-n-data.io/fr/scpi-r-start-corum-lance-son-offre-sans-frais/',
+    },
   ],
   /**
    * Trois citations mises en avant, livrées par CORUM le 10/09/2026 avec leur média et leur date.
    * Reproduites mot pour mot : ce sont des propos de tiers, couverts par `coverageDisclaimer`.
    */
   quotes: [
-    { text: 'CORUM AM confirme son statut d’électron libre de la pierre papier.', media: 'Le Particulier / Le Figaro', date: { label: '20 mai 2026', iso: '2026-05-20' } },
-    { text: 'Un troisième modèle de SCPI qui prend place sur le marché : un modèle de rupture.', media: 'MeilleureSCPI.com', date: { label: 'Juillet 2026', iso: '2026-07' } },
-    { text: 'Corum veut bousculer les codes de la pierre-papier. Un modèle pensé pour renforcer la transparence du marché', media: 'Investissements Conseils', date: { label: 'Mai 2026', iso: '2026-05' } },
+    {
+      text: 'CORUM AM confirme son statut d’électron libre de la pierre papier.',
+      media: 'Le Particulier / Le Figaro',
+      date: { label: '20 mai 2026', iso: '2026-05-20' },
+    },
+    {
+      text: 'Un troisième modèle de SCPI qui prend place sur le marché : un modèle de rupture.',
+      media: 'MeilleureSCPI.com',
+      date: { label: 'Juillet 2026', iso: '2026-07' },
+    },
+    {
+      text: 'Corum veut bousculer les codes de la pierre-papier. Un modèle pensé pour renforcer la transparence du marché',
+      media: 'Investissements Conseils',
+      date: { label: 'Mai 2026', iso: '2026-05' },
+    },
   ],
   /** Avertissement de fin de page, livré par CORUM le 10/09/2026 ; reproduit à l'identique. */
   coverageDisclaimer:
@@ -421,7 +539,8 @@ export const documentsExtra = [
     key: 'simulation',
     group: 'frais',
     title: 'Simulation des frais ex-ante',
-    description: 'Illustration réglementaire de l’ensemble des coûts supportés par l’épargnant, avant souscription.',
+    description:
+      'Illustration réglementaire de l’ensemble des coûts supportés par l’épargnant, avant souscription.',
     file: '/documents/r-start-simulation-frais-ex-ante.pdf',
     version: 'Version 2, mars 2026',
   },
@@ -429,7 +548,8 @@ export const documentsExtra = [
     key: 'pei',
     group: 'formulaire',
     title: 'Adhésion au Plan Épargne Immobilier',
-    description: 'Mise en place de versements programmés (à partir de 50 €), mandat de prélèvement SEPA et conditions générales.',
+    description:
+      'Mise en place de versements programmés (à partir de 50 €), mandat de prélèvement SEPA et conditions générales.',
     file: '/documents/r-start-adhesion-plan-epargne-immobilier.pdf',
     version: 'Version 2.5, avril 2026',
   },
@@ -437,7 +557,8 @@ export const documentsExtra = [
     key: 'rd',
     group: 'formulaire',
     title: 'Adhésion au réinvestissement des dividendes',
-    description: 'Réinvestissement automatique de tout ou partie des dividendes potentiels en nouvelles parts.',
+    description:
+      'Réinvestissement automatique de tout ou partie des dividendes potentiels en nouvelles parts.',
     file: '/documents/r-start-adhesion-reinvestissement-dividendes.pdf',
     version: 'Version 2.5',
   },
@@ -473,11 +594,55 @@ export const documentsExtra = [
  * scripts/make-map.mjs pour la carte de la section Stratégie. Aucun pays hors de cette liste n'y figure.
  */
 export const investmentUniverse = {
-  source: 'Conseil de l’Europe, liste des États membres consultée le 9 septembre 2026 ; DIC du 20 mai 2026',
+  source:
+    'Conseil de l’Europe, liste des États membres consultée le 9 septembre 2026 ; DIC du 20 mai 2026',
   canada: ['CAN'],
   councilOfEurope: [
-    'ALB', 'AND', 'ARM', 'AUT', 'AZE', 'BEL', 'BIH', 'BGR', 'HRV', 'CYP', 'CZE', 'DNK', 'EST', 'FIN', 'FRA',
-    'GEO', 'DEU', 'GRC', 'HUN', 'ISL', 'IRL', 'ITA', 'LVA', 'LIE', 'LTU', 'LUX', 'MLT', 'MDA', 'MCO', 'MNE',
-    'NLD', 'MKD', 'NOR', 'POL', 'PRT', 'ROU', 'SMR', 'SRB', 'SVK', 'SVN', 'ESP', 'SWE', 'CHE', 'TUR', 'UKR', 'GBR',
+    'ALB',
+    'AND',
+    'ARM',
+    'AUT',
+    'AZE',
+    'BEL',
+    'BIH',
+    'BGR',
+    'HRV',
+    'CYP',
+    'CZE',
+    'DNK',
+    'EST',
+    'FIN',
+    'FRA',
+    'GEO',
+    'DEU',
+    'GRC',
+    'HUN',
+    'ISL',
+    'IRL',
+    'ITA',
+    'LVA',
+    'LIE',
+    'LTU',
+    'LUX',
+    'MLT',
+    'MDA',
+    'MCO',
+    'MNE',
+    'NLD',
+    'MKD',
+    'NOR',
+    'POL',
+    'PRT',
+    'ROU',
+    'SMR',
+    'SRB',
+    'SVK',
+    'SVN',
+    'ESP',
+    'SWE',
+    'CHE',
+    'TUR',
+    'UKR',
+    'GBR',
   ],
 } as const;

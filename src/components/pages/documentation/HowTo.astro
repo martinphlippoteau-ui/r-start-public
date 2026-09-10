@@ -29,9 +29,15 @@ const id = 'guide';
       <!-- En-tête collant : titre, avantage et contre-poids dans le même bloc -->
       <div class="lg:col-span-5">
         <div class="lg:sticky lg:top-24">
-          {labels.howToEyebrow && <p class="text-eyebrow mb-4 text-teal-700">{labels.howToEyebrow}</p>}
+          {
+            labels.howToEyebrow && (
+              <p class="text-eyebrow mb-4 text-teal-700">{labels.howToEyebrow}</p>
+            )
+          }
           <h2 id={id + '-title'} class="text-display-md">
-            {howTo.title}<span class="whitespace-nowrap"><DocNoteRef id="documentation-souscription" /></span>
+            {howTo.title}<span class="whitespace-nowrap"
+              ><DocNoteRef id="documentation-souscription" /></span
+            >
           </h2>
           <div class="mt-6 space-y-4">
             {

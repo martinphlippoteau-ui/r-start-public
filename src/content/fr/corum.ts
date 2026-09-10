@@ -112,7 +112,9 @@ const rank = (id: string): number => {
 };
 
 /** Toutes les notes de la section Confiance (trust.ts + corum.ts), numérotées dans l'ordre de lecture. */
-export const notes: LegalNote[] = [...trustNotes, ...corumNotes].sort((a, b) => rank(a.id) - rank(b.id));
+export const notes: LegalNote[] = [...trustNotes, ...corumNotes].sort(
+  (a, b) => rank(a.id) - rank(b.id)
+);
 
 export const corum = {
   eyebrow: 'CORUM',

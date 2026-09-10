@@ -9,7 +9,9 @@ test.describe('Conformité', () => {
     const box = await risk.boundingBox();
     expect(box).not.toBeNull();
     const height = page.viewportSize()?.height ?? 800;
-    expect(box!.y + box!.height, 'ligne risques sous la ligne de flottaison').toBeLessThanOrEqual(height);
+    expect(box!.y + box!.height, 'ligne risques sous la ligne de flottaison').toBeLessThanOrEqual(
+      height
+    );
     // Le sous-titre est le <p> qui précède immédiatement la ligne risques dans l'ordre du document
     // (indépendant de la présence d'un surtitre ou de l'accroche, et de l'enveloppe `data-scrub` qui
     // regroupe accroche + sous-titre : ce n'est donc pas forcément un frère direct).
@@ -17,7 +19,9 @@ test.describe('Conformité', () => {
       .locator('xpath=preceding::p[1]')
       .evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
     const riskSize = await risk.evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
-    expect(riskSize, 'ligne risques plus petite que le sous-titre').toBeGreaterThanOrEqual(subtitleSize * 0.85);
+    expect(riskSize, 'ligne risques plus petite que le sous-titre').toBeGreaterThanOrEqual(
+      subtitleSize * 0.85
+    );
   });
 
   test('le bandeau cookies ne recouvre pas la ligne risques du hero', async ({ page }) => {
@@ -33,6 +37,37 @@ test.describe('Conformité', () => {
       geo.hautBandeau - geo.basRisque,
       `ligne risques recouverte par le bandeau cookies (bas ${Math.round(geo.basRisque)} px, bandeau à ${Math.round(geo.hautBandeau)} px)`
     ).toBeGreaterThanOrEqual(16);
+  });
+
+  /**
+   * Audit UX : le hero portait cinq blocs de texte avant ses boutons, qui tombaient sous le bandeau
+   * cookies au premier chargement — le lecteur voyait le produit mais pas comment y souscrire. Les deux
+   * phrases pédagogiques sont descendues dans « Ce qui change vraiment » ; ce test empêche le hero de
+   * regrossir. Il ne dit rien de la ligne risques, vérifiée par les deux tests précédents.
+   */
+  test('les CTA du hero sont visibles sans scroller', async ({ page }) => {
+    await page.goto('/');
+    const cta = page.locator('#apercu [data-hero-cta]');
+    await expect(cta).toBeVisible();
+    const geo = await page.evaluate(() => {
+      const box = document.querySelector('#apercu [data-hero-cta]')!.getBoundingClientRect();
+      const banner = document.getElementById('consent-banner')?.getBoundingClientRect();
+      return {
+        basCta: box.bottom,
+        hautCta: box.top,
+        hauteurEcran: window.innerHeight,
+        hautBandeau: banner && banner.height ? banner.top : null,
+      };
+    });
+    expect(geo.basCta, 'CTA du hero sous la ligne de flottaison').toBeLessThanOrEqual(
+      geo.hauteurEcran
+    );
+    if (geo.hautBandeau !== null) {
+      expect(
+        geo.hautBandeau - geo.basCta,
+        `CTA du hero recouverts par le bandeau cookies (bas ${Math.round(geo.basCta)} px, bandeau à ${Math.round(geo.hautBandeau)} px)`
+      ).toBeGreaterThanOrEqual(0);
+    }
   });
 
   test('chaque avantage a un risque de longueur comparable', async ({ page }) => {
@@ -54,19 +89,31 @@ test.describe('Conformité', () => {
     );
     for (const p of pairs) {
       expect(p.risk, `avantage sans risque : ${p.text}`).toBeGreaterThan(0);
-      expect(p.risk, `risque trop court pour : ${p.text}`).toBeGreaterThanOrEqual(p.advantage * 0.6);
-      expect(p.riskSize, `risque plus petit que l'avantage : ${p.text}`).toBeGreaterThanOrEqual(p.advSize * 0.95);
+      expect(p.risk, `risque trop court pour : ${p.text}`).toBeGreaterThanOrEqual(
+        p.advantage * 0.6
+      );
+      expect(p.riskSize, `risque plus petit que l'avantage : ${p.text}`).toBeGreaterThanOrEqual(
+        p.advSize * 0.95
+      );
     }
   });
 
   test('aucun risque n’est masqué ou animé', async ({ page }) => {
     await page.goto('/');
-    const hidden = await page.locator('[data-risk]').evaluateAll((nodes) =>
-      nodes.filter((n) => {
-        const cs = getComputedStyle(n);
-        const animatedAncestor = n.closest('[data-animate],[data-scrub],[data-reveal-text],[data-intro]');
-        return !!animatedAncestor || cs.visibility === 'hidden' || parseFloat(cs.opacity) < 0.99 || cs.display === 'none';
-      }).length
+    const hidden = await page.locator('[data-risk]').evaluateAll(
+      (nodes) =>
+        nodes.filter((n) => {
+          const cs = getComputedStyle(n);
+          const animatedAncestor = n.closest(
+            '[data-animate],[data-scrub],[data-reveal-text],[data-intro]'
+          );
+          return (
+            !!animatedAncestor ||
+            cs.visibility === 'hidden' ||
+            parseFloat(cs.opacity) < 0.99 ||
+            cs.display === 'none'
+          );
+        }).length
     );
     expect(hidden).toBe(0);
   });
@@ -78,7 +125,9 @@ test.describe('Conformité', () => {
    * exposent des frais et dans la bascule pédagogique.
    */
   for (const path of ['/', '/frais/']) {
-    test(`taille de police identique pour toutes les valeurs de frais (${path})`, async ({ page }) => {
+    test(`taille de police identique pour toutes les valeurs de frais (${path})`, async ({
+      page,
+    }) => {
       await page.goto(path);
       const blocks = await page.locator('[data-fee-value]').evaluateAll((nodes) => {
         const groups: Record<string, { size: number; text: string }[]> = {};
@@ -92,7 +141,10 @@ test.describe('Conformité', () => {
         return groups;
       });
 
-      expect(Object.keys(blocks).length, `aucune valeur de frais repérée sur ${path}`).toBeGreaterThan(0);
+      expect(
+        Object.keys(blocks).length,
+        `aucune valeur de frais repérée sur ${path}`
+      ).toBeGreaterThan(0);
       for (const [key, values] of Object.entries(blocks)) {
         expect(values.length, `un seul frais dans le groupe ${key}`).toBeGreaterThan(1);
         const sizes = [...new Set(values.map((v) => v.size))];
@@ -123,7 +175,11 @@ test.describe('Conformité', () => {
 
   test('les documents réglementaires répondent', async ({ page, request }) => {
     await page.goto('/');
-    const hrefs = await page.locator('a[href$=".pdf"]').evaluateAll((a) => [...new Set(a.map((x) => (x as HTMLAnchorElement).getAttribute('href') || ''))]);
+    const hrefs = await page
+      .locator('a[href$=".pdf"]')
+      .evaluateAll((a) => [
+        ...new Set(a.map((x) => (x as HTMLAnchorElement).getAttribute('href') || '')),
+      ]);
     // 2 tant que deux des quatre documents sont retenus dans src/content/fr/documentation.ts
     // (PENDING_DOCUMENT_KEYS) : les statuts, dont le PDF fourni est tronqué, et le DIC hébergé, qui
     // classe R Start en 3 sur 7 quand le site affiche 4 sur 7. Remonter ce seuil à chaque document

@@ -17,24 +17,48 @@ import { faqJsonLd, organizationJsonLd, webPageJsonLd } from '@/lib/seo';
 import { heroImageFormat, heroImageSizes, heroImageWidths, loadHeroImage } from '@/lib/hero-image';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const modules = import.meta.glob<{ default: any }>('/src/components/sections/*.astro', { eager: true });
+const modules = import.meta.glob<{ default: any }>('/src/components/sections/*.astro', {
+  eager: true,
+});
 const all = Object.entries(modules)
   .sort(([a], [b]) => a.localeCompare(b))
   .map(([path, mod]) => ({ path, Component: mod.default }));
 const hero = all.find((s) => /\/01-/.test(s.path));
 const rest = all.filter((s) => s !== hero);
 
-const heroLcp = await getImage({ src: await loadHeroImage(), widths: heroImageWidths, format: heroImageFormat });
+const heroLcp = await getImage({
+  src: await loadHeroImage(),
+  widths: heroImageWidths,
+  format: heroImageFormat,
+});
 
 const jsonLd = [
   organizationJsonLd(),
-  webPageJsonLd({ path: '/', title: seo.title, description: seo.description, keywords: seo.keywords }),
+  webPageJsonLd({
+    path: '/',
+    title: seo.title,
+    description: seo.description,
+    keywords: seo.keywords,
+  }),
   faqJsonLd(faq.items),
 ];
 ---
 
-<Base title={seo.title} description={seo.description} path="/" ogImageAlt={seo.ogImageAlt} jsonLd={jsonLd}>
-  <link slot="head" rel="preload" as="image" imagesrcset={heroLcp.srcSet.attribute} imagesizes={heroImageSizes} fetchpriority="high" />
+<Base
+  title={seo.title}
+  description={seo.description}
+  path="/"
+  ogImageAlt={seo.ogImageAlt}
+  jsonLd={jsonLd}
+>
+  <link
+    slot="head"
+    rel="preload"
+    as="image"
+    imagesrcset={heroLcp.srcSet.attribute}
+    imagesizes={heroImageSizes}
+    fetchpriority="high"
+  />
   <SiteNav />
   <main id="contenu">
     {hero && <hero.Component />}

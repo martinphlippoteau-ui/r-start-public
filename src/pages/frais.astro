@@ -102,7 +102,8 @@ const docHint = docIsPdf
 const docHintId = `${ids.document}-hint`;
 
 /** Bascule des frais (brochure p.6) : rendue si le drapeau est levé et si les deux positions existent. */
-const showComparison = SHOW_MARKET_COMPARISON && marketComparison.enabled && marketComparison.sides.length === 2;
+const showComparison =
+  SHOW_MARKET_COMPARISON && marketComparison.enabled && marketComparison.sides.length === 2;
 ---
 
 <Base title={seo.title} description={seo.description} path={page.path} jsonLd={jsonLd}>
@@ -110,18 +111,74 @@ const showComparison = SHOW_MARKET_COMPARISON && marketComparison.enabled && mar
   <main id="contenu">
     <PageHero eyebrow={hero.eyebrow} title={hero.title} intro={hero.intro} riskLine={hero.riskLine}>
       <Breadcrumb slot="breadcrumb" key="fees" tone="dark" />
+      {
+        /* Repère chiffré remonté de la première section : les trois 0 % et, dans le même cadre et la
+          même taille, les trois frais réellement prélevés. Jamais animé, jamais dissocié : afficher
+          les 0 % seuls dans l'en-tête serait exactement ce que l'AMF reproche. Le contre-poids rédigé
+          reste la ligne risques ci-contre, puis la section « Les trois 0 % » plus bas. */
+      }
+      <div
+        slot="aside"
+        class="rounded-3xl bg-white/10 p-6 ring-1 ring-white/15 backdrop-blur-sm sm:p-8"
+      >
+        <h2 id="entete-frais-title" class="visually-hidden">{labels?.zeroHighlights}</h2>
+        {
+          /* Pas de nom accessible sur la <dl> : html-validate refuse aria-label comme
+            aria-labelledby sur une liste de définitions. Le titre masqué au-dessus suffit. */
+        }
+        <dl>
+          {
+            zeroHighlights.map((item) => (
+              <div class="flex items-baseline justify-between gap-4 border-b border-white/15 py-2 first:pt-0">
+                <dd
+                  class="order-first text-2xl leading-none font-bold text-white tabular-nums sm:text-3xl"
+                  data-fee-value
+                  data-fee-block="entete-frais"
+                >
+                  {item.value}
+                </dd>
+                <dt class="text-base leading-snug text-white/90">{item.label}</dt>
+              </div>
+            ))
+          }
+          {
+            counterweightRates.map((item) => (
+              <div class="flex items-baseline justify-between gap-4 border-b border-white/15 py-2 last:border-0 last:pb-0">
+                <dd
+                  class="order-first text-2xl leading-none font-bold text-sand tabular-nums sm:text-3xl"
+                  data-fee-value
+                  data-fee-block="entete-frais"
+                >
+                  {item.value}
+                </dd>
+                <dt class="text-base leading-snug text-white/90">{item.label}</dt>
+              </div>
+            ))
+          }
+        </dl>
+      </div>
     </PageHero>
 
     <!-- 1. Les trois 0 % et leur contre-poids, dans le même bloc -->
     <Section id={ids.zero} tone="white" labelledBy={ids.zero + '-title'}>
       <Container size="wide">
         <h2 id={ids.zero + '-title'} class="visually-hidden">{labels?.zeroHighlights}</h2>
-        <ul role="list" aria-label={labels?.zeroHighlights} class="grid gap-10 sm:grid-cols-3 sm:gap-8 lg:gap-12">
+        <ul
+          role="list"
+          aria-label={labels?.zeroHighlights}
+          class="grid gap-10 sm:grid-cols-3 sm:gap-8 lg:gap-12"
+        >
           {
             zeroHighlights.map((item, i) => (
               <li class="flex flex-col gap-3 border-t border-navy/15 pt-6 sm:pt-8">
                 <p class="flex flex-col gap-3">
-                  <span class="text-stat text-navy" data-fee-value data-fee-block="apercu-frais" data-animate="clip" data-animate-delay={String(i * 0.12)}>
+                  <span
+                    class="text-stat text-navy"
+                    data-fee-value
+                    data-fee-block="apercu-frais"
+                    data-animate="clip"
+                    data-animate-delay={String(i * 0.12)}
+                  >
                     {item.value}
                   </span>
                   <span class="text-lead font-medium text-ink">{item.label}</span>
@@ -141,16 +198,26 @@ const showComparison = SHOW_MARKET_COMPARISON && marketComparison.enabled && mar
           {
             counterweightRates.map((item) => (
               <li class="flex flex-col gap-3">
-                <span class="text-stat text-coral-700 tabular-nums" data-fee-value data-fee-block="apercu-frais">{item.value}</span>
+                <span
+                  class="text-stat text-coral-700 tabular-nums"
+                  data-fee-value
+                  data-fee-block="apercu-frais"
+                >
+                  {item.value}
+                </span>
                 <span class="text-lead font-medium text-ink">{item.label}</span>
               </li>
             ))
           }
         </ul>
 
-        <div class="mt-10 grid gap-6 border-t border-navy/15 pt-8 lg:mt-14 lg:grid-cols-2 lg:gap-12 lg:pt-10">
+        <div
+          class="mt-10 grid gap-6 border-t border-navy/15 pt-8 lg:mt-14 lg:grid-cols-2 lg:gap-12 lg:pt-10"
+        >
           <p data-advantage class="text-lead">
-            {counterweight.advantage}<span class="whitespace-nowrap"><FeesNoteRef id="frais-page-distributeur" /></span>
+            {counterweight.advantage}<span class="whitespace-nowrap"
+              ><FeesNoteRef id="frais-page-distributeur" /></span
+            >
           </p>
           <RiskNote text={counterweight.risk} size="lead" />
         </div>
@@ -160,7 +227,9 @@ const showComparison = SHOW_MARKET_COMPARISON && marketComparison.enabled && mar
     <!-- 2. Le barème complet, en quatre tableaux -->
     <Section id={ids.schedule} tone="paper" labelledBy={ids.schedule + '-title'}>
       <Container size="wide">
-        <h2 id={ids.schedule + '-title'} class="text-display-lg max-w-4xl">{labels?.eyebrows.schedule}</h2>
+        <h2 id={ids.schedule + '-title'} class="text-display-lg max-w-4xl">
+          {labels?.eyebrows.schedule}
+        </h2>
 
         <div class="mt-14 space-y-16 lg:mt-20 lg:space-y-24">
           {
@@ -205,21 +274,31 @@ const showComparison = SHOW_MARKET_COMPARISON && marketComparison.enabled && mar
                     {group.rows.map((row) => (
                       <tr class="border-b border-navy/10 align-top" data-kind={row.kind}>
                         <th scope="row" class="py-4 pr-4 font-normal sm:py-5 lg:w-72">
-                          <span class="block text-base font-semibold text-ink sm:text-xl">{row.label}</span>
+                          <span class="block text-base font-semibold text-ink sm:text-xl">
+                            {row.label}
+                          </span>
                           {labels && (
                             <Pill tone="outline" class="mt-2 text-teal-700">
                               {labels.kinds[row.kind]}
                             </Pill>
                           )}
-                          <span class="mt-2 block text-base leading-relaxed text-slate-700 sm:hidden">{row.base}</span>
+                          <span class="mt-2 block text-base leading-relaxed text-slate-700 sm:hidden">
+                            {row.base}
+                          </span>
                           {row.detail && (
-                            <span class="mt-2 block text-base leading-relaxed text-slate-700 lg:hidden">{row.detail}</span>
+                            <span class="mt-2 block text-base leading-relaxed text-slate-700 lg:hidden">
+                              {row.detail}
+                            </span>
                           )}
                         </th>
                         <td class="hidden py-4 pr-4 text-base leading-relaxed text-slate-700 sm:table-cell sm:py-5 lg:w-64">
                           {row.base}
                         </td>
-                        <td class="py-4 pl-3 text-right text-lg leading-tight font-bold tracking-tight whitespace-nowrap text-navy tabular-nums max-sm:w-[7.25rem] sm:py-5 sm:text-3xl" data-fee-value data-fee-block="bareme-frais">
+                        <td
+                          class="py-4 pl-3 text-right text-lg leading-tight font-bold tracking-tight whitespace-nowrap text-navy tabular-nums max-sm:w-[7.25rem] sm:py-5 sm:text-3xl"
+                          data-fee-value
+                          data-fee-block="bareme-frais"
+                        >
                           {row.valueShort ? (
                             <>
                               <span class="sm:hidden">{row.valueShort}</span>
@@ -229,7 +308,9 @@ const showComparison = SHOW_MARKET_COMPARISON && marketComparison.enabled && mar
                             row.value
                           )}
                         </td>
-                        <td class="hidden py-4 pl-6 text-base leading-relaxed text-slate-700 lg:table-cell lg:py-5">{row.detail}</td>
+                        <td class="hidden py-4 pl-6 text-base leading-relaxed text-slate-700 lg:table-cell lg:py-5">
+                          {row.detail}
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -244,12 +325,22 @@ const showComparison = SHOW_MARKET_COMPARISON && marketComparison.enabled && mar
     <!-- 3. Commission de retrait dégressive, exonérations -->
     <Section id={ids.withdrawal} tone="white" labelledBy={ids.withdrawal + '-title'}>
       <Container size="wide">
-        {labels?.eyebrows.withdrawal && <p class="text-eyebrow mb-4 text-teal-700">{labels.eyebrows.withdrawal}</p>}
+        {
+          labels?.eyebrows.withdrawal && (
+            <p class="text-eyebrow mb-4 text-teal-700">{labels.eyebrows.withdrawal}</p>
+          )
+        }
         <h2 id={ids.withdrawal + '-title'} class="text-display-lg max-w-4xl">{withdrawal.title}</h2>
         <p class="text-lead mt-6 max-w-3xl">
-          {withdrawal.intro}<span class="whitespace-nowrap"><FeesNoteRef id="frais-page-retrait" /></span>
+          {withdrawal.intro}<span class="whitespace-nowrap"
+            ><FeesNoteRef id="frais-page-retrait" /></span
+          >
         </p>
-        <ol aria-label={labels?.steps} class="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-5 sm:gap-5 lg:gap-6" data-animate="stagger">
+        <ol
+          aria-label={labels?.steps}
+          class="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-5 sm:gap-5 lg:gap-6"
+          data-animate="stagger"
+        >
           {
             withdrawal.steps.map((step, i) => {
               const last = i === lastStep;
@@ -257,21 +348,40 @@ const showComparison = SHOW_MARKET_COMPARISON && marketComparison.enabled && mar
                 <li
                   class:list={[
                     'flex flex-col justify-between gap-6 rounded-3xl p-6 lg:p-8',
-                    last ? 'bg-navy text-white shadow-float max-sm:col-span-2' : 'bg-paper text-ink ring-1 ring-navy/5',
+                    last
+                      ? 'bg-navy text-white shadow-float max-sm:col-span-2'
+                      : 'bg-paper text-ink ring-1 ring-navy/5',
                   ]}
                 >
-                  <span class:list={['text-display-md tabular-nums', last ? 'text-sand' : 'text-navy']} data-fee-value data-fee-block="retrait-frais">{step.rate}</span>
-                  <span class:list={['text-base leading-snug font-medium', last ? 'text-white' : 'text-ink']}>{step.period}</span>
+                  <span
+                    class:list={['text-display-md tabular-nums', last ? 'text-sand' : 'text-navy']}
+                    data-fee-value
+                    data-fee-block="retrait-frais"
+                  >
+                    {step.rate}
+                  </span>
+                  <span
+                    class:list={[
+                      'text-base leading-snug font-medium',
+                      last ? 'text-white' : 'text-ink',
+                    ]}
+                  >
+                    {step.period}
+                  </span>
                 </li>
               );
             })
           }
         </ol>
 
-        <div class="mt-14 grid gap-6 border-t border-navy/15 pt-8 lg:mt-20 lg:grid-cols-2 lg:gap-12 lg:pt-10">
+        <div
+          class="mt-14 grid gap-6 border-t border-navy/15 pt-8 lg:mt-20 lg:grid-cols-2 lg:gap-12 lg:pt-10"
+        >
           <div data-advantage class="text-lead">
             <h3 class="text-display-sm text-ink">
-              {withdrawal.exemptionsTitle}<span class="whitespace-nowrap"><FeesNoteRef id="frais-page-exoneration-retrait" /></span>
+              {withdrawal.exemptionsTitle}<span class="whitespace-nowrap"
+                ><FeesNoteRef id="frais-page-exoneration-retrait" /></span
+              >
             </h3>
             <ul role="list" class="mt-4 space-y-3">
               {withdrawal.exemptions.map((item) => <li>{item}</li>)}
@@ -283,11 +393,22 @@ const showComparison = SHOW_MARKET_COMPARISON && marketComparison.enabled && mar
     </Section>
 
     <!-- 4. Moins-value, encadré et avertissement (jamais animés) -->
-    <Section id={ids.loss} tone="ink" labelledBy={ids.loss + '-title'} class="brand-halo grain overflow-hidden">
+    <Section
+      id={ids.loss}
+      tone="ink"
+      labelledBy={ids.loss + '-title'}
+      class="brand-halo grain overflow-hidden"
+    >
       <Container size="wide" class="relative">
-        {labels?.eyebrows.lossMechanism && <p class="text-eyebrow mb-4 text-teal-200">{labels.eyebrows.lossMechanism}</p>}
+        {
+          labels?.eyebrows.lossMechanism && (
+            <p class="text-eyebrow mb-4 text-teal-200">{labels.eyebrows.lossMechanism}</p>
+          )
+        }
         <h2 id={ids.loss + '-title'} class="text-display-lg max-w-4xl text-white">
-          {lossMechanism.title}<span class="whitespace-nowrap"><FeesNoteRef id="frais-page-moins-value" /></span>
+          {lossMechanism.title}<span class="whitespace-nowrap"
+            ><FeesNoteRef id="frais-page-moins-value" /></span
+          >
         </h2>
         <div class="mt-10 grid gap-8 lg:mt-14 lg:grid-cols-2 lg:gap-12">
           <div data-advantage class="text-lead space-y-5 text-white">
@@ -303,7 +424,9 @@ const showComparison = SHOW_MARKET_COMPARISON && marketComparison.enabled && mar
         <div class="mt-16 lg:mt-24">
           <Card lift={false} class="lg:p-10">
             <p class="text-lead font-medium">
-              {arbitrageWarning.title}<span class="whitespace-nowrap"><FeesNoteRef id="frais-page-commission-arbitrage" tone="light" /></span>
+              {arbitrageWarning.title}<span class="whitespace-nowrap"
+                ><FeesNoteRef id="frais-page-commission-arbitrage" tone="light" /></span
+              >
             </p>
             <ul class="mt-5 list-disc space-y-4 pl-6 text-lead marker:text-coral">
               {arbitrageWarning.bullets.map((bullet) => <li class="pl-1">{bullet}</li>)}
@@ -316,9 +439,15 @@ const showComparison = SHOW_MARKET_COMPARISON && marketComparison.enabled && mar
     <!-- 5. Incidence des coûts selon le DIC (coûts, jamais de performance) -->
     <Section id={ids.cost} tone="paper" labelledBy={ids.cost + '-title'}>
       <Container size="wide">
-        {labels?.eyebrows.costImpact && <p class="text-eyebrow mb-4 text-teal-700">{labels.eyebrows.costImpact}</p>}
+        {
+          labels?.eyebrows.costImpact && (
+            <p class="text-eyebrow mb-4 text-teal-700">{labels.eyebrows.costImpact}</p>
+          )
+        }
         <h2 id={ids.cost + '-title'} class="text-display-lg max-w-4xl">
-          {costImpact.title}<span class="whitespace-nowrap"><FeesNoteRef id="frais-page-incidence-dic" /></span>
+          {costImpact.title}<span class="whitespace-nowrap"
+            ><FeesNoteRef id="frais-page-incidence-dic" /></span
+          >
         </h2>
         <div class="mt-6">
           <p data-advantage class="text-lead max-w-3xl">{costImpact.intro}</p>
@@ -328,7 +457,9 @@ const showComparison = SHOW_MARKET_COMPARISON && marketComparison.enabled && mar
                 <li class="flex flex-col justify-between gap-6 rounded-3xl bg-white p-6 shadow-card lg:p-8">
                   <span class="text-base leading-snug font-medium text-ink">{row.period}</span>
                   <span class="text-display-md text-navy tabular-nums">
-                    {labels?.costColumns.impact && <span class="visually-hidden">{labels.costColumns.impact} : </span>}
+                    {labels?.costColumns.impact && (
+                      <span class="visually-hidden">{labels.costColumns.impact} : </span>
+                    )}
                     {row.impact}
                   </span>
                 </li>
@@ -347,14 +478,34 @@ const showComparison = SHOW_MARKET_COMPARISON && marketComparison.enabled && mar
     <!-- 7. Document de référence -->
     <Section id={ids.document} tone="white" labelledBy={ids.document + '-title'}>
       <Container size="wide">
-        {labels?.eyebrows.document && <p class="text-eyebrow mb-6 text-teal-700">{labels.eyebrows.document}</p>}
-        {docHint && <span id={docHintId} hidden>{docHint}</span>}
-        <article class="group relative flex flex-col gap-5 rounded-3xl bg-paper p-6 ring-1 ring-navy/5 transition-shadow duration-300 hover:shadow-card focus-within:shadow-card sm:flex-row sm:gap-8 sm:p-8 lg:p-10">
+        {
+          labels?.eyebrows.document && (
+            <p class="text-eyebrow mb-6 text-teal-700">{labels.eyebrows.document}</p>
+          )
+        }
+        {
+          docHint && (
+            <span id={docHintId} hidden>
+              {docHint}
+            </span>
+          )
+        }
+        <article
+          class="group relative flex flex-col gap-5 rounded-3xl bg-paper p-6 ring-1 ring-navy/5 transition-shadow duration-300 hover:shadow-card focus-within:shadow-card sm:flex-row sm:gap-8 sm:p-8 lg:p-10"
+        >
           <span
             aria-hidden="true"
             class="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-teal-100 text-navy transition-colors duration-300 group-hover:bg-navy group-hover:text-white"
           >
-            <svg class="size-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <svg
+              class="size-7"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
               <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z"></path>
               <path d="M14 3v5h5"></path>
               <path d="M9 13h6M9 17h6"></path>
@@ -374,8 +525,14 @@ const showComparison = SHOW_MARKET_COMPARISON && marketComparison.enabled && mar
                 {simulationDoc.title}
               </a>
             </h2>
-            <p class="text-caption order-first flex flex-wrap items-center gap-x-2 gap-y-1 font-semibold tracking-wider text-slate-700">
-              {docIsPdf && labels?.fileTypeLabel && <span class="uppercase">{labels.fileTypeLabel}</span>}
+            <p
+              class="text-caption order-first flex flex-wrap items-center gap-x-2 gap-y-1 font-semibold tracking-wider text-slate-700"
+            >
+              {
+                docIsPdf && labels?.fileTypeLabel && (
+                  <span class="uppercase">{labels.fileTypeLabel}</span>
+                )
+              }
               {
                 docIsPdf && simulationDoc.kb !== undefined && (
                   <>
@@ -387,11 +544,13 @@ const showComparison = SHOW_MARKET_COMPARISON && marketComparison.enabled && mar
                   </>
                 )
               }
-              {!docIsPdf && labels?.newTabHint && (
-                <span aria-hidden="true" class="normal-case">
-                  {labels.newTabHint}
-                </span>
-              )}
+              {
+                !docIsPdf && labels?.newTabHint && (
+                  <span aria-hidden="true" class="normal-case">
+                    {labels.newTabHint}
+                  </span>
+                )
+              }
             </p>
             <p class="mt-3 text-base leading-relaxed text-ink">{simulationDoc.description}</p>
             <p class="mt-4 flex items-center justify-between gap-4 text-sm text-slate-700">
@@ -423,7 +582,11 @@ const showComparison = SHOW_MARKET_COMPARISON && marketComparison.enabled && mar
         <div class="grid gap-12 lg:grid-cols-12 lg:gap-16">
           <div class="lg:col-span-5">
             <div class="lg:sticky lg:top-24">
-              {labels?.eyebrows.faq && <p class="text-eyebrow mb-4 text-teal-700">{labels.eyebrows.faq}</p>}
+              {
+                labels?.eyebrows.faq && (
+                  <p class="text-eyebrow mb-4 text-teal-700">{labels.eyebrows.faq}</p>
+                )
+              }
               <h2 id={ids.faq + '-title'} class="text-display-lg">{faq.title}</h2>
             </div>
           </div>
@@ -433,10 +596,16 @@ const showComparison = SHOW_MARKET_COMPARISON && marketComparison.enabled && mar
                 faqItems.map((item, i) => (
                   <li class="border-b border-navy/15">
                     <details name="faq-frais" data-faq={item.question} class="faq-item group">
-                      <summary class="block cursor-pointer list-none py-6 [&::-webkit-details-marker]:hidden sm:py-8" data-animate="fade-up">
+                      <summary
+                        class="block cursor-pointer list-none py-6 [&::-webkit-details-marker]:hidden sm:py-8"
+                        data-animate="fade-up"
+                      >
                         <h3 class="flex items-start justify-between gap-5 text-display-sm text-ink transition-colors duration-200 group-hover:text-navy sm:gap-8">
                           <span class="flex min-w-0 flex-col gap-2 sm:flex-row sm:gap-6">
-                            <span aria-hidden="true" class="text-eyebrow pt-1.5 text-teal-700 tabular-nums sm:pt-2">
+                            <span
+                              aria-hidden="true"
+                              class="text-eyebrow pt-1.5 text-teal-700 tabular-nums sm:pt-2"
+                            >
                               {String(i + 1).padStart(2, '0')}
                             </span>
                             <span>{item.question}</span>
@@ -445,8 +614,18 @@ const showComparison = SHOW_MARKET_COMPARISON && marketComparison.enabled && mar
                             aria-hidden="true"
                             class="mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-full border border-navy/40 text-navy transition-[transform,background-color,border-color,color] duration-300 ease-out-expo group-hover:border-navy group-hover:bg-navy group-hover:text-white group-open:rotate-180 group-open:border-navy group-open:bg-navy group-open:text-white motion-reduce:transition-none sm:mt-1 sm:size-12"
                           >
-                            <svg class="size-5 sm:size-6" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
-                              <path d="m5 8 5 5 5-5" stroke-linecap="round" stroke-linejoin="round"></path>
+                            <svg
+                              class="size-5 sm:size-6"
+                              viewBox="0 0 20 20"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="1.8"
+                            >
+                              <path
+                                d="m5 8 5 5 5-5"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                              />
                             </svg>
                           </span>
                         </h3>

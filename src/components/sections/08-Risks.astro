@@ -66,18 +66,30 @@ const TITLE_Y = 12;
 
     <!-- Avertissement du bulletin de souscription (in extenso, jamais animé) -->
     <div class="mt-16 rounded-3xl border border-white/25 bg-white/5 p-6 sm:p-10 lg:mt-24 lg:p-12">
-      {risks.bulletinWarningTitle && <h3 class="text-display-sm text-sand">{risks.bulletinWarningTitle}</h3>}
+      {
+        risks.bulletinWarningTitle && (
+          <h3 class="text-display-sm text-sand">{risks.bulletinWarningTitle}</h3>
+        )
+      }
       <RiskNote text={risks.bulletinWarning} tone="dark" size="lead" class="mt-6" />
     </div>
 
     <!-- Avertissement du DIC et commission d'arbitrage (jamais animés) -->
     <div class="mt-6 grid gap-6 lg:grid-cols-2">
       <div class="rounded-3xl border border-white/25 bg-white/5 p-6 sm:p-10 lg:p-12">
-        {risks.dicWarningTitle && <h3 class="text-display-sm text-sand">{risks.dicWarningTitle}</h3>}
+        {
+          risks.dicWarningTitle && (
+            <h3 class="text-display-sm text-sand">{risks.dicWarningTitle}</h3>
+          )
+        }
         <RiskNote text={risks.dicWarning} tone="dark" size="lead" class="mt-6" />
       </div>
       <div class="rounded-3xl border border-white/25 bg-white/5 p-6 sm:p-10 lg:p-12">
-        {risks.arbitrageTitle && <p class="text-lead font-medium text-sand">{risks.arbitrageTitle}</p>}
+        {
+          risks.arbitrageTitle && (
+            <p class="text-lead font-medium text-sand">{risks.arbitrageTitle}</p>
+          )
+        }
         <ul class="mt-5 list-disc space-y-4 pl-6 text-lead text-white marker:text-sand">
           {risks.arbitrageBullets.map((bullet) => <li class="pl-1">{bullet}</li>)}
         </ul>

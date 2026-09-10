@@ -32,7 +32,11 @@ const { text, class: className = '', tone = 'light', size = 'base', noteId } = A
 >
   <svg
     aria-hidden="true"
-    class:list={['mt-1 shrink-0', size === 'lead' ? 'size-6' : 'size-5', tone === 'dark' ? 'text-sand' : 'text-coral']}
+    class:list={[
+      'mt-1 shrink-0',
+      size === 'lead' ? 'size-6' : 'size-5',
+      tone === 'dark' ? 'text-sand' : 'text-coral',
+    ]}
     viewBox="0 0 20 20"
     fill="none"
     stroke="currentColor"
@@ -42,5 +46,9 @@ const { text, class: className = '', tone = 'light', size = 'base', noteId } = A
     <path d="M10 8v4" stroke-linecap="round"></path>
     <circle cx="10" cy="14" r=".6" fill="currentColor"></circle>
   </svg>
-  <span><span class="visually-hidden">{riskPrefix}</span>{text}{noteId && <NoteRef id={noteId} tone={tone === 'dark' ? 'dark' : 'light'} />}</span>
+  <span
+    ><span class="visually-hidden">{riskPrefix}</span>{text}{
+      noteId && <NoteRef id={noteId} tone={tone === 'dark' ? 'dark' : 'light'} />
+    }</span
+  >
 </p>

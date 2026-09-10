@@ -54,7 +54,8 @@ const photo = media.documents ? await resolveImage(media.documents.src) : null;
 const kbFormat = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 });
 
 /** Clé analytics d'un document : sa clé de facts.ts, à défaut le nom du fichier sans extension. */
-const docKey = (file: string, key?: string) => key ?? file.replace(/^.*\//, '').replace(/\.pdf$/i, '');
+const docKey = (file: string, key?: string) =>
+  key ?? file.replace(/^.*\//, '').replace(/\.pdf$/i, '');
 
 /** Détail du fichier lu par les lecteurs d'écran après le titre du lien (ex. « PDF, nouvelle fenêtre »). */
 const linkHint = [documents.fileTypeLabel, documents.newTabHint].filter(Boolean).join(', ');
@@ -70,15 +71,26 @@ const CARD_STAGGER = 0.1;
     <header class="max-w-4xl">
       <p class="text-eyebrow mb-4 text-teal-700" data-animate="fade-up">{documents.eyebrow}</p>
       <h2 id={titleId} class="text-display-lg" data-reveal-text>{documents.title}</h2>
-      <p class="mt-6 text-lead opacity-90" data-animate="fade-up" data-animate-delay="0.15">{documents.intro}</p>
+      <p class="mt-6 text-lead opacity-90" data-animate="fade-up" data-animate-delay="0.15">
+        {documents.intro}
+      </p>
     </header>
-    {linkHint && <span id={linkHintId} hidden>{linkHint}</span>}
+    {
+      linkHint && (
+        <span id={linkHintId} hidden>
+          {linkHint}
+        </span>
+      )
+    }
 
     <div class="mt-16 grid gap-12 lg:mt-24 lg:grid-cols-12 lg:gap-16">
       <!-- Photo -->
       {
         photo && media.documents && (
-          <figure class="order-last self-start lg:order-first lg:sticky lg:top-24 lg:col-span-5" data-animate="clip">
+          <figure
+            class="order-last self-start lg:order-first lg:sticky lg:top-24 lg:col-span-5"
+            data-animate="clip"
+          >
             <div class="img-frame aspect-[4/3] lg:aspect-[4/5]">
               <Picture
                 src={photo}
@@ -92,7 +104,11 @@ const CARD_STAGGER = 0.1;
                 class="h-full w-full object-cover"
               />
             </div>
-            {media.documents.credit && <figcaption class="text-caption mt-3 text-slate-700">{media.documents.credit}</figcaption>}
+            {media.documents.credit && (
+              <figcaption class="text-caption mt-3 text-slate-700">
+                {media.documents.credit}
+              </figcaption>
+            )}
           </figure>
         )
       }
@@ -101,7 +117,10 @@ const CARD_STAGGER = 0.1;
       <ul
         role="list"
         aria-label={documents.listLabel}
-        class:list={['grid gap-5 lg:gap-6', photo ? 'lg:col-span-7' : 'lg:col-span-12 sm:grid-cols-2']}
+        class:list={[
+          'grid gap-5 lg:gap-6',
+          photo ? 'lg:col-span-7' : 'lg:col-span-12 sm:grid-cols-2',
+        ]}
       >
         {
           documents.items.map((item, i) => (
@@ -123,9 +142,9 @@ const CARD_STAGGER = 0.1;
                   stroke-linecap="round"
                   stroke-linejoin="round"
                 >
-                  <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z"></path>
-                  <path d="M14 3v5h5"></path>
-                  <path d="M9 13h6M9 17h6"></path>
+                  <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z" />
+                  <path d="M14 3v5h5" />
+                  <path d="M9 13h6M9 17h6" />
                 </svg>
               </span>
 
@@ -145,7 +164,9 @@ const CARD_STAGGER = 0.1;
                 </h3>
 
                 <p class="text-caption order-first flex flex-wrap items-center gap-x-2 gap-y-1 font-semibold tracking-wider text-slate-700">
-                  {documents.fileTypeLabel && <span class="uppercase">{documents.fileTypeLabel}</span>}
+                  {documents.fileTypeLabel && (
+                    <span class="uppercase">{documents.fileTypeLabel}</span>
+                  )}
                   {item.kb !== undefined && (
                     <>
                       <span aria-hidden="true">·</span>
@@ -175,7 +196,7 @@ const CARD_STAGGER = 0.1;
                     stroke-linecap="round"
                     stroke-linejoin="round"
                   >
-                    <path d="M4 10h12M11 5l5 5-5 5"></path>
+                    <path d="M4 10h12M11 5l5 5-5 5" />
                   </svg>
                 </p>
               </div>
@@ -204,12 +225,26 @@ const CARD_STAGGER = 0.1;
             class="nav-link inline-flex items-center gap-2 px-2 py-2 text-base font-semibold text-navy underline-offset-4 hover:text-teal-700 hover:underline sm:text-lg"
           >
             {documents.corumLink.label}
-            <svg aria-hidden="true" class="size-4 shrink-0" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+            <svg
+              aria-hidden="true"
+              class="size-4 shrink-0"
+              viewBox="0 0 16 16"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+            >
               <path d="M6 3h7v7M13 3 4 12" stroke-linecap="round" stroke-linejoin="round"></path>
             </svg>
             {documents.newTabHint && <span class="visually-hidden">({documents.newTabHint})</span>}
           </a>
-          <NoteRef id="documents-corum" />
+          {
+            /* Écart réel avec le lien qui précède : un appel de note fait moins de 24 px, il ne passe la
+              règle « taille des cibles tactiles » (WCAG 2.2, 2.5.8) que s'il est suffisamment isolé.
+              Collé au lien corum.fr, il était la seule violation axe de l'accueil. */
+          }
+          <span class="ml-3 inline-block">
+            <NoteRef id="documents-corum" />
+          </span>
         </span>
       </div>
     </div>

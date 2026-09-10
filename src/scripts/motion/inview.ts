@@ -24,7 +24,7 @@ export const setupInView = (): void => {
         else el.classList.remove(...classes);
       }
     },
-    { rootMargin: '10% 0px 10% 0px' },
+    { rootMargin: '10% 0px 10% 0px' }
   );
   els.forEach((el) => io.observe(el));
 };

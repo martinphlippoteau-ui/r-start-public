@@ -18,9 +18,16 @@ const { groups, label } = Astro.props;
 
 {
   label && groups.length > 0 && (
-    <nav aria-label={label} data-docsnav class="surface-glass sticky top-subnav z-20 border-b border-mist">
+    <nav
+      aria-label={label}
+      data-docsnav
+      class="surface-glass sticky top-subnav z-20 border-b border-mist"
+    >
       <Container size="wide">
-        <ul role="list" class="scrollbar-none flex h-14 items-center gap-1 overflow-x-auto sm:gap-2">
+        <ul
+          role="list"
+          class="scrollbar-none flex h-14 items-center gap-1 overflow-x-auto sm:gap-2"
+        >
           {groups.map((group) => (
             <li class="shrink-0">
               <a

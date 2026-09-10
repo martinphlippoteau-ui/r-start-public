@@ -43,8 +43,7 @@ export const riskPrefix = 'Risque : ';
 /** Encadré brochure p.4 « Une innovation, pas une révolution », adapté au grand public (« Vos clients » → « Vous »). */
 export const innovationNotRevolution = {
   title: 'Une innovation, pas une révolution',
-  body:
-    "R Start n'est pas une SCPI sans frais : ce modèle n'existe pas. R Start n'est pas non plus moins chère qu'une SCPI traditionnelle. Son modèle de frais est différent : si les reventes d'immeubles génèrent de fortes plus-values, les commissions peuvent dépasser ce qu'aurait coûté une commission de souscription classique. Vous ne connaissez pas votre coût total à la souscription.",
+  body: "R Start n'est pas une SCPI sans frais : ce modèle n'existe pas. R Start n'est pas non plus moins chère qu'une SCPI traditionnelle. Son modèle de frais est différent : si les reventes d'immeubles génèrent de fortes plus-values, les commissions peuvent dépasser ce qu'aurait coûté une commission de souscription classique. Vous ne connaissez pas votre coût total à la souscription.",
 };
 
 /** Éditeur du site et distributeur (communication commerciale). */
@@ -56,8 +55,8 @@ export const publisher = {
   orias: 'Immatriculée à l’ORIAS sous le numéro 20002932 (www.orias.fr)',
   statuses: [
     'Conseiller en investissements financiers (CIF), membre de la CNCEF',
-    "Intermédiaire en assurance",
-    "Mandataire non exclusif en opérations de banque et services de paiement",
+    'Intermédiaire en assurance',
+    'Mandataire non exclusif en opérations de banque et services de paiement',
   ],
   supervisors: "Placée sous le contrôle de l'ACPR et de l'AMF",
   publicationDirector: 'Anne Carrizo', // corum.fr/mentions-legales — à confirmer
@@ -82,24 +81,24 @@ export const managementCompany = {
 /** Bloc RGPD (responsable de traitement, droits, DPO). */
 export const gdpr = {
   controller: "CORUM L'Épargne et CORUM Asset Management",
-  body:
-    "Vos données à caractère personnel sont collectées par CORUM Asset Management et CORUM L'Épargne conformément à la politique de protection des données personnelles disponible sur www.corum.fr. Vous disposez de droits d'accès, de rectification, d'effacement, de limitation, d'opposition et de portabilité, que vous pouvez exercer à tout moment en contactant le délégué à la protection des données.",
+  body: "Vos données à caractère personnel sont collectées par CORUM Asset Management et CORUM L'Épargne conformément à la politique de protection des données personnelles disponible sur www.corum.fr. Vous disposez de droits d'accès, de rectification, d'effacement, de limitation, d'opposition et de portabilité, que vous pouvez exercer à tout moment en contactant le délégué à la protection des données.",
   dpoEmail: 'dpo@corumbutler.com',
   privacyPolicyUrl: 'https://www.corum.fr',
 } as const;
 
 /** Médiation AMF (DIC p.4). */
 export const mediation = {
-  body:
-    "Conformément aux dispositions de l'article L. 621-19 du Code monétaire et financier et à la charte de la médiation de l'Autorité des marchés financiers, l'associé peut saisir gratuitement le médiateur de l'AMF, sous réserve d'avoir préalablement adressé une réclamation écrite à CORUM Asset Management et de ne pas être satisfait de la réponse, et qu'aucune procédure contentieuse ni aucune enquête de l'AMF portant sur les mêmes faits ne soit en cours.",
-  address: "Le Médiateur de l'Autorité des marchés financiers, 17 place de la Bourse, 75082 Paris Cedex 02",
+  body: "Conformément aux dispositions de l'article L. 621-19 du Code monétaire et financier et à la charte de la médiation de l'Autorité des marchés financiers, l'associé peut saisir gratuitement le médiateur de l'AMF, sous réserve d'avoir préalablement adressé une réclamation écrite à CORUM Asset Management et de ne pas être satisfait de la réponse, et qu'aucune procédure contentieuse ni aucune enquête de l'AMF portant sur les mêmes faits ne soit en cours.",
+  address:
+    "Le Médiateur de l'Autorité des marchés financiers, 17 place de la Bourse, 75082 Paris Cedex 02",
   url: 'https://www.amf-france.org',
 } as const;
 
 export const hosting = {
   provider: 'Microsoft Azure',
   region: 'Région France Central',
-  company: 'Microsoft Ireland Operations Ltd, One Microsoft Place, South County Business Park, Leopardstown, Dublin 18, Irlande',
+  company:
+    'Microsoft Ireland Operations Ltd, One Microsoft Place, South County Business Park, Leopardstown, Dublin 18, Irlande',
 } as const;
 
 /** Mots et formulations interdits dans les textes (contrôle automatisé, voir scripts/check-compliance.mjs). */

@@ -48,7 +48,8 @@ export const income = {
     risk: 'Pendant ce délai, vos parts ne donnent droit à aucun dividende. Vous ne percevez donc aucun revenu pendant les premiers mois. Votre épargne est pourtant déjà versée, et exposée au risque de perte en capital.',
     /** Frise « mois 1 → mois 6 » : la 6e pastille (entrée en jouissance) est mise en avant. */
     timeline: {
-      label: 'Calendrier de l’entrée en jouissance, du mois 1 au mois 6 après la souscription réglée',
+      label:
+        'Calendrier de l’entrée en jouissance, du mois 1 au mois 6 après la souscription réglée',
       monthPrefix: 'Mois',
       count: 6,
       startCaption: 'Souscription réglée',

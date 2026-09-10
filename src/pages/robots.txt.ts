@@ -11,6 +11,13 @@ export const GET: APIRoute = ({ site }) => {
   const preview = PUBLIC_NOINDEX === 'true';
   const body = preview
     ? ['# Prévisualisation : indexation refusée.', 'User-agent: *', 'Disallow: /', ''].join('\n')
-    : ['User-agent: *', 'Allow: /', 'Disallow: ' + withBase('/cookies'), '', 'Sitemap: ' + origin + withBase('/sitemap-index.xml'), ''].join('\n');
+    : [
+        'User-agent: *',
+        'Allow: /',
+        'Disallow: ' + withBase('/cookies'),
+        '',
+        'Sitemap: ' + origin + withBase('/sitemap-index.xml'),
+        '',
+      ].join('\n');
   return new Response(body, { headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
 };

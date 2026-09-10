@@ -53,9 +53,13 @@ const sides = comparison.sides.map((side) => ({ ...side, groups: groupByMoment(s
     {comparison.eyebrow && <p class="text-eyebrow mb-4 text-teal-700">{comparison.eyebrow}</p>}
     <h2 id={id + '-title'} class="text-display-lg max-w-4xl">
       {comparison.title}
-      {comparison.noteId && (
-        <span class="whitespace-nowrap"><FeesNoteRef id={comparison.noteId} /></span>
-      )}
+      {
+        comparison.noteId && (
+          <span class="whitespace-nowrap">
+            <FeesNoteRef id={comparison.noteId} />
+          </span>
+        )
+      }
     </h2>
     <p class="text-lead mt-6 max-w-3xl">{comparison.intro}</p>
 
@@ -105,7 +109,11 @@ const sides = comparison.sides.map((side) => ({ ...side, groups: groupByMoment(s
                           <span class="visually-hidden">{columns.fee} : </span>
                           {step.label}
                         </p>
-                        <p class="fee-value order-first font-bold text-navy tabular-nums sm:order-none sm:text-right" data-fee-value data-fee-block="comparatif">
+                        <p
+                          class="fee-value order-first font-bold text-navy tabular-nums sm:order-none sm:text-right"
+                          data-fee-value
+                          data-fee-block="comparatif"
+                        >
                           <span class="visually-hidden">{columns.value} : </span>
                           {step.value}
                         </p>
@@ -200,7 +208,9 @@ const sides = comparison.sides.map((side) => ({ ...side, groups: groupByMoment(s
         panel.hidden = !active;
         if (active) {
           panel.dataset.feeEntering = 'true';
-          panel.addEventListener('animationend', () => delete panel.dataset.feeEntering, { once: true });
+          panel.addEventListener('animationend', () => delete panel.dataset.feeEntering, {
+            once: true,
+          });
         }
       });
     };

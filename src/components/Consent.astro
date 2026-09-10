@@ -2,7 +2,8 @@
 /**
  * Bandeau de consentement cookies (CNIL) : deux boutons de même poids « Tout accepter » /
  * « Tout refuser », « Personnaliser » en lien, lien vers /cookies. Sous « sm », la carte est compacte
- * (texte court consent.bodyShort, trois boutons sur une seule ligne, marges réduites) : le bandeau
+ * (titre en visually-hidden — il reste annoncé par aria-labelledby —, texte court consent.bodyShort,
+ * trois boutons sur une seule ligne, marges réduites) : le bandeau
  * doit rester sous la ligne risques du hero au premier chargement, sur un écran de 393 × 727 comme
  * sur un 375 × 812 ; à partir de « sm », elle reste assez basse (max-w-4xl, p-6) pour ne pas rogner
  * les CTA du hero à 1440×900. À partir de « lg », la carte devient une barre horizontale (texte à
@@ -29,17 +30,33 @@ const bodyShort = consent.bodyShort ?? consent.body;
   data-max-age-days={site.consent.maxAgeDays}
   hidden
 >
-  <div class="mx-auto max-w-6xl rounded-2xl border border-mist bg-white p-3 shadow-float sm:rounded-3xl sm:p-4 lg:p-5">
+  <div
+    class="mx-auto max-w-6xl rounded-2xl border border-mist bg-white p-2.5 shadow-float sm:rounded-3xl sm:p-4 lg:p-5"
+  >
     <div class="lg:flex lg:items-center lg:gap-8">
       <div class="lg:min-w-0 lg:flex-1">
-        <h2 id="consent-title" class="text-base font-semibold text-navy sm:text-lg">{consent.title}</h2>
-        <p id="consent-body" class="mt-1 text-sm leading-snug text-slate-700 sm:mt-1.5 sm:leading-relaxed">
+        <h2
+          id="consent-title"
+          class="visually-hidden text-base font-semibold text-navy sm:not-sr-only sm:text-lg"
+        >
+          {consent.title}
+        </h2>
+        <p
+          id="consent-body"
+          class="text-sm leading-snug text-slate-700 sm:mt-1.5 sm:leading-relaxed"
+        >
           <span class="sm:hidden">{bodyShort}</span>
           <span class="hidden sm:inline">{consent.body}</span>
-          <a href={withBase(consent.policyHref)} class="ml-1 font-medium text-teal-700 underline underline-offset-4">{consent.policyLabel}</a>
+          <a
+            href={withBase(consent.policyHref)}
+            class="ml-1 font-medium text-teal-700 underline underline-offset-4"
+            >{consent.policyLabel}</a
+          >
         </p>
       </div>
-      <div class="mt-2.5 flex flex-wrap items-center gap-x-1.5 gap-y-1 sm:mt-4 sm:gap-3 lg:mt-0 lg:shrink-0 lg:flex-nowrap">
+      <div
+        class="mt-2.5 flex flex-wrap items-center gap-x-1.5 gap-y-1 sm:mt-4 sm:gap-3 lg:mt-0 lg:shrink-0 lg:flex-nowrap"
+      >
         <button
           type="button"
           data-consent-accept
@@ -88,6 +105,5 @@ const bodyShort = consent.bodyShort ?? consent.body;
         {consent.save}
       </button>
     </div>
-
   </div>
 </div>

@@ -38,7 +38,9 @@ import { pictos, type PictoKey } from '@/content/fr/media';
 import { resolveImage } from '@/lib/images';
 
 /** « 200 € » → préfixe, nombre (fr : virgule décimale), suffixe — pour le compteur ; null si non numérique. */
-const parseNumeric = (value: string): { prefix: string; target: number; decimals: number; suffix: string } | null => {
+const parseNumeric = (
+  value: string
+): { prefix: string; target: number; decimals: number; suffix: string } | null => {
   const m = value.match(/^([^\d]*)(\d+(?:[.,]\d+)?)([^\d]*)$/);
   if (!m) return null;
   const [, prefix, raw, suffix] = m as [string, string, string, string];
@@ -79,11 +81,16 @@ const titleId = sections.highlights.id + '-title';
 <Section id={sections.highlights.id} tone="white">
   <Container size="wide">
     <header class="mx-auto max-w-4xl text-center">
-      <p data-animate="fade-up" class="mb-4 text-sm font-semibold uppercase tracking-[0.18em] text-teal-700">
+      <p
+        data-animate="fade-up"
+        class="mb-4 text-sm font-semibold uppercase tracking-[0.18em] text-teal-700"
+      >
         {highlights.eyebrow}
       </p>
       <h2 id={titleId} class="text-display-lg" data-reveal-text>{highlights.title}</h2>
-      <p data-animate="fade-up" data-animate-delay="0.15" class="mt-6 text-lead opacity-90">{highlights.intro}</p>
+      <p data-animate="fade-up" data-animate-delay="0.15" class="mt-6 text-lead opacity-90">
+        {highlights.intro}
+      </p>
     </header>
 
     <ul role="list" class="mt-block grid gap-5 sm:grid-cols-2 lg:gap-6">
@@ -118,7 +125,9 @@ const titleId = sections.highlights.id + '-title';
                       data-counter={String(card.numeric.target)}
                       data-counter-prefix={card.numeric.prefix || undefined}
                       data-counter-suffix={card.numeric.suffix || undefined}
-                      data-counter-decimals={card.numeric.decimals ? String(card.numeric.decimals) : undefined}
+                      data-counter-decimals={
+                        card.numeric.decimals ? String(card.numeric.decimals) : undefined
+                      }
                       data-counter-duration={String(COUNTER_DURATION)}
                     >
                       {card.value}

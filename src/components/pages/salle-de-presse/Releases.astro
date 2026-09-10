@@ -42,10 +42,18 @@ const linkHintId = `${id}-link-hint`;
     <header class="max-w-4xl">
       <h2 id={id + '-title'} class="text-display-md text-ink">{releases.title}</h2>
       <p class="text-lead mt-5 text-pretty text-slate-700 sm:mt-6">
-        {releases.intro}<span class="whitespace-nowrap"><PressRoomNoteRef id="salle-presse-communiques" /></span>
+        {releases.intro}<span class="whitespace-nowrap"
+          ><PressRoomNoteRef id="salle-presse-communiques" /></span
+        >
       </p>
     </header>
-    {hasLinked && linkHint && <span id={linkHintId} hidden>{linkHint}</span>}
+    {
+      hasLinked && linkHint && (
+        <span id={linkHintId} hidden>
+          {linkHint}
+        </span>
+      )
+    }
 
     {
       items.length === 0 ? (
@@ -53,7 +61,12 @@ const linkHintId = `${id}-link-hint`;
           {releases.emptyLabel}
         </p>
       ) : (
-        <ol role="list" aria-label={labels.releasesListLabel} class="mt-10 grid gap-5 lg:mt-14 lg:gap-6" data-animate="stagger">
+        <ol
+          role="list"
+          aria-label={labels.releasesListLabel}
+          class="mt-10 grid gap-5 lg:mt-14 lg:gap-6"
+          data-animate="stagger"
+        >
           {items.map((item) => (
             <li class="group relative flex flex-col gap-3 rounded-3xl bg-white p-6 shadow-card ring-1 ring-navy/5 transition-shadow duration-300 hover:shadow-float focus-within:shadow-float sm:p-8 lg:p-10">
               <p class="text-caption flex flex-wrap items-center gap-x-2 gap-y-1 font-semibold tracking-wider text-slate-700">
@@ -94,7 +107,9 @@ const linkHintId = `${id}-link-hint`;
               </h3>
 
               {item.summary && <p class="text-base leading-relaxed text-ink">{item.summary}</p>}
-              {!item.linked && <p class="text-base leading-relaxed text-slate-700">{releases.emptyLabel}</p>}
+              {!item.linked && (
+                <p class="text-base leading-relaxed text-slate-700">{releases.emptyLabel}</p>
+              )}
             </li>
           ))}
         </ol>

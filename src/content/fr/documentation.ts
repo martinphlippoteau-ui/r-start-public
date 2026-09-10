@@ -1,5 +1,7 @@
 import type { DocumentItem, LegalNote } from '@/content/types';
 import type { DocumentationContent } from '@/content/types-v2';
+import { pages } from '@/config/pages';
+import { sections } from '@/config/sections';
 import {
   documents as documentFacts,
   documentsExtra,
@@ -123,13 +125,36 @@ const PENDING_FAQ_QUESTIONS: readonly string[] = dicPublished
   : ['Quels sont les risques de la SCPI R Start ?'].map(nb);
 const PENDING_FAQ_NOTE_IDS: readonly string[] = dicPublished ? [] : ['faq-sri'];
 
-const faqItems = faq.items.filter((item) => !PENDING_FAQ_QUESTIONS.includes(item.question));
-if (faq.items.length - faqItems.length !== PENDING_FAQ_QUESTIONS.length) {
+const availableFaqItems = faq.items.filter(
+  (item) => !PENDING_FAQ_QUESTIONS.includes(item.question)
+);
+if (faq.items.length - availableFaqItems.length !== PENDING_FAQ_QUESTIONS.length) {
   throw new Error(
     'documentation.ts : une question de FAQ en attente est introuvable dans faq.ts (libellé modifié ?)'
   );
 }
 
+/**
+ * La page reprenait la FAQ entière de l'accueil : seize questions rendues deux fois sur le site, dont
+ * les revenus, la fiscalité, la stratégie ou la zone d'investissement, qui n'ont rien à faire dans un
+ * centre de documents. Elle ne garde que ce qu'un lecteur venu chercher un document a besoin de savoir :
+ * comment souscrire, ce qu'il signe, quand les revenus commencent, comment sortir. Les autres questions
+ * restent lisibles à un lien d'ici, par le renvoi vers la FAQ complète de l'accueil.
+ *
+ * La sélection porte sur le SUJET de la question, pas sur le texte de la réponse : presque toutes les
+ * réponses citent la souscription, filtrer dessus ne retirait rien. Les libellés ne sont pas recopiés
+ * (ils dériveraient au premier ajustement de faq.ts) : on reconnaît le sujet à un mot. Le garde-fou
+ * ci-dessous fait échouer le build si une reformulation dans faq.ts vidait ou gonflait la liste, plutôt
+ * que de changer la page en silence.
+ */
+const FAQ_SUJETS_DOCUMENTAIRES = /souscrire|revendre ses parts|jouissance|combien coûte/i;
+const faqItems = availableFaqItems.filter((item) => FAQ_SUJETS_DOCUMENTAIRES.test(item.question));
+if (faqItems.length < 3 || faqItems.length > 6) {
+  throw new Error(
+    `documentation.ts : ${faqItems.length} question(s) documentaire(s) retenue(s) sur ${availableFaqItems.length} — ` +
+      'un libellé de faq.ts a changé, ajuster FAQ_SUJETS_DOCUMENTAIRES.'
+  );
+}
 const pei = subscription.options.pei;
 const rd = subscription.options.rd;
 const zeroAfter = feeFacts.withdrawal.zeroAfterYears;
@@ -217,9 +242,18 @@ const rawNotes: LegalNote[] = [
 ];
 
 /** Notes de la page, suivies des notes de la FAQ (fiscalité, jouissance, sources CORUM ; SRI dès publication du DIC) importées de faq.ts. */
+/**
+ * Identifiants de notes réellement appelés par les questions retenues : la page n'importait que
+ * `faq.notes` en bloc, ce qui laissait des notes que plus rien ne référençait une fois la FAQ réduite.
+ * Une note orpheline est du bruit réglementaire : elle occupe la liste sans qu'aucun appel n'y mène.
+ */
+const faqNoteIds = new Set(
+  faqItems.map((item) => item.noteId).filter((id): id is string => Boolean(id))
+);
+
 export const notes: LegalNote[] = [
   ...rawNotes.map((n) => (VERBATIM_NOTE_IDS.includes(n.id) ? n : { ...n, text: nb(n.text) })),
-  ...faq.notes.filter((n) => !PENDING_FAQ_NOTE_IDS.includes(n.id)),
+  ...faq.notes.filter((n) => !PENDING_FAQ_NOTE_IDS.includes(n.id) && faqNoteIds.has(n.id)),
 ];
 
 export const documentation = {
@@ -285,7 +319,17 @@ export const documentation = {
     ],
   },
 
-  faq: { title: 'Questions fréquentes', items: faqItems },
+  faq: {
+    title: 'Questions fréquentes',
+    items: faqItems,
+    /** Renvoi vers la FAQ complète de l'accueil : les questions non documentaires y restent lisibles. */
+    fullFaqLink: {
+      intro:
+        'Ces questions portent sur les documents et la souscription. Les revenus, les risques, la fiscalité et la stratégie sont traités dans la foire aux questions complète.',
+      label: 'Voir toutes les questions',
+      href: pages.home.path + '#' + sections.faq.id,
+    },
+  },
 
   corumLink: {
     label: dicPublished
@@ -304,12 +348,15 @@ export const documentation = {
     sizeUnit: 'ko',
     newTabHint: 'nouvelle fenêtre',
     anchorsLabel: 'Groupes de documents',
+    anchorsCountLabel: '{n} document{s}',
+    anchorsAsideLabel: 'Sommaire des documents',
     groupsEyebrow: 'Documents',
     howToEyebrow: 'Souscrire',
     stepsLabel: 'Les quatre étapes de la souscription',
     stepPrefix: 'Étape',
     faqEyebrow: 'FAQ',
     faqListLabel: 'Questions fréquentes sur R Start',
+    faqNoteLead: 'Source de cette réponse :',
   },
 
   notes,

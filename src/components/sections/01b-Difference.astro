@@ -34,7 +34,9 @@ const ENGINE_STAGGER = 0.1;
     <header class="max-w-4xl">
       <p data-animate="fade-up" class="text-eyebrow mb-4 text-teal-700">{difference.eyebrow}</p>
       <h2 id={titleId} class="text-display-lg" data-reveal-text>{difference.title}</h2>
-      <p data-animate="fade-up" data-animate-delay="0.15" class="mt-6 text-lead opacity-90">{difference.intro}</p>
+      <p data-animate="fade-up" data-animate-delay="0.15" class="mt-6 text-lead opacity-90">
+        {difference.intro}
+      </p>
     </header>
 
     <!-- Les deux moteurs de rémunération : chaque carte porte son risque, hors de tout ancêtre animé -->
@@ -46,7 +48,11 @@ const ENGINE_STAGGER = 0.1;
           </p>
         )
       }
-      <ul role="list" aria-label={difference.enginesLabel} class="grid gap-5 sm:grid-cols-2 lg:gap-6">
+      <ul
+        role="list"
+        aria-label={difference.enginesLabel}
+        class="grid gap-5 sm:grid-cols-2 lg:gap-6"
+      >
         {
           difference.engines.map((engine, i) => (
             <Card as="li" tone="paper" class="flex flex-col ring-1 ring-navy/5 lg:p-10">
@@ -78,31 +84,47 @@ const ENGINE_STAGGER = 0.1;
     </div>
 
     <!-- Formule d'alignement et son contre-poids chiffré, même bloc, même taille -->
-    <div class="mt-12 grid gap-6 border-t border-navy/15 pt-8 sm:mt-16 lg:mt-20 lg:grid-cols-2 lg:gap-12 lg:pt-10">
+    <div
+      class="mt-12 grid gap-6 border-t border-navy/15 pt-8 sm:mt-16 lg:mt-20 lg:grid-cols-2 lg:gap-12 lg:pt-10"
+    >
       <div data-advantage class="text-lead">
-        {difference.counterweight.title && <h3 class="text-display-sm text-ink">{difference.counterweight.title}</h3>}
+        {
+          difference.counterweight.title && (
+            <h3 class="text-display-sm text-ink">{difference.counterweight.title}</h3>
+          )
+        }
+        {
+          /* Les deux phrases descendues du hero : même bloc, même taille, même contre-poids chiffré. */
+        }
+        {difference.counterweight.pedagogy?.map((phrase) => <p class="mt-3 text-ink">{phrase}</p>)}
         <p class="mt-3">
           {difference.counterweight.advantage}
-          {difference.counterweight.noteId && (
-            <span class="whitespace-nowrap">
-              <NoteRef id={difference.counterweight.noteId} />
-            </span>
-          )}
+          {
+            difference.counterweight.noteId && (
+              <span class="whitespace-nowrap">
+                <NoteRef id={difference.counterweight.noteId} />
+              </span>
+            )
+          }
         </p>
       </div>
       <RiskNote text={difference.counterweight.risk} size="lead" />
     </div>
 
     <!-- Mécanisme de réserve en cas de moins-value (brochure p.4), jamais animé -->
-    <div class="mt-12 grid gap-6 border-t border-navy/15 pt-8 sm:mt-16 lg:mt-20 lg:grid-cols-2 lg:gap-12 lg:pt-10">
+    <div
+      class="mt-12 grid gap-6 border-t border-navy/15 pt-8 sm:mt-16 lg:mt-20 lg:grid-cols-2 lg:gap-12 lg:pt-10"
+    >
       <div data-advantage class="text-lead space-y-3">
         <h3 class="text-display-sm text-ink">
           {difference.lossMechanism.title}
-          {difference.lossMechanism.noteId && (
-            <span class="whitespace-nowrap">
-              <NoteRef id={difference.lossMechanism.noteId} />
-            </span>
-          )}
+          {
+            difference.lossMechanism.noteId && (
+              <span class="whitespace-nowrap">
+                <NoteRef id={difference.lossMechanism.noteId} />
+              </span>
+            )
+          }
         </h3>
         {difference.lossMechanism.body.map((paragraph) => <p>{paragraph}</p>)}
       </div>

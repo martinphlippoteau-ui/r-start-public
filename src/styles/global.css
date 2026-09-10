@@ -4,8 +4,10 @@
 @import '@fontsource-variable/plus-jakarta-sans';
 
 @theme {
-  --font-sans: 'Plus Jakarta Sans Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-display: 'Plus Jakarta Sans Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-sans:
+    'Plus Jakarta Sans Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display:
+    'Plus Jakarta Sans Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
 
   /* Marque */
   --color-navy: #024b67;
@@ -83,7 +85,10 @@
     box-shadow: 0 0 0 5px #fff;
     border-radius: 0.25rem;
   }
-  h1, h2, h3, h4 {
+  h1,
+  h2,
+  h3,
+  h4 {
     font-family: var(--font-display);
     letter-spacing: -0.02em;
     text-wrap: balance;
@@ -99,7 +104,10 @@
     color: inherit;
     text-decoration-thickness: 1px;
     text-underline-offset: 0.2em;
-    transition: color 150ms ease, opacity 150ms ease, background-color 150ms ease;
+    transition:
+      color 150ms ease,
+      opacity 150ms ease,
+      background-color 150ms ease;
   }
   figcaption,
   small {
@@ -120,7 +128,14 @@
 
 /* --- Utilitaires de marque --- */
 @utility bg-brand-gradient {
-  background-image: linear-gradient(135deg, #024b68 0%, #0b7a93 32%, #1198af 57%, #14a4ba 71%, #2fb6c9 100%);
+  background-image: linear-gradient(
+    135deg,
+    #024b68 0%,
+    #0b7a93 32%,
+    #1198af 57%,
+    #14a4ba 71%,
+    #2fb6c9 100%
+  );
 }
 @utility bg-brand-gradient-dark {
   background-image: linear-gradient(160deg, #0d2e3d 0%, #024b68 45%, #0b7a93 100%);
@@ -292,12 +307,36 @@
    repli sans script sous 40 rem, où la liste déborde toujours. */
 @utility scroll-fade-x {
   &[data-overflow] {
-    mask-image: linear-gradient(to right, transparent 0, black 0.75rem, black calc(100% - 1.5rem), transparent 100%);
-    -webkit-mask-image: linear-gradient(to right, transparent 0, black 0.75rem, black calc(100% - 1.5rem), transparent 100%);
+    mask-image: linear-gradient(
+      to right,
+      transparent 0,
+      black 0.75rem,
+      black calc(100% - 1.5rem),
+      transparent 100%
+    );
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent 0,
+      black 0.75rem,
+      black calc(100% - 1.5rem),
+      transparent 100%
+    );
   }
   @media (width < 40rem) {
-    mask-image: linear-gradient(to right, transparent 0, black 0.75rem, black calc(100% - 1.5rem), transparent 100%);
-    -webkit-mask-image: linear-gradient(to right, transparent 0, black 0.75rem, black calc(100% - 1.5rem), transparent 100%);
+    mask-image: linear-gradient(
+      to right,
+      transparent 0,
+      black 0.75rem,
+      black calc(100% - 1.5rem),
+      transparent 100%
+    );
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent 0,
+      black 0.75rem,
+      black calc(100% - 1.5rem),
+      transparent 100%
+    );
   }
 }
 
@@ -553,9 +592,9 @@
    Le H1 réserve la place du logo : l'image peut passer dans son calque fixe sans décaler la page. */
 .hero-logo-wrap {
   display: block;
-  /* Sous 40 rem, la marque cède quelques pixels : le hero porte désormais la définition et les deux
-     phrases de pédagogie, et la ligne risques doit rester lisible au-dessus du bandeau cookies. */
-  width: min(46vw, 14rem);
+  /* Sous 40 rem, la marque cède quelques pixels : la ligne risques ET les deux boutons doivent rester
+     lisibles au-dessus du bandeau cookies au premier chargement (tests/conformite.spec.ts). */
+  width: min(40vw, 12.5rem);
   margin-inline: auto;
   aspect-ratio: 290 / 89;
 }

@@ -20,7 +20,14 @@ interface Props {
   class?: string;
   ariaLabel?: string;
 }
-const { href, position = 'hero', variant = 'primary', size = 'md', class: className = '', ariaLabel } = Astro.props;
+const {
+  href,
+  position = 'hero',
+  variant = 'primary',
+  size = 'md',
+  class: className = '',
+  ariaLabel,
+} = Astro.props;
 const isSubscribe = !href;
 // Un lien interne est préfixé par le chemin de base ; les ancres et les URL absolues passent telles
 // quelles. Sans `href`, c'est le tunnel de souscription (URL externe complète).
@@ -32,7 +39,8 @@ const variants = {
     'border border-navy/60 text-navy hover:border-navy hover:bg-navy hover:text-white [--btn-halo:rgb(2_75_103/0.14)]',
   ghost: 'text-navy hover:text-teal-700 underline-offset-4 hover:underline px-2',
   light: 'bg-white text-navy hover:bg-teal-100 [--btn-halo:rgb(255_255_255/0.22)]',
-  'outline-light': 'border border-white/40 text-white hover:border-white hover:bg-white/10 [--btn-halo:rgb(255_255_255/0.16)]',
+  'outline-light':
+    'border border-white/40 text-white hover:border-white hover:bg-white/10 [--btn-halo:rgb(255_255_255/0.16)]',
 };
 const sizes = { sm: 'px-4 py-2.5 text-sm', md: 'px-6 py-3 text-base', lg: 'px-8 py-4 text-lg' };
 ---

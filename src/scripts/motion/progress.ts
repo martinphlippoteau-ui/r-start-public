@@ -20,8 +20,13 @@ export const setupProgress = (): void => {
       {
         scaleX: 1,
         ease: 'none',
-        scrollTrigger: { trigger: scope(bar.dataset.progressFor), start: 'top top', end: 'bottom bottom', scrub: 0.4 },
-      },
+        scrollTrigger: {
+          trigger: scope(bar.dataset.progressFor),
+          start: 'top top',
+          end: 'bottom bottom',
+          scrub: 0.4,
+        },
+      }
     );
   });
 
@@ -33,7 +38,8 @@ export const setupProgress = (): void => {
       end: 'bottom bottom',
       onUpdate: (self) => {
         const compact = self.progress >= threshold;
-        if (compact !== el.hasAttribute('data-compact')) el.toggleAttribute('data-compact', compact);
+        if (compact !== el.hasAttribute('data-compact'))
+          el.toggleAttribute('data-compact', compact);
       },
     });
   });

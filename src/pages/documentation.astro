@@ -42,18 +42,74 @@ const linkHintId = linkHint ? 'documentation-link-hint' : undefined;
 <Base title={seo.title} description={seo.description} path={path} jsonLd={jsonLd}>
   <SiteNav />
   <main id="contenu">
-    <PageHero eyebrow={hero.eyebrow} title={hero.title} intro={hero.intro} riskLine={hero.riskLine}>
+    <PageHero
+      eyebrow={hero.eyebrow}
+      title={hero.title}
+      intro={hero.intro}
+      riskLine={hero.riskLine}
+      asideOnLarge
+    >
       <Breadcrumb slot="breadcrumb" key="documentation" tone="dark" />
+      {
+        /* Sommaire des groupes publiés, avec leur décompte : sur grand écran il occupe la moitié droite
+          restée vide et dit d'emblée ce que la page contient. Sous `lg`, la barre d'ancres collante
+          juste dessous rend le même service : l'aside n'y est pas rendu. */
+      }
+      <nav slot="aside" aria-label={labels.anchorsAsideLabel ?? labels.anchorsLabel}>
+        <ul role="list" class="rounded-3xl bg-white/10 p-4 ring-1 ring-white/15 backdrop-blur-sm">
+          {
+            groups.map((group) => (
+              <li class="border-b border-white/15 last:border-0">
+                <a
+                  href={'#' + group.key}
+                  class="nav-link flex items-baseline justify-between gap-4 rounded-2xl px-4 py-3 text-white no-underline transition-colors hover:bg-white/10"
+                >
+                  <span class="text-base font-semibold sm:text-lg">{group.title}</span>
+                  <span class="text-base text-white/80 tabular-nums">
+                    {(labels.anchorsCountLabel ?? '{n}')
+                      .replace('{n}', String(group.items.length))
+                      .replace('{s}', group.items.length > 1 ? 's' : '')}
+                  </span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
     </PageHero>
 
     <DocumentsNav groups={groups} label={labels.anchorsLabel} />
-    {linkHintId && <span id={linkHintId} hidden>{linkHint}</span>}
+    {
+      linkHintId && (
+        <span id={linkHintId} hidden>
+          {linkHint}
+        </span>
+      )
+    }
 
-    {groups.map((group, i) => <DocumentGroup group={group} tone={i % 2 === 0 ? 'paper' : 'white'} labels={labels} hintId={linkHintId} />)}
+    {
+      groups.map((group, i) => (
+        <DocumentGroup
+          group={group}
+          tone={i % 2 === 0 ? 'paper' : 'white'}
+          labels={labels}
+          hintId={linkHintId}
+        />
+      ))
+    }
 
     <HowTo howTo={howTo} labels={labels} tone={groups.length % 2 === 0 ? 'paper' : 'white'} />
-    <DocumentationFaq faq={faq} labels={labels} tone={groups.length % 2 === 0 ? 'white' : 'paper'} />
-    <DocumentsMention mention={mention} corumLink={corumLink} cta={cta} newTabHint={labels.newTabHint} />
+    <DocumentationFaq
+      faq={faq}
+      labels={labels}
+      tone={groups.length % 2 === 0 ? 'white' : 'paper'}
+    />
+    <DocumentsMention
+      mention={mention}
+      corumLink={corumLink}
+      cta={cta}
+      newTabHint={labels.newTabHint}
+    />
     <LegalNotes notes={notes} />
   </main>
   <Footer />

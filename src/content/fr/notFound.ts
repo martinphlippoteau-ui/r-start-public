@@ -7,7 +7,8 @@ import { menuPages } from '@/config/pages';
 export const notFound = {
   seo: {
     title: 'Page introuvable | R Start, SCPI CORUM',
-    description: 'Cette page n’existe pas ou a été déplacée. Retrouvez R Start, ses frais, sa documentation et son espace presse.',
+    description:
+      'Cette page n’existe pas ou a été déplacée. Retrouvez R Start, ses frais, sa documentation et son espace presse.',
   },
   code: '404',
   title: 'Cette page n’existe pas.',

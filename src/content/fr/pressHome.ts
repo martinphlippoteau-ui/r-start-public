@@ -34,7 +34,7 @@ export const notes: LegalNote[] = [
   {
     id: 'presse-accueil-citations',
     text: nb(
-      `Citations extraites d’articles publiés par des médias tiers en mai et juillet 2026, reproduites mot pour mot avec leur média et leur date, telles que transmises par CORUM L’Épargne le 10 septembre 2026. Elles n’engagent que leurs auteurs et ne constituent ni une recommandation, ni un avis de CORUM Asset Management sur R Start. La revue de presse complète, ${pressFacts.coverage.length} articles, est publiée sur la page « La presse en parle ».`,
+      `Citations extraites d’articles publiés par des médias tiers en mai et juillet 2026, reproduites mot pour mot avec leur média et leur date, telles que transmises par CORUM L’Épargne le 10 septembre 2026. Elles n’engagent que leurs auteurs et ne constituent ni une recommandation, ni un avis de CORUM Asset Management sur R Start. La revue de presse complète, ${pressFacts.coverage.length} articles, est publiée sur la page « La presse en parle ».`
     ),
   },
 ];

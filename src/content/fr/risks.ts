@@ -1,6 +1,11 @@
 import type { LegalNote, RisksContent } from '@/content/types';
 import { fees, product, risk } from '@/content/fr/facts';
-import { arbitrageWarningBullets, arbitrageWarningTitle, bulletinWarning, dicWarning } from '@/content/fr/legal';
+import {
+  arbitrageWarningBullets,
+  arbitrageWarningTitle,
+  bulletinWarning,
+  dicWarning,
+} from '@/content/fr/legal';
 
 /** Espace insécable avant % et € : les libellés de facts.ts utilisent une espace simple. */
 const nb = (s: string): string => s.replace(/ ([%€:;?!])/g, '\u00A0$1');

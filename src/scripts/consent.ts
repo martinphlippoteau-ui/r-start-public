@@ -34,7 +34,8 @@ const readCookie = (): ConsentStatus => {
 const writeCookie = (status: Exclude<ConsentStatus, 'unset'>) => {
   const maxAge = maxAgeDays * 24 * 60 * 60;
   const secure = location.protocol === 'https:' ? '; Secure' : '';
-  document.cookie = cookieName + '=' + status + '; Max-Age=' + maxAge + '; Path=/; SameSite=Lax' + secure;
+  document.cookie =
+    cookieName + '=' + status + '; Max-Age=' + maxAge + '; Path=/; SameSite=Lax' + secure;
 };
 
 let gtmLoaded = false;
@@ -101,7 +102,9 @@ banner?.addEventListener('click', (e) => {
     const panel = banner.querySelector<HTMLElement>('[data-consent-panel]');
     if (panel) {
       panel.hidden = !panel.hidden;
-      banner.querySelector<HTMLElement>('[data-consent-customize]')?.setAttribute('aria-expanded', String(!panel.hidden));
+      banner
+        .querySelector<HTMLElement>('[data-consent-customize]')
+        ?.setAttribute('aria-expanded', String(!panel.hidden));
     }
   }
 });

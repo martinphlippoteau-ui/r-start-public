@@ -41,7 +41,13 @@ const titleClass = 'text-xl font-semibold leading-snug tracking-tight text-ink s
         {coverage.intro}<span class="whitespace-nowrap"><PressNoteRef id="presse-revue" /></span>
       </p>
     </header>
-    {hasLinks && linkHint && <span id={linkHintId} hidden>{linkHint}</span>}
+    {
+      hasLinks && linkHint && (
+        <span id={linkHintId} hidden>
+          {linkHint}
+        </span>
+      )
+    }
 
     <ul
       role="list"
@@ -70,7 +76,9 @@ const titleClass = 'text-xl font-semibold leading-snug tracking-tight text-ink s
               )}
             </h3>
             <p class="mt-auto flex items-center justify-between gap-4 pt-2 text-base text-slate-700">
-              <span>{item.dateIso ? <time datetime={item.dateIso}>{item.date}</time> : item.date}</span>
+              <span>
+                {item.dateIso ? <time datetime={item.dateIso}>{item.date}</time> : item.date}
+              </span>
               {item.url && (
                 <svg
                   aria-hidden="true"

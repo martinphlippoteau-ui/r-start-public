@@ -27,7 +27,14 @@ const MANIFEST = path.join(ROOT, 'src', 'content', 'fr', 'media.manifest.json');
 const RASTER_SETS = [
   { src: '3 - Photos immeubles', out: 'immeubles', maxWidth: 2400, format: 'jpg', quality: 84 },
   { src: '6 - Photos ambiance', out: 'ambiance', maxWidth: 2400, format: 'jpg', quality: 84 },
-  { src: '4 - Pictogrammes 3D', out: 'pictos', maxWidth: 1200, format: 'webp', quality: 90, alpha: true },
+  {
+    src: '4 - Pictogrammes 3D',
+    out: 'pictos',
+    maxWidth: 1200,
+    format: 'webp',
+    quality: 90,
+    alpha: true,
+  },
 ];
 
 /** Logos vectoriels utiles (copie brute). */
@@ -57,12 +64,30 @@ const DOCUMENTS = [
     '7 - Documents/R Start - Bulletin de souscription partenaire - 2026.05.pdf',
     'r-start-bulletin-souscription.pdf',
   ],
-  ['7 - Documents/R Start - Simulation des frais ex-ante 2026 V2-20260327T174149.pdf', 'r-start-simulation-frais-ex-ante.pdf'],
-  ['7 - Documents/CORUM Start - Plan épargne immobilier V2.5.pdf', 'r-start-adhesion-plan-epargne-immobilier.pdf'],
-  ['7 - Documents/CORUM Start - Réinvestissement des dividendes V2.5.pdf', 'r-start-adhesion-reinvestissement-dividendes.pdf'],
-  ['7 - Documents/R Start- Mandat de prélèvement V2.1-20260414T141237.pdf', 'r-start-mandat-prelevement.pdf'],
-  ['7 - Documents/CORUM AM - Formulaire de retrait de parts_2026 V2.2-20260414T141131.pdf', 'corum-am-formulaire-retrait-parts.pdf'],
-  ['7 - Documents/CORUM AM - Formulaire de changement de coordonnées bancaires V2.1-20260414T141049.pdf', 'corum-am-formulaire-changement-coordonnees-bancaires.pdf'],
+  [
+    '7 - Documents/R Start - Simulation des frais ex-ante 2026 V2-20260327T174149.pdf',
+    'r-start-simulation-frais-ex-ante.pdf',
+  ],
+  [
+    '7 - Documents/CORUM Start - Plan épargne immobilier V2.5.pdf',
+    'r-start-adhesion-plan-epargne-immobilier.pdf',
+  ],
+  [
+    '7 - Documents/CORUM Start - Réinvestissement des dividendes V2.5.pdf',
+    'r-start-adhesion-reinvestissement-dividendes.pdf',
+  ],
+  [
+    '7 - Documents/R Start- Mandat de prélèvement V2.1-20260414T141237.pdf',
+    'r-start-mandat-prelevement.pdf',
+  ],
+  [
+    '7 - Documents/CORUM AM - Formulaire de retrait de parts_2026 V2.2-20260414T141131.pdf',
+    'corum-am-formulaire-retrait-parts.pdf',
+  ],
+  [
+    '7 - Documents/CORUM AM - Formulaire de changement de coordonnées bancaires V2.1-20260414T141049.pdf',
+    'corum-am-formulaire-changement-coordonnees-bancaires.pdf',
+  ],
 ];
 
 const slug = (name) =>
@@ -109,7 +134,10 @@ async function processSet(set) {
         withoutEnlargement: true,
         fit: 'inside',
       });
-      if (set.format === 'jpg') pipeline = pipeline.flatten({ background: '#ffffff' }).jpeg({ quality: set.quality, mozjpeg: true });
+      if (set.format === 'jpg')
+        pipeline = pipeline
+          .flatten({ background: '#ffffff' })
+          .jpeg({ quality: set.quality, mozjpeg: true });
       else pipeline = pipeline.webp({ quality: set.quality, alphaQuality: 90 });
       await pipeline.toFile(dst);
     }
@@ -124,7 +152,9 @@ async function processSet(set) {
       orientation: meta.width >= meta.height ? 'paysage' : 'portrait',
       kb: Math.round(stat.size / 1024),
     });
-    process.stdout.write(`${fresh ? '=' : '+'} ${set.out}/${outName} ${meta.width}x${meta.height}\n`);
+    process.stdout.write(
+      `${fresh ? '=' : '+'} ${set.out}/${outName} ${meta.width}x${meta.height}\n`
+    );
   }
   return results;
 }
@@ -163,7 +193,9 @@ async function main() {
     ) + '\n',
     'utf8'
   );
-  console.log(`\nManifeste écrit : ${path.relative(ROOT, MANIFEST)} (${images.length} images, ${documents.length} documents)`);
+  console.log(
+    `\nManifeste écrit : ${path.relative(ROOT, MANIFEST)} (${images.length} images, ${documents.length} documents)`
+  );
 }
 
 main().catch((err) => {

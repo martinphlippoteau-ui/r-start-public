@@ -24,7 +24,16 @@
  */
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { all, allowed, containsProtected, num, parseFromTo, refuse, resolveTrigger, scrubWillChange } from './shared';
+import {
+  all,
+  allowed,
+  containsProtected,
+  num,
+  parseFromTo,
+  refuse,
+  resolveTrigger,
+  scrubWillChange,
+} from './shared';
 
 const SCRUB = 0.6;
 
@@ -46,7 +55,7 @@ export const setupParallax = (): void => {
           invalidateOnRefresh: true,
           ...scrubWillChange(el, 'transform'),
         },
-      },
+      }
     );
   });
 };
@@ -56,7 +65,8 @@ export const setupScrub = (): void => {
     if (!allowed(el, 'data-scrub', true)) return;
     const spec = parseFromTo(el.dataset.scrub || '', el);
     if (!spec) return;
-    const props = 'opacity' in spec.to && Object.keys(spec.to).length === 1 ? 'opacity' : 'transform, opacity';
+    const props =
+      'opacity' in spec.to && Object.keys(spec.to).length === 1 ? 'opacity' : 'transform, opacity';
     gsap.fromTo(el, spec.from, {
       ...spec.to,
       ease: el.dataset.scrubEase || 'none',
@@ -88,7 +98,11 @@ export const setupCurtains = (): void => {
       fastScrollEnd: true,
     });
     if (containsProtected(prev)) {
-      refuse(prev, 'data-curtain (recul de la section précédente)', 'contient un [data-risk] : pin + recouvrement seuls, aucune atténuation');
+      refuse(
+        prev,
+        'data-curtain (recul de la section précédente)',
+        'contient un [data-risk] : pin + recouvrement seuls, aucune atténuation'
+      );
       return;
     }
     gsap.fromTo(
@@ -105,7 +119,7 @@ export const setupCurtains = (): void => {
           scrub: SCRUB,
           ...scrubWillChange(prev, 'transform, opacity'),
         },
-      },
+      }
     );
   });
 };
