@@ -74,7 +74,9 @@ export function breadcrumbJsonLd(key: PageKey): JsonLd {
     itemListElement: breadcrumb(key).map((p, i) => ({
       '@type': 'ListItem',
       position: i + 1,
-      name: p.label,
+      // Même intitulé que le fil d'Ariane affiché (Breadcrumb.astro) : Google demande que la donnée
+      // structurée reprenne ce que voit le lecteur.
+      name: p.navLabel ?? p.label,
       item: absoluteUrl(p.path),
     })),
   };
