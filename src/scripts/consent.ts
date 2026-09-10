@@ -79,8 +79,19 @@ gtag('consent', 'default', {
 });
 
 const current = readCookie();
-if (current === 'unset') show();
-else applyConsent(current);
+if (current === 'unset') {
+  /**
+   * Le bandeau n'est déplié qu'une fois les polices prêtes. Affiché avant, il se compose en police de
+   * repli, puis se recompose quand Plus Jakarta Sans arrive : sa hauteur change et son contenu saute.
+   * C'était l'unique source de décalage de mise en page mesurée par Lighthouse sur l'accueil
+   * (CLS 0,123 en 1440×900, imputé au bandeau, cause « Web font loaded »).
+   * `document.fonts.ready` se résout aussi lorsque le chargement échoue ; le repli couvre les
+   * navigateurs sans l'API. L'attente se compte en dizaines de millisecondes : aucun tag n'est chargé
+   * entre-temps, le consentement reste refusé par défaut.
+   */
+  if (document.fonts?.ready) void document.fonts.ready.then(show);
+  else show();
+} else applyConsent(current);
 
 banner?.addEventListener('click', (e) => {
   const target = e.target as HTMLElement | null;
