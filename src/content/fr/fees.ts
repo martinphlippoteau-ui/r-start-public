@@ -1,6 +1,6 @@
 import type { FeesContent, LegalNote } from '@/content/types';
 import { pages } from '@/config/pages';
-import { fees as feeFacts, product, risk } from '@/content/fr/facts';
+import { fees as feeFacts, marketComparison as marketFacts, product, risk } from '@/content/fr/facts';
 import {
   arbitrageWarningBullets,
   arbitrageWarningTitle,
@@ -75,6 +75,12 @@ export const notes: LegalNote[] = [
   {
     id: 'frais-ht',
     text: feeFacts.vatNote,
+  },
+  {
+    id: 'frais-comparatif-accueil',
+    text: nb(
+      `Résumé du comparatif des frais. Les valeurs de R Start viennent de la brochure R Start 2026 (page 4), du bulletin de souscription de mai 2026 et de la note d’information. Les valeurs de l’autre modèle sont des moyennes de marché, jamais les frais d’une SCPI précise. ${marketFacts.perimeterLead} : ${marketFacts.panel.join(', ')}, ${marketFacts.perimeterTail} Source : ${marketFacts.source} Cette comparaison porte sur les frais, pas sur les résultats : R Start n’a pas d’historique et aucune donnée de performance n’est communiquée. Le parcours complet, des deux côtés, est publié sur la page Frais.`
+    ),
   },
 ];
 
@@ -175,5 +181,31 @@ export const fees = {
   cta: { label: 'Souscrire en ligne', position: 'frais' },
   /** Rendu par 03-Fees.astro uniquement lorsque src/pages/frais.astro existe (pas de lien mort). */
   detailsLink: { label: 'Tous les frais en détail', href: pages.fees.path },
+  /**
+   * Résumé du comparatif (plan V2, zone 5) : trois moments du parcours, une valeur par modèle, la même
+   * taille de police des deux côtés. Le parcours complet est la bascule de /frais.
+   */
+  marketSummary: {
+    title: 'Deux façons de se rémunérer.',
+    intro:
+      'Les SCPI qui ne prélèvent pas de commission de souscription se rémunèrent dès l’achat des immeubles. R Start attend les loyers encaissés et les plus-values réalisées.',
+    sides: [marketFacts.columnLabel, product.name],
+    rows: [
+      {
+        moment: 'À l’achat des immeubles',
+        values: [marketFacts.averages.acquisition.label, feeFacts.acquisition.label],
+      },
+      {
+        moment: 'Pendant la détention, sur les loyers',
+        values: [marketFacts.averages.management.label, feeFacts.management.label],
+      },
+      {
+        moment: 'À la vente d’un immeuble',
+        values: [marketFacts.averages.disposal.label, nb(feeFacts.disposal.label)],
+      },
+    ],
+    noteId: 'frais-comparatif-accueil',
+    link: { label: 'Comparer les deux modèles', href: pages.fees.path },
+  },
   notes,
 } satisfies FeesContent;

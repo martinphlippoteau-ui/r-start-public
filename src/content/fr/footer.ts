@@ -77,6 +77,11 @@ export const footer = {
   legalTitle: 'Mentions légales',
   externalLinkHint: 'nouvelle fenêtre',
   logos: { brandAlt: product.name, publisherAlt: publisher.name },
+  /**
+   * Libellé du repli des blocs d'identité (plan V2 §4, « alléger sans retirer »). Le premier bloc,
+   * « Communication commerciale », reste déplié : il porte les mentions obligatoires et le visa.
+   */
+  legalToggleLabel: 'Mentions légales détaillées',
   legalBlocks: [
     {
       title: 'Communication commerciale',

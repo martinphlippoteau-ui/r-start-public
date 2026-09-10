@@ -153,6 +153,19 @@ export interface FeesContent {
   cta: Cta;
   /** Lien secondaire vers la page Frais détaillée (config/pages.ts). */
   detailsLink?: { label: string; href: string };
+  /**
+   * Résumé du comparatif des frais sur l'accueil (plan V2, zone 5) : la bascule complète vit sur /frais.
+   * Aucune SCPI tierce n'est nommée ; le périmètre et la source sont portés par la note `noteId`.
+   */
+  marketSummary?: {
+    title: string;
+    intro: string;
+    /** Intitulés des deux modèles comparés, dans l'ordre des valeurs de chaque ligne. */
+    sides: [string, string];
+    rows: { moment: string; values: [string, string] }[];
+    noteId?: string;
+    link: { label: string; href: string };
+  };
   notes: LegalNote[];
 }
 
@@ -434,6 +447,8 @@ export interface FooterContent {
   notesTitle?: string;
   /** Titre (masqué visuellement) du bloc de mentions légales du pied de page. */
   legalTitle?: string;
+  /** Libellé du <summary> qui replie les blocs d'identité (le premier bloc reste déplié). */
+  legalToggleLabel?: string;
   /** Mention lue par les lecteurs d'écran sur les liens externes (ex. « nouvelle fenêtre »). */
   externalLinkHint?: string;
   /** Alt des logos du pied de page. */

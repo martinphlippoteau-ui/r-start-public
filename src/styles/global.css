@@ -206,6 +206,19 @@
   line-height: 1.5;
 }
 
+/* Repli des mentions d'identité du pied de page : marqueur maison (le triangle natif est retiré par
+   `list-none` côté composant ; Safari a besoin de la règle ::-webkit-details-marker). */
+.footer-legal > summary::-webkit-details-marker {
+  display: none;
+}
+.footer-legal > summary::after {
+  content: ' +';
+  font-variant-numeric: tabular-nums;
+}
+.footer-legal[open] > summary::after {
+  content: ' −';
+}
+
 /* Surface translucide (navigation collée, barres) */
 @utility surface-glass {
   background-color: rgb(255 255 255 / 0.78);

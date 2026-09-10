@@ -85,6 +85,10 @@ const lastStep = withdrawal.steps.length - 1;
  */
 const feesPageExists = Object.keys(import.meta.glob('/src/pages/frais.astro')).length > 0;
 const detailsLink = feesPageExists ? fees.detailsLink : undefined;
+/** Résumé du comparatif : rendu seulement si la page Frais existe (le lien y renvoie). */
+const marketSummary = feesPageExists ? fees.marketSummary : undefined;
+/** Intitulés de colonnes réutilisés par le résumé du comparatif (aucun texte en dur). */
+const feesTableColumns = table?.columns ?? { fee: 'Frais', base: 'Assiette', value: 'Montant' };
 ---
 
 <Section id={id} tone="paper">
@@ -256,6 +260,74 @@ const detailsLink = feesPageExists ? fees.detailsLink : undefined;
         </ul>
       </Card>
     </div>
+
+    <!-- Résumé du comparatif (plan V2, zone 5). Le parcours complet est la bascule de /frais. -->
+    {
+      marketSummary && (
+        <div class="mt-section-sm">
+          <h3 class="text-display-sm" data-reveal-text>
+            {marketSummary.title}
+            {marketSummary.noteId && (
+              <span class="whitespace-nowrap">
+                <NoteRef id={marketSummary.noteId} />
+              </span>
+            )}
+          </h3>
+          <p class="text-lead mt-4 max-w-3xl" data-animate="fade-up">
+            {marketSummary.intro}
+          </p>
+          {/* Trois colonnes serrées : le tableau défile dans son propre cadre sous 40 rem plutôt que
+              de pousser la page. Un cadre défilant doit être atteignable au clavier et porter un nom
+              (règle axe « scrollable-region-focusable »). */}
+          <div
+            class="mt-10 overflow-x-auto focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-navy"
+            tabindex="0"
+            role="region"
+            aria-label={marketSummary.title}
+          >
+          <table class="w-full min-w-[34rem] border-collapse text-left">
+            <caption class="visually-hidden">{marketSummary.title}</caption>
+            <thead>
+              <tr class="border-b border-navy/20 text-caption font-semibold uppercase tracking-[0.12em] text-slate-700">
+                <th scope="col" class="py-3 pr-4">
+                  {feesTableColumns.fee}
+                </th>
+                {marketSummary.sides.map((side) => (
+                  <th scope="col" class="py-3 pl-3 text-right">
+                    {side}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody data-animate="stagger" data-animate-stagger="0.08" data-animate-y="14">
+              {marketSummary.rows.map((row) => (
+                <tr class="border-b border-navy/10 align-baseline">
+                  <th scope="row" class="py-4 pr-4 text-base font-semibold text-ink sm:py-5 sm:text-xl">
+                    {row.moment}
+                  </th>
+                  {/* Même taille des deux côtés : exigence AMF sur la taille de police des frais. */}
+                  {row.values.map((value) => (
+                    <td
+                      class="py-4 pl-3 text-right text-lg leading-tight font-bold tracking-tight whitespace-nowrap text-navy tabular-nums sm:py-5 sm:text-3xl"
+                      data-fee-value
+                      data-fee-block="comparatif-accueil"
+                    >
+                      {value}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          </div>
+          <div class="mt-8" data-animate="fade-up">
+            <Button href={marketSummary.link.href} variant="secondary" size="lg">
+              {marketSummary.link.label}
+            </Button>
+          </div>
+        </div>
+      )
+    }
 
     <!-- HT = TTC, CTA et lien vers la page Frais -->
     <div class="mt-12 flex flex-col gap-8 border-t border-navy/15 pt-8 lg:mt-16 lg:flex-row lg:items-end lg:justify-between lg:gap-12">

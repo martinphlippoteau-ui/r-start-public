@@ -13,6 +13,14 @@ import { footer } from '@/content/fr/footer';
 import { withBase } from '@/lib/href';
 
 const hint = footer.externalLinkHint;
+/**
+ * Plan V2 §4 : alléger le pied de page sans rien retirer. Le premier bloc légal porte les mentions
+ * obligatoires et le visa AMF — il reste déplié. Les suivants (identité, RGPD, médiation, hébergeur)
+ * passent dans un <details> : le texte reste dans le document, seul son affichage est replié.
+ */
+const legalBlocks = footer.legalBlocks ?? [];
+const alwaysVisible = legalBlocks.slice(0, 1);
+const collapsible = legalBlocks.slice(1);
 ---
 
 <footer class="border-t border-mist bg-white text-ink">
@@ -64,10 +72,11 @@ const hint = footer.externalLinkHint;
       </button>
     </div>
 
-    <section class="mt-10 max-w-4xl space-y-6 text-sm leading-relaxed text-slate-700" aria-labelledby="footer-legal-title">
+    <section class="mt-10 max-w-4xl text-sm leading-relaxed text-slate-700" aria-labelledby="footer-legal-title">
       <h2 id="footer-legal-title" class="visually-hidden">{footer.legalTitle ?? ''}</h2>
+      {/* Toujours déplié : mentions obligatoires (caractère commercial, documents à consulter) et visa AMF. */}
       {
-        (footer.legalBlocks ?? []).map((block) => (
+        alwaysVisible.map((block) => (
           <div>
             <h3 class="font-semibold text-navy">{block.title}</h3>
             {block.paragraphs.map((p) => (
@@ -75,6 +84,28 @@ const hint = footer.externalLinkHint;
             ))}
           </div>
         ))
+      }
+      {/* Replié par défaut : identité de l'éditeur, de la société de gestion, RGPD, médiation, hébergeur.
+          Rien n'est retiré — <details> garde le texte dans le document, lisible par les moteurs et les
+          lecteurs d'écran, et la page reste utilisable sans JavaScript. */}
+      {
+        collapsible.length > 0 && (
+          <details class="footer-legal mt-6 border-t border-mist pt-6">
+            <summary class="cursor-pointer list-none font-semibold text-navy underline underline-offset-4 hover:text-teal-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-navy">
+              {footer.legalToggleLabel ?? footer.legalTitle ?? ''}
+            </summary>
+            <div class="mt-6 space-y-6">
+              {collapsible.map((block) => (
+                <div>
+                  <h3 class="font-semibold text-navy">{block.title}</h3>
+                  {block.paragraphs.map((p) => (
+                    <p class="mt-1.5">{p}</p>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </details>
+        )
       }
     </section>
 
