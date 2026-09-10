@@ -8,6 +8,7 @@ import { notes as incomeNotes } from '@/content/fr/income';
 import { notes as subscribeNotes } from '@/content/fr/subscribe';
 import { notes as corumNotes } from '@/content/fr/corum';
 import { notes as risksNotes } from '@/content/fr/risks';
+import { notes as pressHomeNotes } from '@/content/fr/pressHome';
 import { notes as documentsNotes } from '@/content/fr/documents';
 import { notes as faqNotes } from '@/content/fr/faq';
 
@@ -27,6 +28,7 @@ export const allNotes: LegalNote[] = [
   ...subscribeNotes,
   ...corumNotes,
   ...risksNotes,
+  ...pressHomeNotes,
   ...documentsNotes,
   ...faqNotes,
 ];

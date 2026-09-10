@@ -13,6 +13,7 @@ export type SectionKey =
   | 'subscribe'
   | 'corum'
   | 'risks'
+  | 'press'
   | 'documents'
   | 'faq'
   | 'notes';

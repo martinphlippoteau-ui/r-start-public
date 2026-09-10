@@ -1,0 +1,70 @@
+---
+/**
+ * Section 10 — « La presse en parle » (id « presse-en-parle »), entre Risques (fond ink) et Documents
+ * (fond white) : fond paper, deux citations de médias tiers et un renvoi vers la page /presse qui porte
+ * la revue complète.
+ *
+ * Règles appliquées :
+ *  - les citations sont des propos de tiers, reproduits mot pour mot (pressHome.ts → facts.ts), avec
+ *    leur média et leur date en <cite> ; aucun logo de média, faute de licence ;
+ *  - l'avertissement livré par CORUM est reproduit dans le même bloc, en texte pleine taille
+ *    (RiskNote text-lead) et jamais animé : c'est le contre-poids des citations, il ne part pas en note ;
+ *  - aucune donnée de performance, aucun chiffre repris des articles.
+ *
+ * Motion (src/scripts/motion.ts, attributs seulement) : surtitre et introduction en fade-up, H2 mot à
+ * mot, citations en cascade. L'avertissement ne porte aucun attribut. Sans JS ou en reduced-motion,
+ * tout est visible (l'état final est dans le HTML).
+ * Contenu : src/content/fr/pressHome.ts.
+ */
+import Button from '@/components/ui/Button.astro';
+import Container from '@/components/ui/Container.astro';
+import NoteRef from '@/components/ui/NoteRef.astro';
+import RiskNote from '@/components/ui/RiskNote.astro';
+import Section from '@/components/ui/Section.astro';
+import { sections } from '@/config/sections';
+import { pressHome } from '@/content/fr/pressHome';
+
+const id = sections.press.id;
+/** Décalage d'entrée d'une citation sur la précédente (secondes). */
+const QUOTE_STAGGER = 0.12;
+---
+
+<Section id={id} tone="paper" labelledBy={id + '-title'}>
+  <Container size="wide">
+    <header class="max-w-4xl">
+      <p data-animate="fade-up" class="text-eyebrow mb-4 text-teal-700">{pressHome.eyebrow}</p>
+      <h2 id={id + '-title'} class="text-display-lg" data-reveal-text>{pressHome.title}</h2>
+      <p data-animate="fade-up" data-animate-delay="0.15" class="text-lead mt-6 max-w-3xl opacity-90">
+        {pressHome.intro}<span class="whitespace-nowrap"><NoteRef id={pressHome.noteId} /></span>
+      </p>
+    </header>
+
+    <ul role="list" aria-label={pressHome.quotesListLabel} class="mt-12 grid gap-6 lg:mt-16 lg:grid-cols-2 lg:gap-8">
+      {
+        pressHome.quotes.map((quote, i) => (
+          <li
+            data-animate="fade-up"
+            data-animate-delay={String(i * QUOTE_STAGGER)}
+            class="flex flex-col justify-between gap-6 rounded-3xl bg-white p-6 shadow-card sm:p-8 lg:p-10"
+          >
+            <blockquote class="text-display-sm text-balance text-ink">
+              <p>« {quote.text} »</p>
+            </blockquote>
+            <p class="text-base text-slate-700">
+              <cite class="font-semibold not-italic text-navy">{quote.media}</cite>
+              <span aria-hidden="true"> · </span>
+              <time datetime={quote.dateIso}>{quote.date}</time>
+            </p>
+          </li>
+        ))
+      }
+    </ul>
+
+    <div class="mt-10 grid gap-8 border-t border-navy/15 pt-8 lg:mt-14 lg:grid-cols-[1fr_auto] lg:items-start lg:gap-12">
+      <RiskNote text={pressHome.disclaimer} size="lead" class="max-w-4xl" />
+      <div data-animate="fade-up" class="lg:pt-1">
+        <Button href={pressHome.link.href} variant="secondary" size="lg">{pressHome.link.label}</Button>
+      </div>
+    </div>
+  </Container>
+</Section>

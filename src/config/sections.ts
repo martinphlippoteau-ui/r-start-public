@@ -14,9 +14,10 @@ export const sections: Record<SectionKey, SectionMeta> = {
   subscribe: { id: 'souscrire', label: 'Souscription', order: 7, inNav: true },
   corum: { id: 'corum', label: 'Confiance', order: 8, inNav: true },
   risks: { id: 'risques', label: 'Risques', order: 9, inNav: true },
-  documents: { id: 'documents', label: 'Documents', order: 10, inNav: false },
-  faq: { id: 'faq', label: 'FAQ', order: 11, inNav: true },
-  notes: { id: 'notes', label: 'Notes', order: 12, inNav: false },
+  press: { id: 'presse-en-parle', label: 'La presse en parle', order: 10, inNav: false },
+  documents: { id: 'documents', label: 'Documents', order: 11, inNav: false },
+  faq: { id: 'faq', label: 'FAQ', order: 12, inNav: true },
+  notes: { id: 'notes', label: 'Notes', order: 13, inNav: false },
 };
 
 /** Sections dans l'ordre d'affichage. */
