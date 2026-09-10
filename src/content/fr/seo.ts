@@ -27,6 +27,9 @@ import { product, share } from '@/content/fr/facts';
  *  - FAQPage : strictement les questions/réponses visibles de faq.ts.
  *  Interdits : Product, Offer, AggregateRating (signaux marchands trompeurs sur un produit financier).
  */
+/** Minuscule sur la seule initiale : `toLowerCase()` abîmerait le sigle SCPI de l'accroche. */
+const lowerFirst = (value: string): string => value.charAt(0).toLowerCase() + value.slice(1);
+
 export const seo = {
   /** ≤ 60 caractères. Contient « R Start » et « CORUM ». « Frais d’entrée » : vocabulaire du DIC (« coûts d’entrée », 0 %). */
   title: 'R Start, SCPI CORUM : 0 % de frais d’entrée, 15 % de gestion',
@@ -37,7 +40,7 @@ export const seo = {
   description:
     'R Start, SCPI CORUM : 0 % de frais de souscription, 15 % de gestion, commissions sur cessions et retraits. Perte en capital et revenus non garantis.',
   ogImageAlt:
-    `Logo R Start, ${product.tagline.toLowerCase()} de CORUM, sur un dégradé bleu marine et turquoise.`,
+    `Logo R Start, ${lowerFirst(product.tagline)} de CORUM, sur un dégradé bleu marine et turquoise.`,
   /**
    * Requêtes cibles, formulées comme les internautes les tapent, dans le respect du vocabulaire autorisé.
    * Usage : JSON-LD WebPage.keywords et suivi de positionnement. Google ignore <meta name="keywords">.

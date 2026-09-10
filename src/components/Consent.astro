@@ -2,9 +2,12 @@
 /**
  * Bandeau de consentement cookies (CNIL) : deux boutons de même poids « Tout accepter » /
  * « Tout refuser », « Personnaliser » en lien, lien vers /cookies. Sous « sm », la carte est compacte
- * (texte court consent.bodyShort, boutons sur une ligne, marges réduites) pour ne jamais masquer la
- * ligne risques du hero à 375×812 ; à partir de « sm », elle reste assez basse (max-w-4xl, p-6) pour ne
- * pas rogner les CTA du hero à 1440×900 (haut de carte ≥ 665 px). Toutes les cibles tactiles font au
+ * (texte court consent.bodyShort, trois boutons sur une seule ligne, marges réduites) : le bandeau
+ * doit rester sous la ligne risques du hero au premier chargement, sur un écran de 393 × 727 comme
+ * sur un 375 × 812 ; à partir de « sm », elle reste assez basse (max-w-4xl, p-6) pour ne pas rogner
+ * les CTA du hero à 1440×900. À partir de « lg », la carte devient une barre horizontale (texte à
+ * gauche, boutons à droite) : sa hauteur tombe sous 130 px et la ligne risques du hero reste
+ * découverte au premier chargement, sur 1440×900 comme sur 393×727. Toutes les cibles tactiles font au
  * moins 40 px de haut. Textes : src/content/fr/consent.ts ; logique : src/scripts/consent.ts.
  */
 import { site } from '@/config/site';
@@ -16,7 +19,7 @@ const bodyShort = consent.bodyShort ?? consent.body;
 
 <div
   id="consent-banner"
-  class="fixed inset-x-0 bottom-0 z-50 p-3 sm:p-6"
+  class="fixed inset-x-0 bottom-0 z-50 p-2 sm:p-3"
   role="dialog"
   aria-modal="false"
   aria-labelledby="consent-title"
@@ -26,13 +29,41 @@ const bodyShort = consent.bodyShort ?? consent.body;
   data-max-age-days={site.consent.maxAgeDays}
   hidden
 >
-  <div class="mx-auto max-w-4xl rounded-2xl border border-mist bg-white p-4 shadow-float sm:rounded-3xl sm:p-6">
-    <h2 id="consent-title" class="text-base font-semibold text-navy sm:text-lg">{consent.title}</h2>
-    <p id="consent-body" class="mt-1.5 text-sm leading-relaxed text-slate-700">
-      <span class="sm:hidden">{bodyShort}</span>
-      <span class="hidden sm:inline">{consent.body}</span>
-      <a href={withBase(consent.policyHref)} class="ml-1 font-medium text-teal-700 underline underline-offset-4">{consent.policyLabel}</a>
-    </p>
+  <div class="mx-auto max-w-6xl rounded-2xl border border-mist bg-white p-3 shadow-float sm:rounded-3xl sm:p-4 lg:p-5">
+    <div class="lg:flex lg:items-center lg:gap-8">
+      <div class="lg:min-w-0 lg:flex-1">
+        <h2 id="consent-title" class="text-base font-semibold text-navy sm:text-lg">{consent.title}</h2>
+        <p id="consent-body" class="mt-1 text-sm leading-snug text-slate-700 sm:mt-1.5 sm:leading-relaxed">
+          <span class="sm:hidden">{bodyShort}</span>
+          <span class="hidden sm:inline">{consent.body}</span>
+          <a href={withBase(consent.policyHref)} class="ml-1 font-medium text-teal-700 underline underline-offset-4">{consent.policyLabel}</a>
+        </p>
+      </div>
+      <div class="mt-2.5 flex flex-wrap items-center gap-x-1.5 gap-y-1 sm:mt-4 sm:gap-3 lg:mt-0 lg:shrink-0 lg:flex-nowrap">
+        <button
+          type="button"
+          data-consent-accept
+          class="min-h-10 rounded-full bg-navy px-3 py-2.5 text-sm font-semibold text-white transition hover:bg-teal-700 sm:px-5"
+        >
+          {consent.accept}
+        </button>
+        <button
+          type="button"
+          data-consent-refuse
+          class="min-h-10 rounded-full bg-navy px-3 py-2.5 text-sm font-semibold text-white transition hover:bg-teal-700 sm:px-5"
+        >
+          {consent.refuse}
+        </button>
+        <button
+          type="button"
+          data-consent-customize
+          aria-expanded="false"
+          class="min-h-10 rounded-full px-1.5 py-2.5 text-sm font-semibold text-navy underline underline-offset-4 transition hover:text-teal-700 sm:px-5"
+        >
+          {consent.customize}
+        </button>
+      </div>
+    </div>
 
     <div class="mt-4 space-y-3 sm:mt-5" data-consent-panel hidden>
       <label class="flex items-start gap-3 rounded-2xl bg-paper p-4">
@@ -58,29 +89,5 @@ const bodyShort = consent.bodyShort ?? consent.body;
       </button>
     </div>
 
-    <div class="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 sm:mt-4 sm:gap-3">
-      <button
-        type="button"
-        data-consent-accept
-        class="min-h-10 rounded-full bg-navy px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-teal-700 sm:px-5"
-      >
-        {consent.accept}
-      </button>
-      <button
-        type="button"
-        data-consent-refuse
-        class="min-h-10 rounded-full bg-navy px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-teal-700 sm:px-5"
-      >
-        {consent.refuse}
-      </button>
-      <button
-        type="button"
-        data-consent-customize
-        aria-expanded="false"
-        class="min-h-10 w-full rounded-full px-1 py-2.5 text-left text-sm font-semibold text-navy underline underline-offset-4 transition hover:text-teal-700 sm:w-auto sm:px-5 sm:text-center"
-      >
-        {consent.customize}
-      </button>
-    </div>
   </div>
 </div>

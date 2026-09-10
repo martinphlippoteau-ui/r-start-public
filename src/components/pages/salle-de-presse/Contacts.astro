@@ -1,26 +1,32 @@
 ---
 /**
- * Page Presse — Contacts presse (id « contacts-presse »). Fond paper (alternance avec Revue de presse).
+ * Page Salle de presse — Contacts presse (id « contacts-presse »). Fond réglable par la prop `tone` (alternance des sections).
  * Une carte par contact : organisation (surtitre), nom (H3), rôle, puis une liste de définitions
  * téléphone (lien tel: sans espaces dans le href, numéro insécable) et e-mail (lien mailto:, ligne rendue
  * seulement si le contenu porte un e-mail confirmé). Source des contacts en dessous, avec son appel de note.
  * Animation : révélation en cascade des cartes.
- * Contenu : src/content/fr/press.ts (contacts, labels).
+ * Contenu : src/content/fr/pressRoom.ts (contacts, labels).
  */
 import Container from '@/components/ui/Container.astro';
 import Section from '@/components/ui/Section.astro';
-import PressNoteRef from '@/components/pages/presse/PressNoteRef.astro';
-import { press } from '@/content/fr/press';
+import PressRoomNoteRef from '@/components/pages/salle-de-presse/PressRoomNoteRef.astro';
+import { pressRoom } from '@/content/fr/pressRoom';
+
+interface Props {
+  /** Fond de la section : 'paper' par défaut, 'white' pour alterner avec la section précédente. */
+  tone?: 'paper' | 'white';
+}
+const { tone = 'paper' } = Astro.props;
 
 const id = 'contacts-presse';
-const { contacts } = press;
-const labels = press.labels ?? {};
+const { contacts } = pressRoom;
+const labels = pressRoom.labels ?? {};
 
 /** href tel: : indicatif et chiffres seulement (ex. « +33 6 99 60 10 25 » → « +33699601025 »). */
 const telHref = (phone: string) => 'tel:' + phone.replace(/[^\d+]/g, '');
 ---
 
-<Section id={id} tone="paper">
+<Section id={id} tone={tone}>
   <Container size="wide">
     <header class="max-w-4xl">
       <h2 id={id + '-title'} class="text-display-md text-ink">{contacts.title}</h2>
@@ -66,7 +72,7 @@ const telHref = (phone: string) => 'tel:' + phone.replace(/[^\d+]/g, '');
     </ul>
 
     <p class="mt-8 max-w-4xl text-base leading-relaxed text-slate-700 lg:mt-10">
-      {contacts.source}<span class="whitespace-nowrap"><PressNoteRef id="presse-contacts" /></span>
+      {contacts.source}<span class="whitespace-nowrap"><PressRoomNoteRef id="salle-presse-contacts" /></span>
     </p>
   </Container>
 </Section>

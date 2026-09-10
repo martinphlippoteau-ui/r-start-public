@@ -5,6 +5,7 @@ import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import * as legal from '../src/content/fr/legal.ts';
+import { marketComparison, press as pressFacts, product } from '../src/content/fr/facts.ts';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const DIST = path.join(ROOT, 'dist');
@@ -24,6 +25,14 @@ const norm = (s) =>
     .replace(/&amp;/g, '&')
     .replace(/\s+/g, ' ')
     .trim();
+/**
+ * Retire les citations de tiers (titres d'articles, extraits) avant le contrôle des formulations
+ * interdites : ce sont des propos rapportés, marqués `data-press-quote` dans le HTML et couverts par
+ * l'avertissement de la page « La presse en parle » (plan §5). Tout le reste de la page reste contrôlé.
+ */
+const stripPressQuotes = (html) =>
+  html.replace(/<([a-z]+)[^>]*\sdata-press-quote[^>]*>[\s\S]*?<\/\1>/gi, ' ');
+
 const toText = (html) => norm(html.replace(/<script[\s\S]*?<\/script>/gi, ' ').replace(/<style[\s\S]*?<\/style>/gi, ' ').replace(/<[^>]+>/g, ' '));
 
 async function readHtml(rel) {
@@ -35,7 +44,13 @@ function requirePhrase(text, phrase, label, file) {
 }
 
 const FORBIDDEN = [
-  { re: /sans frais/gi, label: '« sans frais »', allow: /n'est pas une scpi sans frais|frais de souscription/i },
+  {
+    re: /sans frais/gi,
+    label: '« sans frais »',
+    // Autorisé : le démenti de la brochure, un « sans frais » immédiatement qualifié (de souscription,
+    // d'entrée sur les achats d'immeubles), et l'allégation de rang bornée au groupe CORUM.
+    allow: /n'est pas une scpi sans frais|frais de souscription|premi[èe]re scpi du groupe corum sans frais d['’]entrée/i,
+  },
   { re: /\bgratuit/gi, label: '« gratuit »', allow: /saisir gratuitement le médiateur/i },
   { re: /\bgaranti(e|s|es)?\b/gi, label: '« garanti »', allow: /(non|pas|aucune|ni)\s+(de\s+)?garanti|ne (sont|est) pas garanti|ne garantit pas|aucune garantie|sans garantie|n'offrent aucune garantie|ne présagent|garantie en capital/i },
   { re: /sécuris/gi, label: '« sécurisé »', allow: /sécurisé(e)? par (https|tls)|connexion sécurisée/i },
@@ -45,10 +60,20 @@ const FORBIDDEN = [
   { re: /taux de distribution|\bTRI\b|rendement (cible|garanti|attendu|estimé|annuel)|objectif de rendement/g, label: 'indicateur de performance', allow: /(pas|aucun|sans)\s+(d'|de\s)?(objectif de rendement|taux de distribution)/i },
   { re: /\d+(?:[,.]\d+)?\s?%\s?(?:de\s)?(?:rendement|performance|par an|annuel)/gi, label: 'pourcentage de performance' },
   { re: /\bcrédit\b/gi, label: 'mention du crédit', allow: /carte de crédit/i },
+  { re: /objectifs? tenus?/gi, label: '« objectifs tenus » (allégation de performance)' },
+  {
+    // Autorisé : « la première SCPI du groupe CORUM… ». Interdit : la même allégation sans périmètre.
+    re: /premi[èe]re\s+SCPI/gi,
+    label: 'allégation « première SCPI » hors périmètre CORUM',
+    allow: /premi[èe]re SCPI du groupe CORUM/i,
+    // La revue de presse cite des titres d'articles : ils sont couverts par l'avertissement de la page.
+    except: ['presse'],
+  },
 ];
 
 function checkForbidden(text, file) {
   for (const rule of FORBIDDEN) {
+    if (rule.except && rule.except.some((p) => file.includes(p))) continue;
     const matches = [...text.matchAll(rule.re)];
     for (const m of matches) {
       const ctx = text.slice(Math.max(0, m.index - 80), m.index + m[0].length + 80);
@@ -72,6 +97,8 @@ async function checkIndex() {
   requirePhrase(text, legal.dicWarning, 'avertissement du DIC', file);
   for (const b of legal.arbitrageWarningBullets) requirePhrase(text, b.slice(0, 100), 'puce commission d\'arbitrage', file);
   requirePhrase(text, legal.gdpr.dpoEmail, 'e-mail DPO', file);
+  requirePhrase(text, product.definition, 'ligne de définition du hero', file);
+  requirePhrase(text, 'groupe CORUM', 'périmètre de l’allégation de rang', file);
   requirePhrase(text, 'GP-11000012', 'agrément AMF de la société de gestion', file);
   requirePhrase(text, legal.publisher.rcs, 'RCS de l\'éditeur', file);
   requirePhrase(text, '15 %', 'frais de gestion 15 %', file);
@@ -103,8 +130,10 @@ async function checkIndex() {
 
   // Documents PDF
   const pdfLinks = [...new Set([...html.matchAll(/href="([^"]+\.pdf)"/gi)].map((m) => m[1]))];
-  // 3 tant que le PDF des statuts (tronqué à la source) est exclu ; repasser à 4 dès qu'il est remplacé.
-  if (pdfLinks.length < 3) errors.push(`${file} : ${pdfLinks.length} lien(s) PDF (attendu : ≥ 3)`);
+  // 2 tant que les statuts (PDF tronqué à la source) et le DIC (SRI 3/7 contredisant le 4/7 du site,
+  // retour AMF du 10/09/2026) sont exclus de PENDING_DOCUMENT_KEYS (documentation.ts) : il reste la note
+  // d'information et le bulletin. Repasser à 4 dès que les deux fichiers sont remplacés.
+  if (pdfLinks.length < 2) errors.push(`${file} : ${pdfLinks.length} lien(s) PDF (attendu : ≥ 2)`);
   for (const link of pdfLinks) {
     const local = stripBase(link.replace(/^https?:\/\/[^/]+/, ''));
     if (!local.startsWith('/')) continue;
@@ -130,7 +159,7 @@ async function checkIndex() {
 
 /** Sous-pages produit : mêmes interdits, ligne risques dans l'en-tête, mentions obligatoires, structure. */
 async function checkSubPages() {
-  for (const p of ['frais', 'documentation', 'presse']) {
+  for (const p of ['frais', 'documentation', 'presse', 'salle-de-presse']) {
     const file = p + '/index.html';
     let html;
     try {
@@ -140,7 +169,9 @@ async function checkSubPages() {
       continue;
     }
     const text = toText(html);
-    checkForbidden(text, p);
+    // Sur « La presse en parle », les citations de tiers sont exclues du contrôle des formulations
+    // interdites (elles portent data-press-quote) ; l'avertissement qui les couvre est exigé.
+    checkForbidden(p === 'presse' ? toText(stripPressQuotes(html)) : text, p);
     requirePhrase(text, legal.shortRiskLine, 'ligne risques (en-tête de page)', file);
     requirePhrase(text, legal.commercialNotice, 'mention 1 (caractère commercial)', file);
     requirePhrase(text, 'visa S.C.P.I. n° 26-06 en date du 4 mars 2026', 'visa AMF', file);
@@ -150,6 +181,23 @@ async function checkSubPages() {
     const risksAnimated = html.match(/<p[^>]*data-risk[^>]*data-animate[^>]*>|<p[^>]*data-animate[^>]*data-risk[^>]*>/gi) || [];
     if (risksAnimated.length) errors.push(file + ' : ' + risksAnimated.length + ' bloc(s) risque animé(s)');
     if (p === 'frais' && !/15\s?%/.test(text)) errors.push(file + ' : frais de gestion 15 % absents');
+    if (p === 'presse') {
+      // Les titres et citations reproduits ne valent que couverts par l'avertissement fourni.
+      requirePhrase(text, pressFacts.coverageDisclaimer.slice(0, 120), 'avertissement de la revue de presse', file);
+      const quoted = (html.match(/data-press-quote/g) || []).length;
+      if (!quoted) errors.push(file + ' : aucune citation marquée data-press-quote (contrôle inopérant)');
+    }
+    if (p === 'frais') {
+      // Bascule des frais : une SCPI du panel ne peut être citée que dans le périmètre de l'analyse,
+      // et l'encadré « Une innovation, pas une révolution » accompagne toujours la comparaison.
+      const lower = text.toLowerCase();
+      const named = marketComparison.panel.filter((n) => lower.includes(norm(n).toLowerCase()));
+      if (named.length) {
+        requirePhrase(text, marketComparison.perimeterLead.slice(0, 80), 'périmètre du comparatif', file);
+        requirePhrase(text, legal.innovationNotRevolution.title, 'encadré « Une innovation, pas une révolution »', file);
+        requirePhrase(text, marketComparison.source.slice(0, 40), 'source du comparatif', file);
+      }
+    }
     for (const [, body] of html.matchAll(/<script type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/gi)) {
       try {
         JSON.parse(body);
@@ -179,8 +227,25 @@ async function checkOtherPages() {
   }
 }
 
+/** Le dossier de sources de rédaction ne doit jamais atterrir dans le site publié. */
+async function checkNoSourceFiles() {
+  const walk = async (dir, base = '') => {
+    let out = [];
+    for (const entry of await fs.readdir(dir, { withFileTypes: true })) {
+      const rel = base ? base + '/' + entry.name : entry.name;
+      if (entry.isDirectory()) out = out.concat(await walk(path.join(dir, entry.name), rel));
+      else out.push(rel);
+    }
+    return out;
+  };
+  const files = await walk(DIST);
+  const leaked = files.filter((p) => /assets r start|brochure/i.test(p));
+  for (const p of leaked) errors.push('source de rédaction publiée dans dist — ' + p);
+}
+
 await checkIndex();
 await checkOtherPages();
+await checkNoSourceFiles();
 await checkSubPages();
 
 for (const w of warnings) console.log(`⚠ ${w}`);

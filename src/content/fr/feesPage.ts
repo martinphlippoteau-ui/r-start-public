@@ -1,9 +1,10 @@
 import type { DocumentItem, FeeRow, LegalNote } from '@/content/types';
-import type { FeesPageContent } from '@/content/types-v2';
+import type { FeeComparison, FeeComparisonSide, FeesPageContent } from '@/content/types-v2';
 import {
   documents as documentFacts,
   externalLinks,
   fees as feeFacts,
+  marketComparison as marketFacts,
   product,
   risk,
   share,
@@ -42,14 +43,18 @@ import manifest from '@/content/fr/media.manifest.json';
  * (documentation.ts, PENDING_DOCUMENT_KEYS) : tant qu'il est en attente (fichier hébergé du 20/05/2026 à
  * 3 sur 7, CORUM ayant confirmé 4 sur 7), le bloc renvoie vers www.corum.fr et non vers le PDF.
  *
- * Le tableau comparatif de la brochure p.6 (publicité comparative : moyennes de marché et SCPI tierces
- * nommées) n'est pas livré : ses données n'existent pas dans facts.ts et la Conformité ne l'a pas validé.
- * SHOW_MARKET_COMPARISON reste à false ; le réactiver suppose d'abord de porter les moyennes et la liste
- * des SCPI dans facts.ts (ex. `marketComparison`, source brochure 2026 p.6), puis de reconstruire le bloc.
+ * Bascule pédagogique des frais (plan §3 bis, arbitrage du 10/09/2026) : les moyennes de marché de la
+ * brochure p.6 sont portées dans facts.ts (`marketComparison`) avec leur périmètre et leur source ; les
+ * valeurs de R Start viennent, elles, de facts.fees. Garde-fous appliqués ici : aucune SCPI tierce
+ * nommée dans la partie visible (le panel des neuf SCPI vit dans `perimeter`, toujours affiché sous la
+ * bascule, et dans la note « frais-page-comparatif ») ; une seule taille de police pour toutes les
+ * valeurs de frais, des deux côtés ; l'encadré « Une innovation, pas une révolution » (legal.ts)
+ * accompagne la bascule, reproduit à l'identique. La position de marché s'intitule « SCPI avec frais
+ * d'acquisition », comme dans la brochure : ces SCPI ne prélèvent pas de commission de souscription.
  */
 
-/** Drapeau du tableau comparatif « SCPI avec frais d'acquisition vs R Start » (brochure p.6) : aucune donnée en l'état, voir en-tête. */
-export const SHOW_MARKET_COMPARISON = false;
+/** Drapeau de la bascule des frais (brochure p.6) : le passer à false retire le bloc en une ligne. */
+export const SHOW_MARKET_COMPARISON = true;
 
 /**
  * Typographie française : apostrophe typographique, espace insécable (U+00A0, en échappement) avant % € : ; ? !,
@@ -150,7 +155,7 @@ const arbitrageVerbatim = `${arbitrageWarningTitle} ${arbitrageWarningBullets.jo
 const rawNotes: LegalNote[] = [
   {
     id: 'frais-page-ht',
-    text: 'Frais exprimés hors taxes (HT). R Start étant exonérée de TVA, le montant hors taxes est égal au montant toutes taxes comprises (TTC) : les taux affichés sont ceux réellement supportés. Le bulletin de souscription exprime la commission de retrait en TTC, pour des taux identiques. Sources : brochure R Start 2026 et bulletin de souscription, mai 2026.',
+    text: `${feeFacts.vatNote} Sources : brochure R Start 2026 et bulletin de souscription, mai 2026.`,
   },
   {
     id: 'frais-page-sources',
@@ -181,6 +186,10 @@ const rawNotes: LegalNote[] = [
     text: `Incidence des coûts selon le DIC du ${product.dicDate.label} (page 3), pour 10 000 € investis : ${after1Year} après 1 an, ${after5Years} après 5 ans et ${after10Years} après ${holdingYears} ans. Hypothèses réglementaires : au cours de la première année, vous récupérez le montant investi ; pour les autres durées, le produit évolue selon le scénario intermédiaire. L’incidence mesure la réduction moyenne, chaque année, de ce que le placement rapporte, du fait de l’ensemble des coûts, commission de retrait comprise en cas de sortie anticipée. Les montants en euros et les scénarios de performance du DIC ne sont pas repris sur ce site.`,
   },
   {
+    id: 'frais-page-comparatif',
+    text: `Bascule des frais : les valeurs de R Start viennent de la brochure R Start 2026 (page 4), du bulletin de souscription de mai 2026 et de la note d’information ; « frais sur les achats d’immeubles » est le terme d’affichage des frais d’acquisition, et « frais d’agent immobilier » celui des frais d’intermédiation (broker). Les valeurs de l’autre position sont des moyennes de marché, jamais les frais d’une SCPI précise. ${marketFacts.perimeterLead} : ${marketFacts.panel.join(', ')}, ${marketFacts.perimeterTail} ${marketFacts.brokerFootnote} Source : ${marketFacts.source} Cette comparaison porte sur les frais, pas sur les résultats : R Start n’a pas d’historique et aucune donnée de performance n’est communiquée.`,
+  },
+  {
     id: 'frais-page-distributeur',
     text: `Dans le cadre de la commercialisation de R Start, ${managementCompany.name} est susceptible de reverser aux intermédiaires habilités une rémunération récurrente équivalente à ${feeFacts.distributorRemuneration}. ${publisher.name}, éditeur de ce site, distribue R Start. Source : bulletin de souscription R Start, conditions générales de vente, mai 2026.`,
   },
@@ -201,17 +210,79 @@ const disposalRows: FeeRow[] = feeFacts.disposal.tiers.map((t, i) => ({
 }));
 
 /**
- * Tableau comparatif masqué : aucun texte, aucune donnée de marché, aucun nom de SCPI tierce livré au composant.
- * Seule variante existante tant que les données du comparatif ne sont pas dans facts.ts (voir en-tête).
+ * Bascule pédagogique des frais (brochure p.6). Les cinq moments du parcours sont les mêmes des deux
+ * côtés, dans le même ordre : c'est la comparaison du *moment* du prélèvement, pas seulement du montant.
  */
-const marketComparisonDisabled: FeesPageContent['marketComparison'] = {
-  enabled: false,
-  title: '',
-  intro: '',
-  columns: ['', ''],
-  rows: [],
-  perimeter: '',
-  risk: '',
+const moments = {
+  subscribe: 'À la souscription',
+  buy: 'À l’achat des immeubles',
+  hold: 'Pendant la détention',
+  sell: 'À la vente d’un immeuble',
+  exit: 'À la sortie',
+} as const;
+
+const avg = marketFacts.averages;
+
+/** Position de marché : moyennes du panel, aucune SCPI nommée. */
+const marketSide: FeeComparisonSide = {
+  key: 'marche',
+  label: marketFacts.columnLabel,
+  summary:
+    'Ces SCPI ne prélèvent pas de commission de souscription. Elles se rémunèrent dès l’achat des immeubles, puis sur les loyers encaissés, et de nouveau en cas de sortie anticipée.',
+  steps: [
+    { moment: moments.subscribe, label: 'Frais de souscription', value: avg.subscription.label, base: avg.subscription.base, timing: avg.subscription.timing },
+    { moment: moments.buy, label: 'Frais sur les achats d’immeubles', value: avg.acquisition.label, base: avg.acquisition.base, timing: avg.acquisition.timing, detail: 'Prélevés à chaque immeuble acheté, avant tout revenu.' },
+    { moment: moments.buy, label: 'Frais d’agent immobilier', value: avg.broker.label, base: avg.broker.base, timing: avg.broker.timing, detail: 'Deux des neuf SCPI du panel appliquent ces frais.' },
+    { moment: moments.hold, label: 'Frais de gestion', value: avg.management.label, base: avg.management.base, timing: avg.management.timing },
+    { moment: moments.hold, label: 'Frais de travaux', value: avg.works.label, base: avg.works.base, timing: avg.works.timing },
+    { moment: moments.sell, label: 'Frais sur les cessions immobilières', value: avg.disposal.label, base: avg.disposal.base, timing: avg.disposal.timing, detail: 'Taux appliqué au prix de vente, que la vente dégage ou non une plus-value.' },
+    { moment: moments.exit, label: 'Commission de retrait anticipé', value: avg.withdrawal.label, base: avg.withdrawal.base, timing: avg.withdrawal.timing },
+  ],
+};
+
+/** Position R Start : toutes les valeurs viennent de facts.fees, jamais de la brochure p.6. */
+const rstartSide: FeeComparisonSide = {
+  key: 'rstart',
+  label: product.name,
+  summary: `R Start prélève ${feeFacts.subscription.label} de commission de souscription et ${feeFacts.acquisition.label} de frais sur les achats d’immeubles. Elle prélève ${feeFacts.management.label} des loyers HT encaissés, ${disposalRates} sur chaque vente selon la plus-value, et ${withdrawalRates} en cas de retrait avant ${zeroAfter} ans.`,
+  steps: [
+    { moment: moments.subscribe, label: 'Frais de souscription', value: feeFacts.subscription.label, base: 'prélevés sur le montant investi', timing: avg.subscription.timing },
+    { moment: moments.buy, label: 'Frais sur les achats d’immeubles', value: feeFacts.acquisition.label, base: 'prélevés sur le prix d’achat', timing: avg.acquisition.timing, detail: 'Terme réglementaire : frais d’acquisition.' },
+    { moment: moments.buy, label: 'Frais d’agent immobilier', value: feeFacts.broker.label, base: avg.broker.base, timing: avg.broker.timing, detail: 'Terme réglementaire : frais d’intermédiation (broker).' },
+    { moment: moments.hold, label: 'Frais de gestion', value: feeFacts.management.label, base: 'prélevés sur les loyers HT encaissés', timing: avg.management.timing, detail: 'Le taux le plus élevé des deux positions.' },
+    { moment: moments.hold, label: 'Frais de travaux', value: feeFacts.works.label, base: avg.works.base, timing: avg.works.timing },
+    { moment: moments.sell, label: 'Frais sur les cessions immobilières', value: feeFacts.disposal.label, base: feeFacts.disposal.base, timing: avg.disposal.timing, detail: `${disposalSentences} ${feeFacts.disposal.basisNote}` },
+    { moment: moments.exit, label: 'Commission de retrait anticipé', value: withdrawalValue, base: feeFacts.withdrawal.base, timing: avg.withdrawal.timing, detail: withdrawalDetail },
+  ],
+};
+
+/**
+ * Phrase de périmètre affichée sous la bascule, sans nommer le panel (garde-fou publicité comparative,
+ * arbitrage du 10/09/2026 : « aucun concurrent nommé dans la partie visible »). Les neuf SCPI, la note
+ * d'agent immobilier et la source complète vivent uniquement dans la note « frais-page-comparatif »,
+ * déjà appelée par le titre de la bascule (comparison.noteId), toujours affichée.
+ */
+const comparisonPerimeter =
+  'Moyennes de marché calculées sur un panel de SCPI sans frais de souscription et avec frais d’acquisition. Panel, périmètre et sources détaillés dans la note ci-dessus.';
+
+/** Contenu de la bascule, avant typographie (`deepNb` plus bas ; l'encadré legal.ts reste à l'identique). */
+const rawComparison = {
+  enabled: true,
+  eyebrow: 'Comparatif',
+  title: 'Qui se rémunère, et à quel moment ?',
+  intro:
+    'Un même parcours d’épargne, rejoué des deux côtés : la souscription, l’achat des immeubles, la détention, la vente d’un immeuble, la sortie. Chaque ligne indique ce qui est prélevé et quand.',
+  switchLabel: 'Choisir le modèle de frais à afficher',
+  columns: { moment: 'Moment', fee: 'Frais', value: 'Taux' },
+  sides: [marketSide, rstartSide] as [FeeComparisonSide, FeeComparisonSide],
+  perimeter: comparisonPerimeter,
+  risk: `R Start n’est pas moins chère. Ses frais de gestion sont supérieurs à la moyenne du panel (${feeFacts.management.label} contre ${avg.management.label}). Sa commission de retrait avant ${zeroAfter} ans va jusqu’à ${w0.rate}, contre ${avg.withdrawal.label} en moyenne. Si les ventes dégagent de fortes plus-values, les ${disposalRates} sur les cessions peuvent dépasser une commission de souscription classique. Vous ne connaissez pas votre coût total à la souscription.`,
+  noteId: 'frais-page-comparatif',
+};
+
+const feeComparison: FeeComparison = {
+  ...deepNb(rawComparison),
+  innovationBox: innovationNotRevolution,
 };
 
 /** Contenu avant application de la typographie française (voir `deepNb`). */
@@ -266,7 +337,8 @@ const raw = {
     },
     {
       value: feeFacts.acquisition.label,
-      label: 'de frais d’acquisition',
+      /** Vocabulaire V2 (§3) : le terme réglementaire « frais d'acquisition » reste dans le barème détaillé et les notes. */
+      label: 'de frais sur les achats d’immeubles',
       base: feeFacts.acquisition.base,
     },
     { value: feeFacts.works.label, label: 'de frais de travaux', base: feeFacts.works.base },
@@ -276,6 +348,16 @@ const raw = {
     advantage: `Aucune commission n’est prélevée sur votre versement à la souscription, ni sur le prix d’achat des immeubles, ni sur les travaux. Le prix de la part, ${share.priceLabel}, inclut 0 € de commission de souscription. La société de gestion se rémunère sur les loyers encaissés et sur les plus-values réalisées à la vente. Avant ${zeroAfter} ans, elle perçoit aussi une commission de retrait, de ${w0.rate} à ${w3.rate} de la valeur de retrait.`,
     risk: `En contrepartie, ${feeFacts.management.label} des loyers HT sont prélevés au titre des frais de gestion. S’y ajoute une commission sur les cessions d’immeubles (${feeFacts.disposal.label} selon la plus-value). Avant ${zeroAfter} ans, une commission de retrait de ${w0.rate} à ${w3.rate} de la valeur de retrait s’applique aussi. Ces frais réduisent vos revenus potentiels et, en cas de sortie anticipée, la somme récupérée. Votre coût total n’est pas connu à la souscription.`,
   },
+
+  /**
+   * Frais réellement prélevés, affichés à la même taille (text-stat) que les trois « 0 % » juste
+   * au-dessus : retour AMF sur la brochure, taille de police uniforme pour tous les frais (plan §0).
+   */
+  counterweightRates: [
+    { value: feeFacts.management.label, label: 'de frais de gestion sur les loyers HT' },
+    { value: feeFacts.disposal.label, label: 'sur les cessions d’immeubles' },
+    { value: withdrawalValueShort, label: `de commission de retrait avant ${zeroAfter} ans` },
+  ],
 
   groups: [
     {
@@ -404,7 +486,7 @@ const raw = {
       {
         question: `Pourquoi ${feeFacts.management.label} de frais de gestion ?`,
         answer: [
-          `Les frais de gestion rémunèrent ${managementCompany.name} pour la gestion des immeubles, des locataires et de la SCPI. Ils sont prélevés sur les loyers HT encaissés, pas sur votre versement. R Start ne percevant ni commission de souscription ni frais d’acquisition, ce sont ses frais principaux.`,
+          `Les frais de gestion rémunèrent ${managementCompany.name} pour la gestion des immeubles, des locataires et de la SCPI. Ils sont prélevés sur les loyers HT encaissés, pas sur votre versement. R Start ne percevant ni commission de souscription ni frais sur les achats d’immeubles, ce sont ses frais principaux.`,
           'Ce taux s’applique pendant toute la durée de détention. Il réduit d’autant les revenus distribuables, avant les autres charges de la SCPI (impôts, frais non refacturables aux locataires).',
           'Ces frais ne dépendent pas de la valeur de vos parts. Ils sont dus dès qu’un loyer est encaissé, même si cette valeur baisse. Les revenus ne sont pas garantis et varient selon le marché immobilier et le cours des devises.',
         ],
@@ -462,7 +544,7 @@ export const feesPage: FeesPageContent = {
   arbitrageWarning: { title: arbitrageWarningTitle, bullets: [...arbitrageWarningBullets] },
   innovationBox: innovationNotRevolution,
   htNote: feeFacts.vatNote,
-  marketComparison: marketComparisonDisabled,
+  marketComparison: feeComparison,
   simulationDoc: deepNb(costDocument()),
 };
 

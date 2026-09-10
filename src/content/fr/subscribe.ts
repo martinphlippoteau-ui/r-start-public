@@ -8,6 +8,9 @@ import { withdrawalExemptions } from '@/content/fr/fees';
  * rappel des documents à lire et de la commission de retrait avant 8 ans. Le CTA renvoie vers le tunnel
  * de souscription (URL dans src/config/site.ts). Le minimum des versements programmés (50 € par mois,
  * adhésion PEI 04/2026) est affiché en badge sur l'option PEI, depuis facts.ts.
+ * V2 (§3 ter, brochure partenaires 2026, p. 5) : l'intro porte le positionnement complémentaire de
+ * R Start (stratégie patrimoniale plus dynamique, en contrepartie d'un risque plus élevé) et la note
+ * `souscrire-non-eligible` porte le tableau d'éligibilité complet, modalités proposées comprises.
  */
 
 /** Espace insécable avant % et € : les libellés de facts.ts utilisent une espace simple. */
@@ -29,7 +32,9 @@ export const notes: LegalNote[] = [
   },
   {
     id: 'souscrire-non-eligible',
-    text: `Modalités non proposées pour R Start : ${subscription.notEligible.join(', ')}. Source : brochure R Start 2026.`,
+    text: nb(
+      `Éligibilité de R Start : souscription ${subscription.onlineLabel}, ${subscription.options.rd.name} et ${subscription.options.pei.name} proposés. Modalités non proposées : ${subscription.notEligible.join(', ')}. Positionnement : R Start complète la gamme du groupe CORUM. Les premières SCPI du groupe visent des revenus potentiels réguliers ; R Start vise une stratégie patrimoniale plus dynamique, en contrepartie d’un risque plus élevé. Source : brochure partenaires 2026, p. 5.`
+    ),
   },
 ];
 
@@ -37,7 +42,7 @@ export const subscribe = {
   eyebrow: 'Souscrire',
   /** « R Start » en espace insécable : le nom de marque ne se coupe jamais dans le H2 (mobile 375 px). */
   title: `Souscrire à R Start, ${nb(subscription.onlineLabel)}.`,
-  intro: `La souscription se fait entièrement en ligne, en quatre étapes, à partir d’une part de ${nb(share.priceLabel)}. Aucune souscription papier n’est possible. Avant de vous engager, lisez le DIC et la note d’information. R Start comporte un risque de perte en capital.`,
+  intro: `La souscription se fait entièrement en ligne, en quatre étapes, à partir d’une part de ${nb(share.priceLabel)}. Aucune souscription papier n’est possible. R Start vise une stratégie patrimoniale plus dynamique, en contrepartie d’un risque plus élevé. Avant de vous engager, lisez le DIC et la note d’information. R Start comporte un risque de perte en capital.`,
 
   steps: [
     {

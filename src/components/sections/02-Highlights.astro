@@ -46,11 +46,20 @@ const parseNumeric = (value: string): { prefix: string; target: number; decimals
   return { prefix, target: Number(raw.replace(',', '.')), decimals, suffix };
 };
 
+/**
+ * Cartes dont la valeur ne doit jamais être comptée (règle posée par 03-Fees.astro : jamais de compteur
+ * sur une caractéristique réglementaire qui partirait d'une valeur fausse). « calendrier » (délai de
+ * jouissance, « 6 mois ») afficherait un délai plus court que celui du bulletin pendant le comptage ;
+ * « argent » (ticket d'entrée, « 200 € ») afficherait un prix de part inférieur au prix réel. Ces deux
+ * valeurs sont rendues en toutes lettres (data-reveal-text), comme les valeurs non numériques.
+ */
+const NO_COUNTER_ICONS = new Set(['calendrier', 'argent']);
+
 const cards = await Promise.all(
   highlights.cards.map(async (card) => {
     const picto = pictos[card.icon as PictoKey];
     if (!picto) throw new Error(`Pictogramme inconnu dans highlights.ts : ${card.icon}`);
-    const numeric = parseNumeric(card.value);
+    const numeric = NO_COUNTER_ICONS.has(card.icon) ? null : parseNumeric(card.value);
     return { ...card, picto: await resolveImage(picto.src), numeric };
   })
 );

@@ -5,6 +5,7 @@
 
 export type SectionKey =
   | 'hero'
+  | 'difference'
   | 'highlights'
   | 'fees'
   | 'strategy'
@@ -55,6 +56,15 @@ export interface HeroContent {
   /** H1 unique de la page. */
   title: string;
   tagline: string;
+  /**
+   * Ligne de définition du produit (facts.product.definition) : allégation de rang au périmètre du
+   * groupe CORUM, toujours accompagnée de son appel de note (`definitionNoteId`).
+   */
+  definition?: string;
+  /** Id de la LegalNote qui porte le périmètre de la définition (facts.product.definitionScope). */
+  definitionNoteId?: string;
+  /** Deux phrases pédagogiques sur le moment où les frais sont prélevés (une phrase par élément). */
+  pedagogy?: string[];
   subtitle: string;
   /** Ligne risques visible sans scroller, même taille que subtitle. Jamais animée. */
   riskLine: string;
@@ -255,6 +265,8 @@ export interface StatItem {
   value: string;
   /** Valeur numérique pour le compteur animé (optionnel). */
   numeric?: number;
+  /** Préfixe du compteur (ex. « + » pour « + 160 000 ») : sans lui, le comptage perdrait le signe. */
+  prefix?: string;
   suffix?: string;
   label: string;
 }
@@ -265,9 +277,13 @@ export interface CorumContent {
   intro: string;
   stats: StatItem[];
   statsSource: string;
+  /** Contre-poids risque des chiffres du groupe, rendu avec eux et à la même taille. Jamais animé. */
+  statsRisk?: string;
   range: { title: string; description: string; scpiNames: string[] };
-  /** Titre du bloc facultatif sur la rémunération de CORUM lors des cessions (corps : intro). Absent = bloc non rendu. */
+  /** Titre du bloc facultatif sur la rémunération de CORUM lors des cessions. Absent = bloc non rendu. */
   alignmentTitle?: string;
+  /** Corps du bloc « rémunération sur les ventes ». À défaut, le composant retombe sur `intro`. */
+  alignmentBody?: string;
   disclaimer: string;
   notes: LegalNote[];
 }

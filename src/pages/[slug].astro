@@ -1,12 +1,12 @@
 ---
 /**
  * Pages légales (/mentions-legales, /politique-de-confidentialite, /cookies) générées depuis
- * src/content/fr/pages.ts (legalPages). Mise en page sobre : Header clair, fil d'Ariane, H1, sections H2.
+ * src/content/fr/pages.ts (legalPages). Mise en page sobre : SiteNav, fil d'Ariane, H1, sections H2.
  * /cookies est en noindex (plan §7). Aucun texte en dur.
  */
 import type { GetStaticPaths } from 'astro';
 import Base from '@/layouts/Base.astro';
-import Header from '@/components/Header.astro';
+import SiteNav from '@/components/SiteNav.astro';
 import Footer from '@/components/Footer.astro';
 import Breadcrumb from '@/components/ui/Breadcrumb.astro';
 import Container from '@/components/ui/Container.astro';
@@ -29,7 +29,7 @@ const jsonLd = [
 ---
 
 <Base title={page.title} description={page.description} path={page.path} noindex={noindex} jsonLd={jsonLd}>
-  <Header tone="light" />
+  <SiteNav />
   <main id="contenu" class="bg-paper">
     <Container size="narrow" class="py-10 sm:py-14">
       <Breadcrumb key={pageKey} tone="light" />

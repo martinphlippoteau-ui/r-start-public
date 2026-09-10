@@ -5,8 +5,8 @@
  * reste dans le H1 en visually-hidden ; l'image est décorative, aria-hidden), sous-titre en trois
  * phrases, ligne risques dans la même taille (jamais animée), deux CTA, puis le grand visuel
  * (LCP : eager + fetchpriority high ; préchargé depuis index.astro via src/lib/hero-image.ts).
- * Le logo porte `data-brand-flight` : au défilement il rejoint la sous-navigation sticky
- * (src/scripts/motion/brandflight.ts). La place du logo est réservée en CSS (`hero-logo-wrap`) :
+ * Le logo porte `data-brand-flight` : au défilement il rejoint la navigation unique collée en haut
+ * (src/components/SiteNav.astro, src/scripts/motion/brandflight.ts). La place du logo est réservée en CSS (`hero-logo-wrap`) :
  * aucun décalage quand l'image passe dans son calque fixe.
  * Motion (src/scripts/motion.ts) :
  *  - cascade d'entrée `data-intro` (CSS pur, jouée au premier rendu, aucun flash) sur le surtitre,
@@ -22,14 +22,18 @@
  *    chargement) ;
  *  - la dérive du halo (`brand-halo-drift`) ne tourne que quand la section est à l'écran
  *    (`data-in-view` → classe `is-in-view`).
- * Le bloc texte + risques + CTA tient dans le premier viewport (à 375 × 812, la ligne risques garde
- * ≥ 24 px au-dessus du bandeau de consentement : espacements mobiles resserrés) ; l'image peut
+ * Les marges hautes sont réduites de la hauteur de la barre collée (3,5 rem), désormais dans le flux.
+ * Le bloc texte + risques + CTA tient dans le premier viewport. Sous 40 rem, définition, pédagogie,
+ * sous-titre et ligne risques passent ensemble à `text-base` et les écarts se resserrent : la ligne
+ * risques reste au-dessus de la ligne de flottaison malgré les deux paragraphes ajoutés en V2, et
+ * l'égalité de taille entre l'avantage et son contre-poids est préservée (règle AMF). L'image peut
  * dépasser sous la ligne de flottaison. Contenu : src/content/fr/hero.ts et media.ts.
  */
 import { Image } from 'astro:assets';
 import brandLogo from '@/assets/logos/r-start-blanc.svg';
 import Button from '@/components/ui/Button.astro';
 import Container from '@/components/ui/Container.astro';
+import NoteRef from '@/components/ui/NoteRef.astro';
 import RiskNote from '@/components/ui/RiskNote.astro';
 import Section from '@/components/ui/Section.astro';
 import { sections } from '@/config/sections';
@@ -59,13 +63,13 @@ const copyScrub = {
   spacing="none"
   labelledBy={titleId}
   data-in-view="is-in-view"
-  class="brand-halo brand-halo-drift grain flex min-h-svh flex-col overflow-hidden pt-18 sm:pt-32 lg:pt-28"
+  class="brand-halo brand-halo-drift grain flex min-h-svh flex-col overflow-hidden pt-1 sm:pt-10 lg:pt-4"
 >
   <Container size="wide" class="relative flex flex-1 flex-col">
     <div data-hero-copy class="mx-auto flex max-w-4xl flex-col items-center text-center">
       {
         showEyebrow && (
-          <div {...copyScrub} class="mb-2 sm:mb-4">
+          <div {...copyScrub} class="mb-1 sm:mb-4">
             <p data-intro="1" class="text-eyebrow text-teal-200 max-sm:tracking-wider">
               {hero.eyebrow}
             </p>
@@ -79,17 +83,36 @@ const copyScrub = {
         </span>
       </h1>
       <div {...copyScrub} class="flex flex-col items-center">
-        <p data-intro="2" class="text-display-sm mt-2 text-sand sm:mt-4">{hero.tagline}</p>
-        <p data-intro="3" data-intro-move class="text-lead mt-3 max-w-3xl text-pretty text-white sm:mt-6">{hero.subtitle}</p>
+        <p data-intro="2" class="text-display-sm mt-1 text-sand sm:mt-3">{hero.tagline}</p>
+        {
+          hero.definition && (
+            <p data-intro="3" data-intro-move class="text-lead mt-1.5 max-w-3xl text-pretty text-white max-sm:text-base max-sm:leading-snug sm:mt-4">
+              {hero.definition}
+              {hero.definitionNoteId && (
+                <span class="whitespace-nowrap">
+                  <NoteRef id={hero.definitionNoteId} />
+                </span>
+              )}
+            </p>
+          )
+        }
+        {
+          hero.pedagogy && hero.pedagogy.length > 0 && (
+            <p data-intro="4" data-intro-move class="text-lead mt-1.5 max-w-3xl text-pretty text-white/90 max-sm:text-base max-sm:leading-snug sm:mt-3">
+              {hero.pedagogy.join(' ')}
+            </p>
+          )
+        }
+        <p data-intro="5" data-intro-move class="text-lead mt-1.5 max-w-3xl text-pretty text-white max-sm:text-base max-sm:leading-snug sm:mt-4">{hero.subtitle}</p>
       </div>
       <RiskNote
         text={hero.riskLine}
         tone="dark"
         size="lead"
-        class="mx-auto mt-3 max-w-3xl justify-center text-left sm:mt-5"
+        class="mx-auto mt-1.5 max-w-3xl justify-center text-left max-sm:text-base max-sm:leading-snug sm:mt-4"
       />
-      <div {...copyScrub} class="mt-6 w-full sm:mt-7 sm:w-auto">
-        <div data-intro="4" class="flex w-full flex-col items-stretch gap-3 sm:w-auto sm:flex-row sm:items-center">
+      <div {...copyScrub} class="mt-4 w-full sm:mt-7 sm:w-auto">
+        <div data-intro="6" class="flex w-full flex-col items-stretch gap-3 sm:w-auto sm:flex-row sm:items-center">
           <Button position={hero.primaryCta.position} variant="light" size="lg">{hero.primaryCta.label}</Button>
           <Button href={hero.secondaryCta.href} variant="outline-light" size="lg">{hero.secondaryCta.label}</Button>
         </div>

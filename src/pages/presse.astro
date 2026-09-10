@@ -1,26 +1,28 @@
 ---
 /**
- * Page /presse — Espace presse : Header (tone dark, posé sur le PageHero sombre) → main#contenu
- * (PageHero avec le fil d'Ariane dans son slot, ligne risques visible sans scroller → Communiqués →
- * Revue de presse → Contacts presse → Kit média → Notes propres à la page) → Footer.
+ * Page /presse — « La presse en parle » (grand public) : SiteNav collée en haut → main#contenu
+ * (PageHero avec le fil d'Ariane dans son slot et la ligne risques visible sans scroller → citations
+ * mises en avant → revue de presse et avertissement → renvoi vers la salle de presse → notes propres à
+ * la page) → Footer.
+ * Les communiqués, les contacts et le kit média ont quitté cette page : ils vivent sur /salle-de-presse,
+ * accessible depuis le pied de page (arbitrage du 10/09/2026).
  * Métadonnées (title, description, canonical) depuis press.seo, chemin depuis src/config/pages.ts ;
  * JSON-LD Organization + WebPage + BreadcrumbList via src/lib/seo.ts. Aucun texte en dur.
- * Le fil d'Ariane est décalé sous le Header absolu (h-16 / h-20) : le PageHero, calibré pour un
- * Header dans le flux, ne réserve pas cet espace.
  */
 import Base from '@/layouts/Base.astro';
-import Header from '@/components/Header.astro';
+import SiteNav from '@/components/SiteNav.astro';
 import Footer from '@/components/Footer.astro';
 import LegalNotes from '@/components/LegalNotes.astro';
 import Breadcrumb from '@/components/ui/Breadcrumb.astro';
+import Container from '@/components/ui/Container.astro';
 import PageHero from '@/components/ui/PageHero.astro';
-import Releases from '@/components/pages/presse/Releases.astro';
+import Section from '@/components/ui/Section.astro';
 import Coverage from '@/components/pages/presse/Coverage.astro';
-import Contacts from '@/components/pages/presse/Contacts.astro';
-import MediaKit from '@/components/pages/presse/MediaKit.astro';
+import Quotes from '@/components/pages/presse/Quotes.astro';
 import { pages } from '@/config/pages';
 import { press } from '@/content/fr/press';
 import { breadcrumbJsonLd, organizationJsonLd, webPageJsonLd } from '@/lib/seo';
+import { withBase } from '@/lib/href';
 
 const path = pages.press.path;
 const jsonLd = [
@@ -28,10 +30,11 @@ const jsonLd = [
   webPageJsonLd({ path, title: press.seo.title, description: press.seo.description }),
   breadcrumbJsonLd('press'),
 ];
+const { pressRoomLink } = press;
 ---
 
 <Base title={press.seo.title} description={press.seo.description} path={path} jsonLd={jsonLd}>
-  <Header tone="dark" />
+  <SiteNav />
   <main id="contenu">
     <PageHero
       eyebrow={press.hero.eyebrow}
@@ -39,14 +42,29 @@ const jsonLd = [
       intro={press.hero.intro}
       riskLine={press.hero.riskLine}
     >
-      <div slot="breadcrumb" class="pt-10 sm:pt-9 lg:pt-6">
-        <Breadcrumb key="press" tone="dark" />
-      </div>
+      <Breadcrumb slot="breadcrumb" key="press" tone="dark" />
     </PageHero>
-    <Releases />
+    <Quotes />
     <Coverage />
-    <Contacts />
-    <MediaKit />
+
+    <!-- Renvoi vers la salle de presse, absente du menu principal -->
+    <Section id="salle-de-presse-renvoi" tone="paper" spacing="compact" labelledBy="salle-de-presse-renvoi-title">
+      <Container size="wide">
+        <div class="flex flex-col gap-5 rounded-3xl bg-white p-6 shadow-card sm:p-8 lg:flex-row lg:items-center lg:justify-between lg:gap-10 lg:p-10">
+          <div class="max-w-2xl">
+            <h2 id="salle-de-presse-renvoi-title" class="text-display-sm text-ink">{pressRoomLink.title}</h2>
+            <p class="text-lead mt-3 text-slate-700">{pressRoomLink.body}</p>
+          </div>
+          <a
+            href={withBase(pressRoomLink.href)}
+            class="text-lead shrink-0 font-semibold text-navy underline-offset-4 hover:text-teal-700 hover:underline"
+          >
+            {pressRoomLink.label}
+          </a>
+        </div>
+      </Container>
+    </Section>
+
     <LegalNotes notes={press.notes} />
   </main>
   <Footer />

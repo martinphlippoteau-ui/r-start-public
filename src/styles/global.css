@@ -51,10 +51,14 @@
 
 @layer base {
   html {
-    /* Hauteur de la sous-navigation sticky + marge : les ancres ne passent jamais dessous. */
+    /* Hauteur de la navigation collée + marge : les ancres ne passent jamais dessous. */
     scroll-padding-top: calc(var(--spacing-subnav) + 1.5rem);
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+  }
+  /* Page /documentation : une seconde barre collante (ancres des groupes) sous la navigation. */
+  html:has([data-docsnav]) {
+    scroll-padding-top: calc(var(--spacing-subnav) * 2 + 1.5rem);
   }
   @media (prefers-reduced-motion: no-preference) {
     html {
@@ -202,7 +206,7 @@
   line-height: 1.5;
 }
 
-/* Surface translucide (sous-navigation sticky, barres) */
+/* Surface translucide (navigation collée, barres) */
 @utility surface-glass {
   background-color: rgb(255 255 255 / 0.78);
   -webkit-backdrop-filter: saturate(180%) blur(20px);
@@ -261,7 +265,7 @@
   }
 }
 
-/* Défilement horizontal sans barre visible (sous-navigation sur mobile) */
+/* Défilement horizontal sans barre visible (liste de la navigation) */
 @utility scrollbar-none {
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -270,8 +274,14 @@
   }
 }
 
-/* Fondu latéral signalant un défilement horizontal (mobile) ; neutre dès que tout tient. */
+/* Fondu latéral signalant un défilement horizontal ; neutre dès que tout tient. Posé par le script de
+   la navigation (`data-overflow`) dès que la liste déborde réellement, quelle que soit la largeur ;
+   repli sans script sous 40 rem, où la liste déborde toujours. */
 @utility scroll-fade-x {
+  &[data-overflow] {
+    mask-image: linear-gradient(to right, transparent 0, black 0.75rem, black calc(100% - 1.5rem), transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, transparent 0, black 0.75rem, black calc(100% - 1.5rem), transparent 100%);
+  }
   @media (width < 40rem) {
     mask-image: linear-gradient(to right, transparent 0, black 0.75rem, black calc(100% - 1.5rem), transparent 100%);
     -webkit-mask-image: linear-gradient(to right, transparent 0, black 0.75rem, black calc(100% - 1.5rem), transparent 100%);
@@ -526,11 +536,13 @@
   }
 }
 
-/* --- Marque du hero (H1) et son vol vers la sous-navigation (data-brand-flight) ---
+/* --- Marque du hero (H1) et son vol vers la navigation unique (data-brand-flight) ---
    Le H1 réserve la place du logo : l'image peut passer dans son calque fixe sans décaler la page. */
 .hero-logo-wrap {
   display: block;
-  width: min(52vw, 16rem);
+  /* Sous 40 rem, la marque cède quelques pixels : le hero porte désormais la définition et les deux
+     phrases de pédagogie, et la ligne risques doit rester lisible au-dessus du bandeau cookies. */
+  width: min(46vw, 14rem);
   margin-inline: auto;
   aspect-ratio: 290 / 89;
 }
@@ -541,12 +553,14 @@
 }
 @media (width >= 64rem) {
   .hero-logo-wrap {
-    width: min(46vw, 32rem);
+    /* 24 rem plutôt que 32 : le hero porte cinq blocs de texte depuis la V2, et la ligne risques doit
+       rester découverte au-dessus du bandeau cookies sur un écran de 1440 × 900. */
+    width: min(38vw, 24rem);
   }
 }
 
 /* Calque du logo pendant le vol : hors de tout ancêtre transformé, jamais cliquable.
-   Sous la sous-navigation (z 40) : la barre le recouvre en arrivant, le relais se fait en fondu. */
+   Sous la navigation (z 40) : la barre le recouvre en arrivant, le relais se fait en fondu. */
 .brand-flyer {
   position: fixed;
   top: 0;
@@ -574,11 +588,12 @@
   height: auto;
 }
 
-/* Le logo du header ferait double emploi avec le logo du hero et son calque : masqué dès le rendu
-   serveur sur les pages qui portent le vol de la marque (aucun scintillement au chargement), et
-   rétabli là où le vol n'a pas lieu (petits écrans, reduced-motion). */
+/* Le logo de la barre est l'arrivée du vol : sur les pages qui le portent, il est masqué dès le rendu
+   serveur (aucun scintillement au chargement, la marque n'existe qu'une fois à l'écran) ; le script
+   règle ensuite son opacité pour le passage de relais. Rétabli là où le vol n'a pas lieu
+   (sous 40 rem, reduced-motion, autres pages) : la barre porte alors la marque dès le premier écran. */
 @media (prefers-reduced-motion: no-preference) and (width >= 40rem) {
-  body:has([data-brand-flight]) [data-brand-rest] {
-    visibility: hidden;
+  body:has([data-brand-flight]) [data-brand-target] {
+    opacity: 0;
   }
 }

@@ -1,0 +1,35 @@
+---
+/**
+ * Appel de note légale de la page Salle de presse : même gabarit que ui/NoteRef.astro, mais numéroté
+ * dans les notes propres à la page (export `notes` de src/content/fr/pressRoom.ts, rendues par
+ * LegalNotes avec la prop `notes`). Ancre `${sections.notes.id}-${n}`, aria-label « Voir la note n ».
+ * Couleur auto-adaptative au fond (teal-700, ou teal-200 sous un ancêtre `.text-white`).
+ */
+import { sections } from '@/config/sections';
+import { nav } from '@/content/fr/nav';
+import { notes } from '@/content/fr/pressRoom';
+
+interface Props {
+  id: string;
+  tone?: 'light' | 'dark';
+}
+const { id, tone } = Astro.props;
+const index = notes.findIndex((n) => n.id === id);
+const n = index === -1 ? null : index + 1;
+const label = nav.noteRefLabel ? `${nav.noteRefLabel} ${n}` : undefined;
+const colors = {
+  auto: 'text-teal-700 in-[.text-white]:text-teal-200',
+  light: 'text-teal-700',
+  dark: 'text-teal-200',
+};
+---
+
+{
+  n !== null && (
+    <a
+      href={'#' + sections.notes.id + '-' + n}
+      class:list={['ml-0.5 align-super text-[0.65em] font-semibold no-underline hover:underline', colors[tone ?? 'auto']]}
+      aria-label={label}
+    >{n}</a>
+  )
+}

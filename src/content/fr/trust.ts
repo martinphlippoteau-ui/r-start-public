@@ -95,7 +95,7 @@ export const trust = {
       },
       {
         label: 'Société de gestion',
-        value: `${managementCompany.name}, agréée par l’AMF depuis le ${corumGroup.amfSince}${amfApprovalNumber ? ` (n° ${amfApprovalNumber})` : ''}`,
+        value: `${managementCompany.name}, agréée et réglementée par l’AMF depuis le ${corumGroup.amfSince}${amfApprovalNumber ? ` (n° ${amfApprovalNumber})` : ''}`,
         /** Mention légale de l'agrément in extenso (legal.managementCompany.amfApproval), note définie dans corum.ts. */
         noteId: 'corum-agrement',
       },

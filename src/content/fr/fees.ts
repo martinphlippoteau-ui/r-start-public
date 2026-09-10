@@ -74,7 +74,7 @@ export const notes: LegalNote[] = [
   },
   {
     id: 'frais-ht',
-    text: 'Frais exprimés hors taxes (HT). R Start étant exonérée de TVA, le montant hors taxes est égal au montant toutes taxes comprises (TTC) : les taux affichés sont ceux réellement supportés. Le bulletin de souscription exprime la commission de retrait en TTC, pour des taux identiques.',
+    text: feeFacts.vatNote,
   },
 ];
 
@@ -90,15 +90,17 @@ export const fees = {
     },
     {
       value: nb(feeFacts.acquisition.label),
-      label: 'de frais d’acquisition',
+      /** Vocabulaire V2 (§3) : le terme réglementaire « frais d'acquisition » reste dans le barème et les notes. */
+      label: 'de frais sur les achats d’immeubles',
       base: feeFacts.acquisition.base,
     },
     { value: nb(feeFacts.works.label), label: 'de frais de travaux', base: feeFacts.works.base },
   ],
   zeroHighlightsLabel: 'Les trois frais à 0 %',
   counterweight: {
-    advantage:
-      'Rien n’est prélevé sur votre versement à la souscription, ni sur le prix d’achat des immeubles, ni sur les travaux. La société de gestion se rémunère lorsque R Start encaisse des loyers ou réalise une plus-value à la vente.',
+    advantage: nb(
+      `R Start prélève ${feeFacts.subscription.label} de commission de souscription et ${feeFacts.acquisition.label} de frais sur les achats d’immeubles, travaux compris. La société de gestion se rémunère lorsque R Start encaisse des loyers ou réalise une plus-value à la vente.`
+    ),
     risk: `En contrepartie, R Start prélève ${nb(feeFacts.management.label)} de frais de gestion sur les loyers. S’y ajoutent une commission sur les cessions d’immeubles (${nb(feeFacts.disposal.label)}) et une commission de retrait avant ${feeFacts.withdrawal.zeroAfterYears} ans. Votre coût total n’est pas connu à la souscription.`,
   },
   rows: [

@@ -1,7 +1,7 @@
 ---
 /**
- * Page Presse — Communiqués de presse (id « communiques »). Fond paper, après le PageHero (ink).
- * Liste chronologique des communiqués livrés par le contenu (press.releases.items, déjà filtrés et triés
+ * Page Salle de presse — Communiqués de presse (id « communiques »). Fond paper, après le PageHero (ink).
+ * Liste chronologique des communiqués livrés par le contenu (pressRoom.releases.items, déjà filtrés et triés
  * du plus récent au plus ancien) ; si la liste est vide, seul `emptyLabel` est rendu.
  *  - communiqué disponible : carte-lien vers le PDF (nouvel onglet, rel noopener, type application/pdf,
  *    data-doc pour l'analytics document_download), date, mention PDF et poids (résolu au build) ;
@@ -13,18 +13,18 @@
  * est compacte (py-section-sm) pour ne pas paraître creuse entre le PageHero sombre et la Revue de presse ;
  * rythme normal dès le premier communiqué.
  * Animation : révélation en cascade de la liste (aucun [data-risk] dedans).
- * Contenu : src/content/fr/press.ts (releases, labels).
+ * Contenu : src/content/fr/pressRoom.ts (releases, labels).
  */
 import Container from '@/components/ui/Container.astro';
 import Section from '@/components/ui/Section.astro';
-import PressNoteRef from '@/components/pages/presse/PressNoteRef.astro';
-import { press } from '@/content/fr/press';
-import { fileKey, kbFormat, publicFileKb } from '@/components/pages/presse/public-files';
+import PressRoomNoteRef from '@/components/pages/salle-de-presse/PressRoomNoteRef.astro';
+import { pressRoom } from '@/content/fr/pressRoom';
+import { fileKey, kbFormat, publicFileKb } from '@/components/pages/salle-de-presse/public-files';
 import { withBase } from '@/lib/href';
 
 const id = 'communiques';
-const { releases } = press;
-const labels = press.labels ?? {};
+const { releases } = pressRoom;
+const labels = pressRoom.labels ?? {};
 
 const items = releases.items.map((r) => {
   const linked = r.available && r.file.trim() !== '';
@@ -42,7 +42,7 @@ const linkHintId = `${id}-link-hint`;
     <header class="max-w-4xl">
       <h2 id={id + '-title'} class="text-display-md text-ink">{releases.title}</h2>
       <p class="text-lead mt-5 text-pretty text-slate-700 sm:mt-6">
-        {releases.intro}<span class="whitespace-nowrap"><PressNoteRef id="presse-communiques" /></span>
+        {releases.intro}<span class="whitespace-nowrap"><PressRoomNoteRef id="salle-presse-communiques" /></span>
       </p>
     </header>
     {hasLinked && linkHint && <span id={linkHintId} hidden>{linkHint}</span>}

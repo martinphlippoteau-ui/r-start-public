@@ -106,7 +106,7 @@ const detailsLink = feesPageExists ? fees.detailsLink : undefined;
           zeroHighlights.map((item, i) => (
             <li data-step data-step-stay class="flex flex-col gap-1.5 border-t border-navy/15 pt-3 sm:gap-3 sm:pt-8">
               <p class="flex flex-col gap-1.5 sm:gap-3">
-                <span class="text-stat text-navy">
+                <span class="text-stat text-navy" data-fee-value data-fee-block="apercu-accueil">
                   {/* Premier chiffre : accent d'échelle seulement (inline-block : une transform ne s'applique pas à un inline) ; valeur statique, jamais de compteur */}
                   {i === 0 ? (
                     <span data-animate="scale" class="inline-block">
@@ -130,7 +130,7 @@ const detailsLink = feesPageExists ? fees.detailsLink : undefined;
             <li class="flex flex-col gap-1 border-t border-coral/40 pt-2 sm:gap-2 sm:pt-5">
               {/* Même taille que les « 0 % » ci-dessus : l'AMF a relevé sur la brochure qu'un frais ne
                   peut pas être affiché dans une police plus petite que les autres. */}
-              <span class="text-stat text-coral-700 tabular-nums">
+              <span class="text-stat text-coral-700 tabular-nums" data-fee-value data-fee-block="apercu-accueil">
                 {row.valueShort ? (
                   <>
                     <span class="sm:hidden">{row.valueShort}</span>
@@ -191,7 +191,7 @@ const detailsLink = feesPageExists ? fees.detailsLink : undefined;
                       <span class="mt-1 block text-base leading-relaxed text-slate-700 sm:hidden">{row.base}</span>
                     </th>
                     <td class="hidden py-4 pr-4 text-base text-slate-700 sm:table-cell sm:py-5 lg:w-72">{row.base}</td>
-                    <td class="py-4 pl-3 text-right text-lg leading-tight font-bold tracking-tight whitespace-nowrap text-navy tabular-nums max-sm:w-[7.25rem] sm:py-5 sm:text-3xl">
+                    <td class="py-4 pl-3 text-right text-lg leading-tight font-bold tracking-tight whitespace-nowrap text-navy tabular-nums max-sm:w-[7.25rem] sm:py-5 sm:text-3xl" data-fee-value data-fee-block="bareme-accueil">
                       {row.valueShort ? (
                         <>
                           <span class="sm:hidden">{row.valueShort}</span>
@@ -231,7 +231,7 @@ const detailsLink = feesPageExists ? fees.detailsLink : undefined;
                   last ? 'bg-navy text-white shadow-float max-sm:col-span-2' : 'bg-white text-ink shadow-card',
                 ]}
               >
-                <span class:list={['text-display-md tabular-nums', last ? 'text-sand' : 'text-navy']}>{step.rate}</span>
+                <span class:list={['text-display-md tabular-nums', last ? 'text-sand' : 'text-navy']} data-fee-value data-fee-block="retrait-accueil">{step.rate}</span>
                 <span class:list={['text-base leading-snug font-medium', last ? 'text-white' : 'text-ink']}>{step.period}</span>
               </li>
             );

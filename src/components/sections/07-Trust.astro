@@ -247,7 +247,7 @@ const counterDuration = (n?: number): number | undefined =>
               {corum.alignmentTitle}
               <NoteRef id="corum-compensation" tone="light" />
             </h3>
-            <p class="mt-4 max-w-4xl text-lead">{corum.intro}</p>
+            <p class="mt-4 max-w-4xl text-lead">{corum.alignmentBody ?? corum.intro}</p>
           </Card>
         )
       }

@@ -1,6 +1,6 @@
 ---
 /**
- * Page d'accueil : Header → main#contenu (Hero, SubNav sticky, sections 02-10, Notes) → Footer.
+ * Page d'accueil : SiteNav collée en haut → main#contenu (Hero, sections 02-10, Notes) → Footer.
  * Les sections sont assemblées automatiquement depuis src/components/sections/NN-Nom.astro, dans l'ordre
  * des préfixes numériques (contrat : src/config/sections.ts). Métadonnées et JSON-LD depuis seo.ts,
  * legal.ts, facts.ts et faq.ts via src/lib/seo.ts (rien en dur).
@@ -8,8 +8,7 @@
  */
 import { getImage } from 'astro:assets';
 import Base from '@/layouts/Base.astro';
-import Header from '@/components/Header.astro';
-import SubNav from '@/components/SubNav.astro';
+import SiteNav from '@/components/SiteNav.astro';
 import LegalNotes from '@/components/LegalNotes.astro';
 import Footer from '@/components/Footer.astro';
 import { seo } from '@/content/fr/seo';
@@ -36,10 +35,9 @@ const jsonLd = [
 
 <Base title={seo.title} description={seo.description} path="/" ogImageAlt={seo.ogImageAlt} jsonLd={jsonLd}>
   <link slot="head" rel="preload" as="image" imagesrcset={heroLcp.srcSet.attribute} imagesizes={heroImageSizes} fetchpriority="high" />
-  <Header tone="dark" />
+  <SiteNav />
   <main id="contenu">
     {hero && <hero.Component />}
-    <SubNav />
     {rest.map(({ Component }) => <Component />)}
     <LegalNotes />
   </main>

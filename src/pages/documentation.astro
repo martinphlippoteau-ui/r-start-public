@@ -1,7 +1,7 @@
 ---
 /**
  * Page /documentation (périmètre v2, plan §12) : centre de documents de R Start.
- * Header (tone dark, posé sur le hero sombre) → main#contenu : PageHero (fil d'Ariane, H1, intro, ligne
+ * SiteNav collée en haut → main#contenu : PageHero (fil d'Ariane, H1, intro, ligne
  * risques visible sans scroller) → navigation d'ancres collante → un groupe de documents par section
  * (#reglementaire, #frais, #formulaire ; seuls les groupes publiant au moins un document existent) →
  * guide de souscription en quatre étapes → FAQ → mention 2 + renvoi corum.fr + CTA → notes de la page →
@@ -10,7 +10,7 @@
  * Les notes légales sont celles de la page (documentation.notes), numérotées par DocNoteRef.
  */
 import Base from '@/layouts/Base.astro';
-import Header from '@/components/Header.astro';
+import SiteNav from '@/components/SiteNav.astro';
 import Footer from '@/components/Footer.astro';
 import LegalNotes from '@/components/LegalNotes.astro';
 import Breadcrumb from '@/components/ui/Breadcrumb.astro';
@@ -40,13 +40,10 @@ const linkHintId = linkHint ? 'documentation-link-hint' : undefined;
 ---
 
 <Base title={seo.title} description={seo.description} path={path} jsonLd={jsonLd}>
-  <Header tone="dark" />
+  <SiteNav />
   <main id="contenu">
     <PageHero eyebrow={hero.eyebrow} title={hero.title} intro={hero.intro} riskLine={hero.riskLine}>
-      <!-- Le Header (tone dark) est posé en absolu au-dessus du hero : le fil d'Ariane passe sous sa hauteur. -->
-      <div slot="breadcrumb" class="pt-16 sm:pt-20">
-        <Breadcrumb key="documentation" tone="dark" />
-      </div>
+      <Breadcrumb slot="breadcrumb" key="documentation" tone="dark" />
     </PageHero>
 
     <DocumentsNav groups={groups} label={labels.anchorsLabel} />

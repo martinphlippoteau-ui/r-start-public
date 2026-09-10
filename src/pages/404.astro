@@ -5,7 +5,7 @@
  * Contenu : src/content/fr/notFound.ts.
  */
 import Base from '@/layouts/Base.astro';
-import Header from '@/components/Header.astro';
+import SiteNav from '@/components/SiteNav.astro';
 import Footer from '@/components/Footer.astro';
 import Container from '@/components/ui/Container.astro';
 import { notFound } from '@/content/fr/notFound';
@@ -13,7 +13,7 @@ import { withBase } from '@/lib/href';
 ---
 
 <Base title={notFound.seo.title} description={notFound.seo.description} path="/404" noindex>
-  <Header tone="light" />
+  <SiteNav />
   <main id="contenu" class="bg-paper">
     <Container size="narrow" class="flex min-h-[60svh] flex-col justify-center py-16 sm:py-24">
       <p class="text-eyebrow text-teal-700">{notFound.code}</p>

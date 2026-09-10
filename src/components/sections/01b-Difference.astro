@@ -1,0 +1,118 @@
+---
+/**
+ * Section 2 — « Ce qui change vraiment » (id « ce-qui-change »), zone 2 de la V2 (plan §2, §3 ter p.4).
+ * Fond blanc, entre le hero (ink) et Points forts (blanc) : deux moteurs de rémunération (loyers
+ * encaissés, plus-value à la vente), la formule d'alignement au vouvoiement avec son contre-poids
+ * chiffré (frais de gestion, cessions, retrait), puis le mécanisme de réserve en cas de moins-value
+ * (brochure partenaires 2026, p.4). Un lien interne (pas un CTA de souscription) renvoie vers /frais.
+ * Équilibre AMF : chaque moteur porte son risque dans la même carte et à la même taille ; le
+ * contre-poids chiffré et le risque du mécanisme de réserve sont rendus en RiskNote, jamais animés,
+ * jamais enveloppés par un ancêtre animé (seuls les titres et l'introduction portent `data-animate`,
+ * chaque carte porte son propre attribut sur son en-tête, jamais sur l'enveloppe qui contient le
+ * RiskNote).
+ * Aucune donnée de performance, aucun exemple d'investissement, aucune allégation de rang (portée par
+ * le hero avec son périmètre).
+ * Contenu : src/content/fr/difference.ts.
+ */
+import Button from '@/components/ui/Button.astro';
+import Card from '@/components/ui/Card.astro';
+import Container from '@/components/ui/Container.astro';
+import NoteRef from '@/components/ui/NoteRef.astro';
+import RiskNote from '@/components/ui/RiskNote.astro';
+import Section from '@/components/ui/Section.astro';
+import { sections } from '@/config/sections';
+import { difference } from '@/content/fr/difference';
+
+const id = sections.difference.id;
+const titleId = id + '-title';
+/** Décalage de cascade entre les deux cartes des moteurs (secondes). */
+const ENGINE_STAGGER = 0.1;
+---
+
+<Section id={id} tone="white">
+  <Container size="wide">
+    <header class="max-w-4xl">
+      <p data-animate="fade-up" class="text-eyebrow mb-4 text-teal-700">{difference.eyebrow}</p>
+      <h2 id={titleId} class="text-display-lg" data-reveal-text>{difference.title}</h2>
+      <p data-animate="fade-up" data-animate-delay="0.15" class="mt-6 text-lead opacity-90">{difference.intro}</p>
+    </header>
+
+    <!-- Les deux moteurs de rémunération : chaque carte porte son risque, hors de tout ancêtre animé -->
+    <div class="mt-12 sm:mt-16 lg:mt-24">
+      {
+        difference.enginesTitle && (
+          <p data-animate="fade-up" class="text-eyebrow mb-4 text-teal-700">
+            {difference.enginesTitle}
+          </p>
+        )
+      }
+      <ul role="list" aria-label={difference.enginesLabel} class="grid gap-5 sm:grid-cols-2 lg:gap-6">
+        {
+          difference.engines.map((engine, i) => (
+            <Card as="li" tone="paper" class="flex flex-col ring-1 ring-navy/5 lg:p-10">
+              <h3
+                class="text-display-sm text-ink"
+                data-animate="fade-up"
+                data-animate-delay={String(i * ENGINE_STAGGER)}
+              >
+                {engine.title}
+                {engine.noteId && (
+                  <span class="whitespace-nowrap">
+                    <NoteRef id={engine.noteId} />
+                  </span>
+                )}
+              </h3>
+              <p
+                data-advantage
+                data-animate="fade-up"
+                data-animate-delay={String(i * ENGINE_STAGGER + 0.1)}
+                class="mt-4 text-base leading-relaxed text-ink"
+              >
+                {engine.description}
+              </p>
+              <RiskNote text={engine.risk} class="mt-4 border-t border-navy/10 pt-4" />
+            </Card>
+          ))
+        }
+      </ul>
+    </div>
+
+    <!-- Formule d'alignement et son contre-poids chiffré, même bloc, même taille -->
+    <div class="mt-12 grid gap-6 border-t border-navy/15 pt-8 sm:mt-16 lg:mt-20 lg:grid-cols-2 lg:gap-12 lg:pt-10">
+      <div data-advantage class="text-lead">
+        {difference.counterweight.title && <h3 class="text-display-sm text-ink">{difference.counterweight.title}</h3>}
+        <p class="mt-3">
+          {difference.counterweight.advantage}
+          {difference.counterweight.noteId && (
+            <span class="whitespace-nowrap">
+              <NoteRef id={difference.counterweight.noteId} />
+            </span>
+          )}
+        </p>
+      </div>
+      <RiskNote text={difference.counterweight.risk} size="lead" />
+    </div>
+
+    <!-- Mécanisme de réserve en cas de moins-value (brochure p.4), jamais animé -->
+    <div class="mt-12 grid gap-6 border-t border-navy/15 pt-8 sm:mt-16 lg:mt-20 lg:grid-cols-2 lg:gap-12 lg:pt-10">
+      <div data-advantage class="text-lead space-y-3">
+        <h3 class="text-display-sm text-ink">
+          {difference.lossMechanism.title}
+          {difference.lossMechanism.noteId && (
+            <span class="whitespace-nowrap">
+              <NoteRef id={difference.lossMechanism.noteId} />
+            </span>
+          )}
+        </h3>
+        {difference.lossMechanism.body.map((paragraph) => <p>{paragraph}</p>)}
+      </div>
+      <RiskNote text={difference.lossMechanism.risk} size="lead" />
+    </div>
+
+    <div class="mt-10 sm:mt-14 lg:mt-16">
+      <Button href={difference.cta.href} variant="secondary" size="lg">
+        {difference.cta.label}
+      </Button>
+    </div>
+  </Container>
+</Section>

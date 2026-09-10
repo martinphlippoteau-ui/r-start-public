@@ -1,8 +1,8 @@
 ---
 /**
  * Page /frais (périmètre v2, plan §12) : version complète de la section « Frais » de l'accueil.
- * Header (tone dark, posé en absolu sur le PageHero sombre) → fil d'Ariane (slot du PageHero, décalé sous
- * le Header) → PageHero (H1, intro, ligne risques visible sans scroller, jamais animée) → sections :
+ * SiteNav collée en haut (barre unique, entrées de pages) → fil d'Ariane (slot du PageHero) → PageHero
+ * (H1, intro, ligne risques visible sans scroller, jamais animée) → sections :
  *  1. les trois « 0 % » et leur contre-poids dans le même bloc (data-advantage + RiskNote, text-lead) ;
  *  2. le barème en quatre tableaux accessibles (caption = titre H3 + introduction, th scope="col" /
  *     scope="row", nature du frais en pastille depuis FeeRow.kind, assiette et précisions repliées sous le
@@ -10,11 +10,11 @@
  *  3. la commission de retrait : frise des cinq paliers (10-7-5-3-0), cas d'exonération (avantage) et
  *     leur note (risque), même taille ;
  *  4. sur fond ink : mécanisme de réserve en cas de moins-value (avantage en paragraphes + RiskNote),
- *     puis l'encadré « Une innovation, pas une révolution » et l'avertissement commission d'arbitrage,
- *     reproduits à l'identique depuis legal.ts, jamais animés ;
+ *     puis l'avertissement commission d'arbitrage, reproduit à l'identique depuis legal.ts, jamais animé
+ *     (l'encadré « Une innovation, pas une révolution » accompagne désormais la bascule, en 6) ;
  *  5. l'incidence des coûts du DIC (trois durées, méthode, risque : coûts, jamais de performance) ;
- *  6. le tableau comparatif de la brochure p.6, rendu uniquement si SHOW_MARKET_COMPARISON et
- *     marketComparison.enabled (aucune donnée livrée en l'état) ;
+ *  6. la bascule pédagogique des frais (FeeSwitcher, brochure p.6), rendue uniquement si
+ *     SHOW_MARKET_COMPARISON et marketComparison.enabled ;
  *  7. le document de référence (carte PDF data-doc, ou lien externe vers corum.fr tant que le DIC est en
  *     attente : rel noopener noreferrer, mention « nouvelle fenêtre ») ;
  *  8. la FAQ en accordéons natifs <details data-faq> (JSON-LD FAQPage émis par la page) ;
@@ -25,7 +25,7 @@
  * Contenu : src/content/fr/feesPage.ts (aucun texte en dur ; micro-textes dans feesPage.labels).
  */
 import Base from '@/layouts/Base.astro';
-import Header from '@/components/Header.astro';
+import SiteNav from '@/components/SiteNav.astro';
 import Footer from '@/components/Footer.astro';
 import LegalNotes from '@/components/LegalNotes.astro';
 import Breadcrumb from '@/components/ui/Breadcrumb.astro';
@@ -36,6 +36,7 @@ import PageHero from '@/components/ui/PageHero.astro';
 import Pill from '@/components/ui/Pill.astro';
 import RiskNote from '@/components/ui/RiskNote.astro';
 import Section from '@/components/ui/Section.astro';
+import FeeSwitcher from '@/components/pages/frais/FeeSwitcher.astro';
 import FeesNoteRef from '@/components/pages/frais/FeesNoteRef.astro';
 import { pages } from '@/config/pages';
 import { feesPage, notes, SHOW_MARKET_COMPARISON } from '@/content/fr/feesPage';
@@ -49,11 +50,11 @@ const {
   labels,
   zeroHighlights,
   counterweight,
+  counterweightRates,
   groups,
   withdrawal,
   lossMechanism,
   arbitrageWarning,
-  innovationBox,
   costImpact,
   marketComparison,
   simulationDoc,
@@ -100,15 +101,15 @@ const docHint = docIsPdf
   : (labels?.newTabHint ?? '');
 const docHintId = `${ids.document}-hint`;
 
-/** Tableau comparatif (brochure p.6) : rendu conditionnel, drapeau + données présentes. */
-const showComparison = SHOW_MARKET_COMPARISON && marketComparison.enabled && marketComparison.rows.length > 0;
+/** Bascule des frais (brochure p.6) : rendue si le drapeau est levé et si les deux positions existent. */
+const showComparison = SHOW_MARKET_COMPARISON && marketComparison.enabled && marketComparison.sides.length === 2;
 ---
 
 <Base title={seo.title} description={seo.description} path={page.path} jsonLd={jsonLd}>
-  <Header tone="dark" />
+  <SiteNav />
   <main id="contenu">
     <PageHero eyebrow={hero.eyebrow} title={hero.title} intro={hero.intro} riskLine={hero.riskLine}>
-      <Breadcrumb slot="breadcrumb" key="fees" tone="dark" class="pt-8 lg:pt-4" />
+      <Breadcrumb slot="breadcrumb" key="fees" tone="dark" />
     </PageHero>
 
     <!-- 1. Les trois 0 % et leur contre-poids, dans le même bloc -->
@@ -120,7 +121,7 @@ const showComparison = SHOW_MARKET_COMPARISON && marketComparison.enabled && mar
             zeroHighlights.map((item, i) => (
               <li class="flex flex-col gap-3 border-t border-navy/15 pt-6 sm:pt-8">
                 <p class="flex flex-col gap-3">
-                  <span class="text-stat text-navy" data-animate="clip" data-animate-delay={String(i * 0.12)}>
+                  <span class="text-stat text-navy" data-fee-value data-fee-block="apercu-frais" data-animate="clip" data-animate-delay={String(i * 0.12)}>
                     {item.value}
                   </span>
                   <span class="text-lead font-medium text-ink">{item.label}</span>
@@ -130,6 +131,23 @@ const showComparison = SHOW_MARKET_COMPARISON && marketComparison.enabled && mar
             ))
           }
         </ul>
+
+        <!-- Frais réellement prélevés, même taille (text-stat) que les trois 0 % ci-dessus : exigence AMF -->
+        <ul
+          role="list"
+          aria-hidden="true"
+          class="mt-6 grid grid-cols-3 gap-3 border-t border-coral/40 pt-6 sm:gap-8 sm:pt-8"
+        >
+          {
+            counterweightRates.map((item) => (
+              <li class="flex flex-col gap-3">
+                <span class="text-stat text-coral-700 tabular-nums" data-fee-value data-fee-block="apercu-frais">{item.value}</span>
+                <span class="text-lead font-medium text-ink">{item.label}</span>
+              </li>
+            ))
+          }
+        </ul>
+
         <div class="mt-10 grid gap-6 border-t border-navy/15 pt-8 lg:mt-14 lg:grid-cols-2 lg:gap-12 lg:pt-10">
           <p data-advantage class="text-lead">
             {counterweight.advantage}<span class="whitespace-nowrap"><FeesNoteRef id="frais-page-distributeur" /></span>
@@ -196,7 +214,7 @@ const showComparison = SHOW_MARKET_COMPARISON && marketComparison.enabled && mar
                         <td class="hidden py-4 pr-4 text-base leading-relaxed text-slate-700 sm:table-cell sm:py-5 lg:w-64">
                           {row.base}
                         </td>
-                        <td class="py-4 pl-3 text-right text-lg leading-tight font-bold tracking-tight whitespace-nowrap text-navy tabular-nums max-sm:w-[7.25rem] sm:py-5 sm:text-3xl">
+                        <td class="py-4 pl-3 text-right text-lg leading-tight font-bold tracking-tight whitespace-nowrap text-navy tabular-nums max-sm:w-[7.25rem] sm:py-5 sm:text-3xl" data-fee-value data-fee-block="bareme-frais">
                           {row.valueShort ? (
                             <>
                               <span class="sm:hidden">{row.valueShort}</span>
@@ -237,7 +255,7 @@ const showComparison = SHOW_MARKET_COMPARISON && marketComparison.enabled && mar
                     last ? 'bg-navy text-white shadow-float max-sm:col-span-2' : 'bg-paper text-ink ring-1 ring-navy/5',
                   ]}
                 >
-                  <span class:list={['text-display-md tabular-nums', last ? 'text-sand' : 'text-navy']}>{step.rate}</span>
+                  <span class:list={['text-display-md tabular-nums', last ? 'text-sand' : 'text-navy']} data-fee-value data-fee-block="retrait-frais">{step.rate}</span>
                   <span class:list={['text-base leading-snug font-medium', last ? 'text-white' : 'text-ink']}>{step.period}</span>
                 </li>
               );
@@ -273,11 +291,11 @@ const showComparison = SHOW_MARKET_COMPARISON && marketComparison.enabled && mar
           <RiskNote text={lossMechanism.risk} tone="dark" size="lead" />
         </div>
 
-        <div class="mt-16 grid gap-6 lg:mt-24 lg:grid-cols-2">
-          <Card lift={false} class="lg:p-10">
-            <h3 class="text-display-sm">{innovationBox.title}</h3>
-            <RiskNote text={innovationBox.body} size="lead" class="mt-5" />
-          </Card>
+        <!--
+          L'encadré « Une innovation, pas une révolution » n'est plus rendu ici : il accompagne
+          désormais la bascule des frais (FeeSwitcher, section 6), comme demandé par le plan §3 bis.
+        -->
+        <div class="mt-16 lg:mt-24">
           <Card lift={false} class="lg:p-10">
             <p class="text-lead font-medium">
               {arbitrageWarning.title}<span class="whitespace-nowrap"><FeesNoteRef id="frais-page-commission-arbitrage" tone="light" /></span>
@@ -318,54 +336,8 @@ const showComparison = SHOW_MARKET_COMPARISON && marketComparison.enabled && mar
       </Container>
     </Section>
 
-    <!-- 6. Tableau comparatif (brochure p.6) : rendu uniquement derrière le drapeau et si des données existent -->
-    {
-      showComparison && (
-        <Section id={ids.comparison} tone="white" labelledBy={ids.comparison + '-title'}>
-          <Container size="wide">
-            <h2 id={ids.comparison + '-title'} class="text-display-lg max-w-4xl">
-              {marketComparison.title}
-            </h2>
-            <p class="text-lead mt-6 max-w-3xl">{marketComparison.intro}</p>
-            <div class="mt-10 overflow-x-auto">
-              <table class="w-full border-collapse text-left">
-                <caption class="visually-hidden">{marketComparison.title}</caption>
-                <thead>
-                  <tr class="border-b border-navy/20 text-caption font-semibold uppercase tracking-[0.12em] text-slate-700">
-                    <th scope="col" class="py-3 pr-4">
-                      {labels?.columns.fee}
-                    </th>
-                    <th scope="col" class="py-3 pr-4 text-right">
-                      {marketComparison.columns[0]}
-                    </th>
-                    <th scope="col" class="py-3 text-right">
-                      {marketComparison.columns[1]}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {marketComparison.rows.map((row) => (
-                    <tr class="border-b border-navy/10 align-top">
-                      <th scope="row" class="py-4 pr-4 text-base font-semibold text-ink sm:text-xl">
-                        {row.label}
-                      </th>
-                      <td class="py-4 pr-4 text-right text-lg font-bold whitespace-nowrap text-slate-700 tabular-nums sm:text-2xl">{row.other}</td>
-                      <td class="py-4 text-right text-lg font-bold whitespace-nowrap text-navy tabular-nums sm:text-2xl">{row.rstart}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <div class="mt-8 grid gap-6 lg:grid-cols-2 lg:gap-12">
-              <p data-advantage class="text-lead">
-                {marketComparison.perimeter}
-              </p>
-              <RiskNote text={marketComparison.risk} size="lead" />
-            </div>
-          </Container>
-        </Section>
-      )
-    }
+    <!-- 6. Bascule pédagogique des frais (brochure p.6), derrière le drapeau SHOW_MARKET_COMPARISON -->
+    {showComparison && <FeeSwitcher id={ids.comparison} />}
 
     <!-- 7. Document de référence -->
     <Section id={ids.document} tone="white" labelledBy={ids.document + '-title'}>

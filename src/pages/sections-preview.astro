@@ -5,8 +5,7 @@
  * Les lots de construction l'utilisent pour se relire sans toucher à index.astro. Supprimée à l'intégration.
  */
 import Base from '@/layouts/Base.astro';
-import Header from '@/components/Header.astro';
-import SubNav from '@/components/SubNav.astro';
+import SiteNav from '@/components/SiteNav.astro';
 import LegalNotes from '@/components/LegalNotes.astro';
 import Footer from '@/components/Footer.astro';
 import { seo } from '@/content/fr/seo';
@@ -21,10 +20,9 @@ const rest = all.filter((s) => s !== hero);
 ---
 
 <Base title="Prévisualisation des sections R Start" description={seo.description} path="/sections-preview" noindex>
-  <Header tone="dark" />
+  <SiteNav sections />
   <main id="contenu">
     {hero && <hero.Component />}
-    <SubNav />
     {rest.map(({ Component }) => <Component />)}
     <LegalNotes />
   </main>

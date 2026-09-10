@@ -20,6 +20,21 @@ test.describe('Conformité', () => {
     expect(riskSize, 'ligne risques plus petite que le sous-titre').toBeGreaterThanOrEqual(subtitleSize * 0.85);
   });
 
+  test('le bandeau cookies ne recouvre pas la ligne risques du hero', async ({ page }) => {
+    await page.goto('/');
+    // Le bandeau n'est déplié que par le script de consentement, au premier chargement.
+    await expect(page.locator('#consent-banner')).toBeVisible();
+    const geo = await page.evaluate(() => {
+      const risk = document.querySelector('#apercu [data-risk]')!.getBoundingClientRect();
+      const banner = document.getElementById('consent-banner')!.getBoundingClientRect();
+      return { basRisque: risk.bottom, hautBandeau: banner.top };
+    });
+    expect(
+      geo.hautBandeau - geo.basRisque,
+      `ligne risques recouverte par le bandeau cookies (bas ${Math.round(geo.basRisque)} px, bandeau à ${Math.round(geo.hautBandeau)} px)`
+    ).toBeGreaterThanOrEqual(16);
+  });
+
   test('chaque avantage a un risque de longueur comparable', async ({ page }) => {
     await page.goto('/');
     const pairs = await page.locator('[data-advantage]').evaluateAll((nodes) =>
@@ -56,11 +71,64 @@ test.describe('Conformité', () => {
     expect(hidden).toBe(0);
   });
 
+  /**
+   * Retour AMF sur la brochure : un frais ne peut pas être affiché dans une police plus petite que les
+   * autres frais présentés à côté de lui. Chaque groupe de frais porte le même `data-fee-block` ; toutes
+   * les valeurs qu'il contient doivent partager la même taille de police rendue, sur les deux pages qui
+   * exposent des frais et dans la bascule pédagogique.
+   */
+  for (const path of ['/', '/frais/']) {
+    test(`taille de police identique pour toutes les valeurs de frais (${path})`, async ({ page }) => {
+      await page.goto(path);
+      const blocks = await page.locator('[data-fee-value]').evaluateAll((nodes) => {
+        const groups: Record<string, { size: number; text: string }[]> = {};
+        for (const node of nodes) {
+          const key = node.getAttribute('data-fee-block') ?? 'sans-groupe';
+          (groups[key] ??= []).push({
+            size: parseFloat(getComputedStyle(node).fontSize),
+            text: (node.textContent ?? '').replace(/\s+/g, ' ').trim().slice(0, 40),
+          });
+        }
+        return groups;
+      });
+
+      expect(Object.keys(blocks).length, `aucune valeur de frais repérée sur ${path}`).toBeGreaterThan(0);
+      for (const [key, values] of Object.entries(blocks)) {
+        expect(values.length, `un seul frais dans le groupe ${key}`).toBeGreaterThan(1);
+        const sizes = [...new Set(values.map((v) => v.size))];
+        expect(
+          sizes.length,
+          `tailles différentes dans « ${key} » : ${values.map((v) => `${v.text} = ${v.size}px`).join(' | ')}`
+        ).toBe(1);
+      }
+    });
+  }
+
+  test('la bascule des frais affiche les deux modèles dans la même taille', async ({ page }) => {
+    await page.goto('/frais/');
+    const tabs = page.locator('[data-fee-tab]');
+    const count = await tabs.count();
+    test.skip(count < 2, 'comparatif masqué (SHOW_MARKET_COMPARISON à false)');
+    const sizes: number[] = [];
+    for (let i = 0; i < count; i += 1) {
+      await tabs.nth(i).click();
+      const visible = await page
+        .locator('[data-fee-panel]:not([hidden]) [data-fee-value]')
+        .evaluateAll((nodes) => nodes.map((n) => parseFloat(getComputedStyle(n).fontSize)));
+      expect(visible.length, 'panneau de comparatif sans valeur de frais').toBeGreaterThan(0);
+      sizes.push(...visible);
+    }
+    expect([...new Set(sizes)].length, `tailles relevées : ${sizes.join(', ')}`).toBe(1);
+  });
+
   test('les documents réglementaires répondent', async ({ page, request }) => {
     await page.goto('/');
     const hrefs = await page.locator('a[href$=".pdf"]').evaluateAll((a) => [...new Set(a.map((x) => (x as HTMLAnchorElement).getAttribute('href') || ''))]);
-    // 3 tant que les statuts (PDF tronqué) sont exclus dans src/content/fr/documents.ts ; repasser à 4 ensuite.
-    expect(hrefs.length).toBeGreaterThanOrEqual(3);
+    // 2 tant que deux des quatre documents sont retenus dans src/content/fr/documentation.ts
+    // (PENDING_DOCUMENT_KEYS) : les statuts, dont le PDF fourni est tronqué, et le DIC hébergé, qui
+    // classe R Start en 3 sur 7 quand le site affiche 4 sur 7. Remonter ce seuil à chaque document
+    // republié : 3 à la réception du DIC en vigueur, 4 avec les statuts complets.
+    expect(hrefs.length).toBeGreaterThanOrEqual(2);
     for (const href of hrefs) {
       if (!href.startsWith('/')) continue;
       const res = await request.get(href);

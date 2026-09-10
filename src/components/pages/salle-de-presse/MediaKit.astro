@@ -1,7 +1,7 @@
 ---
 /**
- * Page Presse — Kit média (id « kit-media »). Fond white (alternance avec Contacts presse).
- * 1. Logos (press.mediaKit.logos, servis depuis public/presse) : une carte par fichier avec un aperçu
+ * Page Salle de presse — Kit média (id « kit-media »). Fond white (alternance avec Contacts presse).
+ * 1. Logos (pressRoom.mediaKit.logos, servis depuis public/presse) : une carte par fichier avec un aperçu
  *    <img> du SVG (le SVG de même nom sert d'aperçu à un PNG ; un logo « blanc » est présenté sur fond
  *    ink), le libellé en lien de téléchargement (attribut download, data-doc pour l'analytics), le format
  *    (extension) et le poids résolus au build. Les fichiers absents de public/ ne sont pas rendus.
@@ -9,19 +9,19 @@
  *    texte, du rappel des risques (RiskNote, jamais animé, hors de tout conteneur animé).
  * 3. Texte de présentation de CORUM L'Épargne (boilerplate), reproduit tel quel, en carte collante.
  * Animation : cascade sur la grille des logos seulement.
- * Contenu : src/content/fr/press.ts (mediaKit, labels).
+ * Contenu : src/content/fr/pressRoom.ts (mediaKit, labels).
  */
 import Container from '@/components/ui/Container.astro';
 import RiskNote from '@/components/ui/RiskNote.astro';
 import Section from '@/components/ui/Section.astro';
-import PressNoteRef from '@/components/pages/presse/PressNoteRef.astro';
-import { press } from '@/content/fr/press';
-import { fileExtension, fileName, kbFormat, publicFileExists, publicFileKb } from '@/components/pages/presse/public-files';
+import PressRoomNoteRef from '@/components/pages/salle-de-presse/PressRoomNoteRef.astro';
+import { pressRoom } from '@/content/fr/pressRoom';
+import { fileExtension, fileName, kbFormat, publicFileExists, publicFileKb } from '@/components/pages/salle-de-presse/public-files';
 import { withBase } from '@/lib/href';
 
 const id = 'kit-media';
-const { mediaKit } = press;
-const labels = press.labels ?? {};
+const { mediaKit } = pressRoom;
+const labels = pressRoom.labels ?? {};
 
 const logos = mediaKit.logos
   .filter((l) => publicFileExists(l.file))
@@ -50,7 +50,7 @@ const logos = mediaKit.logos
       logos.length > 0 && (
         <div class="mt-10 lg:mt-14">
           <h3 id={id + '-logos'} class="text-display-sm text-ink">
-            {labels.logosTitle}<span class="whitespace-nowrap"><PressNoteRef id="presse-kit" /></span>
+            {labels.logosTitle}<span class="whitespace-nowrap"><PressRoomNoteRef id="salle-presse-kit" /></span>
           </h3>
           <ul
             role="list"
@@ -106,7 +106,7 @@ const logos = mediaKit.logos
     <div class="mt-12 grid gap-8 lg:mt-16 lg:grid-cols-12 lg:gap-10">
       <div class="lg:col-span-7">
         <h3 id={id + '-chiffres'} class="text-display-sm text-ink">
-          {labels.keyFactsTitle}<span class="whitespace-nowrap"><PressNoteRef id="presse-chiffres-cles" /></span>
+          {labels.keyFactsTitle}<span class="whitespace-nowrap"><PressRoomNoteRef id="salle-presse-chiffres-cles" /></span>
         </h3>
         <dl class="mt-6 divide-y divide-navy/10 rounded-3xl bg-paper px-6 ring-1 ring-navy/5 sm:px-8">
           {

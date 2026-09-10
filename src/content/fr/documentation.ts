@@ -87,10 +87,16 @@ const toItem = (d: {
  * dès réception, en même temps que l'exclusion de documents.ts (accueil) et le seuil de liens PDF de
  * scripts/check-compliance.mjs pour les statuts.
  */
-// Décision orchestrateur (08/09/2026) : le DIC est le document de référence obligatoire et reste publié même si sa
-// version hébergée (V7, SRI 3/7) doit être remplacée par CORUM ; la simulation ex-ante est publiée. Seuls les statuts
-// (PDF tronqué à la source) restent en attente.
-export const PENDING_DOCUMENT_KEYS: readonly string[] = ['statuts'];
+// Retours AMF de la réunion produit du 10/09/2026 (voir plan §0) :
+//  - DIC : le fichier hébergé (V7, 20/05/2026) classe R Start en 3 sur 7 quand le site affiche 4 sur 7
+//    (décision client, facts.risk.sri). C'est exactement la contradiction relevée par l'AMF entre un
+//    document réglementaire consultable et le site : le DIC reste donc en attente tant que CORUM n'a
+//    pas fourni la version à jour (priorité une, voir README, « Points en attente ») ;
+//  - simulation des frais ex-ante (V2, 27/03/2026) : affiche 1,12 % de frais de souscription et des
+//    montants d'épargne espérée issus des scénarios du DIC, qui contredisent le 0 % affiché sur tout le
+//    site et publient une donnée de performance (interdite tant que R Start a moins de 12 mois).
+// Les statuts restent en attente pour une autre raison (PDF tronqué à la source, illisible).
+export const PENDING_DOCUMENT_KEYS: readonly string[] = ['statuts', 'dic', 'simulation'];
 /** Un document de facts.ts est-il publié sur les pages v2 ? */
 export const isDocumentPublished = (key: string): boolean => !PENDING_DOCUMENT_KEYS.includes(key);
 const isPublished = (d: { key: string }): boolean => isDocumentPublished(d.key);

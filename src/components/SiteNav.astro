@@ -1,0 +1,427 @@
+---
+/**
+ * Navigation unique du site (plan V2 §1) : une seule barre, collée en haut de page, qui remplace
+ * l'ancien couple Header + SubNav. Un seul landmark de navigation par page (`<nav aria-label>`),
+ * qui contient la barre et le panneau plein écran des petits écrans.
+ *
+ * Entrées :
+ *  - accueil : les sections de la page (src/config/sections.ts, `inNav`) puis les pages qui n'ont
+ *    pas de section (src/config/pages.ts : Documentation, La presse en parle). L'entrée « Frais »
+ *    pointe vers la page /frais, pas vers l'ancre de la section ;
+ *  - sous-page : uniquement les pages du menu, retour à l'accueil compris.
+ * Aucun libellé en dur : src/config/{pages,sections}.ts et src/content/fr/nav.ts.
+ *
+ * Reprise de l'ancienne sous-navigation :
+ *  - liste à défilement horizontal, sans barre visible (`scrollbar-none`), avec fondu latéral
+ *    (`scroll-fade-x`) posé par le script dès que la liste déborde réellement ;
+ *  - pastille active glissante (`data-subnav-pill`, transform + width, aucune propriété de mise en
+ *    page animée) : elle suit la section active sur l'accueil, la page courante sur une sous-page ;
+ *  - état actif des sections par IntersectionObserver (aria-current="location") ;
+ *  - barre de progression de lecture (`data-progress`, scaleX piloté par le moteur sur <main>) ;
+ *  - CTA compacté après 40 % de la page (`data-compact-at` → `data-compact` → scale 0.92).
+ * Reprise de l'ancien en-tête :
+ *  - logo, suffixe de marque et CTA ;
+ *  - sous « lg », un panneau plein écran (aria-expanded / aria-controls, Échap, piège à focus,
+ *    retour du focus sur le bouton) qui liste les mêmes entrées à la verticale.
+ *
+ * L'ombre n'apparaît qu'une fois la page défilée (`data-stuck` sur la barre). Le logo porte
+ * `data-brand-target` : c'est l'arrivée du vol de la marque (src/scripts/motion/brandflight.ts).
+ * La barre est `sticky` sans filtre : le panneau `fixed` reste bien calé sur le viewport (un
+ * `backdrop-filter` sur un ancêtre en ferait le bloc conteneur), d'où la surface vitrée posée sur
+ * l'enfant `[data-sitenav-bar]`.
+ */
+import { Image } from 'astro:assets';
+import brandLogo from '@/assets/logos/r-start-couleur.svg';
+import logoWhite from '@/assets/logos/r-start-blanc.svg';
+import Button from '@/components/ui/Button.astro';
+import Container from '@/components/ui/Container.astro';
+import { menuPages, pages, type PageKey } from '@/config/pages';
+import { navSections, sections } from '@/config/sections';
+import { nav } from '@/content/fr/nav';
+import { withBase } from '@/lib/href';
+
+interface Props {
+  /** Forcer la liste des sections (page de prévisualisation) ; par défaut, sur l'accueil seulement. */
+  sections?: boolean;
+}
+
+/** Chemin courant normalisé (sans barre finale) pour l'état actif du menu. */
+const currentPath = Astro.url.pathname.replace(/\/+$/, '') || '/';
+const isCurrent = (path: string) => (path.replace(/\/+$/, '') || '/') === currentPath;
+const onHome = isCurrent(pages.home.path);
+const { sections: withSections = onHome } = Astro.props as Props;
+
+interface Entry {
+  /** Clé de rendu (identifiant de section ou clé de page). */
+  key: string;
+  label: string;
+  href: string;
+  /** Identifiant de la section observée : seules ces entrées reçoivent aria-current="location". */
+  sectionId?: string;
+  /** Page courante : aria-current="page". */
+  current: boolean;
+}
+
+/** Pages du menu sans section sur l'accueil : ni l'accueil lui-même, ni Frais (déjà dans les sections). */
+const pagesWithoutSection = menuPages.filter((p) => p.key !== 'home' && p.key !== 'fees');
+const pageLabel = (key: PageKey) => pages[key].navLabel ?? pages[key].label;
+
+/** Accueil : sections de la page (Frais renvoie vers /frais) puis pages sans section. */
+const homeEntries: Entry[] = [
+  ...navSections.map((s) =>
+    s.key === 'fees'
+      ? { key: 'fees', label: pageLabel('fees'), href: withBase(pages.fees.path), current: false }
+      : { key: s.id, label: s.label, href: '#' + s.id, sectionId: s.id, current: false },
+  ),
+  ...pagesWithoutSection.map((p) => ({ key: p.key, label: pageLabel(p.key), href: withBase(p.path), current: false })),
+];
+
+/** Sous-page : les pages du menu, retour à l'accueil compris. */
+const pageEntries: Entry[] = menuPages.map((p) => ({
+  key: p.key,
+  label: pageLabel(p.key),
+  href: withBase(p.path),
+  current: isCurrent(p.path),
+}));
+
+const entries = withSections ? homeEntries : pageEntries;
+
+/** Sur l'accueil, le logo remonte en haut de page ; ailleurs il ramène à l'accueil. */
+const logoHref = onHome ? '#' + sections.hero.id : withBase(pages.home.path);
+const panelId = 'site-nav-panel';
+const menuLabel = nav.menuLabel ?? nav.brand;
+const closeLabel = nav.closeLabel ?? menuLabel;
+const menuAriaLabel = nav.menuAriaLabel ?? nav.brand;
+const homeLinkLabel = nav.homeLinkLabel ?? nav.brand;
+const ctaLabel = nav.subnavCtaLabel ?? nav.cta.label;
+const linkClass =
+  'block rounded-full px-2 py-1.5 text-sm whitespace-nowrap text-slate-700 no-underline transition-colors hover:text-navy aria-[current]:font-semibold aria-[current]:text-navy sm:px-3';
+---
+
+<nav data-sitenav data-compact-at="0.4" aria-label={menuAriaLabel} class="sticky top-0 z-40">
+  <div
+    data-sitenav-bar
+    class="surface-glass relative border-b border-navy/10 transition-shadow duration-300 data-[stuck]:shadow-nav"
+  >
+    <Container size="wide" class="flex h-subnav items-center gap-2 sm:gap-4">
+      <a href={logoHref} class="flex shrink-0 items-center gap-2.5 no-underline" aria-label={homeLinkLabel}>
+        <Image
+          src={brandLogo}
+          alt={nav.brand}
+          width={290}
+          height={89}
+          loading="eager"
+          decoding="async"
+          data-brand-target
+          class="h-7 w-auto"
+        />
+        {
+          /* Sur l'accueil, la liste des sections prend toute la largeur : le suffixe de marque n'est
+             gardé que sur les sous-pages (et dans le panneau, où la place ne manque pas). */
+          !withSections && <span class="hidden text-sm text-slate-700 lg:inline">{nav.brandSuffix}</span>
+        }
+      </a>
+
+      <ul
+        data-sitenav-list
+        class="scrollbar-none scroll-fade-x relative -my-2 -mr-2 -ml-3 flex min-w-0 flex-1 items-center gap-0.5 overflow-x-auto py-2 pr-2 pl-3 sm:-mx-2 sm:gap-1 sm:px-2"
+        role="list"
+      >
+        <li aria-hidden="true" data-subnav-pill class="subnav-pill"></li>
+        {
+          entries.map((e) => (
+            <li class="relative shrink-0">
+              <a
+                href={e.href}
+                data-sitenav-link={e.sectionId}
+                aria-current={e.current ? 'page' : undefined}
+                class={linkClass}
+              >
+                {e.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+
+      <div class="hidden shrink-0 sm:block">
+        <Button position="nav" variant="primary" size="sm" class="subnav-cta">{ctaLabel}</Button>
+      </div>
+
+      <button
+        type="button"
+        data-menu-open
+        aria-expanded="false"
+        aria-controls={panelId}
+        class="inline-flex h-10 shrink-0 items-center gap-2 rounded-full px-2.5 text-sm font-semibold text-navy transition-colors hover:bg-navy/8 sm:px-3 lg:hidden"
+      >
+        <svg
+          aria-hidden="true"
+          class="size-5"
+          viewBox="0 0 20 20"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+        >
+          <path d="M3 5.5h14M3 10h14M3 14.5h14"></path>
+        </svg>
+        <span class="max-sm:sr-only">{menuLabel}</span>
+      </button>
+    </Container>
+    <span
+      aria-hidden="true"
+      data-progress
+      class="bg-brand-gradient pointer-events-none absolute inset-x-0 bottom-[-1px] h-[2px] origin-left scale-x-0"></span>
+  </div>
+
+  <div
+    id={panelId}
+    data-menu-panel
+    role="dialog"
+    aria-modal="true"
+    aria-label={menuAriaLabel}
+    class="surface-glass-dark fixed inset-0 z-50 flex flex-col overflow-y-auto text-white lg:hidden"
+    hidden
+  >
+    <Container size="wide" class="flex h-subnav shrink-0 items-center justify-between gap-4">
+      <a href={logoHref} class="flex items-center gap-2.5 no-underline" aria-label={homeLinkLabel} data-menu-close>
+        <Image src={logoWhite} alt={nav.brand} width={290} height={89} loading="lazy" decoding="async" class="h-7 w-auto" />
+        <span class="hidden text-sm text-white/85 sm:inline">{nav.brandSuffix}</span>
+      </a>
+      <button
+        type="button"
+        data-menu-close
+        class="inline-flex h-10 items-center gap-2 rounded-full px-3 text-sm font-semibold text-white transition-colors hover:bg-white/10"
+      >
+        <span>{closeLabel}</span>
+        <svg
+          aria-hidden="true"
+          class="size-5"
+          viewBox="0 0 20 20"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+        >
+          <path d="M4.5 4.5l11 11M15.5 4.5l-11 11"></path>
+        </svg>
+      </button>
+    </Container>
+
+    <Container size="wide" class="flex flex-1 flex-col justify-center py-10">
+      <ul class="flex flex-col gap-1" role="list">
+        {
+          entries.map((e) => (
+            <li>
+              <a
+                href={e.href}
+                data-menu-close
+                data-sitenav-link={e.sectionId}
+                aria-current={e.current ? 'page' : undefined}
+                class="text-display-sm block rounded-2xl px-3 py-2.5 text-white/85 no-underline transition-colors hover:text-white aria-[current]:text-white aria-[current]:underline aria-[current]:decoration-2 aria-[current]:underline-offset-8"
+              >
+                {e.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+      <div class="mt-10 flex flex-col gap-3 sm:flex-row">
+        <Button position="nav" variant="light" size="lg" class="w-full sm:w-auto">{nav.cta.label}</Button>
+      </div>
+    </Container>
+  </div>
+</nav>
+
+<script>
+  /*
+   * Barre unique : état actif (section traversant le tiers supérieur du viewport, ou page courante),
+   * pastille glissante, fondu de débordement, ombre au défilement, panneau plein écran sous « lg ».
+   */
+  const root = document.querySelector<HTMLElement>('[data-sitenav]');
+  if (root) {
+    const bar = root.querySelector<HTMLElement>('[data-sitenav-bar]');
+    const list = root.querySelector<HTMLElement>('[data-sitenav-list]');
+    const pill = root.querySelector<HTMLElement>('[data-subnav-pill]');
+    /* Liens de section : dans la barre et dans le panneau (le même identifiant peut porter deux liens). */
+    const sectionLinks = Array.from(root.querySelectorAll<HTMLAnchorElement>('[data-sitenav-link]'));
+    const barById = new Map<string, HTMLAnchorElement>();
+    for (const link of sectionLinks) {
+      const id = link.dataset.sitenavLink as string;
+      if (list?.contains(link) && !barById.has(id)) barById.set(id, link);
+    }
+    /* Sur une sous-page, la pastille marque la page courante tant qu'aucune section n'est active. */
+    const currentLink = list?.querySelector<HTMLAnchorElement>('a[aria-current="page"]') ?? null;
+    let current: string | null = null;
+
+    /* Pastille : position et taille du lien actif (lectures groupées, puis écritures). */
+    const placePill = () => {
+      if (!pill) return;
+      const active = (current ? barById.get(current) : null) ?? currentLink;
+      if (!active) {
+        pill.style.opacity = '0';
+        return;
+      }
+      const item = active.parentElement as HTMLElement;
+      const { offsetLeft, offsetTop, offsetWidth, offsetHeight } = item;
+      // Première apparition (ou retour après disparition) : placée sans transition de position ni de
+      // largeur, seul le fondu joue ; ensuite elle glisse et se morphe d'un lien à l'autre.
+      const appearing = pill.style.opacity !== '1';
+      if (appearing) pill.style.transitionProperty = 'opacity';
+      pill.style.width = offsetWidth + 'px';
+      pill.style.height = offsetHeight + 'px';
+      pill.style.top = offsetTop + 'px';
+      pill.style.transform = `translateX(${offsetLeft}px)`;
+      pill.style.opacity = '1';
+      if (appearing) {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            pill.style.transitionProperty = '';
+          });
+        });
+      }
+    };
+
+    const setActive = (id: string | null) => {
+      if (id === current) return;
+      current = id;
+      for (const link of sectionLinks) {
+        // La page courante garde aria-current="page" : seules les sections passent en "location".
+        if (link.getAttribute('aria-current') === 'page') continue;
+        if (link.dataset.sitenavLink === id) link.setAttribute('aria-current', 'location');
+        else link.removeAttribute('aria-current');
+      }
+      placePill();
+      // Sur mobile, centre le lien actif dans la liste (défilement horizontal de la liste seule,
+      // jamais de la page).
+      const active = id ? barById.get(id) : null;
+      if (active && list && list.scrollWidth > list.clientWidth) {
+        const left = active.offsetLeft - (list.clientWidth - active.offsetWidth) / 2;
+        list.scrollTo({ left: Math.max(0, left), behavior: 'smooth' });
+      }
+    };
+
+    /* Fondu latéral : uniquement quand la liste déborde réellement. */
+    const syncOverflow = () => {
+      if (list) list.toggleAttribute('data-overflow', list.scrollWidth - list.clientWidth > 1);
+    };
+
+    const ids = [...new Set(sectionLinks.map((l) => l.dataset.sitenavLink as string))];
+    const targets = ids.map((id) => document.getElementById(id)).filter((el): el is HTMLElement => el !== null);
+
+    if ('IntersectionObserver' in window && targets.length) {
+      const visible = new Map<string, number>();
+      const io = new IntersectionObserver(
+        (entries) => {
+          for (const e of entries) {
+            if (e.isIntersecting) visible.set(e.target.id, e.intersectionRatio);
+            else visible.delete(e.target.id);
+          }
+          // Parmi les sections présentes dans la bande, la première dans l'ordre du document ; aucune
+          // section navigable à l'écran (sections hors nav, notes, pied de page) → aucun lien actif.
+          const first = targets.find((t) => visible.has(t.id));
+          setActive(first ? first.id : null);
+        },
+        { rootMargin: '-25% 0px -60% 0px', threshold: [0, 0.01, 0.25, 0.5, 1] },
+      );
+      targets.forEach((t) => io.observe(t));
+    }
+
+    /* Ombre portée dès que la page est défilée : la barre est collée en haut dès le premier écran. */
+    let stuckFrame = 0;
+    const syncStuck = () => {
+      stuckFrame = 0;
+      bar?.toggleAttribute('data-stuck', window.scrollY > 2);
+    };
+    window.addEventListener(
+      'scroll',
+      () => {
+        if (!stuckFrame) stuckFrame = requestAnimationFrame(syncStuck);
+      },
+      { passive: true },
+    );
+
+    /* La pastille et le fondu suivent les changements de largeur (polices, rotation, fenêtre). */
+    let raf = 0;
+    const replace = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        syncOverflow();
+        placePill();
+      });
+    };
+    window.addEventListener('resize', replace, { passive: true });
+    document.fonts?.ready.then(replace);
+    syncOverflow();
+    placePill();
+    syncStuck();
+
+    /* Panneau plein écran (< lg) : ouverture / fermeture, Échap, retour du focus, piège à tabulation. */
+    const opener = root.querySelector<HTMLButtonElement>('[data-menu-open]');
+    const panel = root.querySelector<HTMLElement>('[data-menu-panel]');
+    if (opener && panel) {
+      const focusables = () =>
+        Array.from(
+          panel.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'),
+        ).filter((el) => !el.hidden && el.offsetParent !== null);
+
+      const isOpen = () => !panel.hidden;
+
+      const open = () => {
+        if (isOpen()) return;
+        panel.hidden = false;
+        opener.setAttribute('aria-expanded', 'true');
+        document.documentElement.style.overflow = 'hidden';
+        panel.querySelector<HTMLElement>('[data-menu-close]:not(a)')?.focus();
+      };
+
+      const close = (restoreFocus = true) => {
+        if (!isOpen()) return;
+        panel.hidden = true;
+        opener.setAttribute('aria-expanded', 'false');
+        document.documentElement.style.overflow = '';
+        if (restoreFocus) opener.focus();
+      };
+
+      opener.addEventListener('click', () => (isOpen() ? close() : open()));
+
+      panel.addEventListener('click', (e) => {
+        const target = e.target as HTMLElement | null;
+        const closer = target?.closest<HTMLElement>('[data-menu-close]');
+        if (!closer) return;
+        // Lien : on laisse la navigation se faire (ancre ou page) sans renvoyer le focus sur le bouton.
+        close(closer.tagName !== 'A');
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (!isOpen()) return;
+        if (e.key === 'Escape') {
+          e.preventDefault();
+          close();
+          return;
+        }
+        if (e.key === 'Tab') {
+          const items = focusables();
+          if (!items.length) return;
+          const first = items[0] as HTMLElement;
+          const last = items[items.length - 1] as HTMLElement;
+          const active = document.activeElement as HTMLElement | null;
+          if (e.shiftKey && (active === first || !panel.contains(active))) {
+            e.preventDefault();
+            last.focus();
+          } else if (!e.shiftKey && (active === last || !panel.contains(active))) {
+            e.preventDefault();
+            first.focus();
+          }
+        }
+      });
+
+      // Le panneau n'existe qu'en dessous de « lg » : on le referme si la fenêtre s'élargit.
+      const desktop = window.matchMedia('(min-width: 64rem)');
+      desktop.addEventListener('change', (e) => {
+        if (e.matches) close(false);
+      });
+    }
+  }
+</script>

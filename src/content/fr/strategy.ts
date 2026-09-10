@@ -34,10 +34,9 @@ export const notes: LegalNote[] = [
     id: 'strategie-mot-d-ordre',
     text: `« ${strategyFacts.motto} » est la formule de la brochure R Start 2026. Elle décrit une intention de gestion, non un résultat. ${corumGroup.disposalsDisclaimer}`,
   },
-  {
-    id: 'strategie-sfdr',
-    text: `Classification extra-financière : ${product.sfdr}. Les informations relatives à la durabilité figurent dans la note d’information. Source : DIC du ${product.dicDate.label}.`,
-  },
+  // Pas de note « strategie-sfdr » ici : la classification SFDR de R Start (product.sfdr) est déjà
+  // affichée et sourcée dans le cadre réglementaire de la section Confiance (07-Trust.astro, note
+  // « confiance-agrement »). La dupliquer ici créerait une note jamais appelée par un <NoteRef>.
 ];
 
 export const strategy = {

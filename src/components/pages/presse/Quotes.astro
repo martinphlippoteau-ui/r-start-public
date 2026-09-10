@@ -1,0 +1,66 @@
+---
+/**
+ * Page « La presse en parle » — Le verdict de la presse spécialisée (id « citations-presse »).
+ * Fond paper, entre le PageHero sombre et la revue de presse. Trois citations mises en avant, chacune
+ * dans une <figure> : le propos en <blockquote>, puis le média et la date en <figcaption>.
+ * Les citations sont des propos de tiers : elles portent `data-press-quote` (exclues du contrôle des
+ * formulations interdites de scripts/check-compliance.mjs, car couvertes par l'avertissement de la
+ * revue de presse), et l'introduction rappelle qu'elles n'engagent que leurs auteurs.
+ * Aucun logo de média : les noms sont en typographie (aucune licence).
+ * Animation : révélation en cascade de la grille seulement.
+ * Contenu : src/content/fr/press.ts (quotes, labels).
+ */
+import Container from '@/components/ui/Container.astro';
+import Section from '@/components/ui/Section.astro';
+import PressNoteRef from '@/components/pages/presse/PressNoteRef.astro';
+import { press } from '@/content/fr/press';
+
+const id = 'citations-presse';
+const { quotes } = press;
+const labels = press.labels ?? {};
+---
+
+<Section id={id} tone="paper">
+  <Container size="wide">
+    <header class="max-w-4xl">
+      <h2 id={id + '-title'} class="text-display-md text-ink">{quotes.title}</h2>
+      {
+        quotes.intro && (
+          <p class="text-lead mt-5 text-pretty text-slate-700 sm:mt-6">
+            {quotes.intro}
+            <span class="whitespace-nowrap">
+              <PressNoteRef id="presse-citations" />
+            </span>
+          </p>
+        )
+      }
+    </header>
+
+    <ul
+      role="list"
+      aria-label={labels.quotesListLabel}
+      class="mt-10 grid gap-5 lg:mt-14 lg:grid-cols-3 lg:gap-6"
+      data-animate="stagger"
+    >
+      {
+        quotes.items.map((quote) => (
+          <li>
+            <figure class="flex h-full flex-col gap-6 rounded-3xl bg-white p-6 shadow-card ring-1 ring-navy/5 sm:p-8 lg:p-10">
+              <svg aria-hidden="true" class="size-8 shrink-0 text-teal-700" viewBox="0 0 32 32" fill="currentColor">
+                <path d="M12.6 6.4a1 1 0 0 1 .4 1.9c-2.6 1.2-4 3-4.2 5.4h3.4a1 1 0 0 1 1 1v9.9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-7.9c0-5.2 2.7-8.8 8-10.3a1 1 0 0 1 .6 0Zm16 0a1 1 0 0 1 .4 1.9c-2.6 1.2-4 3-4.2 5.4h3.4a1 1 0 0 1 1 1v9.9a1 1 0 0 1-1 1H20a1 1 0 0 1-1-1v-7.9c0-5.2 2.7-8.8 8-10.3a1 1 0 0 1 .6 0Z" />
+              </svg>
+              <blockquote class="text-lead font-medium text-balance text-ink" data-press-quote>
+                <p>{`« ${quote.text} »`}</p>
+              </blockquote>
+              <figcaption class="mt-auto border-t border-navy/10 pt-5 text-base leading-relaxed text-slate-700">
+                <span class="font-semibold text-ink">{quote.media}</span>
+                <span aria-hidden="true"> · </span>
+                <time datetime={quote.dateIso}>{quote.date}</time>
+              </figcaption>
+            </figure>
+          </li>
+        ))
+      }
+    </ul>
+  </Container>
+</Section>

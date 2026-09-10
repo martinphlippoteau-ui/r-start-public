@@ -1,4 +1,5 @@
 import type { FooterContent, FooterLink, SectionKey } from '@/content/types';
+import { pages } from '@/config/pages';
 import { sections } from '@/config/sections';
 import { externalLinks, product } from '@/content/fr/facts';
 import { publishedDocuments } from '@/content/fr/documents';
@@ -43,7 +44,15 @@ const anchor = (key: SectionKey): FooterLink => ({
 
 export const footer = {
   columns: [
-    { title: 'R Start', links: mainSectionKeys.map(anchor) },
+    {
+      title: 'R Start',
+      // Sections de l'accueil, puis la salle de presse : réservée aux journalistes, elle n'est pas au
+      // menu (src/config/pages.ts, inMenu: false) et n'est accessible que d'ici.
+      links: [
+        ...mainSectionKeys.map(anchor),
+        { label: pages.pressRoom.label, href: pages.pressRoom.path } satisfies FooterLink,
+      ],
+    },
     {
       title: 'Documents',
       // Même liste que la section Documents (statuts exclus tant que le PDF n'est pas remplacé).

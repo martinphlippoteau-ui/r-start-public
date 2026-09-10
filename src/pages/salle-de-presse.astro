@@ -1,0 +1,73 @@
+---
+/**
+ * Page /salle-de-presse — espace destiné aux journalistes (arbitrage du 10/09/2026 : accessible depuis
+ * le pied de page seulement, `inMenu: false` dans src/config/pages.ts, donc absente de la SiteNav).
+ * SiteNav → main#contenu (PageHero avec le fil d'Ariane dans son slot et la ligne risques visible sans
+ * scroller → Communiqués → Contacts presse → Kit média et texte de présentation → renvoi vers « La
+ * presse en parle » → notes propres à la page) → Footer.
+ * La revue de presse et les citations restent sur /presse : les deux publics ne sont plus mélangés.
+ * Métadonnées (title, description, canonical) depuis pressRoom.seo ; JSON-LD Organization + WebPage +
+ * BreadcrumbList via src/lib/seo.ts. Aucun texte en dur.
+ */
+import Base from '@/layouts/Base.astro';
+import SiteNav from '@/components/SiteNav.astro';
+import Footer from '@/components/Footer.astro';
+import LegalNotes from '@/components/LegalNotes.astro';
+import Breadcrumb from '@/components/ui/Breadcrumb.astro';
+import Container from '@/components/ui/Container.astro';
+import PageHero from '@/components/ui/PageHero.astro';
+import Section from '@/components/ui/Section.astro';
+import Releases from '@/components/pages/salle-de-presse/Releases.astro';
+import Contacts from '@/components/pages/salle-de-presse/Contacts.astro';
+import MediaKit from '@/components/pages/salle-de-presse/MediaKit.astro';
+import { pages } from '@/config/pages';
+import { pressRoom } from '@/content/fr/pressRoom';
+import { breadcrumbJsonLd, organizationJsonLd, webPageJsonLd } from '@/lib/seo';
+import { withBase } from '@/lib/href';
+
+const path = pages.pressRoom.path;
+const jsonLd = [
+  organizationJsonLd(),
+  webPageJsonLd({ path, title: pressRoom.seo.title, description: pressRoom.seo.description }),
+  breadcrumbJsonLd('pressRoom'),
+];
+const { coverageLink } = pressRoom;
+---
+
+<Base title={pressRoom.seo.title} description={pressRoom.seo.description} path={path} jsonLd={jsonLd}>
+  <SiteNav />
+  <main id="contenu">
+    <PageHero
+      eyebrow={pressRoom.hero.eyebrow}
+      title={pressRoom.hero.title}
+      intro={pressRoom.hero.intro}
+      riskLine={pressRoom.hero.riskLine}
+    >
+      <Breadcrumb slot="breadcrumb" key="pressRoom" tone="dark" />
+    </PageHero>
+    <Releases />
+    <Contacts tone="white" />
+    <MediaKit />
+
+    <!-- Renvoi vers « La presse en parle », dans le menu principal -->
+    <Section id="revue-de-presse-renvoi" tone="paper" spacing="compact" labelledBy="revue-de-presse-renvoi-title">
+      <Container size="wide">
+        <div class="flex flex-col gap-5 rounded-3xl bg-white p-6 shadow-card sm:p-8 lg:flex-row lg:items-center lg:justify-between lg:gap-10 lg:p-10">
+          <div class="max-w-2xl">
+            <h2 id="revue-de-presse-renvoi-title" class="text-display-sm text-ink">{coverageLink.title}</h2>
+            <p class="text-lead mt-3 text-slate-700">{coverageLink.body}</p>
+          </div>
+          <a
+            href={withBase(coverageLink.href)}
+            class="text-lead shrink-0 font-semibold text-navy underline-offset-4 hover:text-teal-700 hover:underline"
+          >
+            {coverageLink.label}
+          </a>
+        </div>
+      </Container>
+    </Section>
+
+    <LegalNotes notes={pressRoom.notes} />
+  </main>
+  <Footer />
+</Base>

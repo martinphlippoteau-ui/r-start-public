@@ -1,5 +1,6 @@
 import type { LegalNote } from '@/content/types';
 import { notes as heroNotes } from '@/content/fr/hero';
+import { notes as differenceNotes } from '@/content/fr/difference';
 import { notes as highlightsNotes } from '@/content/fr/highlights';
 import { notes as feesNotes } from '@/content/fr/fees';
 import { notes as strategyNotes } from '@/content/fr/strategy';
@@ -18,6 +19,7 @@ import { notes as faqNotes } from '@/content/fr/faq';
  */
 export const allNotes: LegalNote[] = [
   ...heroNotes,
+  ...differenceNotes,
   ...highlightsNotes,
   ...feesNotes,
   ...strategyNotes,
