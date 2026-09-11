@@ -1,7 +1,7 @@
 import type { DifferenceContent } from '@/content/types-v2';
 import type { LegalNote } from '@/content/types';
 import { pages } from '@/config/pages';
-import { fees as feeFacts, product } from '@/content/fr/facts';
+import { corumGroup, fees as feeFacts, product } from '@/content/fr/facts';
 import { arbitrageWarningBullets } from '@/content/fr/legal';
 
 /**
@@ -28,6 +28,12 @@ const zeroAfter = feeFacts.withdrawal.zeroAfterYears;
 
 /** Notes dans l'ordre de leur premier appel dans la section. */
 export const notes: LegalNote[] = [
+  {
+    id: 'difference-definition',
+    text: nb(
+      `${product.definitionScope} Les cinq SCPI concernées : ${corumGroup.scpiNames.join(', ')}.`
+    ),
+  },
   {
     id: 'difference-remuneration',
     text: nb(
@@ -70,6 +76,12 @@ export const difference = {
   ],
   counterweight: {
     title: 'Une rémunération sans commission à l’entrée',
+    /**
+     * Allégation de rang bornée au périmètre du groupe CORUM (facts.product.definition). Elle ouvre le
+     * bloc depuis le 11/09/2026 : le hero porte l'accroche de l'équipe, qui n'est pas bornée. Jamais
+     * affichée sans son appel de note (le périmètre : les cinq SCPI du groupe).
+     */
+    claim: { text: product.definition, noteId: 'difference-definition' },
     /** Trame, zone 1 → ouverture de la zone 2 (hero minimal du 10/09/2026). Formulation exacte : les frais de gestion sont prélevés sur les loyers encaissés. */
     pedagogy: [
       // Claim de l'équipe marketing, repris mot pour mot (décision du 11/09/2026, à défendre en compliance :

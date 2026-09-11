@@ -1,6 +1,6 @@
 import type { HeroContent, LegalNote } from '@/content/types';
-import { sections } from '@/config/sections';
-import { corumGroup, fees, product } from '@/content/fr/facts';
+import { pages } from '@/config/pages';
+import { fees, product } from '@/content/fr/facts';
 import { shortRiskLine } from '@/content/fr/legal';
 
 /**
@@ -12,17 +12,11 @@ import { shortRiskLine } from '@/content/fr/legal';
  * dans le même bloc et à la même taille (règle AMF).
  */
 
-/** Le hero porte de nouveau l'allégation de rang et ses frais (11/09/2026) : deux notes, périmètre et frais. */
+/** Une seule note dans le hero : les frais réels (l'allégation bornée et son périmètre vivent en zone 2). */
 /** Espace insécable avant % (typographie française). */
 const nb = (t: string): string => t.replace(/ ([%€:;?!])/g, '\u00A0$1');
 
 export const notes: LegalNote[] = [
-  {
-    id: 'hero-definition',
-    text: nb(
-      `${product.definitionScope} Les cinq SCPI concernées : ${corumGroup.scpiNames.join(', ')}.`
-    ),
-  },
   {
     id: 'hero-frais',
     text: nb(
@@ -43,14 +37,16 @@ export const hero = {
   badge: 'Nouveau',
   title: product.name,
   /**
-   * Accroche : l'allégation de rang, BORNÉE au périmètre du groupe CORUM (facts.product.definition).
-   * « La première SCPI sans frais d'entrée » sans ce périmètre est refusée par scripts/check-compliance.mjs
-   * (deux règles : « première SCPI » hors périmètre, et « sans frais » non qualifié) — c'est un retour AMF
-   * déjà appliqué à la brochure. Elle n'est jamais affichée sans son appel de note (le périmètre : les cinq
-   * SCPI du groupe) ni sans `subtitle`, qui porte les frais réellement prélevés dans le même bloc.
+   * Accroche de l'équipe marketing, reprise mot pour mot (décision du 11/09/2026, prise en connaissance
+   * du risque). DEUX POINTS À DÉFENDRE, signalés en avertissement par scripts/check-compliance.mjs :
+   *  - « la seule » est une allégation d'exclusivité sur TOUT le marché, sans périmètre ni preuve ; c'est
+   *    précisément ce que l'AMF a fait borner sur la brochure (« la première SCPI DU GROUPE CORUM ») ;
+   *  - « gagnant-gagnant » suggère un gain pour l'épargnant, alors que le capital n'est pas garanti et les
+   *    revenus non plus.
+   * Le contre-poids du hero (`riskLine`, juste sous les CTA) porte les frais réellement prélevés et la
+   * ligne risques ; l'allégation bornée, elle, reste sur la page dans « Ce qui change vraiment ».
    */
-  tagline: product.definition,
-  taglineNoteId: 'hero-definition',
+  tagline: 'La seule SCPI Gagnant-Gagnant',
   /**
    * Contre-poids unique du hero (11/09/2026) : les frais réellement prélevés OUVRENT le bloc « Bon à
    * savoir », suivis de la ligne risques de legal.ts, reproduite mot pour mot et jamais réécrite.
@@ -62,10 +58,11 @@ export const hero = {
   ),
   riskNoteId: 'hero-frais',
   primaryCta: { label: 'Souscrire en ligne', position: 'hero' },
+  /** CTA secondaire (11/09/2026) : il mène à la page Frais, seul accès au barème depuis l'accueil. */
   secondaryCta: {
-    label: 'Découvrir R Start',
+    label: 'Comparer les frais',
     position: 'hero',
-    href: `#${sections.highlights.id}`,
+    href: pages.fees.path,
   },
   notes,
 } satisfies HeroContent;

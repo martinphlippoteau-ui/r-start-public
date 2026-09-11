@@ -243,6 +243,21 @@ async function checkIndex() {
       );
   }
 
+  // Accroche du hero (décision de l'équipe du 11/09/2026, prise en connaissance du risque) : signalée en
+  // AVERTISSEMENT pour rester traçable jusqu'à l'arbitrage de la compliance. « la seule » est une allégation
+  // d'exclusivité sur tout le marché, sans périmètre ni preuve ; « gagnant-gagnant » suggère un gain, alors
+  // que le capital n'est pas garanti. À passer en erreur si la compliance la refuse.
+  for (const [re_, quoi] of [
+    [
+      /\bla seule\s+SCPI/gi,
+      'allégation d’exclusivité « la seule SCPI » (sans périmètre ni preuve)',
+    ],
+    [/gagnant\s*-\s*gagnant/gi, '« gagnant-gagnant » (suggère un gain, capital non garanti)'],
+  ]) {
+    const n = (text.match(re_) || []).length;
+    if (n) warnings.push(`${file} : ${n} occurrence(s) à défendre en compliance — ${quoi}`);
+  }
+
   // « La presse en parle » : la section a quitté l'accueil le 11/09/2026 (la revue complète est sur /presse,
   // au menu). Si elle y revient un jour, elle doit satisfaire les mêmes exigences que /presse — citations de
   // tiers marquées data-press-quote, avertissement de couverture présent — d'où le contrôle conservé, mais

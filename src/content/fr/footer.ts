@@ -28,10 +28,12 @@ export const footer = {
   columns: [
     {
       title: 'R Start',
-      // Pages du menu (jamais d'ancre de section), puis la salle de presse : réservée aux journalistes, elle n'est pas au
+      // Pages du menu (jamais d'ancre de section), puis les deux pages hors menu : la documentation
+      // (sortie du menu le 11/09/2026) et la salle de presse, réservée aux journalistes. : réservée aux journalistes, elle n'est pas au
       // menu (src/config/pages.ts, inMenu: false) et n'est accessible que d'ici.
       links: [
         ...menuPages.map((p): FooterLink => ({ label: p.navLabel ?? p.label, href: p.path })),
+        { label: pages.documentation.label, href: pages.documentation.path } satisfies FooterLink,
         { label: pages.pressRoom.label, href: pages.pressRoom.path } satisfies FooterLink,
       ],
     },

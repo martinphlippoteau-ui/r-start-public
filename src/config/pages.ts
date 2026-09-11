@@ -1,6 +1,7 @@
 /**
- * Plan du site (mis à jour le 11/09/2026) : six pages publiques au menu (Accueil, Les frais, Stratégie
- * d'investissement, La presse en parle, Documentation, À propos — cette dernière en bout de menu), la salle de presse en pied de
+ * Plan du site (mis à jour le 11/09/2026) : cinq pages publiques au menu (Accueil, Les frais, Stratégie
+ * d'investissement, La presse en parle, À propos — cette dernière en bout de menu). Documentation et salle
+ * de presse sont hors menu, accessibles par le pied de page, la salle de presse en pied de
  * page, puis les pages légales. Le menu ne contient que des pages, jamais d'ancre de section.
  * La navigation unique (src/components/SiteNav.astro) suit `order` ; `inMenu` exclut les pages
  * légales. `navLabel` permet un libellé de navigation plus explicite que celui du fil d'Ariane.
@@ -59,7 +60,8 @@ export const pages: Record<PageKey, PageMeta> = {
     path: '/documentation',
     label: 'Documentation',
     order: 5,
-    inMenu: true,
+    // Hors menu depuis le 11/09/2026 : accessible par le pied de page, comme la salle de presse.
+    inMenu: false,
   },
   press: {
     key: 'press',

@@ -108,6 +108,8 @@ export interface DifferenceContent {
     noteId?: string;
     /** Les deux phrases « Payer des frais… oui / … non » de la trame, en ouverture du bloc (hero minimal). */
     pedagogy?: string[];
+    /** Allégation de rang bornée (facts.product.definition) : jamais sans son appel de note. */
+    claim?: { text: string; noteId: string };
   };
   /** Mécanisme de réserve en cas de moins-value, résumé en deux phrases (brochure partenaires 2026, p.4). */
   lossMechanism: { title: string; body: string[]; risk: string; noteId?: string };

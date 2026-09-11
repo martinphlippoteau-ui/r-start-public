@@ -41,7 +41,6 @@ import { Image } from 'astro:assets';
 import brandLogo from '@/assets/logos/r-start-blanc.svg';
 import Button from '@/components/ui/Button.astro';
 import Container from '@/components/ui/Container.astro';
-import NoteRef from '@/components/ui/NoteRef.astro';
 import RiskNote from '@/components/ui/RiskNote.astro';
 import Section from '@/components/ui/Section.astro';
 import { sections } from '@/config/sections';
@@ -140,13 +139,6 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
           class="mt-4 max-w-2xl text-xl leading-snug font-semibold text-balance text-sand sm:mt-7 sm:text-display-sm"
         >
           {hero.tagline}
-          {
-            hero.taglineNoteId && (
-              <span class="whitespace-nowrap">
-                <NoteRef id={hero.taglineNoteId} />
-              </span>
-            )
-          }
         </p>
       </div>
       <div {...copyScrubDown} class="mt-4 w-full max-sm:order-4 sm:mt-10 sm:w-auto">

@@ -128,6 +128,19 @@ const ENGINE_STAGGER = 0.08;
           )
         }
         {
+          /* Allégation de rang bornée, remontée du hero le 11/09/2026 (le hero porte l'accroche de
+            l'équipe, qui n'est pas bornée) : jamais sans son appel de note ; les frais réels suivent dans
+            le même bloc et à la même taille (RiskNote ci-contre). */
+          difference.counterweight.claim && (
+            <p class="mt-3 font-medium text-ink">
+              {difference.counterweight.claim.text}
+              <span class="whitespace-nowrap">
+                <NoteRef id={difference.counterweight.claim.noteId} />
+              </span>
+            </p>
+          )
+        }
+        {
           /* Les deux phrases de la trame, en tête du bloc : même bloc, même taille, même contre-poids chiffré. */
           difference.counterweight.pedagogy?.map((phrase) => (
             <p class="mt-3 font-semibold text-ink">{phrase}</p>
