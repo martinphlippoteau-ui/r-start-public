@@ -107,11 +107,13 @@ export const highlights = {
       noteId: 'points-forts-jouissance',
     },
   ],
-  /** Septième information de la trame, hors grille : elle n'a pas de valeur chiffrée. */
-  banner: nb(subscription.onlineLabel),
-  bannerNoteId: 'points-forts-en-ligne',
-  /** Les deux automatismes de la trame, sous la grille. */
-  options: [
+  /**
+   * Les trois dernières informations de la trame vivent à part (11/09/2026) : ce ne sont pas des
+   * caractéristiques du produit mais la façon d'y souscrire et ce qu'on peut automatiser ensuite.
+   */
+  subscriptionTitle: 'Modalités de souscription et options',
+  subscriptionItems: [
+    { label: 'Souscription', value: nb(subscription.onlineLabel), noteId: 'points-forts-en-ligne' },
     {
       label: 'Versements automatiques',
       value: nb(`dès ${subscription.options.pei.minimumMonthlyLabel}`),

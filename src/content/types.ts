@@ -99,12 +99,13 @@ export interface HighlightsContent {
   title: string;
   intro: string;
   cards: HighlightCard[];
-  /** Ligne pleine largeur sous la grille (ex. « 100 % digital »). */
-  banner?: string;
-  /** Appel de note du bandeau (source et portée). */
-  bannerNoteId?: string;
-  /** Automatismes proposés à la souscription, sous la grille. */
-  options?: { label: string; value: string; noteId?: string }[];
+  /**
+   * Bloc à part sous les six repères (11/09/2026) : comment on souscrit et ce qu'on peut automatiser.
+   * Séparé des repères par un filet et un titre, et rendu plus sobre : ce ne sont pas des
+   * caractéristiques du produit mais des modalités.
+   */
+  subscriptionTitle?: string;
+  subscriptionItems?: { label: string; value: string; noteId?: string }[];
   /** Contre-poids unique de la section, sous les repères. */
   risk?: string;
   notes: LegalNote[];

@@ -75,29 +75,26 @@ const titleId = sections.highlights.id + '-title';
     </ul>
 
     {
-      /* Septième information de la trame : elle n'a pas de valeur chiffrée, elle tient la largeur. */
-      highlights.banner && (
-        <p class="text-display-sm mt-4 rounded-3xl bg-navy px-6 py-5 text-center text-white sm:px-8 lg:mt-6">
-          {highlights.banner}
-          {highlights.bannerNoteId && <NoteRef id={highlights.bannerNoteId} tone="dark" />}
-        </p>
-      )
-    }
-
-    {
-      /* Automatismes proposés à la souscription. */
-      highlights.options && highlights.options.length > 0 && (
-        <ul role="list" class="mt-4 grid gap-4 sm:grid-cols-2 lg:mt-6 lg:gap-6">
-          {highlights.options.map((option) => (
-            <li class="rounded-3xl border border-navy/12 p-5 sm:p-6">
-              <p class="text-base font-medium text-slate-700">
-                {option.label}
-                {option.noteId && <NoteRef id={option.noteId} />}
-              </p>
-              <p class="text-lead mt-1 font-semibold text-navy">{option.value}</p>
-            </li>
-          ))}
-        </ul>
+      /* Bloc À PART (11/09/2026) : comment on souscrit et ce qu'on peut automatiser. Un filet et un titre
+        le détachent des six repères, et il est rendu sans encadré — ce ne sont pas des caractéristiques
+        du produit, mais des modalités. */
+      highlights.subscriptionItems && highlights.subscriptionItems.length > 0 && (
+        <div class="mt-chapter border-t border-navy/15 pt-8 sm:pt-10">
+          {highlights.subscriptionTitle && (
+            <h3 class="text-display-sm text-ink">{highlights.subscriptionTitle}</h3>
+          )}
+          <ul role="list" class="mt-6 grid gap-6 sm:grid-cols-3 sm:gap-8 lg:mt-8">
+            {highlights.subscriptionItems.map((item) => (
+              <li class="border-t border-navy/10 pt-4 sm:border-t-0 sm:pt-0">
+                <p class="text-base font-medium text-slate-700">
+                  {item.label}
+                  {item.noteId && <NoteRef id={item.noteId} />}
+                </p>
+                <p class="text-lead mt-1 font-semibold text-navy">{item.value}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
       )
     }
 
