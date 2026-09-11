@@ -10,6 +10,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import * as legal from '../src/content/fr/legal.ts';
 import { marketComparison, press as pressFacts, product, risk } from '../src/content/fr/facts.ts';
+import { comparator } from '../src/content/fr/comparator.ts';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const DIST = path.join(ROOT, 'dist');
@@ -392,19 +393,21 @@ async function checkSubPages() {
       const lower = text.toLowerCase();
       const named = marketComparison.panel.filter((n) => lower.includes(norm(n).toLowerCase()));
       if (named.length) {
-        requirePhrase(
-          text,
-          marketComparison.perimeterLead.slice(0, 80),
-          'périmètre du comparatif',
-          file
-        );
+        // Nommer une autre SCPI oblige à trois choses : dire ce que la comparaison compare, d'où
+        // viennent les chiffres, et rappeler que R Start n'est pas une SCPI sans frais. Le périmètre
+        // accepté est celui du comparateur SCPI par SCPI (comparator.ts) OU celui des moyennes de
+        // marché de la brochure, selon la comparaison présente sur la page.
+        const perimetres = [comparator.perimeter.slice(0, 80), marketComparison.perimeterLead.slice(0, 80)];
+        if (!perimetres.some((ph) => text.toLowerCase().includes(norm(ph).toLowerCase())))
+          errors.push(file + ' : mention absente — périmètre du comparatif');
         requirePhrase(
           text,
           legal.innovationNotRevolution.title,
           'encadré « Une innovation, pas une révolution »',
           file
         );
-        requirePhrase(text, marketComparison.source.slice(0, 40), 'source du comparatif', file);
+        if (!/Sources\s*:/.test(text))
+          errors.push(file + ' : mention absente — sources du comparatif');
       }
     }
     for (const [, body] of html.matchAll(

@@ -186,10 +186,6 @@ const rawNotes: LegalNote[] = [
     text: `Incidence des coûts selon le DIC du ${product.dicDate.label} (page 3), pour 10 000 € investis : ${after1Year} après 1 an, ${after5Years} après 5 ans et ${after10Years} après ${holdingYears} ans. Hypothèses réglementaires : au cours de la première année, vous récupérez le montant investi ; pour les autres durées, le produit évolue selon le scénario intermédiaire. L’incidence mesure la réduction moyenne, chaque année, de ce que le placement rapporte, du fait de l’ensemble des coûts, commission de retrait comprise en cas de sortie anticipée. Les montants en euros et les scénarios de performance du DIC ne sont pas repris sur ce site.`,
   },
   {
-    id: 'frais-page-comparatif',
-    text: `Bascule des frais : les valeurs de R Start viennent de la brochure R Start 2026 (page 4), du bulletin de souscription de mai 2026 et de la note d’information ; « frais sur les achats d’immeubles » est le terme d’affichage des frais d’acquisition, et « frais d’agent immobilier » celui des frais d’intermédiation (broker). Les valeurs de l’autre position sont des moyennes de marché, jamais les frais d’une SCPI précise. ${marketFacts.perimeterLead} : ${marketFacts.panel.join(', ')}, ${marketFacts.perimeterTail} ${marketFacts.brokerFootnote} Source : ${marketFacts.source} Cette comparaison porte sur les frais, pas sur les résultats : R Start n’a pas d’historique et aucune donnée de performance n’est communiquée.`,
-  },
-  {
     id: 'frais-page-distributeur',
     text: `Dans le cadre de la commercialisation de R Start, ${managementCompany.name} est susceptible de reverser aux intermédiaires habilités une rémunération récurrente équivalente à ${feeFacts.distributorRemuneration}. ${publisher.name}, éditeur de ce site, distribue R Start. Source : bulletin de souscription R Start, conditions générales de vente, mai 2026.`,
   },
@@ -390,7 +386,7 @@ const raw = {
   hero: {
     eyebrow: `Frais · SCPI ${product.name}`,
     title: `Comparer et comprendre les frais de ${product.name}`,
-    intro: `À la souscription et à l’achat des immeubles, R Start ne prélève aucune commission. Sa société de gestion prélève ${feeFacts.management.label} des loyers HT encaissés. Elle se rémunère aussi sur les plus-values à la vente (${feeFacts.disposal.label}) et, avant ${zeroAfter} ans, sur les retraits (${w0.rate} à ${w3.rate}). Cette page détaille chaque frais, son assiette et ses conditions.`,
+    intro: `R Start ne prélève rien à la souscription ni à l’achat des immeubles. Sa société de gestion se rémunère sur les loyers encaissés, sur les plus-values à la vente et, avant ${zeroAfter} ans, sur les retraits.`,
     riskLine: shortRiskLine,
   },
 

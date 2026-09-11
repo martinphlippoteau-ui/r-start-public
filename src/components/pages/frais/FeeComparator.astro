@@ -38,6 +38,8 @@ const data = scpis.map((s) => ({
   name: s.name,
   manager: s.manager,
   values: rows.map((r) => s.values?.[r.key] ?? null),
+  details: rows.map((r) => s.details?.[r.key] ?? null),
+  source: s.source ?? null,
 }));
 ---
 
@@ -54,13 +56,26 @@ const data = scpis.map((s) => ({
       <RiskNote text={comparator.pendingNotice} size="lead" />
     </div>
 
-    <div class="mt-8 overflow-x-auto sm:mt-10">
+    {
+      /* Défilement horizontal SOUS « sm » seulement. `overflow-x: auto` fait de l'enveloppe un conteneur
+        de défilement sur LES DEUX axes : un en-tête collant s'y collerait à l'enveloppe, pas à l'écran,
+        donc il ne bougerait jamais. Le tableau tient à partir de « sm ». */
+    }
+    <div class="mt-8 max-sm:overflow-x-auto sm:mt-10">
       <table data-comparator data-fee-block="comparateur-frais" class="w-full min-w-[34rem]">
         <caption class="visually-hidden">{comparator.title}</caption>
         <thead>
           <tr>
-            <th scope="col" class="w-[34%] p-0"><span class="visually-hidden">Frais</span></th>
-            <th scope="col" class="w-[33%] px-3 pb-5 align-bottom sm:px-5">
+            <th
+              scope="col"
+              class="sticky top-[calc(var(--spacing-nav-total)+0.5rem)] z-10 w-[34%] bg-white p-0"
+            >
+              <span class="visually-hidden">Frais</span>
+            </th>
+            <th
+              scope="col"
+              class="sticky top-[calc(var(--spacing-nav-total)+0.5rem)] z-10 w-[33%] border-b border-navy/12 bg-white px-3 pb-5 align-bottom sm:px-5"
+            >
               <Image
                 src={brandLogo}
                 alt={comparator.leftLabel}
@@ -74,7 +89,10 @@ const data = scpis.map((s) => ({
                 {comparator.leftManager}
               </span>
             </th>
-            <th scope="col" class="w-[33%] px-3 pb-5 align-bottom sm:px-5">
+            <th
+              scope="col"
+              class="sticky top-[calc(var(--spacing-nav-total)+0.5rem)] z-10 w-[33%] border-b border-navy/12 bg-white px-3 pb-5 align-bottom sm:px-5"
+            >
               <label for={selectId} class="visually-hidden">{comparator.selectLabel}</label>
               <select
                 id={selectId}
@@ -103,6 +121,11 @@ const data = scpis.map((s) => ({
                   <span data-fee-value class="text-display-sm text-navy">
                     {row.rstart}
                   </span>
+                  <span data-comparator-best="left" class="mt-1 block" hidden>
+                    <span class="text-caption rounded-full bg-teal-700/10 px-2 py-0.5 font-semibold text-teal-700">
+                      {comparator.bestLabel}
+                    </span>
+                  </span>
                   {row.rstartDetail && (
                     <span class="text-caption mt-1 block text-slate-700">{row.rstartDetail}</span>
                   )}
@@ -111,6 +134,15 @@ const data = scpis.map((s) => ({
                   <span data-comparator-cell={String(i)} class="text-display-sm text-slate-700">
                     {comparator.pendingLabel}
                   </span>
+                  <span data-comparator-best="right" class="mt-1 block" hidden>
+                    <span class="text-caption rounded-full bg-teal-700/10 px-2 py-0.5 font-semibold text-teal-700">
+                      {comparator.bestLabel}
+                    </span>
+                  </span>
+                  <span
+                    data-comparator-detail={String(i)}
+                    class="text-caption mt-1 block text-slate-700"
+                  />
                 </td>
               </tr>
             ))
@@ -119,11 +151,28 @@ const data = scpis.map((s) => ({
       </table>
     </div>
 
-    <p class="text-caption mt-6 text-slate-700">
+    {
+      /* Périmètre et sources : obligatoires dès qu'une autre SCPI est nommée. Ils disent ce qui est
+        comparé — des taux affichés, pas des coûts réels — et d'où viennent les chiffres. */
+    }
+    <p class="text-lead mt-8 max-w-3xl text-ink">{comparator.perimeter}</p>
+
+    <p class="text-caption mt-4 max-w-3xl text-slate-700">{comparator.vatNotice}</p>
+
+    <p class="text-caption mt-4 max-w-3xl text-slate-700">
       <strong class="font-semibold">{comparator.sourceLabel} :</strong>{' '}
       {comparator.sourceRStart}{' '}
       <span data-comparator-source>{comparator.sourceOthers}</span>
     </p>
+
+    {
+      /* Encadré de la brochure (p.4) : un comparatif de frais ne part jamais sans lui — il dit que R Start
+        n'est pas une SCPI sans frais et que son coût total n'est pas connu à la souscription. */
+    }
+    <div class="mt-8 rounded-3xl border border-navy/15 p-6 sm:p-8 lg:mt-10 lg:p-10">
+      <h3 class="text-display-sm">{comparator.innovationBox.title}</h3>
+      <p class="text-lead mt-4 text-ink">{comparator.innovationBox.body}</p>
+    </div>
   </Container>
 </Section>
 
@@ -139,7 +188,15 @@ const data = scpis.map((s) => ({
     if (!table || !select) return;
     const manager = table.querySelector('[data-comparator-manager]');
     const pending = document.querySelector('[data-comparator-pending]');
+    const source = document.querySelector('[data-comparator-source]');
     const cells = [...table.querySelectorAll('[data-comparator-cell]')];
+    const details = [...table.querySelectorAll('[data-comparator-detail]')];
+    const lignes = [...table.querySelectorAll('tbody tr')].map((tr) => ({
+      gauche: tr.querySelector('[data-fee-value]'),
+      marqueGauche: tr.querySelector('[data-comparator-best="left"]'),
+      marqueDroite: tr.querySelector('[data-comparator-best="right"]'),
+    }));
+    const sourceFallback = source ? source.textContent : '';
 
     const render = () => {
       const scpi = data[Number(select.value)] || data[0];
@@ -152,8 +209,35 @@ const data = scpis.map((s) => ({
         cell.classList.toggle('text-navy', Boolean(value));
         cell.classList.toggle('text-slate-700', !value);
         if (!value) missing += 1;
+        const detail = details[i];
+        if (detail) detail.textContent = (value && scpi.details[i]) || '';
       });
       if (pending) pending.hidden = missing === 0;
+      if (source) source.textContent = scpi.source || sourceFallback;
+
+      /*
+       * Taux le plus bas de la ligne. Marqué SEULEMENT si les deux cases portent un pourcentage unique :
+       * un barème à paliers (« 0 / 6 / 12 % ») ne se compare pas à un taux unique, et deux taux égaux ne
+       * départagent rien. Hors de ces cas, aucune marque — mieux vaut ne rien dire que suggérer un
+       * classement que les chiffres ne portent pas.
+       */
+      const seul = (t) => {
+        if (!t) return null;
+        /*
+         * La case doit contenir UN taux et rien d'autre : « 14,40 % TTC » oui, « 0 / 6 / 12 % » non.
+         * Chercher simplement un pourcentage ne suffisait pas — dans « 0 / 6 / 12 % », seul le dernier
+         * nombre est suivi du signe, la valeur était donc lue comme un taux unique de 12 %.
+         */
+        const m = t.trim().match(/^(\d+(?:[,.]\d+)?)\s*%(?:\s*(?:TTC|HT))?$/);
+        return m ? parseFloat(m[1].replace(',', '.')) : null;
+      };
+      lignes.forEach((ligne, i) => {
+        const g = seul(ligne.gauche.textContent);
+        const d = seul(scpi.values[i]);
+        const comparable = g !== null && d !== null && g !== d;
+        ligne.marqueGauche.hidden = !(comparable && g < d);
+        ligne.marqueDroite.hidden = !(comparable && d < g);
+      });
     };
 
     select.addEventListener('change', render);

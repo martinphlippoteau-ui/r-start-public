@@ -875,7 +875,7 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
    au-dessus d'un [data-risk], la cascade de chargement est admise : elle se termine seule, en moins de
    trois secondes, sans aucune action du visiteur.
    Les rangs disent l'ordre d'apparition (01-Hero.astro) : 1 la marque, 2 le surtitre, 3 l'accroche,
-   4 les CTA, 5 la ligne risques, 6 les avis, 7 la flèche. L'identifiant #apercu l'emporte sur la règle générale. */
+   4 les CTA, puis la ligne risques ET les avis ENSEMBLE (5 et 6, même délai), 7 la flèche. L'identifiant #apercu l'emporte sur la règle générale. */
 @media (prefers-reduced-motion: no-preference) {
   html.intro #apercu [data-intro] {
     animation-duration: var(--intro-dur, 700ms);
@@ -914,16 +914,17 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
     --intro-delay: 1580ms;
     --intro-dur: 600ms;
   }
-  /* 6 — les avis. */
+  /* 6 — les avis, EN MÊME TEMPS que la ligne risques (11/09/2026, demande de l'équipe) : même délai,
+     même durée. Les deux forment le bas du hero, les séparer donnait une cascade qui traînait. */
   html.intro #apercu [data-intro='6'] {
     animation-name: intro-hero-trust;
-    --intro-delay: 1740ms;
+    --intro-delay: 1580ms;
     --intro-dur: 600ms;
   }
   /* 7 — la flèche ferme l'ouverture. */
   html.intro #apercu [data-intro='7'] {
     animation-name: intro-hero-hint;
-    --intro-delay: 1900ms;
+    --intro-delay: 1800ms;
     --intro-dur: 550ms;
   }
 }
