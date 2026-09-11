@@ -23,5 +23,5 @@ export const aboutPage: { seo: PageSeo; hero: PageHero; notes: LegalNote[] } = {
     riskLine: shortRiskLine,
   },
   /** Seules les notes appelées par les blocs de cette page. */
-  notes: corumNotes.filter((note) => note.id === 'corum-gamme'),
+  notes: corumNotes.filter((note) => ['confiance-chiffres', 'corum-gamme'].includes(note.id)),
 };

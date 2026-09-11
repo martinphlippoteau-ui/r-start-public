@@ -54,7 +54,7 @@ import { corum } from '@/content/fr/corum';
 import { trust } from '@/content/fr/trust';
 
 const id = sections.corum.id;
-const { trustpilot, stats } = trust;
+const { trustpilot } = trust;
 
 /** Gamme en texte (décision du 09/09/2026 : seuls les logos R Start et CORUM L'Épargne sont utilisés sur le site). */
 
@@ -143,39 +143,10 @@ const TRUSTPILOT_COUNTER = { from: 0, duration: 1.4 };
         }
       </div>
 
-      <!-- Le groupe CORUM en chiffres -->
-      <div class="mt-10 sm:mt-16 border-t border-mist pt-10 sm:pt-16 lg:mt-24 lg:pt-24">
-        <h3 class="text-display-sm" data-animate="fade-up">
-          {stats.title}
-          <NoteRef id="confiance-chiffres" tone="light" />
-        </h3>
-        <!--
-          Grille 2 × 2 sur 8/12 : en 4 colonnes, « 160 000 » en text-stat déborde de sa cellule (texte dégradé
-          tronqué) ; sur 7/12, « 9,6 Md€ » (328 px à 1440 px) dépasse la cellule de 325 px et se replie sur deux lignes.
-        -->
-        <div class="mt-10 grid gap-10 lg:mt-12 lg:grid-cols-12 lg:gap-16">
-          <!-- Les quatre chiffres comptent depuis 0, en place, avec une durée liée à leur ordre de grandeur. -->
-          <ul
-            role="list"
-            class="grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:col-span-12 lg:grid-cols-4"
-          >
-            {
-              stats.items.map((s) => (
-                <li>
-                  <Stat size="solid" value={s.value} suffix={s.suffix} label={s.label} />
-                </li>
-              ))
-            }
-          </ul>
-          {
-            /* Le contre-poids « Ces chiffres sont ceux du groupe CORUM… » et la ligne de source ont été retirés
-              d'ici le 11/09/2026 (décision de l'équipe). Le rappel « cette expérience ne préjuge pas des résultats
-              de R Start, qui n'a pas d'historique propre » reste porté par l'introduction de la section
-              (corum.intro), dans le même chapitre. Les chiffres ne sont donc plus marqués [data-advantage]. */
-          }
-        </div>
-      </div>
-
+      {
+        /* « Le groupe CORUM en chiffres » a quitté l'accueil le 11/09/2026 : les quatre chiffres vivent sur
+          /a-propos, avec l'ambiance des bureaux et la gamme. L'accueil garde l'en-tête et les avis clients. */
+      }
       {
         /* La photo d'ambiance et la gamme des cinq SCPI ont quitté l'accueil le 11/09/2026 : elles vivent
           sur /a-propos (components/pages/a-propos/CorumRange.astro), atteinte par le bouton ci-dessous. */

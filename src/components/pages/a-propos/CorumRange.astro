@@ -1,8 +1,7 @@
 ---
 /**
- * Page /a-propos : photo d'ambiance des bureaux CORUM et gamme des cinq SCPI gérées depuis 2012, avec la
- * tuile R Start marquée « Nouveau ». Ces deux blocs suivaient « Le groupe CORUM en chiffres » sur l'accueil
- * jusqu'au 11/09/2026 ; ils ont leur place ici, où le sujet est la société de gestion.
+ * Page /a-propos (section unique, deux chapitres de même niveau) : les quatre chiffres du groupe CORUM, la photo d'ambiance des bureaux et la gamme des
+ * cinq SCPI, avec la tuile R Start marquée « Nouveau ». Ces blocs étaient sur l'accueil jusqu'au 11/09/2026 ; ils ont leur place ici, où le sujet est la société de gestion.
  * La photo n'a PAS de parallaxe : `data-parallax` exige le moteur GSAP, que cette page n'a aucune autre
  * raison de télécharger (tests/performance.spec.ts). Elle se révèle par `data-animate="clip"`, rendu par le
  * moteur léger.
@@ -15,7 +14,9 @@ import Container from '@/components/ui/Container.astro';
 import NoteRef from '@/components/ui/NoteRef.astro';
 import RiskNote from '@/components/ui/RiskNote.astro';
 import Section from '@/components/ui/Section.astro';
+import Stat from '@/components/ui/Stat.astro';
 import { corum } from '@/content/fr/corum';
+import { trust } from '@/content/fr/trust';
 import { media } from '@/content/fr/media';
 import { product } from '@/content/fr/facts';
 import { resolveImage } from '@/lib/images';
@@ -28,13 +29,44 @@ interface Props {
 }
 const { tone = 'white', notes } = Astro.props as Props;
 const officePhoto = await resolveImage(media.corum[0].src);
+const stats = trust.stats;
 const range = corum.range.scpiNames.map((name) => ({ name, current: name === product.name }));
 const LOGO_STAGGER = 0.08;
 const QUIET_TITLE_Y = 12;
 ---
 
-<Section id="gamme" tone={tone} labelledBy="gamme-title">
+<Section id="corum" tone={tone} labelledBy="chiffres-title">
   <Container size="wide">
+    <!-- Le groupe CORUM en chiffres -->
+    <div>
+      <h2 id="chiffres-title" class="text-display-sm" data-animate="fade-up">
+        {stats.title}
+        <NoteRef notes={notes} id="confiance-chiffres" tone="light" />
+      </h2>
+      <!--
+        Grille 2 × 2 sur 8/12 : en 4 colonnes, « 160 000 » en text-stat déborde de sa cellule (texte dégradé
+        tronqué) ; sur 7/12, « 9,6 Md€ » (328 px à 1440 px) dépasse la cellule de 325 px et se replie sur deux lignes.
+      -->
+      <div class="mt-10 grid gap-10 lg:mt-12 lg:grid-cols-12 lg:gap-16">
+        <!-- Les quatre chiffres comptent depuis 0, en place, avec une durée liée à leur ordre de grandeur. -->
+        <ul role="list" class="grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:col-span-12 lg:grid-cols-4">
+          {
+            stats.items.map((s) => (
+              <li>
+                <Stat size="solid" value={s.value} suffix={s.suffix} label={s.label} />
+              </li>
+            ))
+          }
+        </ul>
+        {
+          /* Le contre-poids « Ces chiffres sont ceux du groupe CORUM… » et la ligne de source ont été retirés
+            d'ici le 11/09/2026 (décision de l'équipe). Le rappel « cette expérience ne préjuge pas des résultats
+            de R Start, qui n'a pas d'historique propre » reste porté par l'introduction de la section
+            (corum.intro), dans le même chapitre. Les chiffres ne sont donc plus marqués [data-advantage]. */
+        }
+      </div>
+    </div>
+
     {
       /* Photo d'ambiance des bureaux : respiration visuelle de la bande blanche, et seule image de la page
         qui illustre la société de gestion. Décorative — aucun avantage, donc aucun contre-poids attendu. */

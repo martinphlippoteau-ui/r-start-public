@@ -84,7 +84,7 @@ export const notes: LegalNote[] = [...trustNotes, ...corumNotes].sort(
  * « rémunération sur les ventes » a été retiré,
  * leurs notes n'ont donc plus d'appel ici. `notes` reste l'export complet pour les autres pages.
  */
-const APPELEES_SUR_ACCUEIL = ['confiance-trustpilot', 'confiance-chiffres'];
+const APPELEES_SUR_ACCUEIL = ['confiance-trustpilot'];
 export const homeNotes: LegalNote[] = notes.filter((n) => APPELEES_SUR_ACCUEIL.includes(n.id));
 if (homeNotes.length !== APPELEES_SUR_ACCUEIL.length) {
   throw new Error(
