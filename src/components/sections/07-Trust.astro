@@ -21,7 +21,8 @@
  *  - les titres H3 des trois blocs entrent par `fade-up` : 24 px (valeur titre) quand un compteur suit
  *    (avis, chiffres), 12 px seulement quand le paragraphe sous le titre est visible d'emblée (gamme) pour
  *    ne pas chevaucher sa première ligne ;
- *  - la note Trustpilot est un compteur (`<Stat numeric>` → data-counter) qui monte de 0 à la note en
+ *  - les quatre chiffres du groupe sont FIXES (size="solid") : le compteur faisait varier leur largeur
+ *    et décalait la grille. La note Trustpilot reste un compteur (`<Stat numeric>`) qui monte de 0 à la note en
  *    1,4 s avec une décimale : c'est le seul effet de son bloc (plus de fade-up sur l'enveloppe) ; le
  *    périmètre / risque à côté reste visible d'emblée ;
  *  - les chiffres du groupe comptent depuis 0, en place (plus de `stagger` sur la liste : le compteur est
@@ -40,6 +41,7 @@
  * (confiance-chiffres), gamme (corum-gamme), rémunération (corum-compensation).
  * Contenu : src/content/fr/trust.ts et src/content/fr/corum.ts.
  */
+import { Picture } from 'astro:assets';
 import Container from '@/components/ui/Container.astro';
 import NoteRef from '@/components/ui/NoteRef.astro';
 import RiskNote from '@/components/ui/RiskNote.astro';
@@ -47,10 +49,14 @@ import Section from '@/components/ui/Section.astro';
 import SectionHeading from '@/components/ui/SectionHeading.astro';
 import Stat from '@/components/ui/Stat.astro';
 import { sections } from '@/config/sections';
+import { resolveImage } from '@/lib/images';
 import { corum } from '@/content/fr/corum';
+import { media } from '@/content/fr/media';
 import { trust } from '@/content/fr/trust';
 import { product } from '@/content/fr/facts';
 
+/** Ambiance des bureaux CORUM (11/09/2026) : la seule image de la page qui montre QUI gère. Décorative. */
+const officePhoto = await resolveImage(media.corum[0].src);
 const id = sections.corum.id;
 const { trustpilot, stats } = trust;
 
@@ -64,18 +70,13 @@ const hint = trustpilot.externalLinkHint;
 
 /** Compteur Trustpilot : départ à 0, 1,4 s (une décimale via decimalsOf). */
 const TRUSTPILOT_COUNTER = { from: 0, duration: 1.4 };
-/** Pas de cascade des logos de la gamme (secondes). */
+{
+  /* Quatre chiffres fixes (11/09/2026) : plus de compteur — la largeur du nombre changeait pendant
+            l'animation et décalait toute la grille. Une seule entrée en cascade sur la liste. */
+}
 const LOGO_STAGGER = 0.08;
 /** Amplitude du fade-up d'un H3 suivi d'un paragraphe visible d'emblée (px), au lieu des 28 px d'un titre. */
 const QUIET_TITLE_Y = 12;
-/**
- * Durée d'un compteur du groupe, proportionnelle à l'ordre de grandeur : 1,2 s + 0,2 s par puissance de
- * dix (9,6 → 1,4 s ; 250 → 1,7 s ; 2 500 → 1,9 s ; 160 000 → 2,2 s). Les grands nombres finissent en dernier.
- */
-const counterDuration = (n?: number): number | undefined =>
-  n === undefined
-    ? undefined
-    : Math.round((1.2 + 0.2 * Math.min(5, Math.log10(Math.abs(n) + 1))) * 100) / 100;
 ---
 
 <Section id={id} tone="ink" spacing="none">
@@ -169,15 +170,7 @@ const counterDuration = (n?: number): number | undefined =>
             {
               stats.items.map((s) => (
                 <li>
-                  <Stat
-                    value={s.value}
-                    numeric={s.numeric}
-                    decimals={decimalsOf(s.numeric)}
-                    suffix={s.suffix}
-                    from={s.numeric === undefined ? undefined : 0}
-                    duration={counterDuration(s.numeric)}
-                    label={s.label}
-                  />
+                  <Stat size="solid" value={s.value} suffix={s.suffix} label={s.label} />
                 </li>
               ))
             }
@@ -190,6 +183,32 @@ const counterDuration = (n?: number): number | undefined =>
           }
         </div>
       </div>
+
+      {
+        /* Photo d'ambiance des bureaux : respiration visuelle de la bande blanche, et seule image de la page
+          qui illustre la société de gestion. Décorative — aucun avantage, donc aucun contre-poids attendu. */
+      }
+      <figure class="mt-16 lg:mt-24" data-animate="clip">
+        <div class="img-frame aspect-[3/2] sm:aspect-[21/9]">
+          <div
+            class="absolute inset-x-0 -top-[12%] h-[124%]"
+            data-parallax="0.05"
+            data-parallax-trigger="parent"
+          >
+            <Picture
+              src={officePhoto}
+              alt={media.corum[0].alt}
+              widths={[640, 1024, 1600, 2400]}
+              sizes="(min-width: 80rem) 72rem, 100vw"
+              formats={['avif', 'webp']}
+              loading="lazy"
+              decoding="async"
+              pictureAttributes={{ class: 'block h-full w-full' }}
+              class="h-full w-full object-cover"
+            />
+          </div>
+        </div>
+      </figure>
 
       <!-- La gamme -->
       <div class="mt-10 sm:mt-16 grid gap-10 lg:mt-24 lg:grid-cols-12 lg:gap-16">

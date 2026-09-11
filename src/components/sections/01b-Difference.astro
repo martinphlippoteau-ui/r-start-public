@@ -17,6 +17,7 @@
  * le hero avec son périmètre).
  * Contenu : src/content/fr/difference.ts.
  */
+import { Picture } from 'astro:assets';
 import Button from '@/components/ui/Button.astro';
 import Card from '@/components/ui/Card.astro';
 import Container from '@/components/ui/Container.astro';
@@ -25,8 +26,12 @@ import RiskNote from '@/components/ui/RiskNote.astro';
 import Section from '@/components/ui/Section.astro';
 import { sections } from '@/config/sections';
 import { difference } from '@/content/fr/difference';
+import { media } from '@/content/fr/media';
+import { resolveImage } from '@/lib/images';
 
 const id = sections.difference.id;
+/** Respiration visuelle de fin de section (11/09/2026) : bande panoramique, purement décorative. */
+const bandPhoto = await resolveImage(media.income.src);
 const titleId = id + '-title';
 /** Décalage de cascade entre les deux cartes (secondes) : la seconde colonne suit la première. */
 const ENGINE_STAGGER = 0.08;
@@ -146,5 +151,37 @@ const ENGINE_STAGGER = 0.08;
         {difference.cta.label}
       </Button>
     </div>
+
+    {
+      /* Bande panoramique : coupe les deux écrans de texte du modèle de frais. Aucune allégation, aucun
+        avantage : elle n'entre dans aucun couple avantage / risque. Crédit visible (R Start n'a pas encore
+        de patrimoine : la photo ne représente aucun immeuble détenu). */
+    }
+    <figure class="mt-10 sm:mt-14 lg:mt-16" data-animate="clip">
+      <div class="img-frame aspect-[3/2] sm:aspect-[21/9]">
+        <div
+          class="absolute inset-x-0 -top-[12%] h-[124%]"
+          data-parallax="0.05"
+          data-parallax-trigger="parent"
+        >
+          <Picture
+            src={bandPhoto}
+            alt={media.income.alt}
+            widths={[640, 1024, 1600, 2400]}
+            sizes="(min-width: 80rem) 72rem, 100vw"
+            formats={['avif', 'webp']}
+            loading="lazy"
+            decoding="async"
+            pictureAttributes={{ class: 'block h-full w-full' }}
+            class="h-full w-full object-cover"
+          />
+        </div>
+      </div>
+      {
+        media.income.credit && (
+          <figcaption class="text-caption mt-3 text-slate-700">{media.income.credit}</figcaption>
+        )
+      }
+    </figure>
   </Container>
 </Section>

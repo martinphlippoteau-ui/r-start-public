@@ -38,7 +38,8 @@ export const start = (): void => {
     });
     // Vol de la marque (hero → barre, motion/brandflight.ts) : sa propre garde ≥ 40 rem, le même seuil que
     // la règle CSS qui masque le logo de la barre ; gsap.matchMedia appelle son nettoyage sous ce seuil.
-    mm.add('(min-width: 40rem)', () => setupBrandFlight());
+    // Vol d'ouverture (logo + CTA vers la barre) : toutes largeurs depuis le 11/09/2026.
+    setupBrandFlight();
     const restoreText = setupRevealText();
     setupReveals();
     const restoreCounters = setupCounters();

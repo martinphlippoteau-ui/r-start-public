@@ -41,6 +41,7 @@
  * plus aucune capture ni icône téléchargée depuis les magasins (AppMyCorum.astro).
  */
 import Button from '@/components/ui/Button.astro';
+import { Picture } from 'astro:assets';
 import AppMyCorum from '@/components/AppMyCorum.astro';
 import Card from '@/components/ui/Card.astro';
 import Container from '@/components/ui/Container.astro';
@@ -51,6 +52,8 @@ import RiskPair from '@/components/ui/RiskPair.astro';
 import Section from '@/components/ui/Section.astro';
 import SectionHeading from '@/components/ui/SectionHeading.astro';
 import { sections } from '@/config/sections';
+import { media } from '@/content/fr/media';
+import { resolveImage } from '@/lib/images';
 import { subscribe } from '@/content/fr/subscribe';
 
 interface Props {
@@ -58,6 +61,7 @@ interface Props {
   compact?: boolean;
 }
 const { compact = false } = Astro.props;
+const photo = await resolveImage(media.subscribe.src);
 
 const id = sections.subscribe.id;
 const title = compact && subscribe.homeTitle ? subscribe.homeTitle : subscribe.title;
@@ -91,16 +95,13 @@ const OPTION_Y = 12;
     <!-- Compact : le stepper (avantage) et son contre-poids partagent ce parent ; complet : grille stepper / MyCORUM. -->
     <div
       data-subscribe-grid
-      class:list={[
-        'mt-10 sm:mt-16 lg:mt-24',
-        compact ? 'max-w-3xl' : 'grid gap-12 lg:grid-cols-12 lg:gap-16',
-      ]}
+      class:list={['mt-10 sm:mt-16 lg:mt-24', 'grid gap-12 lg:grid-cols-12 lg:gap-16']}
     >
       <!-- Stepper -->
       <ol
         aria-label={subscribe.stepsLabel}
         data-advantage={compact ? '' : undefined}
-        class:list={['relative space-y-10 sm:space-y-14', !compact && 'lg:col-span-7']}
+        class:list={['relative space-y-10 sm:space-y-14', 'lg:col-span-7']}
       >
         {
           subscribe.steps.map((step, i) => (
@@ -171,9 +172,43 @@ const OPTION_Y = 12;
       {
         /* Compact : l'unique contre-poids des étapes, frère de la liste (jamais animé). */
         compact && (
-          <div class="mt-10 rounded-3xl bg-paper p-6 sm:mt-14 sm:p-10">
+          <div class="rounded-3xl bg-paper p-6 sm:p-10 lg:col-span-7">
             <RiskNote text={homeRisk} size="lead" />
           </div>
+        )
+      }
+
+      {
+        /* Accueil : photo d'illustration à droite des étapes (11/09/2026, la page manquait d'images).
+          Purement décorative pour la conformité : elle ne porte aucun avantage, le contre-poids des étapes
+          reste la RiskNote ci-dessus, dans le même parent que la liste. */
+        compact && (
+          <figure class="self-start lg:sticky lg:top-24 lg:col-span-5" data-animate="clip">
+            <div class="img-frame aspect-[4/3] lg:aspect-[4/5]">
+              <div
+                class="absolute inset-x-0 -top-[12%] h-[124%]"
+                data-parallax="0.04"
+                data-parallax-trigger="parent"
+              >
+                <Picture
+                  src={photo}
+                  alt={media.subscribe.alt}
+                  widths={[480, 800, 1200]}
+                  sizes="(min-width: 64rem) 26rem, 100vw"
+                  formats={['avif', 'webp']}
+                  loading="lazy"
+                  decoding="async"
+                  pictureAttributes={{ class: 'block h-full w-full' }}
+                  class="h-full w-full object-cover"
+                />
+              </div>
+            </div>
+            {media.subscribe.credit && (
+              <figcaption class="text-caption mt-3 text-slate-700">
+                {media.subscribe.credit}
+              </figcaption>
+            )}
+          </figure>
         )
       }
 

@@ -2,27 +2,28 @@
 /**
  * Bloc MyCORUM : l'application de CORUM L'Épargne pour suivre son épargne après la souscription.
  * Rendu sous la dernière étape du guide (« Suivre votre épargne », /documentation) : texte et badges des
- * deux magasins d'applications d'un côté, maquette de téléphone en 3D de l'autre, écran à la marque
- * R Start. Sur petit écran, le téléphone passe sous le texte.
- * Le téléphone est dessiné en CSS (aucune image) : coque arrondie, tranche métallisée, reflet vitré en
- * diagonale, encoche pilule, et une légère rotation en perspective qui lui donne son volume. Il est
- * décoratif (aria-hidden) : rien de ce qu'il montre n'est une information, et rien n'y est une donnée de
- * performance. En `prefers-reduced-motion`, la rotation reste (c'est une pose, pas une animation).
+ * deux magasins d'applications d'un côté, photo du téléphone de l'autre. Sur petit écran, le téléphone
+ * passe sous le texte.
+ * Le téléphone est une photo fournie par l'équipe (src/content/fr/media.ts, `app`), posée sur une ombre
+ * douce et légèrement inclinée en CSS (`phone-shot`). Elle illustre l'application : rien de ce qu'elle
+ * montre ne doit être lu comme une donnée de performance — à vérifier à chaque remplacement du visuel.
  * Contenu : src/content/fr/subscribe.ts (`app`). Badges : ui/StoreBadge.astro (voir l'avertissement sur
  * les chartes de marque Apple et Google avant mise en ligne).
  * Aucune donnée de performance, aucune promesse : ce bloc n'est ni un avantage ni un risque AMF.
  */
-import { Image } from 'astro:assets';
-import logoWhite from '@/assets/logos/r-start-blanc.svg';
+import { Picture } from 'astro:assets';
 import Card from '@/components/ui/Card.astro';
 import StoreBadge from '@/components/ui/StoreBadge.astro';
+import { media } from '@/content/fr/media';
 import { subscribe } from '@/content/fr/subscribe';
+import { resolveImage } from '@/lib/images';
 
 interface Props {
   class?: string;
 }
 const { class: className = '' } = Astro.props as Props;
 const app = subscribe.app;
+const phone = await resolveImage(media.app.src);
 /** Identifiants stables : l'enveloppe (aside) peut s'y référer par aria-labelledby. */
 const titleId = 'mycorum-app-title';
 const hintId = 'mycorum-app-hint';
@@ -62,24 +63,21 @@ const stores = (app?.stores ?? []).map((store, i) => ({
           </ul>
         </div>
 
-        {/* Maquette de téléphone : purement décorative, dessinée en CSS. */}
-        <div aria-hidden="true" class="phone-3d justify-self-center">
-          <div class="phone-3d-body">
-            <span class="phone-3d-notch" />
-            <div class="phone-3d-screen">
-              <Image
-                src={logoWhite}
-                alt=""
-                width={290}
-                height={89}
-                loading="lazy"
-                decoding="async"
-                class="w-[58%]"
-              />
-            </div>
-            <span class="phone-3d-gloss" />
-          </div>
-        </div>
+        {/* Photo fournie par l'équipe (11/09/2026) : téléphone affichant l'application, à la place de la
+          maquette dessinée en CSS. Décorative pour la conformité — elle n'énonce aucun avantage. */}
+        <figure class="justify-self-center">
+          <Picture
+            src={phone}
+            alt={media.app.alt}
+            widths={[240, 380, 520, 768]}
+            sizes="(min-width: 40rem) 15rem, 13rem"
+            formats={['avif', 'webp']}
+            loading="lazy"
+            decoding="async"
+            pictureAttributes={{ class: 'block' }}
+            class="phone-shot w-52 sm:w-60"
+          />
+        </figure>
       </div>
     </Card>
   )

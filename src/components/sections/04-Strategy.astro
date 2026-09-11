@@ -24,7 +24,7 @@
  *    sont dans la scène mais HORS des steps : visibles du premier au dernier temps, dans le même bloc
  *    et la même taille. Si la formule n'a pas exactement trois temps, rendu statique classique ;
  *  - leviers : filet qui s'étire (data-draw="width") puis numéro + titre + texte en cascade (stagger) ;
- *  - photos : cascade des cadres, et dans chaque cadre une parallaxe de sens alterné (data-parallax,
+ *  - photos (accueil et /strategie) : cascade des cadres, et dans chaque cadre une parallaxe de sens alterné (data-parallax,
  *    élément surdimensionné de ±12 % pour ne jamais découvrir le bord) ;
  *  - piliers : picto au trait (Picto.astro, SVG inline en teal-200, décoratif) ; UN seul effet par carte
  *    (11/09/2026) : le picto — objet visuel isolé, le seul emploi admis de `tilt` — bascule à l'entrée
@@ -203,47 +203,6 @@ const mottoScene = mottoSteps.length === 3;
               ))}
             </ul>
           </div>
-
-          {/* Trois photos d'immeubles, crédit visible, parallaxe de sens alterné dans chaque cadre */}
-          <ul
-            role="list"
-            class="mt-section-sm grid gap-5 sm:grid-cols-3 lg:gap-6"
-            data-animate="stagger"
-            data-animate-stagger="0.1"
-          >
-            {photos.map((photo, i) => (
-              <li>
-                <figure>
-                  <div class="img-frame aspect-[4/3] sm:aspect-[4/5]">
-                    <div
-                      class="absolute inset-x-0 -top-[12%] h-[124%]"
-                      data-parallax={String(PHOTO_PARALLAX[i] ?? PHOTO_PARALLAX[0])}
-                      data-parallax-trigger="parent"
-                    >
-                      <Picture
-                        src={photo.image}
-                        alt={photo.alt}
-                        widths={[480, 800, 1200]}
-                        sizes={photoSizes}
-                        formats={['avif', 'webp']}
-                        loading="lazy"
-                        decoding="async"
-                        pictureAttributes={{ class: 'block h-full w-full' }}
-                        class={
-                          i === 1
-                            ? 'h-full w-full object-cover object-[70%_50%]'
-                            : 'h-full w-full object-cover'
-                        }
-                      />
-                    </div>
-                  </div>
-                  {photo.credit && (
-                    <figcaption class="text-caption mt-3 text-white/90">{photo.credit}</figcaption>
-                  )}
-                </figure>
-              </li>
-            ))}
-          </ul>
         </Fragment>
       )
     }
@@ -366,6 +325,53 @@ const mottoScene = mottoSteps.length === 3;
         </Fragment>
       )
     }
+
+    {
+      /* Photos d'immeubles : sur l'accueil aussi depuis le 11/09/2026 (la page manquait d'images) ; sous
+        « sm » une seule est rendue en mode compact, trois empilées allongeraient trop la page. */
+    }
+    {/* Trois photos d'immeubles, crédit visible, parallaxe de sens alterné dans chaque cadre */}
+    <ul
+      role="list"
+      class="mt-section-sm grid gap-5 sm:grid-cols-3 lg:gap-6"
+      data-animate="stagger"
+      data-animate-stagger="0.1"
+    >
+      {
+        photos.map((photo, i) => (
+          <li>
+            <figure>
+              <div class="img-frame aspect-[4/3] sm:aspect-[4/5]">
+                <div
+                  class="absolute inset-x-0 -top-[12%] h-[124%]"
+                  data-parallax={String(PHOTO_PARALLAX[i] ?? PHOTO_PARALLAX[0])}
+                  data-parallax-trigger="parent"
+                >
+                  <Picture
+                    src={photo.image}
+                    alt={photo.alt}
+                    widths={[480, 800, 1200]}
+                    sizes={photoSizes}
+                    formats={['avif', 'webp']}
+                    loading="lazy"
+                    decoding="async"
+                    pictureAttributes={{ class: 'block h-full w-full' }}
+                    class={
+                      i === 1
+                        ? 'h-full w-full object-cover object-[70%_50%]'
+                        : 'h-full w-full object-cover'
+                    }
+                  />
+                </div>
+              </div>
+              {photo.credit && (
+                <figcaption class="text-caption mt-3 text-white/90">{photo.credit}</figcaption>
+              )}
+            </figure>
+          </li>
+        ))
+      }
+    </ul>
 
     {
       /* Accueil : le chapitre s'arrête ici et renvoie vers la page complète. */

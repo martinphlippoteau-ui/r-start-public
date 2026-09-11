@@ -63,8 +63,14 @@ const flightScrub = {
   'data-scrub-end': '+=30%',
   'data-scrub-ease': 'power1.out',
 };
-/** Surtitre et accroche : montée franche et disparition (comme le titre de Revolut), loin de la ligne risques. */
+/** Accroche : montée franche et disparition (comme le titre de Revolut), loin de la ligne risques. */
 const copyScrubUp = { 'data-scrub': 'y:0,-48|opacity:1,0', ...flightScrub };
+/**
+ * Surtitre et claim : même montée, SANS fondu. Ce sont de petits textes (11 à 14 px) : à mi-fondu leur
+ * contraste tombe sous 4,5:1, et un contrôle d'accessibilité qui mesure la page pendant le lissage du
+ * scrub le relève (axe, reproductible une fois sur cinq). Seule l'accroche, en grand, garde le fondu.
+ */
+const copyScrubMove = { 'data-scrub': 'y:0,-48', ...flightScrub };
 /** CTA : léger recul vers le bas, SANS fondu. Une opacité intermédiaire sur un bouton mêle son fond à celui
  *  du hero et fait tomber le contraste sous 4,5:1 (axe l'a relevé en le surprenant à mi-fondu) ; l'appel à
  *  l'action doit de toute façon rester pleinement lisible pendant la transition. */
@@ -105,7 +111,7 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
     <div data-hero-copy class="mx-auto flex max-w-4xl flex-col items-center text-center">
       {
         showEyebrow && (
-          <div {...copyScrubUp} class="mb-5 max-sm:order-1 sm:mb-6">
+          <div {...copyScrubMove} class="mb-5 max-sm:order-1 sm:mb-6">
             <p
               data-intro="1"
               class="text-eyebrow flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 text-teal-100 max-sm:tracking-wider"
@@ -134,13 +140,13 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
       {
         /* Claim de la trame en deux temps : l'énoncé en petit, la réponse (« Oui ! » / « Non ! ») détachée,
           en couleur d'accent. Entrée en cascade (data-intro 4 et 5) : les réponses arrivent après leur
-          énoncé. Le bloc recule avec les autres textes pendant le vol du logo (copyScrubUp), jamais la
+          énoncé. Le bloc recule avec les autres textes pendant le vol du logo (copyScrubMove), jamais la
           ligne risques. Sur mobile, il passe en dernier (order 6) pour ne pas repousser les CTA. */
       }
       {
         hero.claims && hero.claims.length > 0 && (
           <ul
-            {...copyScrubUp}
+            {...copyScrubMove}
             role="list"
             class="mt-6 flex max-w-3xl flex-col gap-3 text-left max-sm:order-6 max-sm:mt-5 sm:mt-10 sm:flex-row sm:justify-center sm:gap-10"
           >

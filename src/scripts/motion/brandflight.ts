@@ -34,9 +34,9 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-/** Le vol n'a lieu qu'à partir de « sm » : sous cette largeur la barre porte déjà la marque et le
- *  relais serait illisible (même seuil que la règle de masquage de global.css). */
-const FLIGHT_MEDIA = '(min-width: 40rem)';
+/** Le vol a lieu à TOUTES les largeurs depuis le 11/09/2026 : sur téléphone aussi, le logo rejoint le coin
+ *  supérieur gauche et le CTA le coin supérieur droit de la barre. Seule condition restante : la cible doit
+ *  être réellement affichée (sinon il n'y a nulle part où atterrir). */
 /** Distance de vol = FLIGHT_FACTOR × hauteur à parcourir, bornée en pixels et en fraction du viewport. */
 const FLIGHT_FACTOR = 2;
 const FLIGHT_MIN = 160;
@@ -72,13 +72,39 @@ interface Geometry {
   distance: number;
 }
 
-export const setupBrandFlight = (): (() => void) => {
-  const brand = document.querySelector<HTMLElement>('[data-brand-flight]');
-  const target = document.querySelector<HTMLElement>('[data-brand-target]');
-  const home = brand?.parentElement ?? null;
-  if (!brand || !target || !home) return () => {};
+/**
+ * Un vol : un élément du hero rejoint sa place dans la barre, puis passe le relais en fondu croisé.
+ * `clone: true` fait voler une COPIE décorative (le CTA reste en place dans le hero : il doit rester
+ * cliquable, porter son suivi analytique et servir de repère au test « les CTA du hero sont visibles
+ * sans scroller ») ; sinon l'élément lui-même est déplacé dans le calque (cas du logo).
+ */
+const makeFlight = (
+  sourceSelector: string,
+  targetSelector: string,
+  { clone = false }: { clone?: boolean } = {}
+): (() => void) => {
+  const source = document.querySelector<HTMLElement>(sourceSelector);
+  const target = document.querySelector<HTMLElement>(targetSelector);
+  const home = source?.parentElement ?? null;
+  if (!source || !target || !home) return () => {};
+  const brand = clone ? (source.cloneNode(true) as HTMLElement) : source;
+  if (clone) {
+    brand.removeAttribute('id');
+    brand.querySelectorAll('[id]').forEach((el) => el.removeAttribute('id'));
+    // La copie ne doit ni déclencher l'analytique, ni être atteinte au clavier, ni être lue : un élément
+    // focalisable sous aria-hidden est une violation (axe « aria-hidden-focus »), d'où le tabindex -1 sur
+    // TOUS les focalisables, pas seulement ceux qui portent data-cta.
+    brand.querySelectorAll('[data-cta]').forEach((el) => {
+      el.removeAttribute('data-cta');
+      el.removeAttribute('data-cta-position');
+    });
+    brand
+      .querySelectorAll('a, button, input, select, textarea, [tabindex], [contenteditable]')
+      .forEach((el) => el.setAttribute('tabindex', '-1'));
+    brand.setAttribute('aria-hidden', 'true');
+  }
   // Petit écran ou cible masquée : la marque reste dans le hero et la barre garde son logo, sans vol.
-  if (!window.matchMedia(FLIGHT_MEDIA).matches || target.offsetParent === null) return () => {};
+  if (target.offsetParent === null) return () => {};
 
   const flyer = document.createElement('div');
   flyer.className = 'brand-flyer';
@@ -93,7 +119,9 @@ export const setupBrandFlight = (): (() => void) => {
 
   const measure = (): Geometry | null => {
     gsap.set(flyer, { clearProps: 'transform,width' });
-    const homeRect = home.getBoundingClientRect();
+    // Point de départ : la COPIE laisse l'original en place (on mesure l'original) ; le déplacement, lui,
+    // vide son parent, qui réserve la place (`.hero-logo-wrap`) — c'est donc lui qu'il faut mesurer.
+    const homeRect = (clone ? source : home).getBoundingClientRect();
     const targetRect = target.getBoundingClientRect();
     if (!homeRect.width || !targetRect.width) return null;
     const homeTop = homeRect.top + window.scrollY;
@@ -125,6 +153,8 @@ export const setupBrandFlight = (): (() => void) => {
     const hand = clamp01((u - HANDOVER_START) / (1 - HANDOVER_START));
     if (hand === landed) return;
     landed = hand;
+    // Copie en vol : l'original reste en place dans le hero mais s'efface, sinon on le verrait en double.
+    if (clone) source.style.opacity = String(1 - clamp01(u * 6));
     flyer.style.opacity = String(1 - hand);
     // Relais achevé : le calque, invisible, ne conserve plus de couche de composition.
     flyer.style.visibility = hand >= 1 ? 'hidden' : '';
@@ -158,8 +188,21 @@ export const setupBrandFlight = (): (() => void) => {
   return () => {
     st.kill();
     gsap.set(flyer, { clearProps: 'all' });
-    home.appendChild(brand);
+    if (!clone) home.appendChild(brand);
     flyer.remove();
+    source.style.removeProperty('opacity');
     target.style.removeProperty('opacity');
   };
+};
+
+/**
+ * Les deux vols de l'ouverture : le logo vers le coin supérieur gauche, le CTA vers le coin supérieur
+ * droit. Ils partagent la même mécanique et la même distance : ils atterrissent ensemble.
+ */
+export const setupBrandFlight = (): (() => void) => {
+  const stops = [
+    makeFlight('[data-brand-flight]', '[data-brand-target]'),
+    makeFlight('[data-hero-cta]', '[data-cta-target]', { clone: true }),
+  ];
+  return () => stops.forEach((stop) => stop());
 };

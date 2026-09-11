@@ -8,6 +8,12 @@
  */
 interface Props {
   value: string;
+  /**
+   * `display` : très grand chiffre en dégradé de marque (scène d'ouverture).
+   * `solid` : plus petit, encre pleine, chiffres à chasse fixe — pour une grille de chiffres que l'on
+   * compare du regard (11/09/2026 : à 86 px et en dégradé, la grille CORUM était illisible).
+   */
+  size?: 'display' | 'solid';
   label: string;
   numeric?: number;
   prefix?: string;
@@ -19,6 +25,7 @@ interface Props {
 }
 const {
   value,
+  size = 'display',
   label,
   numeric,
   prefix,
@@ -32,7 +39,9 @@ const {
 
 <div class:list={['flex flex-col gap-2', className]}>
   <span
-    class="text-stat text-brand-gradient"
+    class:list={[
+      size === 'solid' ? 'text-display-md tabular-nums text-navy' : 'text-stat text-brand-gradient',
+    ]}
     data-counter={numeric}
     data-counter-prefix={prefix}
     data-counter-suffix={suffix}

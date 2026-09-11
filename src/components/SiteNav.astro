@@ -26,7 +26,8 @@
  *    retour du focus sur le bouton) qui liste les mêmes entrées à la verticale.
  *
  * L'ombre n'apparaît qu'une fois la page défilée (`data-stuck` sur la barre). Aucune différence entre
- * l'accueil et les sous-pages : mêmes entrées, même CTA. Le logo de la barre porte `data-brand-target` :
+ * l'accueil et les sous-pages : mêmes entrées, même CTA. Le logo porte `data-brand-target` et le CTA
+ * `data-cta-target` : ce sont les deux arrivées du vol d'ouverture du hero. Le logo de la barre :
  * c'est l'arrivée du vol de la marque (src/scripts/motion/brandflight.ts), masqué par CSS sur l'accueil
  * (≥ 40 rem, no-preference) jusqu'au fondu croisé ; visible d'emblée partout ailleurs.
  * La barre est `sticky` sans filtre : le panneau `fixed` reste bien calé sur le viewport (un
@@ -117,7 +118,8 @@ const linkClass =
       {
         /* Sous « lg », la liste est masquée : un seul menu (le panneau), le CTA reste visible et pousse à droite. */
       }
-      <div class="ml-auto shrink-0">
+      {/* `data-cta-target` : arrivée du vol du CTA du hero (src/scripts/motion/brandflight.ts). */}
+      <div data-cta-target class="ml-auto shrink-0">
         <Button position="nav" variant="primary" size="sm" class="subnav-cta">{ctaLabel}</Button>
       </div>
 

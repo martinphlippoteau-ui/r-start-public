@@ -32,6 +32,8 @@ export interface MediaImage {
 const illustration = 'Photo d’illustration. Immeuble non détenu par R Start.';
 
 export interface MediaContent {
+  /** Application MyCORUM : photo d'un téléphone affichant l'application (bloc « Après la souscription »). */
+  app: MediaImage;
   /** Photo de second plan du hero (chargement eager, jamais animée) et solution de repli. */
   hero: { main: MediaImage; alt: MediaImage };
   /** Trois immeubles variés pour le défilement de la section Stratégie. */
@@ -49,6 +51,11 @@ export interface MediaContent {
 }
 
 export const media = {
+  // 768 × 1365, fournie par l'équipe le 11/09/2026 : téléphone affichant l'application MyCORUM.
+  app: {
+    src: 'app/iphone-rstart.jpeg',
+    alt: 'Téléphone affichant l’application MyCORUM de CORUM L’Épargne',
+  },
   hero: {
     // 2400 × 1600, 647 ko. Bureaux contemporains bois/verre, ciel bleu, lumière franche : la plus
     // « premium » du lot, avec une zone de ciel qui laisse respirer le titre et la ligne risques.

@@ -298,75 +298,16 @@
 }
 
 /* Défilement horizontal sans barre visible (liste de la navigation) */
-/* --- Maquette de téléphone en 3D (AppMyCorum.astro) ---
-   Aucune image : coque arrondie avec tranche métallisée (dégradé conique sur le bord), écran à la marque,
-   encoche pilule et reflet vitré en diagonale. La pose 3D vient d'une perspective sur le conteneur et
-   d'une rotation sur la coque — c'est un angle figé, pas une animation : rien à couper en reduced-motion.
-   Largeur pilotée par `--phone-w` (14 rem par défaut, 16 rem à partir de `sm`). */
-.phone-3d {
-  --phone-w: 13rem;
-  width: var(--phone-w);
-  perspective: 900px;
-  @media (width >= 40rem) {
-    --phone-w: 15rem;
-  }
-}
-.phone-3d-body {
-  position: relative;
-  aspect-ratio: 9 / 19.5;
-  border-radius: calc(var(--phone-w) / 4.6);
-  padding: calc(var(--phone-w) / 38);
-  background: linear-gradient(
-    155deg,
-    #dfe8ec 0%,
-    #8fa3ad 18%,
-    #2c3f49 52%,
-    #8fa3ad 84%,
-    #dfe8ec 100%
-  );
+/* --- Photo de téléphone (AppMyCorum.astro) ---
+   Pose 3D légère : perspective + rotation figée (ce n'est pas une animation, rien à couper en
+   reduced-motion), coins arrondis et ombre portée qui décollent la photo du fond. */
+.phone-shot {
+  height: auto;
+  border-radius: 1.75rem;
+  transform: perspective(900px) rotateY(-12deg) rotateX(4deg) rotateZ(-1deg);
   box-shadow:
-    0 1px 0 1px rgb(255 255 255 / 0.35) inset,
-    0 28px 50px -26px rgb(13 46 61 / 0.7),
-    0 10px 22px -14px rgb(13 46 61 / 0.55);
-  transform: rotateY(-14deg) rotateX(5deg) rotateZ(-1deg);
-  transform-style: preserve-3d;
-}
-.phone-3d-screen {
-  display: grid;
-  place-items: center;
-  height: 100%;
-  border-radius: calc(var(--phone-w) / 5.2);
-  background:
-    radial-gradient(120% 80% at 20% 0%, rgb(20 164 186 / 0.55), transparent 60%),
-    radial-gradient(90% 60% at 90% 100%, rgb(2 75 103 / 0.75), transparent 65%),
-    linear-gradient(165deg, #0f5f79, #0a2b3a);
-  overflow: hidden;
-}
-/* Encoche pilule, posée sur l'écran. */
-.phone-3d-notch {
-  position: absolute;
-  z-index: 2;
-  top: calc(var(--phone-w) / 18);
-  left: 50%;
-  translate: -50% 0;
-  width: calc(var(--phone-w) / 3.4);
-  height: calc(var(--phone-w) / 13);
-  border-radius: 999px;
-  background: #0b1117;
-}
-/* Reflet vitré : bande diagonale claire, éteinte avant le bas. */
-.phone-3d-gloss {
-  position: absolute;
-  z-index: 3;
-  inset: calc(var(--phone-w) / 38);
-  border-radius: calc(var(--phone-w) / 5.2);
-  pointer-events: none;
-  background: linear-gradient(
-    118deg,
-    rgb(255 255 255 / 0.3) 0%,
-    rgb(255 255 255 / 0.08) 22%,
-    transparent 46%
-  );
+    0 26px 46px -24px rgb(13 46 61 / 0.65),
+    0 10px 20px -14px rgb(13 46 61 / 0.5);
 }
 
 /* --- Pictogrammes « liquid glass » (ui/Picto.astro) ---
@@ -761,8 +702,12 @@
    script règle ensuite son opacité pour le passage de relais. Rétabli partout où le vol n'a pas lieu :
    sous 40 rem, en reduced-motion, sans script (`scripting: enabled` ; un navigateur qui ignore cette
    requête média garde le logo visible et le script le masque au démarrage), et sur les autres pages. */
-@media (prefers-reduced-motion: no-preference) and (width >= 40rem) and (scripting: enabled) {
-  body:has([data-brand-flight]) [data-brand-target] {
+/* Pendant le vol d'ouverture, la barre cède ses deux repères au calque : le logo (`data-brand-target`) et
+   le CTA (`data-cta-target`). Ils sont rendus opaques par le script au fondu croisé. Plus de borne de
+   largeur depuis le 11/09/2026 : le vol a lieu aussi sur téléphone. */
+@media (prefers-reduced-motion: no-preference) and (scripting: enabled) {
+  body:has([data-brand-flight]) [data-brand-target],
+  body:has([data-brand-flight]) [data-cta-target] {
     opacity: 0;
   }
 }

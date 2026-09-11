@@ -13,6 +13,9 @@ import { shortRiskLine } from '@/content/fr/legal';
  */
 
 /** Plus aucune note dans le hero : la définition et ses frais vivent dans difference.ts (difference-definition). */
+/** Espace insécable avant % (typographie française). */
+const nb = (t: string): string => t.replace(/ ([%€:;?!])/g, '\u00A0$1');
+
 export const notes: LegalNote[] = [];
 
 export const hero = {
@@ -21,7 +24,14 @@ export const hero = {
   /** Pastille « Nouveau » : R Start est ouverte aux souscriptions depuis 2026 (facts.product.openingDate). */
   badge: 'Nouveau',
   title: product.name,
-  tagline: product.tagline,
+  /**
+   * Accroche du hero (décision du 11/09/2026) : elle remplace « La SCPI nouvelle génération » de la
+   * brochure, conservée dans facts.product.tagline pour les métadonnées et les autres pages. Elle porte
+   * l'objectif « comprendre que tout est digital », le moins bien servi de la page. À défendre en
+   * compliance : c'est la SOUSCRIPTION et le suivi qui sont 100 % en ligne, pas la SCPI elle-même ; la
+   * section « Six points à connaître » et le chapitre « Souscrire » le précisent.
+   */
+  tagline: nb('La SCPI 100 % digitale'),
   /** Règle AMF : la définition annonce l'absence de frais d'entrée, cette ligne porte, dans le même bloc et à la même taille, les frais réellement prélevés. */
   /**
    * Claim de l'équipe marketing, repris mot pour mot et rendu en deux temps (énoncé, puis réponse) :
