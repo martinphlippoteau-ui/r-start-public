@@ -71,10 +71,11 @@ const copyScrubUp = { 'data-scrub': 'y:0,-48|opacity:1,0', ...flightScrub };
  * scrub le relève (axe, reproductible une fois sur cinq). Seule l'accroche, en grand, garde le fondu.
  */
 const copyScrubMove = { 'data-scrub': 'y:0,-48', ...flightScrub };
-/** CTA : léger recul vers le bas, SANS fondu. Une opacité intermédiaire sur un bouton mêle son fond à celui
- *  du hero et fait tomber le contraste sous 4,5:1 (axe l'a relevé en le surprenant à mi-fondu) ; l'appel à
- *  l'action doit de toute façon rester pleinement lisible pendant la transition. */
-const copyScrubDown = { 'data-scrub': 'y:0,24', ...flightScrub };
+/** CTA : recul et EFFACEMENT (11/09/2026) pendant que celui de la barre apparaît (brandflight.ts).
+ *  Le fondu avait été retiré parce qu'un contrôle d'accessibilité surprenait le bouton à mi-opacité, avec
+ *  un contraste sous 4,5:1 ; la cause réelle était la cascade d'entrée, corrigée depuis (data-intro-move
+ *  partout dans le hero). Le fondu du défilement est donc rétabli, et le contrôle est rejoué en série. */
+const copyScrubDown = { 'data-scrub': 'y:0,24|opacity:1,0', ...flightScrub };
 /** Ligne risques : variantes mobile seulement (voir en-tête) ; rien ne change à partir de « sm ». */
 const riskMobile = 'max-sm:order-5 max-sm:max-w-[24rem] max-sm:text-sm max-sm:leading-snug';
 /** CTA : taille md sous « sm » (la référence de taille de la ligne risques est leur libellé). */
@@ -114,6 +115,7 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
           <div {...copyScrubMove} class="mb-3 max-sm:order-1 sm:mb-6">
             <p
               data-intro="1"
+              data-intro-move
               class="text-eyebrow flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 text-teal-100 max-sm:tracking-wider"
             >
               {badge && (

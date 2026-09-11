@@ -74,9 +74,8 @@ interface Geometry {
 
 /**
  * Un vol : un élément du hero rejoint sa place dans la barre, puis passe le relais en fondu croisé.
- * `clone: true` fait voler une COPIE décorative (le CTA reste en place dans le hero : il doit rester
- * cliquable, porter son suivi analytique et servir de repère au test « les CTA du hero sont visibles
- * sans scroller ») ; sinon l'élément lui-même est déplacé dans le calque (cas du logo).
+ * `clone: true` ferait voler une COPIE décorative plutôt que l'élément lui-même ; plus aucun appelant ne
+ * l'utilise depuis le 11/09/2026 (le CTA ne vole plus, il s'efface), l'option reste pour un éventuel retour.
  */
 const makeFlight = (
   sourceSelector: string,
@@ -199,10 +198,42 @@ const makeFlight = (
  * Les deux vols de l'ouverture : le logo vers le coin supérieur gauche, le CTA vers le coin supérieur
  * droit. Ils partagent la même mécanique et la même distance : ils atterrissent ensemble.
  */
+/**
+ * Relais du CTA (11/09/2026) : plus de vol. Le CTA du hero s'efface simplement au défilement (scrub posé
+ * dans 01-Hero.astro) pendant que celui de la barre apparaît. Les deux se croisent sur la même distance
+ * que le vol du logo, si bien que l'ouverture reste d'un seul tenant.
+ * Le CTA de la barre part à opacité 0 (règle CSS `body:has([data-brand-flight]) [data-cta-target]`) : il
+ * n'y a donc ni flash ni doublon au premier rendu, et rien ne change sur les pages sans hero.
+ */
+const makeCtaHandover = (): (() => void) => {
+  const target = document.querySelector<HTMLElement>('[data-cta-target]');
+  const hero = document.querySelector<HTMLElement>('[data-brand-flight]');
+  if (!target || !hero) return () => {};
+  let last = -1;
+  const apply = (scroll: number) => {
+    const distance = Math.max(FLIGHT_MIN, window.innerHeight * 0.3);
+    const u = clamp01(scroll / distance);
+    if (u === last) return;
+    last = u;
+    target.style.opacity = String(u);
+  };
+  const st = ScrollTrigger.create({
+    trigger: document.documentElement,
+    start: 'top top',
+    end: () => '+=' + Math.max(FLIGHT_MIN, window.innerHeight * 0.3),
+    onRefresh: () => apply(window.scrollY),
+    onUpdate: (self) => apply(self.scroll()),
+    onLeave: () => apply(window.scrollY),
+    onEnterBack: () => apply(window.scrollY),
+  });
+  apply(window.scrollY);
+  return () => {
+    st.kill();
+    target.style.removeProperty('opacity');
+  };
+};
+
 export const setupBrandFlight = (): (() => void) => {
-  const stops = [
-    makeFlight('[data-brand-flight]', '[data-brand-target]'),
-    makeFlight('[data-hero-cta]', '[data-cta-target]', { clone: true }),
-  ];
+  const stops = [makeFlight('[data-brand-flight]', '[data-brand-target]'), makeCtaHandover()];
   return () => stops.forEach((stop) => stop());
 };
