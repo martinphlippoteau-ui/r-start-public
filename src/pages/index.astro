@@ -24,11 +24,10 @@ const all = Object.entries(modules)
 /**
  * Trame de l'accueil (10/09/2026), par préfixe de fichier : 01 Hero → 02 Points forts (comprendre le produit)
  * → 01b Ce qui change vraiment (le modèle de frais) → 07 L'expérience derrière R Start → 03a Immeuble (photo
- * pleine largeur, respiration sans texte) → 03 Frais → 04 Piliers (chapitre court) → 06 Souscrire en étapes (chapitre court, 11/09/2026) → 08b La presse en parle
  * → 08 Risques → 10 FAQ. Hors accueil : 05 Revenus (repris par la FAQ), 06 Souscrire (guide sur
  * /documentation, avec MyCORUM) et 09 Documents (/documentation).
  */
-const HOME_ORDER = ['01-', '01b-', '02-', '03-', '07-', '03a-', '04-', '06-', '08b-', '08-', '10-'];
+const HOME_ORDER = ['01-', '01b-', '02-', '07-', '03a-', '04-', '06-', '08b-', '08-', '10-'];
 const byPrefix = (prefix: string) => all.find((s) => s.path.includes('/sections/' + prefix));
 const hero = byPrefix('01-');
 const rest = HOME_ORDER.slice(1)

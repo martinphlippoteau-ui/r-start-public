@@ -95,6 +95,7 @@ export const difference = {
     ),
     noteId: 'difference-reserve',
   },
-  cta: { label: 'En savoir plus sur les frais', href: pages.fees.path },
+  /** Seul accès aux frais depuis l'accueil (11/09/2026 : la section Frais a quitté la page). */
+  cta: { label: 'Découvrir les frais', href: pages.fees.path },
   notes,
 } satisfies DifferenceContent;

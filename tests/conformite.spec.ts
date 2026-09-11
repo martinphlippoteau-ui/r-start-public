@@ -133,7 +133,15 @@ test.describe('Conformité', () => {
    * les valeurs qu'il contient doivent partager la même taille de police rendue, sur les deux pages qui
    * exposent des frais et dans la bascule pédagogique.
    */
-  for (const path of ['/', '/frais/']) {
+  /**
+   * `requis` : la page DOIT exposer des valeurs de frais. L'accueil ne le fait plus depuis le 11/09/2026
+   * (la section Frais vit sur /frais, atteinte par le CTA « Découvrir les frais ») ; la règle de taille y
+   * reste vérifiée si des valeurs réapparaissent un jour, sans exiger qu'il y en ait.
+   */
+  for (const { path, requis } of [
+    { path: '/', requis: false },
+    { path: '/frais/', requis: true },
+  ]) {
     test(`taille de police identique pour toutes les valeurs de frais (${path})`, async ({
       page,
     }) => {
@@ -150,10 +158,12 @@ test.describe('Conformité', () => {
         return groups;
       });
 
-      expect(
-        Object.keys(blocks).length,
-        `aucune valeur de frais repérée sur ${path}`
-      ).toBeGreaterThan(0);
+      if (requis) {
+        expect(
+          Object.keys(blocks).length,
+          `aucune valeur de frais repérée sur ${path}`
+        ).toBeGreaterThan(0);
+      }
       for (const [key, values] of Object.entries(blocks)) {
         expect(values.length, `un seul frais dans le groupe ${key}`).toBeGreaterThan(1);
         const sizes = [...new Set(values.map((v) => v.size))];

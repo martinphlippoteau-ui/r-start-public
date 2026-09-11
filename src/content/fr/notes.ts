@@ -3,7 +3,6 @@ import { notes as heroNotes } from '@/content/fr/hero';
 import { notes as highlightsNotes } from '@/content/fr/highlights';
 import { notes as differenceNotes } from '@/content/fr/difference';
 import { homeNotes as corumNotes } from '@/content/fr/corum';
-import { notes as feesNotes } from '@/content/fr/fees';
 import { homeNotes as subscribeNotes } from '@/content/fr/subscribe';
 import { notes as pressHomeNotes } from '@/content/fr/pressHome';
 import { notes as risksNotes } from '@/content/fr/risks';
@@ -23,13 +22,13 @@ export const allNotes: LegalNote[] = [
   ...heroNotes,
   ...differenceNotes,
   ...highlightsNotes,
-  ...feesNotes,
   ...corumNotes,
   ...subscribeNotes,
   ...pressHomeNotes,
   ...risksNotes,
   ...faqNotes,
-  // Hors accueil : Revenus et Documents (10/09/2026) ; le cadre réglementaire, dix des seize questions de
+  // Hors accueil : Revenus et Documents (10/09/2026) ; la section Frais entière (11/09/2026 : elle vit
+  // sur /frais, atteinte par le CTA « Découvrir les frais » de la zone 2) ; le cadre réglementaire, dix des seize questions de
   // la FAQ et le guide complet de souscription (11/09/2026) — d'où les registres partiels `homeNotes` de
   // corum.ts, faq.ts et subscribe.ts (06 en `compact` n'appelle que les notes de ses étapes).
 ];
