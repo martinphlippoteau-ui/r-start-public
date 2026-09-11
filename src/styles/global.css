@@ -941,15 +941,26 @@ html.reperes main section[data-section]:first-child::before {
     --intro-dur: 550ms;
   }
 }
-/* La marque GRANDIT depuis son centre (11/09/2026, demande de l'équipe : « comme une apparition
-   PowerPoint »). Plus de montée : un agrandissement pur, de 35 % à sa taille, sur une courbe qui dépasse
-   légèrement sa cible avant de s'y poser. Échelle SEULE, jamais de découpe ni d'opacité : c'est le plus
-   grand élément affiché, donc le candidat LCP, et un contrôle d'accessibilité mesure la page pendant la
-   cascade. Elle part de 35 % et non de zéro pour la même raison — un élément d'aire nulle n'est pas un
-   candidat LCP. */
+/* La marque APPARAÎT EN FONDU puis GRANDIT depuis son centre (11/09/2026, demande de l'équipe : « comme
+   une apparition PowerPoint »). Au tout premier instant elle est invisible, puis elle se révèle en
+   grandissant de 35 % à sa taille.
+   L'opacité est ADMISE ICI, alors qu'elle est proscrite partout ailleurs dans le hero : ce qui l'interdit
+   sur les autres rangs, c'est le contrôle des contrastes, qui ne porte que sur du TEXTE. La marque est une
+   image décorative (aria-hidden, alt vide) : aucun contraste à mesurer.
+   Le fondu est BREF — pleine opacité à 35 % de la durée, soit environ 480 ms — parce que c'est le plus
+   grand élément affiché, donc le candidat LCP, et qu'un élément à opacité nulle n'est pas peint. Allonger
+   ce fondu retarderait d'autant la mesure de performance. */
 @keyframes intro-hero-brand {
   from {
+    opacity: 0;
     transform: scale(0.35);
+  }
+  35% {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
   }
 }
 /* Le surtitre : absent, puis dévoilé de bas en haut. */
