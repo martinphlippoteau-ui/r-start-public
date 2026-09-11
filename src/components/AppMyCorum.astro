@@ -40,7 +40,6 @@ const stores = (app?.stores ?? []).map((store, i) => ({
     <Card tone="paper" lift={false} class={className}>
       <div class="grid items-center gap-8 sm:grid-cols-[1fr_auto] sm:gap-10">
         <div>
-          {app.eyebrow && <p class="text-eyebrow text-teal-700">{app.eyebrow}</p>}
           <h3 id={titleId} class="text-display-sm mt-1">
             {app.title}
           </h3>

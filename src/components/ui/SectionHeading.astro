@@ -28,19 +28,23 @@ const {
 const INTRO_DELAY = '0.1';
 ---
 
-<header class:list={['max-w-4xl', align === 'center' && 'mx-auto text-center', className]}>
-  {
-    eyebrow && (
-      <p class="text-eyebrow mb-4 text-teal-700 in-[.text-white]:text-teal-200">{eyebrow}</p>
-    )
-  }
-  <h2 id={id + '-title'} class="text-display-lg" data-reveal-text={motion ? '' : undefined}>
+{
+  /* Plus de cap de largeur sur l'en-tête depuis le 11/09/2026 : bridé à 56 rem, un titre comme
+    « Pourquoi gagnant-gagnant ? » se coupait en deux alors qu'il tient sur une ligne dans le conteneur.
+    L'introduction, elle, garde sa mesure : une ligne de texte courant sur 1 150 px ne se lit pas. */
+}
+<header class:list={[align === 'center' && 'mx-auto text-center', className]}>
+  <h2
+    id={id + '-title'}
+    class="text-display-lg text-balance"
+    data-reveal-text={motion ? '' : undefined}
+  >
     {title}
   </h2>
   {
     intro && (
       <p
-        class="mt-6 text-lead opacity-90"
+        class="mt-6 max-w-3xl text-lead opacity-90"
         data-animate={motion ? 'fade-up' : undefined}
         data-animate-delay={motion ? INTRO_DELAY : undefined}
       >

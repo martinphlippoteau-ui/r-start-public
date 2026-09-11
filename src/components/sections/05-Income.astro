@@ -68,10 +68,13 @@ const fillRatio = (sri.value / sri.max).toFixed(3);
 
 <Section id={id} tone="paper">
   <Container size="wide">
-    <header class="max-w-4xl">
-      <p class="text-eyebrow mb-4 text-teal-700" data-animate="fade-up">{income.eyebrow}</p>
+    <header>
       <h2 id={titleId} class="text-display-lg" data-reveal-text>{income.title}</h2>
-      <p class="mt-6 text-lead opacity-90" data-animate="fade-up" data-animate-delay="0.15">
+      <p
+        class="mt-6 text-lead max-w-3xl opacity-90"
+        data-animate="fade-up"
+        data-animate-delay="0.15"
+      >
         {income.intro}
       </p>
     </header>

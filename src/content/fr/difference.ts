@@ -5,7 +5,14 @@ import { corumGroup, fees as feeFacts, product } from '@/content/fr/facts';
 import { arbitrageWarningBullets } from '@/content/fr/legal';
 
 /**
- * Section 2 — « Ce qui change vraiment » (zone 2 de la V2).
+ * Section 2 — « Pourquoi gagnant-gagnant ? » (zone 2 de la V2). Titre et copie fournis par l'équipe le
+ * 11/09/2026 et repris tels quels. DEUX POINTS À ARBITRER EN COMPLIANCE, tous deux signalés en
+ * avertissement par scripts/check-compliance.mjs pour rester traçables :
+ *  1. « nous, on ne touche rien tant que vous n'avez pas gagné d'argent » — inexact en lecture stricte :
+ *     les frais de gestion sont prélevés sur les loyers encaissés, y compris quand la valeur des parts
+ *     baisse ; la société de gestion peut donc se rémunérer alors que l'épargnant est en perte ;
+ *  2. « La première SCPI sans frais d'entrée ni frais d'acquisition » — allégation de rang SANS périmètre
+ *     de marché. Le périmètre (les cinq SCPI du groupe CORUM) est porté par l'appel de note qui la suit.
  * Explique quand la société de gestion se rémunère, sans jamais promettre de résultat : deux moteurs
  * (les loyers encaissés puis redistribués, la plus-value réalisée à la vente), la formule d'alignement
  * au vouvoiement, le mécanisme de réserve en cas de moins-value (brochure partenaires 2026, p.4) et le
@@ -30,8 +37,14 @@ const zeroAfter = feeFacts.withdrawal.zeroAfterYears;
 export const notes: LegalNote[] = [
   {
     id: 'difference-definition',
+    /**
+     * Cette note est le PÉRIMÈTRE de l'allégation affichée juste au-dessus, que l'équipe a voulue courte
+     * (« La première SCPI sans frais d'entrée ni frais d'acquisition. »). Elle ouvre donc sur la
+     * formulation bornée exacte — « la première SCPI DU GROUPE CORUM… » — avant d'en donner la portée :
+     * sans elle, l'accueil ne porterait plus que la version non bornée.
+     */
     text: nb(
-      `${product.definitionScope} Les cinq SCPI concernées : ${corumGroup.scpiNames.join(', ')}.`
+      `${product.definition}. ${product.definitionScope} Les cinq SCPI concernées : ${corumGroup.scpiNames.join(', ')}.`
     ),
   },
   {
@@ -40,76 +53,53 @@ export const notes: LegalNote[] = [
       `Rémunération de la société de gestion : ${feeFacts.management.label} de frais de gestion, ${feeFacts.management.base}, une commission sur les cessions d’immeubles de ${feeFacts.disposal.label}, ${feeFacts.disposal.base}, selon la plus-value réalisée, et une commission de retrait dégressive avant ${zeroAfter} ans de détention. Aucune commission de souscription, aucun frais d’acquisition, d’intermédiation ou de travaux. ${feeFacts.vatNote} Sources : brochure partenaires 2026, p. 4 et p. 6 ; document d’informations clés du ${product.dicDate.label} ; note d’information visée par l’AMF.`
     ),
   },
-  {
-    id: 'difference-reserve',
-    text: nb(
-      'Le détail du mécanisme de compensation figure au chapitre III, section 4 de la note d’information de R Start. Source : brochure partenaires 2026, p. 4.'
-    ),
-  },
 ];
 
 export const difference = {
   eyebrow: 'Le modèle',
-  title: 'Ce qui change vraiment',
-  intro:
-    'Dans une SCPI classique, vous payez des frais d’entrée le jour où vous souscrivez, avant qu’un seul immeuble soit acheté. Avec R Start, la société de gestion se rémunère plus tard, de deux façons.',
-  enginesTitle: 'Deux façons de gagner de l’argent',
-  enginesLabel: 'Les deux façons dont la société de gestion se rémunère',
-  engines: [
+  /** Titre et copie fournis par l'équipe le 11/09/2026, repris tels quels (deux points à défendre en
+   *  compliance, signalés en avertissement par scripts/check-compliance.mjs — voir l'en-tête du fichier). */
+  title: 'Pourquoi gagnant-gagnant ?',
+  intro: 'Qui a envie de payer avant de gagner ?',
+  lead: 'Quand vous détenez des parts de R Start, on ne vous prélève des frais que dans deux situations :',
+  /** Les deux situations, en liste. `strong` est le mot mis en valeur par le gabarit. */
+  situations: [
+    { text: 'Quand elle encaisse des loyers qu’elle vous redistribue', strong: 'loyers' },
     {
-      title: 'Quand les locataires paient leur loyer',
-      image: 0,
-      description: nb(
-        `R Start encaisse les loyers de ses immeubles et vous en reverse une part chaque mois. La société de gestion prélève ${feeFacts.management.label} de ces loyers.`
-      ),
-      risk: 'Les loyers dépendent des locataires et du marché. Ces revenus ne sont pas garantis et varient à la hausse comme à la baisse.',
-      noteId: 'difference-remuneration',
-    },
-    {
-      title: 'Quand un immeuble est revendu plus cher',
-      image: 2,
-      description: nb(
-        `R Start vise à acheter des immeubles sous leur valeur, à les valoriser, puis à les revendre. L’écart entre les deux prix s’appelle une plus-value : la commission est alors de ${feeFacts.disposal.label} selon son ampleur.`
-      ),
-      risk: 'Une plus-value n’est jamais acquise. Un immeuble peut se revendre moins cher : c’est une moins-value, et elle fait baisser la valeur de vos parts. La commission reste due dès que le bilan des ventes est positif.',
+      text: 'Quand elle réalise une plus-value sur la vente d’immeubles',
+      strong: 'plus-value',
     },
   ],
   counterweight: {
-    title: 'Une rémunération sans commission à l’entrée',
+    title: undefined,
     /**
-     * Allégation de rang bornée au périmètre du groupe CORUM (facts.product.definition). Elle ouvre le
-     * bloc depuis le 11/09/2026 : le hero porte l'accroche de l'équipe, qui n'est pas bornée. Jamais
-     * affichée sans son appel de note (le périmètre : les cinq SCPI du groupe).
+     * Allégation de rang de l'équipe, reprise mot pour mot le 11/09/2026 : elle N'EST PAS bornée au
+     * périmètre du groupe CORUM, contrairement à `product.definition`. Le périmètre est donc porté par
+     * l'appel de note `difference-definition`, qui le dit en toutes lettres (les cinq SCPI du groupe,
+     * comparaison qui ne porte pas sur l'ensemble du marché). Jamais affichée sans cet appel.
+     * À arbitrer en compliance : le script la signale en avertissement.
      */
-    claim: { text: product.definition, noteId: 'difference-definition' },
-    /** Trame, zone 1 → ouverture de la zone 2 (hero minimal du 10/09/2026). Formulation exacte : les frais de gestion sont prélevés sur les loyers encaissés. */
+    claim: {
+      text: 'La première SCPI sans frais d’entrée ni frais d’acquisition.',
+      noteId: 'difference-definition',
+    },
+    /**
+     * Conclusion de l'équipe, reprise mot pour mot (11/09/2026). À DÉFENDRE EN COMPLIANCE : en lecture
+     * stricte elle est inexacte — les frais de gestion sont prélevés sur les loyers encaissés, y compris
+     * quand la valeur des parts baisse, donc la société de gestion peut se rémunérer alors que l'épargnant
+     * est en perte. Le contre-poids chiffré `risk` suit dans le même bloc et à la même taille.
+     */
     pedagogy: [
-      // Claim de l'équipe marketing, repris mot pour mot (décision du 11/09/2026, à défendre en compliance :
-      // lecture stricte = les frais de gestion sont prélevés sur les loyers encaissés, y compris quand la
-      // valeur des parts baisse ; le contre-poids chiffré `risk` suit dans le même bloc).
-      nb('Payer des frais si notre travail vous fait gagner de l’argent : oui.'),
-      nb('Payer avant même qu’on ait commencé à travailler : non.'),
+      nb(
+        'En clair : nous, on ne touche rien tant que vous n’avez pas gagné d’argent. C’est gagnant-gagnant.'
+      ),
     ],
-    advantage: nb(
-      'Aucune commission n’est prélevée à votre souscription, ni à l’achat des immeubles, ni sur les travaux. En d’autres termes : la société de gestion se rémunère sur les loyers encaissés et les plus-values réalisées, jamais sur le montant que vous versez.'
-    ),
     risk: nb(
       `En contrepartie, R Start prélève ${feeFacts.management.label} de frais de gestion sur les loyers. S’y ajoutent une commission sur les cessions d’immeubles (${feeFacts.disposal.label}) et une commission de retrait avant ${zeroAfter} ans. ${arbitrageWarningBullets[1]} Votre coût total n’est pas connu à la souscription.`
     ),
     noteId: 'difference-remuneration',
   },
-  lossMechanism: {
-    title: 'En cas de moins-value',
-    body: [
-      'Si une vente génère une moins-value, celle-ci est inscrite dans une réserve dédiée.',
-      'Tant que des plus-values futures ne l’ont pas compensée, la société de gestion ne perçoit aucune commission sur les ventes.',
-    ],
-    risk: nb(
-      `Ce mécanisme porte sur les commissions de cession, pas sur la valeur de vos parts. Les frais de gestion restent dus sur les loyers, comme la commission de retrait avant ${zeroAfter} ans.`
-    ),
-    noteId: 'difference-reserve',
-  },
   /** Seul accès aux frais depuis l'accueil (11/09/2026 : la section Frais a quitté la page). */
-  cta: { label: 'Découvrir les frais', href: pages.fees.path },
+  cta: { label: 'Voir le comparateur', href: pages.fees.path },
   notes,
 } satisfies DifferenceContent;

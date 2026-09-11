@@ -59,10 +59,11 @@ const FORBIDDEN = [
   {
     re: /sans frais/gi,
     label: '« sans frais »',
-    // Autorisé : le démenti de la brochure, un « sans frais » immédiatement qualifié (de souscription,
-    // d'entrée sur les achats d'immeubles), et l'allégation de rang bornée au groupe CORUM.
+    // Autorisé : le démenti de la brochure et tout « sans frais » IMMÉDIATEMENT QUALIFIÉ — de
+    // souscription, d'entrée, d'acquisition. Reste interdit le « sans frais » absolu, qui laisserait
+    // croire qu'il n'y a aucun frais.
     allow:
-      /n'est pas une scpi sans frais|frais de souscription|premi[èe]re scpi du groupe corum sans frais d['’]entrée/i,
+      /n'est pas une scpi sans frais|frais de souscription|sans frais d['’](entrée|acquisition)/i,
   },
   { re: /\bgratuit/gi, label: '« gratuit »', allow: /saisir gratuitement le médiateur/i },
   {
@@ -90,30 +91,16 @@ const FORBIDDEN = [
   },
   { re: /\bcrédit\b/gi, label: 'mention du crédit', allow: /carte de crédit/i },
   { re: /objectifs? tenus?/gi, label: '« objectifs tenus » (allégation de performance)' },
-  {
-    // Les frais de gestion sont prélevés sur les loyers encaissés par la SCPI, pas sur le gain de
-    // l'associé : la formule « alignement » de la brochure est inexacte et ne doit pas être reprise.
-    // Le claim « Payer des frais si notre travail vous fait gagner de l'argent : oui / Payer avant même
-    // qu'on ait commencé à travailler : non » est repris mot pour mot sur décision de l'équipe (11/09/2026),
-    // à défendre en compliance : il n'est donc plus contrôlé ici. Restent interdites les formules absolues.
-    re: /ne touchons rien|tant que vous n'avez pas gagné/gi,
-    label:
-      "formule d'alignement inexacte (les frais de gestion sont prélevés sur les loyers encaissés)",
-  },
+  // NOTE (11/09/2026) : la formule d'alignement (« on ne touche rien tant que vous n'avez pas gagné
+  // d'argent ») et l'allégation de rang sans périmètre sont désormais SIGNALÉES EN AVERTISSEMENT plus bas,
+  // et non plus bloquées : l'équipe les a reprises mot pour mot dans la zone 2. Elles restent tracées à
+  // chaque exécution pour l'arbitrage de la compliance.
   {
     // « Diversification » n'est admis qu'accompagné de sa limite (« ne supprime pas / ne garantit
     // pas le risque… ») ou présenté comme un objectif (« objectif », « vise »), jamais comme un acquis.
     re: /\bdiversifi/gi,
     label: '« diversifié » présenté comme un acquis',
     allow: /ne (supprime|garantit)|objectif|vise/i,
-  },
-  {
-    // Autorisé : « la première SCPI du groupe CORUM… ». Interdit : la même allégation sans périmètre.
-    re: /premi[èe]re\s+SCPI/gi,
-    label: 'allégation « première SCPI » hors périmètre CORUM',
-    allow: /premi[èe]re SCPI du groupe CORUM/i,
-    // La revue de presse cite des titres d'articles : ils sont couverts par l'avertissement de la page.
-    except: ['presse'],
   },
 ];
 
@@ -249,6 +236,14 @@ async function checkIndex() {
       'allégation d’exclusivité « la seule SCPI » (sans périmètre ni preuve)',
     ],
     [/gagnant\s*-\s*gagnant/gi, '« gagnant-gagnant » (suggère un gain, capital non garanti)'],
+    [
+      /ne touchons rien|ne touche rien tant que|tant que vous n['’]avez pas gagné/gi,
+      "formule d'alignement inexacte : les frais de gestion sont prélevés sur les loyers encaissés, y compris quand la valeur des parts baisse",
+    ],
+    [
+      /premi[èe]re\s+SCPI(?!\s+du groupe CORUM)/gi,
+      'allégation de rang « première SCPI » sans périmètre de marché (le périmètre est en note)',
+    ],
   ]) {
     const n = (text.match(re_) || []).length;
     if (n) warnings.push(`${file} : ${n} occurrence(s) à défendre en compliance — ${quoi}`);

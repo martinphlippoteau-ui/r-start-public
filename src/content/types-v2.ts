@@ -87,12 +87,17 @@ export interface DifferenceContent {
   eyebrow: string;
   title: string;
   intro: string;
+  /** Phrase qui annonce les deux situations, juste avant la liste. */
+  lead?: string;
+  /** Les deux situations où des frais sont prélevés. `strong` est le mot mis en valeur dans `text`. */
+  situations?: { text: string; strong?: string }[];
   /** Surtitre du bloc des deux moteurs (ex. « Deux moteurs »). */
   enginesTitle?: string;
   /** aria-label de la liste des moteurs (ex. « Les deux moteurs de rémunération »). */
   enginesLabel?: string;
   /** Les deux moteurs. `description` est l'avantage, `risk` son contre-poids (même taille, même carte). */
-  engines: {
+  /** Anciennes cartes du modèle : plus rendues sur l'accueil depuis le 11/09/2026 (zone 2 réduite). */
+  engines?: {
     title: string;
     description: string;
     risk: string;
@@ -107,16 +112,21 @@ export interface DifferenceContent {
    * valeur des parts baisse), et son contre-poids chiffré : frais de gestion, commission sur les
    * cessions, commission de retrait, coût total inconnu à la souscription (risk).
    */
-  counterweight: AdvantageRisk & {
+  counterweight: {
+    /** Paragraphe d'avantage libre : plus rendu sur l'accueil depuis le 11/09/2026 (zone 2 réduite). */
+    advantage?: string;
+    /** Contre-poids chiffré, TOUJOURS rendu : c'est le seul couple avantage / risque de la section. */
+    risk: string;
     title?: string;
     noteId?: string;
-    /** Les deux phrases « Payer des frais… oui / … non » de la trame, en ouverture du bloc (hero minimal). */
+    /** Conclusion de l'équipe, en ouverture du bloc de démonstration. */
     pedagogy?: string[];
-    /** Allégation de rang bornée (facts.product.definition) : jamais sans son appel de note. */
+    /** Allégation de rang : jamais affichée sans son appel de note, qui en porte le périmètre. */
     claim?: { text: string; noteId: string };
   };
   /** Mécanisme de réserve en cas de moins-value, résumé en deux phrases (brochure partenaires 2026, p.4). */
-  lossMechanism: { title: string; body: string[]; risk: string; noteId?: string };
+  /** Mécanisme de réserve : plus rendu sur l'accueil depuis le 11/09/2026. */
+  lossMechanism?: { title: string; body: string[]; risk: string; noteId?: string };
   /** Lien interne vers la page Frais : ce n'est pas un CTA de souscription, il ne porte pas de `position`. */
   cta: { label: string; href: string };
   notes: LegalNote[];

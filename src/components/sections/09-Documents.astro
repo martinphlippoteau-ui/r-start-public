@@ -71,10 +71,13 @@ const CARD_STAGGER = 0.1;
 
 <Section id={id} tone="white">
   <Container size="wide">
-    <header class="max-w-4xl">
-      <p class="text-eyebrow mb-4 text-teal-700" data-animate="fade-up">{documents.eyebrow}</p>
+    <header>
       <h2 id={titleId} class="text-display-lg" data-reveal-text>{documents.title}</h2>
-      <p class="mt-6 text-lead opacity-90" data-animate="fade-up" data-animate-delay="0.15">
+      <p
+        class="mt-6 text-lead max-w-3xl opacity-90"
+        data-animate="fade-up"
+        data-animate-delay="0.15"
+      >
         {documents.intro}
       </p>
     </header>

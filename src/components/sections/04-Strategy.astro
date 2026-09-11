@@ -93,8 +93,7 @@ const mottoScene = mottoSteps.length === 3;
 
 <Section id={id} tone="ink" class="overflow-hidden">
   <Container size="wide" class="relative">
-    <header class="max-w-4xl">
-      <p class="text-eyebrow mb-4 text-teal-200">{strategy.eyebrow}</p>
+    <header>
       <h2 id={titleId} class="text-display-lg" data-reveal-text>
         {compact && strategy.homeTitle ? strategy.homeTitle : strategy.title}
       </h2>
@@ -197,7 +196,7 @@ const mottoScene = mottoSteps.length === 3;
                       {String(i + 1).padStart(2, '0')}
                     </p>
                     <h3 class="text-display-sm mt-3 text-white">{lever.title}</h3>
-                    <p class="text-lead mt-4 text-white">{lever.description}</p>
+                    <p class="text-lead max-w-3xl mt-4 text-white">{lever.description}</p>
                   </div>
                 </li>
               ))}

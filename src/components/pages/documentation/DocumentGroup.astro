@@ -55,11 +55,6 @@ const cardTone = tone === 'paper' ? 'bg-white shadow-card' : 'bg-paper ring-1 ri
       <!-- En-tête collant -->
       <div class="lg:col-span-5">
         <header class="lg:sticky lg:top-24">
-          {
-            labels.groupsEyebrow && (
-              <p class="text-eyebrow mb-4 text-teal-700">{labels.groupsEyebrow}</p>
-            )
-          }
           <h2 id={id + '-title'} class="text-display-md">{group.title}</h2>
           <p class="text-lead mt-6 text-ink">
             {group.intro}
