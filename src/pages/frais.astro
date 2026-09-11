@@ -36,6 +36,7 @@ import PageHero from '@/components/ui/PageHero.astro';
 import Pill from '@/components/ui/Pill.astro';
 import RiskNote from '@/components/ui/RiskNote.astro';
 import Section from '@/components/ui/Section.astro';
+import FeeComparator from '@/components/pages/frais/FeeComparator.astro';
 import FeeSwitcher from '@/components/pages/frais/FeeSwitcher.astro';
 import FeesNoteRef from '@/components/pages/frais/FeesNoteRef.astro';
 import { pages } from '@/config/pages';
@@ -473,6 +474,13 @@ const showComparison =
     </Section>
 
     <!-- 6. Bascule pédagogique des frais (brochure p.6), derrière le drapeau SHOW_MARKET_COMPARISON -->
+    {
+      /* Comparateur SCPI par SCPI (11/09/2026). Il précède la bascule pédagogique : on compare d'abord
+        des taux, on comprend ensuite ce qu'ils produisent. NON PUBLIABLE tant que les taux des autres
+        SCPI ne sont pas relevés — le composant l'affiche et le script de conformité le signale. */
+    }
+    <FeeComparator id="comparateur" />
+
     {showComparison && <FeeSwitcher id={ids.comparison} />}
 
     <!-- 7. Document de référence -->

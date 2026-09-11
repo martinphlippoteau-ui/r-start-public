@@ -1,0 +1,162 @@
+---
+/**
+ * Comparateur de frais (11/09/2026) : R Start à gauche, une SCPI choisie dans une liste à droite, sept
+ * lignes de frais. Le choix se fait sans rechargement — toutes les valeurs sont dans le HTML, le script
+ * ne fait qu'afficher la colonne demandée. Sans script, la première SCPI reste affichée : le tableau est
+ * complet et lisible.
+ *
+ * C'est un VRAI TABLEAU (<table>, en-têtes de colonne et de ligne) : une comparaison de frais se lit
+ * aussi au lecteur d'écran, et la liste déroulante vit dans l'en-tête de la colonne qu'elle change.
+ *
+ * Conformité :
+ *  - chaque taux porte `data-fee-value` dans un même `data-fee-block` : le contrôle vérifie qu'aucun
+ *    frais n'est affiché plus petit que ses voisins (retour AMF sur la brochure) ;
+ *  - tant qu'une valeur manque, un avertissement le dit en toutes lettres au-dessus du tableau, et le
+ *    tableau ne prétend rien comparer ;
+ *  - les sources sont sous le tableau, celle de R Start et celle, à venir, des autres SCPI ;
+ *  - nommer une autre SCPI engage : le périmètre, l'encadré « Une innovation, pas une révolution » et la
+ *    source de l'analyse restent exigés sur la page par scripts/check-compliance.mjs.
+ * Contenu : src/content/fr/comparator.ts. Les taux de R Start viennent de facts.fees.
+ */
+import { Image } from 'astro:assets';
+import brandLogo from '@/assets/logos/r-start-couleur.svg';
+import Container from '@/components/ui/Container.astro';
+import RiskNote from '@/components/ui/RiskNote.astro';
+import Section from '@/components/ui/Section.astro';
+import { comparator } from '@/content/fr/comparator';
+
+interface Props {
+  id: string;
+}
+const { id } = Astro.props as Props;
+const titleId = id + '-title';
+const selectId = id + '-select';
+const { rows, scpis } = comparator;
+
+/** Valeurs par SCPI, sérialisées pour le script : une seule source, aucun texte dupliqué dans le HTML. */
+const data = scpis.map((s) => ({
+  name: s.name,
+  manager: s.manager,
+  values: rows.map((r) => s.values?.[r.key] ?? null),
+}));
+---
+
+<Section id={id} tone="white" labelledBy={titleId}>
+  <Container size="wide">
+    <h2 id={titleId} class="text-display-lg text-balance">{comparator.title}</h2>
+    <p class="text-lead mt-6 max-w-3xl opacity-90">{comparator.intro}</p>
+
+    {
+      /* Avertissement tant que les taux des autres SCPI ne sont pas relevés. Le script le masque dès que
+        la SCPI choisie est complète. */
+    }
+    <div data-comparator-pending class="mt-8">
+      <RiskNote text={comparator.pendingNotice} size="lead" />
+    </div>
+
+    <div class="mt-8 overflow-x-auto sm:mt-10">
+      <table data-comparator data-fee-block="comparateur-frais" class="w-full min-w-[34rem]">
+        <caption class="visually-hidden">{comparator.title}</caption>
+        <thead>
+          <tr>
+            <th scope="col" class="w-[34%] p-0"><span class="visually-hidden">Frais</span></th>
+            <th scope="col" class="w-[33%] px-3 pb-5 align-bottom sm:px-5">
+              <Image
+                src={brandLogo}
+                alt={comparator.leftLabel}
+                width={290}
+                height={89}
+                loading="eager"
+                decoding="async"
+                class="mx-auto h-8 w-auto sm:h-10"
+              />
+              <span class="mt-2 block text-sm font-normal text-slate-700">
+                {comparator.leftManager}
+              </span>
+            </th>
+            <th scope="col" class="w-[33%] px-3 pb-5 align-bottom sm:px-5">
+              <label for={selectId} class="visually-hidden">{comparator.selectLabel}</label>
+              <select
+                id={selectId}
+                data-comparator-select
+                class="w-full rounded-2xl border border-navy/20 bg-white px-4 py-3 text-base font-semibold text-navy focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-navy"
+              >
+                {scpis.map((s, i) => <option value={String(i)}>{s.name}</option>)}
+              </select>
+              <span data-comparator-manager class="mt-2 block text-sm font-normal text-slate-700">
+                {scpis[0]?.manager}
+              </span>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            rows.map((row, i) => (
+              <tr class="border-t border-navy/12">
+                <th scope="row" class="py-5 pr-3 text-left align-top font-medium text-ink sm:pr-5">
+                  {row.label}
+                  <span class="text-caption mt-1 block font-normal text-slate-700">
+                    {row.basis}
+                  </span>
+                </th>
+                <td class="px-3 py-5 text-center align-top sm:px-5">
+                  <span data-fee-value class="text-display-sm text-navy">
+                    {row.rstart}
+                  </span>
+                  {row.rstartDetail && (
+                    <span class="text-caption mt-1 block text-slate-700">{row.rstartDetail}</span>
+                  )}
+                </td>
+                <td class="px-3 py-5 text-center align-top sm:px-5">
+                  <span data-comparator-cell={String(i)} class="text-display-sm text-slate-700">
+                    {comparator.pendingLabel}
+                  </span>
+                </td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <p class="text-caption mt-6 text-slate-700">
+      <strong class="font-semibold">{comparator.sourceLabel} :</strong>{' '}
+      {comparator.sourceRStart}{' '}
+      <span data-comparator-source>{comparator.sourceOthers}</span>
+    </p>
+  </Container>
+</Section>
+
+<script is:inline define:vars={{ data, pendingLabel: comparator.pendingLabel }}>
+  /*
+   * Changement de colonne sans rechargement. Les valeurs sont passées telles quelles : le script ne
+   * calcule rien, il recopie. Une valeur absente reste le libellé « à compléter » et l'avertissement
+   * reste affiché — c'est la seule règle métier ici.
+   */
+  (() => {
+    const table = document.querySelector('[data-comparator]');
+    const select = document.querySelector('[data-comparator-select]');
+    if (!table || !select) return;
+    const manager = table.querySelector('[data-comparator-manager]');
+    const pending = document.querySelector('[data-comparator-pending]');
+    const cells = [...table.querySelectorAll('[data-comparator-cell]')];
+
+    const render = () => {
+      const scpi = data[Number(select.value)] || data[0];
+      if (!scpi) return;
+      if (manager) manager.textContent = scpi.manager;
+      let missing = 0;
+      cells.forEach((cell, i) => {
+        const value = scpi.values[i];
+        cell.textContent = value || pendingLabel;
+        cell.classList.toggle('text-navy', Boolean(value));
+        cell.classList.toggle('text-slate-700', !value);
+        if (!value) missing += 1;
+      });
+      if (pending) pending.hidden = missing === 0;
+    };
+
+    select.addEventListener('change', render);
+    render();
+  })();
+</script>

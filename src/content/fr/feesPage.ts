@@ -389,7 +389,7 @@ const raw = {
 
   hero: {
     eyebrow: `Frais · SCPI ${product.name}`,
-    title: `Les frais de ${product.name}`,
+    title: `Comparer et comprendre les frais de ${product.name}`,
     intro: `À la souscription et à l’achat des immeubles, R Start ne prélève aucune commission. Sa société de gestion prélève ${feeFacts.management.label} des loyers HT encaissés. Elle se rémunère aussi sur les plus-values à la vente (${feeFacts.disposal.label}) et, avant ${zeroAfter} ans, sur les retraits (${w0.rate} à ${w3.rate}). Cette page détaille chaque frais, son assiette et ses conditions.`,
     riskLine: shortRiskLine,
   },

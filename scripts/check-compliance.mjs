@@ -350,6 +350,22 @@ async function checkSubPages() {
       errors.push(file + ' : ' + risksAnimated.length + ' bloc(s) risque animé(s)');
     if (p === 'frais' && !/15\s?%/.test(text))
       errors.push(file + ' : frais de gestion 15 % absents');
+    if (p === 'frais' && /data-comparator\b/.test(html)) {
+      // Comparateur de frais : tant qu'une SCPI proposée n'a pas ses sept taux, la page montrerait les
+      // zéros de R Start face à des cases vides. C'est une comparaison trompeuse : elle ne doit pas être
+      // mise en ligne. Avertissement tant que le comparateur est en construction ; à passer en erreur le
+      // jour où la page part en production.
+      const scpis = (html.match(/<option value="\d+"/g) || []).length;
+      const manquants = (html.match(/À compléter/g) || []).length;
+      if (manquants)
+        warnings.push(
+          `${file} : comparateur INCOMPLET — ${scpis} SCPI proposées, des taux manquent. ` +
+            'Ne pas mettre en ligne : le tableau opposerait les frais de R Start à des cases vides. ' +
+            'Relever les sept taux de chaque SCPI dans son DIC et sa note d’information, avec la date.'
+        );
+      if (!/Sources/.test(text))
+        errors.push(file + ' : comparateur sans ligne de sources');
+    }
     if (p === 'documentation') {
       // Avertissements reproduits in extenso, descendus de l'accueil le 11/09/2026 : ils doivent rester
       // publiés quelque part sur le site, à côté des documents dont ils sont extraits.
