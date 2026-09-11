@@ -59,7 +59,7 @@ export const subscribe = {
   title: `Souscrire à R Start, ${nb(subscription.onlineLabel)}.`,
   homeTitle: `Souscrire en quatre étapes, ${nb(subscription.onlineLabel)}.`,
   /** Accueil, ≤ 30 mots, factuel : en ligne, minimum, signature électronique, moyens de règlement, suivi. */
-  homeIntro: `Tout se fait en ligne, à partir de ${nb(share.priceLabel)} la part : profil investisseur, signature électronique, règlement par virement ou prélèvement, suivi de vos parts sur le site de CORUM.`,
+  homeIntro: `Tout se fait en ligne, à partir de ${nb(share.priceLabel)} la part : profil investisseur, signature électronique, règlement par virement ou prélèvement, suivi de vos parts sur votre espace privé et l’application MyCORUM.`,
   intro: `La souscription se fait entièrement en ligne, en quatre étapes, à partir d’une part de ${nb(share.priceLabel)}. Aucune souscription papier n’est possible. R Start vise une stratégie patrimoniale plus dynamique, en contrepartie d’un risque plus élevé. Avant de vous engager, lisez le DIC et la note d’information. R Start comporte un risque de perte en capital.`,
 
   /**
