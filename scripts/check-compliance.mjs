@@ -309,7 +309,14 @@ async function checkIndex() {
 
 /** Sous-pages produit : mêmes interdits, ligne risques dans l'en-tête, mentions obligatoires, structure. */
 async function checkSubPages() {
-  for (const p of ['frais', 'strategie', 'documentation', 'presse', 'salle-de-presse']) {
+  for (const p of [
+    'frais',
+    'strategie',
+    'a-propos',
+    'documentation',
+    'presse',
+    'salle-de-presse',
+  ]) {
     const file = p + '/index.html';
     let html;
     try {

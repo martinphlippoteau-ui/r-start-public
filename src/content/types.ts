@@ -343,6 +343,8 @@ export interface CorumContent {
   alignmentTitle?: string;
   /** Corps du bloc « rémunération sur les ventes ». À défaut, le composant retombe sur `intro`. */
   alignmentBody?: string;
+  /** Libellé du bouton vers la page À propos. */
+  aboutLink?: string;
   disclaimer: string;
   notes: LegalNote[];
 }

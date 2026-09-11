@@ -1,6 +1,6 @@
 /**
- * Plan du site (périmètre v2, mis à jour le 10/09/2026) : cinq pages publiques au menu (Accueil, Les
- * frais, Stratégie d'investissement, La presse en parle, Documentation), la salle de presse en pied de
+ * Plan du site (mis à jour le 11/09/2026) : six pages publiques au menu (Accueil, Les frais, Stratégie
+ * d'investissement, La presse en parle, Documentation, À propos — cette dernière en bout de menu), la salle de presse en pied de
  * page, puis les pages légales. Le menu ne contient que des pages, jamais d'ancre de section.
  * La navigation unique (src/components/SiteNav.astro) suit `order` ; `inMenu` exclut les pages
  * légales. `navLabel` permet un libellé de navigation plus explicite que celui du fil d'Ariane.
@@ -11,6 +11,7 @@ export type PageKey =
   | 'home'
   | 'fees'
   | 'strategy'
+  | 'about'
   | 'documentation'
   | 'press'
   | 'pressRoom'
@@ -46,6 +47,13 @@ export const pages: Record<PageKey, PageMeta> = {
     order: 3,
     inMenu: true,
   },
+  about: {
+    key: 'about',
+    path: '/a-propos',
+    label: 'À propos',
+    order: 6,
+    inMenu: true,
+  },
   documentation: {
     key: 'documentation',
     path: '/documentation',
@@ -67,7 +75,7 @@ export const pages: Record<PageKey, PageMeta> = {
     key: 'pressRoom',
     path: '/salle-de-presse',
     label: 'Salle de presse',
-    order: 6,
+    order: 7,
     inMenu: false,
   },
   legal: {

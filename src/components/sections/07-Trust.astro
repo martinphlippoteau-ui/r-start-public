@@ -41,27 +41,22 @@
  * (confiance-chiffres), gamme (corum-gamme), rémunération (corum-compensation).
  * Contenu : src/content/fr/trust.ts et src/content/fr/corum.ts.
  */
-import { Picture } from 'astro:assets';
+import Button from '@/components/ui/Button.astro';
 import Container from '@/components/ui/Container.astro';
 import NoteRef from '@/components/ui/NoteRef.astro';
-import RiskNote from '@/components/ui/RiskNote.astro';
 import Section from '@/components/ui/Section.astro';
 import SectionHeading from '@/components/ui/SectionHeading.astro';
 import Stat from '@/components/ui/Stat.astro';
+import { pages } from '@/config/pages';
+import { withBase } from '@/lib/href';
 import { sections } from '@/config/sections';
-import { resolveImage } from '@/lib/images';
 import { corum } from '@/content/fr/corum';
-import { media } from '@/content/fr/media';
 import { trust } from '@/content/fr/trust';
-import { product } from '@/content/fr/facts';
 
-/** Ambiance des bureaux CORUM (11/09/2026) : la seule image de la page qui montre QUI gère. Décorative. */
-const officePhoto = await resolveImage(media.corum[0].src);
 const id = sections.corum.id;
 const { trustpilot, stats } = trust;
 
 /** Gamme en texte (décision du 09/09/2026 : seuls les logos R Start et CORUM L'Épargne sont utilisés sur le site). */
-const range = corum.range.scpiNames.map((name) => ({ name, current: name === product.name }));
 
 /** Décimales du compteur : 1 pour une valeur non entière (ex. 9,6), sinon aucune. */
 const decimalsOf = (n?: number): number | undefined =>
@@ -74,9 +69,6 @@ const TRUSTPILOT_COUNTER = { from: 0, duration: 1.4 };
   /* Quatre chiffres fixes (11/09/2026) : plus de compteur — la largeur du nombre changeait pendant
             l'animation et décalait toute la grille. Une seule entrée en cascade sur la liste. */
 }
-const LOGO_STAGGER = 0.08;
-/** Amplitude du fade-up d'un H3 suivi d'un paragraphe visible d'emblée (px), au lieu des 28 px d'un titre. */
-const QUIET_TITLE_Y = 12;
 ---
 
 <Section id={id} tone="ink" spacing="none">
@@ -185,73 +177,13 @@ const QUIET_TITLE_Y = 12;
       </div>
 
       {
-        /* Photo d'ambiance des bureaux : respiration visuelle de la bande blanche, et seule image de la page
-          qui illustre la société de gestion. Décorative — aucun avantage, donc aucun contre-poids attendu. */
+        /* La photo d'ambiance et la gamme des cinq SCPI ont quitté l'accueil le 11/09/2026 : elles vivent
+          sur /a-propos (components/pages/a-propos/CorumRange.astro), atteinte par le bouton ci-dessous. */
       }
-      <figure class="mt-16 lg:mt-24" data-animate="clip">
-        <div class="img-frame aspect-[3/2] sm:aspect-[21/9]">
-          <div
-            class="absolute inset-x-0 -top-[12%] h-[124%]"
-            data-parallax="0.05"
-            data-parallax-trigger="parent"
-          >
-            <Picture
-              src={officePhoto}
-              alt={media.corum[0].alt}
-              widths={[640, 1024, 1600, 2400]}
-              sizes="(min-width: 80rem) 72rem, 100vw"
-              formats={['avif', 'webp']}
-              loading="lazy"
-              decoding="async"
-              pictureAttributes={{ class: 'block h-full w-full' }}
-              class="h-full w-full object-cover"
-            />
-          </div>
-        </div>
-      </figure>
-
-      <!-- La gamme -->
-      <div class="mt-10 sm:mt-16 grid gap-10 lg:mt-24 lg:grid-cols-12 lg:gap-16">
-        <div class="lg:col-span-5">
-          <!-- Titre suivi d'un paragraphe visible d'emblée : fade-up court pour ne pas chevaucher sa première ligne. -->
-          <h3 class="text-display-sm" data-animate="fade-up" data-animate-y={String(QUIET_TITLE_Y)}>
-            {corum.range.title}
-            <NoteRef id="corum-gamme" tone="light" />
-          </h3>
-          <p class="mt-4 text-lead">{corum.range.description}</p>
-        </div>
-        <div class="lg:col-span-7">
-          <ul
-            role="list"
-            class="grid grid-cols-2 gap-4 sm:grid-cols-3"
-            data-animate="stagger"
-            data-animate-stagger={String(LOGO_STAGGER)}
-          >
-            {
-              range.map(({ name, current }) => (
-                <li
-                  class:list={[
-                    'flex min-h-24 items-center justify-center rounded-2xl border p-5 text-center text-lg font-semibold sm:p-6',
-                    current
-                      ? 'border-teal-400 bg-teal-100 text-navy'
-                      : 'border-mist bg-paper text-navy',
-                  ]}
-                  aria-current={current ? 'true' : undefined}
-                >
-                  <span class="flex flex-col items-center gap-1.5">
-                    {current && corum.range.currentBadge && (
-                      <span class="inline-flex items-center rounded-full bg-navy px-2.5 py-0.5 text-[0.7rem] font-semibold tracking-wider text-white uppercase">
-                        {corum.range.currentBadge}
-                      </span>
-                    )}
-                    <span>{name}</span>
-                  </span>
-                </li>
-              ))
-            }
-          </ul>
-          <RiskNote text={corum.disclaimer} size="lead" class="mt-6" />
-        </div>
+      <div class="mt-10 sm:mt-16 lg:mt-24">
+        <Button href={withBase(pages.about.path)} variant="secondary" size="lg">
+          {corum.aboutLink}
+        </Button>
       </div>
 
       {

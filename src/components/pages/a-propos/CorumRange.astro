@@ -1,0 +1,109 @@
+---
+/**
+ * Page /a-propos : photo d'ambiance des bureaux CORUM et gamme des cinq SCPI gérées depuis 2012, avec la
+ * tuile R Start marquée « Nouveau ». Ces deux blocs suivaient « Le groupe CORUM en chiffres » sur l'accueil
+ * jusqu'au 11/09/2026 ; ils ont leur place ici, où le sujet est la société de gestion.
+ * La photo n'a PAS de parallaxe : `data-parallax` exige le moteur GSAP, que cette page n'a aucune autre
+ * raison de télécharger (tests/performance.spec.ts). Elle se révèle par `data-animate="clip"`, rendu par le
+ * moteur léger.
+ * Équilibre AMF : la gamme porte son contre-poids (corum.disclaimer, RiskNote de même taille, jamais animé),
+ * juste sous les tuiles, dans le même bloc. La photo est décorative.
+ * Contenu : src/content/fr/corum.ts et media.ts. Notes résolues dans celles de la page (about.notes).
+ */
+import { Picture } from 'astro:assets';
+import Container from '@/components/ui/Container.astro';
+import NoteRef from '@/components/ui/NoteRef.astro';
+import RiskNote from '@/components/ui/RiskNote.astro';
+import Section from '@/components/ui/Section.astro';
+import { corum } from '@/content/fr/corum';
+import { media } from '@/content/fr/media';
+import { product } from '@/content/fr/facts';
+import { resolveImage } from '@/lib/images';
+import type { LegalNote } from '@/content/types';
+
+interface Props {
+  tone?: 'paper' | 'white';
+  /** Notes de la page, pour la numérotation des appels de note. */
+  notes?: LegalNote[];
+}
+const { tone = 'white', notes } = Astro.props as Props;
+const officePhoto = await resolveImage(media.corum[0].src);
+const range = corum.range.scpiNames.map((name) => ({ name, current: name === product.name }));
+const LOGO_STAGGER = 0.08;
+const QUIET_TITLE_Y = 12;
+---
+
+<Section id="gamme" tone={tone} labelledBy="gamme-title">
+  <Container size="wide">
+    {
+      /* Photo d'ambiance des bureaux : respiration visuelle de la bande blanche, et seule image de la page
+        qui illustre la société de gestion. Décorative — aucun avantage, donc aucun contre-poids attendu. */
+    }
+    <figure class="mt-16 lg:mt-24" data-animate="clip">
+      <div class="img-frame aspect-[3/2] sm:aspect-[21/9]">
+        <div class="absolute inset-x-0 -top-[12%] h-[124%]">
+          <Picture
+            src={officePhoto}
+            alt={media.corum[0].alt}
+            widths={[640, 1024, 1600, 2400]}
+            sizes="(min-width: 80rem) 72rem, 100vw"
+            formats={['avif', 'webp']}
+            loading="lazy"
+            decoding="async"
+            pictureAttributes={{ class: 'block h-full w-full' }}
+            class="h-full w-full object-cover"
+          />
+        </div>
+      </div>
+    </figure>
+
+    <!-- La gamme -->
+    <div class="mt-10 sm:mt-16 grid gap-10 lg:mt-24 lg:grid-cols-12 lg:gap-16">
+      <div class="lg:col-span-5">
+        <!-- Titre suivi d'un paragraphe visible d'emblée : fade-up court pour ne pas chevaucher sa première ligne. -->
+        <h2
+          id="gamme-title"
+          class="text-display-sm"
+          data-animate="fade-up"
+          data-animate-y={String(QUIET_TITLE_Y)}
+        >
+          {corum.range.title}
+          <NoteRef notes={notes} id="corum-gamme" tone="light" />
+        </h2>
+        <p class="mt-4 text-lead">{corum.range.description}</p>
+      </div>
+      <div class="lg:col-span-7">
+        <ul
+          role="list"
+          class="grid grid-cols-2 gap-4 sm:grid-cols-3"
+          data-animate="stagger"
+          data-animate-stagger={String(LOGO_STAGGER)}
+        >
+          {
+            range.map(({ name, current }) => (
+              <li
+                class:list={[
+                  'flex min-h-24 items-center justify-center rounded-2xl border p-5 text-center text-lg font-semibold sm:p-6',
+                  current
+                    ? 'border-teal-400 bg-teal-100 text-navy'
+                    : 'border-mist bg-paper text-navy',
+                ]}
+                aria-current={current ? 'true' : undefined}
+              >
+                <span class="flex flex-col items-center gap-1.5">
+                  {current && corum.range.currentBadge && (
+                    <span class="inline-flex items-center rounded-full bg-navy px-2.5 py-0.5 text-[0.7rem] font-semibold tracking-wider text-white uppercase">
+                      {corum.range.currentBadge}
+                    </span>
+                  )}
+                  <span>{name}</span>
+                </span>
+              </li>
+            ))
+          }
+        </ul>
+        <RiskNote text={corum.disclaimer} size="lead" class="mt-6" />
+      </div>
+    </div>
+  </Container>
+</Section>

@@ -80,10 +80,11 @@ export const notes: LegalNote[] = [...trustNotes, ...corumNotes].sort(
 
 /**
  * Notes appelées par la section telle qu'elle est rendue sur l'accueil (11/09/2026) : le cadre
- * réglementaire est passé sur /documentation et le bloc « rémunération sur les ventes » a été retiré,
+ * réglementaire est passé sur /documentation, la gamme et l'ambiance sur /a-propos, et le bloc
+ * « rémunération sur les ventes » a été retiré,
  * leurs notes n'ont donc plus d'appel ici. `notes` reste l'export complet pour les autres pages.
  */
-const APPELEES_SUR_ACCUEIL = ['confiance-trustpilot', 'confiance-chiffres', 'corum-gamme'];
+const APPELEES_SUR_ACCUEIL = ['confiance-trustpilot', 'confiance-chiffres'];
 export const homeNotes: LegalNote[] = notes.filter((n) => APPELEES_SUR_ACCUEIL.includes(n.id));
 if (homeNotes.length !== APPELEES_SUR_ACCUEIL.length) {
   throw new Error(
@@ -125,6 +126,8 @@ export const corum = {
     'Quand R Start revend un immeuble, CORUM ne touche une commission (dite « d’arbitrage ») que si l’ensemble des ventes est gagnant. Cette commission a des effets de seuil et peut capter une partie significative de la plus-value. CORUM peut aussi être rémunérée sur une plus-value alors même que la valeur de vos parts diminue.'
   ),
 
+  /** Bouton vers /a-propos (la gamme et l'ambiance y sont depuis le 11/09/2026). */
+  aboutLink: 'En savoir plus sur CORUM',
   disclaimer: corumGroup.disposalsDisclaimer,
 
   notes,

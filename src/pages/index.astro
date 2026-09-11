@@ -27,16 +27,16 @@ const all = Object.entries(modules)
  * → 08 Risques → 10 FAQ. Hors accueil : 05 Revenus (repris par la FAQ), 06 Souscrire (guide sur
  * /documentation, avec MyCORUM) et 09 Documents (/documentation).
  */
-const HOME_ORDER = ['01-', '01b-', '02-', '07-', '03a-', '04-', '06-', '08b-', '08-', '10-'];
+const HOME_ORDER = ['01-', '01b-', '02-', '07-', '03a-', '06-', '08b-', '08-', '10-'];
 const byPrefix = (prefix: string) => all.find((s) => s.path.includes('/sections/' + prefix));
 const hero = byPrefix('01-');
 const rest = HOME_ORDER.slice(1)
   .map(byPrefix)
   .filter((s): s is NonNullable<typeof s> => s !== undefined);
 /** La Stratégie est rendue en chapitre court (les trois piliers) ; la section complète vit sur /strategie. */
-/** Stratégie et Souscrire sont rendues en chapitre court (prop `compact`) ; la Stratégie complète vit sur /strategie,
- *  le guide complet et MyCORUM sur /documentation. */
-const propsFor = (path: string) => (/\/0(4|6)-/.test(path) ? { compact: true } : {});
+/** Souscrire est rendue en chapitre court (prop `compact`) : le guide complet et MyCORUM vivent sur /documentation.
+ *  La Stratégie a quitté l'accueil le 11/09/2026, elle est rendue en entier sur /strategie. */
+const propsFor = (path: string) => (/\/06-/.test(path) ? { compact: true } : {});
 
 const jsonLd = [
   organizationJsonLd(),
