@@ -63,11 +63,10 @@ interface Props {
 const { compact = false } = Astro.props;
 /**
  * Accueil (11/09/2026) : la photo d'immeuble laisse la place au téléphone affichant R Start — un parcours
- * 100 % en ligne se raconte mieux avec l'écran qu'avec une terrasse. C'est un visuel produit sur fond
- * clair : ni parallaxe, ni recadrage au centre, il serait coupé. Le cadre le rogne PAR LE BAS
- * (`object-top`, format 2/3) pour retirer les deux badges de magasins incrustés dans la photo : ils y
- * portent « Apple Store » et « Android Store », alors que les marques déposées sont « App Store » et
- * « Google Play ». À remplacer par un visuel corrigé avant mise en ligne.
+ * 100 % en ligne se raconte mieux avec l'écran qu'avec une terrasse.
+ * Le visuel est un PNG DÉTOURÉ : il n'a pas de fond, donc ni cadre, ni masque de fondu, ni recadrage —
+ * ses bords sont la silhouette du téléphone, et un masque y mordrait. Il est rendu à sa taille naturelle,
+ * bornée à 24 rem : la source ne fait que 338 px de large, l'agrandir davantage le rendrait mou.
  */
 const photo = await resolveImage(media.app.src);
 /** Les deux magasins, dans l'ordre du contenu (App Store puis Google Play). */
@@ -194,22 +193,20 @@ const OPTION_Y = 12;
           Purement décorative pour la conformité : elle ne porte aucun avantage. */
         compact && (
           <figure
-            class="mx-auto w-full max-w-[18rem] self-start sm:max-w-[22rem] lg:sticky lg:top-24 lg:col-span-5 lg:max-w-none"
+            class="mx-auto w-full max-w-[18rem] self-start sm:max-w-[20rem] lg:sticky lg:top-24 lg:col-span-5 lg:max-w-[24rem]"
             data-animate="clip"
           >
-            <div class="photo-fade aspect-[2/3]">
-              <Picture
-                src={photo}
-                alt={media.app.alt}
-                widths={[420, 640, 900]}
-                sizes="(min-width: 64rem) 26rem, 100vw"
-                formats={['avif', 'webp']}
-                loading="lazy"
-                decoding="async"
-                pictureAttributes={{ class: 'block h-full w-full' }}
-                class="h-full w-full object-cover object-top"
-              />
-            </div>
+            <Picture
+              src={photo}
+              alt={media.app.alt}
+              widths={[338, 676]}
+              sizes="(min-width: 64rem) 24rem, 18rem"
+              formats={['avif', 'webp']}
+              loading="lazy"
+              decoding="async"
+              pictureAttributes={{ class: 'block' }}
+              class="mx-auto h-auto w-full"
+            />
 
             {
               /* Les deux magasins sous le visuel : ce sont de vrais liens vers les fiches MyCORUM

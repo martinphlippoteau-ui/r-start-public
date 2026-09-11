@@ -569,13 +569,12 @@ html.reperes main section[data-section]:first-child::before {
 /* --- Photo de téléphone (AppMyCorum.astro) ---
    Pose 3D légère : perspective + rotation figée (ce n'est pas une animation, rien à couper en
    reduced-motion), coins arrondis et ombre portée qui décollent la photo du fond. */
+/* Depuis le 11/09/2026, le visuel fourni est un PNG DÉTOURÉ qui porte déjà sa perspective et son ombre :
+   la pose 3D et l'ombre rectangulaire d'ici s'y ajoutaient, penchaient le téléphone deux fois et le
+   faisaient déborder de sa carte. Il ne reste que la hauteur automatique. À rétablir si un jour l'image
+   redevient une capture à plat. */
 .phone-shot {
   height: auto;
-  border-radius: 1.75rem;
-  transform: perspective(900px) rotateY(-12deg) rotateX(4deg) rotateZ(-1deg);
-  box-shadow:
-    0 26px 46px -24px rgb(13 46 61 / 0.65),
-    0 10px 20px -14px rgb(13 46 61 / 0.5);
 }
 
 @utility scrollbar-none {

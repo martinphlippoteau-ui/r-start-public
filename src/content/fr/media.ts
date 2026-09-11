@@ -52,8 +52,12 @@ export interface MediaContent {
 
 export const media = {
   // 768 × 1365, fournie par l'équipe le 11/09/2026 : téléphone affichant l'application MyCORUM.
+  // 338 × 536, PNG DÉTOURÉ (fond transparent), fourni par l'équipe le 11/09/2026. Il remplace
+  // app/iphone-rstart.jpeg, dont l'arrière-plan blanc devait être fondu au masque et dont les badges
+  // incrustés portaient « Apple Store » et « Android Store » au lieu des marques déposées.
+  // À REDEMANDER EN PLUS GRAND : 338 px de large, le visuel est déjà à sa taille native sur grand écran.
   app: {
-    src: 'app/iphone-rstart.jpeg',
+    src: 'app/iphone-app-corum.png',
     alt: 'Téléphone affichant l’écran d’accueil de l’application, logo R Start sur fond sombre',
   },
   hero: {
