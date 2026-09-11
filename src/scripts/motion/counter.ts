@@ -1,13 +1,17 @@
 /**
- * data-counter="160000" — compteur animé (ease power3.out, 1,6 s), formaté fr-FR.
+ * data-counter="160000" — compteur animé (expo.out, la courbe unique du moteur : le nombre file puis se
+ * pose sur ses derniers chiffres ; 1,6 s), formaté fr-FR.
  * Options : data-counter-prefix, data-counter-suffix, data-counter-decimals, data-counter-from (défaut 0),
- * data-counter-duration (s). Démarre à 85 % du viewport, une seule fois.
+ * data-counter-duration (s). Démarre à 88 % du viewport (START), une seule fois.
+ * Usage (sobriété du 11/09/2026) : uniquement des chiffres NON réglementaires (clients, encours, avis) ;
+ * jamais un taux de frais, un indicateur de risque, un prix de part ni un délai — ces valeurs sont
+ * toujours exactes à l'écran. Le compteur est alors le seul effet d'entrée de son bloc.
  * La valeur finale est toujours dans le HTML (sans JS / reduced-motion, elle reste affichée). Avant
  * le départ, l'élément affiche la valeur de départ ; sa largeur finale est réservée (min-width lu une
  * fois) pour que le comptage ne décale rien autour (CLS).
  */
 import { gsap } from 'gsap';
-import { all, allowed, num, onceTrigger } from './shared';
+import { EASE, all, allowed, num, onceTrigger } from './shared';
 
 const format = (decimals: number) =>
   new Intl.NumberFormat('fr-FR', {
@@ -41,8 +45,8 @@ export const setupCounters = (): (() => void) => {
     gsap.to(state, {
       value: target,
       duration: num(el.dataset.counterDuration, 1.6),
-      ease: 'power3.out',
-      scrollTrigger: onceTrigger(el, 'top 85%'),
+      ease: EASE,
+      scrollTrigger: onceTrigger(el),
       onUpdate: render,
       onComplete: () => {
         el.textContent = original[i] ?? el.textContent;

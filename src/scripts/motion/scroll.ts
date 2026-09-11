@@ -1,5 +1,5 @@
 /**
- * Effets pilotés par la position de défilement (scrub ≤ 1, transform/opacity uniquement).
+ * Effets pilotés par la position de défilement (lissage unique SCRUB 0,6, transform/opacity uniquement).
  *
  *  - data-parallax="0.15" : translateY de 0 à −0,15 × hauteur du viewport pendant la traversée du
  *    déclencheur (valeur négative : l'élément « traîne », effet d'arrière-plan).
@@ -8,7 +8,10 @@
  *    yPercent, scale, scaleX, scaleY, rotate, opacity) sur la traversée du viewport.
  *    Options : data-scrub-trigger, data-scrub-start (défaut `top bottom`), data-scrub-end (`bottom top`),
  *    data-scrub-ease (défaut `none`).
- *  - data-curtain : la section recouvre la précédente. La section précédente est épinglée (sans
+ *  - data-curtain : la section recouvre la précédente. Règle d'emploi (11/09/2026) : seulement quand la
+ *    section précédente ne contient AUCUN épinglage (jamais après une scène, ex. 03-Fees) et quand le
+ *    contraste le justifie (fond clair → ink) ; sur l'accueil, un seul rideau : 08-Risques sur 08b-Presse.
+ *    La section précédente est épinglée (sans
  *    espace réservé) quand son bas touche le bas du viewport pendant que la section rideau monte
  *    par-dessus (z-index, coins arrondis et ombre posés par la CSS `[data-curtain]`). Le recul
  *    (scale 0.96 + opacity 0.6) n'est appliqué QUE si la section précédente ne contient aucun
@@ -25,6 +28,7 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import {
+  SCRUB,
   all,
   allowed,
   containsProtected,
@@ -34,8 +38,6 @@ import {
   resolveTrigger,
   scrubWillChange,
 } from './shared';
-
-const SCRUB = 0.6;
 
 export const setupParallax = (): void => {
   all('[data-parallax]').forEach((el) => {

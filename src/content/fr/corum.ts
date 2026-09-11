@@ -1,7 +1,7 @@
-import type { CorumContent, LegalNote, StatItem } from '@/content/types';
+import type { CorumContent, LegalNote } from '@/content/types';
 import { corumGroup, product } from '@/content/fr/facts';
 import { managementCompany } from '@/content/fr/legal';
-import { notes as trustNotes } from '@/content/fr/trust';
+import { experienceStats, notes as trustNotes } from '@/content/fr/trust';
 
 /**
  * Section « L'expérience derrière R Start » (id : corum), rendue avec trust.ts dans la section
@@ -16,8 +16,10 @@ import { notes as trustNotes } from '@/content/fr/trust';
  * passées ne préjugent pas des performances futures) et `alignmentBody` (effets de seuil de la
  * commission d'arbitrage, énoncés dans le même paragraphe que l'alignement d'intérêts).
  * Les chiffres du groupe restent gouvernés par facts.corumGroup : aucun arbitrage ici.
- * Sur l'accueil, la bande de chiffres rendue est celle de trust.stats (même source) ; `stats` porte
- * les quatre chiffres de la zone 4.
+ * Sur l'accueil, la bande de chiffres rendue est celle de trust.stats, qui expose les quatre chiffres
+ * de la zone 4 (trust.experienceStats) ; `stats` les reprend à l'identique, gouvernés par STATS_DATED.
+ * `alignmentBody` : « ne touche une commission que si l'ensemble des ventes est gagnant » décrit le
+ * mécanisme de réserve (note d'information ch. III § 4), pas un alignement sur votre résultat.
  * Notes : `notes` agrège les notes de trust.ts (cadre réglementaire, visa, Trustpilot, chiffres) et
  * celles définies ici (mention légale de l'agrément, gamme, compensation) dans l'ordre de lecture de
  * 07-Trust.astro ; notes.ts n'importe que ce fichier.
@@ -25,57 +27,17 @@ import { notes as trustNotes } from '@/content/fr/trust';
 
 /** Espace insécable avant % € : ; ? ! et devant « Md€ » : les libellés de facts.ts utilisent une espace simple. */
 const nb = (s: string): string => s.replace(/ ([%€:;?!])/g, ' $1').replace(/ (Md€)/g, ' $1');
-/** Espace insécable entre groupes de trois chiffres (ex. « 160 000 »). */
-const nbDigits = (s: string): string => s.replace(/(\d) (?=\d{3}(?!\d))/g, '$1 ');
-/** Apostrophe typographique (’) : facts.ts écrit certains libellés avec l'apostrophe droite. */
-const typo = (s: string): string => s.replace(/'/g, '’');
 
 /**
- * Passer à true une fois la date de référence des chiffres groupe confirmée par CORUM et reportée dans
- * facts.corumGroup.statsSource (ex. « Source : CORUM, données au 30 juin 2026. »).
+ * Passer à true une fois la date d'arrêté des chiffres groupe confirmée par CORUM et reportée dans
+ * facts.corumGroup.statsSource (« données au … »). Aujourd'hui false : le dépôt ne contient qu'une date
+ * de consultation de corum.fr (08/09/2026, facts.corumGroup.statsDate), la brochure partenaires 2026
+ * n'en donne pas non plus. Une date de consultation n'est pas une date d'arrêté : `stats` reste donc
+ * vide ici. La bande rendue sur l'accueil (trust.stats, 07-Trust.astro) affiche les mêmes chiffres avec
+ * une source qui dit explicitement que la date d'arrêté n'est pas communiquée, faute d'état vide dans le
+ * composant ; lui appliquer ce même drapeau demande d'y ajouter un état vide (hors périmètre contenu).
  */
-const STATS_DATED = true; // chiffres sourcés corum.fr, consulté le 08/09/2026 (facts.corumGroup.statsDate)
-
-/** Chiffre du groupe repris de facts.corumGroup.stats ; erreur explicite si le libellé y disparaît. */
-const groupStat = (fragment: string): StatItem => {
-  const found = corumGroup.stats.find((s) => s.label.includes(fragment));
-  if (!found) throw new Error(`Chiffre absent de facts.corumGroup.stats : ${fragment}`);
-  return found;
-};
-
-const savings = groupStat('épargne gérée');
-const savers = groupStat('épargnants');
-
-/**
- * Les quatre chiffres de la zone 4 (brochure partenaires 2026, p. 7), espaces insécables appliquées.
- * Le « + » devant le nombre d'épargnants vient de facts.corumGroup.stats (savers.prefix), sourcé de la
- * brochure partenaires 2026, p. 7 : aucun arbitrage chiffré n'est pris hors de la source de vérité.
- */
-const experienceStats: StatItem[] = [
-  {
-    value: nb(corumGroup.experienceLabel),
-    numeric: corumGroup.experienceYears,
-    suffix: ' ans',
-    label: 'à investir en immobilier d’entreprise',
-  },
-  {
-    value: nb(savings.value),
-    numeric: savings.numeric,
-    suffix: nb(savings.suffix ?? ''),
-    label: typo(savings.label),
-  },
-  {
-    value: `${savers.prefix}${nbDigits(savers.value)}`,
-    numeric: savers.numeric,
-    prefix: savers.prefix,
-    label: typo(savers.label),
-  },
-  {
-    value: String(corumGroup.scpiCount),
-    numeric: corumGroup.scpiCount,
-    label: `SCPI gérées depuis ${corumGroup.scpiSince}`,
-  },
-];
+const STATS_DATED = false;
 
 const others = corumGroup.scpiNames.slice(0, -1);
 const otherScpi = `${others.slice(0, -1).join(', ')} et ${others[others.length - 1]}`;
@@ -116,6 +78,19 @@ export const notes: LegalNote[] = [...trustNotes, ...corumNotes].sort(
   (a, b) => rank(a.id) - rank(b.id)
 );
 
+/**
+ * Notes appelées par la section telle qu'elle est rendue sur l'accueil (11/09/2026) : le cadre
+ * réglementaire est passé sur /documentation et le bloc « rémunération sur les ventes » a été retiré,
+ * leurs notes n'ont donc plus d'appel ici. `notes` reste l'export complet pour les autres pages.
+ */
+const APPELEES_SUR_ACCUEIL = ['confiance-trustpilot', 'confiance-chiffres', 'corum-gamme'];
+export const homeNotes: LegalNote[] = notes.filter((n) => APPELEES_SUR_ACCUEIL.includes(n.id));
+if (homeNotes.length !== APPELEES_SUR_ACCUEIL.length) {
+  throw new Error(
+    `corum.ts : ${homeNotes.length} note(s) trouvée(s) sur ${APPELEES_SUR_ACCUEIL.length} — un id a changé.`
+  );
+}
+
 export const corum = {
   eyebrow: 'CORUM',
   title: 'L’expérience derrière R Start',
@@ -140,13 +115,14 @@ export const corum = {
     title: `Des SCPI gérées depuis ${corumGroup.scpiSince}`,
     description: `CORUM gère des SCPI depuis ${corumGroup.scpiSince} et en compte aujourd’hui ${corumGroup.scpiCount}, avec ${corumGroup.offices} bureaux. ${product.name} est la plus récente. Elle a ouvert ses souscriptions le ${product.openingDate.label} et n’a pas encore d’historique propre. Les résultats des autres SCPI CORUM ne préjugent pas des siens.`,
     scpiNames: [...corumGroup.scpiNames],
+    currentBadge: 'Nouveau',
   },
 
   /** Titre du bloc facultatif de la section : `alignmentBody` en est le corps (brochure p. 4). */
   alignmentTitle: 'La rémunération de CORUM sur les ventes',
   /** Avantage et contrepartie dans le même paragraphe, à la même taille (exigence AMF). */
   alignmentBody: nb(
-    `Sur les ventes d’immeubles, CORUM ne se rémunère que si le bilan global des cessions est positif. Cette commission d’arbitrage a des effets de seuil : elle peut capter une partie significative de la plus-value. CORUM peut aussi être rémunérée sur une plus-value alors même que la valeur de vos parts diminue.`
+    'Quand R Start revend un immeuble, CORUM ne touche une commission (dite « d’arbitrage ») que si l’ensemble des ventes est gagnant. Cette commission a des effets de seuil et peut capter une partie significative de la plus-value. CORUM peut aussi être rémunérée sur une plus-value alors même que la valeur de vos parts diminue.'
   ),
 
   disclaimer: corumGroup.disposalsDisclaimer,

@@ -2,6 +2,7 @@
 import { noteNumber } from '@/content/fr/notes';
 import { sections } from '@/config/sections';
 import { nav } from '@/content/fr/nav';
+import type { LegalNote } from '@/content/types';
 /**
  * Appel de note légale numérotée pointant vers la section Notes.
  * Couleur auto-adaptative au fond (AA sur les deux) :
@@ -10,7 +11,8 @@ import { nav } from '@/content/fr/nav';
  *    9,6:1 sur ink, via la variante Tailwind `in-[.text-white]`.
  * La prop optionnelle `tone` force la couleur ('light' → teal-700, 'dark' → teal-200) pour les rares
  * cas où l'ancêtre ne porte pas la classe attendue (ex. carte claire posée dans une section sombre).
- * aria-label « Voir la note n » depuis nav.ts.
+ * aria-label « Voir la note n » depuis nav.ts. Zone tactile élargie par un pseudo-élément (after:-inset-2,
+ * ≈ 32 px) sans changer le rendu : les exposants restent lisibles et cliquables au doigt (WCAG 2.5.8).
  * `interactive={false}` : marqueur visuel seul (span, sans lien) — pour un usage à l'intérieur d'un
  * ancêtre déjà interactif (ex. <summary>), où un <a> imbriqué serait une violation d'accessibilité
  * (« nested-interactive »). Le lien accessible équivalent doit alors exister ailleurs dans le contenu
@@ -18,12 +20,16 @@ import { nav } from '@/content/fr/nav';
  */
 interface Props {
   id: string;
+  /** Notes propres à une sous-page (rendues par <LegalNotes notes={…}>) : le numéro y est résolu
+   *  plutôt que dans le registre de l'accueil. */
+  notes?: LegalNote[];
   /** Force la couleur ; sans valeur, elle suit le fond (ancêtre `.text-white` → teal-200). */
   tone?: 'light' | 'dark';
   interactive?: boolean;
 }
-const { id, tone, interactive = true } = Astro.props;
-const n = noteNumber(id);
+const { id, notes, tone, interactive = true } = Astro.props;
+const localIndex = notes ? notes.findIndex((note) => note.id === id) : -1;
+const n = notes ? (localIndex === -1 ? null : localIndex + 1) : noteNumber(id);
 const label = nav.noteRefLabel ? `${nav.noteRefLabel} ${n}` : undefined;
 const colors = {
   auto: 'text-teal-700 in-[.text-white]:text-teal-200',
@@ -31,7 +37,8 @@ const colors = {
   dark: 'text-teal-200',
 };
 const classes = [
-  'ml-0.5 align-super text-[0.65em] font-semibold no-underline hover:underline',
+  // 0,65 em du texte porteur, plafonné à 0,875 rem : dans un H3 (text-display-sm) l'appel ne dépasse plus le corps de texte.
+  "ml-0.5 align-super text-[min(0.65em,0.875rem)] font-semibold no-underline hover:underline relative after:absolute after:-inset-2 after:content-['']",
   colors[tone ?? 'auto'],
 ];
 ---

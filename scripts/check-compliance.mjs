@@ -1,11 +1,15 @@
 // Contrôle de conformité du HTML buildé (dist/). Exit 1 si une règle échoue.
 // Règles : mentions obligatoires présentes, formulations interdites absentes, structure du hero,
-// liens PDF valides, un seul H1, lang="fr", canonical, JSON-LD parsable.
+// liens PDF valides, un seul H1, lang="fr", canonical, JSON-LD parsable, SRI égal à la valeur de
+// facts.ts, citations de presse de l'accueil marquées et couvertes par l'avertissement, notes du
+// registre toutes appelées (avertissement), mentions obligatoires jamais en text-xs.
+// Les contenus sont importés directement des sources TypeScript (Node ≥ 22, sans alias `@/` :
+// notes.ts, qui en dépend, est lu dans le HTML à la place).
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import * as legal from '../src/content/fr/legal.ts';
-import { marketComparison, press as pressFacts, product } from '../src/content/fr/facts.ts';
+import { marketComparison, press as pressFacts, product, risk } from '../src/content/fr/facts.ts';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const DIST = path.join(ROOT, 'dist');
@@ -87,6 +91,23 @@ const FORBIDDEN = [
   { re: /\bcrédit\b/gi, label: 'mention du crédit', allow: /carte de crédit/i },
   { re: /objectifs? tenus?/gi, label: '« objectifs tenus » (allégation de performance)' },
   {
+    // Les frais de gestion sont prélevés sur les loyers encaissés par la SCPI, pas sur le gain de
+    // l'associé : la formule « alignement » de la brochure est inexacte et ne doit pas être reprise.
+    // Le claim « Payer des frais si notre travail vous fait gagner de l'argent : oui / Payer avant même
+    // qu'on ait commencé à travailler : non » est repris mot pour mot sur décision de l'équipe (11/09/2026),
+    // à défendre en compliance : il n'est donc plus contrôlé ici. Restent interdites les formules absolues.
+    re: /ne touchons rien|tant que vous n'avez pas gagné/gi,
+    label:
+      "formule d'alignement inexacte (les frais de gestion sont prélevés sur les loyers encaissés)",
+  },
+  {
+    // « Diversification » n'est admis qu'accompagné de sa limite (« ne supprime pas / ne garantit
+    // pas le risque… ») ou présenté comme un objectif (« objectif », « vise »), jamais comme un acquis.
+    re: /\bdiversifi/gi,
+    label: '« diversifié » présenté comme un acquis',
+    allow: /ne (supprime|garantit)|objectif|vise/i,
+  },
+  {
     // Autorisé : « la première SCPI du groupe CORUM… ». Interdit : la même allégation sans périmètre.
     re: /premi[èe]re\s+SCPI/gi,
     label: 'allégation « première SCPI » hors périmètre CORUM',
@@ -106,6 +127,48 @@ function checkForbidden(text, file) {
       errors.push(`${file} : formulation interdite ${rule.label} — « …${ctx.trim()}… »`);
     }
   }
+}
+
+/**
+ * Le paragraphe qui porte le début de la mention 1 (caractère commercial) ne doit pas être en text-xs,
+ * directement ni par un ancêtre (la régression du 10/09/2026 tenait à la classe posée sur la <section>
+ * du bloc légal). Petit parcours de la pile des balises ouvertes sur le HTML de la page, sans parseur.
+ */
+const VOID_TAGS = /^(area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr)$/i;
+function checkNoticeSize(html, file) {
+  const start = norm(legal.commercialNotice).slice(0, 40).toLowerCase();
+  const stack = [];
+  const tagRe = /<(\/?)([a-z][a-z0-9-]*)([^>]*)>/gi;
+  let m;
+  let found = false;
+  while ((m = tagRe.exec(html))) {
+    const [, closing, name, attrs] = m;
+    if (name === 'script' || name === 'style') continue;
+    if (closing) {
+      const i = stack.map((t) => t.name).lastIndexOf(name.toLowerCase());
+      if (i !== -1) stack.length = i;
+      continue;
+    }
+    if (VOID_TAGS.test(name) || /\/\s*$/.test(attrs)) continue;
+    const cls = (attrs.match(/\sclass="([^"]*)"/i) || [, ''])[1];
+    stack.push({ name: name.toLowerCase(), cls });
+    if (name.toLowerCase() !== 'p') continue;
+    const close = html.indexOf('</p>', tagRe.lastIndex);
+    const inner = toText(
+      html.slice(tagRe.lastIndex, close === -1 ? undefined : close)
+    ).toLowerCase();
+    if (!inner.startsWith(start)) continue;
+    found = true;
+    const small = stack.filter((t) => /(^|\s)text-xs(\s|$)/.test(t.cls));
+    if (small.length)
+      errors.push(
+        `${file} : mention 1 (caractère commercial) en text-xs via <${small.map((t) => t.name).join('>, <')}> — text-caption (14 px) minimum`
+      );
+  }
+  if (!found)
+    warnings.push(
+      `${file} : aucun <p> ne commence par la mention 1 — contrôle de taille inopérant`
+    );
 }
 
 async function checkIndex() {
@@ -167,6 +230,55 @@ async function checkIndex() {
   const nRisk = (html.match(/data-risk/g) || []).length;
   if (nAdv > nRisk) errors.push(`${file} : ${nAdv} avantages pour ${nRisk} risques`);
 
+  // Indicateur synthétique de risque : toute occurrence « N sur 7 » doit être la valeur de facts.ts
+  // (risk.sriLabel). Un « 3 sur 7 » hérité du DIC hébergé ou une coquille est une erreur.
+  if (text.includes('sur 7')) {
+    const sris = [...text.matchAll(/\b\d+\s?sur 7\b/g)].map((m) => norm(m[0]));
+    if (!sris.length)
+      warnings.push(`${file} : « sur 7 » présent sans valeur numérique devant (SRI illisible)`);
+    const wrong = sris.filter((v) => v !== norm(risk.sriLabel));
+    for (const v of new Set(wrong))
+      errors.push(
+        `${file} : SRI « ${v} » (× ${wrong.filter((w) => w === v).length}) différent de facts.risk.sriLabel (« ${risk.sriLabel} »)`
+      );
+  }
+
+  // « La presse en parle » (accueil) : mêmes exigences que /presse — citations de tiers marquées
+  // data-press-quote, avertissement de couverture présent.
+  const pressMatch = html.match(/<section[^>]*id="presse-en-parle"[^>]*>[\s\S]*?<\/section>/i);
+  if (!pressMatch) warnings.push(`${file} : section #presse-en-parle introuvable`);
+  else {
+    const press = pressMatch[0];
+    requirePhrase(
+      toText(press),
+      pressFacts.coverageDisclaimer.slice(0, 120),
+      'avertissement de la revue de presse (#presse-en-parle)',
+      file
+    );
+    const quotes = press.match(/<blockquote\b[^>]*>/gi) || [];
+    const unmarked = quotes.filter((q) => !/\sdata-press-quote\b/i.test(q));
+    // À passer en erreur après ajout de l'attribut dans 08b-Press.astro (hors lot) : aujourd'hui les
+    // blockquotes de l'accueil ne portent pas data-press-quote.
+    if (unmarked.length)
+      warnings.push(
+        `${file} : ${unmarked.length} <blockquote> de #presse-en-parle sans data-press-quote`
+      );
+  }
+
+  // Notes orphelines : chaque note du registre de l'accueil (li id="notes-N" de la section #notes)
+  // doit être appelée au moins une fois (href="#notes-N"). notes.ts n'est pas importable ici (alias
+  // `@/`) : on lit les ancres rendues.
+  const noteIds = [...html.matchAll(/<li[^>]*\bid="notes-(\d+)"/g)].map((m) => m[1]);
+  const noteRefs = new Set([...html.matchAll(/href="#notes-(\d+)"/g)].map((m) => m[1]));
+  const orphans = noteIds.filter((n) => !noteRefs.has(n));
+  if (!noteIds.length)
+    warnings.push(`${file} : aucune note (li id="notes-N") — contrôle inopérant`);
+  if (orphans.length)
+    warnings.push(`${file} : note(s) sans appel dans la page — notes-${orphans.join(', notes-')}`);
+
+  // Mentions obligatoires : jamais en text-xs (12 px), ni sur le <p> ni par un ancêtre.
+  checkNoticeSize(html, file);
+
   // Documents PDF
   const pdfLinks = [...new Set([...html.matchAll(/href="([^"]+\.pdf)"/gi)].map((m) => m[1]))];
   // 2 tant que les statuts (PDF tronqué à la source) et le DIC (SRI 3/7 contredisant le 4/7 du site,
@@ -197,7 +309,7 @@ async function checkIndex() {
 
 /** Sous-pages produit : mêmes interdits, ligne risques dans l'en-tête, mentions obligatoires, structure. */
 async function checkSubPages() {
-  for (const p of ['frais', 'documentation', 'presse', 'salle-de-presse']) {
+  for (const p of ['frais', 'strategie', 'documentation', 'presse', 'salle-de-presse']) {
     const file = p + '/index.html';
     let html;
     try {

@@ -7,37 +7,50 @@
  * de montrer à côté.
  *
  * 1. Scène épinglée (data-scene, fin à +60 % du viewport depuis l'audit : au-delà, le lecteur
- *    traversait un demi-écran vide après le dernier temps) :
- *    les trois « 0 % » (text-stat en navy uni, AA sur paper) sont chacun un [data-step][data-step-stay]
+ *    traversait un demi-écran vide après le dernier temps). Le moteur n'épingle que si la scène tient
+ *    ENTIÈREMENT sous son départ (hauteur + 72 px ≤ fenêtre, scene.ts) : gabarit serré dès lg (valeurs
+ *    text-display-md, libellés et contre-poids text-lg, interlignes réduits) pour tenir en 681 px à
+ *    1440×900, 671 à 1280×800, 678 à 1366×768 (11/09/2026 ; à 1024×768, 854 px : repli statique prévu).
+ *    Avant, 944 px pour 828 disponibles : plus aucun épinglage.
+ *    les trois « 0 % » (navy uni, AA sur paper) sont chacun un [data-step][data-step-stay]
  *    et arrivent un à un au fil du défilement, le premier visible d'emblée — son chiffre reçoit un simple
- *    accent d'échelle à l'entrée (span inline-block data-animate="scale" : opacité + scale 0,95, 0,8 s).
+ *    accent d'échelle à l'entrée (span inline-flex data-animate="scale" : opacité + scale 0,95, 0,6 s ;
+ *    pas `inline-block` : ce nom de classe est détourné par le jeton --spacing-block de global.css).
  *    JAMAIS de compteur sur un taux réglementaire qui partirait d'une valeur fausse ; puis un quatrième
  *    step (data-step-stay) fait « basculer » vers les frais réellement prélevés : 15 % de gestion,
  *    commission sur les cessions, commission de retrait avec ses cinq paliers. Cette rangée n'est plus
  *    aria-hidden : le barème ayant quitté l'accueil, elle est le seul endroit de la page où ces taux
  *    figurent, elle doit donc être lue. Le contre-poids rédigé — avantage (data-advantage, qui porte
- *    l'appel de la note « incidence des coûts du DIC ») + RiskNote, même taille (text-lead) — est HORS
- *    des steps, dans la scène : visible du premier au dernier instant (aucun step ne contient de
- *    [data-risk] ; le moteur refuserait de l'animer). Les steps ne sont pas superposés (pas de
+ *    l'appel de la note « incidence des coûts du DIC ») + RiskNote, même taille (text-lead ; text-lg dès
+ *    lg, voir ci-dessus) — est HORS des steps, dans la scène : visible du premier au dernier instant
+ *    (aucun step ne contient de [data-risk] ; le moteur refuserait de l'animer). Les steps ne sont pas superposés (pas de
  *    `scene-stack`) : ils gardent leur place en flux. Départ du pin sous la barre collée (3,5 rem) :
  *    data-scene-start="top 72px" (ScrollTrigger ne lit pas les rem).
+ *    Taille des six valeurs (AMF : un frais ne s'affiche jamais plus petit que ses voisins, d'où la
+ *    même classe sur tous les [data-fee-value] du bloc « apercu-accueil ») : text-display-md à toutes
+ *    les largeurs (51 px à 1280, 56 px dès 1400 : chiffre géant qui ne concurrence plus le H2 en
+ *    display-lg) ; « 10 à 0 % » tient sur une ligne à 1280 comme à 1440 px.
+ *    Mobile (< sm) : une colonne, chaque frais est une LIGNE — valeur à gauche sur une largeur fixe
+ *    (w-32, alignement commun aux deux listes), libellé puis assiette/détail à droite — car trois
+ *    colonnes de 109 px cassaient « 0 à 12 % » sur deux lignes et les libellés sur cinq. L'ordre DOM
+ *    reste valeur → libellé.
  *    Sans JS / reduced-motion : aucun pin, tout est visible et statique.
  * 2. Rappel « le rachat de vos parts n'est pas garanti » (RiskNote fees.withdrawal.note, jamais animé),
  *    conservé après le retrait de la frise : il porte aussi les cas d'exonération et la durée de
  *    placement recommandée, que rien d'autre ne rappelle sur l'accueil.
- * 3. Encadré « Une innovation, pas une révolution » (Card blanche, jamais animé) et les trois puces de la
- *    commission d'arbitrage (liste, jamais animées), reproduits à l'identique depuis legal.ts.
+ * 3. (Retiré le 10/09/2026 : l'encadré « Une innovation, pas une révolution » et les puces de la
+ *    commission d'arbitrage ne vivent plus que sur /frais ; les puces restent dans la section Risques.)
  * 4. Précision HT = TTC (corps de texte, statique), CTA tunnel (position « frais ») et lien vers la page
  *    /frais, rendu uniquement lorsque src/pages/frais.astro existe (vérification au build : pas de lien
  *    mort tant que la page n'est pas livrée).
- * L'en-tête est rendu ici (surtitre en teal-700, AA sur paper ; H2 mot à mot via data-reveal-text) plutôt
- * que par SectionHeading.
+ * L'en-tête est rendu ici (surtitre en teal-700, AA sur paper, statique ; H2 mot à mot via data-reveal-text ;
+ * introduction en fade-up décalée de 0,1 s — signature commune des chapitres, 11/09/2026) plutôt que par
+ * SectionHeading. L'introduction porte un appel de note : pas d'opacité réduite (contraste).
  * Chaque <NoteRef> est collé à son mot et enveloppé dans un span `whitespace-nowrap` : le gabarit de
  * NoteRef émet un blanc avant le numéro, qui sinon peut passer seul à la ligne.
  * Contenu : src/content/fr/fees.ts.
  */
 import Button from '@/components/ui/Button.astro';
-import Card from '@/components/ui/Card.astro';
 import Container from '@/components/ui/Container.astro';
 import NoteRef from '@/components/ui/NoteRef.astro';
 import RiskNote from '@/components/ui/RiskNote.astro';
@@ -47,7 +60,7 @@ import { fees } from '@/content/fr/fees';
 
 const id = sections.fees.id;
 const titleId = id + '-title';
-const { zeroHighlights, counterweight, withdrawal, innovationBox, arbitrageWarning } = fees;
+const { zeroHighlights, withdrawal } = fees;
 
 /**
  * Face aux trois « 0 % », les frais non nuls perçus ensuite : gestion, cessions, retrait, avec leurs
@@ -66,18 +79,29 @@ const counterRows = fees.rows.filter(
  */
 const feesPageExists = Object.keys(import.meta.glob('/src/pages/frais.astro')).length > 0;
 const detailsLink = feesPageExists ? fees.detailsLink : undefined;
+
+/**
+ * Classes communes aux six valeurs de frais : UNE seule chaîne, pour que la taille rendue soit
+ * identique dans tout le bloc (data-fee-block) quel que soit le viewport. La couleur est ajoutée par
+ * chaque liste. Sous sm, la valeur occupe une colonne fixe (w-32) qui aligne les deux listes.
+ */
+const feeValueClass = 'text-display-md w-32 tabular-nums sm:w-auto';
+
+/** Ligne sur mobile (valeur | libellé + assiette), colonne à partir de sm. */
+const feeItemClass =
+  'grid grid-cols-[auto_1fr] items-baseline gap-x-4 border-t sm:flex sm:flex-col sm:items-stretch';
 ---
 
 <Section id={id} tone="paper">
   <Container size="wide">
     <header class="max-w-4xl">
-      <p data-animate="fade-up" class="text-eyebrow mb-4 text-teal-700">{fees.eyebrow}</p>
+      <p class="text-eyebrow mb-4 text-teal-700">{fees.eyebrow}</p>
       <h2 id={titleId} class="text-display-lg" data-reveal-text>{fees.title}</h2>
       {
         /* La note « sources » était accrochée à la légende du barème, parti sur /frais. Les taux
           restent affichés ici : leur source doit rester à portée, elle rejoint l'introduction. */
       }
-      <p data-animate="fade-up" data-animate-delay="0.15" class="mt-6 text-lead opacity-90">
+      <p data-animate="fade-up" data-animate-delay="0.1" class="mt-6 text-lead">
         {fees.intro}<span class="whitespace-nowrap"><NoteRef id="frais-sources" /></span>
       </p>
     </header>
@@ -92,33 +116,37 @@ const detailsLink = feesPageExists ? fees.detailsLink : undefined;
       <ul
         role="list"
         aria-label={fees.zeroHighlightsLabel}
-        class="grid grid-cols-3 gap-3 sm:gap-8 lg:gap-12"
+        class="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-8 lg:gap-12"
       >
         {
           zeroHighlights.map((item, i) => (
             <li
               data-step
               data-step-stay
-              class="flex flex-col gap-1.5 border-t border-navy/15 pt-3 sm:gap-3 sm:pt-8"
+              class:list={[feeItemClass, 'border-navy/15 pt-3 sm:gap-3 sm:pt-6']}
             >
-              <p class="flex flex-col gap-1.5 sm:gap-3">
-                <span class="text-stat text-navy" data-fee-value data-fee-block="apercu-accueil">
-                  {/* Premier chiffre : accent d'échelle seulement (inline-block : une transform ne s'applique pas à un inline) ; valeur statique, jamais de compteur */}
-                  {i === 0 ? (
-                    <span data-animate="scale" class="inline-block">
-                      {item.value}
-                    </span>
-                  ) : (
-                    item.value
-                  )}
-                </span>
-                <span class="text-base leading-snug font-medium text-ink sm:text-lead">
-                  {item.label}
-                </span>
-              </p>
-              <p class="text-sm leading-snug text-slate-700 sm:text-base sm:leading-relaxed">
-                {item.base}
-              </p>
+              <span
+                class:list={[feeValueClass, 'text-navy']}
+                data-fee-value
+                data-fee-block="apercu-accueil"
+              >
+                {/* Premier chiffre : accent d'échelle seulement (inline-flex : une transform ne s'applique pas à un
+                    inline, et la classe `inline-block` est cassée par le jeton --spacing-block du thème, qui lui fait
+                    émettre `inline-size` : la boîte ferait 2 rem quel que soit le texte) ; valeur statique, jamais de compteur */}
+                {i === 0 ? (
+                  <span data-animate="scale" class="inline-flex">
+                    {item.value}
+                  </span>
+                ) : (
+                  item.value
+                )}
+              </span>
+              <div class="flex flex-col gap-1.5 sm:gap-3">
+                <p class="text-base leading-snug font-medium text-ink sm:text-lg">{item.label}</p>
+                <p class="text-sm leading-snug text-slate-700 sm:text-base sm:leading-relaxed">
+                  {item.base}
+                </p>
+              </div>
             </li>
           ))
         }
@@ -129,68 +157,60 @@ const detailsLink = feesPageExists ? fees.detailsLink : undefined;
         aria-label={fees.counterRowsLabel}
         data-step
         data-step-stay
-        class="mt-4 grid grid-cols-3 gap-3 sm:mt-6 sm:gap-8 lg:mt-8 lg:gap-12"
+        class="mt-4 grid grid-cols-1 gap-3 sm:mt-6 sm:grid-cols-3 sm:gap-8 lg:gap-12"
       >
         {
           counterRows.map((row) => (
-            <li class="flex flex-col gap-1 border-t border-coral/40 pt-2 sm:gap-2 sm:pt-5">
+            <li class:list={[feeItemClass, 'border-coral/40 pt-2 sm:gap-2 sm:pt-5']}>
               {/* Même taille que les « 0 % » ci-dessus : l'AMF a relevé sur la brochure qu'un frais ne
                   peut pas être affiché dans une police plus petite que les autres. */}
+              {/* Forme courte des barèmes (« 0 à 12 % », « 10 à 0 % ») : une seule ligne, alignée sur les
+                  « 0 % » ; les paliers exacts sont dans le contre-poids ci-dessous, les notes et /frais. */}
               <span
-                class="text-stat text-coral-700 tabular-nums"
+                class:list={[feeValueClass, 'text-coral-700']}
                 data-fee-value
                 data-fee-block="apercu-accueil"
               >
-                {row.valueShort ? (
-                  <>
-                    <span class="sm:hidden">{row.valueShort}</span>
-                    <span class="hidden sm:inline">{row.value}</span>
-                  </>
-                ) : (
-                  row.value
+                {row.valueShort ?? row.value}
+              </span>
+              <div class="flex flex-col gap-1 sm:gap-2">
+                <p class="text-base leading-snug font-medium text-ink sm:text-lg">
+                  {row.label}
+                  {row.noteId && (
+                    <span class="whitespace-nowrap">
+                      <NoteRef id={row.noteId} />
+                    </span>
+                  )}
+                </p>
+                {/* Quand et sur quoi le frais est prélevé, en langage courant, sans répéter le taux :
+                    même gabarit que l'assiette sous les « 0 % ». */}
+                {row.detail && (
+                  <p class="text-sm leading-snug text-slate-700 sm:text-base sm:leading-relaxed">
+                    {row.detail}
+                  </p>
                 )}
-              </span>
-              <span class="text-base leading-snug font-medium text-ink sm:text-lead">
-                {row.label}
-              </span>
+              </div>
             </li>
           ))
         }
       </ul>
 
-      <div
-        class="mt-4 grid gap-3 border-t border-navy/15 pt-4 sm:mt-10 sm:gap-6 sm:pt-8 lg:mt-14 lg:grid-cols-2 lg:gap-12 lg:pt-10"
-      >
-        <p data-advantage class="text-lead max-sm:text-base">
-          {counterweight.advantage}<span class="whitespace-nowrap"
-            ><NoteRef id="frais-incidence-dic" /></span
-          >
-        </p>
-        <RiskNote text={counterweight.risk} size="lead" class="max-sm:text-base" />
-      </div>
+      {
+        /* Le couple rédigé « R Start prélève 0 %… / Concrètement, R Start retient 15 %… » a été retiré le
+          11/09/2026 (décision de l'équipe) : la rangée des frais prélevés, dans la même scène et à la même
+          taille que les « 0 % », reste le contre-poids des trois zéros. */
+      }
     </div>
 
     <!-- Rappel de la commission de retrait : la frise détaillée vit sur /frais, ce contre-poids reste ici -->
     <RiskNote text={withdrawal.note} size="lead" class="mt-8 max-w-4xl sm:mt-10" />
 
-    <!-- Encadré et avertissement (jamais animés) -->
-    <div class="mt-section-sm grid gap-6 lg:grid-cols-2">
-      <Card class="lg:p-10">
-        <h3 class="text-display-sm">{innovationBox.title}</h3>
-        <RiskNote text={innovationBox.body} size="lead" class="mt-5" />
-      </Card>
-      <Card class="lg:p-10">
-        <p class="text-lead font-medium">
-          {arbitrageWarning.title}<span class="whitespace-nowrap"
-            ><NoteRef id="frais-commission-arbitrage" /></span
-          >
-        </p>
-        <ul class="mt-5 list-disc space-y-4 pl-6 text-lead marker:text-coral">
-          {arbitrageWarning.bullets.map((bullet) => <li class="pl-1">{bullet}</li>)}
-        </ul>
-      </Card>
-    </div>
-
+    {
+      /* L'encadré « Une innovation, pas une révolution » et les trois puces de la commission d'arbitrage
+        ont quitté l'accueil (allègement du 10/09/2026) : ils vivent sur /frais (feesPage.ts), et les
+        puces figurent déjà dans la section Risques de cette page. Les appels de note des trois frais
+        restent portés par leur libellé ci-dessus. */
+    }
     <!-- HT = TTC, CTA et lien vers la page Frais -->
     <div
       class="mt-12 flex flex-col gap-8 border-t border-navy/15 pt-8 lg:mt-16 lg:flex-row lg:items-end lg:justify-between lg:gap-12"

@@ -23,18 +23,14 @@ const OUT_PUBLIC = path.join(ROOT, 'public');
 const OUT_DOCS = path.join(OUT_PUBLIC, 'documents');
 const MANIFEST = path.join(ROOT, 'src', 'content', 'fr', 'media.manifest.json');
 
-/** Jeux d'images raster : dossier source → dossier cible, taille max, format de sortie. */
+/**
+ * Jeux d'images raster : dossier source → dossier cible, taille max, format de sortie.
+ * Le dossier « 4 - Pictogrammes 3D » n'est plus traité : les pictos sont des SVG au trait dessinés dans
+ * src/components/ui/Picto.astro. (`alpha: true` reste géré pour un futur jeu WebP à transparence.)
+ */
 const RASTER_SETS = [
   { src: '3 - Photos immeubles', out: 'immeubles', maxWidth: 2400, format: 'jpg', quality: 84 },
   { src: '6 - Photos ambiance', out: 'ambiance', maxWidth: 2400, format: 'jpg', quality: 84 },
-  {
-    src: '4 - Pictogrammes 3D',
-    out: 'pictos',
-    maxWidth: 1200,
-    format: 'webp',
-    quality: 90,
-    alpha: true,
-  },
 ];
 
 /** Logos vectoriels utiles (copie brute). */

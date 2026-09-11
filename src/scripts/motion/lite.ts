@@ -4,17 +4,17 @@
  * Pourquoi : les sous-pages (/frais, /documentation, /presse, /salle-de-presse, pages légales) ne
  * déclarent que des `data-animate`. Leur faire télécharger GSAP + ScrollTrigger (≈ 45 Ko gzip) pour
  * quelques fondus est disproportionné. `src/scripts/motion.ts` ne charge le moteur GSAP que si la page
- * déclare un effet qui en a besoin (scène, rideau, pin, scrub, tracé, jauge, compteur, texte mot à mot,
- * barre de progression, vol de la marque) ; sinon il charge ce module.
+ * déclare un effet qui en a besoin (scène, rideau, pin, scrub, tracé, jauge, compteur, texte mot à
+ * mot) ; sinon il charge ce module.
  *
  * Un seul des deux modules tourne par page : sur une page à moteur, `reveal.ts` garde la main et
  * `lite.ts` n'est jamais importé. Aucune double animation possible.
  *
- * Équivalences avec `reveal.ts` (mêmes types, mêmes durées, mêmes distances) :
+ * Équivalences avec `reveal.ts` (mêmes types, même rythme unique : 0,6 s / 20 px, titres 0,7 s / 24 px,
+ * pas de cascade 0,08 s — constantes reprises à la main de shared.ts, qui importe gsap) :
  *   fade-up (défaut) · fade · scale · tilt · clip (médias seulement) · stagger
  *   data-animate-delay (s) · data-animate-stagger (s) · data-animate-y (px)
- * Les courbes reprennent les équivalents CSS des easings GSAP employés côté moteur
- * (expo.out et power3.out pour les titres).
+ * La courbe est l'équivalent CSS de `expo.out`, la seule employée côté moteur (--ease-out-expo).
  *
  * GARDE-FOUS, identiques à ceux du moteur (src/scripts/motion.ts) :
  *  - refusé sur un H1, sur un [data-risk] et sur tout élément qui en contient : une révélation
@@ -32,9 +32,14 @@ import { all, allowed, containsProtected, isProtected, num, refuse } from './dom
 const START_RATIO = 0.88;
 const TITLE = 'h2, h3, [class*="text-display"]';
 const MEDIA = 'img, picture, svg, video, figure';
-/** Équivalents CSS des easings GSAP du moteur. */
+/** Équivalent CSS de `expo.out`, seule courbe du moteur (shared.ts EASE ; global.css --ease-out-expo). */
 const EASE = 'cubic-bezier(0.16, 1, 0.3, 1)';
-const EASE_TITLE = 'cubic-bezier(0.215, 0.61, 0.355, 1)';
+/** Rythme unique de shared.ts (DURATION, DURATION_TITLE, DISTANCE, DISTANCE_TITLE, STAGGER). */
+const DURATION = 0.6;
+const DURATION_TITLE = 0.7;
+const DISTANCE = 20;
+const DISTANCE_TITLE = 24;
+const STAGGER = 0.08;
 
 interface Depart {
   transform: string;
@@ -45,21 +50,27 @@ interface Depart {
 }
 
 /** État de départ d'un élément selon son type d'animation. */
-const depart = (el: HTMLElement, type: string, y: number, titre: boolean): Depart => {
-  const base = { opacity: '0', duree: titre ? 0.9 : 0.7, ease: titre ? EASE_TITLE : EASE };
+const depart = (type: string, y: number, titre: boolean): Depart => {
+  const base = { opacity: '0', duree: titre ? DURATION_TITLE : DURATION, ease: EASE };
   switch (type) {
     case 'fade':
       return { ...base, transform: 'none' };
     case 'scale':
-      return { ...base, transform: 'scale(0.95)', duree: 0.8 };
+      return { ...base, transform: 'scale(0.95)' };
     case 'tilt':
       return {
         ...base,
-        transform: `perspective(900px) translateY(${Math.max(y, 32)}px) rotateX(6deg)`,
-        duree: 0.85,
+        transform: `perspective(900px) translateY(${Math.max(y, DISTANCE_TITLE)}px) rotateX(6deg)`,
+        duree: DURATION_TITLE,
       };
     case 'clip':
-      return { ...base, opacity: '1', transform: 'none', clipPath: 'inset(0 0 100% 0)', duree: 1 };
+      return {
+        ...base,
+        opacity: '1',
+        transform: 'none',
+        clipPath: 'inset(0 0 100% 0)',
+        duree: DURATION_TITLE,
+      };
     default:
       return { ...base, transform: `translateY(${y}px)` };
   }
@@ -79,7 +90,7 @@ const enfantsStagger = (el: HTMLElement): HTMLElement[] =>
 
 /** Pose l'état de départ, puis rend l'élément à son état final quand il entre dans le viewport. */
 const preparer = (el: HTMLElement, type: string, delai: number, y: number): void => {
-  const d = depart(el, type, y, el.matches(TITLE));
+  const d = depart(type, y, el.matches(TITLE));
   el.style.willChange = type === 'clip' ? 'clip-path' : 'transform, opacity';
   el.style.opacity = d.opacity;
   el.style.transform = d.transform;
@@ -135,15 +146,15 @@ export const setupLite = (): void => {
     if (type === 'stagger') {
       const enfants = enfantsStagger(el);
       if (!enfants.length) return;
-      const pas = num(el.dataset.animateStagger, 0.07);
-      const y = num(el.dataset.animateY, 20);
+      const pas = num(el.dataset.animateStagger, STAGGER);
+      const y = num(el.dataset.animateY, DISTANCE);
       // La cascade est déclenchée par le conteneur : les enfants s'échelonnent sur son entrée.
       enfants.forEach((enfant, rang) => preparer(enfant, 'fade-up', delai + rang * pas, y));
       observerConteneur(el, enfants);
       return;
     }
 
-    const y = num(el.dataset.animateY, el.matches(TITLE) ? 28 : 24);
+    const y = num(el.dataset.animateY, el.matches(TITLE) ? DISTANCE_TITLE : DISTANCE);
     preparer(el, type, delai, y);
     observerConteneur(el, [el]);
   });

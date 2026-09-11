@@ -7,7 +7,7 @@
 export const subscribeSoon = {
   ariaLabel: 'Souscription à venir',
   eyebrow: 'Bientôt disponible',
-  title: 'Patience, la souscription arrive très bientôt.',
+  title: 'La souscription 100 % en ligne ouvre bientôt sur cette page.',
   body: [
     'La souscription en ligne à R Start n’est pas encore ouverte depuis cette page.',
     'D’ici là, prenez connaissance des documents réglementaires : ils décrivent le fonctionnement, les frais et les risques de la SCPI.',

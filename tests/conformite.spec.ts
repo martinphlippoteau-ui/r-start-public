@@ -12,12 +12,21 @@ test.describe('Conformité', () => {
     expect(box!.y + box!.height, 'ligne risques sous la ligne de flottaison').toBeLessThanOrEqual(
       height
     );
-    // Le sous-titre est le <p> qui précède immédiatement la ligne risques dans l'ordre du document
-    // (indépendant de la présence d'un surtitre ou de l'accroche, et de l'enveloppe `data-scrub` qui
-    // regroupe accroche + sous-titre : ce n'est donc pas forcément un frère direct).
-    const subtitleSize = await risk
-      .locator('xpath=preceding::p[1]')
-      .evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
+    // Référence : le paragraphe des frais réels (`data-hero-subtitle`, text-lead), corps de texte du hero
+    // qui porte l'avantage (absence de frais d'entrée) dont la ligne risques est le contre-poids. L'ancienne
+    // référence (`preceding::p[1]`) tombait sur le paragraphe des deux phrases de la trame, en 12 px : le
+    // test ne pouvait plus échouer. Repli si le repère disparaît : le premier <p> en text-lead du hero.
+    // Hero minimal (10/09/2026) : plus aucun corps de texte hors la ligne risques ; la référence devient
+    // alors le libellé des CTA, seul autre texte courant du hero.
+    const subtitle = page.locator('#apercu [data-hero-subtitle]');
+    const reference =
+      (await subtitle.count()) > 0
+        ? subtitle.first()
+        : page.locator('#apercu [data-hero-cta] a').first();
+    await expect(reference, 'aucun corps de texte de référence dans le hero').toBeVisible();
+    const subtitleSize = await reference.evaluate((el) =>
+      parseFloat(getComputedStyle(el).fontSize)
+    );
     const riskSize = await risk.evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
     expect(riskSize, 'ligne risques plus petite que le sous-titre').toBeGreaterThanOrEqual(
       subtitleSize * 0.85

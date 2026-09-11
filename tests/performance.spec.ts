@@ -2,10 +2,16 @@ import { test, expect } from '@playwright/test';
 
 /**
  * Poids embarqué par page. Le moteur d'animation GSAP (motion/engine.ts, ≈ 45 Ko gzip avec
- * ScrollTrigger) n'a de raison d'être que sur l'accueil, seule page à déclarer des effets qui en
- * dépendent (scènes épinglées, compteurs, tracés, texte mot à mot, vol de la marque, barre de
- * progression). Les sous-pages ne déclarent que des révélations `data-animate`, rendues par le moteur
- * léger (motion/lite.ts). Ce test empêche un attribut ajouté par inadvertance de ramener GSAP partout.
+ * ScrollTrigger) n'a de raison d'être que sur les pages qui déclarent des effets qui en dépendent
+ * (scènes épinglées, compteurs, tracés, texte mot à mot). La navigation n'en fait pas partie : plus de
+ * vol de la marque ni de barre de progression depuis le 10/09/2026, le CTA compact est géré par le
+ * script inline de SiteNav. Les sous-pages ne déclarent que des révélations `data-animate`, rendues par
+ * le moteur léger (motion/lite.ts). Ce test empêche un attribut ajouté par inadvertance de ramener GSAP
+ * partout.
+ */
+/**
+ * /strategie n'y figure pas : depuis le 10/09/2026 cette page rend la section Stratégie complète de
+ * l'accueil (scène épinglée du mot d'ordre, texte mot à mot, tracés, parallaxe), qui exige le moteur GSAP.
  */
 const SOUS_PAGES = ['/frais/', '/documentation/', '/presse/', '/salle-de-presse/'];
 

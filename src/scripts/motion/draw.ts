@@ -1,5 +1,6 @@
 /**
- * Dessins et jauges à l'entrée dans le viewport (85 %), une seule fois — ou au scrub si demandé.
+ * Dessins et jauges à l'entrée dans le viewport (88 %, START), une seule fois — ou au scrub si demandé
+ * (lissage SCRUB 0,6). Courbe unique du moteur (EASE) pour les tracés joués une fois.
  *
  *  - data-draw : tracé progressif des formes SVG (path, line, polyline, polygon, circle, ellipse,
  *    rect) contenues dans l'élément (ou de l'élément lui-même) via stroke-dashoffset, en cascade.
@@ -12,7 +13,7 @@
  * Sans JS ou en reduced-motion, tout est dessiné/rempli. Refusés sur le H1 et [data-risk].
  */
 import { gsap } from 'gsap';
-import { all, allowed, num, onceTrigger, onceVars } from './shared';
+import { EASE, SCRUB, all, allowed, num, onceTrigger, onceVars } from './shared';
 
 const SHAPES = 'path, line, polyline, polygon, circle, ellipse, rect';
 
@@ -27,7 +28,7 @@ const scrubTrigger = (el: HTMLElement): ScrollTrigger.Vars => ({
   trigger: el,
   start: el.dataset.drawStart || 'top 80%',
   end: el.dataset.drawEnd || 'bottom 60%',
-  scrub: 0.6,
+  scrub: SCRUB,
 });
 
 export const setupDraw = (): void => {
@@ -35,7 +36,7 @@ export const setupDraw = (): void => {
     if (!allowed(el, 'data-draw')) return;
     const scrub = el.hasAttribute('data-draw-scrub');
     const stagger = num(el.dataset.drawStagger, 0.15);
-    const scrollTrigger = scrub ? scrubTrigger(el) : onceTrigger(el, 'top 85%');
+    const scrollTrigger = scrub ? scrubTrigger(el) : onceTrigger(el);
 
     if (el.dataset.draw === 'width') {
       gsap.fromTo(
@@ -44,7 +45,7 @@ export const setupDraw = (): void => {
         {
           scaleX: 1,
           duration: 1.2,
-          ease: scrub ? 'none' : 'expo.out',
+          ease: scrub ? 'none' : EASE,
           scrollTrigger,
           ...onceVars(el, 'transform'),
         }
@@ -62,7 +63,7 @@ export const setupDraw = (): void => {
     gsap.to(shapes, {
       strokeDashoffset: 0,
       duration: 1.4,
-      ease: scrub ? 'none' : 'power2.inOut',
+      ease: scrub ? 'none' : EASE,
       stagger,
       scrollTrigger,
       clearProps: scrub ? '' : 'strokeDasharray,strokeDashoffset',
@@ -82,8 +83,8 @@ export const setupFill = (): void => {
     gsap.fromTo(el, from, {
       ...to,
       duration: 0.9 + 0.5 * value,
-      ease: 'expo.out',
-      scrollTrigger: onceTrigger(el, 'top 85%'),
+      ease: EASE,
+      scrollTrigger: onceTrigger(el),
       clearProps: 'transform,willChange',
       ...onceVars(el, 'transform'),
     });

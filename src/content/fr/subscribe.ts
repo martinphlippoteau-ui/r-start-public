@@ -1,5 +1,12 @@
 import type { LegalNote, SubscribeContent } from '@/content/types';
-import { fees, income as incomeFacts, risk, share, subscription } from '@/content/fr/facts';
+import {
+  externalLinks,
+  fees,
+  income as incomeFacts,
+  risk,
+  share,
+  subscription,
+} from '@/content/fr/facts';
 import { withdrawalExemptions } from '@/content/fr/fees';
 
 /**
@@ -11,6 +18,9 @@ import { withdrawalExemptions } from '@/content/fr/fees';
  * V2 (§3 ter, brochure partenaires 2026, p. 5) : l'intro porte le positionnement complémentaire de
  * R Start (stratégie patrimoniale plus dynamique, en contrepartie d'un risque plus élevé) et la note
  * `souscrire-non-eligible` porte le tableau d'éligibilité complet, modalités proposées comprises.
+ * Accueil (chapitre court, 11/09/2026) : `homeTitle`, `homeIntro` et `homeNotes` (les seules notes appelées
+ * par les étapes, numérotées dans src/content/fr/notes.ts) ; le guide complet et MyCORUM restent sur
+ * /documentation.
  */
 
 /** Espace insécable avant % et € : les libellés de facts.ts utilisent une espace simple. */
@@ -18,7 +28,6 @@ const nb = (s: string): string => s.replace(/ ([%€:;?!])/g, '\u00A0$1');
 const lowerFirst = (s: string): string => s.charAt(0).toLowerCase() + s.slice(1);
 
 const documentsList = subscription.documentsRequired.map(lowerFirst).join(', ');
-const [w0, w1, w2, w3, w4] = fees.withdrawal.steps;
 const zeroAfter = fees.withdrawal.zeroAfterYears;
 
 export const notes: LegalNote[] = [
@@ -38,10 +47,19 @@ export const notes: LegalNote[] = [
   },
 ];
 
+/**
+ * Rappel de la durée de placement et de la commission de retrait ; aussi réutilisé dans `homeRisk`
+ * (accueil) : un seul des deux rappels y est trop court (≈ 58 % du texte cumulé des étapes, seuil 60 %).
+ */
+const withdrawalReminder = `R Start est un placement de long terme : ${risk.recommendedHoldingLabel} recommandés. Si vous retirez vos parts avant ${zeroAfter} ans de détention, une commission est prélevée sur la somme que vous récupérez ; elle diminue chaque année et disparaît après ${zeroAfter} ans. Le détail année par année figure dans la section Frais. ${withdrawalExemptions} Le rachat de vos parts n’est pas garanti : vous ne récupérez votre argent que si un autre épargnant les achète.`;
+
 export const subscribe = {
   eyebrow: 'Souscrire',
   /** « R Start » en espace insécable : le nom de marque ne se coupe jamais dans le H2 (mobile 375 px). */
   title: `Souscrire à R Start, ${nb(subscription.onlineLabel)}.`,
+  homeTitle: `Souscrire en quatre étapes, ${nb(subscription.onlineLabel)}.`,
+  /** Accueil, ≤ 30 mots, factuel : en ligne, minimum, signature électronique, moyens de règlement, suivi. */
+  homeIntro: `Tout se fait en ligne, à partir de ${nb(share.priceLabel)} la part : profil investisseur, signature électronique, règlement par virement ou prélèvement, suivi de vos parts sur le site de CORUM.`,
   intro: `La souscription se fait entièrement en ligne, en quatre étapes, à partir d’une part de ${nb(share.priceLabel)}. Aucune souscription papier n’est possible. R Start vise une stratégie patrimoniale plus dynamique, en contrepartie d’un risque plus élevé. Avant de vous engager, lisez le DIC et la note d’information. R Start comporte un risque de perte en capital.`,
 
   steps: [
@@ -91,11 +109,34 @@ export const subscribe = {
 
   beforeYouSubscribe: `Avant de souscrire, lisez le document d’informations clés (DIC) et la note d’information. Ils décrivent les caractéristiques, les risques et les frais de R Start. Préparez aussi : ${documentsList}.`,
 
-  withdrawalReminder: `R Start est un placement de long terme : ${risk.recommendedHoldingLabel} recommandés. Si vous retirez vos parts avant ${zeroAfter} ans de détention, une commission de retrait dégressive s’applique. Elle est de ${nb(w0.rate)} avant 4 ans, ${nb(w1.rate)} la 5e et la 6e année, ${nb(w2.rate)} la 7e année, ${nb(w3.rate)} la 8e année, puis ${nb(w4.rate)}. ${withdrawalExemptions} Le rachat de vos parts n’est pas garanti : il dépend de l’existence d’une contrepartie à l’achat.`,
+  withdrawalReminder,
 
+  /** Accueil : unique contre-poids des quatre étapes (RiskNote, jamais animé) ; rappel du DIC + `withdrawalReminder`. */
+  homeRisk: `Avant de souscrire, lisez le document d’informations clés (DIC) et la note d’information. ${withdrawalReminder}`,
+
+  /**
+   * Après la souscription : l'application MyCORUM (CORUM L'Épargne), à la place de l'ancienne photo
+   * d'illustration. Description factuelle des fonctions, aucune promesse de résultat.
+   */
+  app: {
+    eyebrow: 'Après la souscription',
+    title: 'Suivez votre épargne dans MyCORUM',
+    description:
+      'L’application de CORUM L’Épargne, sur iPhone et Android, permet de consulter vos parts, vos versements et vos documents, de programmer des versements et de gérer le réinvestissement de vos revenus.',
+    storesLabel: 'Télécharger l’application MyCORUM',
+    stores: [
+      { label: 'Télécharger sur l’App Store', href: externalLinks.myCorumAppStore },
+      { label: 'Disponible sur Google Play', href: externalLinks.myCorumGooglePlay },
+    ],
+    newTabHint: 'nouvelle fenêtre',
+  },
   cta: { label: 'Souscrire en ligne', position: 'souscrire' },
 
   notes,
 } satisfies SubscribeContent;
+
+/** Notes appelées par les étapes (rendues sur l'accueil en `compact`) ; `notes` reste complet pour le guide. */
+const idsAppeles = subscribe.steps.map((step) => step.noteId).filter(Boolean);
+export const homeNotes: LegalNote[] = notes.filter((n) => idsAppeles.includes(n.id));
 
 export default subscribe;

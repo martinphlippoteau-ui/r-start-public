@@ -1,9 +1,11 @@
 ---
 /**
- * Section 10 — FAQ (id « faq »). Fond paper (alternance avec Documents).
- * Deux colonnes sur grand écran : en-tête collant (surtitre, H2, introduction) face à la liste des
- * dix questions en accordéons natifs <details name="faq"> (un seul ouvert à la fois), chevron animé
- * en CSS, réponse en paragraphes text-lead. Dans chaque réponse, les paragraphes « avantage »
+ * Section 10 — FAQ (id « faq »). Six questions depuis le 11/09/2026 (faq.items, sélection HOME_FAQ) ;
+ * la FAQ complète est sur /documentation, atteinte par `faq.moreLink`. Fond paper (après Risques, ink) ; dernière section de l'accueil avant les Notes.
+ * Deux colonnes sur grand écran : en-tête collant (surtitre, H2 en text-display-md : la FAQ clôt la page, un
+ * cran sous les chapitres) face à la liste des dix questions en accordéons natifs <details name="faq"> (un
+ * seul ouvert à la fois), chevron animé en CSS, questions en text-xl (text-display-sm dès sm : une question
+ * longue tient sur deux lignes à 375 px), réponse en paragraphes text-lead. Dans chaque réponse, les paragraphes « avantage »
  * (data-advantage) sont suivis, dans le même bloc et la même taille, de leur contre-poids risque
  * (RiskNote, data-risk) : la coupure vient du contenu (item.riskFrom), l'appel de note aussi
  * (item.noteId). Le CTA tunnel ferme la colonne des questions. Le JSON-LD FAQPage est émis par la
@@ -14,14 +16,13 @@
  *
  * Motion (src/scripts/motion.ts, attributs seulement) — même signature que 02-Highlights / 05-Income :
  *  - en-tête, dans son enveloppe collante (les attributs sont sur les enfants, jamais sur l'élément
- *    sticky) : surtitre en fade-up, H2 mot à mot (data-reveal-text, titre court), intro en fade-up
- *    décalée de 0,15 s ;
- *  - questions : chaque <summary> porte un fade-up SANS délai. Chaque summary (~100 px de haut) a son
- *    propre déclencheur à 88 % du viewport : le défilement produit la cascade de lui-même, au rythme du
- *    lecteur ; un délai par rang donnait « cascade puis paquet » sur grand écran (rangs au-delà du plafond
- *    arrivant ensemble) et un retard aux questions qui entrent seules sur mobile. Ni le H2, ni la liste,
- *    ni aucun ancêtre des RiskNote n'est animé (règle « aucun [data-risk] sous un [data-animate] ») : un
- *    `stagger` sur la liste serait refusé par le moteur, chaque réponse contenant un risque ;
+ *    sticky) : surtitre statique, H2 mot à mot (data-reveal-text, titre court), intro en fade-up
+ *    décalée de 0,1 s ;
+ *  - questions : statiques (sobriété du 11/09/2026 : six <summary> entrant un à un formaient une cascade
+ *    de plus de quatre éléments, et un `stagger` sur la liste serait refusé par le moteur, chaque réponse
+ *    contenant un risque). Le mouvement de la FAQ est celui de l'accordéon (CSS ci-dessous). Ni le H2, ni
+ *    la liste, ni aucun ancêtre des RiskNote n'est animé (règle « aucun [data-risk] sous un
+ *    [data-animate] ») ;
  *  - chevron : rotation 180° et inversion des couleurs en CSS à l'ouverture (transform, couleurs) ;
  *  - ouverture / fermeture d'une réponse : transition de hauteur en CSS pur, sans JS, sur le pseudo-élément
  *    `::details-content` (grille `grid-template-rows` 0fr → 1fr sous `@supports selector(::details-content)`,
@@ -64,9 +65,9 @@ const items = faq.items.map((item) => {
       <!-- En-tête collant -->
       <div class="lg:col-span-5">
         <header class="max-w-4xl lg:sticky lg:top-24">
-          <p class="text-eyebrow mb-4 text-teal-700" data-animate="fade-up">{faq.eyebrow}</p>
-          <h2 id={titleId} class="text-display-lg" data-reveal-text>{faq.title}</h2>
-          <p class="mt-6 text-lead opacity-90" data-animate="fade-up" data-animate-delay="0.15">
+          <p class="text-eyebrow mb-4 text-teal-700">{faq.eyebrow}</p>
+          <h2 id={titleId} class="text-display-md" data-reveal-text>{faq.title}</h2>
+          <p class="mt-6 text-lead opacity-90" data-animate="fade-up" data-animate-delay="0.1">
             {faq.intro}
           </p>
         </header>
@@ -79,11 +80,8 @@ const items = faq.items.map((item) => {
             items.map((item, i) => (
               <li class="border-b border-navy/15">
                 <details name="faq" data-faq={item.question} class="faq-item group">
-                  <summary
-                    class="block cursor-pointer list-none py-6 [&::-webkit-details-marker]:hidden sm:py-8"
-                    data-animate="fade-up"
-                  >
-                    <h3 class="flex items-start justify-between gap-5 text-display-sm text-ink transition-colors duration-200 group-hover:text-navy sm:gap-8">
+                  <summary class="block cursor-pointer list-none py-6 [&::-webkit-details-marker]:hidden sm:py-8">
+                    <h3 class="flex items-start justify-between gap-5 text-xl font-semibold text-ink transition-colors duration-200 group-hover:text-navy sm:gap-8 sm:text-display-sm">
                       <span class="flex min-w-0 flex-col gap-2 sm:flex-row sm:gap-6">
                         <span
                           aria-hidden="true"
@@ -140,6 +138,14 @@ const items = faq.items.map((item) => {
         <!-- CTA -->
         <div class="mt-10 flex flex-col items-stretch sm:mt-12 sm:flex-row sm:items-center">
           <Button position={faq.cta.position} variant="primary" size="lg">{faq.cta.label}</Button>
+          {
+            /* Six questions sur l'accueil (11/09/2026) : les seize vivent sur /documentation. */
+            faq.moreLink && (
+              <Button href={faq.moreLink.href} variant="secondary" size="lg">
+                {faq.moreLink.label}
+              </Button>
+            )
+          }
         </div>
       </div>
     </div>

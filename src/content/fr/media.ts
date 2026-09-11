@@ -12,6 +12,8 @@
  *  - hors zone d'investissement exclu (moment-studio) ; bâtiments emblématiques d'autrui évités
  *    (cheval-blanc, arbre-blanc) pour ne pas suggérer qu'ils appartiennent à R Start.
  * Les alt décrivent l'architecture : aucun locataire ni adresse n'est nommé faute de certitude.
+ * Les pictogrammes ne sont plus des images : ce sont des SVG au trait dessinés dans
+ * src/components/ui/Picto.astro (clés du champ `icon` des contenus : type PictoKey exporté par le composant).
  */
 
 export interface MediaImage {
@@ -28,29 +30,6 @@ export interface MediaImage {
 
 /** Mention sous chaque photo d'immeuble : aucun de ces bâtiments n'appartient à R Start. */
 const illustration = 'Photo d’illustration. Immeuble non détenu par R Start.';
-
-export type PictoKey =
-  'argent' | 'document-valide' | 'calendrier' | 'equipe' | 'exploration' | 'alerte' | 'analyse';
-
-/**
- * Pictogrammes 3D (WebP avec transparence). Décoratifs : alt vide, à masquer aux lecteurs d'écran
- * dans le composant (aria-hidden). Clés utilisées dans les champs `icon` des contenus.
- */
-export const pictos: Record<PictoKey, MediaImage> = {
-  argent: { src: 'pictos/3d-casual-life-banknotes-with-coins.webp', alt: '' },
-  'document-valide': { src: 'pictos/3d-casual-life-document-with-checkmark.webp', alt: '' },
-  calendrier: { src: 'pictos/3d-casual-life-document-with-clock-icon.webp', alt: '' },
-  equipe: {
-    src: 'pictos/3d-casual-life-group-of-young-people-discussing-something-while-working.webp',
-    alt: '',
-  },
-  exploration: { src: 'pictos/3d-casual-life-man-holding-binoculars-and-map.webp', alt: '' },
-  alerte: { src: 'pictos/3d-casual-life-ringing-bell-on-blue.webp', alt: '' },
-  analyse: {
-    src: 'pictos/hands-passing-bar-and-pie-chart-card-business-analytics-and-kpi-dashboard.webp',
-    alt: '',
-  },
-};
 
 export interface MediaContent {
   /** Photo de second plan du hero (chargement eager, jamais animée) et solution de repli. */

@@ -1,15 +1,18 @@
 ---
 /**
  * Section 2 — « Ce qui change vraiment » (id « ce-qui-change »), zone 2 de la V2 (plan §2, §3 ter p.4).
- * Fond blanc, entre le hero (ink) et Points forts (blanc) : deux moteurs de rémunération (loyers
- * encaissés, plus-value à la vente), la formule d'alignement au vouvoiement avec son contre-poids
+ * Fond paper, entre Points forts (white, lu d'abord pour comprendre le produit) et Confiance (ink) :
+ * alternance ink → white → paper → ink ; ses cartes sont white. Deux façons dont la société de gestion se rémunère (loyers
+ * encaissés, plus-value à la vente), la formule d'alignement (les deux phrases « Payer des frais… » vivent
+ * dans le hero depuis la trame du 10/09/2026) avec son contre-poids
  * chiffré (frais de gestion, cessions, retrait), puis le mécanisme de réserve en cas de moins-value
  * (brochure partenaires 2026, p.4). Un lien interne (pas un CTA de souscription) renvoie vers /frais.
- * Équilibre AMF : chaque moteur porte son risque dans la même carte et à la même taille ; le
+ * Équilibre AMF : chaque façon porte son risque dans la même carte et à la même taille ; le
  * contre-poids chiffré et le risque du mécanisme de réserve sont rendus en RiskNote, jamais animés,
- * jamais enveloppés par un ancêtre animé (seuls les titres et l'introduction portent `data-animate`,
- * chaque carte porte son propre attribut sur son en-tête, jamais sur l'enveloppe qui contient le
- * RiskNote).
+ * jamais enveloppés par un ancêtre animé. Motion (sobriété du 11/09/2026, un effet par bloc) : H2 mot à
+ * mot et introduction en fade-up (0,1 s) ; dans chaque carte, seul le H3 entre en fade-up (délai
+ * par colonne 0 / 0,08 s), description et RiskNote en place d'emblée ; surtitres statiques ; rien sur
+ * l'enveloppe qui contient le RiskNote.
  * Aucune donnée de performance, aucun exemple d'investissement, aucune allégation de rang (portée par
  * le hero avec son périmètre).
  * Contenu : src/content/fr/difference.ts.
@@ -25,27 +28,25 @@ import { difference } from '@/content/fr/difference';
 
 const id = sections.difference.id;
 const titleId = id + '-title';
-/** Décalage de cascade entre les deux cartes des moteurs (secondes). */
-const ENGINE_STAGGER = 0.1;
+/** Décalage de cascade entre les deux cartes (secondes) : la seconde colonne suit la première. */
+const ENGINE_STAGGER = 0.08;
 ---
 
-<Section id={id} tone="white">
+<Section id={id} tone="paper">
   <Container size="wide">
     <header class="max-w-4xl">
-      <p data-animate="fade-up" class="text-eyebrow mb-4 text-teal-700">{difference.eyebrow}</p>
+      <p class="text-eyebrow mb-4 text-teal-700">{difference.eyebrow}</p>
       <h2 id={titleId} class="text-display-lg" data-reveal-text>{difference.title}</h2>
-      <p data-animate="fade-up" data-animate-delay="0.15" class="mt-6 text-lead opacity-90">
+      <p data-animate="fade-up" data-animate-delay="0.1" class="mt-6 text-lead opacity-90">
         {difference.intro}
       </p>
     </header>
 
-    <!-- Les deux moteurs de rémunération : chaque carte porte son risque, hors de tout ancêtre animé -->
+    <!-- Les deux façons de se rémunérer : chaque carte porte son risque, hors de tout ancêtre animé -->
     <div class="mt-12 sm:mt-16 lg:mt-24">
       {
         difference.enginesTitle && (
-          <p data-animate="fade-up" class="text-eyebrow mb-4 text-teal-700">
-            {difference.enginesTitle}
-          </p>
+          <p class="text-eyebrow mb-4 text-teal-700">{difference.enginesTitle}</p>
         )
       }
       <ul
@@ -55,7 +56,7 @@ const ENGINE_STAGGER = 0.1;
       >
         {
           difference.engines.map((engine, i) => (
-            <Card as="li" tone="paper" class="flex flex-col ring-1 ring-navy/5 lg:p-10">
+            <Card as="li" tone="white" class="flex flex-col ring-1 ring-navy/5 lg:p-10">
               <h3
                 class="text-display-sm text-ink"
                 data-animate="fade-up"
@@ -68,12 +69,7 @@ const ENGINE_STAGGER = 0.1;
                   </span>
                 )}
               </h3>
-              <p
-                data-advantage
-                data-animate="fade-up"
-                data-animate-delay={String(i * ENGINE_STAGGER + 0.1)}
-                class="mt-4 text-base leading-relaxed text-ink"
-              >
+              <p data-advantage class="mt-4 text-base leading-relaxed text-ink">
                 {engine.description}
               </p>
               <RiskNote text={engine.risk} class="mt-4 border-t border-navy/10 pt-4" />
@@ -94,9 +90,23 @@ const ENGINE_STAGGER = 0.1;
           )
         }
         {
-          /* Les deux phrases descendues du hero : même bloc, même taille, même contre-poids chiffré. */
+          /* Définition descendue du hero (allégation de rang), jamais sans son appel de note ; les frais réels
+            (RiskNote ci-contre) sont dans le même bloc et la même taille. */
+          difference.counterweight.claim && (
+            <p class="mt-3 font-medium text-ink">
+              {difference.counterweight.claim.text}
+              <span class="whitespace-nowrap">
+                <NoteRef id={difference.counterweight.claim.noteId} />
+              </span>
+            </p>
+          )
         }
-        {difference.counterweight.pedagogy?.map((phrase) => <p class="mt-3 text-ink">{phrase}</p>)}
+        {
+          /* Les deux phrases de la trame, en tête du bloc : même bloc, même taille, même contre-poids chiffré. */
+          difference.counterweight.pedagogy?.map((phrase) => (
+            <p class="mt-3 font-semibold text-ink">{phrase}</p>
+          ))
+        }
         <p class="mt-3">
           {difference.counterweight.advantage}
           {

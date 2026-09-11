@@ -39,6 +39,12 @@ export const shortRiskLine =
 
 /** Préfixe lu par les lecteurs d'écran devant chaque contre-poids risque (RiskNote) ; masqué visuellement. */
 export const riskPrefix = 'Risque : ';
+/**
+ * Libellé VISIBLE qui ouvre chaque contre-poids (décision du 11/09/2026) : il remplace le pictogramme
+ * d'alerte. Le préfixe « Risque : » reste lu par les lecteurs d'écran (riskPrefix) pour que l'avertissement
+ * garde sa nature. Lecture stricte AMF à défendre : un avertissement présenté comme un conseil.
+ */
+export const riskLabel = 'Bon à savoir :';
 
 /** Encadré brochure p.4 « Une innovation, pas une révolution », adapté au grand public (« Vos clients » → « Vous »). */
 export const innovationNotRevolution = {

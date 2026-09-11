@@ -1,0 +1,146 @@
+---
+/**
+ * Pictogrammes R Start en « liquid glass » : une tuile de verre translucide (squircle) qui FLOUTE et SATURE
+ * ce qui se trouve derrière elle (backdrop-filter), avec reflet spéculaire sur l'arête haute, ombre interne
+ * et halo coloré porté par la clé. Le glyphe est tracé en blanc au centre. Le verre prend donc la couleur du
+ * fond sur lequel il est posé (sections ink comme claires) : c'est le principe du matériau d'Apple.
+ * Repli sans `backdrop-filter` (Firefox ancien, navigateurs sans support) : la tuile garde un fond teinté
+ * semi-opaque, le rendu reste lisible — `@supports` dans global.css (utilitaire `picto-glass`).
+ * Clés (champ `icon` de strategy.ts / highlights.ts) : argent, alerte, document-valide, calendrier,
+ * equipe (deux immeubles et flèche montante), exploration (carte et repère), analyse (immeuble et loupe).
+ * Taille via la classe reçue (`size-16 sm:size-20`) : elle s'applique à la tuile, le glyphe suit.
+ * Accessibilité : décoratif par défaut (aria-hidden sur le SVG) ; avec `title`, la tuile devient une image
+ * nommée (role="img" + <title>). Aucun attribut motion ici : l'animation se pose sur l'enveloppe.
+ */
+export const PICTO_KEYS = [
+  'argent',
+  'alerte',
+  'document-valide',
+  'calendrier',
+  'equipe',
+  'exploration',
+  'analyse',
+] as const;
+export type PictoKey = (typeof PICTO_KEYS)[number];
+export const isPictoKey = (value: string): value is PictoKey =>
+  (PICTO_KEYS as readonly string[]).includes(value);
+
+interface Props {
+  name: PictoKey;
+  /** Taille de la tuile : classes Tailwind (`size-16 sm:size-20`). */
+  class?: string;
+  /** Nom accessible facultatif ; sans lui, le picto est purement décoratif. */
+  title?: string;
+}
+const { name, class: className, title } = Astro.props as Props;
+
+/**
+ * Teinte du verre par clé (halo interne et lueur portée) : le verre reste très transparent, la teinte ne
+ * fait que le colorer légèrement, comme un filtre. Valeurs en RGB pour composer les opacités en CSS.
+ */
+const tints: Record<PictoKey, string> = {
+  argent: '43 184 196',
+  alerte: '224 138 109',
+  'document-valide': '79 195 201',
+  calendrier: '111 168 201',
+  equipe: '53 194 177',
+  exploration: '90 182 224',
+  analyse: '47 176 216',
+};
+
+/** Glyphes tracés en blanc sur la tuile (grille 48 × 48, marges intérieures d'environ 11 px). */
+const glyphs: Record<PictoKey, string> = {
+  // Billet et pièce.
+  argent: [
+    '<rect x="11" y="16" width="20" height="13" rx="3"/>',
+    '<circle cx="21" cy="22.5" r="3"/>',
+    '<circle cx="31" cy="31" r="6"/>',
+    '<path d="M31 28v6M29 30h4"/>',
+  ].join(''),
+  // Triangle, barre et point.
+  alerte: [
+    '<path d="M22.1 13.2 12 32.4a2.2 2.2 0 0 0 1.9 3.3h20.2a2.2 2.2 0 0 0 1.9-3.3L25.9 13.2a2.2 2.2 0 0 0-3.8 0z"/>',
+    '<path d="M24 20.5v7"/>',
+    '<circle cx="24" cy="31.5" r="1.2" fill="#fff" stroke="none"/>',
+  ].join(''),
+  // Feuille à coin replié et coche.
+  'document-valide': [
+    '<path d="M26 12H15a2.5 2.5 0 0 0-2.5 2.5v19A2.5 2.5 0 0 0 15 36h5"/>',
+    '<path d="M26 12l6.5 6.5V24"/>',
+    '<path d="M26 12v5a1.5 1.5 0 0 0 1.5 1.5H32"/>',
+    '<path d="M17.5 22h8M17.5 27h5"/>',
+    '<circle cx="29.5" cy="30.5" r="6"/>',
+    '<path d="M27 30.5l2 2 4-4.5"/>',
+  ].join(''),
+  // Cadre à anneaux et grille de jours, un jour marqué.
+  calendrier: [
+    '<rect x="11.5" y="14" width="25" height="22" rx="3"/>',
+    '<path d="M11.5 20h25M18 11v5M30 11v5"/>',
+    '<path d="M17 26h.01M23 26h.01M29 26h.01M17 31h.01M23 31h.01"/>',
+    '<circle cx="29.5" cy="31" r="2.6" fill="#fff" stroke="none" opacity=".9"/>',
+  ].join(''),
+  // Deux immeubles de hauteurs différentes et flèche montante.
+  equipe: [
+    '<path d="M11 36h26"/>',
+    '<path d="M14 36V25a1.5 1.5 0 0 1 1.5-1.5h5A1.5 1.5 0 0 1 22 25v11"/>',
+    '<path d="M22 36V17a1.5 1.5 0 0 1 1.5-1.5h6A1.5 1.5 0 0 1 31 17v19"/>',
+    '<path d="M17 28h.01M17 32h.01M26 20h.01M26 25h.01M26 30h.01"/>',
+    '<path d="M33 22l4-4M34 18h3v3"/>',
+  ].join(''),
+  // Carte en trois volets et repère.
+  exploration: [
+    '<path d="M11 21l8-3 10 3 8-3v14l-8 3-10-3-8 3z"/>',
+    '<path d="M19 18v14M29 21v14"/>',
+    '<path d="M24 9a4.4 4.4 0 0 0-4.4 4.4c0 3 4.4 7.4 4.4 7.4s4.4-4.4 4.4-7.4A4.4 4.4 0 0 0 24 9z" fill="#fff" fill-opacity=".22"/>',
+    '<circle cx="24" cy="13.4" r="1.6"/>',
+  ].join(''),
+  // Immeuble à fenêtres et loupe.
+  analyse: [
+    '<path d="M11 36h13"/>',
+    '<path d="M14 36V15a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v6"/>',
+    '<path d="M18 19h.01M22 19h.01M18 24h.01M22 24h.01M18 29h.01"/>',
+    '<circle cx="30" cy="27" r="6.5"/>',
+    '<path d="M34.6 31.6 38 35"/>',
+  ].join(''),
+};
+
+const glyph = glyphs[name];
+if (!glyph) throw new Error(`Pictogramme inconnu : ${name}`);
+const tint = tints[name];
+
+/* Identifiant du <title> : unique par tuile rendue (le frontmatter s'exécute une fois par instance). */
+const g = globalThis as { __pictoSeq?: number };
+g.__pictoSeq = (g.__pictoSeq ?? 0) + 1;
+const uid = `${name}-${g.__pictoSeq}`;
+const titleId = title ? `picto-title-${uid}` : undefined;
+---
+
+<span
+  class:list={['picto-glass', className]}
+  style={`--picto-tint: ${tint};`}
+  role={title ? 'img' : undefined}
+  aria-labelledby={title ? titleId : undefined}
+  aria-hidden={title ? undefined : 'true'}
+  data-picto={name}
+>
+  {
+    title && (
+      <span id={titleId} class="visually-hidden">
+        {title}
+      </span>
+    )
+  }
+  <svg
+    viewBox="0 0 48 48"
+    fill="none"
+    stroke="#fff"
+    stroke-width="1.9"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    focusable="false"
+    aria-hidden="true"
+    class="picto-glass-glyph"
+  >
+    <Fragment set:html={glyph} />
+  </svg>
+</span>

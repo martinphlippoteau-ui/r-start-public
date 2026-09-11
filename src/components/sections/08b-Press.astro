@@ -1,8 +1,8 @@
 ---
 /**
- * Section 10 — « La presse en parle » (id « presse-en-parle »), entre Risques (fond ink) et Documents
- * (fond white) : fond paper, deux citations de médias tiers et un renvoi vers la page /presse qui porte
- * la revue complète.
+ * Section 8b — « La presse en parle » (id « presse-en-parle »), entre la Stratégie en chapitre court (04, ink)
+ * et Risques (08, ink) : fond paper, deux citations de médias tiers et un renvoi vers la page /presse qui
+ * porte la revue complète.
  *
  * Règles appliquées :
  *  - les citations sont des propos de tiers, reproduits mot pour mot (pressHome.ts → facts.ts), avec
@@ -11,9 +11,13 @@
  *    (RiskNote text-lead) et jamais animé : c'est le contre-poids des citations, il ne part pas en note ;
  *  - aucune donnée de performance, aucun chiffre repris des articles.
  *
- * Motion (src/scripts/motion.ts, attributs seulement) : surtitre et introduction en fade-up, H2 mot à
- * mot, citations en cascade. L'avertissement ne porte aucun attribut. Sans JS ou en reduced-motion,
- * tout est visible (l'état final est dans le HTML).
+ * Motion (src/scripts/motion.ts, attributs seulement) : PAS de rideau sur cette section (retiré le
+ * 11/09/2026 : un rideau ne se justifie que du clair vers l'ink, or elle est claire et suit Souscrire,
+ * white) ; elle est en revanche recouverte par le rideau de 08-Risques (paper → ink). Surtitre statique,
+ * H2 mot à mot, introduction en fade-up (0,1 s), chaque citation (carte sans risque) en fade-up décalé de
+ * 0,08 s, bouton en fade-up. L'avertissement ne porte aucun attribut. L'introduction porte l'appel de note à pleine opacité (pas
+ * d'opacity-90 : contraste de la note ≥ 4,5:1). Sans JS ou en reduced-motion, tout est visible (l'état
+ * final est dans le HTML, aucun pin, aucun rideau).
  * Contenu : src/content/fr/pressHome.ts.
  */
 import Button from '@/components/ui/Button.astro';
@@ -26,19 +30,15 @@ import { pressHome } from '@/content/fr/pressHome';
 
 const id = sections.press.id;
 /** Décalage d'entrée d'une citation sur la précédente (secondes). */
-const QUOTE_STAGGER = 0.12;
+const QUOTE_STAGGER = 0.08;
 ---
 
 <Section id={id} tone="paper" labelledBy={id + '-title'}>
   <Container size="wide">
     <header class="max-w-4xl">
-      <p data-animate="fade-up" class="text-eyebrow mb-4 text-teal-700">{pressHome.eyebrow}</p>
+      <p class="text-eyebrow mb-4 text-teal-700">{pressHome.eyebrow}</p>
       <h2 id={id + '-title'} class="text-display-lg" data-reveal-text>{pressHome.title}</h2>
-      <p
-        data-animate="fade-up"
-        data-animate-delay="0.15"
-        class="text-lead mt-6 max-w-3xl opacity-90"
-      >
+      <p data-animate="fade-up" data-animate-delay="0.1" class="text-lead mt-6 max-w-3xl">
         {pressHome.intro}<span class="whitespace-nowrap"><NoteRef id={pressHome.noteId} /></span>
       </p>
     </header>
@@ -55,7 +55,7 @@ const QUOTE_STAGGER = 0.12;
             data-animate-delay={String(i * QUOTE_STAGGER)}
             class="flex flex-col justify-between gap-6 rounded-3xl bg-white p-6 shadow-card sm:p-8 lg:p-10"
           >
-            <blockquote class="text-display-sm text-balance text-ink">
+            <blockquote data-press-quote class="text-display-sm text-balance text-ink">
               <p>« {quote.text} »</p>
             </blockquote>
             <p class="text-base text-slate-700">

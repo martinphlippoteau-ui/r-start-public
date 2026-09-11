@@ -16,9 +16,12 @@ import { managementCompany, visaNotice } from '@/content/fr/legal';
  * Chaque bloc porte son contre-poids risque, de longueur comparable au bloc rendu (items et disclaimer
  * compris pour le cadre réglementaire) : champs `risk` (amf, stats) et fin du champ `scope` (trustpilot,
  * dont le type ne prévoit pas de champ `risk`).
- * Les chiffres du groupe suivent facts.corumGroup.stats sans exclusion locale : même liste que la section
- * CORUM de l'accueil (corum.ts). Tout arbitrage (ex. « partenaires professionnels » : 2 500 sur corum.fr
- * au 08/09/2026, 3 000 dans la brochure 2026) se fait dans facts.ts, jamais ici.
+ * Les chiffres du groupe (`experienceStats`, exporté) sont les quatre de la zone 4 de la trame du 10/09/2026
+ * (15 ans, 9,6 Md€, + 160 000 épargnants, 5 SCPI depuis 2012), construits depuis facts.corumGroup et
+ * réutilisés par corum.ts ; ce fichier les définit parce que corum.ts importe déjà ses notes (pas de cycle).
+ * Tout arbitrage chiffré se fait dans facts.ts, jamais ici. Leur source porte une date de consultation de
+ * corum.fr, pas une date d'arrêté (aucune n'existe dans le dépôt, voir facts.corumGroup et corum.ts
+ * STATS_DATED) : le bloc reste rendu, le composant n'ayant pas d'état vide, et la source le dit.
  * Notes : les quatre notes exportées ici (agrément, visa, Trustpilot, chiffres) sont agrégées par corum.ts
  * avec les siennes (mention légale de l'agrément, gamme, compensation) dans l'ordre de lecture de la section ;
  * notes.ts n'importe que corum.ts. La note « chiffres » n'existe qu'ici (corum.ts ne la double plus).
@@ -38,13 +41,49 @@ const typo = (s: string): string => s.replace(/'/g, '’');
 /** Numéro d'agrément AMF, extrait de la mention légale (jamais recopié en dur). */
 const amfApprovalNumber = managementCompany.amfApproval.match(/GP-\d+/)?.[0] ?? '';
 
-/** Chiffres groupe (facts.corumGroup.stats, dans l'ordre et sans exclusion), espaces insécables appliquées, compteurs conservés. */
-const groupStats: StatItem[] = corumGroup.stats.map((s) => ({
-  value: nbDigits(nb(s.value)),
-  numeric: s.numeric,
-  suffix: nb(s.suffix),
-  label: typo(s.label),
-}));
+/** Chiffre du groupe repris de facts.corumGroup.stats ; erreur explicite si le libellé y disparaît. */
+const groupStat = (fragment: string): StatItem => {
+  const found = corumGroup.stats.find((s) => s.label.includes(fragment));
+  if (!found) throw new Error(`Chiffre absent de facts.corumGroup.stats : ${fragment}`);
+  return found;
+};
+
+const savings = groupStat('épargne gérée');
+const savers = groupStat('épargnants');
+
+/**
+ * Les quatre chiffres de la zone 4 (brochure partenaires 2026, p. 7), dans l'ordre de la trame :
+ * ancienneté, épargne gérée, épargnants, SCPI gérées depuis 2012. Espaces insécables appliquées,
+ * compteurs (numeric / prefix / suffix) conservés. Le « + » devant le nombre d'épargnants vient de
+ * facts.corumGroup.stats (savers.prefix), sourcé de la brochure p. 7. Partenaires et collaborateurs
+ * (facts.corumGroup.stats) ne sont pas repris : hors trame. Réutilisés par corum.ts (`stats`) ; rendus
+ * ici, dans trust.stats, par 07-Trust.astro.
+ */
+export const experienceStats: StatItem[] = [
+  {
+    value: nb(corumGroup.experienceLabel),
+    numeric: corumGroup.experienceYears,
+    suffix: ' ans',
+    label: 'à investir en immobilier d’entreprise',
+  },
+  {
+    value: nb(savings.value),
+    numeric: savings.numeric,
+    suffix: nb(savings.suffix ?? ''),
+    label: typo(savings.label),
+  },
+  {
+    value: `${savers.prefix}${nbDigits(savers.value)}`,
+    numeric: savers.numeric,
+    prefix: savers.prefix,
+    label: typo(savers.label),
+  },
+  {
+    value: String(corumGroup.scpiCount),
+    numeric: corumGroup.scpiCount,
+    label: `SCPI gérées depuis ${corumGroup.scpiSince}`,
+  },
+];
 
 const tp = trustFacts.trustpilot;
 /** Nom du distributeur en apostrophe typographique (titre et note Trustpilot). */
@@ -139,7 +178,7 @@ export const trust = {
 
   stats: {
     title: 'Le groupe CORUM en chiffres',
-    items: groupStats,
+    items: experienceStats,
     source: nb(corumGroup.statsSource),
     risk: `Ces chiffres sont ceux du groupe CORUM, pas ceux de R Start. R Start a ouvert ses souscriptions le ${product.openingDate.label} et n’a pas d’historique propre. La taille du groupe ne préjuge ni de ses résultats, ni de la liquidité de ses parts.`,
   },

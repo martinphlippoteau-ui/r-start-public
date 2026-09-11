@@ -5,8 +5,10 @@
  * corum.fr/mentions-legales.
  *
  * Points en attente de confirmation par CORUM (voir README) :
- *  - SRI : 4/7 confirmé par CORUM le 08/09/2026 (brochure p.3). Le DIC V7 hébergé (20/05/2026) indique 3/7 :
- *    CORUM doit fournir le DIC à jour (public/documents/r-start-dic.pdf) avant mise en ligne.
+ *  - SRI : le site affiche 3/7, valeur du DIC V7 hébergé (20/05/2026, texte extrait du PDF le 10/09/2026 :
+ *    « classe de risque 3 sur 7, qui est une classe de risque moyenne »). La brochure p.3 et CORUM
+ *    (08/09/2026) annoncent 4/7 : une communication commerciale ne peut pas contredire le DIC en vigueur,
+ *    CORUM doit soit confirmer le DIC hébergé, soit fournir un DIC à jour (le site suivra ce document).
  *  - Minimum des versements programmés (PEI) : 50 € (adhésion PEI 04/2026) → affiché.
  *  - Cas d'exonération de la commission de retrait : confirmés par la note d'information ch. III § 6 → affichés (libellé exact à confirmer).
  *  - Chiffres groupe : corum.fr consulté le 08/09/2026 ; date de référence officielle à fournir par CORUM.
@@ -198,13 +200,16 @@ export const income = {
 } as const;
 
 export const risk = {
-  // Valeur communiquée par la société de gestion (brochure p.3), confirmée par CORUM le 08/09/2026 et
-  // maintenue par décision client le 10/09/2026. ATTENTION : le DIC V7 hébergé indique 3 sur 7 et l'AMF
-  // a relevé cet écart dans ses retours sur la brochure. À aligner dès réception du DIC en vigueur.
-  sri: 4,
+  // Valeur du DIC V7 hébergé (public/documents/r-start-dic.pdf, 20/05/2026), p.2 : « Nous avons classé
+  // ce produit dans la classe de risque 3 sur 7, qui est une classe de risque moyenne. » (texte extrait
+  // du PDF le 10/09/2026). La brochure p.3 et CORUM (08/09/2026) annoncent 4 sur 7, mais une communication
+  // commerciale ne peut pas contredire le document réglementaire consultable par l'épargnant (écart relevé
+  // par l'AMF sur la brochure) : le site suit le DIC. Toute phrase qui cite cette valeur l'attribue au DIC
+  // et à sa date (product.dicDate). À mettre à jour uniquement à la réception d'un nouveau DIC.
+  sri: 3,
   sriMax: 7,
-  sriLabel: '4 sur 7',
-  sriClass: 'classe de risque moyenne', // DIC p.2
+  sriLabel: '3 sur 7',
+  sriClass: 'classe de risque moyenne', // DIC p.2, libellé exact du document
   recommendedHoldingYears: 10, // DIC, bulletin
   recommendedHoldingLabel: '10 ans',
   maxLeverage: '40 %', // DIC p.1 (de la valeur d'expertise des actifs immobiliers)
@@ -267,7 +272,13 @@ export const subscription = {
 } as const;
 
 export const corumGroup = {
-  /** Chiffres groupe : corum.fr (« Qui sommes-nous »), consulté le 08/09/2026 ; recoupés avec la brochure 2026. Date officielle à fournir. */
+  /**
+   * Chiffres groupe : corum.fr (« Qui sommes-nous »), consulté le 08/09/2026 ; recoupés avec la brochure 2026.
+   * Aucune date d'arrêté officielle (« données au … ») n'existe dans le dépôt ni dans les documents cités :
+   * `statsSource` le dit explicitement et `statsDate` reste une date de consultation, pas d'arrêté.
+   * Dès que CORUM communique la date d'arrêté, l'écrire ici (« données au … ») et passer STATS_DATED à true
+   * dans corum.ts.
+   */
   stats: [
     {
       value: '9,6 Md€',
@@ -282,7 +293,8 @@ export const corumGroup = {
     { value: '250', numeric: 250, suffix: '', prefix: '', label: 'collaborateurs dans 7 pays' },
   ],
   statsSource:
-    'Source : CORUM L’Épargne, corum.fr, consulté le 8 septembre 2026. Chiffres du groupe CORUM, sans lien avec les résultats futurs de R Start.',
+    'Source : CORUM L’Épargne, corum.fr, chiffres relevés le 8 septembre 2026 ; date d’arrêté des données non communiquée par CORUM. Chiffres du groupe CORUM, sans lien avec les résultats futurs de R Start.',
+  /** Date de consultation de corum.fr, pas date d'arrêté des chiffres. */
   statsDate: { label: '8 septembre 2026', iso: '2026-09-08' },
   employees: 250, // corum.fr
   countries: 7, // corum.fr
@@ -342,6 +354,9 @@ export const externalLinks = {
   corum: 'https://www.corum.fr',
   corumLegal: 'https://www.corumbutler.com/mentions-legales',
   amfMediator: 'https://www.amf-france.org',
+  /** Application MyCORUM (CORUM L'Épargne) : suivi de l'épargne après souscription. */
+  myCorumAppStore: 'https://apps.apple.com/fr/app/mycorum/id6692633584',
+  myCorumGooglePlay: 'https://play.google.com/store/apps/details?id=com.client.corum&hl=fr',
 } as const;
 
 /** Blocs de confiance (périmètre v2). Aucun logo AMF, aucune formulation de caution. */

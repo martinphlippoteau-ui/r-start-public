@@ -9,16 +9,20 @@ import {
 } from '@/content/fr/legal';
 
 /**
- * Section 3 — Frais en bref (id « frais »).
+ * Section 3 — Frais en bref (id « frais »), titre « Ce que vous payez, et quand. » : la section annonce
+ * ce qu'elle montre (les frais et leur moment) plutôt qu'un « 0 % » isolé en H2.
  * Les trois « 0 % » sont contrebalancés immédiatement (counterweight, même taille), puis le barème
  * complet est présenté : 15 % de frais de gestion, commission sur les cessions 0 / 6 / 12 %, commission
  * de retrait 10 / 7 / 5 / 3 / 0 %. L'encadré « Une innovation, pas une révolution » et les trois puces
  * de la commission d'arbitrage sont importés de legal.ts à l'identique. Toutes les valeurs viennent de
  * facts.fees.
  * Version « chapitre » de la page /frais : chaque ligne du barème se limite au libellé, à l'assiette et
- * au taux (le texte long par ligne, `FeeRow.detail`, est réservé à feesPage.ts). Les notes légales
+ * au taux. Les trois frais non nuls portent en plus un `detail` d'une ou deux phrases, en langage
+ * courant, qui dit quand et sur quoi ils sont prélevés : sans lui, « 0 / 6 / 12 % » ou
+ * « 10 / 7 / 5 / 3 / 0 % » restent opaques pour un néophyte. Ce texte ne répète aucun taux (les taux
+ * ne s'affichent que dans la valeur, à la taille commune exigée par l'AMF). Les notes légales
  * sont toutes appelées dans la section : sources (légende du tableau), commission d'arbitrage et
- * exonérations (lignes du tableau), incidence des coûts du DIC (contre-poids des 0 %), rémunération
+ * exonérations (lignes du tableau), rémunération
  * des intermédiaires (ligne des frais de gestion), HT = TTC (précision finale).
  */
 
@@ -33,7 +37,12 @@ const bare = (rate: string): string => rate.replace(/\s*%$/, '');
 /** « 10 / 7 / 5 / 3 / 0 % ». */
 const withdrawalValue = nb(`${feeFacts.withdrawal.steps.map((s) => bare(s.rate)).join(' / ')} %`);
 
-/** « 10 à 0 % » : variante courte du barème dégressif pour la colonne Taux sur mobile. */
+/** « 0 à 12 % » : variante courte des paliers de la commission sur les cessions (accueil). */
+const disposalValueShort = nb(
+  `${bare(feeFacts.disposal.tiers[0].rate)} à ${bare(feeFacts.disposal.tiers[feeFacts.disposal.tiers.length - 1].rate)} %`
+);
+
+/** « 10 à 0 % » : variante courte du barème dégressif (accueil, colonne Taux sur mobile). */
 const withdrawalValueShort = nb(
   `${bare(feeFacts.withdrawal.steps[0].rate)} à ${bare(feeFacts.withdrawal.steps[feeFacts.withdrawal.steps.length - 1].rate)} %`
 );
@@ -50,10 +59,6 @@ export const withdrawalExemptions = nb(
 
 /** Notes dans l'ordre de leur premier appel dans la section (numérotation croissante à la lecture). */
 export const notes: LegalNote[] = [
-  {
-    id: 'frais-incidence-dic',
-    text: `Incidence des coûts selon le DIC du ${product.dicDate.label}, pour un investissement de 10 000 € et selon les hypothèses réglementaires : ${nb(feeFacts.dicCostImpact.after1Year)} en cas de sortie après 1 an, ${nb(feeFacts.dicCostImpact.after5Years)} après 5 ans et ${nb(feeFacts.dicCostImpact.after10Years)} après ${risk.recommendedHoldingYears} ans. Cette incidence mesure la réduction moyenne, chaque année, de ce que le placement rapporte, du fait de l’ensemble des coûts, commission de retrait comprise en cas de sortie anticipée.`,
-  },
   {
     id: 'frais-sources',
     text: `Sources : document d’informations clés (DIC) du ${product.dicDate.label}, bulletin de souscription de mai 2026 (conditions générales de vente) et brochure R Start 2026. L’ensemble des frais figure dans la note d’information visée par l’AMF (visa SCPI n° ${product.visa.number} du ${product.visa.date}) et dans le DIC.`,
@@ -80,8 +85,9 @@ export const notes: LegalNote[] = [
 
 export const fees = {
   eyebrow: 'Frais',
-  title: `${nb(feeFacts.subscription.label)} de frais de souscription.`,
-  intro: `Sa société de gestion ne perçoit aucune commission à l’entrée ni à l’achat des immeubles. Elle se rémunère sur les loyers encaissés, sur les plus-values réalisées à la vente et, avant ${feeFacts.withdrawal.zeroAfterYears} ans, sur les retraits. Voici ses frais et commissions. L’ensemble des coûts supportés par R Start figure dans le DIC et la note d’information.`,
+  title: 'Ce que vous payez, et quand.',
+  /** 40 mots au plus : l'absence de commission à l'entrée y est immédiatement suivie des trois moments où R Start se rémunère. */
+  intro: `Aucune commission à l’entrée ni à l’achat des immeubles. La société de gestion se rémunère sur les loyers encaissés, sur les plus-values réalisées à la vente et, avant ${feeFacts.withdrawal.zeroAfterYears} ans, sur les retraits. Le DIC détaille l’ensemble des coûts.`,
   zeroHighlights: [
     {
       value: nb(feeFacts.subscription.label),
@@ -98,12 +104,8 @@ export const fees = {
   ],
   zeroHighlightsLabel: 'Les trois frais à 0 %',
   counterRowsLabel: 'Les frais réellement prélevés par R Start',
-  counterweight: {
-    advantage: nb(
-      `R Start prélève ${feeFacts.subscription.label} de commission de souscription et ${feeFacts.acquisition.label} de frais sur les achats d’immeubles, travaux compris. La société de gestion se rémunère lorsque R Start encaisse des loyers ou réalise une plus-value à la vente.`
-    ),
-    risk: `En contrepartie, R Start prélève ${nb(feeFacts.management.label)} de frais de gestion sur les loyers. S’y ajoutent une commission sur les cessions d’immeubles (${nb(feeFacts.disposal.label)}) et une commission de retrait avant ${feeFacts.withdrawal.zeroAfterYears} ans. Votre coût total n’est pas connu à la souscription.`,
-  },
+  // `counterweight` (avantage rédigé + contre-poids) : retiré de l'accueil le 11/09/2026, la rangée des frais
+  // prélevés joue ce rôle dans la scène. Le type le rend optionnel.
   rows: [
     {
       kind: 'entree',
@@ -128,6 +130,8 @@ export const fees = {
       label: 'Frais de gestion',
       base: feeFacts.management.base,
       value: nb(feeFacts.management.label),
+      detail:
+        'Prélevés sur les loyers HT encaissés par R Start, avant le versement de vos revenus. Rien n’est prélevé sur le montant que vous investissez.',
       noteId: 'frais-distributeur',
     },
     {
@@ -138,9 +142,13 @@ export const fees = {
     },
     {
       kind: 'transaction',
-      label: 'Commission sur les cessions d’immeubles',
+      label: 'Commission sur les ventes d’immeubles (dite « commission d’arbitrage »)',
       base: feeFacts.disposal.base,
       value: nb(feeFacts.disposal.label),
+      valueShort: disposalValueShort,
+      detail: nb(
+        `Uniquement lorsque R Start revend un immeuble, ${feeFacts.disposal.base}. Ce taux dépend du gain réalisé sur la vente, pas de son montant : aucune commission si le gain est inférieur à 7 % du prix de vente, taux maximal au-delà de 13 %.`
+      ),
       noteId: 'frais-commission-arbitrage',
     },
     {
@@ -149,6 +157,7 @@ export const fees = {
       base: feeFacts.withdrawal.base,
       value: withdrawalValue,
       valueShort: withdrawalValueShort,
+      detail: `Uniquement si vous revendez vos parts avant ${feeFacts.withdrawal.zeroAfterYears} ans de détention, ${feeFacts.withdrawal.base}. Elle diminue chaque année et disparaît après ${feeFacts.withdrawal.zeroAfterYears} ans.`,
       noteId: 'frais-exoneration-retrait',
     },
   ],
@@ -168,7 +177,7 @@ export const fees = {
     intro: `Si vous revendez vos parts avant ${feeFacts.withdrawal.zeroAfterYears} ans de détention, une commission est prélevée sur la valeur de retrait. Elle diminue avec le temps.`,
     steps: feeFacts.withdrawal.steps.map(({ period, rate }) => ({ period, rate: nb(rate) })),
     stepsLabel: 'Commission de retrait selon la durée de détention des parts',
-    note: `Le rachat de vos parts n’est pas garanti : la sortie n’est possible que s’il existe une contrepartie à l’achat. ${withdrawalExemptions} Durée de placement recommandée : ${risk.recommendedHoldingLabel}.`,
+    note: `Le rachat de vos parts n’est pas garanti : vous ne récupérez votre argent que si un autre épargnant achète vos parts. ${withdrawalExemptions} Durée de placement recommandée : ${risk.recommendedHoldingLabel}.`,
   },
   innovationBox: innovationNotRevolution,
   arbitrageWarning: { title: arbitrageWarningTitle, bullets: [...arbitrageWarningBullets] },

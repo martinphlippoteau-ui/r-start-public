@@ -1,11 +1,22 @@
 /**
- * Plan du site (périmètre v2, mis à jour le 10/09/2026) : quatre pages publiques au menu, la salle de
- * presse en pied de page, puis les pages légales.
+ * Plan du site (périmètre v2, mis à jour le 10/09/2026) : cinq pages publiques au menu (Accueil, Les
+ * frais, Stratégie d'investissement, La presse en parle, Documentation), la salle de presse en pied de
+ * page, puis les pages légales. Le menu ne contient que des pages, jamais d'ancre de section.
  * La navigation unique (src/components/SiteNav.astro) suit `order` ; `inMenu` exclut les pages
  * légales. `navLabel` permet un libellé de navigation plus explicite que celui du fil d'Ariane.
+ * (`hasSectionNav`, reliquat de la sous-navigation par sections, est retiré le 10/09/2026 : aucun
+ * consommateur.)
  */
 export type PageKey =
-  'home' | 'fees' | 'documentation' | 'press' | 'pressRoom' | 'legal' | 'privacy' | 'cookies';
+  | 'home'
+  | 'fees'
+  | 'strategy'
+  | 'documentation'
+  | 'press'
+  | 'pressRoom'
+  | 'legal'
+  | 'privacy'
+  | 'cookies';
 
 export interface PageMeta {
   key: PageKey;
@@ -16,27 +27,31 @@ export interface PageMeta {
   navLabel?: string;
   order: number;
   inMenu: boolean;
-  /** Sous-navigation sticky des sections (accueil uniquement). */
-  hasSectionNav: boolean;
 }
 
 export const pages: Record<PageKey, PageMeta> = {
-  home: { key: 'home', path: '/', label: 'Accueil', order: 1, inMenu: true, hasSectionNav: true },
+  home: { key: 'home', path: '/', label: 'Accueil', order: 1, inMenu: true },
   fees: {
     key: 'fees',
     path: '/frais',
     label: 'Frais',
+    navLabel: 'Les frais',
     order: 2,
     inMenu: true,
-    hasSectionNav: false,
+  },
+  strategy: {
+    key: 'strategy',
+    path: '/strategie',
+    label: 'Stratégie d’investissement',
+    order: 3,
+    inMenu: true,
   },
   documentation: {
     key: 'documentation',
     path: '/documentation',
     label: 'Documentation',
-    order: 3,
+    order: 5,
     inMenu: true,
-    hasSectionNav: false,
   },
   press: {
     key: 'press',
@@ -45,7 +60,6 @@ export const pages: Record<PageKey, PageMeta> = {
     navLabel: 'La presse en parle',
     order: 4,
     inMenu: true,
-    hasSectionNav: false,
   },
   // Salle de presse : réservée aux journalistes, accessible depuis le pied de page seulement
   // (arbitrage du 10/09/2026), donc hors du menu et hors de la navigation unique.
@@ -53,9 +67,8 @@ export const pages: Record<PageKey, PageMeta> = {
     key: 'pressRoom',
     path: '/salle-de-presse',
     label: 'Salle de presse',
-    order: 5,
+    order: 6,
     inMenu: false,
-    hasSectionNav: false,
   },
   legal: {
     key: 'legal',
@@ -63,7 +76,6 @@ export const pages: Record<PageKey, PageMeta> = {
     label: 'Mentions légales',
     order: 10,
     inMenu: false,
-    hasSectionNav: false,
   },
   privacy: {
     key: 'privacy',
@@ -71,7 +83,6 @@ export const pages: Record<PageKey, PageMeta> = {
     label: 'Politique de confidentialité',
     order: 11,
     inMenu: false,
-    hasSectionNav: false,
   },
   cookies: {
     key: 'cookies',
@@ -79,7 +90,6 @@ export const pages: Record<PageKey, PageMeta> = {
     label: 'Politique cookies',
     order: 12,
     inMenu: false,
-    hasSectionNav: false,
   },
 };
 

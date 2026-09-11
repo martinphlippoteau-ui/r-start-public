@@ -1,60 +1,78 @@
 ---
 /**
  * Section 1 — Hero (id « apercu »). Référence visuelle des autres sections.
- * Fond ink + halo de marque (dérive lente en CSS), H1 porté par le logo R Start (le texte du titre
- * reste dans le H1 en visually-hidden ; l'image est décorative, aria-hidden), sous-titre en trois
- * phrases, ligne risques dans la même taille (jamais animée), deux CTA, puis le grand visuel
- * (LCP : eager + fetchpriority high ; préchargé depuis index.astro via src/lib/hero-image.ts).
- * Le logo porte `data-brand-flight` : au défilement il rejoint la navigation unique collée en haut
- * (src/components/SiteNav.astro, src/scripts/motion/brandflight.ts). La place du logo est réservée en CSS (`hero-logo-wrap`) :
- * aucun décalage quand l'image passe dans son calque fixe.
- * Motion (src/scripts/motion.ts) :
- *  - cascade d'entrée `data-intro` (CSS pur, jouée au premier rendu, aucun flash) sur le surtitre,
- *    l'accroche, le sous-titre et les CTA — jamais sur le H1 ni sur la RiskNote, affichés d'emblée.
- *    Le sous-titre est le candidat LCP à 375 px : il entre par transform seul (`data-intro-move`,
- *    opacité intacte) pour ne pas retarder le LCP ;
- *  - au scroll, les mêmes blocs (enveloppes `data-scrub`, séparées des éléments `data-intro` pour ne
- *    pas partager la même propriété) passent à 35 % d'opacité en quittant le viewport par le haut ;
- *    la RiskNote est hors de ces enveloppes : elle reste à opacité 1 ;
- *  - l'image n'est jamais transformée par JS avant le LCP : dézoom CSS 1.04 → 1 via la classe posée à
- *    `load` (`data-on-load`), puis léger zoom (`data-scrub` sur l'enveloppe) et parallaxe (figure)
- *    pilotés par le défilement de la section, à partir de la position 0 (aucune transformation au
- *    chargement) ;
- *  - la dérive du halo (`brand-halo-drift`) ne tourne que quand la section est à l'écran
- *    (`data-in-view` → classe `is-in-view`).
- * Les marges hautes sont réduites de la hauteur de la barre collée (3,5 rem), désormais dans le flux.
- * Le bloc texte + risques + CTA tient dans le premier viewport. Sous 40 rem, définition, pédagogie,
- * sous-titre et ligne risques passent ensemble à `text-base` et les écarts se resserrent : la ligne
- * risques reste au-dessus de la ligne de flottaison malgré les deux paragraphes ajoutés en V2, et
- * l'égalité de taille entre l'avantage et son contre-poids est préservée (règle AMF). L'image peut
- * dépasser sous la ligne de flottaison. Contenu : src/content/fr/hero.ts et media.ts.
+ * Fond ink + couche de halo de marque (`brand-halo`, dérive lente `brand-halo-drift` jouée seulement quand la
+ * section est à l'écran via `data-in-view`) + grain. La photo plein cadre du 10/09 et son voile sont
+ * retirés (11/09/2026, jugés datés) : l'effet « waou » est désormais le vol de la marque au défilement.
+ * La section est `isolate` ; sa hauteur minimale est le premier écran moins la barre (3,5 rem, dans le
+ * flux) : le hero remplit exactement la première vue.
+ * H1 porté par le logo R Start (texte du titre en visually-hidden ; image décorative, aria-hidden). Le
+ * bloc logo (.hero-logo-stack) porte `data-brand-flight` : au défilement il se détache, monte avec la
+ * page puis glisse et rétrécit jusqu'à la position exacte du logo de la barre (`data-brand-target`,
+ * SiteNav.astro) et lui passe le relais en fondu croisé (src/scripts/motion/brandflight.ts, ≥ 40 rem,
+ * no-preference). Le H1 réserve la place du logo en CSS (.hero-logo-wrap) : aucun décalage de mise en
+ * page. Puis surtitre + pastille, accroche, ligne risques (jamais animée, opacité 1), deux CTA.
+ * LCP : le logo (eager) ou l'accroche — jamais d'animation d'opacité dessus : l'accroche entre par
+ * transform seul (`data-intro-move`) — c'est le cas de TOUS les textes et des CTA depuis le 11/09/2026 :
+ * un contrôle d'accessibilité qui mesure la page pendant la cascade voyait le bouton à 30 % d'opacité, donc
+ * un contraste de 1,19:1 (axe, reproductible). Le logo n'a ni data-intro ni data-animate ; plus d'image à
+ * précharger (src/lib/hero-image.ts est vide).
+ * Motion (src/scripts/motion.ts) — orchestration d'ouverture (11/09/2026) :
+ *  - la marque est le point fixe : peinte au premier rendu (candidat LCP, descendante du H1 : le moteur
+ *    refuse tout effet sur elle), elle est le rang 0 autour duquel la cascade `data-intro` (CSS pur,
+ *    500 ms expo.out, 70 ms par rang) se construit : surtitre (1, opacité + transform), accroche (2,
+ *    transform seul), CTA (3) — jamais le H1 ni la RiskNote, qui sont là d'emblée. Son vol vers la barre
+ *    (data-brand-flight) est le second temps, piloté par le défilement ;
+ *  - second temps du vol : pendant qu'il a lieu (du défilement 0 à la moitié d'un écran, repère `html`),
+ *    surtitre et accroche reculent vers le haut (y −20 px) et les CTA vers le bas (y +10 px), tous à
+ *    35 % d'opacité (enveloppes `data-scrub`, transform/opacity, réversibles). Ils s'écartent ainsi de
+ *    la ligne risques, hors de ces enveloppes, qui ne bouge pas et reste à opacité 1.
+ * Sous « sm » (11/09/2026) : CTA en taille md (16 px) et ligne risques en text-sm (14 px, soit ≥ 85 % du
+ * libellé des CTA, tests/conformite.spec.ts), interligne serré, icône 16 px, blanc à 85 %, largeur bornée,
+ * placée APRÈS les CTA (`order-last`) pour ne plus s'imposer d'entrée — toujours visible sans défiler et
+ * au-dessus du bandeau cookies (Pixel 5, iPhone 13). À partir de « sm », ordre et tailles ne changent pas
+ * (CTA lg, risque text-base). Le bloc tient au-dessus du bandeau cookies sur Pixel 5, iPhone 13 et
+ * 1440 × 900 : sous 40 rem le contenu est calé en haut (le bandeau y prend jusqu'à 130 px), au-dessus il
+ * est centré dans la zone qui reste (padding bas 6 rem, puis 12 rem à partir de 64 rem). iPhone SE
+ * (320 × 568) reste hors de portée : le bandeau y couvre un tiers de l'écran.
+ * Contenu : src/content/fr/hero.ts (ligne risques importée de legal.ts, jamais réécrite).
  */
 import { Image } from 'astro:assets';
 import brandLogo from '@/assets/logos/r-start-blanc.svg';
 import Button from '@/components/ui/Button.astro';
 import Container from '@/components/ui/Container.astro';
-import NoteRef from '@/components/ui/NoteRef.astro';
 import RiskNote from '@/components/ui/RiskNote.astro';
 import Section from '@/components/ui/Section.astro';
 import { sections } from '@/config/sections';
 import { hero } from '@/content/fr/hero';
-import { media } from '@/content/fr/media';
-import { heroImageFormat, heroImageSizes, heroImageWidths, loadHeroImage } from '@/lib/hero-image';
 
-const heroImage = await loadHeroImage();
 const titleId = sections.hero.id + '-title';
 /** Surtitre informatif court (hero.ts) : affiché dès qu'il n'est pas vide. */
 const showEyebrow = hero.eyebrow.trim() !== '';
-/** Sélecteur de la section : les effets au scroll partent de sa position 0 (aucun état initial transformé). */
-const sectionSelector = '#' + sections.hero.id;
-const copySelector = '[data-hero-copy]';
-/** Fondu du texte quand il sort par le haut : de « haut du bloc en haut du viewport » à sa sortie. */
-const copyScrub = {
-  'data-scrub': 'opacity:1,0.35',
-  'data-scrub-trigger': copySelector,
+const badge = hero.badge?.trim() ?? '';
+/**
+ * Transition d'ouverture (11/09/2026, mécanique observée sur revolut.com) : le hero est épinglé par le rideau
+ * de la section suivante (02-Highlights, data-curtain) qui glisse par-dessus ; pendant ce temps le logo vole
+ * vers la barre (brandflight.ts), les textes montent et s'effacent vite, sur les 30 premiers % d'un écran de
+ * défilement (repère `html`, `top top`), et le halo se pose (dézoom, couche de fond ci-dessous). La ligne
+ * risques n'est dans aucune de ces enveloppes : elle reste en place jusqu'à être recouverte.
+ */
+const flightScrub = {
+  'data-scrub-trigger': 'html',
   'data-scrub-start': 'top top',
-  'data-scrub-end': 'bottom top',
+  'data-scrub-end': '+=30%',
+  'data-scrub-ease': 'power1.out',
 };
+/** Surtitre et accroche : montée franche et disparition (comme le titre de Revolut), loin de la ligne risques. */
+const copyScrubUp = { 'data-scrub': 'y:0,-48|opacity:1,0', ...flightScrub };
+/** CTA : léger recul vers le bas, SANS fondu. Une opacité intermédiaire sur un bouton mêle son fond à celui
+ *  du hero et fait tomber le contraste sous 4,5:1 (axe l'a relevé en le surprenant à mi-fondu) ; l'appel à
+ *  l'action doit de toute façon rester pleinement lisible pendant la transition. */
+const copyScrubDown = { 'data-scrub': 'y:0,24', ...flightScrub };
+/** Ligne risques : variantes mobile seulement (voir en-tête) ; rien ne change à partir de « sm ». */
+const riskMobile = 'max-sm:order-5 max-sm:max-w-[24rem] max-sm:text-sm max-sm:leading-snug';
+/** CTA : taille md sous « sm » (la référence de taille de la ligne risques est leur libellé). */
+const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
 ---
 
 <Section
@@ -62,122 +80,127 @@ const copyScrub = {
   tone="ink"
   spacing="none"
   labelledBy={titleId}
-  data-in-view="is-in-view"
-  class="brand-halo brand-halo-drift grain flex min-h-svh flex-col overflow-hidden pt-1 sm:pt-10 lg:pt-4"
+  class="isolate flex min-h-[calc(100svh-3.5rem)] flex-col overflow-hidden"
 >
-  <Container size="wide" class="relative flex flex-1 flex-col">
+  {
+    /* Couche de fond : halo de marque (dérive lente jouée à l'écran via data-in-view) + grain, isolée du
+      contenu pour pouvoir être scrubée sans toucher la ligne risques : dézoom d'installation 1,04 → 1 sur les
+      40 premiers % d'écran de défilement, comme le décor de revolut.com qui « se pose » sous le contenu. */
+  }
+  <div
+    aria-hidden="true"
+    data-in-view="is-in-view"
+    data-scrub="scale:1.04,1"
+    data-scrub-trigger="html"
+    data-scrub-start="top top"
+    data-scrub-end="+=40%"
+    data-scrub-ease="power1.out"
+    class="brand-halo brand-halo-drift grain pointer-events-none absolute inset-0 -z-10 will-change-transform"
+  >
+  </div>
+  <Container
+    size="wide"
+    class="relative flex flex-1 flex-col pt-4 pb-12 sm:justify-center sm:pt-8 sm:pb-24 lg:pt-6 lg:pb-48"
+  >
     <div data-hero-copy class="mx-auto flex max-w-4xl flex-col items-center text-center">
       {
         showEyebrow && (
-          <div {...copyScrub} class="mb-1 sm:mb-4">
-            <p data-intro="1" class="text-eyebrow text-teal-200 max-sm:tracking-wider">
-              {hero.eyebrow}
+          <div {...copyScrubUp} class="mb-5 max-sm:order-1 sm:mb-6">
+            <p
+              data-intro="1"
+              class="text-eyebrow flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 text-teal-100 max-sm:tracking-wider"
+            >
+              {badge && (
+                <span class="inline-flex items-center rounded-full border border-teal-200/50 bg-teal-200/12 px-2.5 py-0.5 text-[0.7rem] font-semibold tracking-wider text-teal-100 uppercase">
+                  {badge}
+                </span>
+              )}
+              <span>{hero.eyebrow}</span>
             </p>
           </div>
         )
       }
-      <h1 id={titleId} class="hero-logo-wrap">
+      <h1 id={titleId} class="hero-logo-wrap max-sm:order-2">
         <span class="visually-hidden">{hero.title}</span>
-        <span class="hero-logo-stack" aria-hidden="true" data-brand-flight>
+        <span class="hero-logo-stack" data-brand-flight aria-hidden="true">
           <Image src={brandLogo} alt="" width={290} height={89} loading="eager" decoding="async" />
         </span>
       </h1>
-      <div {...copyScrub} class="flex flex-col items-center">
-        <p data-intro="2" class="text-display-sm mt-0.5 text-sand sm:mt-3">{hero.tagline}</p>
-        {
-          hero.definition && (
-            <p
-              data-intro="3"
-              data-intro-move
-              class="text-lead mt-1 max-w-3xl text-pretty text-white max-sm:text-base max-sm:leading-snug sm:mt-4"
-            >
-              {hero.definition}
-              {hero.definitionNoteId && (
-                <span class="whitespace-nowrap">
-                  <NoteRef id={hero.definitionNoteId} />
-                </span>
-              )}
-            </p>
-          )
-        }
-        {
-          /* Les deux phrases pédagogiques sont descendues dans « Ce qui change vraiment » (audit UX) :
-            elles coûtaient trois lignes avant même que le lecteur sache ce qu'est R Start, et
-            repoussaient les CTA sous le bandeau cookies sur mobile. */
-        }
-        <p
-          data-intro="4"
-          data-intro-move
-          class="text-lead mt-1 max-w-3xl text-pretty text-white max-sm:text-base max-sm:leading-snug sm:mt-4"
-        >
-          {hero.subtitle}
+      <div {...copyScrubUp} class="flex flex-col items-center max-sm:order-3">
+        <p data-intro="2" data-intro-move class="text-display-sm mt-5 text-sand sm:mt-7">
+          {hero.tagline}
         </p>
       </div>
+      {
+        /* Claim de la trame en deux temps : l'énoncé en petit, la réponse (« Oui ! » / « Non ! ») détachée,
+          en couleur d'accent. Entrée en cascade (data-intro 4 et 5) : les réponses arrivent après leur
+          énoncé. Le bloc recule avec les autres textes pendant le vol du logo (copyScrubUp), jamais la
+          ligne risques. Sur mobile, il passe en dernier (order 6) pour ne pas repousser les CTA. */
+      }
+      {
+        hero.claims && hero.claims.length > 0 && (
+          <ul
+            {...copyScrubUp}
+            role="list"
+            class="mt-6 flex max-w-3xl flex-col gap-3 text-left max-sm:order-6 max-sm:mt-5 sm:mt-10 sm:flex-row sm:justify-center sm:gap-10"
+          >
+            {hero.claims.map((claim, i) => (
+              <li class="flex items-baseline gap-2 sm:flex-col sm:items-start sm:gap-1">
+                <span
+                  data-intro={String(4 + i * 2)}
+                  data-intro-move
+                  class="text-sm leading-snug text-white/90 sm:text-base"
+                >
+                  {claim.text}
+                </span>
+                <span
+                  data-intro={String(5 + i * 2)}
+                  data-intro-move
+                  class="text-display-sm shrink-0 leading-none font-bold text-sand max-sm:text-xl"
+                >
+                  {claim.answer}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )
+      }
+
       <RiskNote
         text={hero.riskLine}
         tone="dark"
-        size="lead"
-        class="mx-auto mt-1 max-w-3xl justify-center text-left max-sm:text-base max-sm:leading-snug sm:mt-4"
+        size="base"
+        class:list={['mx-auto mt-6 max-w-3xl text-left sm:mt-8', riskMobile]}
       />
-      <div {...copyScrub} class="mt-2.5 w-full sm:mt-7 sm:w-auto">
+      <div {...copyScrubDown} class="mt-6 w-full max-sm:order-4 sm:mt-10 sm:w-auto">
         {
           /* `data-hero-cta` : repère stable pour la mesure et pour le test « les CTA du hero sont
             visibles sans scroller » — il ne dépend pas du rang dans la cascade d'entrée. */
         }
         <div
           data-hero-cta
-          data-intro="5"
+          data-intro="3"
+          data-intro-move
           class="flex w-full flex-col items-stretch gap-2 sm:w-auto sm:flex-row sm:items-center sm:gap-3"
         >
-          <Button position={hero.primaryCta.position} variant="light" size="lg"
+          <Button position={hero.primaryCta.position} variant="light" size="lg" class={ctaMobile}
             >{hero.primaryCta.label}</Button
           >
-          <Button href={hero.secondaryCta.href} variant="outline-light" size="lg"
-            >{hero.secondaryCta.label}</Button
+          {
+            /* Sous « sm », le bouton secondaire (simple ancre vers Points forts) cède la place : les CTA
+              et la ligne risques doivent rester au-dessus du bandeau cookies (tests/conformite.spec.ts).
+              Le défilement mène au même endroit. */
+          }
+          <Button
+            href={hero.secondaryCta.href}
+            variant="outline-light"
+            size="lg"
+            class="max-sm:hidden"
           >
+            {hero.secondaryCta.label}
+          </Button>
         </div>
       </div>
     </div>
-
-    <figure
-      class="mx-auto mt-12 w-full max-w-7xl pb-12 sm:pb-16 lg:pb-20"
-      data-parallax="0.08"
-      data-parallax-trigger={sectionSelector}
-      data-parallax-start="top top"
-      data-parallax-end="bottom top"
-    >
-      <div class="img-frame aspect-[4/3] sm:aspect-[16/9] lg:aspect-[21/9]">
-        <div
-          class="h-full w-full"
-          data-scrub="scale:1,1.06"
-          data-scrub-trigger={sectionSelector}
-          data-scrub-start="top top"
-          data-scrub-end="bottom top"
-        >
-          <Image
-            src={heroImage}
-            alt={media.hero.main.alt}
-            widths={heroImageWidths}
-            sizes={heroImageSizes}
-            format={heroImageFormat}
-            loading="eager"
-            fetchpriority="high"
-            decoding="async"
-            data-on-load="is-loaded"
-            class="hero-media h-full w-full object-cover"
-          />
-        </div>
-        <div
-          aria-hidden="true"
-          class="absolute inset-0 bg-gradient-to-t from-ink/45 via-transparent to-transparent"
-        >
-        </div>
-      </div>
-      {
-        media.hero.main.credit && (
-          <figcaption class="text-caption mt-3 text-white/90">{media.hero.main.credit}</figcaption>
-        )
-      }
-    </figure>
   </Container>
 </Section>

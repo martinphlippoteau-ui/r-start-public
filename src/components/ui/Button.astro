@@ -8,7 +8,9 @@ import type { CtaPosition } from '@/content/types';
  * URL centralisée (config/site.ts), data-cta pour l'analytics, ouverture dans le même onglet.
  * Variantes : primary (navy), secondary (contour navy, fond clair), ghost (texte), light (blanc,
  * fond sombre), outline-light (contour blanc, fond sombre).
- * Tailles : sm (40 px de haut, cible tactile minimale), md (48 px), lg (60 px).
+ * Tailles : sm (40 px de haut, cible tactile minimale), md (48 px), lg (60 px), bordure comprise : les variantes
+ * pleines (primary, light) portent une bordure transparente pour mesurer exactement comme secondary /
+ * outline-light (62 px en lg) quand elles sont côte à côte.
  * Micro-interactions (utilitaire `btn-motion`, global.css) : légère élévation + halo doux au survol,
  * scale 0.98 à l'appui, 150-200 ms ; halo coloré par variante (`--btn-halo`) ; rien en reduced-motion.
  */
@@ -33,12 +35,14 @@ const isSubscribe = !href;
 // quelles. Sans `href`, c'est le tunnel de souscription (URL externe complète).
 const finalHref = href ? withBase(href) : subscribeHref(position);
 const variants = {
-  primary: 'bg-navy text-white hover:bg-teal-700 [--btn-halo:rgb(20_164_186/0.22)]',
+  primary:
+    'border border-transparent bg-navy text-white hover:bg-teal-700 [--btn-halo:rgb(20_164_186/0.22)]',
   // Contour navy à 60 % : ≥ 3:1 sur blanc (WCAG 1.4.11), le texte navy reste le repère principal.
   secondary:
     'border border-navy/60 text-navy hover:border-navy hover:bg-navy hover:text-white [--btn-halo:rgb(2_75_103/0.14)]',
   ghost: 'text-navy hover:text-teal-700 underline-offset-4 hover:underline px-2',
-  light: 'bg-white text-navy hover:bg-teal-100 [--btn-halo:rgb(255_255_255/0.22)]',
+  light:
+    'border border-transparent bg-white text-navy hover:bg-teal-100 [--btn-halo:rgb(255_255_255/0.22)]',
   'outline-light':
     'border border-white/40 text-white hover:border-white hover:bg-white/10 [--btn-halo:rgb(255_255_255/0.16)]',
 };

@@ -55,7 +55,7 @@ export const risks = {
     },
     {
       title: 'Liquidité limitée',
-      description: `R Start ne garantit pas le rachat de vos parts. La sortie n’est possible que s’il existe une contrepartie à l’achat. Avant ${fees.withdrawal.zeroAfterYears} ans de détention, une commission de retrait dégressive s’applique.`,
+      description: `R Start ne garantit pas le rachat de vos parts : vous ne récupérez votre argent que si un autre épargnant les achète. Si personne ne se présente, votre argent reste investi. Avant ${fees.withdrawal.zeroAfterYears} ans de détention, une commission de retrait dégressive s’applique.`,
       noteId: 'risques-sortie',
     },
     {

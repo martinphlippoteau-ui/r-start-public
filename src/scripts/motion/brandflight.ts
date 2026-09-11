@@ -1,56 +1,75 @@
 /**
- * Vol de la marque : le grand logo R Start du hero se détache, glisse vers le coin supérieur gauche
- * et passe le relais au logo de la navigation unique, collée en haut de page depuis le premier écran
- * (effet « élément partagé » façon page produit Apple).
+ * Vol de la marque : le grand logo R Start du hero se détache au défilement, monte d'abord avec la
+ * page, puis s'infléchit vers le coin supérieur gauche en rétrécissant jusqu'à la position exacte du
+ * logo de la navigation collée en haut, et lui passe le relais en fondu croisé (élément partagé façon
+ * page produit Apple). Recréé le 11/09/2026 après le retrait de la photo de fond du hero.
  *
  * Vocabulaire :
- *  - `data-brand-flight` : le bloc logo du hero (images décoratives, aria-hidden, dans le H1 dont le
- *    texte reste présent en visually-hidden). Le H1 n'est jamais transformé et réserve la place du
- *    logo en CSS : aucun décalage de mise en page quand le bloc passe dans son calque fixe.
+ *  - `data-brand-flight` : le bloc logo du hero (.hero-logo-stack, image décorative aria-hidden, dans
+ *    le H1 dont le texte reste en visually-hidden). Le H1 n'est jamais transformé : il réserve la place
+ *    du logo en CSS (.hero-logo-wrap), aucun décalage de mise en page quand le bloc passe dans son
+ *    calque fixe (.brand-flyer, global.css).
  *  - `data-brand-target` : le logo de la barre (src/components/SiteNav.astro). Masqué dès le rendu
- *    serveur sur les pages qui portent le vol (global.css), révélé à l'arrivée du calque.
+ *    serveur sur les pages qui portent le vol (global.css : ≥ 40 rem, no-preference, scripting
+ *    activé), révélé par le fondu croisé ; son opacité est ensuite pilotée ici, en ligne.
  *
- * Trajectoire : le calque est fixe, donc toujours à l'écran. L'accélération `power2.out` fait qu'au
- * tout début il monte presque à la vitesse de la page (détachement naturel), puis il ralentit en
- * arrivant dans le coin. La barre ne bouge plus (elle est collée dès le chargement) : le passage de
- * relais se joue donc sur la fin de la trajectoire, en fondu croisé entre le calque et le logo de la
- * barre, tous deux exactement au même endroit. Le calque passe SOUS la barre (z-index) : il n'est
- * jamais coupé en deux par le bord du bandeau.
+ * Trajectoire, u = défilement / distance de vol (0 → 1) :
+ *  - vertical : Hermite cubique dont la vitesse initiale est celle de la page (−1 px par px défilé) et
+ *    la vitesse finale nulle : à u = 0 le logo monte exactement avec le hero (il en fait encore partie),
+ *    puis il décolle et freine en arrivant sur la ligne du logo de la barre. Aucun dépassement tant que
+ *    la distance de vol reste < 3 × la hauteur à parcourir (FLIGHT_FACTOR = 2 le garantit) ;
+ *  - horizontal : power3.out — il glisse tôt vers la gauche, l'arc reste à gauche des entrées du menu ;
+ *  - échelle : power2.out, de 1 au rapport largeur cible / largeur d'origine (origine 0 0).
+ *  Distance de vol bornée à 60 % de la hauteur du viewport : le relais est terminé bien avant que le
+ *  hero ait quitté l'écran.
+ * Relais : fondu croisé calque → logo de la barre sur les 12 derniers % du vol, quand les deux occupent
+ * la même place à quelques pixels près. Le calque est AU-DESSUS de la barre (z 45) : il se pose net sur
+ * le verre au lieu d'être flouté sous lui ; le panneau du menu (z 50) le recouvre s'il s'ouvre.
  *
- * Garde-fous : transform et opacity uniquement ; rien sans le moteur (donc rien en
- * `prefers-reduced-motion: reduce`) ; rien sous 40 rem ni si la cible est masquée ; tout est
- * réversible.
+ * Garde-fous : transform et opacity uniquement, appliqués en direct (aucun lissage : à 0 le logo doit
+ * rester collé à sa place) ; rien sans le moteur (donc rien en prefers-reduced-motion) ; rien sous
+ * 40 rem ni si la cible est masquée ; tout est réversible (fonction de nettoyage rendue à
+ * gsap.matchMedia, qui l'appelle si la fenêtre passe sous 40 rem ou si la préférence change).
  */
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-/** Distance de vol : le logo a rejoint le coin quand le titre aurait fini de quitter l'écran. */
-const FLIGHT_FACTOR = 1.35;
-const FLIGHT_MIN = 240;
-/** Le vol n'a lieu qu'à partir de « sm » : sous cette largeur, la barre porte déjà la marque et le
+/** Le vol n'a lieu qu'à partir de « sm » : sous cette largeur la barre porte déjà la marque et le
  *  relais serait illisible (même seuil que la règle de masquage de global.css). */
 const FLIGHT_MEDIA = '(min-width: 40rem)';
-/** Fondu croisé : de 90 % à 110 % de la distance de vol, le calque étant alors posé sur sa cible. */
-const HANDOVER_START = 0.9;
-const HANDOVER_END = 1.1;
+/** Distance de vol = FLIGHT_FACTOR × hauteur à parcourir, bornée en pixels et en fraction du viewport. */
+const FLIGHT_FACTOR = 2;
+const FLIGHT_MIN = 160;
+const FLIGHT_MAX_VH = 0.6;
+/** Début du fondu croisé, en fraction du vol. */
+const HANDOVER_START = 0.88;
 
 const clamp01 = (n: number): number => (n < 0 ? 0 : n > 1 ? 1 : n);
 const lerp = (a: number, b: number, t: number): number => a + (b - a) * t;
-const ease = gsap.parseEase('power2.out');
+const easeX = gsap.parseEase('power3.out');
+const easeScale = gsap.parseEase('power2.out');
+
+/**
+ * Hermite cubique en u ∈ [0, 1] : part de `from` à la vitesse de la page (−distance par unité de u,
+ * soit −1 px par px défilé), arrive en `to` à vitesse nulle.
+ */
+const hermiteY = (u: number, from: number, to: number, distance: number): number => {
+  const u2 = u * u;
+  const u3 = u2 * u;
+  return from + (to - from) * (3 * u2 - 2 * u3) - distance * (u3 - 2 * u2 + u);
+};
 
 interface Geometry {
+  /** Place du logo dans le hero : haut en coordonnées de page, gauche et largeur (viewport). */
   homeTop: number;
   homeLeft: number;
   homeWidth: number;
-  /** Position du logo de la barre dans le viewport (elle est collée en haut) et sa largeur. */
+  /** Logo de la barre dans le viewport (la barre est collée en haut). */
   restTop: number;
   restLeft: number;
   restWidth: number;
-  /** Défilement auquel le logo a fini de rejoindre le coin. */
-  flightEnd: number;
-  /** Défilement auquel le fondu croisé commence et se termine : fin de la mission du calque. */
-  handStart: number;
-  handEnd: number;
+  /** Défilement au terme duquel le logo est posé sur sa cible et le relais achevé. */
+  distance: number;
 }
 
 export const setupBrandFlight = (): (() => void) => {
@@ -64,13 +83,12 @@ export const setupBrandFlight = (): (() => void) => {
   const flyer = document.createElement('div');
   flyer.className = 'brand-flyer';
   flyer.setAttribute('aria-hidden', 'true');
-  document.body.appendChild(flyer);
   flyer.appendChild(brand);
-  document.documentElement.classList.add('brand-flight');
+  document.body.appendChild(flyer);
   target.style.opacity = '0';
 
   let geo: Geometry | null = null;
-  /** Avancement du passage de relais vers la barre (0 : le calque porte la marque, 1 : la barre). */
+  /** Dernier avancement appliqué du relais (0 : le calque porte la marque, 1 : la barre). */
   let landed = -1;
 
   const measure = (): Geometry | null => {
@@ -79,7 +97,11 @@ export const setupBrandFlight = (): (() => void) => {
     const targetRect = target.getBoundingClientRect();
     if (!homeRect.width || !targetRect.width) return null;
     const homeTop = homeRect.top + window.scrollY;
-    const flightEnd = Math.max(FLIGHT_MIN, (homeTop + homeRect.height) * FLIGHT_FACTOR);
+    const climb = Math.max(1, homeTop - targetRect.top);
+    const distance = Math.max(
+      FLIGHT_MIN,
+      Math.min(climb * FLIGHT_FACTOR, window.innerHeight * FLIGHT_MAX_VH)
+    );
     return {
       homeTop,
       homeLeft: homeRect.left,
@@ -87,60 +109,57 @@ export const setupBrandFlight = (): (() => void) => {
       restTop: targetRect.top,
       restLeft: targetRect.left,
       restWidth: targetRect.width,
-      flightEnd,
-      handStart: flightEnd * HANDOVER_START,
-      handEnd: flightEnd * HANDOVER_END,
+      distance,
     };
   };
 
-  /**
-   * Passage de relais : les deux logos occupent exactement la même place, le fondu se joue sur la fin
-   * de la trajectoire, quand le calque est déjà posé sur le logo de la barre.
-   */
-  const handover = (scroll: number) => {
-    const hand = clamp01((scroll - geo!.handStart) / Math.max(1, geo!.handEnd - geo!.handStart));
+  /** Mesure (à chaque refresh de ScrollTrigger) et rend la distance de vol pour la borne `end`. */
+  const remeasure = (): number => {
+    geo = measure();
+    landed = -1;
+    if (geo) gsap.set(flyer, { width: geo.homeWidth });
+    return geo?.distance ?? 1;
+  };
+
+  const handover = (u: number) => {
+    const hand = clamp01((u - HANDOVER_START) / (1 - HANDOVER_START));
     if (hand === landed) return;
     landed = hand;
     flyer.style.opacity = String(1 - hand);
+    // Relais achevé : le calque, invisible, ne conserve plus de couche de composition.
+    flyer.style.visibility = hand >= 1 ? 'hidden' : '';
     target.style.opacity = String(hand);
   };
 
   const apply = (scroll: number) => {
     if (!geo) return;
-    const t = ease(clamp01(scroll / geo.flightEnd));
+    const u = clamp01(scroll / geo.distance);
     gsap.set(flyer, {
-      width: geo.homeWidth,
-      x: lerp(geo.homeLeft, geo.restLeft, t),
-      y: lerp(geo.homeTop, geo.restTop, t),
-      scale: lerp(1, geo.restWidth / geo.homeWidth, t),
+      x: lerp(geo.homeLeft, geo.restLeft, easeX(u)),
+      // Rebond élastique (défilement négatif) : le logo suit simplement la page.
+      y: scroll < 0 ? geo.homeTop - scroll : hermiteY(u, geo.homeTop, geo.restTop, geo.distance),
+      scale: lerp(1, geo.restWidth / geo.homeWidth, easeScale(u)),
     });
-    handover(scroll);
+    handover(u);
   };
 
-  const refresh = () => {
-    geo = measure();
-    apply(window.scrollY);
-  };
-
-  refresh();
-
+  remeasure();
   const st = ScrollTrigger.create({
     trigger: document.documentElement,
     start: 'top top',
-    end: () => '+=' + (geo?.handEnd ?? 1),
-    invalidateOnRefresh: true,
-    onRefresh: refresh,
+    end: () => '+=' + remeasure(),
+    onRefresh: () => apply(window.scrollY),
     onUpdate: (self) => apply(self.scroll()),
     onLeave: () => apply(window.scrollY),
     onEnterBack: () => apply(window.scrollY),
   });
+  apply(window.scrollY);
 
   return () => {
     st.kill();
     gsap.set(flyer, { clearProps: 'all' });
     home.appendChild(brand);
     flyer.remove();
-    document.documentElement.classList.remove('brand-flight');
     target.style.removeProperty('opacity');
   };
 };

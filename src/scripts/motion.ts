@@ -8,8 +8,8 @@
  * `prefers-reduced-motion: reduce` (rien n'est alors téléchargé).
  * DEUX MOTEURS, un seul par page, choisi d'après ce que la page déclare :
  *  - motion/engine.ts (GSAP + ScrollTrigger, ≈ 45 Ko gzip + 4 Ko) dès qu'un effet de la liste
- *    BESOIN_GSAP est présent — épinglage, défilement lié, tracé, compteur, texte mot à mot, barre de
- *    progression, vol de la marque. Aujourd'hui : l'accueil ;
+ *    BESOIN_GSAP est présent — épinglage, défilement lié, tracé, compteur, texte mot à mot.
+ *    Aujourd'hui : l'accueil et /strategie ;
  *  - motion/lite.ts (≈ 1 Ko, IntersectionObserver + transitions CSS) sinon : il rend les révélations
  *    `data-animate` avec les mêmes types, les mêmes durées et LES MÊMES GARDE-FOUS. Les sous-pages ne
  *    déclarent que cela : elles ne téléchargent plus GSAP.
@@ -29,27 +29,33 @@
  * │                               animations CSS continues jouées seulement à l'écran.            │
  * │ Révélations uniques (once, interruptibles, 88 % du viewport) — motion/reveal.ts              │
  * │  data-animate="fade-up|fade|scale|tilt|clip|stagger"  + data-animate-delay / -stagger / -y   │
- * │                               0,7 s / 24 px / expo.out (titres : 0,9 s) ; `clip` réservé aux  │
- * │                               médias (sinon fade-up) ; un élément déjà à l'écran à l'init     │
- * │                               n'est pas animé (pas de flash).                                  │
- * │  data-reveal-text[="scrub"]   mot à mot — titres courts (≤ 12 mots) uniquement. → text.ts     │
- * │  data-counter="160000"        + -prefix / -suffix / -decimals / -from / -duration (fr-FR)     │
+ * │                               rythme unique (shared.ts) : 0,6 s / 20 px / expo.out, titres    │
+ * │                               0,7 s / 24 px, cascade 0,08 s ; `tilt` réservé à un objet visuel │
+ * │                               isolé (picto), `clip` aux médias (sinon fade-up) ; un élément    │
+ * │                               déjà à l'écran à l'init n'est pas animé (pas de flash).         │
+ * │  data-reveal-text[="scrub"]   mot à mot — H2 de chapitre (≤ 12 mots) uniquement. → text.ts    │
+ * │  data-counter="160000"        + -prefix / -suffix / -decimals / -from / -duration (fr-FR) ;   │
+ * │                               chiffres non réglementaires seulement (jamais un frais, un SRI) │
  * │  data-draw[="width"]          tracé SVG (stroke-dashoffset) ou barre (scaleX) ; data-draw-scrub│
  * │  data-fill="0.57"             jauge (scaleX, ou scaleY avec data-fill-axis="y")               │
- * │ Scènes au scroll (scrub ≤ 1, transform/opacity uniquement) — motion/scroll.ts, scene.ts      │
+ * │ Scènes au scroll (lissage SCRUB 0,6 partout, transform/opacity) — motion/scroll.ts, scene.ts │
  * │  data-parallax="0.15"         + -trigger / -start / -end                                      │
  * │  data-scrub="scale:1,1.08|opacity:1,0"  + -trigger / -start / -end / -ease                    │
  * │  data-scene + data-scene-end="+=120%"   enfants [data-step] (+ data-step-stay), classe        │
  * │                               `scene-stack` pour superposer les steps ; RiskNote HORS des     │
  * │                               steps (toujours visible).                                        │
  * │  data-curtain                 la section recouvre la précédente (pin) ; recul scale 0.96 /    │
- * │                               opacity 0.6 seulement si la précédente n'a aucun [data-risk].   │
+ * │                               opacity 0.6 seulement si la précédente n'a aucun [data-risk] ;  │
+ * │                               jamais après un épinglage, seulement clair → ink.                │
  * │  data-pin + data-pin-end      épinglage simple (compatibilité)                                │
- * │ Navigation — motion/progress.ts                                                               │
- * │  data-progress                barre de lecture (scaleX sur <main>) ; data-compact-at="0.4"    │
  * │ Exclusion                                                                                     │
  * │  data-no-motion               l'élément et ses descendants sont exclus de tout effet          │
  * └───────────────────────────────────────────────────────────────────────────────────────────────┘
+ *
+ * SOBRIÉTÉ (passe du 11/09/2026, niveau page produit) : au plus UN effet d'entrée par bloc de contenu
+ * (carte, liste, titre), jamais sur un conteneur ET son contenu ; surtitres statiques ; H2 de chapitre mot à
+ * mot, introduction en fade-up ; dans une carte, seul le titre (ou le picto) entre, description et risque
+ * sont en place ; une seule scène (frais) et un seul rideau (Risques) sur l'accueil.
  *
  * GARDE-FOUS (appliqués par le moteur, contrôlés par scripts/check-compliance.mjs et tests/) :
  *  - Jamais d'effet sur le H1, sur un [data-risk] (ligne risques, contre-poids, avertissements
@@ -77,9 +83,11 @@ const IDLE_TIMEOUT = 1000;
 
 /**
  * Effets qui exigent GSAP + ScrollTrigger : épinglage, défilement lié, tracé, compteur, découpe de
- * texte, barre de progression, vol de la marque. Une page qui n'en déclare aucun n'a besoin que des
- * révélations `data-animate`, rendues par le moteur léger (motion/lite.ts) : elle ne télécharge pas
- * les 45 Ko gzip de la bibliothèque. Aujourd'hui, seul l'accueil déclare ces effets.
+ * texte. Une page qui n'en déclare aucun n'a besoin que des révélations `data-animate`, rendues par
+ * le moteur léger (motion/lite.ts) : elle ne télécharge pas les 45 Ko gzip de la bibliothèque.
+ * La navigation (src/components/SiteNav.astro) ne dépend d'aucun moteur (plus de barre de progression,
+ * CTA compact géré par son script inline) ; seul l'accueil, dont le hero porte `[data-brand-flight]`,
+ * charge GSAP pour le vol de la marque vers la barre (motion/brandflight.ts, recréé le 11/09/2026).
  */
 const BESOIN_GSAP = [
   '[data-scene]',
@@ -91,7 +99,6 @@ const BESOIN_GSAP = [
   '[data-fill]',
   '[data-counter]',
   '[data-reveal-text]',
-  '[data-progress]',
   '[data-brand-flight]',
 ].join(',');
 

@@ -7,6 +7,11 @@ import { site } from '@/config/site';
 import JsonLd from '@/components/JsonLd.astro';
 import { nav } from '@/content/fr/nav';
 import { withBase } from '@/lib/href';
+// Sous-ensemble latin de la police variable (le seul utilisé par le contenu français) : préchargé pour que
+// le premier rendu du texte n'attende pas la découverte du @font-face dans la feuille de style. Même fichier
+// que celui référencé par le CSS de @fontsource-variable/plus-jakarta-sans (global.css), donc un seul
+// téléchargement ; `?url` passe par le pipeline d'assets de Vite, comme l'url() du CSS.
+import plusJakartaLatinUrl from '@fontsource-variable/plus-jakarta-sans/files/plus-jakarta-sans-latin-wght-normal.woff2?url';
 
 interface Props {
   title: string;
@@ -38,6 +43,7 @@ const {
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <Seo {title} {description} {path} {noindex} {ogImage} {ogImageAlt} />
+    <link rel="preload" href={plusJakartaLatinUrl} as="font" type="font/woff2" crossorigin />
     <link rel="icon" href={withBase('/favicon.ico')} sizes="32x32" />
     <link rel="icon" href={withBase('/favicon.svg')} type="image/svg+xml" />
     <link rel="apple-touch-icon" href={withBase('/apple-touch-icon.png')} />

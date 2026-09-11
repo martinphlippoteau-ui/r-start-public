@@ -90,15 +90,20 @@ export interface DifferenceContent {
   /** Les deux moteurs. `description` est l'avantage, `risk` son contre-poids (même taille, même carte). */
   engines: { title: string; description: string; risk: string; noteId?: string }[];
   /**
-   * Formule d'alignement « nous ne touchons rien tant que vous n'avez pas gagné d'argent » (advantage)
-   * et son contre-poids chiffré : frais de gestion, commission sur les cessions, commission de retrait,
-   * coût total inconnu à la souscription (risk).
+   * Formule d'alignement (advantage) : « la société de gestion se rémunère sur les loyers encaissés et
+   * les plus-values réalisées, jamais sur le montant que vous versez » (jamais « nous ne touchons rien
+   * tant que vous n'avez pas gagné d'argent » : les 15 % sont prélevés sur les loyers même quand la
+   * valeur des parts baisse), et son contre-poids chiffré : frais de gestion, commission sur les
+   * cessions, commission de retrait, coût total inconnu à la souscription (risk).
    */
-  /**
-   * `pedagogy` : les deux phrases sur le moment du prélèvement, descendues du hero par l'audit UX.
-   * Elles sont rendues dans le même bloc que `advantage` et partagent son contre-poids `risk`.
-   */
-  counterweight: AdvantageRisk & { title?: string; noteId?: string; pedagogy?: string[] };
+  counterweight: AdvantageRisk & {
+    title?: string;
+    noteId?: string;
+    /** Les deux phrases « Payer des frais… oui / … non » de la trame, en ouverture du bloc (hero minimal). */
+    pedagogy?: string[];
+    /** Allégation de rang (facts.product.definition), descendue du hero : jamais sans son appel de note. */
+    claim?: { text: string; noteId: string };
+  };
   /** Mécanisme de réserve en cas de moins-value, résumé en deux phrases (brochure partenaires 2026, p.4). */
   lossMechanism: { title: string; body: string[]; risk: string; noteId?: string };
   /** Lien interne vers la page Frais : ce n'est pas un CTA de souscription, il ne porte pas de `position`. */

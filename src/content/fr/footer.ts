@@ -1,6 +1,5 @@
-import type { FooterContent, FooterLink, SectionKey } from '@/content/types';
-import { pages } from '@/config/pages';
-import { sections } from '@/config/sections';
+import type { FooterContent, FooterLink } from '@/content/types';
+import { menuPages, pages } from '@/config/pages';
 import { externalLinks, product } from '@/content/fr/facts';
 import { publishedDocuments } from '@/content/fr/documents';
 import {
@@ -25,31 +24,14 @@ import { legalPages } from '@/content/fr/pages';
 /** Espace insécable avant « : » et « ; » dans les paragraphes assemblés ici. */
 const nb = (s: string): string => s.replace(/ ([%€:;?!])/g, '\u00A0$1');
 
-/** Sections principales de la page, dans l'ordre de src/config/sections.ts. */
-const mainSectionKeys: readonly SectionKey[] = [
-  'hero',
-  'fees',
-  'strategy',
-  'income',
-  'subscribe',
-  'risks',
-  'documents',
-  'faq',
-];
-
-const anchor = (key: SectionKey): FooterLink => ({
-  label: sections[key].label,
-  href: `/#${sections[key].id}`, // préfixé pour fonctionner depuis les sous-pages
-});
-
 export const footer = {
   columns: [
     {
       title: 'R Start',
-      // Sections de l'accueil, puis la salle de presse : réservée aux journalistes, elle n'est pas au
+      // Pages du menu (jamais d'ancre de section), puis la salle de presse : réservée aux journalistes, elle n'est pas au
       // menu (src/config/pages.ts, inMenu: false) et n'est accessible que d'ici.
       links: [
-        ...mainSectionKeys.map(anchor),
+        ...menuPages.map((p): FooterLink => ({ label: p.navLabel ?? p.label, href: p.path })),
         { label: pages.pressRoom.label, href: pages.pressRoom.path } satisfies FooterLink,
       ],
     },
@@ -70,6 +52,7 @@ export const footer = {
       ],
     },
   ],
+  /** aria-label de la navigation du pied de page ; sert aussi de H2 masqué au-dessus des colonnes (H3). */
   navLabel: 'Pied de page',
   manageCookiesLabel: 'Gérer les cookies',
   copyright: `© 2026 ${publisher.name}. Tous droits réservés.`,

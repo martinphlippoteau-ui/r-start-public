@@ -4,30 +4,31 @@
  * l'ancien couple Header + SubNav. Un seul landmark de navigation par page (`<nav aria-label>`),
  * qui contient la barre et le panneau plein écran des petits écrans.
  *
- * Entrées :
- *  - accueil : les sections de la page (src/config/sections.ts, `inNav`) puis les pages qui n'ont
- *    pas de section (src/config/pages.ts : Documentation, La presse en parle). L'entrée « Frais »
- *    pointe vers la page /frais, pas vers l'ancre de la section ;
- *  - sous-page : uniquement les pages du menu, retour à l'accueil compris.
- * Aucun libellé en dur : src/config/{pages,sections}.ts et src/content/fr/nav.ts.
+ * Entrées : uniquement les pages du menu (src/config/pages.ts, `menuPages`), l'accueil compris, sur
+ * toutes les pages — jamais d'ancre de section (décision du 10/09/2026). Aucun libellé en dur :
+ * src/config/pages.ts et src/content/fr/nav.ts.
  *
  * Reprise de l'ancienne sous-navigation :
- *  - liste à défilement horizontal, sans barre visible (`scrollbar-none`), avec fondu latéral
+ *  - liste des pages visible à partir de « lg » seulement (sous ce seuil, un seul menu : le panneau ; la barre
+ *    ne garde que le logo, le CTA et le bouton Menu), à défilement horizontal sans barre visible (`scrollbar-none`), avec fondu latéral
  *    (`scroll-fade-x`) posé par le script dès que la liste déborde réellement ;
- *  - pastille active glissante (`data-subnav-pill`, transform + width, aucune propriété de mise en
- *    page animée) : elle suit la section active sur l'accueil, la page courante sur une sous-page ;
- *  - état actif des sections par IntersectionObserver (aria-current="location") ;
- *  - barre de progression de lecture (`data-progress`, scaleX piloté par le moteur sur <main>),
- *    rendue sur l'accueil seulement : ailleurs la page tient en quelques écrans et l'attribut
- *    forcerait le chargement de GSAP ;
- *  - CTA compacté après 40 % de la page (`data-compact-at` → `data-compact` → scale 0.92).
+ *  - pastille glissante (`data-subnav-pill`, transform + width, aucune propriété de mise en page
+ *    animée) posée sur la page courante (aria-current="page") ; plus aucun état actif de section
+ *    (IntersectionObserver retiré le 10/09/2026 avec les ancres) ;
+ *  - CTA compacté au-delà de 40 % du défilement du document (`data-compact-at="0.4"` sur le <nav> →
+ *    attribut `data-compact` → CSS `.subnav-cta`, scale 0.92). Géré ici, par le script inline, sans
+ *    GSAP : le comportement est le même sur l'accueil et sur les sous-pages (ex-motion/progress.ts).
  * Reprise de l'ancien en-tête :
- *  - logo, suffixe de marque et CTA ;
+ *  - logo et CTA (le suffixe « par CORUM L'Épargne » est retiré de la barre depuis le 10/09/2026, à la
+ *    demande de l'équipe ; `nav.brandSuffix` n'a plus de consommateur, il reste dans nav.ts parce que
+ *    NavContent l'exige encore) ;
  *  - sous « lg », un panneau plein écran (aria-expanded / aria-controls, Échap, piège à focus,
  *    retour du focus sur le bouton) qui liste les mêmes entrées à la verticale.
  *
- * L'ombre n'apparaît qu'une fois la page défilée (`data-stuck` sur la barre). Le logo porte
- * `data-brand-target` : c'est l'arrivée du vol de la marque (src/scripts/motion/brandflight.ts).
+ * L'ombre n'apparaît qu'une fois la page défilée (`data-stuck` sur la barre). Aucune différence entre
+ * l'accueil et les sous-pages : mêmes entrées, même CTA. Le logo de la barre porte `data-brand-target` :
+ * c'est l'arrivée du vol de la marque (src/scripts/motion/brandflight.ts), masqué par CSS sur l'accueil
+ * (≥ 40 rem, no-preference) jusqu'au fondu croisé ; visible d'emblée partout ailleurs.
  * La barre est `sticky` sans filtre : le panneau `fixed` reste bien calé sur le viewport (un
  * `backdrop-filter` sur un ancêtre en ferait le bloc conteneur), d'où la surface vitrée posée sur
  * l'enfant `[data-sitenav-bar]`.
@@ -37,64 +38,32 @@ import brandLogo from '@/assets/logos/r-start-couleur.svg';
 import logoWhite from '@/assets/logos/r-start-blanc.svg';
 import Button from '@/components/ui/Button.astro';
 import Container from '@/components/ui/Container.astro';
-import { menuPages, pages, type PageKey } from '@/config/pages';
-import { navSections, sections } from '@/config/sections';
+import { menuPages, pages } from '@/config/pages';
 import { nav } from '@/content/fr/nav';
 import { withBase } from '@/lib/href';
-
-interface Props {
-  /** Forcer la liste des sections (page de prévisualisation) ; par défaut, sur l'accueil seulement. */
-  sections?: boolean;
-}
 
 /** Chemin courant normalisé (sans barre finale) pour l'état actif du menu. */
 const currentPath = Astro.url.pathname.replace(/\/+$/, '') || '/';
 const isCurrent = (path: string) => (path.replace(/\/+$/, '') || '/') === currentPath;
-const onHome = isCurrent(pages.home.path);
-const { sections: withSections = onHome } = Astro.props as Props;
 
 interface Entry {
-  /** Clé de rendu (identifiant de section ou clé de page). */
   key: string;
   label: string;
   href: string;
-  /** Identifiant de la section observée : seules ces entrées reçoivent aria-current="location". */
-  sectionId?: string;
   /** Page courante : aria-current="page". */
   current: boolean;
 }
 
-/** Pages du menu sans section sur l'accueil : ni l'accueil lui-même, ni Frais (déjà dans les sections). */
-const pagesWithoutSection = menuPages.filter((p) => p.key !== 'home' && p.key !== 'fees');
-const pageLabel = (key: PageKey) => pages[key].navLabel ?? pages[key].label;
-
-/** Accueil : sections de la page (Frais renvoie vers /frais) puis pages sans section. */
-const homeEntries: Entry[] = [
-  ...navSections.map((s) =>
-    s.key === 'fees'
-      ? { key: 'fees', label: pageLabel('fees'), href: withBase(pages.fees.path), current: false }
-      : { key: s.id, label: s.label, href: '#' + s.id, sectionId: s.id, current: false }
-  ),
-  ...pagesWithoutSection.map((p) => ({
-    key: p.key,
-    label: pageLabel(p.key),
-    href: withBase(p.path),
-    current: false,
-  })),
-];
-
-/** Sous-page : les pages du menu, retour à l'accueil compris. */
-const pageEntries: Entry[] = menuPages.map((p) => ({
+/** Le menu ne contient que des pages (décision du 10/09/2026), l'accueil compris, sur toutes les pages. */
+const entries: Entry[] = menuPages.map((p) => ({
   key: p.key,
-  label: pageLabel(p.key),
+  label: p.navLabel ?? p.label,
   href: withBase(p.path),
   current: isCurrent(p.path),
 }));
 
-const entries = withSections ? homeEntries : pageEntries;
-
-/** Sur l'accueil, le logo remonte en haut de page ; ailleurs il ramène à l'accueil. */
-const logoHref = onHome ? '#' + sections.hero.id : withBase(pages.home.path);
+/** Le logo ramène toujours à l'accueil (aucune ancre dans la navigation). */
+const logoHref = withBase(pages.home.path);
 const panelId = 'site-nav-panel';
 const menuLabel = nav.menuLabel ?? nav.brand;
 const closeLabel = nav.closeLabel ?? menuLabel;
@@ -126,30 +95,18 @@ const linkClass =
           data-brand-target
           class="h-7 w-auto"
         />
-        {
-          /* Sur l'accueil, la liste des sections prend toute la largeur : le suffixe de marque n'est
-             gardé que sur les sous-pages (et dans le panneau, où la place ne manque pas). */
-          !withSections && (
-            <span class="hidden text-sm text-slate-700 lg:inline">{nav.brandSuffix}</span>
-          )
-        }
       </a>
 
       <ul
         data-sitenav-list
-        class="scrollbar-none scroll-fade-x relative -my-2 -mr-2 -ml-3 flex min-w-0 flex-1 items-center gap-0.5 overflow-x-auto py-2 pr-2 pl-3 sm:-mx-2 sm:gap-1 sm:px-2"
+        class="scrollbar-none scroll-fade-x relative -my-2 -mr-2 -ml-3 hidden min-w-0 flex-1 items-center gap-0.5 overflow-x-auto py-2 pr-2 pl-3 sm:-mx-2 sm:gap-1 sm:px-2 lg:flex"
         role="list"
       >
         <li aria-hidden="true" data-subnav-pill class="subnav-pill"></li>
         {
           entries.map((e) => (
             <li class="relative shrink-0">
-              <a
-                href={e.href}
-                data-sitenav-link={e.sectionId}
-                aria-current={e.current ? 'page' : undefined}
-                class={linkClass}
-              >
+              <a href={e.href} aria-current={e.current ? 'page' : undefined} class={linkClass}>
                 {e.label}
               </a>
             </li>
@@ -157,7 +114,10 @@ const linkClass =
         }
       </ul>
 
-      <div class="hidden shrink-0 sm:block">
+      {
+        /* Sous « lg », la liste est masquée : un seul menu (le panneau), le CTA reste visible et pousse à droite. */
+      }
+      <div class="ml-auto shrink-0">
         <Button position="nav" variant="primary" size="sm" class="subnav-cta">{ctaLabel}</Button>
       </div>
 
@@ -182,21 +142,6 @@ const linkClass =
         <span class="max-sm:sr-only">{menuLabel}</span>
       </button>
     </Container>
-    {
-      /* Barre de progression de lecture : réservée à l'accueil. Elle n'a de sens que sur une page très
-        longue, et elle est le seul effet des sous-pages qui exigeait GSAP : sans elle, /frais,
-        /documentation, /presse et /salle-de-presse prennent le moteur léger et ne téléchargent plus
-        les 45 Ko de la bibliothèque (src/scripts/motion.ts, BESOIN_GSAP). */
-    }
-    {
-      onHome && (
-        <span
-          aria-hidden="true"
-          data-progress
-          class="bg-brand-gradient pointer-events-none absolute inset-x-0 bottom-[-1px] h-[2px] origin-left scale-x-0"
-        />
-      )
-    }
   </div>
 
   <div
@@ -224,7 +169,6 @@ const linkClass =
           decoding="async"
           class="h-7 w-auto"
         />
-        <span class="hidden text-sm text-white/85 sm:inline">{nav.brandSuffix}</span>
       </a>
       <button
         type="button"
@@ -254,7 +198,6 @@ const linkClass =
               <a
                 href={e.href}
                 data-menu-close
-                data-sitenav-link={e.sectionId}
                 aria-current={e.current ? 'page' : undefined}
                 class="text-display-sm block rounded-2xl px-3 py-2.5 text-white/85 no-underline transition-colors hover:text-white aria-[current]:text-white aria-[current]:underline aria-[current]:decoration-2 aria-[current]:underline-offset-8"
               >
@@ -275,39 +218,29 @@ const linkClass =
 
 <script>
   /*
-   * Barre unique : état actif (section traversant le tiers supérieur du viewport, ou page courante),
-   * pastille glissante, fondu de débordement, ombre au défilement, panneau plein écran sous « lg ».
+   * Barre unique : pastille sur la page courante, fondu de débordement, ombre au défilement, CTA
+   * compact au-delà de 40 % du document, panneau plein écran sous « lg ». Aucune dépendance au moteur
+   * d'animation : identique sur toutes les pages.
    */
   const root = document.querySelector<HTMLElement>('[data-sitenav]');
   if (root) {
     const bar = root.querySelector<HTMLElement>('[data-sitenav-bar]');
     const list = root.querySelector<HTMLElement>('[data-sitenav-list]');
     const pill = root.querySelector<HTMLElement>('[data-subnav-pill]');
-    /* Liens de section : dans la barre et dans le panneau (le même identifiant peut porter deux liens). */
-    const sectionLinks = Array.from(
-      root.querySelectorAll<HTMLAnchorElement>('[data-sitenav-link]')
-    );
-    const barById = new Map<string, HTMLAnchorElement>();
-    for (const link of sectionLinks) {
-      const id = link.dataset.sitenavLink as string;
-      if (list?.contains(link) && !barById.has(id)) barById.set(id, link);
-    }
-    /* Sur une sous-page, la pastille marque la page courante tant qu'aucune section n'est active. */
+    /* La pastille marque la page courante (le menu ne contient que des pages). */
     const currentLink = list?.querySelector<HTMLAnchorElement>('a[aria-current="page"]') ?? null;
-    let current: string | null = null;
 
-    /* Pastille : position et taille du lien actif (lectures groupées, puis écritures). */
+    /* Pastille : position et taille du lien courant (lectures groupées, puis écritures). */
     const placePill = () => {
       if (!pill) return;
-      const active = (current ? barById.get(current) : null) ?? currentLink;
-      if (!active) {
+      if (!currentLink) {
         pill.style.opacity = '0';
         return;
       }
-      const item = active.parentElement as HTMLElement;
+      const item = currentLink.parentElement as HTMLElement;
       const { offsetLeft, offsetTop, offsetWidth, offsetHeight } = item;
-      // Première apparition (ou retour après disparition) : placée sans transition de position ni de
-      // largeur, seul le fondu joue ; ensuite elle glisse et se morphe d'un lien à l'autre.
+      // Première apparition : placée sans transition de position ni de largeur, seul le fondu joue ;
+      // ensuite (redimensionnement, polices) elle glisse et se morphe.
       const appearing = pill.style.opacity !== '1';
       if (appearing) pill.style.transitionProperty = 'opacity';
       pill.style.width = offsetWidth + 'px';
@@ -324,81 +257,50 @@ const linkClass =
       }
     };
 
-    const setActive = (id: string | null) => {
-      if (id === current) return;
-      current = id;
-      for (const link of sectionLinks) {
-        // La page courante garde aria-current="page" : seules les sections passent en "location".
-        if (link.getAttribute('aria-current') === 'page') continue;
-        if (link.dataset.sitenavLink === id) link.setAttribute('aria-current', 'location');
-        else link.removeAttribute('aria-current');
-      }
-      placePill();
-      // Sur mobile, centre le lien actif dans la liste (défilement horizontal de la liste seule,
-      // jamais de la page).
-      const active = id ? barById.get(id) : null;
-      if (active && list && list.scrollWidth > list.clientWidth) {
-        const left = active.offsetLeft - (list.clientWidth - active.offsetWidth) / 2;
-        list.scrollTo({ left: Math.max(0, left), behavior: 'smooth' });
-      }
-    };
-
     /* Fondu latéral : uniquement quand la liste déborde réellement. */
     const syncOverflow = () => {
       if (list) list.toggleAttribute('data-overflow', list.scrollWidth - list.clientWidth > 1);
     };
 
-    const ids = [...new Set(sectionLinks.map((l) => l.dataset.sitenavLink as string))];
-    const targets = ids
-      .map((id) => document.getElementById(id))
-      .filter((el): el is HTMLElement => el !== null);
-
-    if ('IntersectionObserver' in window && targets.length) {
-      const visible = new Map<string, number>();
-      const io = new IntersectionObserver(
-        (entries) => {
-          for (const e of entries) {
-            if (e.isIntersecting) visible.set(e.target.id, e.intersectionRatio);
-            else visible.delete(e.target.id);
-          }
-          // Parmi les sections présentes dans la bande, la première dans l'ordre du document ; aucune
-          // section navigable à l'écran (sections hors nav, notes, pied de page) → aucun lien actif.
-          const first = targets.find((t) => visible.has(t.id));
-          setActive(first ? first.id : null);
-        },
-        { rootMargin: '-25% 0px -60% 0px', threshold: [0, 0.01, 0.25, 0.5, 1] }
-      );
-      targets.forEach((t) => io.observe(t));
-    }
-
-    /* Ombre portée dès que la page est défilée : la barre est collée en haut dès le premier écran. */
-    let stuckFrame = 0;
-    const syncStuck = () => {
-      stuckFrame = 0;
-      bar?.toggleAttribute('data-stuck', window.scrollY > 2);
+    /*
+     * Ombre portée dès que la page est défilée (la barre est collée en haut dès le premier écran) et
+     * CTA compact une fois passé le seuil `data-compact-at` (part du défilement total du document,
+     * 0,4 par défaut ; l'attribut est retiré en remontant). Une seule lecture de scroll par frame.
+     */
+    const compactAt = Math.min(1, Math.max(0, parseFloat(root.dataset.compactAt ?? '') || 0.4));
+    let scrollFrame = 0;
+    const syncScroll = () => {
+      scrollFrame = 0;
+      const y = window.scrollY;
+      bar?.toggleAttribute('data-stuck', y > 2);
+      const range = document.documentElement.scrollHeight - window.innerHeight;
+      const compact = range > 0 && y / range >= compactAt;
+      if (compact !== root.hasAttribute('data-compact'))
+        root.toggleAttribute('data-compact', compact);
     };
     window.addEventListener(
       'scroll',
       () => {
-        if (!stuckFrame) stuckFrame = requestAnimationFrame(syncStuck);
+        if (!scrollFrame) scrollFrame = requestAnimationFrame(syncScroll);
       },
       { passive: true }
     );
 
-    /* La pastille et le fondu suivent les changements de largeur (polices, rotation, fenêtre). */
+    /* La pastille, le fondu et le seuil suivent les changements de taille (polices, rotation, fenêtre). */
     let raf = 0;
     const replace = () => {
       cancelAnimationFrame(raf);
       raf = requestAnimationFrame(() => {
         syncOverflow();
         placePill();
+        syncScroll();
       });
     };
     window.addEventListener('resize', replace, { passive: true });
     document.fonts?.ready.then(replace);
     syncOverflow();
     placePill();
-    syncStuck();
+    syncScroll();
 
     /* Panneau plein écran (< lg) : ouverture / fermeture, Échap, retour du focus, piège à tabulation. */
     const opener = root.querySelector<HTMLButtonElement>('[data-menu-open]');

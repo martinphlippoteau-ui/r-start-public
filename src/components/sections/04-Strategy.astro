@@ -1,13 +1,21 @@
 ---
 /**
- * Section 4 — Stratégie (id « strategie »). Chapitre sur fond ink (alternance avec Points forts et Frais).
+ * Section 4 — Stratégie (id « strategie »). Sans `data-curtain` : la section précédente (03-Fees) porte une
+ * scène épinglée, et un rideau l'épinglerait une seconde fois (scène cassée au défilement, 11/09/2026). Chapitre sur fond ink ; sur l'accueil (trame du 10/09/2026) entre
+ * Frais (03) et La presse en parle (08b, paper).
+ * Props : `compact` (accueil) arrête le rendu après le mot d'ordre et son contre-poids, puis renvoie vers
+ * la page /strategie qui rend la section entière ; `pageNotes` (page /strategie) numérote les appels de
+ * note dans les notes propres à la page.
  * En-tête, mot d'ordre en très grand, introduction (data-advantage) et son contre-poids (mottoRisk,
  * RiskNote de même taille), deux leviers en deux colonnes, trois photos d'immeubles (avec crédit
  * visible), trois piliers avec leur contre-poids, zone d'investissement avec carte stylisée (Canada +
  * Europe, SVG décoratif aria-hidden), types d'actifs en liste de pastilles (texte courant), effet de
  * levier en paire avantage / risque (text-lead).
  * Motion (src/scripts/motion.ts, tout par attributs) :
- *  - en-tête : surtitre en fade-up, H2 mot à mot (data-reveal-text) ;
+ *  - aucun rideau, sur l'accueil comme sur /strategie : la section suit 03-Fees (scène épinglée, jamais
+ *    deux épinglages) ou le PageHero (qui porte la ligne risques) ;
+ *  - en-tête : surtitre statique (tous les surtitres le sont depuis la passe de sobriété du 11/09/2026),
+ *    H2 mot à mot (data-reveal-text) ;
  *  - mot d'ordre en scène épinglée à trois temps (data-scene) : la formule « Acheter décoté,
  *    valoriser, revendre » est découpée sur ses virgules en trois [data-step] en très grand, chacun
  *    restant affiché (data-step-stay) — à la fin de la scène la formule complète est lisible, avec ses
@@ -18,47 +26,56 @@
  *  - leviers : filet qui s'étire (data-draw="width") puis numéro + titre + texte en cascade (stagger) ;
  *  - photos : cascade des cadres, et dans chaque cadre une parallaxe de sens alterné (data-parallax,
  *    élément surdimensionné de ±12 % pour ne jamais découvrir le bord) ;
- *  - piliers : seul le bloc picto + titre arrive en cascade (data-animate="tilt", délai incrémental)
- *    et le picto flotte doucement au scroll (data-scrub) ; description et RiskNote restent statiques,
- *    aucun ancêtre d'un [data-risk] n'est animé ;
+ *  - piliers : picto au trait (Picto.astro, SVG inline en teal-200, décoratif) ; UN seul effet par carte
+ *    (11/09/2026) : le picto — objet visuel isolé, le seul emploi admis de `tilt` — bascule à l'entrée
+ *    (data-animate="tilt" sur son enveloppe, délai 0 / 0,08 / 0,16 s par colonne lg) ; surtitre, titre,
+ *    description et RiskNote sont en place d'emblée (plus de tilt sur le bloc titre, plus de flottement
+ *    au scroll), aucun ancêtre d'un [data-risk] n'est animé ;
  *  - carte (StrategyMap.astro, générée par scripts/make-map.mjs depuis de vraies frontières) : contours tracés au fil du défilement (data-draw + data-draw-scrub),
  *    aplats et trame en fondu, puis points lumineux qui s'allument en cascade (data-animate="stagger",
  *    cercles décoratifs sans signification géographique) ;
  *  - pastilles des types d'actifs en cascade rapide ; effet de levier : filet étiré + titre en fade-up,
  *    paire avantage / risque intacte.
- * Contenu : src/content/fr/strategy.ts ; visuels : src/content/fr/media.ts.
+ * Contenu : src/content/fr/strategy.ts ; photos : src/content/fr/media.ts ; pictos : ui/Picto.astro.
  */
-import { Image, Picture } from 'astro:assets';
+import { Picture } from 'astro:assets';
 import Card from '@/components/ui/Card.astro';
 import Container from '@/components/ui/Container.astro';
 import NoteRef from '@/components/ui/NoteRef.astro';
+import Picto, { isPictoKey } from '@/components/ui/Picto.astro';
 import RiskNote from '@/components/ui/RiskNote.astro';
 import Section from '@/components/ui/Section.astro';
 import StrategyMap from '@/components/StrategyMap.astro';
 import { sections } from '@/config/sections';
-import { media, pictos, type PictoKey } from '@/content/fr/media';
+import { media } from '@/content/fr/media';
 import { strategy } from '@/content/fr/strategy';
+import type { LegalNote } from '@/content/types';
 import { resolveImage } from '@/lib/images';
+import Button from '@/components/ui/Button.astro';
+
+interface Props {
+  /** Accueil : chapitre court (en-tête, mot d'ordre, introduction et contre-poids, lien vers /strategie). */
+  compact?: boolean;
+  /** Page /strategie : notes propres à la page, pour la numérotation des appels de note. */
+  pageNotes?: LegalNote[];
+}
+const { compact = false, pageNotes } = Astro.props;
 
 const id = sections.strategy.id;
 const titleId = id + '-title';
-const pillars = await Promise.all(
-  strategy.pillars.map(async (pillar) => {
-    const picto = pictos[pillar.icon as PictoKey];
-    if (!picto) throw new Error(`Pictogramme inconnu dans strategy.ts : ${pillar.icon}`);
-    return { ...pillar, picto: await resolveImage(picto.src) };
-  })
-);
+const pillars = strategy.pillars.map((pillar) => {
+  if (!isPictoKey(pillar.icon))
+    throw new Error(`Pictogramme inconnu dans strategy.ts : ${pillar.icon}`);
+  return { ...pillar, icon: pillar.icon };
+});
 const photos = await Promise.all(
   media.strategy.map(async (m) => ({ ...m, image: await resolveImage(m.src) }))
 );
 const photoSizes = '(min-width: 1024px) 400px, (min-width: 640px) 50vw, 100vw';
-/** Décalage de la cascade entre deux piliers (secondes). */
-const STAGGER = 0.09;
+/** Décalage de la cascade entre deux piliers (secondes) : par colonne lg, chaque carte a son déclencheur. */
+const STAGGER = 0.08;
 /** Parallaxe des trois photos : douce, sens alterné (haut, bas, haut) ; cadres surdimensionnés de ±12 %. */
 const PHOTO_PARALLAX = [0.035, -0.03, 0.04];
-/** Flottement des pictos des piliers au scroll (px, sens alterné). */
-const PICTO_FLOAT = ['y:10,-10', 'y:-8,8', 'y:12,-12'];
 
 /**
  * Mot d'ordre en trois temps : la formule de facts.ts est découpée sur ses virgules (« Acheter
@@ -77,184 +94,179 @@ const mottoScene = mottoSteps.length === 3;
 <Section id={id} tone="ink" class="overflow-hidden">
   <Container size="wide" class="relative">
     <header class="max-w-4xl">
-      <p
-        data-animate="fade-up"
-        class="mb-4 text-sm font-semibold uppercase tracking-[0.18em] text-teal-200"
-      >
-        {strategy.eyebrow}
-      </p>
-      <h2 id={titleId} class="text-display-lg" data-reveal-text>{strategy.title}</h2>
+      <p class="text-eyebrow mb-4 text-teal-200">{strategy.eyebrow}</p>
+      <h2 id={titleId} class="text-display-lg" data-reveal-text>
+        {compact && strategy.homeTitle ? strategy.homeTitle : strategy.title}
+      </h2>
     </header>
 
     {
       /* Mot d'ordre en très grand + introduction (avantage) et son contre-poids, même taille, jamais animé */
     }
     {
-      mottoScene ? (
-        <div class="mt-block">
-          <div data-scene data-scene-start="top 72px" data-scene-end="+=60%" class="py-4">
-            <p class="text-display-lg lg:text-display-xl text-sand">
-              {mottoSteps.map((step, i) =>
-                i < mottoSteps.length - 1 ? (
-                  <span data-step data-step-stay class="block">
-                    {step},
-                  </span>
-                ) : (
-                  <span data-step data-step-stay class="block">
-                    {step}
-                    <NoteRef id="strategie-mot-d-ordre" />
-                  </span>
-                )
-              )}
-            </p>
-            <div class="mt-8 grid gap-6 text-white sm:grid-cols-2 lg:mt-10 lg:gap-10">
-              <p data-advantage class="text-lead">
-                {strategy.intro}
-              </p>
-              {strategy.mottoRisk && (
-                <RiskNote
-                  text={strategy.mottoRisk}
-                  tone="dark"
-                  size="lead"
-                  class="border-t border-white/15 pt-5 sm:border-t-0 sm:pt-0"
-                />
-              )}
+      /* Mot d'ordre, leviers et photos : page /strategie seulement ; l'accueil (zone 6 de la trame) va
+        droit aux trois piliers. */
+    }
+    {
+      !compact && (
+        <Fragment>
+          {mottoScene ? (
+            <div class="mt-chapter">
+              <div data-scene data-scene-start="top 72px" data-scene-end="+=60%" class="py-4">
+                <p class="text-display-lg lg:text-display-xl text-sand">
+                  {mottoSteps.map((step, i) =>
+                    i < mottoSteps.length - 1 ? (
+                      <span data-step data-step-stay class="block">
+                        {step},
+                      </span>
+                    ) : (
+                      <span data-step data-step-stay class="block">
+                        {step}
+                        <NoteRef notes={pageNotes} id="strategie-mot-d-ordre" />
+                      </span>
+                    )
+                  )}
+                </p>
+                <div class="mt-8 grid gap-6 text-white sm:grid-cols-2 lg:mt-10 lg:gap-10">
+                  <p data-advantage class="text-lead">
+                    {strategy.intro}
+                  </p>
+                  {strategy.mottoRisk && (
+                    <RiskNote
+                      text={strategy.mottoRisk}
+                      tone="dark"
+                      size="lead"
+                      class="border-t border-white/15 pt-5 sm:border-t-0 sm:pt-0"
+                    />
+                  )}
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-      ) : (
-        <div class="mt-block grid gap-6 lg:grid-cols-12 lg:gap-10">
-          {strategy.motto && (
-            <p class="text-display-md text-sand lg:col-span-7" data-animate="fade-up">
-              {strategy.motto}
-              <NoteRef id="strategie-mot-d-ordre" />
-            </p>
+          ) : (
+            <div class="mt-chapter grid gap-6 lg:grid-cols-12 lg:gap-10">
+              {strategy.motto && (
+                <p class="text-display-md text-sand lg:col-span-7" data-animate="fade-up">
+                  {strategy.motto}
+                  <NoteRef notes={pageNotes} id="strategie-mot-d-ordre" />
+                </p>
+              )}
+              <div
+                class:list={[
+                  'max-w-2xl text-white',
+                  strategy.motto ? 'lg:col-span-5 lg:pt-2' : 'lg:col-span-12',
+                ]}
+              >
+                <p data-advantage class="text-lead" data-animate="fade-up" data-animate-delay="0.1">
+                  {strategy.intro}
+                </p>
+                {strategy.mottoRisk && (
+                  <RiskNote
+                    text={strategy.mottoRisk}
+                    tone="dark"
+                    size="lead"
+                    class="mt-5 border-t border-white/15 pt-5"
+                  />
+                )}
+              </div>
+            </div>
           )}
-          <div
-            class:list={[
-              'max-w-2xl text-white',
-              strategy.motto ? 'lg:col-span-5 lg:pt-2' : 'lg:col-span-12',
-            ]}
-          >
-            <p data-advantage class="text-lead" data-animate="fade-up" data-animate-delay="0.1">
-              {strategy.intro}
-            </p>
-            {strategy.mottoRisk && (
-              <RiskNote
-                text={strategy.mottoRisk}
-                tone="dark"
-                size="lead"
-                class="mt-5 border-t border-white/15 pt-5"
-              />
+
+          {/* Deux leviers */}
+          <div class="mt-section-sm">
+            {strategy.leversTitle && (
+              <p class="text-eyebrow text-teal-200">{strategy.leversTitle}</p>
             )}
+            <ul
+              role="list"
+              class="mt-6 grid gap-6 sm:grid-cols-2 lg:gap-8"
+              data-animate="stagger"
+              data-animate-stagger="0.12"
+            >
+              {strategy.levers.map((lever, i) => (
+                <li>
+                  <span
+                    aria-hidden="true"
+                    data-draw="width"
+                    class="block h-px w-full bg-white/20"
+                  />
+                  <div class="pt-6">
+                    <p
+                      class="text-caption font-semibold tabular-nums text-teal-200"
+                      aria-hidden="true"
+                    >
+                      {String(i + 1).padStart(2, '0')}
+                    </p>
+                    <h3 class="text-display-sm mt-3 text-white">{lever.title}</h3>
+                    <p class="text-lead mt-4 text-white">{lever.description}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
           </div>
-        </div>
+
+          {/* Trois photos d'immeubles, crédit visible, parallaxe de sens alterné dans chaque cadre */}
+          <ul
+            role="list"
+            class="mt-section-sm grid gap-5 sm:grid-cols-3 lg:gap-6"
+            data-animate="stagger"
+            data-animate-stagger="0.1"
+          >
+            {photos.map((photo, i) => (
+              <li>
+                <figure>
+                  <div class="img-frame aspect-[4/3] sm:aspect-[4/5]">
+                    <div
+                      class="absolute inset-x-0 -top-[12%] h-[124%]"
+                      data-parallax={String(PHOTO_PARALLAX[i] ?? PHOTO_PARALLAX[0])}
+                      data-parallax-trigger="parent"
+                    >
+                      <Picture
+                        src={photo.image}
+                        alt={photo.alt}
+                        widths={[480, 800, 1200]}
+                        sizes={photoSizes}
+                        formats={['avif', 'webp']}
+                        loading="lazy"
+                        decoding="async"
+                        pictureAttributes={{ class: 'block h-full w-full' }}
+                        class={
+                          i === 1
+                            ? 'h-full w-full object-cover object-[70%_50%]'
+                            : 'h-full w-full object-cover'
+                        }
+                      />
+                    </div>
+                  </div>
+                  {photo.credit && (
+                    <figcaption class="text-caption mt-3 text-white/90">{photo.credit}</figcaption>
+                  )}
+                </figure>
+              </li>
+            ))}
+          </ul>
+        </Fragment>
       )
     }
 
-    {/* Deux leviers */}
-    <div class="mt-section-sm">
-      {
-        strategy.leversTitle && (
-          <p class="text-eyebrow text-teal-200" data-animate="fade-up">
-            {strategy.leversTitle}
-          </p>
-        )
-      }
-      <ul
-        role="list"
-        class="mt-6 grid gap-6 sm:grid-cols-2 lg:gap-8"
-        data-animate="stagger"
-        data-animate-stagger="0.12"
-      >
-        {
-          strategy.levers.map((lever, i) => (
-            <li>
-              <span aria-hidden="true" data-draw="width" class="block h-px w-full bg-white/20" />
-              <div class="pt-6">
-                <p class="text-caption font-semibold tabular-nums text-teal-200" aria-hidden="true">
-                  {String(i + 1).padStart(2, '0')}
-                </p>
-                <h3 class="text-display-sm mt-3 text-white">{lever.title}</h3>
-                <p class="text-lead mt-4 text-white">{lever.description}</p>
-              </div>
-            </li>
-          ))
-        }
-      </ul>
-    </div>
-
-    {/* Trois photos d'immeubles, crédit visible, parallaxe de sens alterné dans chaque cadre */}
-    <ul
-      role="list"
-      class="mt-section-sm grid gap-5 sm:grid-cols-3 lg:gap-6"
-      data-animate="stagger"
-      data-animate-stagger="0.1"
-    >
-      {
-        photos.map((photo, i) => (
-          <li>
-            <figure>
-              <div class="img-frame aspect-[4/3] sm:aspect-[4/5]">
-                <div
-                  class="absolute inset-x-0 -top-[12%] h-[124%]"
-                  data-parallax={String(PHOTO_PARALLAX[i] ?? PHOTO_PARALLAX[0])}
-                  data-parallax-trigger="parent"
-                >
-                  <Picture
-                    src={photo.image}
-                    alt={photo.alt}
-                    widths={[480, 800, 1200]}
-                    sizes={photoSizes}
-                    formats={['avif', 'webp']}
-                    loading="lazy"
-                    decoding="async"
-                    pictureAttributes={{ class: 'block h-full w-full' }}
-                    class={
-                      i === 1
-                        ? 'h-full w-full object-cover object-[70%_50%]'
-                        : 'h-full w-full object-cover'
-                    }
-                  />
-                </div>
-              </div>
-              {photo.credit && (
-                <figcaption class="text-caption mt-3 text-white/90">{photo.credit}</figcaption>
-              )}
-            </figure>
-          </li>
-        ))
-      }
-    </ul>
-
     {/* Trois piliers, chacun avec son contre-poids */}
     <div class="mt-section-sm">
-      {
-        strategy.pillarsTitle && (
-          <p class="text-eyebrow text-teal-200" data-animate="fade-up">
-            {strategy.pillarsTitle}
-          </p>
-        )
-      }
+      {strategy.pillarsTitle && <p class="text-eyebrow text-teal-200">{strategy.pillarsTitle}</p>}
       <ul role="list" class="mt-6 grid gap-5 lg:grid-cols-3 lg:gap-6">
         {
           pillars.map((pillar, i) => (
             <Card as="li" tone="glass" class="flex flex-col">
-              <div data-animate="tilt" data-animate-delay={String(i * STAGGER)}>
-                <Image
-                  src={pillar.picto}
-                  alt=""
-                  aria-hidden="true"
-                  width={112}
-                  height={112}
-                  densities={[1, 2]}
-                  format="webp"
-                  loading="lazy"
-                  decoding="async"
-                  data-scrub={PICTO_FLOAT[i] ?? PICTO_FLOAT[0]}
-                  class="size-24 object-contain object-left-bottom sm:size-28"
-                />
-                <h3 class="text-display-sm mt-6 text-white">{pillar.title}</h3>
+              <div>
+                <span
+                  class="block w-fit"
+                  data-animate="tilt"
+                  data-animate-delay={String(i * STAGGER)}
+                >
+                  <Picto name={pillar.icon} class="size-16 sm:size-20" />
+                </span>
+                {pillar.kicker && <p class="text-eyebrow mt-6 text-teal-200">{pillar.kicker}</p>}
+                <h3 class:list={['text-display-sm text-white', pillar.kicker ? 'mt-2' : 'mt-6']}>
+                  {pillar.title}
+                </h3>
               </div>
               <p data-advantage class="mt-4 text-base leading-relaxed text-white">
                 {pillar.description}
@@ -266,95 +278,104 @@ const mottoScene = mottoSteps.length === 3;
       </ul>
     </div>
 
-    {/* Zone d'investissement : carte stylisée + texte et contre-poids */}
-    <div class="mt-section-sm grid items-center gap-8 lg:grid-cols-12 lg:gap-12">
-      <div class="lg:col-span-7">
-        <p class="text-eyebrow text-teal-200" data-animate="fade-up">
-          {strategy.zone.countriesLabel}
-        </p>
-        <StrategyMap id={id} class="mt-4" />
-        {
-          strategy.zone.mapLabels && (
-            <div class="mt-3 grid grid-cols-2 gap-6 text-sm font-semibold text-teal-200">
-              <span>{strategy.zone.mapLabels.canada}</span>
-              <span class="text-right lg:text-left lg:pl-[calc(620/1200*100%-1.5rem)]">
-                {strategy.zone.mapLabels.europe}
-              </span>
+    {
+      !compact && (
+        <Fragment>
+          {/* Zone d'investissement : carte stylisée + texte et contre-poids */}
+          <div class="mt-section-sm grid items-center gap-8 lg:grid-cols-12 lg:gap-12">
+            <div class="lg:col-span-7">
+              <p class="text-eyebrow text-teal-200">{strategy.zone.countriesLabel}</p>
+              <StrategyMap id={id} class="mt-4" />
+              {strategy.zone.mapLabels && (
+                <div class="mt-3 grid grid-cols-2 gap-6 text-sm font-semibold text-teal-200">
+                  <span>{strategy.zone.mapLabels.canada}</span>
+                  <span class="text-right lg:text-left lg:pl-[calc(620/1200*100%-1.5rem)]">
+                    {strategy.zone.mapLabels.europe}
+                  </span>
+                </div>
+              )}
+              {strategy.zone.mapLabels && (
+                <p class="text-caption mt-4 text-white/85">{strategy.zone.mapLabels.legend}</p>
+              )}
             </div>
-          )
-        }
-        {
-          strategy.zone.mapLabels && (
-            <p class="text-caption mt-4 text-white/85">{strategy.zone.mapLabels.legend}</p>
-          )
-        }
-      </div>
-      <div class="lg:col-span-5">
-        <h3 class="text-display-sm text-white" data-animate="fade-up">
-          {strategy.zone.title}
-          <NoteRef id="strategie-objectif" />
-        </h3>
-        <p data-advantage class="text-lead mt-4 text-white">{strategy.zone.description}</p>
-        <RiskNote
-          text={strategy.zone.risk}
-          tone="dark"
-          size="lead"
-          class="mt-5 border-t border-white/15 pt-5"
-        />
-      </div>
-    </div>
+            <div class="lg:col-span-5">
+              <h3 class="text-display-sm text-white" data-animate="fade-up">
+                {strategy.zone.title}
+                <NoteRef notes={pageNotes} id="strategie-objectif" />
+              </h3>
+              <p data-advantage class="text-lead mt-4 text-white">
+                {strategy.zone.description}
+              </p>
+              <RiskNote
+                text={strategy.zone.risk}
+                tone="dark"
+                size="lead"
+                class="mt-5 border-t border-white/15 pt-5"
+              />
+            </div>
+          </div>
 
-    {/* Types d'actifs */}
-    <div class="mt-section-sm">
-      {
-        strategy.assetTypesLabel && (
-          <p class="text-eyebrow text-teal-200" data-animate="fade-up">
-            {strategy.assetTypesLabel}
-            <span class="text-lead">
-              <NoteRef id="strategie-actifs" />
-            </span>
-          </p>
-        )
-      }
-      <ul
-        role="list"
-        class="mt-5 flex flex-wrap gap-2.5"
-        data-animate="stagger"
-        data-animate-stagger="0.04"
-        data-animate-y="12"
-      >
-        {
-          strategy.assetTypes.map((type) => (
-            <li class="rounded-full bg-white/10 px-4 py-2 text-base leading-snug text-white ring-1 ring-white/15">
-              {type}
-            </li>
-          ))
-        }
-      </ul>
-    </div>
+          {/* Types d'actifs */}
+          <div class="mt-section-sm">
+            {strategy.assetTypesLabel && (
+              <p class="text-eyebrow text-teal-200">
+                {strategy.assetTypesLabel}
+                <span class="text-lead">
+                  <NoteRef notes={pageNotes} id="strategie-actifs" />
+                </span>
+              </p>
+            )}
+            <ul
+              role="list"
+              class="mt-5 flex flex-wrap gap-2.5"
+              data-animate="stagger"
+              data-animate-stagger="0.04"
+              data-animate-y="12"
+            >
+              {strategy.assetTypes.map((type) => (
+                <li class="rounded-full bg-white/10 px-4 py-2 text-base leading-snug text-white ring-1 ring-white/15">
+                  {type}
+                </li>
+              ))}
+            </ul>
+          </div>
 
-    {/* Effet de levier : avantage et risque dans le même bloc */}
-    <div class="mt-section-sm">
-      <span aria-hidden="true" data-draw="width" class="block h-px w-full bg-white/20"></span>
-      <div class="pt-8 lg:grid lg:grid-cols-12 lg:gap-12">
-        {
-          strategy.leverageTitle && (
-            <h3 class="text-display-sm text-white lg:col-span-5" data-animate="fade-up">
-              {strategy.leverageTitle}
-              <NoteRef id="strategie-endettement" />
-            </h3>
-          )
-        }
-        <div class="mt-4 space-y-5 text-white lg:col-span-7 lg:mt-0">
-          <p data-advantage class="text-lead">{strategy.leverage.advantage}</p>
-          <RiskNote
-            text={strategy.leverage.risk}
-            tone="dark"
-            size="lead"
-            class="border-t border-white/15 pt-5"
-          />
+          {/* Effet de levier : avantage et risque dans le même bloc */}
+          <div class="mt-section-sm">
+            <span aria-hidden="true" data-draw="width" class="block h-px w-full bg-white/20" />
+            <div class="pt-8 lg:grid lg:grid-cols-12 lg:gap-12">
+              {strategy.leverageTitle && (
+                <h3 class="text-display-sm text-white lg:col-span-5" data-animate="fade-up">
+                  {strategy.leverageTitle}
+                  <NoteRef notes={pageNotes} id="strategie-endettement" />
+                </h3>
+              )}
+              <div class="mt-4 space-y-5 text-white lg:col-span-7 lg:mt-0">
+                <p data-advantage class="text-lead">
+                  {strategy.leverage.advantage}
+                </p>
+                <RiskNote
+                  text={strategy.leverage.risk}
+                  tone="dark"
+                  size="lead"
+                  class="border-t border-white/15 pt-5"
+                />
+              </div>
+            </div>
+          </div>
+        </Fragment>
+      )
+    }
+
+    {
+      /* Accueil : le chapitre s'arrête ici et renvoie vers la page complète. */
+      compact && strategy.pageLink && (
+        <div class="mt-10 lg:mt-12">
+          <Button href={strategy.pageLink.href} variant="outline-light" size="lg">
+            {strategy.pageLink.label}
+          </Button>
         </div>
-      </div>
-    </div>
+      )
+    }
   </Container>
 </Section>

@@ -1,16 +1,21 @@
 /**
  * data-animate — révélation unique à l'entrée dans le viewport (88 %), interruptible (once).
- * Rythme court façon page produit : 0,7 s, 24 px, expo.out — le mouvement finit avant que l'œil ne
- * lise. Les grands titres (h2, h3, text-display-*) gardent 0,9 s / 28 px / power3.out.
- *  - "fade-up" (défaut) : opacity 0 → 1, y 24 → 0
+ * Rythme unique (shared.ts, 11/09/2026) : 0,6 s, 20 px, expo.out ; les grands titres (h2, h3,
+ * text-display-*) 0,7 s / 24 px, même courbe. Le mouvement finit avant que l'œil ne lise.
+ *  - "fade-up" (défaut) : opacity 0 → 1, y 20 → 0
  *  - "fade"             : opacity 0 → 1
  *  - "scale"            : opacity 0 → 1, scale 0.95 → 1
- *  - "tilt"             : opacity 0 → 1, y 32 → 0, rotationX 6° → 0 (cartes, perspective 900 px)
+ *  - "tilt"             : opacity 0 → 1, y 24 → 0, rotationX 6° → 0 (perspective 900 px). Réservé à un
+ *                         objet visuel isolé (picto, image) — jamais un titre ni une carte entière.
  *  - "clip"             : clip-path inset bas → 0. Réservé aux médias (img, picture, svg, video,
  *                         figure) : la propriété n'est pas composée sur le GPU. Sur tout autre
  *                         élément, rendu en fade-up (avertissement en développement).
- *  - "stagger"          : les enfants directs cascadent (opacity 0 → 1, y 20 → 0, pas de 0,07 s)
- * Options : data-animate-delay="0.1" (s), data-animate-stagger="0.07" (s), data-animate-y="24" (px).
+ *  - "stagger"          : les enfants directs cascadent (opacity 0 → 1, y 20 → 0, pas de 0,08 s)
+ * Options : data-animate-delay="0.1" (s), data-animate-stagger="0.08" (s), data-animate-y="20" (px).
+ *
+ * Règle de sobriété (11/09/2026) : au plus UN effet d'entrée par bloc de contenu (une carte, une liste,
+ * un titre), jamais sur un conteneur ET son contenu ; une cascade de plus de quatre éléments est un seul
+ * `stagger` sur le parent.
  *
  * Garde-fous :
  *  - refusé sur le H1, sur un [data-risk] et sur tout élément qui en contient : une révélation
@@ -22,6 +27,12 @@
  */
 import { gsap } from 'gsap';
 import {
+  DISTANCE,
+  DISTANCE_TITLE,
+  DURATION,
+  DURATION_TITLE,
+  EASE,
+  STAGGER,
   all,
   allowed,
   containsProtected,
@@ -66,11 +77,11 @@ export const setupReveals = (): void => {
     }
     const title = el.matches(TITLE);
     const delay = num(el.dataset.animateDelay, 0);
-    const y = num(el.dataset.animateY, title ? 28 : 24);
+    const y = num(el.dataset.animateY, title ? DISTANCE_TITLE : DISTANCE);
     const targets: gsap.TweenTarget = type === 'stagger' ? staggerTargets(el) : el;
     const base: gsap.TweenVars = {
-      duration: title ? 0.9 : 0.7,
-      ease: title ? 'power3.out' : 'expo.out',
+      duration: title ? DURATION_TITLE : DURATION,
+      ease: EASE,
       delay,
       scrollTrigger: onceTrigger(el),
       clearProps: 'opacity,transform,clipPath,willChange',
@@ -81,28 +92,28 @@ export const setupReveals = (): void => {
         gsap.from(el, { ...base, opacity: 0 });
         break;
       case 'scale':
-        gsap.from(el, { ...base, opacity: 0, scale: 0.95, duration: 0.8 });
+        gsap.from(el, { ...base, opacity: 0, scale: 0.95 });
         break;
       case 'tilt':
         gsap.from(el, {
           ...base,
           opacity: 0,
-          y: Math.max(y, 32),
+          y: Math.max(y, DISTANCE_TITLE),
           rotationX: 6,
           transformPerspective: 900,
-          duration: 0.85,
+          duration: DURATION_TITLE,
         });
         break;
       case 'clip':
-        gsap.from(el, { ...base, clipPath: 'inset(0 0 100% 0)', duration: 1, ease: 'expo.out' });
+        gsap.from(el, { ...base, clipPath: 'inset(0 0 100% 0)', duration: DURATION_TITLE });
         break;
       case 'stagger':
         if (!(targets as Element[]).length) return;
         gsap.from(targets, {
           ...base,
           opacity: 0,
-          y: num(el.dataset.animateY, 20),
-          stagger: num(el.dataset.animateStagger, 0.07),
+          y: num(el.dataset.animateY, DISTANCE),
+          stagger: num(el.dataset.animateStagger, STAGGER),
         });
         break;
       case 'fade-up':

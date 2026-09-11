@@ -1,0 +1,40 @@
+---
+/**
+ * Cadre réglementaire de R Start (visa AMF, société de gestion agréée, dépositaire, autorité compétente,
+ * classification SFDR), descendu de l'accueil le 11/09/2026 : il a sa place ici, à côté des documents
+ * qu'il décrit. Contenu : src/content/fr/trust.ts (`trust.amf`), repris sans réécriture.
+ * Équilibre AMF : les cartouches portent `data-advantage`, la réserve et le contre-poids risque suivent
+ * dans le même bloc et à la même taille (text-lead), jamais animés.
+ */
+import Container from '@/components/ui/Container.astro';
+import RiskNote from '@/components/ui/RiskNote.astro';
+import Section from '@/components/ui/Section.astro';
+import { trust } from '@/content/fr/trust';
+
+interface Props {
+  tone?: 'paper' | 'white';
+}
+const { tone = 'white' } = Astro.props;
+const amf = trust.amf;
+const id = 'cadre-reglementaire';
+---
+
+<Section id={id} tone={tone} labelledBy={id + '-title'}>
+  <Container size="wide">
+    <h2 id={id + '-title'} class="text-display-md">{amf.title}</h2>
+    <dl data-advantage class="mt-8 grid gap-4 sm:grid-cols-2 lg:mt-10 lg:gap-6">
+      {
+        amf.items.map((item) => (
+          <div class="rounded-3xl border border-navy/10 bg-paper p-6 sm:p-8">
+            <dt class="text-eyebrow text-teal-700">{item.label}</dt>
+            <dd class="text-lead mt-3 font-medium text-ink">{item.value}</dd>
+          </div>
+        ))
+      }
+    </dl>
+    <div class="mt-6 rounded-3xl border border-navy/15 p-6 sm:p-8 lg:p-10">
+      <p class="text-lead text-ink">{amf.disclaimer}</p>
+      <RiskNote text={amf.risk} size="lead" class="mt-5" />
+    </div>
+  </Container>
+</Section>

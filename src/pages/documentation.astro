@@ -4,12 +4,14 @@
  * SiteNav collée en haut → main#contenu : PageHero (fil d'Ariane, H1, intro, ligne
  * risques visible sans scroller) → navigation d'ancres collante → un groupe de documents par section
  * (#reglementaire, #frais, #formulaire ; seuls les groupes publiant au moins un document existent) →
- * guide de souscription en quatre étapes → FAQ → mention 2 + renvoi corum.fr + CTA → notes de la page →
+ * guide de souscription en quatre étapes (avec le bloc MyCORUM, trame du 10/09/2026) → FAQ → mention 2 + renvoi corum.fr + CTA → notes de la page →
  * Footer. Métadonnées et JSON-LD (Organization, WebPage, BreadcrumbList) depuis documentation.ts,
  * config/pages.ts et src/lib/seo.ts : aucun texte en dur.
  * Les notes légales sont celles de la page (documentation.notes), numérotées par DocNoteRef.
  */
 import Base from '@/layouts/Base.astro';
+import AppMyCorum from '@/components/AppMyCorum.astro';
+import RegulatoryFrame from '@/components/pages/documentation/RegulatoryFrame.astro';
 import SiteNav from '@/components/SiteNav.astro';
 import Footer from '@/components/Footer.astro';
 import LegalNotes from '@/components/LegalNotes.astro';
@@ -98,12 +100,18 @@ const linkHintId = linkHint ? 'documentation-link-hint' : undefined;
       ))
     }
 
-    <HowTo howTo={howTo} labels={labels} tone={groups.length % 2 === 0 ? 'paper' : 'white'} />
+    <HowTo howTo={howTo} labels={labels} tone={groups.length % 2 === 0 ? 'paper' : 'white'}>
+      <AppMyCorum slot="aside" class="mt-10" />
+    </HowTo>
     <DocumentationFaq
       faq={faq}
       labels={labels}
       tone={groups.length % 2 === 0 ? 'white' : 'paper'}
     />
+    {
+      /* Cadre réglementaire descendu de l'accueil (11/09/2026) : visa, agrément, dépositaire, SFDR. */
+    }
+    <RegulatoryFrame tone={groups.length % 2 === 0 ? 'paper' : 'white'} />
     <DocumentsMention
       mention={mention}
       corumLink={corumLink}

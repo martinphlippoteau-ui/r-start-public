@@ -2,12 +2,13 @@ import type { NavContent } from '@/content/types';
 import { publisher } from '@/content/fr/legal';
 
 /**
- * En-tête, menu entre pages et sous-navigation sticky. Les entrées du menu viennent de
- * src/config/pages.ts (`menuPages`), celles de la sous-nav de src/config/sections.ts
- * (`navSections`) ; ce fichier ne porte que la marque, le CTA, le lien d'évitement et les libellés
- * d'accessibilité. Le libellé du CTA (« Souscrire en ligne » dans l'en-tête, « Souscrire » en version
- * courte dans la sous-navigation sticky, pour garder la liste des sections lisible à 375 px) ne doit
- * jamais coïncider avec celui d'une section (« Souscription ») ni d'une page du menu.
+ * Navigation unique (src/components/SiteNav.astro). Les entrées du menu viennent de
+ * src/config/pages.ts (`menuPages`) — uniquement des pages depuis le 10/09/2026, plus aucune section ;
+ * ce fichier ne porte que la marque, le CTA, le lien d'évitement et les libellés d'accessibilité.
+ * Le libellé du CTA (« Souscrire en ligne » dans le panneau, « Souscrire » en version courte dans la
+ * barre, pour garder la liste des pages lisible à 375 px) ne doit jamais coïncider avec celui d'une
+ * page du menu. `brandSuffix` n'est plus affiché nulle part (retiré de la barre le 10/09/2026) : il
+ * reste tant que NavContent l'exige. `sectionsLabel` (aria-label de l'ex-sous-navigation) est retiré.
  */
 export const nav = {
   brand: 'R Start',
@@ -15,7 +16,6 @@ export const nav = {
   cta: { label: 'Souscrire en ligne', position: 'nav' },
   subnavCtaLabel: 'Souscrire',
   skipLink: 'Aller au contenu',
-  sectionsLabel: 'Sections',
   homeLinkLabel: 'R Start, retour à l’accueil',
   menuLabel: 'Menu',
   closeLabel: 'Fermer le menu',

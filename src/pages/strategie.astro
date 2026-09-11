@@ -1,0 +1,41 @@
+---
+/**
+ * Page /strategie — « Stratégie d'investissement » (menu, décision du 10/09/2026 : la stratégie quitte
+ * l'accueil, qui n'en garde que le chapitre court). SiteNav → main#contenu : PageHero (fil d'Ariane, H1,
+ * intro, ligne risques visible sans scroller) → section Stratégie complète (04-Strategy.astro, contenu
+ * strategy.ts, appels de note résolus dans les notes de la page) → notes → Footer. Métadonnées et
+ * JSON-LD (Organization, WebPage, BreadcrumbList) depuis strategyPage.ts, config/pages.ts et src/lib/seo.ts.
+ */
+import Base from '@/layouts/Base.astro';
+import SiteNav from '@/components/SiteNav.astro';
+import Footer from '@/components/Footer.astro';
+import LegalNotes from '@/components/LegalNotes.astro';
+import Breadcrumb from '@/components/ui/Breadcrumb.astro';
+import PageHero from '@/components/ui/PageHero.astro';
+import Strategy from '@/components/sections/04-Strategy.astro';
+import { pages } from '@/config/pages';
+import { notes } from '@/content/fr/strategy';
+import { strategyPage } from '@/content/fr/strategyPage';
+import { breadcrumbJsonLd, organizationJsonLd, webPageJsonLd } from '@/lib/seo';
+
+const page = pages.strategy;
+const { seo, hero } = strategyPage;
+
+const jsonLd = [
+  organizationJsonLd(),
+  webPageJsonLd({ path: page.path, title: seo.title, description: seo.description }),
+  breadcrumbJsonLd('strategy'),
+];
+---
+
+<Base title={seo.title} description={seo.description} path={page.path} jsonLd={jsonLd}>
+  <SiteNav />
+  <main id="contenu">
+    <PageHero eyebrow={hero.eyebrow} title={hero.title} intro={hero.intro} riskLine={hero.riskLine}>
+      <Breadcrumb slot="breadcrumb" key="strategy" tone="dark" />
+    </PageHero>
+    <Strategy pageNotes={notes} />
+    <LegalNotes notes={notes} />
+  </main>
+  <Footer />
+</Base>

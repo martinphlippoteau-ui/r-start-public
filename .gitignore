@@ -26,3 +26,6 @@ Thumbs.db
 
 # Sources de rédaction, jamais publiées (brochure réservée aux professionnels)
 Assets R Start/
+
+# Outillage local Claude Code (agents, worktrees, réglages) : jamais versionné.
+.claude/

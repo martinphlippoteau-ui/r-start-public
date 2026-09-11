@@ -32,6 +32,8 @@ const lowerFirst = (value: string): string => value.charAt(0).toLowerCase() + va
 
 export const seo = {
   /** ≤ 60 caractères. Contient « R Start » et « CORUM ». « Frais d’entrée » : vocabulaire du DIC (« coûts d’entrée », 0 %). */
+  // La variante « … 0 % de frais d’entrée, capital non garanti » (audit du 10/09/2026) fait 64 caractères :
+  // écartée ; le 0 % reste contrebalancé ici par les 15 % de gestion et, dans la description, par le risque.
   title: 'R Start, SCPI CORUM : 0 % de frais d’entrée, 15 % de gestion',
   /**
    * 140 à 155 caractères, avec rappel de risque. Le « 0 % » y est toujours accompagné des 15 % de gestion

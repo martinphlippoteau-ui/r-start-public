@@ -1,7 +1,6 @@
 import type { DocumentItem, LegalNote } from '@/content/types';
 import type { DocumentationContent } from '@/content/types-v2';
 import { pages } from '@/config/pages';
-import { sections } from '@/config/sections';
 import {
   documents as documentFacts,
   documentsExtra,
@@ -33,11 +32,11 @@ import manifest from '@/content/fr/media.manifest.json';
  *
  * Documents en attente (voir PENDING_DOCUMENT_KEYS et README, « Points en attente ») :
  *  - statuts : PDF tronqué et illisible ;
- *  - DIC : le fichier hébergé (20/05/2026) classe R Start en 3 sur 7 alors que CORUM a confirmé 4 sur 7 ;
- *    publié dès réception du DIC à jour. Tant qu'il est en attente, la page ne republie pas la question de la
- *    FAQ « Quels sont les risques de la SCPI R Start ? » (elle cite l'indicateur 4 sur 7 avec pour source le DIC
- *    du 20/05/2026) ni sa note « faq-sri » ; le titre SEO, l'intro du hero, le lien corum.fr et l'intro du
- *    groupe réglementaire renvoient au DIC sur www.corum.fr ;
+ *  - DIC : le fichier hébergé (20/05/2026) classe R Start en 3 sur 7, valeur que le site affiche désormais
+ *    (facts.risk) ; la brochure et CORUM (08/09/2026) annonçaient 4 sur 7. Publié dès que CORUM confirme la
+ *    version du DIC en vigueur. Tant qu'il est en attente, le titre SEO, l'intro du hero, le lien corum.fr
+ *    et l'intro du groupe réglementaire renvoient au DIC sur www.corum.fr ; la FAQ n'est plus filtrée sur ce
+ *    point (elle cite la valeur du DIC avec sa date) ;
  *  - simulation des frais ex-ante (V2, 27/03/2026) : affiche 1,12 % de frais de souscription et des montants
  *    d'épargne espérée issus des scénarios du DIC ; publiée dès livraison d'une version corrigée et validée.
  * PENDING_DOCUMENT_KEYS est la décision unique de publication des pages v2 : feesPage.ts la consomme pour le
@@ -90,10 +89,11 @@ const toItem = (d: {
  * scripts/check-compliance.mjs pour les statuts.
  */
 // Retours AMF de la réunion produit du 10/09/2026 (voir plan §0) :
-//  - DIC : le fichier hébergé (V7, 20/05/2026) classe R Start en 3 sur 7 quand le site affiche 4 sur 7
-//    (décision client, facts.risk.sri). C'est exactement la contradiction relevée par l'AMF entre un
-//    document réglementaire consultable et le site : le DIC reste donc en attente tant que CORUM n'a
-//    pas fourni la version à jour (priorité une, voir README, « Points en attente ») ;
+//  - DIC : le fichier hébergé (V7, 20/05/2026) classe R Start en 3 sur 7 ; le site s'y est aligné le
+//    10/09/2026 (facts.risk.sri), une communication commerciale ne pouvant contredire le document
+//    réglementaire consultable (écart relevé par l'AMF). Il reste en attente parce que CORUM annonçait
+//    4 sur 7 (brochure p.3, 08/09/2026) : CORUM doit confirmer la version en vigueur avant publication
+//    (voir README, « Points en attente ») ; retirer alors la clé ici et dans documents.ts ;
 //  - simulation des frais ex-ante (V2, 27/03/2026) : affiche 1,12 % de frais de souscription et des
 //    montants d'épargne espérée issus des scénarios du DIC, qui contredisent le 0 % affiché sur tout le
 //    site et publient une donnée de performance (interdite tant que R Start a moins de 12 mois).
@@ -115,24 +115,11 @@ const feeDocuments = documentsExtra.filter((d) => d.group === 'frais').filter(is
 const formDocuments = documentsExtra.filter((d) => d.group === 'formulaire').filter(isPublished);
 
 /**
- * Questions de faq.ts non republiées sur cette page tant que le DIC à jour n'est pas hébergé : la question sur
- * les risques cite l'indicateur synthétique de risque avec pour source le DIC du 20/05/2026 (note « faq-sri »),
- * que la page retire précisément pour cette divergence. Libellés comparés après typographie (faq.ts applique `nb`).
- * Retirer ces deux listes en même temps que 'dic' de PENDING_DOCUMENT_KEYS.
+ * La question de la FAQ sur les risques n'est plus écartée : depuis le 10/09/2026, elle cite l'indicateur
+ * synthétique de risque tel que le DIC du 20/05/2026 le donne (3 sur 7), avec sa date. Elle reste hors de
+ * cette page par son sujet (FAQ_SUJETS_DOCUMENTAIRES), comme les autres questions non documentaires.
  */
-const PENDING_FAQ_QUESTIONS: readonly string[] = dicPublished
-  ? []
-  : ['Quels sont les risques de la SCPI R Start ?'].map(nb);
-const PENDING_FAQ_NOTE_IDS: readonly string[] = dicPublished ? [] : ['faq-sri'];
-
-const availableFaqItems = faq.items.filter(
-  (item) => !PENDING_FAQ_QUESTIONS.includes(item.question)
-);
-if (faq.items.length - availableFaqItems.length !== PENDING_FAQ_QUESTIONS.length) {
-  throw new Error(
-    'documentation.ts : une question de FAQ en attente est introuvable dans faq.ts (libellé modifié ?)'
-  );
-}
+const availableFaqItems = faq.allItems ?? faq.items;
 
 /**
  * La page reprenait la FAQ entière de l'accueil : seize questions rendues deux fois sur le site, dont
@@ -147,14 +134,11 @@ if (faq.items.length - availableFaqItems.length !== PENDING_FAQ_QUESTIONS.length
  * ci-dessous fait échouer le build si une reformulation dans faq.ts vidait ou gonflait la liste, plutôt
  * que de changer la page en silence.
  */
-const FAQ_SUJETS_DOCUMENTAIRES = /souscrire|revendre ses parts|jouissance|combien coûte/i;
-const faqItems = availableFaqItems.filter((item) => FAQ_SUJETS_DOCUMENTAIRES.test(item.question));
-if (faqItems.length < 3 || faqItems.length > 6) {
-  throw new Error(
-    `documentation.ts : ${faqItems.length} question(s) documentaire(s) retenue(s) sur ${availableFaqItems.length} — ` +
-      'un libellé de faq.ts a changé, ajuster FAQ_SUJETS_DOCUMENTAIRES.'
-  );
-}
+/**
+ * Depuis le 11/09/2026, cette page porte la FAQ COMPLÈTE : l'accueil n'en rend plus que six questions
+ * (faq.ts, HOME_FAQ) et renvoie ici. Plus aucun filtre par sujet : les seize questions sont rendues.
+ */
+const faqItems = availableFaqItems;
 const pei = subscription.options.pei;
 const rd = subscription.options.rd;
 const zeroAfter = feeFacts.withdrawal.zeroAfterYears;
@@ -241,11 +225,11 @@ const rawNotes: LegalNote[] = [
   },
 ];
 
-/** Notes de la page, suivies des notes de la FAQ (fiscalité, jouissance, sources CORUM ; SRI dès publication du DIC) importées de faq.ts. */
 /**
- * Identifiants de notes réellement appelés par les questions retenues : la page n'importait que
- * `faq.notes` en bloc, ce qui laissait des notes que plus rien ne référençait une fois la FAQ réduite.
- * Une note orpheline est du bruit réglementaire : elle occupe la liste sans qu'aucun appel n'y mène.
+ * Notes de la page, suivies des notes de la FAQ importées de faq.ts, limitées aux identifiants réellement
+ * appelés par les questions retenues : la page n'importait que `faq.notes` en bloc, ce qui laissait des
+ * notes que plus rien ne référençait une fois la FAQ réduite. Une note orpheline est du bruit
+ * réglementaire : elle occupe la liste sans qu'aucun appel n'y mène.
  */
 const faqNoteIds = new Set(
   faqItems.map((item) => item.noteId).filter((id): id is string => Boolean(id))
@@ -253,7 +237,7 @@ const faqNoteIds = new Set(
 
 export const notes: LegalNote[] = [
   ...rawNotes.map((n) => (VERBATIM_NOTE_IDS.includes(n.id) ? n : { ...n, text: nb(n.text) })),
-  ...faq.notes.filter((n) => !PENDING_FAQ_NOTE_IDS.includes(n.id) && faqNoteIds.has(n.id)),
+  ...faq.notes.filter((n) => faqNoteIds.has(n.id)),
 ];
 
 export const documentation = {
@@ -322,12 +306,12 @@ export const documentation = {
   faq: {
     title: 'Questions fréquentes',
     items: faqItems,
-    /** Renvoi vers la FAQ complète de l'accueil : les questions non documentaires y restent lisibles. */
+    /** Cette page porte désormais la FAQ complète : le renvoi vers l'accueil n'a plus lieu d'être. */
     fullFaqLink: {
       intro:
-        'Ces questions portent sur les documents et la souscription. Les revenus, les risques, la fiscalité et la stratégie sont traités dans la foire aux questions complète.',
-      label: 'Voir toutes les questions',
-      href: pages.home.path + '#' + sections.faq.id,
+        'Ces questions reprennent l’intégralité de la foire aux questions du site : documents, souscription, revenus, risques, fiscalité et stratégie.',
+      label: 'Revenir à l’accueil',
+      href: pages.home.path,
     },
   },
 

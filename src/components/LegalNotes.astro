@@ -15,6 +15,10 @@
  * appel de note dans la page), puis laisse le navigateur défiler. Les <li> portent `tabindex="-1"` et
  * reçoivent le focus : au clavier, la note visée est lue immédiatement, pas seulement affichée.
  * Sans JavaScript, l'ancre reste atteignable une fois le bloc déplié à la main.
+ *
+ * Taille : text-xs (12 px), un cran sous le corps de texte, comme les mentions du pied de page. Les
+ * avertissements réglementaires (risques, DIC, frais) ne sont pas concernés : ils gardent la taille
+ * du texte courant dans leurs sections.
  */
 import Container from '@/components/ui/Container.astro';
 import Section from '@/components/ui/Section.astro';
@@ -44,7 +48,7 @@ const toggleLabel = (footer.notesToggleLabel ?? '{n}').replace('{n}', String(not
         {toggleLabel}
       </summary>
       <ol
-        class="mt-6 max-w-4xl list-decimal space-y-3 pl-6 text-sm leading-relaxed text-slate-700 marker:font-semibold marker:text-navy"
+        class="mt-6 max-w-4xl list-decimal space-y-3 pl-6 text-xs leading-relaxed text-slate-700 marker:font-semibold marker:text-navy"
       >
         {
           notes.map((note, i) => (

@@ -1,9 +1,14 @@
 ---
 /**
  * Pied de page réglementaire : une navigation unique (colonnes de liens titrées), « Gérer les
- * cookies » (data-consent-open), puis le bloc légal en texte normal (≥ 0.875rem, contraste AA sur
- * fond blanc). Textes : footer.ts (qui assemble les mentions de legal.ts à l'identique).
- * Logos R Start et CORUM L'Épargne ; aucun logo AMF.
+ * cookies » (data-consent-open), puis le bloc légal. Textes : footer.ts (qui assemble les mentions de
+ * legal.ts à l'identique). Logos R Start et CORUM L'Épargne ; aucun logo AMF.
+ * Plan des titres : un H2 masqué (`footer.navLabel`, « Pied de page ») chapeaute les quatre colonnes,
+ * dont les titres sont des H3 — le pied de page n'introduit plus quatre H2 de premier niveau dans le
+ * plan de la page ; le bloc légal garde son H2 masqué et ses H3.
+ * Tailles : le bloc des mentions obligatoires (commercialNotice, documentsNotice, visa) reste en
+ * text-caption (14 px, contrôlé par scripts/check-compliance.mjs : jamais text-xs) ; les blocs
+ * d'identité repliés et le copyright peuvent être en text-xs.
  */
 import { Image } from 'astro:assets';
 import brandLogo from '@/assets/logos/r-start-couleur.svg';
@@ -42,47 +47,50 @@ const collapsible = legalBlocks.slice(1);
       />
     </div>
 
-    <nav aria-label={footer.navLabel} class="mt-12 grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
-      {
-        footer.columns.map((col) => (
-          <div>
-            <h2 class="text-sm font-semibold text-navy">{col.title}</h2>
-            <ul class="mt-4 space-y-2.5" role="list">
-              {col.links.map((link) => (
-                <li>
-                  <a
-                    href={link.external ? link.href : withBase(link.href)}
-                    class="nav-link inline-flex items-center gap-1 text-sm text-slate-700 hover:text-navy"
-                    target={link.external ? '_blank' : undefined}
-                    rel={link.external ? 'noopener noreferrer' : undefined}
-                  >
-                    {link.label}
-                    {link.external && (
-                      <>
-                        <svg
-                          aria-hidden="true"
-                          class="size-3.5 text-slate"
-                          viewBox="0 0 16 16"
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-width="1.5"
-                        >
-                          <path
-                            d="M6 3h7v7M13 3 4 12"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                          />
-                        </svg>
-                        {hint && <span class="visually-hidden">({hint})</span>}
-                      </>
-                    )}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))
-      }
+    <nav aria-labelledby="footer-nav-title" class="mt-12">
+      <h2 id="footer-nav-title" class="visually-hidden">{footer.navLabel}</h2>
+      <div class="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+        {
+          footer.columns.map((col) => (
+            <div>
+              <h3 class="text-sm font-semibold text-navy">{col.title}</h3>
+              <ul class="mt-4 space-y-2.5" role="list">
+                {col.links.map((link) => (
+                  <li>
+                    <a
+                      href={link.external ? link.href : withBase(link.href)}
+                      class="nav-link inline-flex items-center gap-1 text-sm text-slate-700 hover:text-navy"
+                      target={link.external ? '_blank' : undefined}
+                      rel={link.external ? 'noopener noreferrer' : undefined}
+                    >
+                      {link.label}
+                      {link.external && (
+                        <>
+                          <svg
+                            aria-hidden="true"
+                            class="size-3.5 text-slate"
+                            viewBox="0 0 16 16"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.5"
+                          >
+                            <path
+                              d="M6 3h7v7M13 3 4 12"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                            />
+                          </svg>
+                          {hint && <span class="visually-hidden">({hint})</span>}
+                        </>
+                      )}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))
+        }
+      </div>
     </nav>
 
     <div class="mt-10 border-t border-mist pt-8">
@@ -96,7 +104,7 @@ const collapsible = legalBlocks.slice(1);
     </div>
 
     <section
-      class="mt-10 max-w-4xl text-sm leading-relaxed text-slate-700"
+      class="mt-10 max-w-4xl leading-relaxed text-slate-700"
       aria-labelledby="footer-legal-title"
     >
       <h2 id="footer-legal-title" class="visually-hidden">{footer.legalTitle ?? ''}</h2>
@@ -105,7 +113,7 @@ const collapsible = legalBlocks.slice(1);
       }
       {
         alwaysVisible.map((block) => (
-          <div>
+          <div class="text-caption">
             <h3 class="font-semibold text-navy">{block.title}</h3>
             {block.paragraphs.map((p) => (
               <p class="mt-1.5">{p}</p>
@@ -120,7 +128,7 @@ const collapsible = legalBlocks.slice(1);
       }
       {
         collapsible.length > 0 && (
-          <details class="footer-legal mt-6 border-t border-mist pt-6">
+          <details class="footer-legal mt-6 border-t border-mist pt-6 text-xs">
             <summary class="cursor-pointer list-none font-semibold text-navy underline underline-offset-4 hover:text-teal-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-navy">
               {footer.legalToggleLabel ?? footer.legalTitle ?? ''}
             </summary>
@@ -139,6 +147,6 @@ const collapsible = legalBlocks.slice(1);
       }
     </section>
 
-    <p class="mt-10 text-sm text-slate-700">{footer.copyright}</p>
+    <p class="mt-10 text-xs text-slate-700">{footer.copyright}</p>
   </Container>
 </footer>

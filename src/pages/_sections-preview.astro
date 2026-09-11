@@ -1,8 +1,10 @@
 ---
 /**
  * Page de prévisualisation (développement) : assemble automatiquement toutes les sections présentes dans
- * src/components/sections dans l'ordre de leur nom de fichier (NN-Nom.astro). Non indexée, hors sitemap.
- * Les lots de construction l'utilisent pour se relire sans toucher à index.astro. Supprimée à l'intégration.
+ * src/components/sections dans l'ordre de leur nom de fichier (NN-Nom.astro).
+ * HORS ROUTAGE depuis le 10/09/2026 (préfixe `_` : Astro ne construit pas la page) : elle rendait les
+ * sections 05, 06 et 09 retirées de l'accueil, avec leurs anciens libellés, sur une URL atteignable.
+ * Pour la réactiver ponctuellement en local, retirer le `_` du nom de fichier — sans la livrer.
  */
 import Base from '@/layouts/Base.astro';
 import SiteNav from '@/components/SiteNav.astro';
@@ -27,7 +29,7 @@ const rest = all.filter((s) => s !== hero);
   path="/sections-preview"
   noindex
 >
-  <SiteNav sections />
+  <SiteNav />
   <main id="contenu">
     {hero && <hero.Component />}
     {rest.map(({ Component }) => <Component />)}

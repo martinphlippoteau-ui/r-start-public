@@ -1,12 +1,11 @@
 ---
 /**
- * Page d'accueil : SiteNav collée en haut → main#contenu (Hero, sections 02-10, Notes) → Footer.
- * Les sections sont assemblées automatiquement depuis src/components/sections/NN-Nom.astro, dans l'ordre
- * des préfixes numériques (contrat : src/config/sections.ts). Métadonnées et JSON-LD depuis seo.ts,
+ * Page d'accueil : SiteNav collée en haut → main#contenu (sections de la trame, voir HOME_ORDER, puis Notes)
+ * → Footer. Les sections viennent de src/components/sections/NN-Nom.astro ; l'ordre est celui de la trame
+ * (contrat : src/config/sections.ts). Métadonnées et JSON-LD depuis seo.ts,
  * legal.ts, facts.ts et faq.ts via src/lib/seo.ts (rien en dur).
- * Le visuel du hero (LCP) est préchargé avec exactement le srcset/sizes de sa balise <img>.
+ * Plus d'image de fond dans le hero depuis le 11/09/2026 : aucun préchargement d'image (le LCP est le logo ou l'accroche).
  */
-import { getImage } from 'astro:assets';
 import Base from '@/layouts/Base.astro';
 import SiteNav from '@/components/SiteNav.astro';
 import LegalNotes from '@/components/LegalNotes.astro';
@@ -14,7 +13,6 @@ import Footer from '@/components/Footer.astro';
 import { seo } from '@/content/fr/seo';
 import { faq } from '@/content/fr/faq';
 import { faqJsonLd, organizationJsonLd, webPageJsonLd } from '@/lib/seo';
-import { heroImageFormat, heroImageSizes, heroImageWidths, loadHeroImage } from '@/lib/hero-image';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const modules = import.meta.glob<{ default: any }>('/src/components/sections/*.astro', {
@@ -23,14 +21,23 @@ const modules = import.meta.glob<{ default: any }>('/src/components/sections/*.a
 const all = Object.entries(modules)
   .sort(([a], [b]) => a.localeCompare(b))
   .map(([path, mod]) => ({ path, Component: mod.default }));
-const hero = all.find((s) => /\/01-/.test(s.path));
-const rest = all.filter((s) => s !== hero);
-
-const heroLcp = await getImage({
-  src: await loadHeroImage(),
-  widths: heroImageWidths,
-  format: heroImageFormat,
-});
+/**
+ * Trame de l'accueil (10/09/2026), par préfixe de fichier : 01 Hero → 02 Points forts (comprendre le produit)
+ * → 01b Ce qui change vraiment (le modèle de frais) → 07 L'expérience derrière R Start → 03a Immeuble (photo
+ * pleine largeur, respiration sans texte) → 03 Frais → 04 Piliers (chapitre court) → 06 Souscrire en étapes (chapitre court, 11/09/2026) → 08b La presse en parle
+ * → 08 Risques → 10 FAQ. Hors accueil : 05 Revenus (repris par la FAQ), 06 Souscrire (guide sur
+ * /documentation, avec MyCORUM) et 09 Documents (/documentation).
+ */
+const HOME_ORDER = ['01-', '02-', '01b-', '03-', '07-', '03a-', '04-', '06-', '08b-', '08-', '10-'];
+const byPrefix = (prefix: string) => all.find((s) => s.path.includes('/sections/' + prefix));
+const hero = byPrefix('01-');
+const rest = HOME_ORDER.slice(1)
+  .map(byPrefix)
+  .filter((s): s is NonNullable<typeof s> => s !== undefined);
+/** La Stratégie est rendue en chapitre court (les trois piliers) ; la section complète vit sur /strategie. */
+/** Stratégie et Souscrire sont rendues en chapitre court (prop `compact`) ; la Stratégie complète vit sur /strategie,
+ *  le guide complet et MyCORUM sur /documentation. */
+const propsFor = (path: string) => (/\/0(4|6)-/.test(path) ? { compact: true } : {});
 
 const jsonLd = [
   organizationJsonLd(),
@@ -51,18 +58,10 @@ const jsonLd = [
   ogImageAlt={seo.ogImageAlt}
   jsonLd={jsonLd}
 >
-  <link
-    slot="head"
-    rel="preload"
-    as="image"
-    imagesrcset={heroLcp.srcSet.attribute}
-    imagesizes={heroImageSizes}
-    fetchpriority="high"
-  />
   <SiteNav />
   <main id="contenu">
     {hero && <hero.Component />}
-    {rest.map(({ Component }) => <Component />)}
+    {rest.map(({ path, Component }) => <Component {...propsFor(path)} />)}
     <LegalNotes />
   </main>
   <Footer />

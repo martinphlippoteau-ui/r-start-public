@@ -1,0 +1,86 @@
+---
+/**
+ * Bloc MyCORUM : l'application de CORUM L'Épargne pour suivre son épargne après la souscription.
+ * Rendu sous la dernière étape du guide (« Suivre votre épargne », /documentation) : texte et badges des
+ * deux magasins d'applications d'un côté, maquette de téléphone en 3D de l'autre, écran à la marque
+ * R Start. Sur petit écran, le téléphone passe sous le texte.
+ * Le téléphone est dessiné en CSS (aucune image) : coque arrondie, tranche métallisée, reflet vitré en
+ * diagonale, encoche pilule, et une légère rotation en perspective qui lui donne son volume. Il est
+ * décoratif (aria-hidden) : rien de ce qu'il montre n'est une information, et rien n'y est une donnée de
+ * performance. En `prefers-reduced-motion`, la rotation reste (c'est une pose, pas une animation).
+ * Contenu : src/content/fr/subscribe.ts (`app`). Badges : ui/StoreBadge.astro (voir l'avertissement sur
+ * les chartes de marque Apple et Google avant mise en ligne).
+ * Aucune donnée de performance, aucune promesse : ce bloc n'est ni un avantage ni un risque AMF.
+ */
+import { Image } from 'astro:assets';
+import logoWhite from '@/assets/logos/r-start-blanc.svg';
+import Card from '@/components/ui/Card.astro';
+import StoreBadge from '@/components/ui/StoreBadge.astro';
+import { subscribe } from '@/content/fr/subscribe';
+
+interface Props {
+  class?: string;
+}
+const { class: className = '' } = Astro.props as Props;
+const app = subscribe.app;
+/** Identifiants stables : l'enveloppe (aside) peut s'y référer par aria-labelledby. */
+const titleId = 'mycorum-app-title';
+const hintId = 'mycorum-app-hint';
+
+/** Les deux magasins, dans l'ordre des liens du contenu (App Store puis Google Play). */
+const stores = (app?.stores ?? []).map((store, i) => ({
+  ...store,
+  platform: (i === 0 ? 'apple' : 'google') as 'apple' | 'google',
+}));
+---
+
+{
+  app && (
+    <Card tone="paper" lift={false} class={className}>
+      <div class="grid items-center gap-8 sm:grid-cols-[1fr_auto] sm:gap-10">
+        <div>
+          {app.eyebrow && <p class="text-eyebrow text-teal-700">{app.eyebrow}</p>}
+          <h3 id={titleId} class="text-display-sm mt-1">
+            {app.title}
+          </h3>
+          <p class="mt-4 text-base leading-relaxed text-ink sm:text-lg">{app.description}</p>
+
+          <p id={hintId} class="visually-hidden">
+            {app.newTabHint}
+          </p>
+          <ul role="list" aria-label={app.storesLabel} class="mt-6 flex flex-wrap gap-3">
+            {stores.map((store) => (
+              <li>
+                <StoreBadge
+                  store={store.platform}
+                  href={store.href}
+                  label={store.label}
+                  hintId={hintId}
+                />
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Maquette de téléphone : purement décorative, dessinée en CSS. */}
+        <div aria-hidden="true" class="phone-3d justify-self-center">
+          <div class="phone-3d-body">
+            <span class="phone-3d-notch" />
+            <div class="phone-3d-screen">
+              <Image
+                src={logoWhite}
+                alt=""
+                width={290}
+                height={89}
+                loading="lazy"
+                decoding="async"
+                class="w-[58%]"
+              />
+            </div>
+            <span class="phone-3d-gloss" />
+          </div>
+        </div>
+      </div>
+    </Card>
+  )
+}

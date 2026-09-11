@@ -783,69 +783,6 @@
       "height": 1336,
       "orientation": "paysage",
       "kb": 375
-    },
-    {
-      "set": "pictos",
-      "file": "pictos/3d-casual-life-banknotes-with-coins.webp",
-      "source": "3d-casual-life-banknotes-with-coins.png",
-      "width": 1200,
-      "height": 1169,
-      "orientation": "paysage",
-      "kb": 116
-    },
-    {
-      "set": "pictos",
-      "file": "pictos/3d-casual-life-document-with-checkmark.webp",
-      "source": "3d-casual-life-document-with-checkmark.png",
-      "width": 1200,
-      "height": 1201,
-      "orientation": "portrait",
-      "kb": 53
-    },
-    {
-      "set": "pictos",
-      "file": "pictos/3d-casual-life-document-with-clock-icon.webp",
-      "source": "3d-casual-life-document-with-clock-icon.png",
-      "width": 1200,
-      "height": 1461,
-      "orientation": "portrait",
-      "kb": 57
-    },
-    {
-      "set": "pictos",
-      "file": "pictos/3d-casual-life-group-of-young-people-discussing-something-while-working.webp",
-      "source": "3d-casual-life-group-of-young-people-discussing-something-while-working.png",
-      "width": 1200,
-      "height": 1082,
-      "orientation": "paysage",
-      "kb": 191
-    },
-    {
-      "set": "pictos",
-      "file": "pictos/3d-casual-life-man-holding-binoculars-and-map.webp",
-      "source": "3d-casual-life-man-holding-binoculars-and-map.png",
-      "width": 1200,
-      "height": 1258,
-      "orientation": "portrait",
-      "kb": 68
-    },
-    {
-      "set": "pictos",
-      "file": "pictos/3d-casual-life-ringing-bell-on-blue.webp",
-      "source": "3d-casual-life-ringing-bell-on-blue.png",
-      "width": 1200,
-      "height": 1213,
-      "orientation": "portrait",
-      "kb": 62
-    },
-    {
-      "set": "pictos",
-      "file": "pictos/hands-passing-bar-and-pie-chart-card-business-analytics-and-kpi-dashboard.webp",
-      "source": "hands-passing-bar-and-pie-chart-card-business-analytics-and-kpi-dashboard.png",
-      "width": 1200,
-      "height": 1200,
-      "orientation": "paysage",
-      "kb": 61
     }
   ],
   "logos": [

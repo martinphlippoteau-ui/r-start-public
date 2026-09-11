@@ -54,6 +54,8 @@ export interface AdvantageRisk {
 
 export interface HeroContent {
   eyebrow: string;
+  /** Pastille courte affichée devant le surtitre (« Nouveau ») ; vide ou absente : rien. */
+  badge?: string;
   /** H1 unique de la page. */
   title: string;
   tagline: string;
@@ -64,8 +66,11 @@ export interface HeroContent {
   definition?: string;
   /** Id de la LegalNote qui porte le périmètre de la définition (facts.product.definitionScope). */
   definitionNoteId?: string;
-  subtitle: string;
-  /** Ligne risques visible sans scroller, même taille que subtitle. Jamais animée. */
+  /** Frais réellement prélevés, obligatoire dès que `definition` annonce une absence de frais (hors hero depuis le 10/09/2026). */
+  subtitle?: string;
+  /** Ligne risques visible sans scroller, même taille que le corps du hero. Jamais animée. */
+  /** Claim de la trame, en deux temps : l'énoncé puis la réponse (« Oui ! » / « Non ! »), en petit et animé. */
+  claims?: { text: string; answer: string }[];
   riskLine: string;
   primaryCta: Cta;
   secondaryCta: Cta;
@@ -129,7 +134,8 @@ export interface FeesContent {
    */
   counterRowsLabel?: string;
   /** Contre-poids immédiat des 0 % (même taille). */
-  counterweight: AdvantageRisk;
+  /** Optionnel depuis le 11/09/2026 : l'accueil ne rend plus de couple rédigé sous les frais. */
+  counterweight?: AdvantageRisk;
   rows: FeeRow[];
   /**
    * Micro-textes du tableau compact du barème : légende visible, en-têtes de colonnes et libellé de
@@ -174,6 +180,8 @@ export interface FeesContent {
 
 export interface StrategyPillar {
   icon: string;
+  /** Mot-clé court au-dessus du titre (« Comment », « Où », « Quoi »). */
+  kicker?: string;
   title: string;
   description: string;
   risk: string;
@@ -182,6 +190,8 @@ export interface StrategyPillar {
 export interface StrategyContent {
   eyebrow: string;
   title: string;
+  /** Titre du chapitre court sur l'accueil (zone 6 de la trame), si différent de `title`. */
+  homeTitle?: string;
   intro: string;
   /** Mot d'ordre affiché en très grand au-dessus de l'introduction (ex. « Acheter décoté, valoriser, revendre »). */
   motto?: string;
@@ -211,6 +221,8 @@ export interface StrategyContent {
   /** Titre du bloc effet de levier (ex. « L'effet de levier »). */
   leverageTitle?: string;
   leverage: AdvantageRisk;
+  /** Sur l'accueil (chapitre court), lien vers la page Stratégie d'investissement. */
+  pageLink?: { label: string; href: string };
   notes: LegalNote[];
 }
 
@@ -239,7 +251,7 @@ export interface IncomeContent {
     max: number;
     label: string;
     description: string;
-    /** aria-label complet de la jauge (ex. « Indicateur synthétique de risque : 4 sur 7… »). */
+    /** aria-label complet de la jauge (ex. « Indicateur synthétique de risque : 3 sur 7… »). */
     ariaLabel?: string;
     /** Légendes des extrémités de la jauge. */
     scaleLow?: string;
@@ -259,7 +271,16 @@ export interface StepItem {
 export interface SubscribeContent {
   eyebrow: string;
   title: string;
+  /** Titre du chapitre court sur l'accueil (prop `compact` de 06-Subscribe), si différent de `title`. */
+  homeTitle?: string;
   intro: string;
+  /** Introduction du chapitre court (≤ 30 mots, factuelle) ; à défaut, `intro`. */
+  homeIntro?: string;
+  /**
+   * Contre-poids unique du chapitre court (RiskNote, même parent que la liste des étapes qui porte
+   * data-advantage) : ≥ 60 % du texte cumulé des étapes ; à défaut, `withdrawalReminder`.
+   */
+  homeRisk?: string;
   steps: StepItem[];
   /** aria-label de la liste des étapes (ex. « Les quatre étapes de la souscription »). */
   stepsLabel?: string;
@@ -274,6 +295,17 @@ export interface SubscribeContent {
   options: { title: string; description: string; badge?: string; risk?: string }[];
   beforeYouSubscribe: string;
   withdrawalReminder: string;
+  /** Bloc MyCORUM (à la place de la photo) : application de suivi, liens vers les deux stores. */
+  app?: {
+    eyebrow?: string;
+    title: string;
+    description: string;
+    /** aria-label de la liste des liens de téléchargement. */
+    storesLabel: string;
+    stores: { label: string; href: string }[];
+    /** Mention lue par les lecteurs d'écran : les liens ouvrent un nouvel onglet. */
+    newTabHint: string;
+  };
   cta: Cta;
   notes: LegalNote[];
 }
@@ -296,7 +328,13 @@ export interface CorumContent {
   statsSource: string;
   /** Contre-poids risque des chiffres du groupe, rendu avec eux et à la même taille. Jamais animé. */
   statsRisk?: string;
-  range: { title: string; description: string; scpiNames: string[] };
+  range: {
+    title: string;
+    description: string;
+    scpiNames: string[];
+    /** Pastille sur la tuile de R Start dans la gamme (« Nouveau ») ; absente : rien. */
+    currentBadge?: string;
+  };
   /** Titre du bloc facultatif sur la rémunération de CORUM lors des cessions. Absent = bloc non rendu. */
   alignmentTitle?: string;
   /** Corps du bloc « rémunération sur les ventes ». À défaut, le composant retombe sur `intro`. */
@@ -381,8 +419,12 @@ export interface FaqContent {
   title: string;
   intro: string;
   items: FaqItem[];
+  /** Toutes les questions, pour la page qui porte la FAQ complète (/documentation). */
+  allItems?: FaqItem[];
   /** aria-label de la liste des questions (ex. « Questions fréquentes sur R Start »). */
   listLabel?: string;
+  /** Renvoi vers la FAQ complète, rendu sous la liste de l'accueil. */
+  moreLink?: { label: string; href: string };
   cta: Cta;
   notes: LegalNote[];
 }

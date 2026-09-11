@@ -1,7 +1,17 @@
 ---
 /**
- * Section 6 — Souscrire (id « souscrire »). Fond white.
- * Stepper vertical en quatre étapes numérotées (liste ordonnée, ligne de progression) face à la photo
+ * Section 6 — Souscrire (id « souscrire »). Deux rendus :
+ *  - `compact` (accueil, trame du 11/09/2026 : entre Piliers 04 et La presse en parle 08b) : chapitre court
+ *    qui raconte la souscription 100 % en ligne — surtitre, H2 `homeTitle`, `homeIntro`, le stepper des
+ *    quatre étapes (l'avantage, `data-advantage` sur la liste) suivi, dans le même parent et jamais animé,
+ *    d'un seul contre-poids (RiskNote `homeRisk` : rappel du DIC, durée de placement, commission de retrait,
+ *    rachat non garanti — ≥ 60 % du texte cumulé des étapes), puis le CTA. Ni MyCORUM, ni options, ni « lisez le DIC » : ils vivent sur
+ *    /documentation ;
+ *  - complet (aucune page ne le rend aujourd'hui ; conservé pour réemploi) : le rendu historique ci-dessous.
+ * Fond white. Le guide de souscription vit sur /documentation.
+ * Stepper vertical en quatre étapes numérotées (liste ordonnée, ligne de progression) face au bloc
+ * MyCORUM (application de suivi, capture officielle du store, icône, liens App Store et Google Play en
+ * nouvel onglet ; il remplace la photo d'illustration depuis le 10/09/2026) — anciennement face à la photo
  * (collante sur grand écran), deux options facultatives en cartes (versements programmés avec le
  * minimum confirmé, réinvestissement des dividendes) rendues en paire avantage / risque, rappels
  * « lisez le DIC » et commission de retrait en RiskNote pleine largeur (jamais animés), puis le CTA
@@ -16,19 +26,22 @@
  *    teal-500 (bornes de `text-brand-gradient`, lisibles sur white) réparti sur les segments : la
  *    pointe reste visible jusqu'au bout ;
  *  - chaque étape entre par `fade-up` à son arrivée dans le viewport, avec un léger décalage par rang
- *    (cascade si plusieurs entrent ensemble), et sa pastille numérotée « s'allume » par `scale` juste
- *    après, au moment où le trait la rejoint ;
- *  - la photo se dévoile par `clip` (média) puis zoome légèrement pendant la traversée de la grille
- *    (`data-scrub`, enveloppe interne, comme le hero) ;
- *  - les options : chaque carte contient sa RiskPair, donc la carte elle-même n'est jamais animée ;
+ *    (cascade si plusieurs entrent ensemble) : c'est le seul effet d'entrée de l'étape (sobriété du
+ *    11/09/2026 : la pastille n'a plus son `scale`, un effet sur un bloc ET son contenu) ; la liste
+ *    elle-même (data-advantage) n'est pas animée et le RiskNote est hors de la liste : aucune révélation
+ *    n'enveloppe un risque ;
+ *  - en-tête : H2 mot à mot et introduction en fade-up (SectionHeading `motion`), surtitre statique ;
+ *  - MyCORUM (complet) entre par `fade-up` ;
+ *  - les options (complet) : chaque carte contient sa RiskPair, donc la carte elle-même n'est jamais animée ;
  *    seul son bloc titre + badge entre par un `fade-up` court (12 px, modèle 02-Highlights : l'avantage
  *    seul) — pas de `tilt`, réservé aux cartes entières ;
- *  - le CTA entre par `fade-up`. Les deux RiskNote « avant de souscrire » restent intouchées.
- * Sans JS ou en reduced-motion : ligne dessinée, photo et cartes visibles, rien ne bouge.
- * Contenu : src/content/fr/subscribe.ts et media.ts (photo media.subscribe + crédit).
+ *  - le CTA entre par `fade-up`. Les RiskNote restent intouchées.
+ * Sans JS ou en reduced-motion : ligne dessinée, tout visible, rien ne bouge.
+ * Contenu : src/content/fr/subscribe.ts (dont `app`). Le bloc MyCORUM dessine son téléphone en CSS :
+ * plus aucune capture ni icône téléchargée depuis les magasins (AppMyCorum.astro).
  */
-import { Picture } from 'astro:assets';
 import Button from '@/components/ui/Button.astro';
+import AppMyCorum from '@/components/AppMyCorum.astro';
 import Card from '@/components/ui/Card.astro';
 import Container from '@/components/ui/Container.astro';
 import NoteRef from '@/components/ui/NoteRef.astro';
@@ -38,12 +51,19 @@ import RiskPair from '@/components/ui/RiskPair.astro';
 import Section from '@/components/ui/Section.astro';
 import SectionHeading from '@/components/ui/SectionHeading.astro';
 import { sections } from '@/config/sections';
-import { media } from '@/content/fr/media';
 import { subscribe } from '@/content/fr/subscribe';
-import { resolveImage } from '@/lib/images';
+
+interface Props {
+  /** Accueil : chapitre court (en-tête, étapes, un contre-poids, CTA) ; sans lui, rendu complet. */
+  compact?: boolean;
+}
+const { compact = false } = Astro.props;
 
 const id = sections.subscribe.id;
-const photo = await resolveImage(media.subscribe.src);
+const title = compact && subscribe.homeTitle ? subscribe.homeTitle : subscribe.title;
+const intro = compact && subscribe.homeIntro ? subscribe.homeIntro : subscribe.intro;
+/** Contre-poids unique du chapitre court (≥ 60 % du texte cumulé des étapes, voir subscribe.ts). */
+const homeRisk = subscribe.homeRisk ?? subscribe.withdrawalReminder;
 const OptionTitle = subscribe.optionsTitle ? 'h4' : 'h3';
 /** Identifiant du dégradé SVG du segment de ligne d'une étape (unique dans la page). */
 const lineGradientId = (i: number): string => `${id}-stepper-line-${i}`;
@@ -55,12 +75,8 @@ const lineGradientId = (i: number): string => `${id}-stepper-line-${i}`;
 const LINE_COLORS = ['var(--color-navy)', 'var(--color-teal-700)', 'var(--color-teal-500)'];
 const lineColor = (i: number): string => LINE_COLORS[Math.min(i, LINE_COLORS.length - 1)] as string;
 const lastStep = subscribe.steps.length - 1;
-/** Sélecteur de la grille stepper + photo : traversée qui pilote le zoom de la photo collante. */
-const gridSelector = '[data-subscribe-grid]';
 /** Décalage de cascade entre deux étapes qui entreraient ensemble (secondes). */
 const STEP_STAGGER = 0.06;
-/** Délai de la pastille après l'entrée de son étape (secondes). */
-const BADGE_DELAY = 0.12;
 /** Décalage de cascade entre les deux cartes options (secondes). */
 const OPTION_STAGGER = 0.1;
 /** Amplitude du fade-up du bloc titre des options (px) : court, la carte autour est immobile. */
@@ -70,11 +86,22 @@ const OPTION_Y = 12;
 <Section id={id} tone="white">
   <Container size="wide">
     <p class="text-eyebrow mb-4 text-teal-700">{subscribe.eyebrow}</p>
-    <SectionHeading id={id} title={subscribe.title} intro={subscribe.intro} />
+    <SectionHeading id={id} {title} {intro} motion />
 
-    <div data-subscribe-grid class="mt-16 grid gap-12 lg:mt-24 lg:grid-cols-12 lg:gap-16">
+    <!-- Compact : le stepper (avantage) et son contre-poids partagent ce parent ; complet : grille stepper / MyCORUM. -->
+    <div
+      data-subscribe-grid
+      class:list={[
+        'mt-10 sm:mt-16 lg:mt-24',
+        compact ? 'max-w-3xl' : 'grid gap-12 lg:grid-cols-12 lg:gap-16',
+      ]}
+    >
       <!-- Stepper -->
-      <ol aria-label={subscribe.stepsLabel} class="relative space-y-10 sm:space-y-14 lg:col-span-7">
+      <ol
+        aria-label={subscribe.stepsLabel}
+        data-advantage={compact ? '' : undefined}
+        class:list={['relative space-y-10 sm:space-y-14', !compact && 'lg:col-span-7']}
+      >
         {
           subscribe.steps.map((step, i) => (
             <li
@@ -121,8 +148,6 @@ const OPTION_Y = 12;
               <span
                 aria-hidden="true"
                 class="relative z-10 flex size-12 shrink-0 items-center justify-center rounded-full bg-navy text-lg font-bold text-white tabular-nums shadow-card ring-4 ring-white"
-                data-animate="scale"
-                data-animate-delay={String(BADGE_DELAY + i * STEP_STAGGER)}
               >
                 {i + 1}
               </span>
@@ -143,83 +168,75 @@ const OPTION_Y = 12;
         }
       </ol>
 
-      <!-- Photo -->
-      <figure class="self-start lg:sticky lg:top-24 lg:col-span-5" data-animate="clip">
-        <div class="img-frame aspect-[4/3] lg:aspect-[4/5]">
-          <div
-            class="h-full w-full"
-            data-scrub="scale:1,1.06"
-            data-scrub-trigger={gridSelector}
-            data-scrub-start="top bottom"
-            data-scrub-end="bottom top"
-          >
-            <Picture
-              src={photo}
-              alt={media.subscribe.alt}
-              widths={[480, 800, 1200, 1600]}
-              sizes="(min-width: 64rem) 34rem, 100vw"
-              formats={['webp']}
-              loading="lazy"
-              decoding="async"
-              pictureAttributes={{ class: 'block h-full w-full' }}
-              class="h-full w-full object-cover"
-            />
-          </div>
-        </div>
-        {
-          media.subscribe.credit && (
-            <figcaption class="text-caption mt-3 text-slate-700">
-              {media.subscribe.credit}
-            </figcaption>
-          )
-        }
-      </figure>
-    </div>
-
-    <!-- Options facultatives -->
-    <div class="mt-16 lg:mt-24">
       {
-        subscribe.optionsTitle && (
-          <h3 class="text-display-sm" data-animate="fade-up">
-            {subscribe.optionsTitle}
-            <NoteRef id="souscrire-non-eligible" />
-          </h3>
+        /* Compact : l'unique contre-poids des étapes, frère de la liste (jamais animé). */
+        compact && (
+          <div class="mt-10 rounded-3xl bg-paper p-6 sm:mt-14 sm:p-10">
+            <RiskNote text={homeRisk} size="lead" />
+          </div>
         )
       }
-      <!-- Chaque carte contient sa RiskPair : la carte n'est jamais animée, seul son bloc titre entre (fade-up court). -->
-      <ul class="mt-8 grid gap-6 sm:grid-cols-2">
-        {
-          subscribe.options.map((option, i) => (
-            <Card as="li" tone="paper" class="lg:p-10">
-              <div
-                class="flex flex-wrap items-center gap-x-4 gap-y-2"
-                data-animate="fade-up"
-                data-animate-y={String(OPTION_Y)}
-                data-animate-delay={String(i * OPTION_STAGGER)}
-              >
-                <OptionTitle class="text-xl font-semibold tracking-tight sm:text-2xl">
-                  {option.title}
-                </OptionTitle>
-                {option.badge && <Pill tone="teal">{option.badge}</Pill>}
-              </div>
-              {option.risk ? (
-                <RiskPair advantage={option.description} risk={option.risk} class="mt-4" />
-              ) : (
-                <p class="mt-4 text-base leading-relaxed">{option.description}</p>
-              )}
-            </Card>
-          ))
-        }
-      </ul>
+
+      <!-- Application MyCORUM (complet ; à la place de la photo d'illustration, 10/09/2026) -->
+      {
+        !compact && subscribe.app && (
+          <aside
+            class="self-start lg:sticky lg:top-24 lg:col-span-5"
+            aria-labelledby="mycorum-app-title"
+            data-animate="fade-up"
+          >
+            <AppMyCorum />
+          </aside>
+        )
+      }
     </div>
 
-    <!-- Avant de souscrire (jamais animé) -->
-    <div class="mt-16 rounded-3xl bg-paper p-6 sm:p-10 lg:mt-24 lg:p-12">
-      <div class="divide-y divide-mist">
-        <RiskNote text={subscribe.beforeYouSubscribe} size="lead" class="pb-6 sm:pb-8" />
-        <RiskNote text={subscribe.withdrawalReminder} size="lead" class="pt-6 sm:pt-8" />
-      </div>
-    </div>
+    {
+      !compact && (
+        <Fragment>
+          {/* Options facultatives */}
+          <div class="mt-10 sm:mt-16 lg:mt-24">
+            {subscribe.optionsTitle && (
+              <h3 class="text-display-sm" data-animate="fade-up">
+                {subscribe.optionsTitle}
+                <NoteRef id="souscrire-non-eligible" />
+              </h3>
+            )}
+            {/* Chaque carte contient sa RiskPair : la carte n'est jamais animée, seul son bloc titre entre (fade-up court). */}
+            <ul class="mt-8 grid gap-6 sm:grid-cols-2">
+              {subscribe.options.map((option, i) => (
+                <Card as="li" tone="paper" class="lg:p-10">
+                  <div
+                    class="flex flex-wrap items-center gap-x-4 gap-y-2"
+                    data-animate="fade-up"
+                    data-animate-y={String(OPTION_Y)}
+                    data-animate-delay={String(i * OPTION_STAGGER)}
+                  >
+                    <OptionTitle class="text-xl font-semibold tracking-tight sm:text-2xl">
+                      {option.title}
+                    </OptionTitle>
+                    {option.badge && <Pill tone="teal">{option.badge}</Pill>}
+                  </div>
+                  {option.risk ? (
+                    <RiskPair advantage={option.description} risk={option.risk} class="mt-4" />
+                  ) : (
+                    <p class="mt-4 text-base leading-relaxed">{option.description}</p>
+                  )}
+                </Card>
+              ))}
+            </ul>
+          </div>
+
+          {/* Avant de souscrire (jamais animé) */}
+          <div class="mt-10 sm:mt-16 rounded-3xl bg-paper p-6 sm:p-10 lg:mt-24 lg:p-12">
+            <div class="divide-y divide-mist">
+              <RiskNote text={subscribe.beforeYouSubscribe} size="lead" class="pb-6 sm:pb-8" />
+              <RiskNote text={subscribe.withdrawalReminder} size="lead" class="pt-6 sm:pt-8" />
+            </div>
+          </div>
+        </Fragment>
+      )
+    }
 
     <!-- CTA -->
     <div

@@ -1,4 +1,5 @@
 import type { FaqContent, LegalNote } from '@/content/types';
+import { pages } from '@/config/pages';
 import {
   corumGroup,
   fees as feeFacts,
@@ -101,16 +102,16 @@ const rawNotes: LegalNote[] = [
     text: `R Start n’affiche aucun objectif de rendement, à la différence des premières SCPI du groupe CORUM, dont les frais sont par ailleurs forfaitaires. Source : brochure partenaires 2026, p. 5, tableau « Une gamme complémentaire ».`,
   },
   {
-    id: 'faq-fiscalite',
-    text: `Prélèvement à la source obligatoire de ${income.withholdingTax} (hors prélèvements sociaux de ${income.socialContributions}) opéré par la société de gestion sur les produits financiers, pour tout associé personne physique résidant fiscalement en France. Il constitue un acompte d’impôt sur le revenu, imputable sur l’impôt dû et restituable s’il l’excède. Une dispense peut être demandée sous conditions de revenus (article 242 quater du Code général des impôts). Source : bulletin de souscription R Start, ${bulletinDate}. Taux en vigueur à cette date, susceptibles d’évoluer.`,
-  },
-  {
     id: 'faq-jouissance',
     text: `Délai de jouissance de R Start : ${income.enjoymentDelayLabel} (brochure partenaires 2026, p. 3). Date de jouissance : date à partir de laquelle les parts donnent droit aux dividendes potentiels. Pour R Start : ${lowerFirst(income.enjoymentDate)}. Source : bulletin de souscription R Start, conditions générales de vente.`,
   },
   {
     id: 'faq-sri',
-    text: `Indicateur synthétique de risque (SRI) : échelle de 1 (risque le plus faible) à ${risk.sriMax} (risque le plus élevé), établie en supposant que vous conservez le produit ${risk.recommendedHoldingLabel}. Niveau communiqué par ${managementCompany.name} ; le document d’informations clés fait foi.`,
+    text: `Indicateur synthétique de risque (SRI) : échelle de 1 (risque le plus faible) à ${risk.sriMax} (risque le plus élevé), établie en supposant que vous conservez le produit ${risk.recommendedHoldingLabel}. R Start y est classée ${risk.sriLabel} dans son document d’informations clés du ${product.dicDate.label}, qui seul fait foi. Source : document d’informations clés de R Start, p. 2.`,
+  },
+  {
+    id: 'faq-fiscalite',
+    text: `Prélèvement à la source obligatoire de ${income.withholdingTax} (hors prélèvements sociaux de ${income.socialContributions}) opéré par la société de gestion sur les produits financiers, pour tout associé personne physique résidant fiscalement en France. Il constitue un acompte d’impôt sur le revenu, imputable sur l’impôt dû et restituable s’il l’excède. Une dispense peut être demandée sous conditions de revenus (article 242 quater du Code général des impôts). Source : bulletin de souscription R Start, ${bulletinDate}. Taux en vigueur à cette date, susceptibles d’évoluer.`,
   },
   {
     id: 'faq-corum-source',
@@ -240,7 +241,7 @@ const rawItems: FaqContent['items'] = [
     answer: [
       'R Start est un investissement immobilier de long terme. Le capital investi n’est pas garanti : la valeur de vos parts peut baisser, et vous pourriez perdre tout ou partie de votre investissement. Les revenus ne sont pas garantis et varient selon le marché immobilier et le cours des devises.',
       `S’y ajoutent trois risques spécifiques. Le risque de liquidité : le rachat des parts n’est pas garanti. Le risque de change : R Start peut investir hors zone euro, sans couverture systématique. L’effet de levier : R Start peut recourir à l’endettement jusqu’à ${risk.maxLeverage} de la valeur d’expertise de ses actifs, ce qui amplifie les variations à la hausse comme à la baisse.`,
-      `${managementCompany.name} classe R Start en ${risk.sriLabel} sur l’indicateur synthétique de risque, une ${risk.sriClass}, qui tient compte de son caractère récent. Cet indicateur n’intègre ni le risque de change, ni le risque de liquidité, ni l’effet de levier. Enfin, la commission d’arbitrage a des effets de seuil et peut capter une partie significative de la plus-value. Durée de placement recommandée : ${risk.recommendedHoldingLabel}.`,
+      `R Start est classée ${risk.sriLabel} sur l’indicateur synthétique de risque, une ${risk.sriClass}, dans son document d’informations clés du ${product.dicDate.label}. Cet indicateur suppose une détention de ${risk.recommendedHoldingLabel} et n’intègre ni le risque de change, ni le risque de liquidité, ni l’effet de levier. Enfin, la commission d’arbitrage a des effets de seuil et peut capter une partie significative de la plus-value.`,
     ],
   },
   {
@@ -298,17 +299,49 @@ const rawItems: FaqContent['items'] = [
   },
 ];
 
+/**
+ * Questions rendues sur l'accueil (allègement du 11/09/2026) : six questions, une par objectif de la page
+ * (comprendre la SCPI, le modèle de frais, le coût réel, les revenus, qui gère, comment souscrire en ligne).
+ * Les seize questions restent rendues en entier sur /documentation, qui porte la FAQ complète ; le contrôle
+ * ci-dessous échoue au build si un libellé change, plutôt que de réduire la FAQ de l'accueil en silence.
+ */
+const HOME_FAQ = [
+  'Qu’est-ce qu’une SCPI ?',
+  'Pourquoi R Start affiche-t-elle 0 % de frais de souscription ?',
+  'Combien coûte réellement la SCPI R Start ?',
+  'Quand reçoit-on les premiers revenus avec R Start ?',
+  'Qui gère la SCPI R Start ?',
+  'Comment souscrire à R Start en ligne ?',
+];
+const homeItems = rawItems.filter((item) => HOME_FAQ.includes(item.question));
+if (homeItems.length !== HOME_FAQ.length) {
+  const manquantes = HOME_FAQ.filter((q) => !rawItems.some((item) => item.question === q));
+  throw new Error(`faq.ts : questions de l’accueil introuvables — ${manquantes.join(' ; ')}`);
+}
+
+/** Notes appelées par les six questions de l'accueil ; `notes` reste complet pour /documentation. */
+const idsAppeles = homeItems.map((item) => item.noteId).filter(Boolean);
+export const homeNotes: LegalNote[] = notes.filter((n) => idsAppeles.includes(n.id));
+
 export const faq = {
   eyebrow: 'FAQ',
   title: 'Vos questions sur la SCPI R Start.',
   intro:
     'Des réponses courtes et factuelles, issues des documents officiels de R Start. Elles ne remplacent pas la lecture du DIC et de la note d’information.',
-  items: rawItems.map(({ question, answer, ...rest }) => ({
+  items: homeItems.map(({ question, answer, ...rest }) => ({
+    ...rest,
+    question: nb(question),
+    answer: answer.map(nb),
+  })),
+  /** Les seize questions, pour /documentation (FAQ complète) : l'accueil n'en rend que six. */
+  allItems: rawItems.map(({ question, answer, ...rest }) => ({
     ...rest,
     question: nb(question),
     answer: answer.map(nb),
   })),
   listLabel: 'Questions fréquentes sur R Start',
+  /** Renvoi vers la FAQ complète : les dix autres questions vivent sur /documentation. */
+  moreLink: { label: 'Toutes les questions', href: pages.documentation.path + '#faq' },
   cta: { label: 'Souscrire en ligne', position: 'faq' },
   notes,
 } satisfies FaqContent;
