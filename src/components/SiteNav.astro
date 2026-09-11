@@ -302,17 +302,18 @@ const linkClass =
      * La distance est celle du relais d'ouverture du hero (motion/brandflight.ts) : sur l'accueil, le
      * verre arrive exactement quand le logo et le CTA se posent dans la barre. Elle est reprise ici pour
      * que les sous-pages, qui ne chargent pas GSAP, se comportent à l'identique.
-     * Rien en reduced-motion ni sans en-tête sombre : la CSS laisse alors la barre pleine.
+     * En mouvement réduit, la matière bascule d'un coup à mi-distance au lieu d'être dosée : l'effet
+     * existe pour tout le monde, seul le fondu disparaît. Sans en-tête sombre, rien ne s'applique.
      */
     const GLASS_MIN = 160;
-    const veiled =
-      !!document.querySelector('[data-page-header="dark"]') &&
-      window.matchMedia('(prefers-reduced-motion: no-preference)').matches;
+    const veiled = !!document.querySelector('[data-page-header="dark"]');
+    const smooth = window.matchMedia('(prefers-reduced-motion: no-preference)').matches;
     let lastGlass = -1;
     const syncGlass = (y: number) => {
       if (!veiled || !bar) return;
       const distance = Math.max(GLASS_MIN, window.innerHeight * 0.3);
-      const u = Math.min(1, Math.max(0, y / distance));
+      const progress = Math.min(1, Math.max(0, y / distance));
+      const u = smooth ? progress : progress >= 0.5 ? 1 : 0;
       if (u === lastGlass) return;
       lastGlass = u;
       bar.style.setProperty('--nav-glass-on', String(u));

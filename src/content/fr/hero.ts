@@ -59,5 +59,11 @@ export const hero = {
     position: 'hero',
     href: pages.fees.path,
   },
+  /**
+   * Invitation à descendre (11/09/2026), posée dans le vide sous le bandeau Trustpilot. La flèche n'a
+   * aucun texte visible : ce libellé EST son nom accessible, et il dit où l'on va — « en savoir plus »
+   * ne dirait rien à un lecteur d'écran qui parcourt la liste des liens.
+   */
+  scrollHint: { label: 'Descendre à la section : ce qui change vraiment' },
   notes,
 } satisfies HeroContent;

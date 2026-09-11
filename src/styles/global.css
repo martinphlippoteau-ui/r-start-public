@@ -264,8 +264,13 @@
   isolation: isolate;
   border-radius: var(--radius-nav);
   background-color: rgb(255 255 255 / calc(var(--nav-glass-tint) * var(--nav-glass-on)));
-  -webkit-backdrop-filter: saturate(185%) blur(calc(24px * var(--nav-glass-on)));
-  backdrop-filter: saturate(185%) blur(calc(24px * var(--nav-glass-on)));
+  /* La SATURATION suit `--nav-glass-on` elle aussi (11/09/2026) : à 0, seul le flou était annulé et le
+     `saturate(185%)` continuait de sursaturer l'en-tête derrière la pastille — elle se dessinait en clair
+     alors que son fond était transparent. À 0 le filtre vaut saturate(100%) blur(0), c'est-à-dire rien. */
+  -webkit-backdrop-filter: saturate(calc(100% + 85% * var(--nav-glass-on)))
+    blur(calc(24px * var(--nav-glass-on)));
+  backdrop-filter: saturate(calc(100% + 85% * var(--nav-glass-on)))
+    blur(calc(24px * var(--nav-glass-on)));
   box-shadow:
     inset 0 0 0 1px rgb(255 255 255 / calc(0.45 * var(--nav-glass-on))),
     inset 0 1px 0 rgb(255 255 255 / calc(0.75 * var(--nav-glass-on))),
@@ -314,16 +319,21 @@
    Les pages à fond clair (mentions légales, 404) n'ont pas ce marqueur : la barre y reste pleine et leur
    contenu réserve sa hauteur en padding.
    La transition de la matière est coupée ici : elle est pilotée au défilement, la lisser une seconde
-   fois la ferait traîner derrière le doigt. Sans script ou en reduced-motion, la barre est pleine dès le
-   rendu serveur — le script n'y touche pas non plus. */
-@media (prefers-reduced-motion: no-preference) and (scripting: enabled) {
+   fois la ferait traîner derrière le doigt.
+   La règle ne dépend PLUS de `prefers-reduced-motion` (11/09/2026) : masquer la barre n'est pas du
+   mouvement, et la faire dépendre de ce réglage donnait une barre pleine à qui a activé « réduire les
+   animations » — un comportement impossible à expliquer. En mouvement réduit, le script bascule la
+   matière d'un coup au lieu de la doser au défilement. Sans script, la barre reste pleine (scripting). */
+@media (scripting: enabled) {
   body:has([data-page-header='dark']) [data-sitenav-bar] {
     --nav-glass-on: 0;
     transition-property: none;
   }
-  body:has([data-page-header='dark']) [data-sitenav-bar] [data-menu-open],
-  body:has([data-page-header='dark']) [data-sitenav-bar] [data-sitenav-list] a {
-    transition: color 240ms var(--ease-out-expo);
+  @media (prefers-reduced-motion: no-preference) {
+    body:has([data-page-header='dark']) [data-sitenav-bar] [data-menu-open],
+    body:has([data-page-header='dark']) [data-sitenav-bar] [data-sitenav-list] a {
+      transition: color 240ms var(--ease-out-expo);
+    }
   }
   body:has([data-page-header='dark']) [data-sitenav-bar]:not([data-landed]) [data-menu-open],
   body:has([data-page-header='dark']) [data-sitenav-bar]:not([data-landed]) [data-sitenav-list] a {
@@ -800,6 +810,30 @@
   from {
     transform: translateY(14px);
   }
+}
+
+/* Invitation à descendre, au bas du hero (01-Hero.astro). Elle respire lentement : un objet posé qui
+   attend, plutôt qu'un pictogramme figé — la respiration est sur le CHEVRON, pas sur le lien, dont la
+   transform est déjà prise par le scrub de défilement. Rien en mouvement réduit.
+   Elle s'efface tant que le bandeau cookies est déplié : il la recouvrirait. `visibility` et non
+   `opacity`, parce que le scrub pose une opacité en ligne qui l'emporterait — et parce que cela la
+   retire aussi du parcours au clavier. */
+@media (prefers-reduced-motion: no-preference) {
+  [data-hero-scroll-hint] svg {
+    animation: hint-bob 2.4s var(--ease-in-out-quart) infinite;
+  }
+}
+@keyframes hint-bob {
+  0%,
+  100% {
+    transform: translate3d(0, -2px, 0);
+  }
+  50% {
+    transform: translate3d(0, 3px, 0);
+  }
+}
+body:has(#consent-banner:not([hidden])) [data-hero-scroll-hint] {
+  visibility: hidden;
 }
 
 /* Bandeau cookies déplié : il occupe le bas du premier écran et recouvrirait la ligne risques du hero

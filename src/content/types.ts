@@ -76,6 +76,8 @@ export interface HeroContent {
   riskLine: string;
   primaryCta: Cta;
   secondaryCta: Cta;
+  /** Invitation à descendre, au bas du hero : la flèche n'a pas de texte visible, ce libellé la nomme. */
+  scrollHint?: { label: string };
   notes: LegalNote[];
 }
 
