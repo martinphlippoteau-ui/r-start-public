@@ -25,8 +25,6 @@
  * Sans JS / reduced-motion : HTML complet et statique, valeurs exactes.
  * Contenu : src/content/fr/highlights.ts.
  */
-import Card from '@/components/ui/Card.astro';
-import Picto, { isPictoKey } from '@/components/ui/Picto.astro';
 import Container from '@/components/ui/Container.astro';
 import NoteRef from '@/components/ui/NoteRef.astro';
 import RiskNote from '@/components/ui/RiskNote.astro';
@@ -46,42 +44,64 @@ const titleId = sections.highlights.id + '-title';
 <Section id={sections.highlights.id} tone="white">
   <Container size="wide">
     <header class="mx-auto max-w-4xl text-center">
-      <h2 id={titleId} class="text-display-lg" data-reveal-text>{highlights.title}</h2>
+      <h2 id={titleId} class="text-display-lg text-balance" data-reveal-text>{highlights.title}</h2>
       <p data-animate="fade-up" data-animate-delay="0.1" class="mt-6 text-lead opacity-90">
         {highlights.intro}
       </p>
     </header>
 
-    <ul role="list" class="mt-chapter grid gap-5 sm:grid-cols-2 lg:gap-6">
+    {
+      /* Six blocs simples en 3 × 2 (11/09/2026) : un libellé, une valeur, un appel de note. Ni
+        pictogramme, ni description, ni contre-poids par bloc — celui de la section les remplace, sous la
+        grille. Les blocs ne portent donc pas `data-advantage` : ce sont des caractéristiques du produit,
+        pas des arguments, et le contrôle d'équilibre AMF compte le couple de la section. */
+    }
+    <ul role="list" class="mt-chapter grid gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6">
       {
         cards.map((card, i) => (
-          <Card as="li" tone="paper" class="flex flex-col ring-1 ring-navy/5 lg:p-10">
-            <h3
-              class="flex flex-col gap-3"
-              data-animate="fade-up"
-              data-animate-delay={String((i % COLUMNS) * STAGGER)}
-            >
-              {/* Pictogramme de verre (11/09/2026) : respiration visuelle de la section la plus dense, une
-                  par carte. Décoratif, il ne remplace ni la valeur ni le libellé. */}
-              {isPictoKey(card.icon) && (
-                <Picto name={card.icon} class="size-11 text-teal-700 sm:size-12" />
-              )}
-              {/* La valeur est l'image : text-display-lg pour les six cartes ; min-h = son clamp, la ligne de valeur a la même hauteur partout, libellés et descriptions restent alignés par rangée. Valeur statique et exacte (aucun compteur, aucun mot à mot). */}
-              <span class="flex min-h-[clamp(2.5rem,5.5vw,5rem)] items-end text-display-lg text-navy">
-                {card.value}
-              </span>
-              <span class="text-lead font-medium text-ink">
-                {card.label}
-                {card.noteId && <NoteRef id={card.noteId} />}
-              </span>
-            </h3>
-            <p data-advantage class="mt-5 text-base leading-relaxed text-ink sm:mt-6">
-              {card.description}
+          <li
+            class="rounded-3xl border border-navy/12 bg-paper p-6 sm:p-8"
+            data-animate="fade-up"
+            data-animate-delay={String((i % COLUMNS) * STAGGER)}
+          >
+            <p class="text-base font-medium text-slate-700">
+              {card.label}
+              {card.noteId && <NoteRef id={card.noteId} />}
             </p>
-            <RiskNote text={card.risk} class="mt-4 border-t border-navy/10 pt-4" />
-          </Card>
+            <p class="text-display-sm mt-2 text-navy">{card.value}</p>
+          </li>
         ))
       }
     </ul>
+
+    {
+      /* Septième information de la trame : elle n'a pas de valeur chiffrée, elle tient la largeur. */
+      highlights.banner && (
+        <p class="text-display-sm mt-4 rounded-3xl bg-navy px-6 py-5 text-center text-white sm:px-8 lg:mt-6">
+          {highlights.banner}
+          {highlights.bannerNoteId && <NoteRef id={highlights.bannerNoteId} tone="dark" />}
+        </p>
+      )
+    }
+
+    {
+      /* Automatismes proposés à la souscription. */
+      highlights.options && highlights.options.length > 0 && (
+        <ul role="list" class="mt-4 grid gap-4 sm:grid-cols-2 lg:mt-6 lg:gap-6">
+          {highlights.options.map((option) => (
+            <li class="rounded-3xl border border-navy/12 p-5 sm:p-6">
+              <p class="text-base font-medium text-slate-700">
+                {option.label}
+                {option.noteId && <NoteRef id={option.noteId} />}
+              </p>
+              <p class="text-lead mt-1 font-semibold text-navy">{option.value}</p>
+            </li>
+          ))}
+        </ul>
+      )
+    }
+
+    {/* Contre-poids unique de la section, jamais animé. */}
+    {highlights.risk && <RiskNote text={highlights.risk} size="lead" class="mt-8 lg:mt-10" />}
   </Container>
 </Section>

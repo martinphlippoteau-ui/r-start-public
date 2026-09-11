@@ -82,14 +82,16 @@ export interface HeroContent {
 }
 
 export interface HighlightCard {
-  /** Clé du pictogramme 3D (voir media.ts). */
-  icon: string;
-  value: string;
+  /** Libellé du repère (ex. « Ticket d'entrée »), au-dessus de la valeur. */
   label: string;
-  description: string;
-  /** Contre-poids risque de la carte, même taille que description. */
-  risk: string;
+  /** Valeur mise en avant (ex. « 200 € »). */
+  value: string;
+  /** Appel de note : source et portée de la valeur. */
   noteId?: string;
+  /** Champs de l'ancienne carte détaillée, plus rendus depuis le 11/09/2026 (blocs simples). */
+  icon?: string;
+  description?: string;
+  risk?: string;
 }
 
 export interface HighlightsContent {
@@ -97,6 +99,14 @@ export interface HighlightsContent {
   title: string;
   intro: string;
   cards: HighlightCard[];
+  /** Ligne pleine largeur sous la grille (ex. « 100 % digital »). */
+  banner?: string;
+  /** Appel de note du bandeau (source et portée). */
+  bannerNoteId?: string;
+  /** Automatismes proposés à la souscription, sous la grille. */
+  options?: { label: string; value: string; noteId?: string }[];
+  /** Contre-poids unique de la section, sous les repères. */
+  risk?: string;
   notes: LegalNote[];
 }
 
