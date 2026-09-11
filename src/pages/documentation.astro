@@ -11,6 +11,7 @@
  */
 import Base from '@/layouts/Base.astro';
 import AppMyCorum from '@/components/AppMyCorum.astro';
+import MandatoryWarnings from '@/components/pages/documentation/MandatoryWarnings.astro';
 import RegulatoryFrame from '@/components/pages/documentation/RegulatoryFrame.astro';
 import SiteNav from '@/components/SiteNav.astro';
 import Footer from '@/components/Footer.astro';
@@ -112,6 +113,11 @@ const linkHintId = linkHint ? 'documentation-link-hint' : undefined;
       /* Cadre réglementaire descendu de l'accueil (11/09/2026) : visa, agrément, dépositaire, SFDR. */
     }
     <RegulatoryFrame tone={groups.length % 2 === 0 ? 'paper' : 'white'} />
+    {
+      /* Avertissements reproduits in extenso (bulletin, DIC, commission d'arbitrage), descendus de
+        l'accueil le 11/09/2026 : leur place est à côté des documents dont ils sont extraits. */
+    }
+    <MandatoryWarnings tone={groups.length % 2 === 0 ? 'white' : 'paper'} />
     <DocumentsMention
       mention={mention}
       corumLink={corumLink}

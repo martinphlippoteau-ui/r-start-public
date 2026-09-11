@@ -1,0 +1,50 @@
+---
+/**
+ * Avertissements réglementaires reproduits in extenso : bulletin de souscription (p.4), document
+ * d'informations clés (p.1) et commission d'arbitrage (3 puces). Descendus de l'accueil le 11/09/2026
+ * à la demande de l'équipe : ils allongeaient la section Risques d'un pavé de texte réglementaire, et
+ * leur place est ici, à côté des documents dont ils sont extraits.
+ * Ces textes sont IMPOSÉS et reproduits à l'identique (src/content/fr/legal.ts, via risks.ts) : ils ne
+ * sont ni réécrits, ni résumés, ni animés. Le script de conformité les exige désormais sur cette page.
+ * Le contrôle de leur présence sur le site reste à arbitrer avec la compliance CORUM.
+ */
+import Container from '@/components/ui/Container.astro';
+import RiskNote from '@/components/ui/RiskNote.astro';
+import Section from '@/components/ui/Section.astro';
+import { risks } from '@/content/fr/risks';
+
+interface Props {
+  tone?: 'paper' | 'white';
+}
+const { tone = 'paper' } = Astro.props as Props;
+const id = 'avertissements';
+const title = risks.warningsTitle;
+---
+
+<Section id={id} tone={tone} labelledBy={id + '-title'}>
+  <Container size="wide">
+    <h2 id={id + '-title'} class="text-display-md">{title}</h2>
+
+    <div class="mt-8 rounded-3xl border border-navy/15 p-6 sm:p-8 lg:mt-10 lg:p-10">
+      {risks.bulletinWarningTitle && <h3 class="text-display-sm">{risks.bulletinWarningTitle}</h3>}
+      <RiskNote text={risks.bulletinWarning} size="lead" class="mt-5" />
+    </div>
+
+    <div class="mt-6 grid gap-6 lg:grid-cols-2">
+      <div class="rounded-3xl border border-navy/15 p-6 sm:p-8 lg:p-10">
+        {risks.dicWarningTitle && <h3 class="text-display-sm">{risks.dicWarningTitle}</h3>}
+        <RiskNote text={risks.dicWarning} size="lead" class="mt-5" />
+      </div>
+      <div class="rounded-3xl border border-navy/15 p-6 sm:p-8 lg:p-10">
+        {
+          risks.arbitrageTitle && (
+            <p class="text-lead font-medium text-ink">{risks.arbitrageTitle}</p>
+          )
+        }
+        <ul class="text-lead mt-5 list-disc space-y-4 pl-6 text-ink marker:text-coral-700">
+          {risks.arbitrageBullets.map((bullet) => <li class="pl-1">{bullet}</li>)}
+        </ul>
+      </div>
+    </div>
+  </Container>
+</Section>

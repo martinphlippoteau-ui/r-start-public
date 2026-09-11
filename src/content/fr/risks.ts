@@ -74,6 +74,7 @@ export const risks = {
     },
   ],
 
+  warningsTitle: 'Les avertissements réglementaires',
   bulletinWarningTitle: 'Avertissement du bulletin de souscription',
   bulletinWarning,
   dicWarningTitle: 'Avertissement du document d’informations clés',

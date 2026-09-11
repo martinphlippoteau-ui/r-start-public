@@ -186,10 +186,6 @@ async function checkIndex() {
   );
   requirePhrase(text, 'visa S.C.P.I. n° 26-06 en date du 4 mars 2026', 'visa AMF', file);
   requirePhrase(text, legal.shortRiskLine, 'ligne risques courte', file);
-  requirePhrase(text, legal.bulletinWarning.slice(0, 120), 'avertissement du bulletin', file);
-  requirePhrase(text, legal.dicWarning, 'avertissement du DIC', file);
-  for (const b of legal.arbitrageWarningBullets)
-    requirePhrase(text, b.slice(0, 100), "puce commission d'arbitrage", file);
   requirePhrase(text, legal.gdpr.dpoEmail, 'e-mail DPO', file);
   requirePhrase(text, product.definition, 'ligne de définition du hero', file);
   requirePhrase(text, 'groupe CORUM', 'périmètre de l’allégation de rang', file);
@@ -359,6 +355,14 @@ async function checkSubPages() {
       errors.push(file + ' : ' + risksAnimated.length + ' bloc(s) risque animé(s)');
     if (p === 'frais' && !/15\s?%/.test(text))
       errors.push(file + ' : frais de gestion 15 % absents');
+    if (p === 'documentation') {
+      // Avertissements reproduits in extenso, descendus de l'accueil le 11/09/2026 : ils doivent rester
+      // publiés quelque part sur le site, à côté des documents dont ils sont extraits.
+      requirePhrase(text, legal.bulletinWarning.slice(0, 120), 'avertissement du bulletin', file);
+      requirePhrase(text, legal.dicWarning, 'avertissement du DIC', file);
+      for (const b of legal.arbitrageWarningBullets)
+        requirePhrase(text, b.slice(0, 100), "puce commission d'arbitrage", file);
+    }
     if (p === 'presse') {
       // Les titres et citations reproduits ne valent que couverts par l'avertissement fourni.
       requirePhrase(

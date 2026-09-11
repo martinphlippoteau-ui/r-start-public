@@ -31,9 +31,12 @@
  * libellé des CTA, tests/conformite.spec.ts), interligne serré, icône 16 px, blanc à 85 %, largeur bornée,
  * placée APRÈS les CTA (`order-last`) pour ne plus s'imposer d'entrée — toujours visible sans défiler et
  * au-dessus du bandeau cookies (Pixel 5, iPhone 13). À partir de « sm », ordre et tailles ne changent pas
- * (CTA lg, risque text-base). Le bloc tient au-dessus du bandeau cookies sur Pixel 5, iPhone 13 et
- * 1440 × 900 : sous 40 rem le contenu est calé en haut (le bandeau y prend jusqu'à 130 px), au-dessus il
- * est centré dans la zone qui reste (padding bas 6 rem, puis 12 rem à partir de 64 rem). iPhone SE
+ * (CTA lg, risque text-base). CENTRAGE VERTICAL (11/09/2026) : à partir de 64 rem de large ET 56 rem de
+ * haut, la copie est exactement centrée dans la section (paddings haut et bas égaux) ; elle ne remonte que
+ * TANT QUE LE BANDEAU COOKIES EST DÉPLIÉ, par une règle de global.css accrochée à
+ * `#consent-banner:not([hidden])`. Une fois le choix fait — l'état d'une visite normale — le hero est
+ * centré. Sous 56 rem de haut (écran de 800 px), le bandeau prend jusqu'à 190 px en permanence au premier
+ * écran : la copie y reste calée haut, seule façon de garder la ligne risques découverte. iPhone SE
  * (320 × 568) reste hors de portée : le bandeau y couvre un tiers de l'écran.
  * Contenu : src/content/fr/hero.ts (ligne risques importée de legal.ts, jamais réécrite).
  */
@@ -106,7 +109,7 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
   </div>
   <Container
     size="wide"
-    class="relative flex flex-1 flex-col pt-4 pb-12 sm:justify-center sm:pt-10 sm:pb-20 lg:pt-6 lg:pb-44 [@media(min-height:56rem)]:lg:pt-12 [@media(min-height:56rem)]:lg:pb-28"
+    class="relative flex flex-1 flex-col pt-4 pb-12 sm:justify-center sm:pt-10 sm:pb-20 lg:pt-6 lg:pb-44 [@media(min-height:56rem)]:lg:pt-12 [@media(min-height:56rem)]:lg:pb-12"
   >
     <div data-hero-copy class="mx-auto flex max-w-4xl flex-col items-center text-center">
       {

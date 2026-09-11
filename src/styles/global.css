@@ -51,18 +51,24 @@
   --spacing-chapter: clamp(2rem, 4vw, 3.5rem)
     /* ex `--spacing-block`, renommé le 10/09/2026 : Tailwind v4 en dérivait `.inline-block { inline-size: … }`, en collision avec `display: inline-block` */;
   --spacing-subnav: 3.5rem;
+  /* Navigation flottante (11/09/2026) : la barre se décolle du haut et des bords, elle n'est plus un
+     bandeau plein. `--spacing-nav-gap` est cet écart ; il entre dans scroll-padding-top et dans le
+     calage de la barre d'ancres de /documentation. */
+  --spacing-nav-gap: 0.75rem;
+  --radius-nav: 1.75rem;
 }
 
 @layer base {
   html {
-    /* Hauteur de la navigation collée + marge : les ancres ne passent jamais dessous. */
-    scroll-padding-top: calc(var(--spacing-subnav) + 1.5rem);
+    /* Hauteur de la navigation flottante (écart au bord compris) + marge : les ancres ne passent
+       jamais dessous. */
+    scroll-padding-top: calc(var(--spacing-subnav) + var(--spacing-nav-gap) + 1.5rem);
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
   /* Page /documentation : une seconde barre collante (ancres des groupes) sous la navigation. */
   html:has([data-docsnav]) {
-    scroll-padding-top: calc(var(--spacing-subnav) * 2 + 1.5rem);
+    scroll-padding-top: calc(var(--spacing-subnav) * 2 + var(--spacing-nav-gap) + 1.5rem);
   }
   @media (prefers-reduced-motion: no-preference) {
     html {
@@ -234,6 +240,57 @@
 }
 .footer-legal[open] > summary::after {
   content: ' −';
+}
+
+/* Verre liquide de la navigation flottante (11/09/2026, demande de l'équipe : barre décollée du haut,
+   gros rayon, matière « liquid glass »). Trois couches : le flou coloré du fond, une nappe spéculaire en
+   dégradé posée derrière le contenu (::before, z-index négatif dans un contexte d'empilement isolé) et
+   un liseré clair en ombre interne qui dessine l'arête. L'opacité du blanc ne descend pas sous 0,72 :
+   composée sur le hero ink, elle garde un rapport de contraste de 5,3:1 avec le texte navy (AA).
+   Au défilement (`data-stuck`), le blanc se densifie et l'ombre se creuse : la barre se détache du
+   contenu qui passe dessous. */
+@utility nav-glass {
+  position: relative;
+  isolation: isolate;
+  border-radius: var(--radius-nav);
+  background-color: rgb(255 255 255 / 0.72);
+  -webkit-backdrop-filter: saturate(185%) blur(24px);
+  backdrop-filter: saturate(185%) blur(24px);
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 0.45),
+    inset 0 1px 0 rgb(255 255 255 / 0.75),
+    0 1px 2px rgb(2 75 103 / 0.05),
+    0 12px 32px -16px rgb(2 75 103 / 0.3);
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background-image: linear-gradient(to bottom, rgb(255 255 255 / 0.5), rgb(255 255 255 / 0) 58%);
+    pointer-events: none;
+  }
+
+  &[data-stuck] {
+    background-color: rgb(255 255 255 / 0.84);
+    box-shadow:
+      inset 0 0 0 1px rgb(255 255 255 / 0.5),
+      inset 0 1px 0 rgb(255 255 255 / 0.8),
+      0 2px 4px rgb(2 75 103 / 0.06),
+      0 18px 40px -18px rgb(2 75 103 / 0.38);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    transition:
+      background-color 320ms var(--ease-out-expo),
+      box-shadow 320ms var(--ease-out-expo);
+  }
+
+  /* Sans flou d'arrière-plan (Firefox ancien), le blanc devient opaque : la barre reste lisible. */
+  @supports not (backdrop-filter: blur(1px)) {
+    background-color: rgb(255 255 255 / 0.96);
+  }
 }
 
 /* Surface translucide (navigation collée, barres) */
@@ -595,6 +652,22 @@
 @keyframes intro-move {
   from {
     transform: translateY(14px);
+  }
+}
+
+/* Bandeau cookies déplié : il occupe le bas du premier écran et recouvrirait la ligne risques du hero
+   (− 7 px de marge en 1440 × 900). Tant qu'il est là, la copie remonte ; comme elle est centrée par
+   `justify-content: center`, une marge basse de 4 rem la décale de la moitié, soit 32 px. Le bandeau passe
+   en `hidden` dès que le choix est fait (scripts/consent.ts) : la règle cesse alors de s'appliquer et le
+   hero retrouve son centrage exact. Bornée aux écrans où le hero est centré (voir 01-Hero.astro). */
+@media (width >= 64rem) {
+  body:has(#consent-banner:not([hidden])) [data-hero-copy] {
+    margin-bottom: 4.5rem;
+  }
+}
+@media (width >= 64rem) and (height >= 56rem) {
+  body:has(#consent-banner:not([hidden])) [data-hero-copy] {
+    margin-bottom: 5rem;
   }
 }
 

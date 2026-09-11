@@ -4,6 +4,15 @@
  * l'ancien couple Header + SubNav. Un seul landmark de navigation par page (`<nav aria-label>`),
  * qui contient la barre et le panneau plein écran des petits écrans.
  *
+ * Forme (11/09/2026, demande de l'équipe) : ce n'est plus un bandeau pleine largeur mais une PASTILLE
+ * FLOTTANTE — décollée du haut et des bords de `--spacing-nav-gap`, gros rayon (`--radius-nav`),
+ * matière « liquid glass » (@utility nav-glass). Le contenu de la page défile dans l'écart au-dessus
+ * d'elle : c'est ce qui lui donne sa profondeur. L'écart entre dans `scroll-padding-top` (global.css) et
+ * dans le calage de la barre d'ancres de /documentation, pour qu'aucune ancre ne passe dessous.
+ * Sur téléphone, le libellé « Menu » est désormais visible à côté du chevron (il était en `sr-only`) :
+ * au premier écran de l'accueil, le logo et le CTA sont encore à opacité 0 — ils arrivent par le vol
+ * d'ouverture — et la barre paraissait vide.
+ *
  * Entrées : uniquement les pages du menu (src/config/pages.ts, `menuPages`), l'accueil compris, sur
  * toutes les pages — jamais d'ancre de section (décision du 10/09/2026). Aucun libellé en dur :
  * src/config/pages.ts et src/content/fr/nav.ts.
@@ -75,12 +84,14 @@ const linkClass =
   'block rounded-full px-2 py-1.5 text-sm whitespace-nowrap text-slate-700 no-underline transition-colors hover:text-navy aria-[current]:font-semibold aria-[current]:text-navy sm:px-3';
 ---
 
-<nav data-sitenav data-compact-at="0.4" aria-label={menuAriaLabel} class="sticky top-0 z-40">
-  <div
-    data-sitenav-bar
-    class="surface-glass relative border-b border-navy/10 transition-shadow duration-300 data-[stuck]:shadow-nav"
-  >
-    <Container size="wide" class="flex h-subnav items-center gap-2 sm:gap-4">
+<nav
+  data-sitenav
+  data-compact-at="0.4"
+  aria-label={menuAriaLabel}
+  class="pt-nav-gap sticky top-0 z-40"
+>
+  <div class="mx-auto w-full max-w-7xl px-3 sm:px-5">
+    <div data-sitenav-bar class="nav-glass flex h-subnav items-center gap-2 px-3 sm:gap-4 sm:px-4">
       <a
         href={logoHref}
         class="flex shrink-0 items-center gap-2.5 no-underline"
@@ -141,9 +152,9 @@ const linkClass =
         >
           <path d="M3 5.5h14M3 10h14M3 14.5h14"></path>
         </svg>
-        <span class="max-sm:sr-only">{menuLabel}</span>
+        <span class="max-[22rem]:sr-only">{menuLabel}</span>
       </button>
-    </Container>
+    </div>
   </div>
 
   <div

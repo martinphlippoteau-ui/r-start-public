@@ -359,6 +359,8 @@ export interface RisksContent {
   title: string;
   intro: string;
   items: RiskItem[];
+  /** Titre (H2) de la section qui regroupe les avertissements reproduits in extenso (/documentation). */
+  warningsTitle?: string;
   /** Avertissement du bulletin de souscription, in extenso. */
   bulletinWarning: string;
   /** Titre (H3) du bloc reproduisant l'avertissement du bulletin. */
