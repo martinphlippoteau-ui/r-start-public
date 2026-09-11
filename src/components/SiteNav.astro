@@ -6,8 +6,11 @@
  *
  * Forme (11/09/2026, demande de l'équipe) : ce n'est plus un bandeau pleine largeur mais une PASTILLE
  * FLOTTANTE — décollée du haut et des bords de `--spacing-nav-gap`, gros rayon (`--radius-nav`),
- * matière « liquid glass » (@utility nav-glass). Le contenu de la page défile dans l'écart au-dessus
- * d'elle : c'est ce qui lui donne sa profondeur. L'écart entre dans `scroll-padding-top` (global.css) et
+ * matière « liquid glass » (@utility nav-glass). Elle RECOUVRE le contenu au lieu de le pousser vers le
+ * bas (marge basse négative de `--spacing-nav-total`) : l'en-tête sombre de chaque page passe derrière
+ * elle. Sans ce recouvrement, la pastille claire était posée sur le fond clair du document, donc
+ * invisible, et un bouton Menu blanc l'aurait été aussi (constat du 11/09/2026). Les en-têtes réservent
+ * cette hauteur en padding haut. L'écart entre dans `scroll-padding-top` (global.css) et
  * dans le calage de la barre d'ancres de /documentation, pour qu'aucune ancre ne passe dessous.
  * Sur téléphone, le libellé « Menu » est désormais visible à côté du chevron (il était en `sr-only`) :
  * au premier écran de l'accueil, le logo et le CTA sont encore à opacité 0 — ils arrivent par le vol
@@ -18,6 +21,8 @@
  * src/config/pages.ts et src/content/fr/nav.ts.
  *
  * Reprise de l'ancienne sous-navigation :
+ *  - sur grand écran, la barre passe en grille de trois colonnes (1fr / auto / 1fr) : les entrées sont
+ *    CENTRÉES dans la pastille, quelles que soient les largeurs du logo à gauche et du CTA à droite ;
  *  - liste des pages visible à partir de « lg » seulement (sous ce seuil, un seul menu : le panneau ; la barre
  *    ne garde que le logo, le CTA et le bouton Menu), à défilement horizontal sans barre visible (`scrollbar-none`), avec fondu latéral
  *    (`scroll-fade-x`) posé par le script dès que la liste déborde réellement ;
@@ -88,13 +93,16 @@ const linkClass =
   data-sitenav
   data-compact-at="0.4"
   aria-label={menuAriaLabel}
-  class="pt-nav-gap sticky top-0 z-40"
+  class="pt-nav-gap -mb-nav-total sticky top-0 z-40"
 >
   <div class="mx-auto w-full max-w-7xl px-3 sm:px-5">
-    <div data-sitenav-bar class="nav-glass flex h-subnav items-center gap-2 px-3 sm:gap-4 sm:px-4">
+    <div
+      data-sitenav-bar
+      class="nav-glass flex h-subnav items-center gap-2 px-3 sm:gap-4 sm:px-4 lg:grid lg:grid-cols-[1fr_auto_1fr]"
+    >
       <a
         href={logoHref}
-        class="flex shrink-0 items-center gap-2.5 no-underline"
+        class="flex shrink-0 items-center gap-2.5 no-underline lg:justify-self-start"
         aria-label={homeLinkLabel}
       >
         <Image
@@ -111,7 +119,7 @@ const linkClass =
 
       <ul
         data-sitenav-list
-        class="scrollbar-none scroll-fade-x relative -my-2 -mr-2 -ml-3 hidden min-w-0 flex-1 items-center gap-0.5 overflow-x-auto py-2 pr-2 pl-3 sm:-mx-2 sm:gap-1 sm:px-2 lg:flex"
+        class="scrollbar-none scroll-fade-x relative -my-2 -mr-2 -ml-3 hidden min-w-0 flex-1 items-center gap-0.5 overflow-x-auto py-2 pr-2 pl-3 sm:-mx-2 sm:gap-1 sm:px-2 lg:flex lg:justify-self-center"
         role="list"
       >
         <li aria-hidden="true" data-subnav-pill class="subnav-pill"></li>
@@ -130,7 +138,7 @@ const linkClass =
         /* Sous « lg », la liste est masquée : un seul menu (le panneau), le CTA reste visible et pousse à droite. */
       }
       {/* `data-cta-target` : arrivée du vol du CTA du hero (src/scripts/motion/brandflight.ts). */}
-      <div data-cta-target class="ml-auto shrink-0">
+      <div data-cta-target class="ml-auto shrink-0 lg:ml-0 lg:justify-self-end">
         <Button position="nav" variant="primary" size="sm" class="subnav-cta">{ctaLabel}</Button>
       </div>
 

@@ -55,6 +55,11 @@
      bandeau plein. `--spacing-nav-gap` est cet écart ; il entre dans scroll-padding-top et dans le
      calage de la barre d'ancres de /documentation. */
   --spacing-nav-gap: 0.75rem;
+  /* Hauteur totale de la navigation flottante : elle RECOUVRE le contenu (marge basse négative sur le
+     <nav>), si bien que les en-têtes sombres passent derrière elle. C'est la condition pour qu'un verre
+     clair et un bouton Menu blanc se lisent : posée sur le fond clair de la page, la pastille était
+     invisible (constat du 11/09/2026). Les en-têtes réservent cette hauteur en padding haut. */
+  --spacing-nav-total: calc(var(--spacing-subnav) + var(--spacing-nav-gap));
   --radius-nav: 1.75rem;
 }
 
@@ -248,19 +253,24 @@
    un liseré clair en ombre interne qui dessine l'arête. L'opacité du blanc ne descend pas sous 0,72 :
    composée sur le hero ink, elle garde un rapport de contraste de 5,3:1 avec le texte navy (AA).
    Au défilement (`data-stuck`), le blanc se densifie et l'ombre se creuse : la barre se détache du
-   contenu qui passe dessous. */
+   contenu qui passe dessous.
+   `--nav-glass-on` (0 → 1) règle la PRÉSENCE de la matière d'un seul geste : blanc, flou, liseré, ombre
+   et nappe en dépendent tous. Il vaut 1 partout, sauf sur l'accueil où le vol d'ouverture le pousse de
+   0 à 1 (bloc « barre sans matière » plus bas). */
 @utility nav-glass {
+  --nav-glass-tint: 0.72;
+  --nav-glass-on: 1;
   position: relative;
   isolation: isolate;
   border-radius: var(--radius-nav);
-  background-color: rgb(255 255 255 / 0.72);
-  -webkit-backdrop-filter: saturate(185%) blur(24px);
-  backdrop-filter: saturate(185%) blur(24px);
+  background-color: rgb(255 255 255 / calc(var(--nav-glass-tint) * var(--nav-glass-on)));
+  -webkit-backdrop-filter: saturate(185%) blur(calc(24px * var(--nav-glass-on)));
+  backdrop-filter: saturate(185%) blur(calc(24px * var(--nav-glass-on)));
   box-shadow:
-    inset 0 0 0 1px rgb(255 255 255 / 0.45),
-    inset 0 1px 0 rgb(255 255 255 / 0.75),
-    0 1px 2px rgb(2 75 103 / 0.05),
-    0 12px 32px -16px rgb(2 75 103 / 0.3);
+    inset 0 0 0 1px rgb(255 255 255 / calc(0.45 * var(--nav-glass-on))),
+    inset 0 1px 0 rgb(255 255 255 / calc(0.75 * var(--nav-glass-on))),
+    0 1px 2px rgb(2 75 103 / calc(0.05 * var(--nav-glass-on))),
+    0 12px 32px -16px rgb(2 75 103 / calc(0.3 * var(--nav-glass-on)));
 
   &::before {
     content: '';
@@ -269,16 +279,17 @@
     z-index: -1;
     border-radius: inherit;
     background-image: linear-gradient(to bottom, rgb(255 255 255 / 0.5), rgb(255 255 255 / 0) 58%);
+    opacity: var(--nav-glass-on);
     pointer-events: none;
   }
 
   &[data-stuck] {
-    background-color: rgb(255 255 255 / 0.84);
+    --nav-glass-tint: 0.84;
     box-shadow:
-      inset 0 0 0 1px rgb(255 255 255 / 0.5),
-      inset 0 1px 0 rgb(255 255 255 / 0.8),
-      0 2px 4px rgb(2 75 103 / 0.06),
-      0 18px 40px -18px rgb(2 75 103 / 0.38);
+      inset 0 0 0 1px rgb(255 255 255 / calc(0.5 * var(--nav-glass-on))),
+      inset 0 1px 0 rgb(255 255 255 / calc(0.8 * var(--nav-glass-on))),
+      0 2px 4px rgb(2 75 103 / calc(0.06 * var(--nav-glass-on))),
+      0 18px 40px -18px rgb(2 75 103 / calc(0.38 * var(--nav-glass-on)));
   }
 
   @media (prefers-reduced-motion: no-preference) {
@@ -289,7 +300,34 @@
 
   /* Sans flou d'arrière-plan (Firefox ancien), le blanc devient opaque : la barre reste lisible. */
   @supports not (backdrop-filter: blur(1px)) {
-    background-color: rgb(255 255 255 / 0.96);
+    background-color: rgb(255 255 255 / calc(0.96 * var(--nav-glass-on)));
+  }
+}
+
+/* Accueil, avant le premier défilement (11/09/2026, demande de l'équipe) : la barre n'a AUCUNE matière —
+   ni verre, ni flou, ni liseré, ni ombre — et seul le bouton Menu se voit, en blanc sur le hero sombre.
+   La matière arrive avec son contenu : `--nav-glass-on` est poussé de 0 à 1 par le relais d'ouverture
+   (scripts/motion/brandflight.ts), exactement au rythme du logo et du CTA qui se posent dans la barre.
+   Sur grand écran, les entrées du menu et la pastille de la page courante suivent le même mouvement.
+   La transition de la matière est coupée ici : elle est pilotée au défilement, la lisser une seconde
+   fois la ferait traîner derrière le doigt. Garde identique à celle du vol — sans script ou en
+   reduced-motion, la barre est pleine dès le rendu serveur. */
+@media (prefers-reduced-motion: no-preference) and (scripting: enabled) {
+  body:has([data-brand-flight]) [data-sitenav-bar] {
+    --nav-glass-on: 0;
+    transition-property: none;
+  }
+  body:has([data-brand-flight]) [data-sitenav-bar] [data-menu-open],
+  body:has([data-brand-flight]) [data-sitenav-bar] [data-sitenav-list] a {
+    transition: color 240ms var(--ease-out-expo);
+  }
+  body:has([data-brand-flight]) [data-sitenav-bar]:not([data-landed]) [data-menu-open],
+  body:has([data-brand-flight]) [data-sitenav-bar]:not([data-landed]) [data-sitenav-list] a {
+    color: #fff;
+  }
+  /* Seul sur le hero, le bouton Menu ne peut pas s'éclaircir avec un voile sombre au survol. */
+  body:has([data-brand-flight]) [data-sitenav-bar]:not([data-landed]) [data-menu-open]:hover {
+    background-color: rgb(255 255 255 / 0.16);
   }
 }
 
@@ -507,7 +545,9 @@
   width: 0;
   height: 0;
   border-radius: 9999px;
-  background: rgb(2 75 103 / 0.08);
+  /* Elle appartient à la matière de la barre : invisible tant que le verre n'est pas là (accueil, avant
+     le vol d'ouverture), elle apparaît avec lui. `opacity` reste pilotée en ligne par le script. */
+  background: rgb(2 75 103 / calc(0.08 * var(--nav-glass-on, 1)));
   opacity: 0;
   pointer-events: none;
   @media (prefers-reduced-motion: no-preference) {
@@ -662,12 +702,12 @@
    hero retrouve son centrage exact. Bornée aux écrans où le hero est centré (voir 01-Hero.astro). */
 @media (width >= 64rem) {
   body:has(#consent-banner:not([hidden])) [data-hero-copy] {
-    margin-bottom: 4.5rem;
+    margin-bottom: 2.5rem;
   }
 }
 @media (width >= 64rem) and (height >= 56rem) {
   body:has(#consent-banner:not([hidden])) [data-hero-copy] {
-    margin-bottom: 5rem;
+    margin-bottom: 3rem;
   }
 }
 

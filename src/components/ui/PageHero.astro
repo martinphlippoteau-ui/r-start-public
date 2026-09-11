@@ -64,7 +64,8 @@ const hasAside = Astro.slots.has('aside');
   class:list={[
     'brand-halo grain relative overflow-hidden text-white',
     tones[tone],
-    'pt-3 pb-10 sm:pt-14 sm:pb-20 lg:pt-20 lg:pb-24',
+    /* La navigation flottante recouvre le haut de l'en-tête : sa hauteur est réservée ici. */
+    'pt-[calc(var(--spacing-nav-total)+0.75rem)] pb-10 sm:pt-[calc(var(--spacing-nav-total)+3.5rem)] sm:pb-20 lg:pt-[calc(var(--spacing-nav-total)+5rem)] lg:pb-24',
     className,
   ]}
 >

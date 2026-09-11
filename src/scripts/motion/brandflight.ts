@@ -209,6 +209,11 @@ const makeCtaHandover = (): (() => void) => {
   const target = document.querySelector<HTMLElement>('[data-cta-target]');
   const hero = document.querySelector<HTMLElement>('[data-brand-flight]');
   if (!target || !hero) return () => {};
+  /* La MATIÈRE de la barre suit le même avancement que le CTA (11/09/2026) : avant le premier
+     défilement, l'accueil n'affiche qu'un bouton Menu blanc sur le hero ; le verre, le flou, le liseré et
+     l'ombre se posent au rythme du logo qui atterrit. `--nav-glass-on` porte cet avancement (global.css)
+     et `data-landed`, franchi à mi-course, rend au bouton Menu et aux entrées leur couleur navy. */
+  const bar = document.querySelector<HTMLElement>('[data-sitenav-bar]');
   let last = -1;
   const apply = (scroll: number) => {
     const distance = Math.max(FLIGHT_MIN, window.innerHeight * 0.3);
@@ -216,6 +221,10 @@ const makeCtaHandover = (): (() => void) => {
     if (u === last) return;
     last = u;
     target.style.opacity = String(u);
+    if (bar) {
+      bar.style.setProperty('--nav-glass-on', String(u));
+      bar.toggleAttribute('data-landed', u >= 0.5);
+    }
   };
   const st = ScrollTrigger.create({
     trigger: document.documentElement,
@@ -230,6 +239,10 @@ const makeCtaHandover = (): (() => void) => {
   return () => {
     st.kill();
     target.style.removeProperty('opacity');
+    if (bar) {
+      bar.style.removeProperty('--nav-glass-on');
+      bar.removeAttribute('data-landed');
+    }
   };
 };
 
