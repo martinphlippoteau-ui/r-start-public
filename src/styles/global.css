@@ -648,7 +648,7 @@
   /* Sous 40 rem : la marque occupe l'écran (64 vw, 11/09/2026 — le logo paraissait timide sur téléphone),
      tout en laissant la ligne risques ET les deux boutons au-dessus du bandeau cookies au premier
      chargement (tests/conformite.spec.ts : Pixel 5 et iPhone 13). */
-  width: min(64vw, 17rem);
+  width: min(52vw, 13.5rem);
   margin-inline: auto;
   aspect-ratio: 290 / 89;
 }

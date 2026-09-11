@@ -59,6 +59,10 @@ export interface HeroContent {
   /** H1 unique de la page. */
   title: string;
   tagline: string;
+  /** Note de périmètre de l'allégation de rang portée par l'accroche. */
+  taglineNoteId?: string;
+  /** Note des frais réels, accolée au contre-poids du hero. */
+  riskNoteId?: string;
   /**
    * Ligne de définition du produit (facts.product.definition) : allégation de rang au périmètre du
    * groupe CORUM, toujours accompagnée de son appel de note (`definitionNoteId`).

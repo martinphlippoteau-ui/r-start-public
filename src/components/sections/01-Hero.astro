@@ -41,6 +41,7 @@ import { Image } from 'astro:assets';
 import brandLogo from '@/assets/logos/r-start-blanc.svg';
 import Button from '@/components/ui/Button.astro';
 import Container from '@/components/ui/Container.astro';
+import NoteRef from '@/components/ui/NoteRef.astro';
 import RiskNote from '@/components/ui/RiskNote.astro';
 import Section from '@/components/ui/Section.astro';
 import { sections } from '@/config/sections';
@@ -111,7 +112,7 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
     <div data-hero-copy class="mx-auto flex max-w-4xl flex-col items-center text-center">
       {
         showEyebrow && (
-          <div {...copyScrubMove} class="mb-5 max-sm:order-1 sm:mb-6">
+          <div {...copyScrubMove} class="mb-3 max-sm:order-1 sm:mb-6">
             <p
               data-intro="1"
               class="text-eyebrow flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 text-teal-100 max-sm:tracking-wider"
@@ -133,52 +134,22 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
         </span>
       </h1>
       <div {...copyScrubUp} class="flex flex-col items-center max-sm:order-3">
-        <p data-intro="2" data-intro-move class="text-display-sm mt-5 text-sand sm:mt-7">
+        <p
+          data-intro="2"
+          data-intro-move
+          class="mt-4 max-w-2xl text-xl leading-snug font-semibold text-balance text-sand sm:mt-7 sm:text-display-sm"
+        >
           {hero.tagline}
+          {
+            hero.taglineNoteId && (
+              <span class="whitespace-nowrap">
+                <NoteRef id={hero.taglineNoteId} />
+              </span>
+            )
+          }
         </p>
       </div>
-      {
-        /* Claim de la trame en deux temps : l'énoncé en petit, la réponse (« Oui ! » / « Non ! ») détachée,
-          en couleur d'accent. Entrée en cascade (data-intro 4 et 5) : les réponses arrivent après leur
-          énoncé. Le bloc recule avec les autres textes pendant le vol du logo (copyScrubMove), jamais la
-          ligne risques. Sur mobile, il passe en dernier (order 6) pour ne pas repousser les CTA. */
-      }
-      {
-        hero.claims && hero.claims.length > 0 && (
-          <ul
-            {...copyScrubMove}
-            role="list"
-            class="mt-6 flex max-w-3xl flex-col gap-3 text-left max-sm:order-6 max-sm:mt-5 sm:mt-10 sm:flex-row sm:justify-center sm:gap-10"
-          >
-            {hero.claims.map((claim, i) => (
-              <li class="flex items-baseline gap-2 sm:flex-col sm:items-start sm:gap-1">
-                <span
-                  data-intro={String(4 + i * 2)}
-                  data-intro-move
-                  class="text-sm leading-snug text-white/90 sm:text-base"
-                >
-                  {claim.text}
-                </span>
-                <span
-                  data-intro={String(5 + i * 2)}
-                  data-intro-move
-                  class="text-display-sm shrink-0 leading-none font-bold text-sand max-sm:text-xl"
-                >
-                  {claim.answer}
-                </span>
-              </li>
-            ))}
-          </ul>
-        )
-      }
-
-      <RiskNote
-        text={hero.riskLine}
-        tone="dark"
-        size="base"
-        class:list={['mx-auto mt-6 max-w-3xl text-left sm:mt-8', riskMobile]}
-      />
-      <div {...copyScrubDown} class="mt-6 w-full max-sm:order-4 sm:mt-10 sm:w-auto">
+      <div {...copyScrubDown} class="mt-4 w-full max-sm:order-4 sm:mt-10 sm:w-auto">
         {
           /* `data-hero-cta` : repère stable pour la mesure et pour le test « les CTA du hero sont
             visibles sans scroller » — il ne dépend pas du rang dans la cascade d'entrée. */
@@ -207,6 +178,16 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
           </Button>
         </div>
       </div>
+      {
+        /* Ligne risques SOUS les CTA (11/09/2026) : à toutes les largeurs, jamais animée, jamais atténuée. */
+      }
+      <RiskNote
+        text={hero.riskLine}
+        noteId={hero.riskNoteId}
+        tone="dark"
+        size="base"
+        class:list={['mx-auto mt-4 max-w-3xl text-left sm:mt-8', riskMobile]}
+      />
     </div>
   </Container>
 </Section>

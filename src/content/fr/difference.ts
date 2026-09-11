@@ -1,7 +1,7 @@
 import type { DifferenceContent } from '@/content/types-v2';
 import type { LegalNote } from '@/content/types';
 import { pages } from '@/config/pages';
-import { corumGroup, fees as feeFacts, product } from '@/content/fr/facts';
+import { fees as feeFacts, product } from '@/content/fr/facts';
 import { arbitrageWarningBullets } from '@/content/fr/legal';
 
 /**
@@ -32,12 +32,6 @@ export const notes: LegalNote[] = [
     id: 'difference-remuneration',
     text: nb(
       `Rémunération de la société de gestion : ${feeFacts.management.label} de frais de gestion, ${feeFacts.management.base}, une commission sur les cessions d’immeubles de ${feeFacts.disposal.label}, ${feeFacts.disposal.base}, selon la plus-value réalisée, et une commission de retrait dégressive avant ${zeroAfter} ans de détention. Aucune commission de souscription, aucun frais d’acquisition, d’intermédiation ou de travaux. ${feeFacts.vatNote} Sources : brochure partenaires 2026, p. 4 et p. 6 ; document d’informations clés du ${product.dicDate.label} ; note d’information visée par l’AMF.`
-    ),
-  },
-  {
-    id: 'difference-definition',
-    text: nb(
-      `${product.definitionScope} Les cinq SCPI concernées : ${corumGroup.scpiNames.join(', ')}.`
     ),
   },
   {
@@ -74,8 +68,6 @@ export const difference = {
   ],
   counterweight: {
     title: 'Une rémunération sans commission à l’entrée',
-    /** Allégation de rang (hero minimal) : jamais sans son appel de note, toujours suivie des frais réels (risk). */
-    claim: { text: product.definition, noteId: 'difference-definition' },
     /** Trame, zone 1 → ouverture de la zone 2 (hero minimal du 10/09/2026). Formulation exacte : les frais de gestion sont prélevés sur les loyers encaissés. */
     pedagogy: [
       // Claim de l'équipe marketing, repris mot pour mot (décision du 11/09/2026, à défendre en compliance :
