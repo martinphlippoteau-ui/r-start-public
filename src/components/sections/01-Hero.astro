@@ -130,13 +130,22 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
       }
       <h1 id={titleId} class="hero-logo-wrap max-sm:order-2">
         <span class="visually-hidden">{hero.title}</span>
-        <span class="hero-logo-stack" data-brand-flight aria-hidden="true">
+        {
+          /* Rang 2 de l'ouverture : le logo entre par déplacement seul (candidat LCP, jamais d'opacité). */
+        }
+        <span
+          class="hero-logo-stack"
+          data-brand-flight
+          aria-hidden="true"
+          data-intro="2"
+          data-intro-move
+        >
           <Image src={brandLogo} alt="" width={290} height={89} loading="eager" decoding="async" />
         </span>
       </h1>
       <div {...copyScrubUp} class="flex flex-col items-center max-sm:order-3">
         <p
-          data-intro="2"
+          data-intro="3"
           data-intro-move
           class="mt-4 max-w-2xl text-xl leading-snug font-semibold text-balance text-sand sm:mt-7 sm:text-display-sm"
         >
@@ -150,7 +159,7 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
         }
         <div
           data-hero-cta
-          data-intro="3"
+          data-intro="4"
           data-intro-move
           class="flex w-full flex-col items-stretch gap-2 sm:w-auto sm:flex-row sm:items-center sm:gap-3"
         >

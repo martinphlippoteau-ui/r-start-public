@@ -27,26 +27,23 @@ export const notes: LegalNote[] = [
 
 export const hero = {
   /**
-   * Surtitre (11/09/2026) : il porte l'objectif « comprendre que tout est digital », le moins bien servi
-   * de la page. La nature juridique du produit (facts.product.type) reste dans les données structurées et
-   * les mentions légales. À défendre en compliance : ce sont la souscription et le suivi qui sont 100 %
-   * en ligne, pas la SCPI elle-même ; la carte « en ligne » et le chapitre « Souscrire » le précisent.
+   * Premier temps de l'ouverture (11/09/2026) : la signature de l'annonceur, rendue en grand au-dessus du
+   * logo. La nature juridique du produit (facts.product.type) reste dans les données structurées et les
+   * mentions légales.
    */
-  eyebrow: nb('SCPI 100 % digitale'),
+  eyebrow: 'CORUM invente',
   /** Pastille « Nouveau » : R Start est ouverte aux souscriptions depuis 2026 (facts.product.openingDate). */
   badge: 'Nouveau',
   title: product.name,
   /**
    * Accroche de l'équipe marketing, reprise mot pour mot (décision du 11/09/2026, prise en connaissance
-   * du risque). DEUX POINTS À DÉFENDRE, signalés en avertissement par scripts/check-compliance.mjs :
-   *  - « la seule » est une allégation d'exclusivité sur TOUT le marché, sans périmètre ni preuve ; c'est
-   *    précisément ce que l'AMF a fait borner sur la brochure (« la première SCPI DU GROUPE CORUM ») ;
-   *  - « gagnant-gagnant » suggère un gain pour l'épargnant, alors que le capital n'est pas garanti et les
-   *    revenus non plus.
+   * du risque). UN POINT À DÉFENDRE, signalé en avertissement par scripts/check-compliance.mjs :
+   * « gagnant-gagnant » suggère un gain pour l'épargnant, alors que le capital n'est pas garanti et les
+   * revenus non plus. (L'allégation d'exclusivité « la seule SCPI » a été abandonnée le 11/09/2026.)
    * Le contre-poids du hero (`riskLine`, juste sous les CTA) porte les frais réellement prélevés et la
    * ligne risques ; l'allégation bornée, elle, reste sur la page dans « Ce qui change vraiment ».
    */
-  tagline: 'La seule SCPI Gagnant-Gagnant',
+  tagline: 'L’immobilier gagnant-gagnant',
   /**
    * Contre-poids unique du hero (11/09/2026) : les frais réellement prélevés OUVRENT le bloc « Bon à
    * savoir », suivis de la ligne risques de legal.ts, reproduite mot pour mot et jamais réécrite.
