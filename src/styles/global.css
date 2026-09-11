@@ -523,8 +523,46 @@ html.reperes main section[data-section]:first-child::before {
 @utility photo-fade {
   position: relative;
   overflow: hidden;
-  -webkit-mask-image: radial-gradient(115% 92% at 50% 44%, rgb(0 0 0 / 1) 56%, rgb(0 0 0 / 0) 100%);
-  mask-image: radial-gradient(115% 92% at 50% 44%, rgb(0 0 0 / 1) 56%, rgb(0 0 0 / 0) 100%);
+  /* DEUX dégradés croisés plutôt qu'un masque radial (11/09/2026) : un cercle centré sur une boîte que le
+     sujet remplit presque ne peut pas à la fois effacer les coins et épargner le sujet — il laissait les
+     coins à 80 % d'opacité, donc le bord restait net. Ici, chaque bord a sa bande de fondu et le centre
+     n'est jamais touché ; `intersect` les croise, ce qui efface les coins deux fois.
+     Les bandes sont calées sur la place du sujet dans le cadre : 20 % à gauche et à droite (le téléphone
+     commence à 34 %), 14 % en haut (il commence à 25 %), 10 % en bas (il finit à 89 %). */
+  -webkit-mask-image:
+    linear-gradient(
+      to bottom,
+      rgb(0 0 0 / 0) 0%,
+      rgb(0 0 0 / 1) 14%,
+      rgb(0 0 0 / 1) 90%,
+      rgb(0 0 0 / 0) 100%
+    ),
+    linear-gradient(
+      to right,
+      rgb(0 0 0 / 0) 0%,
+      rgb(0 0 0 / 1) 20%,
+      rgb(0 0 0 / 1) 80%,
+      rgb(0 0 0 / 0) 100%
+    );
+  mask-image:
+    linear-gradient(
+      to bottom,
+      rgb(0 0 0 / 0) 0%,
+      rgb(0 0 0 / 1) 14%,
+      rgb(0 0 0 / 1) 90%,
+      rgb(0 0 0 / 0) 100%
+    ),
+    linear-gradient(
+      to right,
+      rgb(0 0 0 / 0) 0%,
+      rgb(0 0 0 / 1) 20%,
+      rgb(0 0 0 / 1) 80%,
+      rgb(0 0 0 / 0) 100%
+    );
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
 }
 
 /* Défilement horizontal sans barre visible (liste de la navigation) */
