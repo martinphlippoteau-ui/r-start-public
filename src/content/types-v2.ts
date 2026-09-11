@@ -63,6 +63,10 @@ export interface TrustContent {
     scoreSuffix?: string;
     /** Mention lue par les lecteurs d'écran sur le lien externe (ex. « nouvelle fenêtre »). */
     externalLinkHint?: string;
+    /** Nom accessible des TrustBox officiels (contenu rendu par Trustpilot dans une iframe). */
+    widgetLabel?: string;
+    /** Portée des avis, affichée sous le bandeau du hero. */
+    heroCaption?: string;
   };
   stats: {
     title: string;

@@ -1,0 +1,60 @@
+---
+/**
+ * TrustBox Trustpilot — widget OFFICIEL fourni par Trustpilot (code d'intégration remis par l'équipe le
+ * 11/09/2026). Le contenu (logo, note, étoiles, avis) est rendu par Trustpilot dans une iframe : il n'est
+ * ni composé ni sélectionné par CORUM, et il n'entre donc pas dans le périmètre du contrôle des
+ * formulations du site (scripts/check-compliance.mjs ne voit que le lien de repli).
+ *
+ * C'est précisément ce qui rend l'intégration défendable : le carrousel est réglé sur `data-stars`
+ * « 1,2,3,4,5 », donc il diffuse TOUTES les notes, y compris les avis négatifs. Aucun tri favorable n'est
+ * opéré — l'obligation d'information sur les avis en ligne (art. L111-7-2 du code de la consommation) est
+ * tenue par ce réglage et par la note légale `confiance-trustpilot`.
+ *
+ * Le script d'amorçage doit être chargé UNE SEULE FOIS par page, dans le <head> :
+ * components/TrustpilotScript.astro, passé à Base.astro par le slot « head ». Sans lui, le contenu du
+ * <div> reste tel quel — d'où le lien de repli vers le profil public, qui garde la mention accessible.
+ *
+ * Identifiants : src/content/fr/facts.ts (`trust.trustpilot.widgets`). Ne jamais les inventer : ils sont
+ * propres au compte Trustpilot de CORUM et viennent de son back-office.
+ */
+import { trust as trustFacts } from '@/content/fr/facts';
+
+type TemplateKey = keyof typeof trustFacts.trustpilot.widgets.templates;
+
+interface Props {
+  /** Gabarit Trustpilot à afficher : « horizontal » (bandeau note + étoiles) ou « carousel » (avis). */
+  template: TemplateKey;
+  /** « dark » sur fond sombre (Trustpilot y compose son texte en clair). */
+  theme?: 'light' | 'dark';
+  /** Nom accessible de la zone, faute de quoi l'iframe arrive sans contexte dans la page. */
+  label: string;
+  class?: string;
+}
+const { template, theme, label, class: className = '' } = Astro.props as Props;
+const tp = trustFacts.trustpilot;
+const widget = tp.widgets.templates[template];
+---
+
+{
+  /* Attributs repris à l'identique du code d'intégration Trustpilot : les renommer casse le widget. */
+}
+{
+  /* L'enveloppe ne porte PAS la classe `trustpilot-widget` : le script d'amorçage initialise tout élément
+    qui la porte, et un conteneur sans identifiants le fait échouer (erreur remontée à Trustpilot). */
+}
+<div class:list={[className]} role="group" aria-label={label}>
+  <div
+    class="trustpilot-widget"
+    data-locale={tp.widgets.locale}
+    data-template-id={widget.templateId}
+    data-businessunit-id={tp.widgets.businessUnitId}
+    data-style-height={widget.height}
+    data-style-width="100%"
+    data-token={widget.token}
+    data-theme={theme}
+    data-stars={widget.stars}
+    data-review-languages={widget.reviewLanguages}
+  >
+    <a href={tp.url} target="_blank" rel="noopener noreferrer">Trustpilot</a>
+  </div>
+</div>

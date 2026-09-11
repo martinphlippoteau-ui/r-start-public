@@ -5,11 +5,13 @@
  * zone 2 et de /frais) a été retiré. Trame du 10/09/2026 : 02 Points
  * forts (white) → 01b Ce qui change (paper) → 07 → 03a Immeuble (photo pleine largeur) → 03 Frais. Deux
  * bandes contrastées avec les voisines : une bande ink (en-tête + cadre réglementaire en cartes label / valeur,
- * réserve AMF et RiskNote), puis une bande white (avis Trustpilot en grand chiffre compteur + lien externe
+ * réserve AMF et RiskNote), puis une bande white (carrousel d'avis Trustpilot officiel + lien externe
  * + périmètre en RiskNote ; chiffres du groupe CORUM en quatre compteurs 2 × 2, RiskNote puis source ;
  * gamme des cinq SCPI avec logos ; rémunération de CORUM sur les ventes). Les cinq blocs sont des H3 de
  * même niveau sous le H2.
- * Aucun logo AMF, aucune étoile ni logo Trustpilot, aucune photo (droits media.corum non confirmés).
+ * Aucun logo AMF, aucune photo (droits media.corum non confirmés). Le logo Trustpilot, les étoiles et les
+ * avis sont rendus par le TrustBox OFFICIEL (ui/TrustBox.astro) : ils viennent de Trustpilot, pas du site
+ * (11/09/2026). Le carrousel est réglé sur toutes les notes, de une à cinq étoiles : aucun tri favorable.
  * Les chiffres viennent de trust.stats (corum.stats n'est pas rendu ici pour ne pas doubler) : les quatre
  * chiffres de la trame (zone 4) sont tous rendus, dans l'ordre du contenu ; leur contre-poids et leur source
  * ont quitté le bloc le 11/09/2026 (voir le commentaire dans le gabarit).
@@ -21,10 +23,8 @@
  *  - les titres H3 des trois blocs entrent par `fade-up` : 24 px (valeur titre) quand un compteur suit
  *    (avis, chiffres), 12 px seulement quand le paragraphe sous le titre est visible d'emblée (gamme) pour
  *    ne pas chevaucher sa première ligne ;
- *  - les quatre chiffres du groupe sont FIXES (size="solid") : le compteur faisait varier leur largeur
- *    et décalait la grille. La note Trustpilot reste un compteur (`<Stat numeric>`) qui monte de 0 à la note en
- *    1,4 s avec une décimale : c'est le seul effet de son bloc (plus de fade-up sur l'enveloppe) ; le
- *    périmètre / risque à côté reste visible d'emblée ;
+ *  - le bloc des avis n'a plus aucun effet d'entrée : son contenu est une iframe Trustpilot, que le site
+ *    n'anime pas ;
  *  - les chiffres du groupe comptent depuis 0, en place (plus de `stagger` sur la liste : le compteur est
  *    l'entrée), avec une durée proportionnelle à l'ordre de grandeur (1,4 s pour 9,6 → 2,2 s pour
  *    160 000) : les grands nombres finissent en dernier. Chiffres non réglementaires (clients, encours,
@@ -46,7 +46,7 @@ import Container from '@/components/ui/Container.astro';
 import NoteRef from '@/components/ui/NoteRef.astro';
 import Section from '@/components/ui/Section.astro';
 import SectionHeading from '@/components/ui/SectionHeading.astro';
-import Stat from '@/components/ui/Stat.astro';
+import TrustBox from '@/components/ui/TrustBox.astro';
 import { pages } from '@/config/pages';
 import { withBase } from '@/lib/href';
 import { sections } from '@/config/sections';
@@ -58,13 +58,7 @@ const { trustpilot } = trust;
 
 /** Gamme en texte (décision du 09/09/2026 : seuls les logos R Start et CORUM L'Épargne sont utilisés sur le site). */
 
-/** Décimales du compteur : 1 pour une valeur non entière (ex. 9,6), sinon aucune. */
-const decimalsOf = (n?: number): number | undefined =>
-  n === undefined || Number.isInteger(n) ? undefined : 1;
 const hint = trustpilot.externalLinkHint;
-
-/** Compteur Trustpilot : départ à 0, 1,4 s (une décimale via decimalsOf). */
-const TRUSTPILOT_COUNTER = { from: 0, duration: 1.4 };
 {
   /* Quatre chiffres fixes (11/09/2026) : plus de compteur — la largeur du nombre changeait pendant
             l'animation et décalait toute la grille. Une seule entrée en cascade sur la liste. */
@@ -104,22 +98,18 @@ const TRUSTPILOT_COUNTER = { from: 0, duration: 1.4 };
           {trustpilot.title}
           <NoteRef id="confiance-trustpilot" tone="light" />
         </h3>
-        <!-- La note compte de 0 à sa valeur (seul effet du bloc). -->
+        {
+          /* TrustBox officiel « carrousel » (11/09/2026) : la note figée et son compteur ont laissé la
+            place aux avis servis en direct par Trustpilot, toutes notes confondues (`stars` 1 à 5). Rien
+            n'est composé ni trié ici : le contenu arrive dans une iframe Trustpilot. */
+        }
         <div class="lg:col-span-12">
-          <Stat
-            value={trustpilot.scoreLabel}
-            numeric={trustpilot.score}
-            decimals={decimalsOf(trustpilot.score)}
-            suffix={trustpilot.scoreSuffix}
-            from={TRUSTPILOT_COUNTER.from}
-            duration={TRUSTPILOT_COUNTER.duration}
-            label={`${trustpilot.reviewsLabel} ${trustpilot.dateLabel}`}
-          />
+          <TrustBox template="carousel" label={trustpilot.widgetLabel!} />
           <a
             href={trustpilot.url}
             target="_blank"
             rel="noopener noreferrer"
-            class="mt-6 inline-flex items-center gap-2 text-base font-semibold text-teal-700 no-underline hover:text-navy hover:underline"
+            class="mt-4 inline-flex items-center gap-2 text-base font-semibold text-teal-700 no-underline hover:text-navy hover:underline"
           >
             {trustpilot.linkLabel}
             {hint && <span class="visually-hidden">({hint})</span>}

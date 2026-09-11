@@ -107,7 +107,7 @@ export const notes: LegalNote[] = [
   {
     id: 'confiance-trustpilot',
     text: nb(
-      `Note de ${tp.scoreLabel} et ${tp.reviewsLabel} relevés sur ${tp.url} le ${tp.snapshotDate.label}, profil revendiqué par ${company}. Trustpilot est une plateforme d’avis indépendante de CORUM. Les avis portent sur les services du distributeur ${company}, non sur R Start. Ils évoluent en permanence : seule la page Trustpilot fait foi à la date de consultation. Ils ne constituent ni une recommandation ni une indication sur les résultats futurs de R Start.`
+      `Note et avis affichés en direct par Trustpilot depuis le profil ${tp.url}, revendiqué par ${company}. Trustpilot est une plateforme d’avis indépendante de CORUM : elle publie et modère ces avis, CORUM ne les sélectionne pas et ne les modifie pas. Le carrousel diffuse toutes les notes, de une à cinq étoiles, avis négatifs compris. Les avis portent sur les services du distributeur ${company}, non sur R Start. Ils évoluent en permanence : seule la page Trustpilot fait foi à la date de consultation. Ils ne constituent ni une recommandation ni une indication sur les résultats futurs de R Start, et ne réduisent aucun de ses risques : perte en capital, revenus non garantis, liquidité limitée.`
     ),
   },
   {
@@ -168,6 +168,10 @@ export const trust = {
     reviewsLabel: nbDigits(tp.reviewsLabel),
     dateLabel: `au ${tp.snapshotDate.label}`,
     linkLabel: 'Lire les avis sur Trustpilot',
+    /** Nom accessible des deux TrustBox (le contenu arrive dans une iframe servie par Trustpilot). */
+    widgetLabel: `Avis Trustpilot sur ${company}`,
+    /** Portée, visible sous le bandeau du hero : les avis ne parlent pas de R Start. */
+    heroCaption: `Avis sur ${company}, distributeur de R Start.`,
     url: tp.url,
     externalLinkHint: 'nouvelle fenêtre',
     /** Périmètre des avis puis contre-poids risque, affichés ensemble et à la même taille que la note. */

@@ -7,6 +7,7 @@
  * Plus d'image de fond dans le hero depuis le 11/09/2026 : aucun préchargement d'image (le LCP est le logo ou l'accroche).
  */
 import Base from '@/layouts/Base.astro';
+import TrustpilotScript from '@/components/TrustpilotScript.astro';
 import SiteNav from '@/components/SiteNav.astro';
 import LegalNotes from '@/components/LegalNotes.astro';
 import Footer from '@/components/Footer.astro';
@@ -57,6 +58,11 @@ const jsonLd = [
   ogImageAlt={seo.ogImageAlt}
   jsonLd={jsonLd}
 >
+  {
+    /* Script d'amorçage des TrustBox Trustpilot : une seule fois, dans le <head> (consigne de
+      Trustpilot). Seule l'accueil porte des widgets, les autres pages ne le chargent donc pas. */
+  }
+  <TrustpilotScript slot="head" />
   <SiteNav />
   <main id="contenu">
     {hero && <hero.Component />}

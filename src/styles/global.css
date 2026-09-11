@@ -707,7 +707,7 @@
 }
 @media (width >= 64rem) and (height >= 56rem) {
   body:has(#consent-banner:not([hidden])) [data-hero-copy] {
-    margin-bottom: 3rem;
+    margin-bottom: 5rem;
   }
 }
 

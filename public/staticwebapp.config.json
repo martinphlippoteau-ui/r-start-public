@@ -34,7 +34,7 @@
     "Referrer-Policy": "strict-origin-when-cross-origin",
     "X-Frame-Options": "DENY",
     "Permissions-Policy": "camera=(), microphone=(), geolocation=(), payment=(), usb=()",
-    "Content-Security-Policy-Report-Only": "default-src 'self'; script-src 'self' https://*.googletagmanager.com; connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; img-src 'self' data: https://*.googletagmanager.com https://*.google-analytics.com; style-src 'self' 'unsafe-inline'; font-src 'self'; frame-ancestors 'none'; base-uri 'self'; object-src 'none'; form-action 'self'"
+    "Content-Security-Policy-Report-Only": "default-src 'self'; script-src 'self' https://*.googletagmanager.com https://widget.trustpilot.com; connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://*.trustpilot.com; img-src 'self' data: https://*.googletagmanager.com https://*.google-analytics.com https://*.trustpilot.com; style-src 'self' 'unsafe-inline'; font-src 'self' https://*.trustpilot.com; frame-src https://widget.trustpilot.com; frame-ancestors 'none'; base-uri 'self'; object-src 'none'; form-action 'self'"
   },
   "mimeTypes": {
     ".webp": "image/webp",

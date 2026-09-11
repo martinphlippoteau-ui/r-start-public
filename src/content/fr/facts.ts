@@ -383,7 +383,32 @@ export const trust = {
     reviews: 248,
     reviewsLabel: '248 avis',
     claimed: true,
-    url: 'https://fr.trustpilot.com/review/corum.fr',
+    url: 'https://fr.trustpilot.com/review/www.corum.fr', // profil visé par les codes d'intégration Trustpilot
+    /**
+     * Identifiants des TrustBox officiels, remis par l'équipe le 11/09/2026 depuis le back-office
+     * Trustpilot de CORUM. Ils ne se devinent pas : toute modification vient de ce back-office.
+     * Le carrousel diffuse TOUTES les notes (`stars` : 1 à 5) : aucun tri favorable des avis.
+     */
+    widgets: {
+      locale: 'fr-FR',
+      businessUnitId: '5fbeb56b2bf7fb00015d6b3f',
+      templates: {
+        horizontal: {
+          templateId: '5406e65db0d04a09e042d5fc',
+          token: '82ca7f96-d8e5-4085-9c1a-2f0b448390c4',
+          height: '28px',
+          stars: undefined,
+          reviewLanguages: undefined,
+        },
+        carousel: {
+          templateId: '53aa8912dec7e10d38f59f36',
+          token: '57f52181-f64a-4a4f-b409-edb45c746c8d',
+          height: '140px',
+          stars: '1,2,3,4,5',
+          reviewLanguages: 'fr',
+        },
+      },
+    },
     snapshotDate: { label: '8 septembre 2026', iso: '2026-09-08' }, // relevé fr.trustpilot.com/review/corum.fr
     scope:
       'Avis publiés sur Trustpilot à propos de CORUM L’Épargne, distributeur de R Start. Ils ne portent ni sur R Start ni sur ses résultats futurs.',

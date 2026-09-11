@@ -199,6 +199,16 @@ export const legalPages: LegalPage[] = [
         ],
       },
       {
+        /* Déclaré le 11/09/2026 avec l'intégration des TrustBox officiels : sans cette section, la
+          politique affirmerait à tort que le site ne charge aucun contenu tiers. */
+        title: 'Les contenus tiers : les avis Trustpilot',
+        paragraphs: [
+          'L’accueil affiche les avis publiés sur Trustpilot au sujet de CORUM L’Épargne, distributeur de R Start. Ces avis sont servis directement par Trustpilot : le composant est chargé depuis widget.trustpilot.com, et son contenu est publié et modéré par Trustpilot, pas par CORUM.',
+          'Ce composant ne dépose pas de cookie sur votre appareil. En revanche, l’affichage des avis suppose une connexion aux serveurs de Trustpilot, qui reçoivent alors votre adresse IP et les informations techniques transmises par votre navigateur. Trustpilot est responsable de ces traitements : sa politique de confidentialité est accessible depuis fr.trustpilot.com.',
+          'Si vous préférez ne pas charger ce composant, vous pouvez bloquer le domaine widget.trustpilot.com dans les paramètres ou les extensions de votre navigateur. Le reste du site continue de fonctionner normalement.',
+        ],
+      },
+      {
         title: 'Aucune mesure d’audience sans votre accord',
         paragraphs: [
           'À votre première visite, un bandeau vous propose d’accepter ou de refuser la mesure d’audience. Les deux boutons ont le même poids. Tant que vous n’avez pas choisi, aucun outil de mesure n’est chargé et aucun cookie de mesure d’audience n’est déposé.',

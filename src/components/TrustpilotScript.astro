@@ -1,0 +1,17 @@
+---
+/**
+ * Script d'amorçage des TrustBox Trustpilot, à placer dans le <head> (consigne de Trustpilot) et UNE
+ * SEULE FOIS par page : `<TrustpilotScript slot="head" />` sur les pages qui affichent un widget.
+ * `is:inline` : l'URL est externe, elle ne passe pas par le bundle. `async` : le widget ne bloque ni le
+ * rendu ni le plus grand élément affiché du hero.
+ *
+ * Tiers : widget.trustpilot.com. Le TrustBox n'écrit rien sur l'appareil du visiteur (il affiche des avis
+ * publics), mais il expose son adresse IP à Trustpilot : le domaine est déclaré dans la politique de
+ * sécurité de public/staticwebapp.config.json et doit l'être dans la politique de confidentialité.
+ */
+---
+
+<script
+  is:inline
+  async
+  src="https://widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js"></script>
