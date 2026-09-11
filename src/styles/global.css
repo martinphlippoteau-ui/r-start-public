@@ -399,6 +399,39 @@
   }
 }
 
+/* Pastille d'appel flottante (components/StickyCta.astro) : absente tant que le défilement n'a pas
+   atteint sa section de départ, puis posée en bas de l'écran jusqu'au pied de page. `visibility` en plus
+   de l'opacité — sans elle, un lien invisible resterait dans le parcours au clavier. Elle s'efface aussi
+   tant que le bandeau cookies est déplié : il occupe la même place. */
+[data-sticky-cta] {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(0.75rem);
+}
+[data-sticky-cta][data-on] {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
+  opacity: 0;
+  visibility: hidden;
+}
+@media (prefers-reduced-motion: no-preference) {
+  [data-sticky-cta] {
+    transition:
+      opacity 260ms ease,
+      transform 320ms var(--ease-out-expo),
+      visibility 0s linear 260ms;
+  }
+  [data-sticky-cta][data-on] {
+    transition:
+      opacity 260ms ease,
+      transform 320ms var(--ease-out-expo),
+      visibility 0s;
+  }
+}
+
 /* PROVISOIRE (11/09/2026) — repères de travail. « Section 1 », « Section 2 »… posés en haut à gauche de
    chaque grande section pour pouvoir en parler sans ambiguïté pendant la refonte. Le libellé vit dans
    `content` : rien dans le DOM, donc aucun effet sur le contrôle de conformité, la validation HTML ou les
@@ -847,7 +880,9 @@ html.reperes main section[data-section]:first-child::before {
    Pourquoi `clip-path` et pas `opacity` : un contrôle d'accessibilité mesure les contrastes pendant la
    cascade et lisait des textes à mi-fondu. Le découpage ne change aucune couleur.
    La marque, elle, n'est jamais découpée : c'est le plus grand élément affiché, donc le candidat LCP.
-   Elle entre par déplacement et échelle seuls, sur une courbe qui dépasse sa cible avant de s'y poser.
+   Elle GRANDIT depuis son centre, de 35 % à sa taille — une apparition façon PowerPoint (demande de
+   l'équipe, 11/09/2026) — sur une courbe qui dépasse sa cible avant de s'y poser. Échelle seule, sans
+   déplacement ni opacité.
    La ligne risques fait partie de la séquence depuis le 11/09/2026 (demande de l'équipe) : elle arrive
    entre les CTA et les avis, donc le risque précède la réassurance. Le garde-fou de
    tests/conformite.spec.ts est resserré en conséquence — une révélation AU SCROLL reste interdite
@@ -864,9 +899,10 @@ html.reperes main section[data-section]:first-child::before {
   /* 1 — LA MARQUE, seule à l'écran pendant toute son entrée. */
   html.intro #apercu [data-intro='1'] {
     animation-name: intro-hero-brand;
-    animation-timing-function: cubic-bezier(0.16, 1.12, 0.3, 1);
+    animation-timing-function: cubic-bezier(0.22, 1.14, 0.32, 1);
+    transform-origin: 50% 50%;
     --intro-delay: 100ms;
-    --intro-dur: 1200ms;
+    --intro-dur: 1100ms;
   }
   /* 2 — le surtitre se dévoile au-dessus d'elle. */
   html.intro #apercu [data-intro='2'] {
@@ -905,10 +941,15 @@ html.reperes main section[data-section]:first-child::before {
     --intro-dur: 550ms;
   }
 }
-/* La marque : déplacement et échelle seuls, jamais de découpe (candidat LCP). */
+/* La marque GRANDIT depuis son centre (11/09/2026, demande de l'équipe : « comme une apparition
+   PowerPoint »). Plus de montée : un agrandissement pur, de 35 % à sa taille, sur une courbe qui dépasse
+   légèrement sa cible avant de s'y poser. Échelle SEULE, jamais de découpe ni d'opacité : c'est le plus
+   grand élément affiché, donc le candidat LCP, et un contrôle d'accessibilité mesure la page pendant la
+   cascade. Elle part de 35 % et non de zéro pour la même raison — un élément d'aire nulle n'est pas un
+   candidat LCP. */
 @keyframes intro-hero-brand {
   from {
-    transform: translate3d(0, 72px, 0) scale(0.86);
+    transform: scale(0.35);
   }
 }
 /* Le surtitre : absent, puis dévoilé de bas en haut. */

@@ -3,8 +3,10 @@
  * Section 2 — « Pourquoi gagnant-gagnant ? » (id « ce-qui-change »), zone 2 de la V2.
  * Réduite au texte fourni par l'équipe le 11/09/2026 : H2, question d'accroche en H3, la phrase qui
  * annonce les deux situations, les deux situations en liste, la conclusion, l'allégation de rang et un
- * lien vers le comparateur. Plus de cartes, plus de photos, plus de sur-titre, plus de mécanisme de
- * réserve : la section tient en un écran.
+ * lien vers le comparateur. Plus de cartes, plus de sur-titre, plus de mécanisme de réserve : la section
+ * tient en un écran.
+ * Le bouton qui la fermait est devenu une PASTILLE FLOTTANTE (components/StickyCta.astro, rendue par la
+ * page) : le lien vers le comparateur reste atteignable pendant toute la lecture.
  * Équilibre AMF : la section ne porte PLUS de couple avantage / risque depuis le 11/09/2026 — le
  * contre-poids chiffré a été retiré sur demande réitérée de l'équipe, et le marquage `data-advantage`
  * avec lui, faute de frère. Les risques de l'accueil reposent sur la ligne du hero et sur la section
@@ -15,7 +17,6 @@
  * Contenu : src/content/fr/difference.ts.
  */
 import { Picture } from 'astro:assets';
-import Button from '@/components/ui/Button.astro';
 import Container from '@/components/ui/Container.astro';
 import NoteRef from '@/components/ui/NoteRef.astro';
 import Section from '@/components/ui/Section.astro';
@@ -153,12 +154,6 @@ const situations = (difference.situations ?? []).map((s) => {
           )
         }
       </figure>
-    </div>
-
-    <div class="mt-10 sm:mt-14">
-      <Button href={difference.cta.href} variant="secondary" size="lg">
-        {difference.cta.label}
-      </Button>
     </div>
   </Container>
 </Section>

@@ -1,0 +1,77 @@
+---
+/**
+ * Pastille d'appel flottante, façon page produit Apple (11/09/2026, demande de l'équipe) : un petit lien
+ * posé en bas de l'écran, qui apparaît une fois le premier écran passé et s'efface à l'arrivée du pied de
+ * page. Elle remplace le bouton qui fermait la zone 2 : le lien vers le comparateur reste atteignable
+ * pendant toute la lecture, au lieu d'être manqué si on saute la fin de la section.
+ *
+ * Rendue au niveau de la PAGE, jamais dans une section. Les sections de l'accueil sont épinglées au
+ * défilement (`data-curtain`) : un ancêtre transformé devient le bloc conteneur d'un enfant `fixed`, la
+ * pastille se calerait alors sur la section au lieu du viewport.
+ *
+ * Elle disparaît tant que le bandeau cookies est déplié — il occupe la même place — et se retire du
+ * parcours au clavier quand elle est invisible (`visibility`, pas seulement l'opacité).
+ * Ce n'est pas un CTA de souscription : pas d'attribut `data-cta`, rien à compter côté conformité.
+ */
+interface Props {
+  label: string;
+  href: string;
+  /** Section à partir de laquelle elle apparaît (id). */
+  fromId: string;
+}
+const { label, href, fromId } = Astro.props as Props;
+---
+
+<div
+  data-sticky-cta
+  data-from={fromId}
+  class="pointer-events-none fixed inset-x-0 bottom-4 z-30 flex justify-center px-4 sm:bottom-6"
+>
+  <a
+    href={href}
+    class="pointer-events-auto inline-flex items-center gap-2 rounded-full bg-navy px-5 py-3 text-sm font-semibold text-white no-underline shadow-float outline-offset-4 transition-colors hover:bg-ink focus-visible:outline-3 focus-visible:outline-navy"
+  >
+    {label}
+    <svg
+      aria-hidden="true"
+      class="size-4"
+      viewBox="0 0 16 16"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d="M6 3.5 10.5 8 6 12.5"></path>
+    </svg>
+  </a>
+</div>
+
+<script>
+  /*
+   * Visible entre le haut de la section de départ et l'arrivée du pied de page. Une seule lecture de
+   * défilement par frame, comme la barre de navigation. Aucune dépendance au moteur d'animation : la
+   * pastille doit vivre même si GSAP n'est pas chargé.
+   */
+  const box = document.querySelector<HTMLElement>('[data-sticky-cta]');
+  const from = box?.dataset.from ? document.getElementById(box.dataset.from) : null;
+  const footer = document.querySelector<HTMLElement>('footer');
+  if (box && from) {
+    let frame = 0;
+    const sync = () => {
+      frame = 0;
+      const y = window.scrollY;
+      const start = from.getBoundingClientRect().top + y - window.innerHeight * 0.5;
+      const end = footer
+        ? footer.getBoundingClientRect().top + y - window.innerHeight
+        : Number.POSITIVE_INFINITY;
+      box.toggleAttribute('data-on', y > start && y < end);
+    };
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(sync);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+    sync();
+  }
+</script>

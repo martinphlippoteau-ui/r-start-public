@@ -11,8 +11,12 @@ import TrustpilotScript from '@/components/TrustpilotScript.astro';
 import SiteNav from '@/components/SiteNav.astro';
 import LegalNotes from '@/components/LegalNotes.astro';
 import Footer from '@/components/Footer.astro';
+import StickyCta from '@/components/StickyCta.astro';
 import { seo } from '@/content/fr/seo';
 import { faq } from '@/content/fr/faq';
+import { difference } from '@/content/fr/difference';
+import { sections } from '@/config/sections';
+import { withBase } from '@/lib/href';
 import { faqJsonLd, organizationJsonLd, webPageJsonLd } from '@/lib/seo';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -69,5 +73,14 @@ const jsonLd = [
     {rest.map(({ path, Component }) => <Component {...propsFor(path)} />)}
     <LegalNotes />
   </main>
+  {
+    /* Pastille d'appel flottante : au niveau de la page, jamais dans une section — les sections de
+      l'accueil sont épinglées au défilement, et un ancêtre transformé capturerait un enfant `fixed`. */
+  }
+  <StickyCta
+    label={difference.cta.label}
+    href={withBase(difference.cta.href)}
+    fromId={sections.difference.id}
+  />
   <Footer />
 </Base>
