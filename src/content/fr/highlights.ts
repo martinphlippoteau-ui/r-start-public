@@ -111,7 +111,7 @@ export const highlights = {
    * Les trois dernières informations de la trame vivent à part (11/09/2026) : ce ne sont pas des
    * caractéristiques du produit mais la façon d'y souscrire et ce qu'on peut automatiser ensuite.
    */
-  subscriptionTitle: 'Modalités de souscription et options',
+  subscriptionTitle: 'Souscription et options disponibles',
   subscriptionItems: [
     { label: 'Souscription', value: nb(subscription.onlineLabel), noteId: 'points-forts-en-ligne' },
     {
