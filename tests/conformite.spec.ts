@@ -107,15 +107,26 @@ test.describe('Conformité', () => {
     }
   });
 
+  /**
+   * Un avertissement de risque ne doit jamais dépendre d'une action du visiteur pour apparaître : une
+   * révélation AU SCROLL (`data-animate`, `data-scrub`, `data-reveal-text`) est donc interdite au-dessus
+   * d'un [data-risk] — on peut ne jamais atteindre le point qui la déclenche.
+   * `data-intro` a été SORTI de cette liste le 11/09/2026 : c'est la cascade de chargement du hero, elle
+   * se joue seule dès l'ouverture de la page, se termine en moins de trois secondes sans aucune action,
+   * et son état final est toujours l'élément pleinement visible (`animation-fill-mode: backwards`, aucun
+   * `forwards`). La ligne risques y entre entre les CTA et les avis, donc le risque précède la
+   * réassurance. Le contrôle de l'état final ci-dessous (opacité, visibilité, affichage) reste entier :
+   * il s'exécute après le chargement et échouerait si la cascade laissait quoi que ce soit masqué.
+   */
   test('aucun risque n’est masqué ou animé', async ({ page }) => {
     await page.goto('/');
+    // L'assertion porte sur l'état APRÈS la cascade d'ouverture : on la laisse se terminer.
+    await page.waitForTimeout(3000);
     const hidden = await page.locator('[data-risk]').evaluateAll(
       (nodes) =>
         nodes.filter((n) => {
           const cs = getComputedStyle(n);
-          const animatedAncestor = n.closest(
-            '[data-animate],[data-scrub],[data-reveal-text],[data-intro]'
-          );
+          const animatedAncestor = n.closest('[data-animate],[data-scrub],[data-reveal-text]');
           return (
             !!animatedAncestor ||
             cs.visibility === 'hidden' ||

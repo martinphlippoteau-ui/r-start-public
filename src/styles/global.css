@@ -367,6 +367,60 @@
     opacity: 1;
     pointer-events: auto;
   }
+
+  /* Tant que la barre est vide, le bouton Menu est le SEUL repère : il existe donc aussi sur grand écran,
+     où il cède la place aux entrées dès que la barre prend sa matière. Et il n'y montre que ses trois
+     barres — le mot « Menu » reste dans le DOM, masqué visuellement, sans quoi le bouton perdrait son
+     nom accessible (le chevron est décoratif). */
+  @media (width >= 64rem) {
+    body:has([data-page-header='dark']) [data-sitenav-bar]:not([data-landed]) [data-menu-open] {
+      display: inline-flex;
+      /* La barre est une grille de trois colonnes : sans placement, ce quatrième élément s'ouvrirait une
+         deuxième ligne et s'étirerait sur toute la largeur. Il partage la colonne de droite avec le CTA,
+         invisible tant que la barre est vide, et disparaît dès qu'elle prend sa matière. */
+      grid-column: 3;
+      grid-row: 1;
+      justify-self: end;
+    }
+  }
+  body:has([data-page-header='dark'])
+    [data-sitenav-bar]:not([data-landed])
+    [data-menu-open]
+    > span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+}
+
+/* Tiroir du menu (SiteNav.astro) : il entre par la DROITE et le voile se pose derrière lui. L'état ouvert
+   est porté par `data-open`, jamais par `hidden` — celui-ci ne revient qu'à la fin de la sortie, pour que
+   le glissement ait lieu. Sans transition en mouvement réduit : le tiroir est simplement là. */
+[data-menu-panel] [data-menu-drawer] {
+  transform: translateX(100%);
+}
+[data-menu-panel] [data-menu-scrim] {
+  opacity: 0;
+}
+[data-menu-panel][data-open] [data-menu-drawer] {
+  transform: translateX(0);
+}
+[data-menu-panel][data-open] [data-menu-scrim] {
+  opacity: 1;
+}
+@media (prefers-reduced-motion: no-preference) {
+  [data-menu-panel] [data-menu-drawer] {
+    transition: transform 420ms var(--ease-out-expo);
+  }
+  [data-menu-panel] [data-menu-scrim] {
+    transition: opacity 320ms ease;
+  }
 }
 
 /* Surface translucide (navigation collée, barres) */
@@ -705,62 +759,85 @@
     --intro-i: 5;
   }
 }
-/* Ouverture du hero (11/09/2026, reprise cinématique) : une VRAIE séquence, pas une cascade régulière.
-   Le GESTE DIT LE RANG — chaque élément entre autrement selon son importance, et c'est ce contraste qui
-   fait la hiérarchie, bien plus qu'un simple décalage dans le temps :
-     1. le surtitre, le plus discret : un court dévoilement de 14 px, 700 ms ;
-     2. LA MARQUE, sommet de la page : 64 px de montée, de 0,88 à sa taille, 1,6 s, et une courbe qui
-        dépasse légèrement sa cible avant de s'y poser — c'est le seul élément qui « atterrit » ;
-     3. l'accroche : dévoilement franc de 26 px, 1 s, une fois la marque presque posée ;
-     4. les CTA, fonctionnels : une montée sobre de 20 px, sans dévoilement ;
-     5. la réassurance Trustpilot, la plus légère : 12 px, elle ferme la séquence.
-   La ligne risques N'EST PAS de la séquence : elle est présente et lisible dès le premier rendu. C'est une
-   contrainte AMF, tenue par tests/conformite.spec.ts (aucun [data-risk] animé ni sous un ancêtre animé).
-   Transform et clip-path SEULS : aucun texte du hero ne varie en opacité (un contrôle d'accessibilité
-   mesure les contrastes pendant la cascade) et la marque, candidate LCP, n'est jamais masquée.
-   Le vol d'ouverture ne prend la marque qu'au premier défilement (motion/brandflight.ts) : déplacée dans
-   le DOM, elle redémarrerait son animation et redescendrait d'un coup.
-   L'identifiant #apercu l'emporte sur la règle générale `html.intro [data-intro][data-intro-move]`. */
+/* Ouverture du hero (11/09/2026) : LE LOGO SEUL, puis les éléments apparaissent.
+   La page se pose sur la marque : pendant la première seconde, elle est le seul élément du hero à
+   l'écran. Tout le reste est réellement INVISIBLE — découpé à zéro par `clip-path`, pas simplement
+   décalé — puis chacun se dévoile à son tour. Un déplacement de quelques pixels ne se voyait pas dans un
+   hero de cette taille ; une apparition, oui.
+   Pourquoi `clip-path` et pas `opacity` : un contrôle d'accessibilité mesure les contrastes pendant la
+   cascade et lisait des textes à mi-fondu. Le découpage ne change aucune couleur.
+   La marque, elle, n'est jamais découpée : c'est le plus grand élément affiché, donc le candidat LCP.
+   Elle entre par déplacement et échelle seuls, sur une courbe qui dépasse sa cible avant de s'y poser.
+   La ligne risques fait partie de la séquence depuis le 11/09/2026 (demande de l'équipe) : elle arrive
+   entre les CTA et les avis, donc le risque précède la réassurance. Le garde-fou de
+   tests/conformite.spec.ts est resserré en conséquence — une révélation AU SCROLL reste interdite
+   au-dessus d'un [data-risk], la cascade de chargement est admise : elle se termine seule, en moins de
+   trois secondes, sans aucune action du visiteur.
+   Les rangs disent l'ordre d'apparition (01-Hero.astro) : 1 la marque, 2 le surtitre, 3 l'accroche,
+   4 les CTA, 5 la ligne risques, 6 les avis, 7 la flèche. L'identifiant #apercu l'emporte sur la règle générale. */
 @media (prefers-reduced-motion: no-preference) {
   html.intro #apercu [data-intro] {
-    animation-duration: var(--intro-dur, 900ms);
+    animation-duration: var(--intro-dur, 700ms);
     animation-delay: var(--intro-delay, 0ms);
     animation-timing-function: var(--ease-out-expo);
   }
+  /* 1 — LA MARQUE, seule à l'écran pendant toute son entrée. */
   html.intro #apercu [data-intro='1'] {
+    animation-name: intro-hero-brand;
+    animation-timing-function: cubic-bezier(0.16, 1.12, 0.3, 1);
+    --intro-delay: 100ms;
+    --intro-dur: 1200ms;
+  }
+  /* 2 — le surtitre se dévoile au-dessus d'elle. */
+  html.intro #apercu [data-intro='2'] {
     animation-name: intro-hero-eyebrow;
-    --intro-delay: 120ms;
+    --intro-delay: 950ms;
     --intro-dur: 700ms;
   }
-  html.intro #apercu [data-intro='2'] {
-    animation-name: intro-hero-brand;
-    animation-timing-function: cubic-bezier(0.16, 1.08, 0.3, 1);
-    --intro-delay: 300ms;
-    --intro-dur: 1600ms;
-  }
+  /* 3 — l'accroche, le geste le plus ample après la marque. */
   html.intro #apercu [data-intro='3'] {
     animation-name: intro-hero-tagline;
-    --intro-delay: 1000ms;
-    --intro-dur: 1000ms;
+    --intro-delay: 1160ms;
+    --intro-dur: 800ms;
   }
+  /* 4 — les CTA. */
   html.intro #apercu [data-intro='4'] {
     animation-name: intro-hero-cta;
-    --intro-delay: 1300ms;
-    --intro-dur: 750ms;
-  }
-  html.intro #apercu [data-intro='5'] {
-    animation-name: intro-hero-trust;
-    --intro-delay: 1520ms;
+    --intro-delay: 1400ms;
     --intro-dur: 650ms;
   }
+  /* 5 — la ligne risques : le risque arrive avant la réassurance. */
+  html.intro #apercu [data-intro='5'] {
+    animation-name: intro-hero-risk;
+    --intro-delay: 1580ms;
+    --intro-dur: 600ms;
+  }
+  /* 6 — les avis. */
+  html.intro #apercu [data-intro='6'] {
+    animation-name: intro-hero-trust;
+    --intro-delay: 1740ms;
+    --intro-dur: 600ms;
+  }
+  /* 7 — la flèche ferme l'ouverture. */
+  html.intro #apercu [data-intro='7'] {
+    animation-name: intro-hero-hint;
+    --intro-delay: 1900ms;
+    --intro-dur: 550ms;
+  }
 }
-/* 1 — surtitre : petit élément, petit geste. Le bord bas de sa boîte lui sert de cache. */
+/* La marque : déplacement et échelle seuls, jamais de découpe (candidat LCP). */
+@keyframes intro-hero-brand {
+  from {
+    transform: translate3d(0, 72px, 0) scale(0.86);
+  }
+}
+/* Le surtitre : absent, puis dévoilé de bas en haut. */
 @keyframes intro-hero-eyebrow {
   from {
-    transform: translate3d(0, 14px, 0);
+    transform: translate3d(0, 18px, 0);
     clip-path: inset(100% 0 0 0);
   }
-  70% {
+  75% {
     clip-path: inset(0 0 0 0);
   }
   to {
@@ -768,16 +845,39 @@
     clip-path: inset(0 0 0 0);
   }
 }
-/* 2 — la marque : le geste le plus ample et le plus long de la page. */
-@keyframes intro-hero-brand {
-  from {
-    transform: translate3d(0, 64px, 0) scale(0.88);
-  }
-}
-/* 3 — l'accroche : dévoilement franc, deux fois le déplacement du surtitre. */
+/* L'accroche : même geste, plus ample. */
 @keyframes intro-hero-tagline {
   from {
-    transform: translate3d(0, 26px, 0);
+    transform: translate3d(0, 34px, 0);
+    clip-path: inset(100% 0 0 0);
+  }
+  60% {
+    clip-path: inset(0 0 0 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+    clip-path: inset(0 0 0 0);
+  }
+}
+/* Les CTA : dévoilement franc et rapide, la rangée arrive d'un bloc. */
+@keyframes intro-hero-cta {
+  from {
+    transform: translate3d(0, 24px, 0);
+    clip-path: inset(100% 0 0 0);
+  }
+  45% {
+    clip-path: inset(0 0 0 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+    clip-path: inset(0 0 0 0);
+  }
+}
+/* La ligne risques : dévoilement sobre, sans déplacement appuyé — elle s'annonce, elle ne se met pas en
+   scène. `backwards` seulement : à la fin de la cascade elle est toujours pleinement visible. */
+@keyframes intro-hero-risk {
+  from {
+    transform: translate3d(0, 14px, 0);
     clip-path: inset(100% 0 0 0);
   }
   55% {
@@ -788,16 +888,32 @@
     clip-path: inset(0 0 0 0);
   }
 }
-/* 4 — les CTA : sobres, sans dévoilement (un bouton qui se découpe fait bricolage). */
-@keyframes intro-hero-cta {
-  from {
-    transform: translate3d(0, 20px, 0) scale(0.97);
-  }
-}
-/* 5 — la réassurance : le geste le plus léger, il ne doit pas voler la vedette. */
+/* Les avis : le geste le plus léger. */
 @keyframes intro-hero-trust {
   from {
-    transform: translate3d(0, 12px, 0);
+    transform: translate3d(0, 16px, 0);
+    clip-path: inset(100% 0 0 0);
+  }
+  50% {
+    clip-path: inset(0 0 0 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+    clip-path: inset(0 0 0 0);
+  }
+}
+/* La flèche : elle se pose, sans déplacement notable. */
+@keyframes intro-hero-hint {
+  from {
+    transform: translate3d(0, 10px, 0);
+    clip-path: inset(100% 0 0 0);
+  }
+  60% {
+    clip-path: inset(0 0 0 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+    clip-path: inset(0 0 0 0);
   }
 }
 @keyframes intro-in {

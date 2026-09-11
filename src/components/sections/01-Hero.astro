@@ -64,8 +64,10 @@ const showEyebrow = hero.eyebrow.trim() !== '';
 /*
  * Sortie du hero au défilement : chaque élément part avec SON amplitude, jamais la même (idée reprise de
  * charmling.app, qui multiplie un même mouvement par une inertie propre à chaque objet). Le surtitre, le
- * plus léger, monte le plus loin ; l'accroche suit ; les CTA et la flèche descendent d'un cran en
- * s'effaçant. Le bloc se disperse par couches au lieu de glisser d'une seule pièce.
+ * plus léger, monte le plus loin en s'effaçant ; l'accroche suit ; les CTA, les avis et la flèche
+ * descendent d'un cran en s'effaçant. Le bloc se disperse par couches, jamais d'une seule pièce.
+ * Le scrub se pose toujours sur une ENVELOPPE et l'entrée (data-intro) sur son enfant : GSAP réécrit la
+ * transform en ligne, une animation CSS sur le même élément se battrait avec elle.
  */
 const flightScrub = {
   'data-scrub-trigger': 'html',
@@ -80,7 +82,7 @@ const copyScrubUp = { 'data-scrub': 'y:0,-48|opacity:1,0', ...flightScrub };
  * contraste tombe sous 4,5:1, et un contrôle d'accessibilité qui mesure la page pendant le lissage du
  * scrub le relève (axe, reproductible une fois sur cinq). Seule l'accroche, en grand, garde le fondu.
  */
-const copyScrubMove = { 'data-scrub': 'y:0,-72', ...flightScrub };
+const copyScrubFar = { 'data-scrub': 'y:0,-72|opacity:1,0', ...flightScrub };
 /** CTA : recul et EFFACEMENT (11/09/2026) pendant que celui de la barre apparaît (brandflight.ts).
  *  Le fondu avait été retiré parce qu'un contrôle d'accessibilité surprenait le bouton à mi-opacité, avec
  *  un contraste sous 4,5:1 ; la cause réelle était la cascade d'entrée, corrigée depuis (data-intro-move
@@ -123,9 +125,9 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
     <div data-hero-copy class="mx-auto flex max-w-4xl flex-col items-center text-center">
       {
         showEyebrow && (
-          <div {...copyScrubMove} class="mb-3 max-sm:order-1 sm:mb-6">
+          <div {...copyScrubFar} class="mb-3 max-sm:order-1 sm:mb-6">
             <p
-              data-intro="1"
+              data-intro="2"
               data-intro-move
               class="text-base leading-tight font-semibold tracking-[0.14em] text-teal-100 uppercase sm:text-lg lg:text-xl"
             >
@@ -149,7 +151,7 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
             class="hero-logo-stack"
             data-brand-flight
             aria-hidden="true"
-            data-intro="2"
+            data-intro="1"
             data-intro-move
           >
             <Image
@@ -206,13 +208,22 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
         {
           /* Ligne risques SOUS les CTA (11/09/2026) : à toutes les largeurs, jamais animée, jamais atténuée. */
         }
-        <RiskNote
-          text={hero.riskLine}
-          noteId={hero.riskNoteId}
-          tone="dark"
-          size="base"
-          class:list={['mx-auto mt-4 max-w-3xl text-left sm:mt-8', riskMobile]}
-        />
+        {
+          /* La ligne risques entre dans la séquence d'ouverture (11/09/2026, demande de l'équipe) : elle
+            apparaît APRÈS les CTA et AVANT les avis, donc le risque précède la réassurance. L'enveloppe
+            est en `display: contents` pour ne pas s'intercaler dans la mise en page. Le garde-fou AMF est
+            resserré en conséquence : une révélation AU SCROLL reste interdite au-dessus d'un [data-risk]
+            (on peut ne jamais y arriver), la cascade de chargement est admise (elle se termine seule). */
+        }
+        <div data-intro="5" data-intro-move>
+          <RiskNote
+            text={hero.riskLine}
+            noteId={hero.riskNoteId}
+            tone="dark"
+            size="base"
+            class:list={['mx-auto mt-4 max-w-3xl text-left sm:mt-8', riskMobile]}
+          />
+        </div>
         {
           /* TrustBox officiel (11/09/2026, code d'intégration fourni par l'équipe) : la réassurance sur le
             distributeur arrive au premier écran, sous la ligne risques. Jamais dans une enveloppe animée —
@@ -220,9 +231,11 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
             ferme la séquence d'ouverture (rang 5). Sa portée est dite juste dessous : les avis parlent de
             CORUM L'Épargne, pas de R Start. */
         }
-        <div data-intro="5" data-intro-move class="mx-auto mt-5 w-full max-w-md sm:mt-8">
-          <TrustBox template="horizontal" theme="dark" label={trust.trustpilot.widgetLabel!} />
-          <p class="mt-2 text-sm leading-snug text-white/80">{trust.trustpilot.heroCaption}</p>
+        <div {...copyScrubDown} class="mx-auto mt-5 w-full max-w-md sm:mt-8">
+          <div data-intro="6" data-intro-move>
+            <TrustBox template="horizontal" theme="dark" label={trust.trustpilot.widgetLabel!} />
+            <p class="mt-2 text-sm leading-snug text-white/80">{trust.trustpilot.heroCaption}</p>
+          </div>
         </div>
       </div>
     </div>
@@ -236,26 +249,32 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
     }
     {
       hero.scrollHint && (
-        <a
-          href={'#' + sections.difference.id}
-          data-hero-scroll-hint
-          aria-label={hero.scrollHint.label}
+        <div
           {...copyScrubDown}
-          class="absolute bottom-3 left-1/2 flex size-11 -translate-x-1/2 items-center justify-center rounded-full border border-white/30 text-white/75 no-underline transition-colors hover:border-white/60 hover:bg-white/10 hover:text-white focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-white sm:bottom-5"
+          class="pointer-events-none absolute inset-x-0 bottom-3 flex justify-center sm:bottom-5"
         >
-          <svg
-            aria-hidden="true"
-            class="size-5"
-            viewBox="0 0 20 20"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.8"
-            stroke-linecap="round"
-            stroke-linejoin="round"
+          <a
+            href={'#' + sections.difference.id}
+            data-hero-scroll-hint
+            data-intro="7"
+            data-intro-move
+            aria-label={hero.scrollHint.label}
+            class="pointer-events-auto flex size-11 items-center justify-center rounded-full border border-white/30 text-white/75 no-underline transition-colors hover:border-white/60 hover:bg-white/10 hover:text-white focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-white"
           >
-            <path d="M10 4v11M5 10.5 10 15.5l5-5" />
-          </svg>
-        </a>
+            <svg
+              aria-hidden="true"
+              class="size-5"
+              viewBox="0 0 20 20"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M10 4v11M5 10.5 10 15.5l5-5" />
+            </svg>
+          </a>
+        </div>
       )
     }
   </Container>
