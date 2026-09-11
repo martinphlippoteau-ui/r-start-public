@@ -516,6 +516,17 @@ html.reperes main section[data-section]:first-child::before {
   }
 }
 
+/* Visuel produit détouré posé sans cadre (11/09/2026) : ses bords se fondent dans la page au lieu d'être
+   coupés net par un rectangle. Masque radial — le cœur reste parfaitement opaque jusqu'à 56 %, donc le
+   sujet n'est jamais atténué, seule la marge de fond s'efface. À n'utiliser que sur un visuel dont le
+   fond est proche de celui de la section (ici, blanc sur blanc), sinon le dégradé se voit. */
+@utility photo-fade {
+  position: relative;
+  overflow: hidden;
+  -webkit-mask-image: radial-gradient(115% 92% at 50% 44%, rgb(0 0 0 / 1) 56%, rgb(0 0 0 / 0) 100%);
+  mask-image: radial-gradient(115% 92% at 50% 44%, rgb(0 0 0 / 1) 56%, rgb(0 0 0 / 0) 100%);
+}
+
 /* Défilement horizontal sans barre visible (liste de la navigation) */
 /* --- Photo de téléphone (AppMyCorum.astro) ---
    Pose 3D légère : perspective + rotation figée (ce n'est pas une animation, rien à couper en

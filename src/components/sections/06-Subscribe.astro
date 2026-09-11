@@ -42,6 +42,7 @@
 import Button from '@/components/ui/Button.astro';
 import { Picture } from 'astro:assets';
 import AppMyCorum from '@/components/AppMyCorum.astro';
+import StoreBadge from '@/components/ui/StoreBadge.astro';
 import Card from '@/components/ui/Card.astro';
 import Container from '@/components/ui/Container.astro';
 import NoteRef from '@/components/ui/NoteRef.astro';
@@ -69,6 +70,13 @@ const { compact = false } = Astro.props;
  * « Google Play ». À remplacer par un visuel corrigé avant mise en ligne.
  */
 const photo = await resolveImage(media.app.src);
+/** Les deux magasins, dans l'ordre du contenu (App Store puis Google Play). */
+const stores = (subscribe.app?.stores ?? []).map((store, i) => ({
+  ...store,
+  platform: (i === 0 ? 'apple' : 'google') as 'apple' | 'google',
+}));
+/** Mention « nouvelle fenêtre » commune aux deux liens. */
+const storeHintId = 'souscrire-stores-hint';
 
 const id = sections.subscribe.id;
 const title = compact && subscribe.homeTitle ? subscribe.homeTitle : subscribe.title;
@@ -189,7 +197,7 @@ const OPTION_Y = 12;
             class="mx-auto w-full max-w-[18rem] self-start sm:max-w-[22rem] lg:sticky lg:top-24 lg:col-span-5 lg:max-w-none"
             data-animate="clip"
           >
-            <div class="img-frame aspect-[2/3] bg-white">
+            <div class="photo-fade aspect-[2/3]">
               <Picture
                 src={photo}
                 alt={media.app.alt}
@@ -202,6 +210,35 @@ const OPTION_Y = 12;
                 class="h-full w-full object-cover object-top"
               />
             </div>
+
+            {
+              /* Les deux magasins sous le visuel : ce sont de vrais liens vers les fiches MyCORUM
+                (src/content/fr/subscribe.ts). Ils remplacent les badges incrustés dans la photo, que le
+                recadrage retire — ceux-là portaient des noms de marque erronés. */
+              subscribe.app?.stores && (
+                <figcaption class="mt-4">
+                  <span id={storeHintId} hidden>
+                    {subscribe.app.newTabHint}
+                  </span>
+                  <ul
+                    role="list"
+                    aria-label={subscribe.app.storesLabel}
+                    class="flex flex-wrap justify-center gap-3"
+                  >
+                    {stores.map((store) => (
+                      <li>
+                        <StoreBadge
+                          store={store.platform}
+                          href={store.href}
+                          label={store.label}
+                          hintId={storeHintId}
+                        />
+                      </li>
+                    ))}
+                  </ul>
+                </figcaption>
+              )
+            }
           </figure>
         )
       }
