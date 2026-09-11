@@ -246,9 +246,9 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
         fonctionne sans script, et `scroll-padding-top` (global.css) empêche la section d'arriver sous la
         barre. Elle s'efface au défilement comme les CTA, et disparaît tant que le bandeau cookies est
         déplié : elle serait dessous.
-        Plus de cercle depuis le 11/09/2026 (demande de l'équipe) : seul le chevron se voit. La zone
-        cliquable reste un carré de 56 px, invisible mais tenue — un chevron seul ferait une cible trop
-        petite au doigt. */
+        Plus de cercle depuis le 11/09/2026 (demande de l'équipe) : le libellé « Découvrir R Start » et le
+        chevron, rien d'autre. Le libellé est VISIBLE, il nomme donc le lien pour tout le monde — plus
+        d'aria-label, qui ferait doublon — et il donne au passage une cible large au doigt. */
     }
     {
       hero.scrollHint && (
@@ -261,9 +261,9 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
             data-hero-scroll-hint
             data-intro="7"
             data-intro-move
-            aria-label={hero.scrollHint.label}
-            class="pointer-events-auto flex size-14 items-center justify-center rounded-full text-white/70 no-underline transition-colors hover:text-white focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-white"
+            class="pointer-events-auto flex flex-col items-center gap-2 rounded-2xl px-4 py-2 text-white/70 no-underline transition-colors hover:text-white focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-white"
           >
+            <span class="text-sm font-semibold tracking-[0.08em]">{hero.scrollHint.label}</span>
             <svg
               aria-hidden="true"
               class="size-10"

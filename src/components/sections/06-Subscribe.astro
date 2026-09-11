@@ -65,8 +65,12 @@ const { compact = false } = Astro.props;
  * Accueil (11/09/2026) : la photo d'immeuble laisse la place au téléphone affichant R Start — un parcours
  * 100 % en ligne se raconte mieux avec l'écran qu'avec une terrasse.
  * Le visuel est un PNG DÉTOURÉ : il n'a pas de fond, donc ni cadre, ni masque de fondu, ni recadrage —
- * ses bords sont la silhouette du téléphone, et un masque y mordrait. Il est rendu à sa taille naturelle,
- * bornée à 24 rem : la source ne fait que 338 px de large, l'agrandir davantage le rendrait mou.
+ * ses bords sont la silhouette du téléphone, et un masque y mordrait.
+ * Largeur bornée à 19 rem sur grand écran (11/09/2026) pour que le BAS DES BADGES tombe sur la dernière
+ * étape : le visuel mesure 1,586 fois sa largeur, plus 16 px d'écart et 46 px de badges, à caler sur les
+ * 559 px que couvrent les quatre étapes. Le téléphone démarre un peu plus bas que l'étape 1 : le fichier
+ * porte 10,6 % de marge transparente en haut, que seule une marge négative effacerait — elle ferait
+ * remonter le visuel sur l'introduction. La source ne fait de toute façon que 338 px de large.
  */
 const photo = await resolveImage(media.app.src);
 /** Les deux magasins, dans l'ordre du contenu (App Store puis Google Play). */
@@ -192,7 +196,7 @@ const OPTION_Y = 12;
           Purement décorative pour la conformité : elle ne porte aucun avantage. */
         compact && (
           <figure
-            class="mx-auto w-full max-w-[18rem] self-start sm:max-w-[20rem] lg:sticky lg:top-24 lg:col-span-5 lg:max-w-[24rem]"
+            class="mx-auto w-full max-w-[18rem] self-start sm:max-w-[20rem] lg:sticky lg:top-24 lg:col-span-5 lg:max-w-[19rem]"
             data-animate="clip"
           >
             <Picture

@@ -28,6 +28,14 @@ const copy = {
   apple: { top: 'Télécharger dans l’', bottom: 'App Store' },
   google: { top: 'Disponible sur', bottom: 'Google Play' },
 }[store];
+
+/**
+ * Largeur du cartouche, par magasin (11/09/2026) : « Google Play » court jusqu'à 132,8 unités et frôlait
+ * le bord d'un cartouche de 135, ce qui se lisait comme un logo coupé. Chaque badge prend donc la largeur
+ * de son texte plus la même retombée de 11 unités qu'à gauche — c'est aussi le cas des badges officiels,
+ * où celui de Google est plus large que celui d'Apple.
+ */
+const width = store === 'apple' ? 135 : 146;
 ---
 
 <a
@@ -41,12 +49,12 @@ const copy = {
   ]}
 >
   <span class="visually-hidden">{label}</span>
-  <svg viewBox="0 0 135 40" role="presentation" aria-hidden="true" class="h-10 w-auto">
-    <rect x=".5" y=".5" width="134" height="39" rx="7" fill="#000"></rect>
+  <svg viewBox={`0 0 ${width} 40`} role="presentation" aria-hidden="true" class="h-10 w-auto">
+    <rect x=".5" y=".5" width={width - 1} height="39" rx="7" fill="#000"></rect>
     <rect
       x=".5"
       y=".5"
-      width="134"
+      width={width - 1}
       height="39"
       rx="7"
       fill="none"
