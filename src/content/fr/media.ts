@@ -54,7 +54,7 @@ export const media = {
   // 768 × 1365, fournie par l'équipe le 11/09/2026 : téléphone affichant l'application MyCORUM.
   app: {
     src: 'app/iphone-rstart.jpeg',
-    alt: 'Téléphone affichant l’application MyCORUM de CORUM L’Épargne',
+    alt: 'Téléphone affichant l’écran d’accueil de l’application, logo R Start sur fond sombre',
   },
   hero: {
     // 2400 × 1600, 647 ko. Bureaux contemporains bois/verre, ciel bleu, lumière franche : la plus

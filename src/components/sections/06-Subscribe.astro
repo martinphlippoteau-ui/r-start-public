@@ -60,7 +60,15 @@ interface Props {
   compact?: boolean;
 }
 const { compact = false } = Astro.props;
-const photo = await resolveImage(media.subscribe.src);
+/**
+ * Accueil (11/09/2026) : la photo d'immeuble laisse la place au téléphone affichant R Start — un parcours
+ * 100 % en ligne se raconte mieux avec l'écran qu'avec une terrasse. C'est un visuel produit sur fond
+ * clair : ni parallaxe, ni recadrage au centre, il serait coupé. Le cadre le rogne PAR LE BAS
+ * (`object-top`, format 2/3) pour retirer les deux badges de magasins incrustés dans la photo : ils y
+ * portent « Apple Store » et « Android Store », alors que les marques déposées sont « App Store » et
+ * « Google Play ». À remplacer par un visuel corrigé avant mise en ligne.
+ */
+const photo = await resolveImage(media.app.src);
 
 const id = sections.subscribe.id;
 const title = compact && subscribe.homeTitle ? subscribe.homeTitle : subscribe.title;
@@ -177,31 +185,23 @@ const OPTION_Y = 12;
         /* Accueil : photo d'illustration à droite des étapes (11/09/2026, la page manquait d'images).
           Purement décorative pour la conformité : elle ne porte aucun avantage. */
         compact && (
-          <figure class="self-start lg:sticky lg:top-24 lg:col-span-5" data-animate="clip">
-            <div class="img-frame aspect-[4/3] lg:aspect-[4/5]">
-              <div
-                class="absolute inset-x-0 -top-[12%] h-[124%]"
-                data-parallax="0.04"
-                data-parallax-trigger="parent"
-              >
-                <Picture
-                  src={photo}
-                  alt={media.subscribe.alt}
-                  widths={[480, 800, 1200]}
-                  sizes="(min-width: 64rem) 26rem, 100vw"
-                  formats={['avif', 'webp']}
-                  loading="lazy"
-                  decoding="async"
-                  pictureAttributes={{ class: 'block h-full w-full' }}
-                  class="h-full w-full object-cover"
-                />
-              </div>
+          <figure
+            class="mx-auto w-full max-w-[18rem] self-start sm:max-w-[22rem] lg:sticky lg:top-24 lg:col-span-5 lg:max-w-none"
+            data-animate="clip"
+          >
+            <div class="img-frame aspect-[2/3] bg-white">
+              <Picture
+                src={photo}
+                alt={media.app.alt}
+                widths={[420, 640, 900]}
+                sizes="(min-width: 64rem) 26rem, 100vw"
+                formats={['avif', 'webp']}
+                loading="lazy"
+                decoding="async"
+                pictureAttributes={{ class: 'block h-full w-full' }}
+                class="h-full w-full object-cover object-top"
+              />
             </div>
-            {media.subscribe.credit && (
-              <figcaption class="text-caption mt-3 text-slate-700">
-                {media.subscribe.credit}
-              </figcaption>
-            )}
           </figure>
         )
       }
