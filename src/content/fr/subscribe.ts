@@ -62,27 +62,22 @@ export const subscribe = {
   homeIntro: `Tout se fait en ligne, à partir de ${nb(share.priceLabel)} la part : profil investisseur, signature électronique, règlement par virement ou prélèvement, suivi de vos parts sur le site de CORUM.`,
   intro: `La souscription se fait entièrement en ligne, en quatre étapes, à partir d’une part de ${nb(share.priceLabel)}. Aucune souscription papier n’est possible. R Start vise une stratégie patrimoniale plus dynamique, en contrepartie d’un risque plus élevé. Avant de vous engager, lisez le DIC et la note d’information. R Start comporte un risque de perte en capital.`,
 
+  /**
+   * Quatre intitulés, sans description (11/09/2026, trame de l'équipe) : le parcours se lit d'un coup
+   * d'œil. Ce que portaient les descriptions n'est pas perdu — le délai de jouissance est un des six
+   * repères de la zone 3, les moyens de règlement et le délai de rétractation sont dans les notes
+   * appelées ici, et le suivi de l'épargne a sa place sur /documentation, avec MyCORUM.
+   */
   steps: [
+    { title: 'Renseignez votre situation et vos objectifs' },
+    { title: 'Choisissez le nombre de parts que vous souhaitez acheter' },
     {
-      title: 'Créer votre profil investisseur',
-      description:
-        'Vous renseignez votre identité, votre situation financière et vos objectifs. Ce questionnaire réglementaire permet de vérifier que R Start est adaptée à votre situation et à votre horizon de placement.',
-    },
-    {
-      title: 'Signer en ligne',
-      description:
-        'Vous choisissez votre nombre de parts et, si vous le souhaitez, les versements programmés ou le réinvestissement des dividendes. Vous signez ensuite le bulletin de souscription par signature électronique.',
+      title: 'Signez le bulletin de souscription par signature électronique',
       noteId: 'souscrire-reflexion',
     },
     {
-      title: 'Régler par virement ou prélèvement',
-      description: `Vous réglez votre souscription par virement ou par prélèvement SEPA. Vos parts entrent en jouissance ${incomeFacts.enjoymentDate.toLowerCase()}. Aucun dividende n’est versé avant cette date.`,
+      title: 'Effectuez votre versement par virement ou par prélèvement',
       noteId: 'souscrire-reglement',
-    },
-    {
-      title: 'Suivre votre épargne',
-      description:
-        'Vous suivez vos parts, vos dividendes potentiels et vos documents en ligne, sur le site de CORUM. Ces revenus ne sont pas garantis. Ils varient à la hausse comme à la baisse, selon les résultats de la SCPI.',
     },
   ],
 

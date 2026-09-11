@@ -278,7 +278,8 @@ export interface IncomeContent {
 
 export interface StepItem {
   title: string;
-  description: string;
+  /** Détail de l'étape : plus rendu sur l'accueil depuis le 11/09/2026 (intitulés seuls). */
+  description?: string;
   /** Appel de note légale porté par le titre de l'étape (id d'une LegalNote de la section). */
   noteId?: string;
 }
