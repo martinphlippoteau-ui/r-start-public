@@ -12,13 +12,13 @@ import type { SectionKey, SectionMeta } from '@/content/types';
  */
 export const sections: Record<SectionKey, SectionMeta> = {
   hero: { id: 'apercu', label: 'Aperçu', order: 1, inNav: false },
-  highlights: { id: 'points-forts', label: 'Points forts', order: 2, inNav: false },
-  difference: { id: 'ce-qui-change', label: 'Ce qui change', order: 3, inNav: false },
-  fees: { id: 'frais', label: 'Frais', order: 5, inNav: false },
+  highlights: { id: 'points-forts', label: 'Points forts', order: 3, inNav: false },
+  difference: { id: 'ce-qui-change', label: 'Ce qui change', order: 2, inNav: false },
+  fees: { id: 'frais', label: 'Frais', order: 4, inNav: false },
   strategy: { id: 'strategie', label: 'Stratégie d’investissement', order: 6, inNav: false },
   income: { id: 'revenus', label: 'Revenus', order: 12, inNav: false },
   subscribe: { id: 'souscrire', label: 'Souscription', order: 7, inNav: false },
-  corum: { id: 'corum', label: 'Confiance', order: 4, inNav: false },
+  corum: { id: 'corum', label: 'Confiance', order: 5, inNav: false },
   risks: { id: 'risques', label: 'Risques', order: 9, inNav: false },
   press: { id: 'presse-en-parle', label: 'La presse en parle', order: 8, inNav: false },
   documents: { id: 'documents', label: 'Documents', order: 13, inNav: false },

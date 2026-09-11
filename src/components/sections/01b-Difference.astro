@@ -37,7 +37,13 @@ const titleId = id + '-title';
 const ENGINE_STAGGER = 0.08;
 ---
 
-<Section id={id} tone="paper">
+{
+  /* `data-curtain` (11/09/2026, transition « à la Revolut ») : le hero, section précédente, est épinglé pendant
+    que celle-ci glisse par-dessus (coins arrondis et ombre posés par la CSS [data-curtain]). Le hero contient
+    la ligne risques : le moteur se limite à épingler et recouvrir, sans recul ni fondu (scroll.ts). Sous 64 rem,
+    aucun épinglage : défilement normal. */
+}
+<Section id={id} tone="paper" data-curtain>
   <Container size="wide">
     <header class="max-w-4xl">
       <p class="text-eyebrow mb-4 text-teal-700">{difference.eyebrow}</p>

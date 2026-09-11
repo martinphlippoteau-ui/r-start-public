@@ -43,13 +43,7 @@ const COLUMNS = 2;
 const titleId = sections.highlights.id + '-title';
 ---
 
-{
-  /* `data-curtain` (11/09/2026, transition « à la Revolut ») : le hero, section précédente, est épinglé pendant
-    que celle-ci glisse par-dessus (coins arrondis et ombre posés par la CSS [data-curtain]). Le hero contient
-    la ligne risques : le moteur se limite à épingler et recouvrir, sans recul ni fondu (scroll.ts). Sous 64 rem,
-    aucun épinglage : défilement normal. */
-}
-<Section id={sections.highlights.id} tone="white" data-curtain>
+<Section id={sections.highlights.id} tone="white">
   <Container size="wide">
     <header class="mx-auto max-w-4xl text-center">
       <p class="text-eyebrow mb-4 text-teal-700">{highlights.eyebrow}</p>

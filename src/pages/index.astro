@@ -28,7 +28,7 @@ const all = Object.entries(modules)
  * → 08 Risques → 10 FAQ. Hors accueil : 05 Revenus (repris par la FAQ), 06 Souscrire (guide sur
  * /documentation, avec MyCORUM) et 09 Documents (/documentation).
  */
-const HOME_ORDER = ['01-', '02-', '01b-', '03-', '07-', '03a-', '04-', '06-', '08b-', '08-', '10-'];
+const HOME_ORDER = ['01-', '01b-', '02-', '03-', '07-', '03a-', '04-', '06-', '08b-', '08-', '10-'];
 const byPrefix = (prefix: string) => all.find((s) => s.path.includes('/sections/' + prefix));
 const hero = byPrefix('01-');
 const rest = HOME_ORDER.slice(1)

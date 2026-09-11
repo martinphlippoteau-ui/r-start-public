@@ -21,10 +21,10 @@ import { homeNotes as faqNotes } from '@/content/fr/faq';
  */
 export const allNotes: LegalNote[] = [
   ...heroNotes,
-  ...highlightsNotes,
   ...differenceNotes,
-  ...corumNotes,
+  ...highlightsNotes,
   ...feesNotes,
+  ...corumNotes,
   ...subscribeNotes,
   ...pressHomeNotes,
   ...risksNotes,
