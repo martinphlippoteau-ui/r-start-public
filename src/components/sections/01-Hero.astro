@@ -245,7 +245,10 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
         centrée par `justify-content`, un frère dans le flux en décalerait l'axe. Lien d'ancre réel : il
         fonctionne sans script, et `scroll-padding-top` (global.css) empêche la section d'arriver sous la
         barre. Elle s'efface au défilement comme les CTA, et disparaît tant que le bandeau cookies est
-        déplié : elle serait dessous. */
+        déplié : elle serait dessous.
+        Plus de cercle depuis le 11/09/2026 (demande de l'équipe) : seul le chevron se voit. La zone
+        cliquable reste un carré de 56 px, invisible mais tenue — un chevron seul ferait une cible trop
+        petite au doigt. */
     }
     {
       hero.scrollHint && (
@@ -259,15 +262,15 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
             data-intro="7"
             data-intro-move
             aria-label={hero.scrollHint.label}
-            class="pointer-events-auto flex size-14 items-center justify-center rounded-full border border-white/35 text-white/75 no-underline transition-colors hover:border-white/60 hover:bg-white/10 hover:text-white focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-white"
+            class="pointer-events-auto flex size-14 items-center justify-center rounded-full text-white/70 no-underline transition-colors hover:text-white focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-white"
           >
             <svg
               aria-hidden="true"
-              class="size-7"
+              class="size-10"
               viewBox="0 0 20 20"
               fill="none"
               stroke="currentColor"
-              stroke-width="1.8"
+              stroke-width="1.5"
               stroke-linecap="round"
               stroke-linejoin="round"
             >
