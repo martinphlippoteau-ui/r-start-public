@@ -570,6 +570,22 @@
     --intro-i: 5;
   }
 }
+/* Ouverture du hero (11/09/2026) : plus ample et plus lente que la cascade générale — 900 ms, 140 ms par
+   rang, 36 px de montée et un très léger agrandissement. Transform SEUL : aucun texte du hero ne varie en
+   opacité (un contrôle d'accessibilité mesure la page pendant la cascade). L'identifiant #apercu l'emporte
+   sur la règle générale `html.intro [data-intro][data-intro-move]`. */
+@media (prefers-reduced-motion: no-preference) {
+  html.intro #apercu [data-intro] {
+    animation-name: intro-cinema;
+    animation-duration: 900ms;
+    animation-delay: calc(var(--intro-i, 0) * 140ms);
+  }
+}
+@keyframes intro-cinema {
+  from {
+    transform: translate3d(0, 36px, 0) scale(0.985);
+  }
+}
 @keyframes intro-in {
   from {
     opacity: 0;

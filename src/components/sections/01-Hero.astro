@@ -49,7 +49,6 @@ import { hero } from '@/content/fr/hero';
 const titleId = sections.hero.id + '-title';
 /** Surtitre informatif court (hero.ts) : affiché dès qu'il n'est pas vide. */
 const showEyebrow = hero.eyebrow.trim() !== '';
-const badge = hero.badge?.trim() ?? '';
 /**
  * Transition d'ouverture (11/09/2026, mécanique observée sur revolut.com) : le hero est épinglé par le rideau
  * de la section suivante (02-Highlights, data-curtain) qui glisse par-dessus ; pendant ce temps le logo vole
@@ -116,81 +115,90 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
             <p
               data-intro="1"
               data-intro-move
-              class="text-eyebrow flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 text-teal-100 max-sm:tracking-wider"
+              class="max-w-[18ch] text-2xl leading-tight font-semibold tracking-[0.12em] text-balance text-teal-100 uppercase sm:max-w-none sm:text-3xl lg:text-4xl"
             >
-              {badge && (
-                <span class="inline-flex items-center rounded-full border border-teal-200/50 bg-teal-200/12 px-2.5 py-0.5 text-[0.7rem] font-semibold tracking-wider text-teal-100 uppercase">
-                  {badge}
-                </span>
-              )}
-              <span>{hero.eyebrow}</span>
+              {hero.eyebrow}
             </p>
           </div>
         )
       }
-      <h1 id={titleId} class="hero-logo-wrap max-sm:order-2">
-        <span class="visually-hidden">{hero.title}</span>
-        {
-          /* Rang 2 de l'ouverture : le logo entre par déplacement seul (candidat LCP, jamais d'opacité). */
-        }
-        <span
-          class="hero-logo-stack"
-          data-brand-flight
-          aria-hidden="true"
-          data-intro="2"
-          data-intro-move
-        >
-          <Image src={brandLogo} alt="" width={290} height={89} loading="eager" decoding="async" />
-        </span>
-      </h1>
-      <div {...copyScrubUp} class="flex flex-col items-center max-sm:order-3">
-        <p
-          data-intro="3"
-          data-intro-move
-          class="mt-4 max-w-2xl text-xl leading-snug font-semibold text-balance text-sand sm:mt-7 sm:text-display-sm"
-        >
-          {hero.tagline}
-        </p>
-      </div>
-      <div {...copyScrubDown} class="mt-4 w-full max-sm:order-4 sm:mt-10 sm:w-auto">
-        {
-          /* `data-hero-cta` : repère stable pour la mesure et pour le test « les CTA du hero sont
-            visibles sans scroller » — il ne dépend pas du rang dans la cascade d'entrée. */
-        }
-        <div
-          data-hero-cta
-          data-intro="4"
-          data-intro-move
-          class="flex w-full flex-col items-stretch gap-2 sm:w-auto sm:flex-row sm:items-center sm:gap-3"
-        >
-          <Button position={hero.primaryCta.position} variant="light" size="lg" class={ctaMobile}
-            >{hero.primaryCta.label}</Button
-          >
+      {
+        /* La pastille « Nouveau » se pose en haut à droite du logo (11/09/2026) : l'enveloppe `relative`
+          prend exactement la largeur réservée au logo (.hero-logo-wrap), la pastille s'accroche à son
+          angle. Elle est HORS du H1 (élément protégé du moteur) et s'efface avec le vol de la marque. */
+      }
+      <div class="relative mx-auto w-fit max-sm:order-2">
+        <h1 id={titleId} class="hero-logo-wrap">
+          <span class="visually-hidden">{hero.title}</span>
           {
-            /* Sous « sm », le bouton secondaire (simple ancre vers Points forts) cède la place : les CTA
+            /* Rang 2 de l'ouverture : le logo entre par déplacement seul (candidat LCP, jamais d'opacité). */
+          }
+          <span
+            class="hero-logo-stack"
+            data-brand-flight
+            aria-hidden="true"
+            data-intro="2"
+            data-intro-move
+          >
+            <Image
+              src={brandLogo}
+              alt=""
+              width={290}
+              height={89}
+              loading="eager"
+              decoding="async"
+            />
+          </span>
+        </h1>
+        <div {...copyScrubUp} class="flex flex-col items-center max-sm:order-3">
+          <p
+            data-intro="3"
+            data-intro-move
+            class="mt-4 max-w-2xl text-xl leading-snug font-semibold text-balance text-sand sm:mt-7 sm:text-display-sm"
+          >
+            {hero.tagline}
+          </p>
+        </div>
+        <div {...copyScrubDown} class="mt-4 w-full max-sm:order-4 sm:mt-10 sm:w-auto">
+          {
+            /* `data-hero-cta` : repère stable pour la mesure et pour le test « les CTA du hero sont
+            visibles sans scroller » — il ne dépend pas du rang dans la cascade d'entrée. */
+          }
+          <div
+            data-hero-cta
+            data-intro="4"
+            data-intro-move
+            class="flex w-full flex-col items-stretch gap-2 sm:w-auto sm:flex-row sm:items-center sm:gap-3"
+          >
+            <Button position={hero.primaryCta.position} variant="light" size="lg" class={ctaMobile}
+              >{hero.primaryCta.label}</Button
+            >
+            {
+              /* Sous « sm », le bouton secondaire (simple ancre vers Points forts) cède la place : les CTA
               et la ligne risques doivent rester au-dessus du bandeau cookies (tests/conformite.spec.ts).
               Le défilement mène au même endroit. */
-          }
-          <Button
-            href={hero.secondaryCta.href}
-            variant="outline-light"
-            size="lg"
-            class="max-sm:hidden"
-          >
-            {hero.secondaryCta.label}
-          </Button>
+            }
+            <Button
+              href={hero.secondaryCta.href}
+              variant="outline-light"
+              size="lg"
+              class="max-sm:hidden"
+            >
+              {hero.secondaryCta.label}
+            </Button>
+          </div>
         </div>
+        {
+          /* Ligne risques SOUS les CTA (11/09/2026) : à toutes les largeurs, jamais animée, jamais atténuée. */
+        }
+        <RiskNote
+          text={hero.riskLine}
+          noteId={hero.riskNoteId}
+          tone="dark"
+          size="base"
+          class:list={['mx-auto mt-4 max-w-3xl text-left sm:mt-8', riskMobile]}
+        />
       </div>
-      {
-        /* Ligne risques SOUS les CTA (11/09/2026) : à toutes les largeurs, jamais animée, jamais atténuée. */
-      }
-      <RiskNote
-        text={hero.riskLine}
-        noteId={hero.riskNoteId}
-        tone="dark"
-        size="base"
-        class:list={['mx-auto mt-4 max-w-3xl text-left sm:mt-8', riskMobile]}
-      />
     </div>
   </Container>
 </Section>

@@ -31,9 +31,7 @@ export const hero = {
    * logo. La nature juridique du produit (facts.product.type) reste dans les données structurées et les
    * mentions légales.
    */
-  eyebrow: 'CORUM invente',
-  /** Pastille « Nouveau » : R Start est ouverte aux souscriptions depuis 2026 (facts.product.openingDate). */
-  badge: 'Nouveau',
+  eyebrow: 'CORUM invente la SCPI',
   title: product.name,
   /**
    * Accroche de l'équipe marketing, reprise mot pour mot (décision du 11/09/2026, prise en connaissance

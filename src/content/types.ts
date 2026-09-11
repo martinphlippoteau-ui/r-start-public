@@ -54,8 +54,6 @@ export interface AdvantageRisk {
 
 export interface HeroContent {
   eyebrow: string;
-  /** Pastille courte affichée devant le surtitre (« Nouveau ») ; vide ou absente : rien. */
-  badge?: string;
   /** H1 unique de la page. */
   title: string;
   tagline: string;
