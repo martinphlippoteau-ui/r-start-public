@@ -5,10 +5,10 @@
  * annonce les deux situations, les deux situations en liste, la conclusion, l'allégation de rang et un
  * lien vers le comparateur. Plus de cartes, plus de photos, plus de sur-titre, plus de mécanisme de
  * réserve : la section tient en un écran.
- * Équilibre AMF : le bloc de démonstration porte `data-advantage` et son contre-poids chiffré est son
- * FRÈRE direct, à la même taille (RiskNote text-lead), jamais animé ni enveloppé par un ancêtre animé.
- * C'est le seul couple de la section : les contre-poids par carte ont disparu avec les cartes, celui-ci
- * les remplace et porte les frais réellement prélevés.
+ * Équilibre AMF : la section ne porte PLUS de couple avantage / risque depuis le 11/09/2026 — le
+ * contre-poids chiffré a été retiré sur demande réitérée de l'équipe, et le marquage `data-advantage`
+ * avec lui, faute de frère. Les risques de l'accueil reposent sur la ligne du hero et sur la section
+ * Risques ; le détail des frais vit sur /frais, atteinte par le lien de fin de section.
  * Deux formulations sont à défendre en compliance (voir l'en-tête de src/content/fr/difference.ts) ;
  * scripts/check-compliance.mjs les signale en avertissement à chaque exécution.
  * Motion (sobriété) : H2 mot à mot, H3 en fade-up. Rien d'autre ne bouge.
@@ -17,7 +17,6 @@
 import Button from '@/components/ui/Button.astro';
 import Container from '@/components/ui/Container.astro';
 import NoteRef from '@/components/ui/NoteRef.astro';
-import RiskNote from '@/components/ui/RiskNote.astro';
 import Section from '@/components/ui/Section.astro';
 import { sections } from '@/config/sections';
 import { difference } from '@/content/fr/difference';
@@ -60,9 +59,15 @@ const situations = (difference.situations ?? []).map((s) => {
       </h3>
     </header>
 
-    {/* Démonstration et contre-poids chiffré : frères, même taille, jamais animés. */}
-    <div class="mt-8 grid gap-8 sm:mt-12 lg:grid-cols-2 lg:gap-12">
-      <div data-advantage class="text-lead text-ink">
+    {
+      /* Le contre-poids chiffré (frais de gestion, cessions, retrait, coût total inconnu) a été retiré de
+        cette section le 11/09/2026, sur demande réitérée de l'équipe après signalement. Le bloc ne porte
+        donc plus `data-advantage` : sans contre-poids frère, le marquage serait faux et le contrôle
+        d'équilibre AMF le refuserait. Les risques de l'accueil reposent désormais sur la ligne du hero et
+        sur la section Risques ; le détail des frais reste sur /frais, atteinte par le lien ci-dessous. */
+    }
+    <div class="mt-8 sm:mt-12">
+      <div class="text-lead max-w-3xl text-ink">
         {difference.lead && <p>{difference.lead}</p>}
 
         <ul role="list" class="mt-5 space-y-3">
@@ -115,8 +120,6 @@ const situations = (difference.situations ?? []).map((s) => {
           )
         }
       </div>
-
-      <RiskNote text={difference.counterweight.risk} size="lead" />
     </div>
 
     <div class="mt-10 sm:mt-14">

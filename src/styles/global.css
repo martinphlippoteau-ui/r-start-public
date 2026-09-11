@@ -399,6 +399,38 @@
   }
 }
 
+/* PROVISOIRE (11/09/2026) — repères de travail. « Section 1 », « Section 2 »… posés en haut à gauche de
+   chaque grande section pour pouvoir en parler sans ambiguïté pendant la refonte. Le libellé vit dans
+   `content` : rien dans le DOM, donc aucun effet sur le contrôle de conformité, la validation HTML ou les
+   tests. Couleur volontairement hors charte, pour qu'on ne l'oublie pas en ligne.
+   Pour tout retirer : `provisionalSectionTags: false` dans src/config/site.ts. */
+html.reperes main {
+  counter-reset: repere-section;
+}
+html.reperes main section[data-section] {
+  counter-increment: repere-section;
+}
+html.reperes main section[data-section]::before {
+  content: 'Section ' counter(repere-section);
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 30;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  background: #e11d48;
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+/* La première section passe sous la navigation flottante : son repère descend d'autant. */
+html.reperes main section[data-section]:first-child::before {
+  top: calc(var(--spacing-nav-total) + 0.5rem);
+}
+
 /* Tiroir du menu (SiteNav.astro) : il entre par la DROITE et le voile se pose derrière lui. L'état ouvert
    est porté par `data-open`, jamais par `hidden` — celui-ci ne revient qu'à la fin de la sortie, pour que
    le glissement ait lieu. Sans transition en mouvement réduit : le tiroir est simplement là. */
