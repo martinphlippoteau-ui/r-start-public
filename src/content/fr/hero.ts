@@ -43,14 +43,14 @@ export const hero = {
    */
   tagline: 'L’immobilier gagnant-gagnant',
   /**
-   * Contre-poids unique du hero (11/09/2026) : les frais réellement prélevés OUVRENT le bloc « Bon à
-   * savoir », suivis de la ligne risques de legal.ts, reproduite mot pour mot et jamais réécrite.
-   * Règle AMF : l'accroche annonce une absence de frais, ce bloc porte les frais réels juste dessous.
-   * À défendre en compliance : il est rendu dans la taille du contre-poids, plus petite que l'accroche.
+   * Contre-poids unique du hero. La phrase qui énumérait les frais prélevés a été retirée le 11/09/2026
+   * à la demande de l'équipe : le bloc ne porte plus que la ligne risques de legal.ts, reproduite mot
+   * pour mot et jamais réécrite. Le détail des frais reste À UN CLIC, dans la note `hero-frais` appelée
+   * en fin de ligne — c'est elle qui garde les 15 % de frais de gestion sur l'accueil.
+   * À défendre en compliance : l'accroche annonce une absence de frais d'entrée et les frais réellement
+   * prélevés ne sont plus énoncés au même endroit, seulement en note.
    */
-  riskLine: nb(
-    `R Start prélève ${fees.management.label} de frais de gestion sur les loyers, une commission sur les ventes d’immeubles et une commission de retrait avant ${fees.withdrawal.zeroAfterYears} ans. ${shortRiskLine}`
-  ),
+  riskLine: nb(shortRiskLine),
   riskNoteId: 'hero-frais',
   primaryCta: { label: 'Souscrire en ligne', position: 'hero' },
   /** CTA secondaire (11/09/2026) : il mène à la page Frais, seul accès au barème depuis l'accueil. */

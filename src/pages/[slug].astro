@@ -40,7 +40,11 @@ const jsonLd = [
   jsonLd={jsonLd}
 >
   <SiteNav />
-  <main id="contenu" class="bg-paper">
+  {
+    /* La navigation flottante recouvre le haut de la page : sa hauteur est réservée ici (les pages
+    à en-tête sombre la réservent dans leur en-tête). */
+  }
+  <main id="contenu" class="pt-nav-total bg-paper">
     <Container size="narrow" class="py-10 sm:py-14">
       <Breadcrumb key={pageKey} tone="light" />
       <h1 class="text-display-md mt-8">{page.title}</h1>

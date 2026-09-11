@@ -108,9 +108,26 @@ const makeFlight = (
   const flyer = document.createElement('div');
   flyer.className = 'brand-flyer';
   flyer.setAttribute('aria-hidden', 'true');
-  flyer.appendChild(brand);
   document.body.appendChild(flyer);
   target.style.opacity = '0';
+
+  /*
+   * La marque n'entre dans le calque qu'AU PREMIER DÉFILEMENT (11/09/2026). Déplacer un élément dans le
+   * DOM redémarre ses animations CSS : en montant le calque dès le chargement, la séquence d'ouverture du
+   * hero (data-intro, 1,5 s pour la marque) repartait de zéro au moment où le moteur s'initialisait, et le
+   * logo redescendait d'un coup. Tant que la page n'a pas bougé, la marque reste donc à sa place, où le
+   * vol la veut de toute façon à u = 0. Au montage, la séquence est coupée net : le vol prend le relais du
+   * placement, les deux ne doivent jamais se superposer.
+   */
+  let mounted = false;
+  const mount = () => {
+    if (mounted) return;
+    mounted = true;
+    flyer.appendChild(brand);
+    brand.getAnimations?.().forEach((a) => a.cancel());
+    brand.style.animation = 'none';
+    remeasure();
+  };
 
   let geo: Geometry | null = null;
   /** Dernier avancement appliqué du relais (0 : le calque porte la marque, 1 : la barre). */
@@ -161,7 +178,8 @@ const makeFlight = (
   };
 
   const apply = (scroll: number) => {
-    if (!geo) return;
+    if (scroll > 0) mount();
+    if (!mounted || !geo) return;
     const u = clamp01(scroll / geo.distance);
     gsap.set(flyer, {
       x: lerp(geo.homeLeft, geo.restLeft, easeX(u)),
@@ -187,7 +205,8 @@ const makeFlight = (
   return () => {
     st.kill();
     gsap.set(flyer, { clearProps: 'all' });
-    if (!clone) home.appendChild(brand);
+    if (!clone && mounted) home.appendChild(brand);
+    brand.style.removeProperty('animation');
     flyer.remove();
     source.style.removeProperty('opacity');
     target.style.removeProperty('opacity');
@@ -209,11 +228,10 @@ const makeCtaHandover = (): (() => void) => {
   const target = document.querySelector<HTMLElement>('[data-cta-target]');
   const hero = document.querySelector<HTMLElement>('[data-brand-flight]');
   if (!target || !hero) return () => {};
-  /* La MATIÈRE de la barre suit le même avancement que le CTA (11/09/2026) : avant le premier
-     défilement, l'accueil n'affiche qu'un bouton Menu blanc sur le hero ; le verre, le flou, le liseré et
-     l'ombre se posent au rythme du logo qui atterrit. `--nav-glass-on` porte cet avancement (global.css)
-     et `data-landed`, franchi à mi-course, rend au bouton Menu et aux entrées leur couleur navy. */
-  const bar = document.querySelector<HTMLElement>('[data-sitenav-bar]');
+  /* La matière de la barre suit le même avancement, mais elle est pilotée par le script de
+     SiteNav.astro : le comportement doit être identique sur les sous-pages, qui ne chargent pas GSAP.
+     Même distance des deux côtés — max(160, 30 % de la hauteur du viewport) — donc sur l'accueil le verre
+     arrive exactement quand le logo et le CTA se posent. */
   let last = -1;
   const apply = (scroll: number) => {
     const distance = Math.max(FLIGHT_MIN, window.innerHeight * 0.3);
@@ -221,10 +239,6 @@ const makeCtaHandover = (): (() => void) => {
     if (u === last) return;
     last = u;
     target.style.opacity = String(u);
-    if (bar) {
-      bar.style.setProperty('--nav-glass-on', String(u));
-      bar.toggleAttribute('data-landed', u >= 0.5);
-    }
   };
   const st = ScrollTrigger.create({
     trigger: document.documentElement,
@@ -239,10 +253,6 @@ const makeCtaHandover = (): (() => void) => {
   return () => {
     st.kill();
     target.style.removeProperty('opacity');
-    if (bar) {
-      bar.style.removeProperty('--nav-glass-on');
-      bar.removeAttribute('data-landed');
-    }
   };
 };
 

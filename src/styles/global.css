@@ -304,30 +304,58 @@
   }
 }
 
-/* Accueil, avant le premier défilement (11/09/2026, demande de l'équipe) : la barre n'a AUCUNE matière —
-   ni verre, ni flou, ni liseré, ni ombre — et seul le bouton Menu se voit, en blanc sur le hero sombre.
-   La matière arrive avec son contenu : `--nav-glass-on` est poussé de 0 à 1 par le relais d'ouverture
-   (scripts/motion/brandflight.ts), exactement au rythme du logo et du CTA qui se posent dans la barre.
-   Sur grand écran, les entrées du menu et la pastille de la page courante suivent le même mouvement.
+/* Avant le premier défilement (11/09/2026, demande de l'équipe) : sur TOUTE page dont l'en-tête est
+   sombre (`[data-page-header="dark"]` : le hero de l'accueil et le PageHero des sous-pages), la barre n'a
+   AUCUNE matière — ni verre, ni flou, ni liseré, ni ombre — et son contenu passe en blanc sur l'en-tête.
+   Sur téléphone, seul le bouton Menu s'y voit ; sur grand écran, les entrées du menu l'accompagnent.
+   La matière se pose ensuite au défilement : `--nav-glass-on` est poussé de 0 à 1 par le script de
+   SiteNav.astro, sur la même distance que le relais d'ouverture du hero — sur l'accueil, le verre arrive
+   donc exactement quand le logo et le CTA se posent dans la barre.
+   Les pages à fond clair (mentions légales, 404) n'ont pas ce marqueur : la barre y reste pleine et leur
+   contenu réserve sa hauteur en padding.
    La transition de la matière est coupée ici : elle est pilotée au défilement, la lisser une seconde
-   fois la ferait traîner derrière le doigt. Garde identique à celle du vol — sans script ou en
-   reduced-motion, la barre est pleine dès le rendu serveur. */
+   fois la ferait traîner derrière le doigt. Sans script ou en reduced-motion, la barre est pleine dès le
+   rendu serveur — le script n'y touche pas non plus. */
 @media (prefers-reduced-motion: no-preference) and (scripting: enabled) {
-  body:has([data-brand-flight]) [data-sitenav-bar] {
+  body:has([data-page-header='dark']) [data-sitenav-bar] {
     --nav-glass-on: 0;
     transition-property: none;
   }
-  body:has([data-brand-flight]) [data-sitenav-bar] [data-menu-open],
-  body:has([data-brand-flight]) [data-sitenav-bar] [data-sitenav-list] a {
+  body:has([data-page-header='dark']) [data-sitenav-bar] [data-menu-open],
+  body:has([data-page-header='dark']) [data-sitenav-bar] [data-sitenav-list] a {
     transition: color 240ms var(--ease-out-expo);
   }
-  body:has([data-brand-flight]) [data-sitenav-bar]:not([data-landed]) [data-menu-open],
-  body:has([data-brand-flight]) [data-sitenav-bar]:not([data-landed]) [data-sitenav-list] a {
+  body:has([data-page-header='dark']) [data-sitenav-bar]:not([data-landed]) [data-menu-open],
+  body:has([data-page-header='dark']) [data-sitenav-bar]:not([data-landed]) [data-sitenav-list] a {
     color: #fff;
   }
-  /* Seul sur le hero, le bouton Menu ne peut pas s'éclaircir avec un voile sombre au survol. */
-  body:has([data-brand-flight]) [data-sitenav-bar]:not([data-landed]) [data-menu-open]:hover {
+  /* Seul sur l'en-tête, le bouton Menu ne peut pas s'éclaircir avec un voile sombre au survol. */
+  body:has([data-page-header='dark']) [data-sitenav-bar]:not([data-landed]) [data-menu-open]:hover {
     background-color: rgb(255 255 255 / 0.16);
+  }
+
+  /* Tant que la barre n'a pas de matière, son CONTENU est masqué lui aussi (11/09/2026) : une marque en
+     couleurs, un bouton plein et des entrées posés à même l'en-tête, sans verre dessous, se lisaient comme
+     des éléments flottants. Ne reste que le bouton Menu, en blanc. Les trois blocs se révèlent avec le
+     verre : leur opacité EST `--nav-glass-on`. Sur l'accueil, les scripts du vol d'ouverture posent une
+     opacité en ligne sur la marque et le CTA — elle l'emporte, et c'est voulu : le relais garde son propre
+     fondu croisé. `pointer-events` suit, pour qu'on ne clique pas un élément invisible ; le clavier, lui,
+     ramène tout (`:focus-within`), sinon la navigation deviendrait inatteignable au premier écran. */
+  body:has([data-page-header='dark'])
+    [data-sitenav-bar]
+    :is([data-nav-brand], [data-sitenav-list], [data-cta-target]) {
+    opacity: var(--nav-glass-on);
+  }
+  body:has([data-page-header='dark'])
+    [data-sitenav-bar]:not([data-landed])
+    :is([data-nav-brand], [data-sitenav-list], [data-cta-target]) {
+    pointer-events: none;
+  }
+  body:has([data-page-header='dark'])
+    [data-sitenav-bar]:focus-within
+    :is([data-nav-brand], [data-sitenav-list], [data-cta-target]) {
+    opacity: 1;
+    pointer-events: auto;
   }
 }
 
@@ -667,20 +695,99 @@
     --intro-i: 5;
   }
 }
-/* Ouverture du hero (11/09/2026) : plus ample et plus lente que la cascade générale — 900 ms, 140 ms par
-   rang, 36 px de montée et un très léger agrandissement. Transform SEUL : aucun texte du hero ne varie en
-   opacité (un contrôle d'accessibilité mesure la page pendant la cascade). L'identifiant #apercu l'emporte
-   sur la règle générale `html.intro [data-intro][data-intro-move]`. */
+/* Ouverture du hero (11/09/2026, reprise cinématique) : une VRAIE séquence, pas une cascade régulière.
+   Le GESTE DIT LE RANG — chaque élément entre autrement selon son importance, et c'est ce contraste qui
+   fait la hiérarchie, bien plus qu'un simple décalage dans le temps :
+     1. le surtitre, le plus discret : un court dévoilement de 14 px, 700 ms ;
+     2. LA MARQUE, sommet de la page : 64 px de montée, de 0,88 à sa taille, 1,6 s, et une courbe qui
+        dépasse légèrement sa cible avant de s'y poser — c'est le seul élément qui « atterrit » ;
+     3. l'accroche : dévoilement franc de 26 px, 1 s, une fois la marque presque posée ;
+     4. les CTA, fonctionnels : une montée sobre de 20 px, sans dévoilement ;
+     5. la réassurance Trustpilot, la plus légère : 12 px, elle ferme la séquence.
+   La ligne risques N'EST PAS de la séquence : elle est présente et lisible dès le premier rendu. C'est une
+   contrainte AMF, tenue par tests/conformite.spec.ts (aucun [data-risk] animé ni sous un ancêtre animé).
+   Transform et clip-path SEULS : aucun texte du hero ne varie en opacité (un contrôle d'accessibilité
+   mesure les contrastes pendant la cascade) et la marque, candidate LCP, n'est jamais masquée.
+   Le vol d'ouverture ne prend la marque qu'au premier défilement (motion/brandflight.ts) : déplacée dans
+   le DOM, elle redémarrerait son animation et redescendrait d'un coup.
+   L'identifiant #apercu l'emporte sur la règle générale `html.intro [data-intro][data-intro-move]`. */
 @media (prefers-reduced-motion: no-preference) {
   html.intro #apercu [data-intro] {
-    animation-name: intro-cinema;
-    animation-duration: 900ms;
-    animation-delay: calc(var(--intro-i, 0) * 140ms);
+    animation-duration: var(--intro-dur, 900ms);
+    animation-delay: var(--intro-delay, 0ms);
+    animation-timing-function: var(--ease-out-expo);
+  }
+  html.intro #apercu [data-intro='1'] {
+    animation-name: intro-hero-eyebrow;
+    --intro-delay: 120ms;
+    --intro-dur: 700ms;
+  }
+  html.intro #apercu [data-intro='2'] {
+    animation-name: intro-hero-brand;
+    animation-timing-function: cubic-bezier(0.16, 1.08, 0.3, 1);
+    --intro-delay: 300ms;
+    --intro-dur: 1600ms;
+  }
+  html.intro #apercu [data-intro='3'] {
+    animation-name: intro-hero-tagline;
+    --intro-delay: 1000ms;
+    --intro-dur: 1000ms;
+  }
+  html.intro #apercu [data-intro='4'] {
+    animation-name: intro-hero-cta;
+    --intro-delay: 1300ms;
+    --intro-dur: 750ms;
+  }
+  html.intro #apercu [data-intro='5'] {
+    animation-name: intro-hero-trust;
+    --intro-delay: 1520ms;
+    --intro-dur: 650ms;
   }
 }
-@keyframes intro-cinema {
+/* 1 — surtitre : petit élément, petit geste. Le bord bas de sa boîte lui sert de cache. */
+@keyframes intro-hero-eyebrow {
   from {
-    transform: translate3d(0, 36px, 0) scale(0.985);
+    transform: translate3d(0, 14px, 0);
+    clip-path: inset(100% 0 0 0);
+  }
+  70% {
+    clip-path: inset(0 0 0 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+    clip-path: inset(0 0 0 0);
+  }
+}
+/* 2 — la marque : le geste le plus ample et le plus long de la page. */
+@keyframes intro-hero-brand {
+  from {
+    transform: translate3d(0, 64px, 0) scale(0.88);
+  }
+}
+/* 3 — l'accroche : dévoilement franc, deux fois le déplacement du surtitre. */
+@keyframes intro-hero-tagline {
+  from {
+    transform: translate3d(0, 26px, 0);
+    clip-path: inset(100% 0 0 0);
+  }
+  55% {
+    clip-path: inset(0 0 0 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+    clip-path: inset(0 0 0 0);
+  }
+}
+/* 4 — les CTA : sobres, sans dévoilement (un bouton qui se découpe fait bricolage). */
+@keyframes intro-hero-cta {
+  from {
+    transform: translate3d(0, 20px, 0) scale(0.97);
+  }
+}
+/* 5 — la réassurance : le geste le plus léger, il ne doit pas voler la vedette. */
+@keyframes intro-hero-trust {
+  from {
+    transform: translate3d(0, 12px, 0);
   }
 }
 @keyframes intro-in {

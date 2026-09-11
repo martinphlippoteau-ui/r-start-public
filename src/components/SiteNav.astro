@@ -39,6 +39,9 @@
  *  - sous « lg », un panneau plein écran (aria-expanded / aria-controls, Échap, piège à focus,
  *    retour du focus sur le bouton) qui liste les mêmes entrées à la verticale.
  *
+ * Matière : sur une page à en-tête sombre (`[data-page-header="dark"]`), la barre est transparente au
+ * premier écran et le verre se pose au défilement (`--nav-glass-on`, piloté ici) ; sur les pages à fond
+ * clair (mentions légales, 404), elle est pleine d'emblée et leur contenu réserve sa hauteur.
  * L'ombre n'apparaît qu'une fois la page défilée (`data-stuck` sur la barre). Aucune différence entre
  * l'accueil et les sous-pages : mêmes entrées, même CTA. Le logo porte `data-brand-target` et le CTA
  * `data-cta-target` : ce sont les deux arrivées du vol d'ouverture du hero. Le logo de la barre :
@@ -102,6 +105,7 @@ const linkClass =
     >
       <a
         href={logoHref}
+        data-nav-brand
         class="flex shrink-0 items-center gap-2.5 no-underline lg:justify-self-start"
         aria-label={homeLinkLabel}
       >
@@ -289,11 +293,38 @@ const linkClass =
      * 0,4 par défaut ; l'attribut est retiré en remontant). Une seule lecture de scroll par frame.
      */
     const compactAt = Math.min(1, Math.max(0, parseFloat(root.dataset.compactAt ?? '') || 0.4));
+
+    /*
+     * Matière de la barre (11/09/2026). Sur toute page dont l'en-tête est sombre, la barre est
+     * TRANSPARENTE au premier écran — ni verre, ni flou, ni ombre, contenu en blanc — puis le verre se
+     * pose au défilement. `--nav-glass-on` porte cet avancement (global.css) et `data-landed`, franchi à
+     * mi-course, rend au bouton Menu et aux entrées leur couleur navy.
+     * La distance est celle du relais d'ouverture du hero (motion/brandflight.ts) : sur l'accueil, le
+     * verre arrive exactement quand le logo et le CTA se posent dans la barre. Elle est reprise ici pour
+     * que les sous-pages, qui ne chargent pas GSAP, se comportent à l'identique.
+     * Rien en reduced-motion ni sans en-tête sombre : la CSS laisse alors la barre pleine.
+     */
+    const GLASS_MIN = 160;
+    const veiled =
+      !!document.querySelector('[data-page-header="dark"]') &&
+      window.matchMedia('(prefers-reduced-motion: no-preference)').matches;
+    let lastGlass = -1;
+    const syncGlass = (y: number) => {
+      if (!veiled || !bar) return;
+      const distance = Math.max(GLASS_MIN, window.innerHeight * 0.3);
+      const u = Math.min(1, Math.max(0, y / distance));
+      if (u === lastGlass) return;
+      lastGlass = u;
+      bar.style.setProperty('--nav-glass-on', String(u));
+      bar.toggleAttribute('data-landed', u >= 0.5);
+    };
+
     let scrollFrame = 0;
     const syncScroll = () => {
       scrollFrame = 0;
       const y = window.scrollY;
       bar?.toggleAttribute('data-stuck', y > 2);
+      syncGlass(y);
       const range = document.documentElement.scrollHeight - window.innerHeight;
       const compact = range > 0 && y / range >= compactAt;
       if (compact !== root.hasAttribute('data-compact'))

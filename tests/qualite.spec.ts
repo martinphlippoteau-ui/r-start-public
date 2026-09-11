@@ -22,9 +22,24 @@ test.describe('Qualité', () => {
     const hrefs = await ctas.evaluateAll((a) => a.map((x) => (x as HTMLAnchorElement).href));
     for (const h of hrefs) expect(h).toMatch(/^https?:\/\//);
     await page.evaluate(() => document.addEventListener('click', (e) => e.preventDefault(), true));
-    // Le premier CTA du DOM (nav) n'est visible qu'à partir du breakpoint sm (le mobile a un menu
-    // burger à la place) : on clique le premier CTA réellement visible dans ce viewport.
-    await ctas.visible().first().click();
+    // Le premier CTA du DOM est celui de la barre. Il est INERTE tant que la page n'a pas défilé : sur une
+    // page à en-tête sombre, la barre n'a ni matière ni contenu visible au premier écran (global.css,
+    // `--nav-glass-on`), donc opacité 0 et `pointer-events: none`. Playwright considère un élément
+    // d'opacité 0 comme visible : on cherche donc le premier CTA réellement ACTIONNABLE.
+    const index = await ctas.evaluateAll((els) =>
+      els.findIndex((node) => {
+        const el = node as HTMLElement & {
+          checkVisibility?: (options?: Record<string, boolean>) => boolean;
+        };
+        const shown =
+          typeof el.checkVisibility === 'function'
+            ? el.checkVisibility({ opacityProperty: true, visibilityProperty: true })
+            : el.offsetParent !== null;
+        return shown && getComputedStyle(el).pointerEvents !== 'none';
+      })
+    );
+    expect(index, 'aucun CTA actionnable au premier écran').toBeGreaterThanOrEqual(0);
+    await ctas.nth(index).click();
     const events = await page.evaluate(() =>
       (window as unknown as { dataLayer: Record<string, unknown>[] }).dataLayer.filter(
         (e) => e && e.event === 'cta_souscrire_click'

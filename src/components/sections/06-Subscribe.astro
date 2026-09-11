@@ -3,10 +3,10 @@
  * Section 6 — Souscrire (id « souscrire »). Deux rendus :
  *  - `compact` (accueil, trame du 11/09/2026 : entre Piliers 04 et La presse en parle 08b) : chapitre court
  *    qui raconte la souscription 100 % en ligne — surtitre, H2 `homeTitle`, `homeIntro`, le stepper des
- *    quatre étapes (l'avantage, `data-advantage` sur la liste) suivi, dans le même parent et jamais animé,
- *    d'un seul contre-poids (RiskNote `homeRisk` : rappel du DIC, durée de placement, commission de retrait,
- *    rachat non garanti — ≥ 60 % du texte cumulé des étapes), puis le CTA. Ni MyCORUM, ni options, ni « lisez le DIC » : ils vivent sur
- *    /documentation ;
+ *    quatre étapes, puis le CTA. Le contre-poids qui suivait la liste (rappel du DIC, durée de placement,
+ *    commission de retrait, rachat non garanti) a été retiré le 11/09/2026 à la demande de l'équipe ; la
+ *    liste ne porte donc plus `data-advantage`, faute de contre-poids frère. Ni MyCORUM, ni options, ni
+ *    « lisez le DIC » : ils vivent sur /documentation ;
  *  - complet (aucune page ne le rend aujourd'hui ; conservé pour réemploi) : le rendu historique ci-dessous.
  * Fond white. Le guide de souscription vit sur /documentation.
  * Stepper vertical en quatre étapes numérotées (liste ordonnée, ligne de progression) face au bloc
@@ -28,8 +28,7 @@
  *  - chaque étape entre par `fade-up` à son arrivée dans le viewport, avec un léger décalage par rang
  *    (cascade si plusieurs entrent ensemble) : c'est le seul effet d'entrée de l'étape (sobriété du
  *    11/09/2026 : la pastille n'a plus son `scale`, un effet sur un bloc ET son contenu) ; la liste
- *    elle-même (data-advantage) n'est pas animée et le RiskNote est hors de la liste : aucune révélation
- *    n'enveloppe un risque ;
+ *    elle-même n'est pas animée : aucune révélation n'enveloppe un risque ;
  *  - en-tête : H2 mot à mot et introduction en fade-up (SectionHeading `motion`), surtitre statique ;
  *  - MyCORUM (complet) entre par `fade-up` ;
  *  - les options (complet) : chaque carte contient sa RiskPair, donc la carte elle-même n'est jamais animée ;
@@ -67,7 +66,6 @@ const id = sections.subscribe.id;
 const title = compact && subscribe.homeTitle ? subscribe.homeTitle : subscribe.title;
 const intro = compact && subscribe.homeIntro ? subscribe.homeIntro : subscribe.intro;
 /** Contre-poids unique du chapitre court (≥ 60 % du texte cumulé des étapes, voir subscribe.ts). */
-const homeRisk = subscribe.homeRisk ?? subscribe.withdrawalReminder;
 const OptionTitle = subscribe.optionsTitle ? 'h4' : 'h3';
 /** Identifiant du dégradé SVG du segment de ligne d'une étape (unique dans la page). */
 const lineGradientId = (i: number): string => `${id}-stepper-line-${i}`;
@@ -100,7 +98,6 @@ const OPTION_Y = 12;
       <!-- Stepper -->
       <ol
         aria-label={subscribe.stepsLabel}
-        data-advantage={compact ? '' : undefined}
         class:list={['relative space-y-10 sm:space-y-14', 'lg:col-span-7']}
       >
         {
@@ -170,18 +167,16 @@ const OPTION_Y = 12;
       </ol>
 
       {
-        /* Compact : l'unique contre-poids des étapes, frère de la liste (jamais animé). */
-        compact && (
-          <div class="rounded-3xl bg-paper p-6 sm:p-10 lg:col-span-7">
-            <RiskNote text={homeRisk} size="lead" />
-          </div>
-        )
+        /* Le contre-poids des étapes (rappel du DIC, durée de placement, commission de retrait) a été
+          retiré de l'accueil le 11/09/2026 à la demande de l'équipe. La liste ne porte donc plus
+          `data-advantage` : sans contre-poids frère, le marquage serait faux et le contrôle d'équilibre
+          AMF (tests/conformite.spec.ts) le refuserait. Les risques restent portés par la ligne du hero et
+          par la section Risques ; le rappel complet vit sur /documentation. */
       }
 
       {
         /* Accueil : photo d'illustration à droite des étapes (11/09/2026, la page manquait d'images).
-          Purement décorative pour la conformité : elle ne porte aucun avantage, le contre-poids des étapes
-          reste la RiskNote ci-dessus, dans le même parent que la liste. */
+          Purement décorative pour la conformité : elle ne porte aucun avantage. */
         compact && (
           <figure class="self-start lg:sticky lg:top-24 lg:col-span-5" data-animate="clip">
             <div class="img-frame aspect-[4/3] lg:aspect-[4/5]">

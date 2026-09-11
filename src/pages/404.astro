@@ -14,7 +14,11 @@ import { withBase } from '@/lib/href';
 
 <Base title={notFound.seo.title} description={notFound.seo.description} path="/404" noindex>
   <SiteNav />
-  <main id="contenu" class="bg-paper">
+  {
+    /* La navigation flottante recouvre le haut de la page : sa hauteur est réservée ici (les pages
+    à en-tête sombre la réservent dans leur en-tête). */
+  }
+  <main id="contenu" class="pt-nav-total bg-paper">
     <Container size="narrow" class="flex min-h-[60svh] flex-col justify-center py-16 sm:py-24">
       <p class="text-eyebrow text-teal-700">{notFound.code}</p>
       <h1 class="text-display-md mt-4">{notFound.title}</h1>
