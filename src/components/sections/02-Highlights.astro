@@ -64,7 +64,9 @@ const titleId = sections.highlights.id + '-title';
             >
               {/* Pictogramme de verre (11/09/2026) : respiration visuelle de la section la plus dense, une
                   par carte. Décoratif, il ne remplace ni la valeur ni le libellé. */}
-              {isPictoKey(card.icon) && <Picto name={card.icon} class="size-14 sm:size-16" />}
+              {isPictoKey(card.icon) && (
+                <Picto name={card.icon} class="size-11 text-teal-700 sm:size-12" />
+              )}
               {/* La valeur est l'image : text-display-lg pour les six cartes ; min-h = son clamp, la ligne de valeur a la même hauteur partout, libellés et descriptions restent alignés par rangée. Valeur statique et exacte (aucun compteur, aucun mot à mot). */}
               <span class="flex min-h-[clamp(2.5rem,5.5vw,5rem)] items-end text-display-lg text-navy">
                 {card.value}

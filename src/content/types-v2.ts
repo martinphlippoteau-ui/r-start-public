@@ -88,7 +88,14 @@ export interface DifferenceContent {
   /** aria-label de la liste des moteurs (ex. « Les deux moteurs de rémunération »). */
   enginesLabel?: string;
   /** Les deux moteurs. `description` est l'avantage, `risk` son contre-poids (même taille, même carte). */
-  engines: { title: string; description: string; risk: string; noteId?: string }[];
+  engines: {
+    title: string;
+    description: string;
+    risk: string;
+    noteId?: string;
+    /** Index de la photo d'illustration dans media.strategy (carte du modèle). */
+    image?: number;
+  }[];
   /**
    * Formule d'alignement (advantage) : « la société de gestion se rémunère sur les loyers encaissés et
    * les plus-values réalisées, jamais sur le montant que vous versez » (jamais « nous ne touchons rien

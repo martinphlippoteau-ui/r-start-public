@@ -32,6 +32,10 @@ import { resolveImage } from '@/lib/images';
 const id = sections.difference.id;
 /** Respiration visuelle de fin de section (11/09/2026) : bande panoramique, purement décorative. */
 const bandPhoto = await resolveImage(media.income.src);
+/** Photos des deux cartes du modèle : immeubles de media.strategy, décoratives (crédit visible sous la section). */
+const photos = await Promise.all(
+  media.strategy.map(async (photo) => ({ ...photo, image: await resolveImage(photo.src) }))
+);
 const titleId = id + '-title';
 /** Décalage de cascade entre les deux cartes (secondes) : la seconde colonne suit la première. */
 const ENGINE_STAGGER = 0.08;
@@ -67,23 +71,46 @@ const ENGINE_STAGGER = 0.08;
       >
         {
           difference.engines.map((engine, i) => (
-            <Card as="li" tone="white" class="flex flex-col ring-1 ring-navy/5 lg:p-10">
-              <h3
-                class="text-display-sm text-ink"
-                data-animate="fade-up"
-                data-animate-delay={String(i * ENGINE_STAGGER)}
-              >
-                {engine.title}
-                {engine.noteId && (
-                  <span class="whitespace-nowrap">
-                    <NoteRef id={engine.noteId} />
-                  </span>
-                )}
-              </h3>
-              <p data-advantage class="mt-4 text-base leading-relaxed text-ink">
-                {engine.description}
-              </p>
-              <RiskNote text={engine.risk} class="mt-4 border-t border-navy/10 pt-4" />
+            <Card
+              as="li"
+              tone="white"
+              class="flex flex-col overflow-hidden ring-1 ring-navy/5 p-0!"
+            >
+              {/* Photo d'illustration (11/09/2026) : décorative, elle n'énonce aucun avantage et ne compte
+                  donc dans aucun couple avantage / risque. Crédit sous la carte, comme les autres photos. */}
+              {engine.image !== undefined && photos[engine.image] && (
+                <div class="img-frame aspect-[16/9] rounded-none shadow-none">
+                  <Picture
+                    src={photos[engine.image].image}
+                    alt={photos[engine.image].alt}
+                    widths={[480, 800, 1200]}
+                    sizes="(min-width: 64rem) 34rem, 100vw"
+                    formats={['avif', 'webp']}
+                    loading="lazy"
+                    decoding="async"
+                    pictureAttributes={{ class: 'block h-full w-full' }}
+                    class="h-full w-full object-cover"
+                  />
+                </div>
+              )}
+              <div class="flex flex-1 flex-col p-6 sm:p-8 lg:p-10">
+                <h3
+                  class="text-display-sm text-ink"
+                  data-animate="fade-up"
+                  data-animate-delay={String(i * ENGINE_STAGGER)}
+                >
+                  {engine.title}
+                  {engine.noteId && (
+                    <span class="whitespace-nowrap">
+                      <NoteRef id={engine.noteId} />
+                    </span>
+                  )}
+                </h3>
+                <p data-advantage class="mt-4 text-base leading-relaxed text-ink">
+                  {engine.description}
+                </p>
+                <RiskNote text={engine.risk} class="mt-4 border-t border-navy/10 pt-4" />
+              </div>
             </Card>
           ))
         }

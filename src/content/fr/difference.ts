@@ -52,18 +52,20 @@ export const difference = {
   engines: [
     {
       title: 'Quand les locataires paient leur loyer',
+      image: 0,
       description: nb(
-        `R Start perçoit les loyers de ses immeubles, puis distribue chaque mois des dividendes potentiels. La société de gestion prélève alors ${feeFacts.management.label} de frais de gestion, ${feeFacts.management.base}.`
+        `R Start encaisse les loyers de ses immeubles et vous en reverse une part chaque mois. La société de gestion prélève ${feeFacts.management.label} de ces loyers.`
       ),
-      risk: 'Les loyers dépendent des locataires et des marchés immobiliers. Les revenus ne sont pas garantis et peuvent varier, à la hausse comme à la baisse.',
+      risk: 'Les loyers dépendent des locataires et du marché. Ces revenus ne sont pas garantis et varient à la hausse comme à la baisse.',
       noteId: 'difference-remuneration',
     },
     {
       title: 'Quand un immeuble est revendu plus cher',
+      image: 2,
       description: nb(
-        `Selon l’analyse de CORUM Asset Management, R Start vise à acheter des immeubles vendus sous leur valeur, à les valoriser, puis à les revendre. Si un immeuble est revendu plus cher qu’il n’a été payé, cet écart s’appelle une plus-value : la commission est alors de ${feeFacts.disposal.label} selon son ampleur.`
+        `R Start vise à acheter des immeubles sous leur valeur, à les valoriser, puis à les revendre. L’écart entre les deux prix s’appelle une plus-value : la commission est alors de ${feeFacts.disposal.label} selon son ampleur.`
       ),
-      risk: 'Une plus-value n’est jamais acquise d’avance. Un immeuble peut se revendre moins cher qu’il n’a été payé : c’est une moins-value, et elle fait baisser la valeur de vos parts. La commission sur les ventes est due dès que le bilan des ventes est positif, même si la valeur de vos parts a diminué.',
+      risk: 'Une plus-value n’est jamais acquise. Un immeuble peut se revendre moins cher : c’est une moins-value, et elle fait baisser la valeur de vos parts. La commission reste due dès que le bilan des ventes est positif.',
     },
   ],
   counterweight: {

@@ -243,11 +243,12 @@ async function checkIndex() {
       );
   }
 
-  // « La presse en parle » (accueil) : mêmes exigences que /presse — citations de tiers marquées
-  // data-press-quote, avertissement de couverture présent.
+  // « La presse en parle » : la section a quitté l'accueil le 11/09/2026 (la revue complète est sur /presse,
+  // au menu). Si elle y revient un jour, elle doit satisfaire les mêmes exigences que /presse — citations de
+  // tiers marquées data-press-quote, avertissement de couverture présent — d'où le contrôle conservé, mais
+  // sans exiger sa présence.
   const pressMatch = html.match(/<section[^>]*id="presse-en-parle"[^>]*>[\s\S]*?<\/section>/i);
-  if (!pressMatch) warnings.push(`${file} : section #presse-en-parle introuvable`);
-  else {
+  if (pressMatch) {
     const press = pressMatch[0];
     requirePhrase(
       toText(press),

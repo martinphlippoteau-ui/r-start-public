@@ -19,11 +19,11 @@ export const sections: Record<SectionKey, SectionMeta> = {
   income: { id: 'revenus', label: 'Revenus', order: 12, inNav: false },
   subscribe: { id: 'souscrire', label: 'Souscription', order: 5, inNav: false },
   corum: { id: 'corum', label: 'Confiance', order: 4, inNav: false },
-  risks: { id: 'risques', label: 'Risques', order: 7, inNav: false },
-  press: { id: 'presse-en-parle', label: 'La presse en parle', order: 6, inNav: false },
+  risks: { id: 'risques', label: 'Risques', order: 6, inNav: false },
+  press: { id: 'presse-en-parle', label: 'La presse en parle', order: 9, inNav: false },
   documents: { id: 'documents', label: 'Documents', order: 13, inNav: false },
-  faq: { id: 'faq', label: 'FAQ', order: 8, inNav: false },
-  notes: { id: 'notes', label: 'Notes', order: 9, inNav: false },
+  faq: { id: 'faq', label: 'FAQ', order: 7, inNav: false },
+  notes: { id: 'notes', label: 'Notes', order: 8, inNav: false },
 };
 
 /** Sections dans l'ordre d'affichage. */

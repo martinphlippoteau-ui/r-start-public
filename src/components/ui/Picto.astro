@@ -1,20 +1,15 @@
 ---
 /**
- * Pictogrammes R Start, style ISOMÉTRIQUE AU TRAIT (demande du 11/09/2026) : chaque objet est dessiné en
- * volume, vu sous un angle fixe, en contour seul. L'uniformité ne tient pas à une consigne mais à la
- * GÉOMÉTRIE : tous les dessins sont projetés par la même fonction `iso()` depuis des coordonnées 3D, avec
- * la même échelle, le même angle (projection 2:1, arêtes horizontales à 26,6°) et la même épaisseur de
- * trait. Deux pictogrammes ne peuvent donc pas diverger de style.
- *
- * Primitives : `cuboid()` un pavé (face supérieure fermée, deux arêtes verticales, deux arêtes au sol),
- * `face()` une surface plane, `disc()` un disque à plat (ellipse 2:1). Les accents pleins se limitent à la
- * face supérieure, à 14 % d'opacité : le volume se lit sans alourdir le trait.
- *
- * La tuile de verre translucide (utilitaire `picto-glass`, global.css) est conservée : elle floute le fond
- * et porte la teinte de la clé ; le dessin isométrique est tracé en blanc par-dessus.
+ * Pictogrammes R Start : dessins au TRAIT PLAT, vus de face, sans support ni volume (la tuile de verre et
+ * l'isométrie ont été abandonnées le 11/09/2026 : illisibles à petite taille, et le support jurait avec le
+ * trait). Grille 24 × 24, trait de 1,5 pour la forme et 1,25 à 55 % d'opacité pour les détails (fenêtres,
+ * lignes, jours) : ce second niveau évite l'effet « gros trait » d'une épaisseur unique. `currentColor` :
+ * la couleur vient de la classe reçue, contraste tenu sur fond clair comme sur fond sombre.
+ * Formes volontairement archi-connues (billet, triangle, feuille, calendrier, immeubles, globe, loupe) :
+ * un pictogramme se reconnaît, il ne s'interprète pas.
  * Clés (champ `icon` de strategy.ts / highlights.ts) : argent, alerte, document-valide, calendrier,
- * equipe (deux volumes et flèche montante), exploration (carte et repère), analyse (immeuble et loupe).
- * Accessibilité : décoratif par défaut ; avec `title`, la tuile devient une image nommée (role="img").
+ * equipe (deux immeubles et flèche montante), exploration (globe et repère), analyse (immeuble et loupe).
+ * Accessibilité : décoratif par défaut (aria-hidden) ; avec `title`, le SVG devient une image nommée.
  * Aucun attribut motion ici : l'animation se pose sur l'enveloppe.
  */
 export const PICTO_KEYS = [
@@ -32,7 +27,7 @@ export const isPictoKey = (value: string): value is PictoKey =>
 
 interface Props {
   name: PictoKey;
-  /** Taille de la tuile : classes Tailwind (`size-16 sm:size-20`). */
+  /** Taille ET couleur : classes Tailwind (`size-14 text-teal-700`). */
   class?: string;
   /** Nom accessible facultatif ; sans lui, le picto est purement décoratif. */
   title?: string;
@@ -40,166 +35,121 @@ interface Props {
 const { name, class: className, title } = Astro.props as Props;
 
 /**
- * Teinte du verre par clé (halo interne et lueur portée) : le verre reste très transparent, la teinte ne
- * fait que le colorer légèrement, comme un filtre. Valeurs en RGB pour composer les opacités en CSS.
+ * Dessins sur une grille 24 × 24, en DEUX niveaux : `trait` porte la forme principale, `detail` les
+ * éléments secondaires (fenêtres, lignes de texte, jours) rendus plus fins et à 55 % d'opacité. C'est ce
+ * second niveau qui évite l'effet « gros trait » d'un pictogramme tout en épaisseur unique.
  */
-const tints: Record<PictoKey, string> = {
-  argent: '43 184 196',
-  alerte: '224 138 109',
-  'document-valide': '79 195 201',
-  calendrier: '111 168 201',
-  equipe: '53 194 177',
-  exploration: '90 182 224',
-  analyse: '47 176 216',
-};
-
-/* --- Projection isométrique commune (2:1) : (x, y, z) du monde → (X, Y) de la grille 48 × 48 --- */
-const OX = 24;
-const OY = 32;
-const U = 1.5;
-const iso = (x: number, y: number, z: number): [number, number] => [
-  +(OX + (x - y) * U).toFixed(2),
-  +(OY - ((x + y) * U) / 2 - z * U).toFixed(2),
-];
-const pt = (a: [number, number]) => `${a[0]} ${a[1]}`;
-const poly = (pts: [number, number][]) => `M${pts.map(pt).join('L')}Z`;
-const line = (a: [number, number], b: [number, number]) => `M${pt(a)}L${pt(b)}`;
-
-/** Surface plane à la hauteur z, de (x0,y0) à (x1,y1). */
-const face = (x0: number, y0: number, x1: number, y1: number, z = 0) =>
-  poly([iso(x0, y0, z), iso(x1, y0, z), iso(x1, y1, z), iso(x0, y1, z)]);
-
-/** Pavé de (x0,y0,0) à (x1,y1,h) : dessus fermé, deux arêtes verticales, deux arêtes au sol. */
-const cuboid = (x0: number, y0: number, x1: number, y1: number, h: number) =>
-  [
-    face(x0, y0, x1, y1, h),
-    line(iso(x1, y0, h), iso(x1, y0, 0)),
-    line(iso(x1, y1, h), iso(x1, y1, 0)),
-    line(iso(x0, y1, h), iso(x0, y1, 0)),
-    line(iso(x1, y0, 0), iso(x1, y1, 0)),
-    line(iso(x1, y1, 0), iso(x0, y1, 0)),
-  ].join('');
-
-/** Disque à plat (ellipse 2:1) centré en (x,y) à la hauteur z. */
-const disc = (x: number, y: number, z: number, r: number) => {
-  const [cx, cy] = iso(x, y, z);
-  return `<ellipse cx="${cx}" cy="${cy}" rx="${(r * U * 2).toFixed(2)}" ry="${(r * U).toFixed(2)}"/>`;
-};
-
-/** Accent : face supérieure remplie à 14 %. */
-const topAccent = (x0: number, y0: number, x1: number, y1: number, h: number) =>
-  `<path d="${face(x0, y0, x1, y1, h)}" fill="#fff" fill-opacity=".14" stroke="none"/>`;
-
-const p = (d: string) => `<path d="${d}"/>`;
-const dot = (x: number, y: number, z: number, r = 0.9) => {
-  const [cx, cy] = iso(x, y, z);
-  return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="#fff" stroke="none"/>`;
-};
-
-/* --- Les sept dessins, bâtis sur les mêmes primitives --- */
-const glyphs: Record<PictoKey, string> = {
-  // Liasse posée à plat et pile de deux jetons : ce que l'on verse.
-  argent: [
-    topAccent(-5.5, -3, 2, 3, 0.6),
-    p(cuboid(-5.5, -3, 2, 3, 0.6)),
-    disc(4.5, 0, 2.4, 2.2),
-    disc(4.5, 0, 1.2, 2.2),
-    p(line(iso(6.5, 0, 1.2), iso(6.5, 0, 2.4))),
-    p(line(iso(2.5, 0, 1.2), iso(2.5, 0, 2.4))),
-  ].join(''),
-  // Panneau triangulaire dressé sur un socle : l'avertissement.
-  alerte: [
-    topAccent(-3.2, -3.2, 3.2, 3.2, 0.5),
-    p(cuboid(-3.2, -3.2, 3.2, 3.2, 0.5)),
-    p(poly([iso(0, 0, 1.1), iso(-3.6, 3.6, 8), iso(3.6, -3.6, 8)])),
-    p(line(iso(0, 0, 4.2), iso(0, 0, 6.2))),
-    dot(0, 0, 3.1, 0.85),
-  ].join(''),
-  // Feuille à plat, deux lignes de texte, coche en relief : le document validé.
-  'document-valide': [
-    topAccent(-5, -4, 2.5, 4, 0.35),
-    p(cuboid(-5, -4, 2.5, 4, 0.35)),
-    p(line(iso(-3.4, -2.4, 0.35), iso(0.9, -2.4, 0.35))),
-    p(line(iso(-3.4, 0, 0.35), iso(-0.3, 0, 0.35))),
-    p(`M${pt(iso(-1.4, 2.6, 2.6))}L${pt(iso(-0.2, 3.8, 1.9))}L${pt(iso(2.8, 0.8, 4.6))}`),
-  ].join(''),
-  // Bloc de dates, grille sur la face supérieure, un jour marqué, deux anneaux.
-  calendrier: [
-    topAccent(-4.4, -4.4, 4.4, 4.4, 0.7),
-    p(cuboid(-4.4, -4.4, 4.4, 4.4, 0.7)),
-    p(line(iso(-1.5, -4.4, 0.7), iso(-1.5, 4.4, 0.7))),
-    p(line(iso(1.5, -4.4, 0.7), iso(1.5, 4.4, 0.7))),
-    p(line(iso(-4.4, -1.5, 0.7), iso(4.4, -1.5, 0.7))),
-    p(line(iso(-4.4, 1.5, 0.7), iso(4.4, 1.5, 0.7))),
-    `<path d="${face(1.5, 1.5, 4.4, 4.4, 0.7)}" fill="#fff" fill-opacity=".45" stroke="none"/>`,
-    p(line(iso(-2.9, -4.4, 1.3), iso(-2.9, -4.4, 2.3))),
-    p(line(iso(2.9, -4.4, 1.3), iso(2.9, -4.4, 2.3))),
-  ].join(''),
-  // Deux volumes de hauteurs différentes et une flèche montante : le double potentiel.
-  equipe: [
-    topAccent(-4.8, -1.4, -1.2, 2.2, 4),
-    p(cuboid(-4.8, -1.4, -1.2, 2.2, 4)),
-    topAccent(0.4, -2.4, 4, 1.2, 7),
-    p(cuboid(0.4, -2.4, 4, 1.2, 7)),
-    p(line(iso(5.6, -4, 6.2), iso(5.6, -4, 9.2))),
-    p(`M${pt(iso(4.9, -4, 8.4))}L${pt(iso(5.6, -4, 9.2))}L${pt(iso(6.3, -4, 8.4))}`),
-  ].join(''),
-  // Carte dépliée en trois volets et repère planté : la zone d'investissement.
-  exploration: [
-    topAccent(-5.6, -4.2, 5.6, 4.2, 0.3),
-    p(cuboid(-5.6, -4.2, 5.6, 4.2, 0.3)),
-    p(line(iso(-1.9, -4.2, 0.3), iso(-1.9, 4.2, 0.3))),
-    p(line(iso(1.9, -4.2, 0.3), iso(1.9, 4.2, 0.3))),
-    p(line(iso(0, 0, 1.2), iso(0, 0, 4.4))),
-    `<circle cx="${iso(0, 0, 5.4)[0]}" cy="${iso(0, 0, 5.4)[1]}" r="2"/>`,
-  ].join(''),
-  // Immeuble en volume et loupe au premier plan : les bons immeubles au bon prix.
-  analyse: [
-    topAccent(-4.8, -2.8, -0.4, 1.6, 7),
-    p(cuboid(-4.8, -2.8, -0.4, 1.6, 7)),
-    p(line(iso(-3.6, -2.8, 2.2), iso(-1.6, -2.8, 2.2))),
-    p(line(iso(-3.6, -2.8, 4.2), iso(-1.6, -2.8, 4.2))),
-    `<circle cx="${iso(3.4, -0.8, 3.2)[0]}" cy="${iso(3.4, -0.8, 3.2)[1]}" r="4.3"/>`,
-    p(line(iso(3.4, -0.8, 0.4), iso(4.6, 0.4, -0.8))),
-  ].join(''),
+const glyphs: Record<PictoKey, { trait: string; detail?: string }> = {
+  // Billet et pièce.
+  argent: {
+    trait: [
+      '<rect x="2" y="6.5" width="13.5" height="8.5" rx="2.25"/>',
+      '<circle cx="17" cy="16" r="5"/>',
+    ].join(''),
+    detail: ['<circle cx="8.75" cy="10.75" r="1.9"/>', '<path d="M17 13.9v4.2M15.4 16h3.2"/>'].join(
+      ''
+    ),
+  },
+  // Triangle d'avertissement.
+  alerte: {
+    trait:
+      '<path d="M10.4 3.7 2.2 17.9A1.9 1.9 0 0 0 3.8 20.8h16.4a1.9 1.9 0 0 0 1.6-2.9L13.6 3.7a1.9 1.9 0 0 0-3.2 0z"/>',
+    detail: '<path d="M12 9.6v4.3M12 17.3h.01"/>',
+  },
+  // Feuille avec une coche.
+  'document-valide': {
+    trait: [
+      '<path d="M12.75 2.5H6.25A1.75 1.75 0 0 0 4.5 4.25v15.5A1.75 1.75 0 0 0 6.25 21.5H12"/>',
+      '<path d="M12.75 2.5 17.5 7.25V11"/>',
+      '<circle cx="17" cy="17" r="4.5"/>',
+    ].join(''),
+    detail: [
+      '<path d="M12.75 2.5v3.75A1 1 0 0 0 13.75 7.25H17.5"/>',
+      '<path d="M7.6 11h4.4M7.6 14.6h2.6"/>',
+      '<path d="M15.1 17.1 16.4 18.4 18.9 15.8"/>',
+    ].join(''),
+  },
+  // Calendrier, un jour cerclé.
+  calendrier: {
+    trait: [
+      '<rect x="3" y="5.25" width="18" height="15.75" rx="2.25"/>',
+      '<path d="M3 10.25h18"/>',
+    ].join(''),
+    detail: [
+      '<path d="M8 3.2v4M16 3.2v4"/>',
+      '<path d="M7.6 14h.01M12 14h.01M16.4 14h.01M7.6 17.4h.01M12 17.4h.01"/>',
+      '<circle cx="16.4" cy="17.4" r="1.7"/>',
+    ].join(''),
+  },
+  // Deux immeubles de hauteurs différentes, flèche montante.
+  equipe: {
+    trait: [
+      '<path d="M2.5 21h19"/>',
+      '<path d="M4.5 21v-8.75A1.25 1.25 0 0 1 5.75 11h3.5A1.25 1.25 0 0 1 10.5 12.25V21"/>',
+      '<path d="M10.5 21V6.25A1.25 1.25 0 0 1 11.75 5h4.5A1.25 1.25 0 0 1 17.5 6.25V21"/>',
+    ].join(''),
+    detail: [
+      '<path d="M6.4 14.5h.01M8.6 14.5h.01M6.4 17.5h.01M8.6 17.5h.01"/>',
+      '<path d="M12.6 8.4h.01M15.4 8.4h.01M12.6 11.6h.01M15.4 11.6h.01M12.6 14.8h.01M15.4 14.8h.01"/>',
+      '<path d="M20 12.5V7.6M18.2 9.4 20 7.6l1.8 1.8"/>',
+    ].join(''),
+  },
+  // Globe et repère : la zone d'investissement.
+  exploration: {
+    trait: [
+      '<circle cx="11" cy="11" r="8.5"/>',
+      '<path d="M17.5 15.6c1.8 0 3.3 1.5 3.3 3.3 0 2.2-3.3 4.4-3.3 4.4s-3.3-2.2-3.3-4.4c0-1.8 1.5-3.3 3.3-3.3z" fill="var(--picto-bg, #fff)"/>',
+    ].join(''),
+    detail: [
+      '<path d="M2.6 11h16.8"/>',
+      '<path d="M11 2.6a13 13 0 0 1 0 16.8 13 13 0 0 1 0-16.8z"/>',
+      '<circle cx="17.5" cy="18.9" r="1.1"/>',
+    ].join(''),
+  },
+  // Immeuble et loupe.
+  analyse: {
+    trait: [
+      '<path d="M2.5 21h9.5"/>',
+      '<path d="M4.5 21V4.25A1.25 1.25 0 0 1 5.75 3h5.5A1.25 1.25 0 0 1 12.5 4.25V10"/>',
+      '<circle cx="16.5" cy="14.5" r="5"/>',
+    ].join(''),
+    detail: [
+      '<path d="M6.6 7h.01M9.6 7h.01M6.6 11h.01M9.6 11h.01M6.6 15h.01M9.6 15h.01"/>',
+      '<path d="M20.1 18.1 22.4 20.4"/>',
+    ].join(''),
+  },
 };
 
 const glyph = glyphs[name];
 if (!glyph) throw new Error(`Pictogramme inconnu : ${name}`);
-const tint = tints[name];
 
-/* Identifiant du <title> : unique par tuile rendue (le frontmatter s'exécute une fois par instance). */
+/* Identifiant du <title> : unique par picto rendu (le frontmatter s'exécute une fois par instance). */
 const g = globalThis as { __pictoSeq?: number };
 g.__pictoSeq = (g.__pictoSeq ?? 0) + 1;
 const titleId = title ? `picto-title-${name}-${g.__pictoSeq}` : undefined;
 ---
 
-<span
-  class:list={['picto-glass', className]}
-  style={`--picto-tint: ${tint};`}
-  role={title ? 'img' : undefined}
-  aria-labelledby={title ? titleId : undefined}
+<svg
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="1.5"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  focusable="false"
   aria-hidden={title ? undefined : 'true'}
+  role={title ? 'img' : undefined}
+  aria-labelledby={titleId}
   data-picto={name}
+  class:list={['shrink-0', className]}
 >
+  {title && <title id={titleId}>{title}</title>}
+  <Fragment set:html={glyph.trait} />
   {
-    title && (
-      <span id={titleId} class="visually-hidden">
-        {title}
-      </span>
+    glyph.detail && (
+      <g stroke-width="1.25" opacity=".55">
+        <Fragment set:html={glyph.detail} />
+      </g>
     )
   }
-  <svg
-    viewBox="0 0 48 48"
-    fill="none"
-    stroke="#fff"
-    stroke-width="1.6"
-    stroke-linecap="round"
-    stroke-linejoin="round"
-    focusable="false"
-    aria-hidden="true"
-    class="picto-glass-glyph"
-  >
-    <Fragment set:html={glyph} />
-  </svg>
-</span>
+</svg>
