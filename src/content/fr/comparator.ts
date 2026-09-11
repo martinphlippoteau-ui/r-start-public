@@ -53,11 +53,13 @@ export const comparator = {
   /** Affiché à la place d'un taux non relevé. */
   pendingLabel: 'À compléter',
   /**
-   * Marqueur du taux le plus bas d'une ligne. Il n'apparaît que si LES DEUX cases portent un pourcentage
-   * unique et comparable : un barème à paliers (« 0 / 6 / 12 % ») ne se compare pas à un taux unique, et
-   * un taux plus bas sur une ligne ne dit rien du coût total — la phrase de périmètre le rappelle.
+   * Le taux le plus bas d'une ligne est mis en avant par la COULEUR et la GRAISSE, l'autre est atténué.
+   * Jamais par la TAILLE : un frais affiché plus petit que ses voisins est précisément ce que l'AMF a
+   * reproché à la brochure, et tests/conformite.spec.ts le vérifie.
+   * Ce libellé n'est pas affiché : il est lu par les lecteurs d'écran, pour qui une différence de couleur
+   * ne dit rien. Il n'apparaît que si LES DEUX cases portent un pourcentage unique et comparable.
    */
-  bestLabel: 'Le plus bas sur cette ligne',
+  bestLabel: 'taux le plus bas de la ligne',
   /** Bandeau d'avertissement tant qu'une seule valeur manque pour la SCPI choisie. */
   pendingNotice:
     'Les taux de cette SCPI ne sont pas encore relevés. Tant qu’ils manquent, ce tableau ne compare rien : il ne montre que les frais de R Start. Aucune conclusion ne peut en être tirée.',
@@ -72,7 +74,7 @@ export const comparator = {
    * marché de la brochure, ni une comparaison de résultats.
    */
   perimeter:
-    'Ce tableau compare les taux de frais affichés dans les documents de chaque SCPI. La mention « le plus bas sur cette ligne » ne porte que sur la ligne concernée, et seulement quand les deux taux sont directement comparables : elle ne dit rien du coût total, qui dépend de ce que la SCPI encaisse et de votre durée de détention. Il ne compare pas les résultats. Il ne porte pas sur l’ensemble du marché : seules les SCPI de la liste y figurent. R Start n’a pas d’historique et aucune donnée de performance n’est communiquée sur ce site.',
+    'Ce tableau compare les taux de frais affichés dans les documents de chaque SCPI. Quand les deux taux d’une ligne sont directement comparables, le plus bas est mis en avant : cette mise en avant ne porte que sur cette ligne et ne dit rien du coût total, qui dépend de ce que la SCPI encaisse et de votre durée de détention. Il ne compare pas les résultats. Il ne porte pas sur l’ensemble du marché : seules les SCPI de la liste y figurent. R Start n’a pas d’historique et aucune donnée de performance n’est communiquée sur ce site.',
   /**
    * Base de comparaison HT / TTC. Sans elle, on opposerait un taux TTC à un taux HT sans le dire, ce que
    * l'AMF a déjà reproché à la brochure. R Start étant exonérée de TVA, ses deux montants sont égaux.

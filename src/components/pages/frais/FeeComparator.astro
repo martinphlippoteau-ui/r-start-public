@@ -121,10 +121,8 @@ const data = scpis.map((s) => ({
                   <span data-fee-value class="text-display-sm text-navy">
                     {row.rstart}
                   </span>
-                  <span data-comparator-best="left" class="mt-1 block" hidden>
-                    <span class="text-caption rounded-full bg-teal-700/10 px-2 py-0.5 font-semibold text-teal-700">
-                      {comparator.bestLabel}
-                    </span>
+                  <span data-comparator-best="left" class="visually-hidden" hidden>
+                    {comparator.bestLabel}
                   </span>
                   {row.rstartDetail && (
                     <span class="text-caption mt-1 block text-slate-700">{row.rstartDetail}</span>
@@ -134,10 +132,8 @@ const data = scpis.map((s) => ({
                   <span data-comparator-cell={String(i)} class="text-display-sm text-slate-700">
                     {comparator.pendingLabel}
                   </span>
-                  <span data-comparator-best="right" class="mt-1 block" hidden>
-                    <span class="text-caption rounded-full bg-teal-700/10 px-2 py-0.5 font-semibold text-teal-700">
-                      {comparator.bestLabel}
-                    </span>
+                  <span data-comparator-best="right" class="visually-hidden" hidden>
+                    {comparator.bestLabel}
                   </span>
                   <span
                     data-comparator-detail={String(i)}
@@ -235,8 +231,24 @@ const data = scpis.map((s) => ({
         const g = seul(ligne.gauche.textContent);
         const d = seul(scpi.values[i]);
         const comparable = g !== null && d !== null && g !== d;
-        ligne.marqueGauche.hidden = !(comparable && g < d);
-        ligne.marqueDroite.hidden = !(comparable && d < g);
+        const gagneGauche = comparable && g < d;
+        const gagneDroite = comparable && d < g;
+        ligne.marqueGauche.hidden = !gagneGauche;
+        ligne.marqueDroite.hidden = !gagneDroite;
+        /*
+         * Mise en avant par la COULEUR et la GRAISSE seulement : la taille reste identique d'une case à
+         * l'autre, sans quoi un frais serait affiché plus petit que son voisin — ce que l'AMF refuse.
+         * Le perdant est atténué, jamais effacé : il reste parfaitement lisible.
+         */
+        const peindre = (cell, gagne, perd) => {
+          cell.classList.toggle('font-bold', gagne);
+          cell.classList.toggle('text-teal-700', gagne);
+          cell.classList.toggle('text-slate-600', perd);
+          cell.classList.toggle('text-navy', !gagne && !perd);
+        };
+        peindre(ligne.gauche, gagneGauche, gagneDroite);
+        const droite = cells[i];
+        if (droite && scpi.values[i]) peindre(droite, gagneDroite, gagneGauche);
       });
     };
 
