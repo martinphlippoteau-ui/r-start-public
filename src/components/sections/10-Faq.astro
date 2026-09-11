@@ -61,19 +61,25 @@ const items = faq.items.map((item) => {
 
 <Section id={id} tone="paper">
   <Container size="wide">
-    <div class="grid gap-12 lg:grid-cols-12 lg:gap-16">
-      <!-- En-tête collant -->
-      <div class="lg:col-span-5">
-        <header class="max-w-4xl lg:sticky lg:top-24">
-          <h2 id={titleId} class="text-display-md" data-reveal-text>{faq.title}</h2>
-          <p class="mt-6 text-lead opacity-90" data-animate="fade-up" data-animate-delay="0.1">
-            {faq.intro}
-          </p>
-        </header>
-      </div>
+    {
+      /* En-tête PLEINE LARGEUR depuis le 11/09/2026 : dans sa colonne de cinq douzièmes, le titre ne
+        pouvait pas prendre la taille commune aux autres sections sans se couper en quatre lignes. Il sort
+        donc de la grille, comme partout ailleurs, et les questions occupent le reste. */
+    }
+    <header>
+      <h2 id={titleId} class="text-display-lg text-balance" data-reveal-text>{faq.title}</h2>
+      <p
+        class="mt-6 max-w-3xl text-lead opacity-90"
+        data-animate="fade-up"
+        data-animate-delay="0.1"
+      >
+        {faq.intro}
+      </p>
+    </header>
 
+    <div class="mt-chapter grid gap-12 lg:grid-cols-12 lg:gap-16">
       <!-- Questions -->
-      <div class="lg:col-span-7">
+      <div class="lg:col-span-8 lg:col-start-3">
         <ul role="list" aria-label={faq.listLabel} class="border-t border-navy/15">
           {
             items.map((item, i) => (

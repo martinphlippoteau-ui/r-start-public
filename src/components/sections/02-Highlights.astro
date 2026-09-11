@@ -43,9 +43,17 @@ const titleId = sections.highlights.id + '-title';
 
 <Section id={sections.highlights.id} tone="white">
   <Container size="wide">
-    <header class="mx-auto max-w-4xl text-center">
+    {
+      /* Aligné à gauche comme tous les autres titres de section depuis le 11/09/2026 : c'était le seul
+        en-tête centré de la page. */
+    }
+    <header>
       <h2 id={titleId} class="text-display-lg text-balance" data-reveal-text>{highlights.title}</h2>
-      <p data-animate="fade-up" data-animate-delay="0.1" class="mt-6 text-lead opacity-90">
+      <p
+        data-animate="fade-up"
+        data-animate-delay="0.1"
+        class="mt-6 max-w-3xl text-lead opacity-90"
+      >
         {highlights.intro}
       </p>
     </header>

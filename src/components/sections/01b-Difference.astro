@@ -14,15 +14,25 @@
  * Motion (sobriété) : H2 mot à mot, H3 en fade-up. Rien d'autre ne bouge.
  * Contenu : src/content/fr/difference.ts.
  */
+import { Picture } from 'astro:assets';
 import Button from '@/components/ui/Button.astro';
 import Container from '@/components/ui/Container.astro';
 import NoteRef from '@/components/ui/NoteRef.astro';
 import Section from '@/components/ui/Section.astro';
 import { sections } from '@/config/sections';
 import { difference } from '@/content/fr/difference';
+import { media } from '@/content/fr/media';
+import { resolveImage } from '@/lib/images';
 
 const id = sections.difference.id;
 const titleId = id + '-title';
+/**
+ * Photo d'illustration à droite de la démonstration (11/09/2026) : la section n'avait plus aucune image
+ * depuis qu'elle a été réduite au texte. Purement décorative pour la conformité — elle n'énonce aucun
+ * avantage, elle n'entre donc dans aucun couple avantage / risque. Crédit visible : R Start n'a pas de
+ * patrimoine, la photo ne représente aucun immeuble détenu.
+ */
+const photo = await resolveImage(media.strategy[0].src);
 
 /**
  * Les deux situations, découpées autour du mot à mettre en valeur : le contenu reste du texte brut
@@ -66,8 +76,8 @@ const situations = (difference.situations ?? []).map((s) => {
         d'équilibre AMF le refuserait. Les risques de l'accueil reposent désormais sur la ligne du hero et
         sur la section Risques ; le détail des frais reste sur /frais, atteinte par le lien ci-dessous. */
     }
-    <div class="mt-8 sm:mt-12">
-      <div class="text-lead max-w-3xl text-ink">
+    <div class="mt-8 grid items-start gap-10 sm:mt-12 lg:grid-cols-12 lg:gap-16">
+      <div class="text-lead text-ink lg:col-span-7">
         {difference.lead && <p>{difference.lead}</p>}
 
         <ul role="list" class="mt-5 space-y-3">
@@ -120,6 +130,29 @@ const situations = (difference.situations ?? []).map((s) => {
           )
         }
       </div>
+
+      <figure class="lg:col-span-5" data-animate="clip">
+        <div class="img-frame aspect-[4/3]">
+          <Picture
+            src={photo}
+            alt={media.strategy[0].alt}
+            widths={[480, 800, 1200]}
+            sizes="(min-width: 64rem) 26rem, 100vw"
+            formats={['avif', 'webp']}
+            loading="lazy"
+            decoding="async"
+            pictureAttributes={{ class: 'block h-full w-full' }}
+            class="h-full w-full object-cover"
+          />
+        </div>
+        {
+          media.strategy[0].credit && (
+            <figcaption class="text-caption mt-3 text-slate-700">
+              {media.strategy[0].credit}
+            </figcaption>
+          )
+        }
+      </figure>
     </div>
 
     <div class="mt-10 sm:mt-14">
