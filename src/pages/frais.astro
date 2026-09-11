@@ -161,6 +161,15 @@ const showComparison =
     </PageHero>
 
     <!-- 1. Les trois 0 % et leur contre-poids, dans le même bloc -->
+    {
+      /* Comparateur SCPI par SCPI, PREMIER ÉLÉMENT de la page (11/09/2026, demande de l'équipe) : on
+        compare d'abord des taux, on comprend ensuite ce qu'ils recouvrent. Tout ce qui suit explique les
+        frais de R Start à partir de la brochure partenaires et du document d'informations clés.
+        NON PUBLIABLE tant que les taux des autres SCPI ne sont pas relevés — le composant l'affiche et le
+        script de conformité le signale. */
+    }
+    <FeeComparator id="comparateur" />
+
     <Section id={ids.zero} tone="white" labelledBy={ids.zero + '-title'}>
       <Container size="wide">
         <h2 id={ids.zero + '-title'} class="visually-hidden">{labels?.zeroHighlights}</h2>
@@ -474,13 +483,6 @@ const showComparison =
     </Section>
 
     <!-- 6. Bascule pédagogique des frais (brochure p.6), derrière le drapeau SHOW_MARKET_COMPARISON -->
-    {
-      /* Comparateur SCPI par SCPI (11/09/2026). Il précède la bascule pédagogique : on compare d'abord
-        des taux, on comprend ensuite ce qu'ils produisent. NON PUBLIABLE tant que les taux des autres
-        SCPI ne sont pas relevés — le composant l'affiche et le script de conformité le signale. */
-    }
-    <FeeComparator id="comparateur" />
-
     {showComparison && <FeeSwitcher id={ids.comparison} />}
 
     <!-- 7. Document de référence -->

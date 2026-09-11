@@ -17,13 +17,6 @@ export const site = {
   subscribeIsPlaceholder: /placeholder/i.test(PUBLIC_SUBSCRIBE_URL),
   gtmId: PUBLIC_GTM_ID,
   ogImagePath: '/og/og-rstart.jpg',
-  /**
-   * PROVISOIRE (11/09/2026) : pose « Section 1 », « Section 2 »… sur chaque grande section, pour se
-   * repérer pendant la refonte. Le libellé est généré en CSS (`content`) : il n'existe pas dans le DOM,
-   * donc il n'entre ni dans le contrôle de conformité, ni dans la validation HTML, ni dans les tests.
-   * Passer à false pour tout retirer d'un coup, sans autre modification.
-   */
-  provisionalSectionTags: true,
   consent: {
     cookieName: 'rstart_consent',
     maxAgeDays: 180,

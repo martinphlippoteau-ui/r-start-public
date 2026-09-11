@@ -8,6 +8,7 @@
  */
 import Base from '@/layouts/Base.astro';
 import TrustpilotScript from '@/components/TrustpilotScript.astro';
+import IntroOnce from '@/components/IntroOnce.astro';
 import SiteNav from '@/components/SiteNav.astro';
 import LegalNotes from '@/components/LegalNotes.astro';
 import Footer from '@/components/Footer.astro';
@@ -67,6 +68,11 @@ const jsonLd = [
       Trustpilot). Seule l'accueil porte des widgets, les autres pages ne le chargent donc pas. */
   }
   <TrustpilotScript slot="head" />
+  {
+    /* Ouverture jouée une seule fois par session : le script retire la classe `intro` au retour depuis
+      une autre page du site. Accueil uniquement — voir public/intro-once.js. */
+  }
+  <IntroOnce slot="head" />
   <SiteNav />
   <main id="contenu">
     {hero && <hero.Component />}

@@ -323,24 +323,35 @@
    La règle ne dépend PLUS de `prefers-reduced-motion` (11/09/2026) : masquer la barre n'est pas du
    mouvement, et la faire dépendre de ce réglage donnait une barre pleine à qui a activé « réduire les
    animations » — un comportement impossible à expliquer. En mouvement réduit, le script bascule la
-   matière d'un coup au lieu de la doser au défilement. Sans script, la barre reste pleine (scripting). */
+   matière d'un coup au lieu de la doser au défilement. Sans script, la barre reste pleine (scripting).
+   PÉRIMÈTRE (11/09/2026) : l'ACCUEIL SEULEMENT (`[data-brand-flight]`, le bloc logo du hero), et
+   seulement tant que l'ouverture est jouée (`html.intro`, retirée par public/intro-once.js au retour
+   depuis une autre page). Sur les sous-pages, et au retour sur l'accueil, la barre est pleine d'emblée :
+   on ne fait pas redécouvrir la navigation à quelqu'un qui l'a déjà vue. */
 @media (scripting: enabled) {
-  body:has([data-page-header='dark']) [data-sitenav-bar] {
+  html.intro body:has([data-brand-flight]) [data-sitenav-bar] {
     --nav-glass-on: 0;
     transition-property: none;
   }
   @media (prefers-reduced-motion: no-preference) {
-    body:has([data-page-header='dark']) [data-sitenav-bar] [data-menu-open],
-    body:has([data-page-header='dark']) [data-sitenav-bar] [data-sitenav-list] a {
+    html.intro body:has([data-brand-flight]) [data-sitenav-bar] [data-menu-open],
+    html.intro body:has([data-brand-flight]) [data-sitenav-bar] [data-sitenav-list] a {
       transition: color 240ms var(--ease-out-expo);
     }
   }
-  body:has([data-page-header='dark']) [data-sitenav-bar]:not([data-landed]) [data-menu-open],
-  body:has([data-page-header='dark']) [data-sitenav-bar]:not([data-landed]) [data-sitenav-list] a {
+  html.intro body:has([data-brand-flight]) [data-sitenav-bar]:not([data-landed]) [data-menu-open],
+  html.intro
+    body:has([data-brand-flight])
+    [data-sitenav-bar]:not([data-landed])
+    [data-sitenav-list]
+    a {
     color: #fff;
   }
   /* Seul sur l'en-tête, le bouton Menu ne peut pas s'éclaircir avec un voile sombre au survol. */
-  body:has([data-page-header='dark']) [data-sitenav-bar]:not([data-landed]) [data-menu-open]:hover {
+  html.intro
+    body:has([data-brand-flight])
+    [data-sitenav-bar]:not([data-landed])
+    [data-menu-open]:hover {
     background-color: rgb(255 255 255 / 0.16);
   }
 
@@ -351,17 +362,20 @@
      opacité en ligne sur la marque et le CTA — elle l'emporte, et c'est voulu : le relais garde son propre
      fondu croisé. `pointer-events` suit, pour qu'on ne clique pas un élément invisible ; le clavier, lui,
      ramène tout (`:focus-within`), sinon la navigation deviendrait inatteignable au premier écran. */
-  body:has([data-page-header='dark'])
+  html.intro
+    body:has([data-brand-flight])
     [data-sitenav-bar]
     :is([data-nav-brand], [data-sitenav-list], [data-cta-target]) {
     opacity: var(--nav-glass-on);
   }
-  body:has([data-page-header='dark'])
+  html.intro
+    body:has([data-brand-flight])
     [data-sitenav-bar]:not([data-landed])
     :is([data-nav-brand], [data-sitenav-list], [data-cta-target]) {
     pointer-events: none;
   }
-  body:has([data-page-header='dark'])
+  html.intro
+    body:has([data-brand-flight])
     [data-sitenav-bar]:focus-within
     :is([data-nav-brand], [data-sitenav-list], [data-cta-target]) {
     opacity: 1;
@@ -373,7 +387,10 @@
      barres — le mot « Menu » reste dans le DOM, masqué visuellement, sans quoi le bouton perdrait son
      nom accessible (le chevron est décoratif). */
   @media (width >= 64rem) {
-    body:has([data-page-header='dark']) [data-sitenav-bar]:not([data-landed]) [data-menu-open] {
+    html.intro
+      body:has([data-brand-flight])
+      [data-sitenav-bar]:not([data-landed])
+      [data-menu-open] {
       display: inline-flex;
       /* La barre est une grille de trois colonnes : sans placement, ce quatrième élément s'ouvrirait une
          deuxième ligne et s'étirerait sur toute la largeur. Il partage la colonne de droite avec le CTA,
@@ -383,7 +400,8 @@
       justify-self: end;
     }
   }
-  body:has([data-page-header='dark'])
+  html.intro
+    body:has([data-brand-flight])
     [data-sitenav-bar]:not([data-landed])
     [data-menu-open]
     > span {
@@ -430,38 +448,6 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
       transform 320ms var(--ease-out-expo),
       visibility 0s;
   }
-}
-
-/* PROVISOIRE (11/09/2026) — repères de travail. « Section 1 », « Section 2 »… posés en haut à gauche de
-   chaque grande section pour pouvoir en parler sans ambiguïté pendant la refonte. Le libellé vit dans
-   `content` : rien dans le DOM, donc aucun effet sur le contrôle de conformité, la validation HTML ou les
-   tests. Couleur volontairement hors charte, pour qu'on ne l'oublie pas en ligne.
-   Pour tout retirer : `provisionalSectionTags: false` dans src/config/site.ts. */
-html.reperes main {
-  counter-reset: repere-section;
-}
-html.reperes main section[data-section] {
-  counter-increment: repere-section;
-}
-html.reperes main section[data-section]::before {
-  content: 'Section ' counter(repere-section);
-  position: absolute;
-  top: 0.5rem;
-  left: 0.5rem;
-  z-index: 30;
-  padding: 0.2rem 0.6rem;
-  border-radius: 9999px;
-  background: #e11d48;
-  color: #fff;
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  pointer-events: none;
-}
-/* La première section passe sous la navigation flottante : son repère descend d'autant. */
-html.reperes main section[data-section]:first-child::before {
-  top: calc(var(--spacing-nav-total) + 0.5rem);
 }
 
 /* Tiroir du menu (SiteNav.astro) : il entre par la DROITE et le voile se pose derrière lui. L'état ouvert

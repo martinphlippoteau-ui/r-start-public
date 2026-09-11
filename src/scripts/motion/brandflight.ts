@@ -257,6 +257,10 @@ const makeCtaHandover = (): (() => void) => {
 };
 
 export const setupBrandFlight = (): (() => void) => {
+  /* L'ouverture ne se joue qu'une fois par session : `intro` est retirée de <html> par
+     public/intro-once.js au retour depuis une autre page. Sans elle, la barre est déjà pleine et le logo
+     reste dans le hero — il n'y a plus rien à faire voler. */
+  if (!document.documentElement.classList.contains('intro')) return () => {};
   const stops = [makeFlight('[data-brand-flight]', '[data-brand-target]'), makeCtaHandover()];
   return () => stops.forEach((stop) => stop());
 };

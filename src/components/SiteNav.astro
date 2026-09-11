@@ -316,7 +316,11 @@ const linkClass =
      * existe pour tout le monde, seul le fondu disparaît. Sans en-tête sombre, rien ne s'applique.
      */
     const GLASS_MIN = 160;
-    const veiled = !!document.querySelector('[data-page-header="dark"]');
+    /* Accueil seulement, et seulement tant que l'ouverture est jouée : `intro` est retirée de <html>
+       par public/intro-once.js au retour depuis une autre page du site. */
+    const veiled =
+      document.documentElement.classList.contains('intro') &&
+      !!document.querySelector('[data-brand-flight]');
     const smooth = window.matchMedia('(prefers-reduced-motion: no-preference)').matches;
     let lastGlass = -1;
     const syncGlass = (y: number) => {
