@@ -76,7 +76,13 @@ const hasAside = Astro.slots.has('aside');
     <div
       class:list={['mt-2 sm:mt-8', hasAside && 'lg:grid lg:grid-cols-12 lg:items-end lg:gap-12']}
     >
-      <div class:list={['max-w-4xl', hasAside && 'lg:col-span-7 lg:max-w-none']}>
+      {
+        /* 64 rem à partir de « lg » (13/09/2026) : à 80 px, « Comparer et comprendre » réclame 942 px et
+          n'en avait que 896, la première ligne du H1 de la page Frais se coupait donc en deux et le
+          titre tenait sur trois lignes au lieu de deux. Les titres courts ne changent pas de largeur
+          pour autant, ils n'atteignaient déjà pas la borne. */
+      }
+      <div class:list={['max-w-4xl lg:max-w-5xl', hasAside && 'lg:col-span-7 lg:max-w-none']}>
         {
           /* Un saut de ligne dans le titre est respecté : la césure d'un H1 est une décision de mise en
             page, elle appartient au contenu et non au hasard de la largeur disponible. Le texte reste
@@ -108,6 +114,13 @@ const hasAside = Astro.slots.has('aside');
           size="lead"
           class="mt-2 max-w-3xl max-sm:text-base max-sm:leading-snug sm:mt-5"
         />
+        {
+          /* Appel à l'action de l'en-tête, APRÈS la ligne risques : on ne propose pas de souscrire
+            avant d'avoir dit ce qu'on risque. */
+        }
+        <div class="empty:hidden mt-8 sm:mt-10">
+          <slot name="cta" />
+        </div>
       </div>
       {
         hasAside && (

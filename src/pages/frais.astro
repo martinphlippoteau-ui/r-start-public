@@ -30,6 +30,7 @@ import Footer from '@/components/Footer.astro';
 import LegalNotes from '@/components/LegalNotes.astro';
 import Breadcrumb from '@/components/ui/Breadcrumb.astro';
 import Button from '@/components/ui/Button.astro';
+import StickyCta from '@/components/StickyCta.astro';
 import Card from '@/components/ui/Card.astro';
 import Container from '@/components/ui/Container.astro';
 import PageHero from '@/components/ui/PageHero.astro';
@@ -96,6 +97,7 @@ const faqItems = faq.items.map((item) => {
     }
     <PageHero eyebrow={hero.eyebrow} title={hero.title} riskLine={hero.riskLine}>
       <Breadcrumb slot="breadcrumb" key="fees" tone="dark" />
+      <Button slot="cta" position={cta.position} variant="light" size="lg">{cta.label}</Button>
       {
         /* En-tête MINIMALISTE (11/09/2026, demande de l'équipe) : le tableau des taux qui l'occupait est
           parti, pour qu'on arrive au comparateur sans défiler. Les 0 % ne sont donc plus annoncés seuls
@@ -422,6 +424,12 @@ const faqItems = faq.items.map((item) => {
 
     <LegalNotes notes={notes} />
   </main>
+
+  {
+    /* Pastille d'appel : elle arrive avec la section qui suit le comparateur, une fois la comparaison
+      lue, et reste jusqu'au bas de la page. Rendue au niveau de la page, jamais dans une section. */
+  }
+  <StickyCta label={cta.label} position={cta.position} from={'#' + ids.zero} />
   <Footer />
 </Base>
 
