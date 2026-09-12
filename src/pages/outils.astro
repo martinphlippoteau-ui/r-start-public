@@ -1,13 +1,14 @@
 ---
 /**
- * Page /outils (12/09/2026) : les quatre outils chiffrés du site.
+ * Page /outils (12/09/2026) : la porte d'entrée des quatre outils chiffrés du site.
  * SiteNav → main#contenu : PageHero (fil d'Ariane, H1, ligne risques visible sans défiler) → cadre qui
- * pose la règle commune aux quatre outils → simulateur de frais et point de bascule → calendrier de
- * jouissance → coût d'une sortie anticipée → versements programmés → notes → Footer.
+ * pose la règle commune aux quatre outils → quatre cartes, une par outil → notes → Footer.
+ *
+ * Chaque outil vit sur SA page, sous /outil : la page d'accueil ne fait que poser la question à laquelle
+ * il répond. Voir src/content/fr/toolsPage.ts pour le détail et pour les deux idées écartées.
  *
  * Règle de la page : aucun outil ne projette de performance. Ils appliquent les taux du contrat aux
- * montants saisis par le visiteur, et le cadre en tête de page le dit avant tout calcul. Voir
- * src/content/fr/toolsPage.ts pour le détail et pour les deux idées écartées.
+ * montants saisis par le visiteur, et le cadre le dit avant le premier calcul.
  */
 import Base from '@/layouts/Base.astro';
 import SiteNav from '@/components/SiteNav.astro';
@@ -18,13 +19,13 @@ import Container from '@/components/ui/Container.astro';
 import PageHero from '@/components/ui/PageHero.astro';
 import RiskNote from '@/components/ui/RiskNote.astro';
 import Section from '@/components/ui/Section.astro';
-import ToolsSuite from '@/components/pages/outils/ToolsSuite.astro';
+import ToolCard from '@/components/pages/outils/ToolCard.astro';
 import { pages } from '@/config/pages';
-import { notes, toolsPage } from '@/content/fr/toolsPage';
+import { notes, toolCards, toolsPage } from '@/content/fr/toolsPage';
 import { breadcrumbJsonLd, organizationJsonLd, webPageJsonLd } from '@/lib/seo';
 
 const page = pages.tools;
-const { seo, hero, frame } = toolsPage;
+const { seo, hero, frame, index } = toolsPage;
 
 const jsonLd = [
   organizationJsonLd(),
@@ -41,7 +42,7 @@ const jsonLd = [
     </PageHero>
 
     {
-      /* Le cadre se lit AVANT le premier outil : il dit ce que ces calculs sont, et ce qu'ils ne sont
+      /* Le cadre se lit AVANT la première carte : il dit ce que ces calculs sont, et ce qu'ils ne sont
         pas. Son contre-poids est son frère direct, à la même taille, jamais animé. */
     }
     <Section id="cadre" tone="paper" spacing="compact" labelledBy="cadre-title">
@@ -54,7 +55,30 @@ const jsonLd = [
       </Container>
     </Section>
 
-    <ToolsSuite />
+    <Section id="liste" tone="white" labelledBy="liste-title">
+      <Container size="wide">
+        <h2 id="liste-title" class="text-display-lg text-balance">{index.title}</h2>
+        <p class="text-lead mt-6 max-w-3xl opacity-90">{index.intro}</p>
+
+        <ul class="mt-10 grid gap-6 sm:grid-cols-2 lg:gap-8" role="list">
+          {
+            toolCards.map((outil) => (
+              <li class="h-full">
+                <ToolCard
+                  href={pages[outil.pageKey].path}
+                  eyebrow={outil.card.eyebrow}
+                  title={pages[outil.pageKey].label}
+                  question={outil.card.question}
+                  teaser={outil.card.teaser}
+                  cta={index.cardCta}
+                />
+              </li>
+            ))
+          }
+        </ul>
+      </Container>
+    </Section>
+
     <LegalNotes notes={notes} />
   </main>
   <Footer />

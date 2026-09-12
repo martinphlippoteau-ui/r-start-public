@@ -317,6 +317,10 @@ async function checkSubPages() {
   for (const p of [
     'frais',
     'outils',
+    'outil/simulateur-de-frais',
+    'outil/date-de-jouissance',
+    'outil/cout-de-sortie',
+    'outil/versements-programmes',
     'strategie',
     'a-propos',
     'documentation',

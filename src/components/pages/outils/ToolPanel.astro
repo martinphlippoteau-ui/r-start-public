@@ -1,0 +1,74 @@
+---
+/**
+ * Cadre commun aux quatre outils : titre, introduction, sélecteur de niveau, champs à gauche, résultats
+ * à droite, contre-poids risque en bas. Chaque outil n'apporte que ses champs et ses résultats, par les
+ * deux emplacements `fields` et `results`.
+ *
+ * `data-tool-level` enveloppe le sélecteur ET le contenu : c'est sur lui que portent les sélecteurs CSS
+ * qui montrent ou masquent les éléments selon le niveau choisi (global.css).
+ *
+ * `data-tool` ne porte que le groupe de champs : le script de l'outil y écoute `input` et `change`, qui
+ * remontent depuis chaque champ. Les boutons de niveau sont en dehors, ils n'ont rien à recalculer.
+ *
+ * L'introduction sert aussi de `data-advantage` : le contrôle de conformité exige qu'un avantage ait un
+ * frère `data-risk` d'au moins 60 % de sa longueur et 95 % de sa taille de police. Le RiskNote en bas
+ * remplit ce rôle, et il n'est jamais animé.
+ */
+import Container from '@/components/ui/Container.astro';
+import RiskNote from '@/components/ui/RiskNote.astro';
+import Section from '@/components/ui/Section.astro';
+import ToolLevels from './ToolLevels.astro';
+
+interface Props {
+  /** Identifiant de section, aussi préfixe des boutons radio et valeur de `data-tool`. */
+  id: string;
+  title: string;
+  intro: string;
+  risk: string;
+  noteId: string;
+  levelNotes: { debutant: string; intermediaire: string; expert: string };
+  tone?: 'paper' | 'white';
+  /** Le bloc de champs passe sur deux colonnes dès « sm » quand l'outil en a plus d'un. */
+  twoColumns?: boolean;
+}
+const {
+  id,
+  title,
+  intro,
+  risk,
+  noteId,
+  levelNotes,
+  tone = 'white',
+  twoColumns = true,
+} = Astro.props as Props;
+const titleId = `${id}-title`;
+---
+
+<Section id={id} tone={tone} labelledBy={titleId}>
+  <Container size="wide">
+    <h2 id={titleId} class="text-display-lg text-balance">{title}</h2>
+    <p class="text-lead mt-6 max-w-3xl opacity-90">{intro}</p>
+
+    <div data-tool-level={id} class="mt-10">
+      <ToolLevels name={id} notes={levelNotes} />
+
+      <div class="mt-10 grid gap-10 lg:grid-cols-12 lg:gap-16">
+        <div
+          role="group"
+          aria-labelledby={titleId}
+          data-tool={id}
+          class:list={['grid gap-6 lg:col-span-7', twoColumns && 'sm:grid-cols-2']}
+        >
+          <slot name="fields" />
+        </div>
+
+        <div class="grid content-start gap-4 lg:col-span-5">
+          <slot name="results" />
+        </div>
+      </div>
+    </div>
+
+    <div data-advantage class="visually-hidden">{intro}</div>
+    <RiskNote text={risk} size="lead" class="mt-10" noteId={noteId} />
+  </Container>
+</Section>

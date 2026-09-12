@@ -1,0 +1,248 @@
+---
+/**
+ * Outil 1 : ce que R Start prélève, et le point de bascule face à une SCPI à frais d'entrée.
+ *
+ * Trois niveaux :
+ *  1. montant et loyers, ce que prélève chaque modèle ;
+ *  2. + durée de détention et plus-value, + le point de bascule ;
+ *  3. + les taux de la SCPI comparée, + le détail poste par poste.
+ *
+ * Aucune projection : les loyers et la plus-value sont des hypothèses saisies par le visiteur, tous les
+ * taux viennent de facts.ts. Un champ masqué garde sa valeur par défaut, le calcul reste complet.
+ */
+import NoteRef from '@/components/ui/NoteRef.astro';
+import ToolField from './ToolField.astro';
+import ToolPanel from './ToolPanel.astro';
+import ToolResult from './ToolResult.astro';
+import { fees, marketComparison } from '@/content/fr/facts';
+import { toolsPage } from '@/content/fr/toolsPage';
+
+const { feeSimulator: outil, labels } = toolsPage;
+const { fields, hints, results } = outil;
+
+/** Un libellé de moyenne de marché (« 8,00 % TTC ») réduit au nombre qu'un champ numérique accepte. */
+const taux = (label: string): number => parseFloat(label.replace(/[^\d,.]/g, '').replace(',', '.'));
+
+/** Barèmes transmis au script. Un seul point de vérité : facts.ts. */
+const bareme = {
+  management: fees.management.rate,
+  disposalTiers: fees.disposal.tiers.map((t) => ({ rate: parseFloat(t.rate), from: t.from })),
+  withdrawalSteps: fees.withdrawal.steps.map((s) => ({ rate: parseFloat(s.rate), until: s.until })),
+  textes: {
+    crossoverNever: results.crossoverNever,
+    crossoverAlways: results.crossoverAlways,
+    crossoverTemplate: results.crossoverTemplate,
+  },
+};
+---
+
+<ToolPanel
+  id="frais"
+  title={outil.title}
+  intro={outil.intro}
+  risk={outil.risk}
+  noteId={outil.noteId}
+  levelNotes={outil.levelNotes}
+  tone="white"
+>
+  <Fragment slot="fields">
+    <ToolField
+      id="frais-montant"
+      label={fields.amount}
+      unit={labels.euro}
+      value={10000}
+      min={200}
+      step={100}
+    />
+    <ToolField
+      id="frais-loyers"
+      label={fields.rent}
+      unit={labels.euro}
+      value={4000}
+      min={0}
+      step={100}
+      hint={hints.rent}
+    />
+    <ToolField
+      id="frais-duree"
+      label={fields.years}
+      unit={labels.years}
+      value={10}
+      min={1}
+      max={30}
+      level={2}
+    />
+    <ToolField
+      id="frais-plusvalue"
+      label={fields.gain}
+      unit={labels.percent}
+      value={0}
+      min={0}
+      max={100}
+      step={1}
+      hint={hints.gain}
+      level={2}
+    />
+    <ToolField
+      id="frais-entree-rivale"
+      label={fields.rivalEntry}
+      unit={labels.percent}
+      value={taux(marketComparison.averages.acquisition.label)}
+      min={0}
+      max={20}
+      step={0.1}
+      hint={hints.rivalEntry}
+      level={3}
+    />
+    <ToolField
+      id="frais-gestion-rivale"
+      label={fields.rivalManagement}
+      unit={labels.percent}
+      value={taux(marketComparison.averages.management.label)}
+      min={0}
+      max={30}
+      step={0.1}
+      level={3}
+    />
+  </Fragment>
+
+  <Fragment slot="results">
+    <ToolResult id="frais-out-rstart" label={results.rstart} emphasis />
+    <ToolResult id="frais-out-rivale" label={results.rival} />
+
+    <div data-level="2" class="rounded-3xl bg-paper p-5 sm:p-6">
+      <p class="text-base font-medium text-slate-700">
+        {results.crossover}
+        <NoteRef id={outil.marketNoteId} notes={toolsPage.notes} />
+      </p>
+      <p id="frais-out-bascule" data-tool-out aria-live="polite" class="text-lead mt-2 text-ink">
+        {labels.pending}
+      </p>
+    </div>
+
+    {
+      /* Détail poste par poste, réservé au niveau expert : il dit d'où vient le total, ligne à ligne.
+        Les trois postes sont les seuls que R Start prélève, la dernière phrase le rappelle. */
+    }
+    <div data-level="3" class="rounded-3xl bg-paper p-5 sm:p-6">
+      <h3 class="text-base font-semibold text-ink">{results.detailTitle}</h3>
+      <dl class="mt-3 grid gap-2">
+        <div class="flex flex-wrap items-baseline justify-between gap-x-4">
+          <dt class="text-base text-slate-700">{results.detailManagement}</dt>
+          <dd
+            id="frais-out-detail-gestion"
+            data-tool-out
+            class="text-base font-semibold text-navy tabular-nums"
+          >
+            {labels.pending}
+          </dd>
+        </div>
+        <div class="flex flex-wrap items-baseline justify-between gap-x-4">
+          <dt class="text-base text-slate-700">{results.detailDisposal}</dt>
+          <dd
+            id="frais-out-detail-cession"
+            data-tool-out
+            class="text-base font-semibold text-navy tabular-nums"
+          >
+            {labels.pending}
+          </dd>
+        </div>
+        <div class="flex flex-wrap items-baseline justify-between gap-x-4">
+          <dt class="text-base text-slate-700">{results.detailWithdrawal}</dt>
+          <dd
+            id="frais-out-detail-retrait"
+            data-tool-out
+            class="text-base font-semibold text-navy tabular-nums"
+          >
+            {labels.pending}
+          </dd>
+        </div>
+      </dl>
+      <p class="text-caption mt-3 text-slate-700">{results.detailNone}</p>
+    </div>
+  </Fragment>
+</ToolPanel>
+
+<script is:inline define:vars={{ bareme }}>
+  /*
+   * Le calcul ne dépend JAMAIS du niveau affiché : il lit les six champs, masqués compris, qui gardent
+   * alors leur valeur par défaut. Un champ vide vaut zéro plutôt que NaN.
+   */
+  (() => {
+    const groupe = document.querySelector('[data-tool="frais"]');
+    if (!groupe) return;
+
+    const euro = new Intl.NumberFormat('fr-FR', {
+      style: 'currency',
+      currency: 'EUR',
+      maximumFractionDigits: 0,
+    });
+    const val = (id) => {
+      const el = document.getElementById(id);
+      if (!el) return 0;
+      const n = parseFloat(String(el.value).replace(',', '.'));
+      return Number.isFinite(n) ? n : 0;
+    };
+    const ecrire = (id, texte) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = texte;
+    };
+
+    /* Premier palier de retrait dont la borne n'est pas atteinte ; le dernier, sans borne, vaut au-delà. */
+    const tauxRetrait = (annees) => {
+      const palier = bareme.withdrawalSteps.find((s) => s.until === null || annees < s.until);
+      return palier ? palier.rate : 0;
+    };
+
+    const calcul = () => {
+      const montant = val('frais-montant');
+      const loyers = val('frais-loyers');
+      const plusValue = val('frais-plusvalue');
+      const annees = val('frais-duree');
+      const entreeRivale = val('frais-entree-rivale');
+      const gestionRivale = val('frais-gestion-rivale');
+
+      /* R Start : gestion sur les loyers, cession selon le palier de plus-value, retrait si sortie tôt. */
+      const gestion = (loyers * bareme.management) / 100;
+      let cession = 0;
+      if (plusValue > 0) {
+        const palier = bareme.disposalTiers.reduce(
+          (acc, t) => (plusValue >= t.from ? t.rate : acc),
+          0
+        );
+        cession = (montant * (1 + plusValue / 100) * palier) / 100;
+      }
+      const retrait = (montant * tauxRetrait(annees)) / 100;
+      const rstart = gestion + cession + retrait;
+
+      /* SCPI comparée : commission d'entrée une fois, gestion sur les mêmes loyers. */
+      const rivale = (montant * entreeRivale) / 100 + (loyers * gestionRivale) / 100;
+
+      ecrire('frais-out-rstart', euro.format(rstart));
+      ecrire('frais-out-rivale', euro.format(rivale));
+      ecrire('frais-out-detail-gestion', euro.format(gestion));
+      ecrire('frais-out-detail-cession', euro.format(cession));
+      ecrire('frais-out-detail-retrait', euro.format(retrait));
+
+      /* Bascule : niveau de loyers où les deux modèles coûtent le même prix. */
+      const ecartTaux = (bareme.management - gestionRivale) / 100;
+      if (ecartTaux <= 0) {
+        ecrire('frais-out-bascule', bareme.textes.crossoverNever);
+        return;
+      }
+      const seuil = (montant * entreeRivale) / 100 / ecartTaux;
+      if (seuil <= 0) {
+        ecrire('frais-out-bascule', bareme.textes.crossoverAlways);
+        return;
+      }
+      ecrire(
+        'frais-out-bascule',
+        bareme.textes.crossoverTemplate.replace('{seuil}', euro.format(seuil))
+      );
+    };
+
+    groupe.addEventListener('input', calcul);
+    groupe.addEventListener('change', calcul);
+    calcul();
+  })();
+</script>

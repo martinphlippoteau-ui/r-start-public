@@ -1350,3 +1350,28 @@ body:has(#consent-banner:not([hidden])) [data-hero-scroll-hint] {
     padding: 0;
   }
 }
+
+/* Niveaux d'expertise des outils (12/09/2026, /outil/*). Trois boutons radio par outil, et la bascule
+   se fait ICI, en CSS pure : sans JavaScript le visiteur change quand même de niveau, et sur un
+   navigateur qui ignore `:has()` tout reste affiché, ce qui ne cache rien.
+
+   Le niveau ne change jamais le calcul. Un champ masqué garde sa valeur par défaut, l'outil applique
+   les mêmes taux, le résultat reste juste. Seule change la quantité de paramètres exposés.
+
+   Deux vocabulaires :
+    - `data-level="N"` : visible À PARTIR du niveau N (champs, résultats) ;
+    - `data-level="N" data-level-only` : visible SEULEMENT au niveau N (la phrase qui décrit le niveau).
+
+   On ne fait jamais que POSER `display: none`, jamais le rétablir : rétablir imposerait une valeur
+   d'affichage et écraserait celle que l'élément tient de ses propres classes. */
+[data-tool-level]:has([data-tool-level-input][value='1']:checked)
+  :is([data-level='2'], [data-level='3']),
+[data-tool-level]:has([data-tool-level-input][value='2']:checked) [data-level='3'] {
+  display: none;
+}
+
+[data-tool-level]:has([data-tool-level-input][value='2']:checked) [data-level-only][data-level='1'],
+[data-tool-level]:has([data-tool-level-input][value='3']:checked)
+  :is([data-level-only][data-level='1'], [data-level-only][data-level='2']) {
+  display: none;
+}

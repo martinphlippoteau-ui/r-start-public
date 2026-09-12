@@ -16,6 +16,10 @@ import { test, expect } from '@playwright/test';
 const SOUS_PAGES = [
   '/frais/',
   '/outils/',
+  '/outil/simulateur-de-frais/',
+  '/outil/date-de-jouissance/',
+  '/outil/cout-de-sortie/',
+  '/outil/versements-programmes/',
   '/a-propos/',
   '/documentation/',
   '/presse/',

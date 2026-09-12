@@ -1,0 +1,156 @@
+---
+/**
+ * Outil 4 : ce que représente un versement programmé, en parts.
+ *
+ * Trois niveaux :
+ *  1. un versement mensuel, une durée, le total et le nombre de parts ;
+ *  2. + ce que le plan exige, et la jouissance du premier versement ;
+ *  3. + le prix de part retenu, pour mesurer l'effet d'une révision.
+ *
+ * De l'arithmétique, rien d'autre : un total divisé par un prix de part. Aucun rendement, aucune
+ * capitalisation, aucune valeur future. Le prix par défaut est celui en vigueur (facts.share).
+ */
+import ToolField from './ToolField.astro';
+import ToolPanel from './ToolPanel.astro';
+import ToolResult from './ToolResult.astro';
+import { income, share, subscription } from '@/content/fr/facts';
+import { toolsPage } from '@/content/fr/toolsPage';
+
+const { savings: outil, labels } = toolsPage;
+const { results } = outil;
+
+const reglage = {
+  prixDefaut: share.price,
+  moisJouissance: income.enjoymentDelayMonths,
+  minimum: subscription.options.pei.minimum,
+};
+---
+
+<ToolPanel
+  id="versements"
+  title={outil.title}
+  intro={outil.intro}
+  risk={outil.risk}
+  noteId={outil.noteId}
+  levelNotes={outil.levelNotes}
+  tone="paper"
+>
+  <Fragment slot="fields">
+    <ToolField
+      id="versements-mensuel"
+      label={outil.fields.monthly}
+      unit={labels.euro}
+      value={subscription.options.pei.minimum}
+      min={subscription.options.pei.minimum}
+      step={10}
+      hint={outil.hints.monthly}
+    />
+    <ToolField
+      id="versements-duree"
+      label={outil.fields.months}
+      unit={labels.months}
+      value={60}
+      min={1}
+      max={480}
+    />
+    <ToolField
+      id="versements-prix"
+      label={outil.fields.sharePrice}
+      unit={labels.euro}
+      value={share.price}
+      min={1}
+      step={1}
+      hint={outil.hints.sharePrice}
+      level={3}
+      class="sm:col-span-2"
+    />
+  </Fragment>
+
+  <Fragment slot="results">
+    <ToolResult id="versements-out-total" label={results.total} emphasis />
+    <ToolResult id="versements-out-parts" label={results.shares} />
+
+    <div data-level="2" class="rounded-3xl bg-white p-5 sm:p-6">
+      <h3 class="text-base font-semibold text-ink">{results.minimumTitle}</h3>
+      <p class="text-base mt-2 text-slate-700">{results.minimum}</p>
+    </div>
+
+    {
+      /* La jouissance se compte versement par versement : le premier ouvre droit avant les suivants.
+        Sans date saisie ici, on part du mois en cours, et le libellé le dit. */
+    }
+    <div data-level="2" class="rounded-3xl bg-white p-5 sm:p-6">
+      <p class="text-base font-medium text-slate-700">{results.firstEnjoyment}</p>
+      <p
+        id="versements-out-jouissance"
+        data-tool-out
+        aria-live="polite"
+        class="text-lead mt-1 text-ink"
+      >
+        {labels.pending}
+      </p>
+      <p class="text-caption mt-2 text-slate-700">{results.firstEnjoymentHint}</p>
+    </div>
+  </Fragment>
+</ToolPanel>
+
+<script is:inline define:vars={{ reglage }}>
+  /*
+   * Total versé et nombre de parts au prix retenu. Le prix vient d'un champ : à l'expert de le changer
+   * pour mesurer l'effet d'une révision. Un prix nul ou vide retombe sur le prix en vigueur, sans quoi
+   * la division renverrait l'infini.
+   */
+  (() => {
+    const groupe = document.querySelector('[data-tool="versements"]');
+    if (!groupe) return;
+
+    const euro = new Intl.NumberFormat('fr-FR', {
+      style: 'currency',
+      currency: 'EUR',
+      maximumFractionDigits: 2,
+    });
+    const nombre = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 4 });
+    const jourMois = new Intl.DateTimeFormat('fr-FR', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    });
+    /* « 1er mai », pas « 1 mai » : Intl ne connaît pas l'ordinal français du premier du mois, et toute
+       entrée en jouissance tombe précisément un premier. */
+    const dateLongue = (d) =>
+      d.getDate() === 1 ? jourMois.format(d).replace(/^1\b/, '1er') : jourMois.format(d);
+    const val = (id) => {
+      const el = document.getElementById(id);
+      if (!el) return 0;
+      const n = parseFloat(String(el.value).replace(',', '.'));
+      return Number.isFinite(n) ? n : 0;
+    };
+    const ecrire = (id, texte) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = texte;
+    };
+
+    const calcul = () => {
+      const mensuel = val('versements-mensuel');
+      const mois = val('versements-duree');
+      const prix = val('versements-prix') || reglage.prixDefaut;
+      const total = mensuel * mois;
+
+      ecrire('versements-out-total', euro.format(total));
+      ecrire('versements-out-parts', nombre.format(total / prix));
+
+      /* Jouissance du premier versement, comptée depuis le mois en cours. */
+      const aujourdhui = new Date();
+      const cible = new Date(
+        aujourdhui.getFullYear(),
+        aujourdhui.getMonth() + reglage.moisJouissance,
+        1
+      );
+      ecrire('versements-out-jouissance', dateLongue(cible));
+    };
+
+    groupe.addEventListener('input', calcul);
+    groupe.addEventListener('change', calcul);
+    calcul();
+  })();
+</script>

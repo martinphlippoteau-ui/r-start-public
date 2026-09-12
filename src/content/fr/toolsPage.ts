@@ -1,5 +1,5 @@
 import type { LegalNote } from '../types';
-import { fees, income, marketComparison, product, share } from './facts.ts';
+import { fees, income, marketComparison, product, share, subscription } from './facts.ts';
 import { shortRiskLine } from './legal.ts';
 
 /**
@@ -38,7 +38,7 @@ export const notes: LegalNote[] = [
   {
     id: 'outils-marche',
     text: nb(
-      `Les taux proposés par défaut pour la SCPI de comparaison sont des moyennes de marché, pas les frais d’une SCPI précise : ${marketComparison.averages.subscription.label} de commission de souscription, ${marketComparison.averages.acquisition.label} de frais d’acquisition et ${marketComparison.averages.management.label} de frais de gestion. ${marketComparison.perimeterLead} : ${marketComparison.panel.join(', ')}, ${marketComparison.perimeterTail} Source : ${marketComparison.source} Vous pouvez remplacer ces valeurs par celles de la SCPI de votre choix : le calcul suit ce que vous saisissez.`
+      `Les taux proposés par défaut pour la SCPI de comparaison sont des moyennes de marché, pas les frais d’une SCPI précise. Le prélèvement à l’entrée est renseigné avec la moyenne des frais d’acquisition, ${marketComparison.averages.acquisition.label} : les SCPI du panel ne prennent pas de commission de souscription (${marketComparison.averages.subscription.label}), elles se rémunèrent à l’achat des immeubles. Les frais de gestion sont renseignés avec la moyenne du panel, ${marketComparison.averages.management.label}. ${marketComparison.perimeterLead} : ${marketComparison.panel.join(', ')}, ${marketComparison.perimeterTail} Source : ${marketComparison.source} Vous pouvez remplacer ces valeurs par celles de la SCPI de votre choix : le calcul suit ce que vous saisissez.`
     ),
   },
   {
@@ -54,6 +54,42 @@ export const notes: LegalNote[] = [
     ),
   },
 ];
+
+/**
+ * Les trois niveaux d'expertise, communs aux quatre outils. Ils ne changent RIEN au calcul : l'outil
+ * applique toujours les mêmes taux aux mêmes champs. Ce qui change, c'est le nombre de paramètres
+ * exposés et le détail rendu. Un champ masqué garde sa valeur par défaut, le résultat reste juste.
+ *
+ * Le choix se fait par des boutons radio et la bascule est en CSS pure (global.css) : sans JavaScript,
+ * les trois niveaux restent accessibles, et sans `:has()` tout s'affiche, ce qui ne cache rien.
+ */
+export const toolLevels = [
+  {
+    id: 'debutant',
+    rank: 1,
+    label: 'Débutant',
+    hint: 'L’essentiel, deux champs et une réponse.',
+  },
+  {
+    id: 'intermediaire',
+    rank: 2,
+    label: 'Intermédiaire',
+    hint: 'Vos hypothèses de durée et de revente.',
+  },
+  {
+    id: 'expert',
+    rank: 3,
+    label: 'Expert',
+    hint: 'Tous les paramètres et le détail du calcul.',
+  },
+] as const;
+
+export type ToolLevelId = (typeof toolLevels)[number]['id'];
+
+export const levelPicker = {
+  legend: 'Niveau de détail',
+  help: 'Changez de niveau à tout moment : les champs masqués gardent leur valeur par défaut et le calcul reste le même.',
+};
 
 export const toolsPage = {
   seo: {
@@ -79,6 +115,20 @@ export const toolsPage = {
 
   /** 1. Simulateur de frais et point de bascule. */
   feeSimulator: {
+    pageKey: 'toolFees' as const,
+    card: {
+      eyebrow: 'Frais',
+      question: 'Combien R Start me prélèvera-t-il, et à partir de quand est-ce plus cher ?',
+      teaser:
+        'R Start ne prend rien à l’entrée et se rémunère sur les loyers. Une SCPI à frais d’entrée fait l’inverse. Posez vos hypothèses, l’outil chiffre les deux modèles et donne le niveau de loyers où ils se croisent.',
+    },
+    levelNotes: {
+      debutant: 'Un montant, une hypothèse de loyers, et ce que chaque modèle prélève.',
+      intermediaire:
+        'Ajoute la durée de détention, la plus-value à la revente et le point de bascule.',
+      expert:
+        'Ajoute les taux de la SCPI comparée et le détail poste par poste de ce que prélève R Start.',
+    },
     title: 'Ce que R Start prélève, et à partir de quand c’est plus cher',
     intro:
       'R Start ne prend rien à l’entrée et se rémunère sur les loyers. Une SCPI à frais d’entrée prend l’inverse : beaucoup au départ, moins ensuite. Posez vos hypothèses, l’outil calcule les deux et vous dit à partir de quel niveau de loyers le modèle R Start devient le plus coûteux.',
@@ -87,17 +137,24 @@ export const toolsPage = {
       rent: 'Loyers qui vous sont distribués, au total sur la période',
       gain: 'Plus-value à la revente, en % du prix de vente',
       years: 'Durée de détention',
-      rivalEntry: 'Commission de souscription de la SCPI comparée',
+      rivalEntry: 'Frais prélevés à l’entrée par la SCPI comparée',
       rivalManagement: 'Frais de gestion de la SCPI comparée',
     },
     hints: {
       rent: 'Votre hypothèse. Rien n’oblige une SCPI à distribuer quoi que ce soit.',
       gain: 'Votre hypothèse. Une revente peut aussi se faire à perte.',
-      rivalEntry: 'Moyenne de marché par défaut, modifiable.',
+      rivalEntry:
+        'Moyenne de marché par défaut, modifiable. Les SCPI du panel ne prennent pas de commission de souscription : leur prélèvement à l’entrée est un frais d’acquisition.',
     },
     results: {
       rstart: 'Ce que prélève R Start',
       rival: 'Ce que prélève la SCPI comparée',
+      detailTitle: 'Détail de ce que prélève R Start',
+      detailManagement: 'Frais de gestion sur les loyers',
+      detailDisposal: 'Commission sur la cession des immeubles',
+      detailWithdrawal: 'Commission de retrait anticipé',
+      detailNone:
+        'Aucune commission de souscription, d’acquisition, d’intermédiation ni de travaux.',
       crossover: 'Point de bascule',
       crossoverNever:
         'Avec ces taux, le modèle R Start reste le moins coûteux quel que soit le montant des loyers : ses frais de gestion ne dépassent pas ceux de la SCPI comparée.',
@@ -115,10 +172,31 @@ export const toolsPage = {
 
   /** 2. Calendrier de jouissance. */
   enjoyment: {
+    pageKey: 'toolEnjoyment' as const,
+    card: {
+      eyebrow: 'Calendrier',
+      question: 'À partir de quand mes parts ouvrent-elles droit aux versements ?',
+      teaser: `Vos parts n’ouvrent droit aux versements qu’après ${income.enjoymentDelayLabel}. Le compte à rebours part de l’encaissement de votre règlement, pas de votre signature. Donnez la date, l’outil donne le jour exact.`,
+    },
+    levelNotes: {
+      debutant: 'Une date d’encaissement, une date d’entrée en jouissance.',
+      intermediaire: 'Ajoute l’attente en jours et le rythme des versements.',
+      expert: 'Ajoute la règle appliquée et ce que change le jour du mois où vous êtes encaissé.',
+    },
     title: 'Quand vos parts commencent à produire des revenus',
     intro: `Vos parts n’ouvrent droit aux versements qu’après un délai de ${income.enjoymentDelayLabel}. Indiquez la date à laquelle votre règlement sera encaissé.`,
     fields: { date: 'Date d’encaissement de votre règlement' },
-    results: { date: 'Vos parts entrent en jouissance le', wait: 'Soit une attente de' },
+    results: {
+      date: 'Vos parts entrent en jouissance le',
+      wait: 'Soit une attente de',
+      frequency: 'Rythme des versements',
+      frequencyValue: income.frequencyLabel,
+      ruleTitle: 'La règle appliquée',
+      rule: income.enjoymentDate,
+      sameMonthTitle: 'Le jour du mois ne change rien',
+      sameMonthTemplate:
+        'Tout règlement encaissé entre le {debut} et le {fin} donne la même entrée en jouissance, le {jouissance}. Encaissé un jour plus tard, au {suivant}, elle recule d’un mois entier.',
+    },
     risk: nb(
       `Entrer en jouissance ne veut pas dire percevoir un montant connu. Les dividendes potentiels dépendent des loyers encaissés et de la décision de la société de gestion. Aucun montant n’est annoncé à l’avance, et un mois peut se solder par aucune distribution.`
     ),
@@ -127,10 +205,34 @@ export const toolsPage = {
 
   /** 3. Coût d'une sortie anticipée. */
   exit: {
+    pageKey: 'toolExit' as const,
+    card: {
+      eyebrow: 'Sortie',
+      question: 'Combien me coûte une sortie avant l’échéance ?',
+      teaser: `La commission de retrait décroît avec la durée de détention et disparaît après ${fees.withdrawal.zeroAfterYears} ans. Indiquez ce que vous voulez retirer et depuis quand vous détenez vos parts.`,
+    },
+    levelNotes: {
+      debutant: 'Un montant, une durée, et ce qui vous reste.',
+      intermediaire: 'Ajoute le barème complet, palier courant en évidence.',
+      expert: 'Ajoute ce que vous gagneriez à attendre le palier suivant.',
+    },
     title: 'Ce que coûte une sortie avant l’échéance',
     intro: `La commission de retrait diminue avec la durée de détention et disparaît après ${fees.withdrawal.zeroAfterYears} ans. Indiquez le montant que vous souhaitez retirer et depuis combien de temps vous détenez vos parts.`,
     fields: { amount: 'Montant du retrait, à la valeur de retrait', years: 'Durée de détention' },
-    results: { rate: 'Commission appliquée', cost: 'Montant prélevé', net: 'Il vous reste' },
+    results: {
+      rate: 'Commission appliquée',
+      cost: 'Montant prélevé',
+      net: 'Il vous reste',
+      scaleTitle: 'Le barème complet',
+      scaleCurrent: 'Votre palier',
+      nextTitle: 'Si vous attendiez le palier suivant',
+      nextTemplate:
+        'À partir de {duree} de détention, la commission tombe à {taux}. Sur ce montant, attendre vous éviterait {economie}.',
+      nextNone:
+        'Vous êtes au dernier palier : au-delà de ' +
+        fees.withdrawal.zeroAfterYears +
+        ' ans, aucune commission de retrait n’est prélevée.',
+    },
     risk: nb(
       `Ce calcul suppose que le retrait est possible. Il ne l’est pas toujours : vous ne récupérez votre argent que si un autre épargnant achète vos parts, et la société de gestion ne garantit pas leur rachat. La valeur de retrait peut par ailleurs être inférieure au prix que vous avez payé.`
     ),
@@ -139,14 +241,55 @@ export const toolsPage = {
 
   /** 4. Versements programmés. */
   savings: {
+    pageKey: 'toolSavings' as const,
+    card: {
+      eyebrow: 'Versements',
+      question: 'Que représente un versement programmé, en parts ?',
+      teaser: `À partir de ${subscription.options.pei.minimumMonthlyLabel}, vos versements achètent des parts entières et des fractions de part. L’outil calcule ce que vous aurez versé et combien de parts cela représente au prix en vigueur.`,
+    },
+    levelNotes: {
+      debutant: 'Un versement mensuel, une durée, et le nombre de parts.',
+      intermediaire:
+        'Ajoute le minimum du plan, sa condition d’accès et la jouissance du premier versement.',
+      expert: 'Ajoute le prix de part retenu, pour mesurer l’effet d’une révision.',
+    },
     title: 'Ce que représente un versement programmé',
     intro: `À partir de ${share.priceLabel} la part, fractionnable, vos versements achètent des parts entières et des fractions de part. L’outil calcule ce que vous aurez versé et combien de parts cela représente au prix actuel.`,
-    fields: { monthly: 'Versement mensuel', months: 'Pendant' },
-    results: { total: 'Total versé', shares: 'Nombre de parts au prix actuel' },
+    fields: {
+      monthly: 'Versement mensuel',
+      months: 'Pendant',
+      sharePrice: 'Prix de part retenu',
+    },
+    hints: {
+      monthly: `Minimum du plan : ${subscription.options.pei.minimumMonthlyLabel}.`,
+      sharePrice: `Prix en vigueur : ${share.priceLabel}. Modifiez-le pour mesurer l’effet d’une révision.`,
+    },
+    results: {
+      total: 'Total versé',
+      shares: 'Nombre de parts au prix retenu',
+      minimumTitle: 'Ce que le plan exige',
+      minimum: `${subscription.options.pei.minimumMonthlyLabel} minimum. ${subscription.options.pei.requirement}.`,
+      firstEnjoyment: 'Jouissance du premier versement',
+      firstEnjoymentHint: `Chaque versement a sa propre date de jouissance, ${income.enjoymentDelayLabel} après son encaissement.`,
+    },
     risk: nb(
       `Le nombre de parts est calculé au prix de souscription en vigueur. Ce prix peut être révisé : à versement égal, vous obtiendrez plus ou moins de parts. Détenir davantage de parts n’implique aucun revenu et ne protège pas d’une perte en capital.`
     ),
     noteId: 'outils-parts',
+  },
+
+  /** Page d'accueil des outils : une carte par outil, chacune vers sa page. */
+  index: {
+    title: 'Quatre questions, quatre outils',
+    intro:
+      'Chaque outil répond à une question et vit sur sa propre page. Sur chacune, trois niveaux de détail : l’essentiel, vos hypothèses, ou tous les paramètres.',
+    cardCta: 'Ouvrir l’outil',
+  },
+
+  /** Renvois d'une page d'outil vers les trois autres. */
+  elsewhere: {
+    title: 'Les autres outils',
+    backLabel: 'Tous les outils',
   },
 
   labels: {
@@ -162,5 +305,17 @@ export const toolsPage = {
   cta: { label: 'Souscrire en ligne', position: 'outils' as const },
   notes,
 };
+
+/**
+ * Les quatre outils dans l'ordre de lecture, pour la page d'accueil des outils et pour la route
+ * /outil/[slug]. Chacun sait à quelle page il correspond (`pageKey`) : le chemin, le libellé et le fil
+ * d'Ariane viennent alors de src/config/pages.ts, jamais d'une chaîne recopiée ici.
+ */
+export const toolCards = [
+  toolsPage.feeSimulator,
+  toolsPage.enjoyment,
+  toolsPage.exit,
+  toolsPage.savings,
+] as const;
 
 export default toolsPage;

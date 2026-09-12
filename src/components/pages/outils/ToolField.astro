@@ -3,6 +3,10 @@
  * Champ de saisie d'un outil : libellé, unité et aide facultative. Un vrai <label> lié au champ, et
  * `inputmode="decimal"` pour que le clavier des téléphones propose des chiffres. Les valeurs se
  * saisissent en clair, sans curseur : un montant se lit mieux qu'il ne se devine.
+ *
+ * `level` : rang du niveau d'expertise à partir duquel le champ s'affiche (1 débutant, 2 intermédiaire,
+ * 3 expert). Masqué, le champ garde sa valeur par défaut et le calcul reste juste. La bascule est en
+ * CSS pure, voir global.css.
  */
 interface Props {
   id: string;
@@ -15,6 +19,8 @@ interface Props {
   max?: number;
   step?: number;
   type?: 'number' | 'date';
+  /** Rang du niveau d'expertise à partir duquel le champ apparaît. 1 par défaut : toujours visible. */
+  level?: 1 | 2 | 3;
   class?: string;
 }
 const {
@@ -27,12 +33,13 @@ const {
   max,
   step,
   type = 'number',
+  level = 1,
   class: className = '',
 } = Astro.props as Props;
 const hintId = hint ? `${id}-hint` : undefined;
 ---
 
-<div class:list={['flex flex-col gap-2', className]}>
+<div data-level={String(level)} class:list={['flex flex-col gap-2', className]}>
   <label for={id} class="text-base font-medium text-ink">{label}</label>
   <div class="flex items-center gap-2">
     <input

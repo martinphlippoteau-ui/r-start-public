@@ -1,0 +1,168 @@
+---
+/**
+ * Outil 3 : ce que coûte une sortie avant l'échéance.
+ *
+ * Trois niveaux :
+ *  1. un montant, une durée, ce qui reste ;
+ *  2. + le barème complet, palier courant en évidence ;
+ *  3. + ce qu'attendre le palier suivant éviterait de payer.
+ *
+ * Le barème vient de facts.fees.withdrawal, bornes comprises (`until`). Le contre-poids rappelle que ce
+ * calcul suppose un retrait possible, ce qui n'est jamais garanti.
+ */
+import ToolField from './ToolField.astro';
+import ToolPanel from './ToolPanel.astro';
+import ToolResult from './ToolResult.astro';
+import { fees } from '@/content/fr/facts';
+import { toolsPage } from '@/content/fr/toolsPage';
+
+const { exit: outil, labels } = toolsPage;
+const { results } = outil;
+
+const paliers = fees.withdrawal.steps.map((s) => ({
+  rate: parseFloat(s.rate),
+  until: s.until,
+  label: s.rate,
+  period: s.period,
+}));
+
+const reglage = {
+  paliers,
+  annees: labels.years,
+  gabaritSuivant: results.nextTemplate,
+  aucunSuivant: results.nextNone,
+};
+---
+
+<ToolPanel
+  id="sortie"
+  title={outil.title}
+  intro={outil.intro}
+  risk={outil.risk}
+  noteId={outil.noteId}
+  levelNotes={outil.levelNotes}
+  tone="white"
+>
+  <Fragment slot="fields">
+    <ToolField
+      id="sortie-montant"
+      label={outil.fields.amount}
+      unit={labels.euro}
+      value={10000}
+      min={0}
+      step={100}
+    />
+    <ToolField
+      id="sortie-duree"
+      label={outil.fields.years}
+      unit={labels.years}
+      value={3}
+      min={0}
+      max={30}
+    />
+  </Fragment>
+
+  <Fragment slot="results">
+    <ToolResult id="sortie-out-taux" label={results.rate} emphasis />
+    <ToolResult id="sortie-out-cout" label={results.cost} />
+    <ToolResult id="sortie-out-net" label={results.net} />
+
+    {
+      /* Barème complet dès le niveau intermédiaire : voir son palier au milieu des autres vaut mieux
+        qu'un taux isolé. Le script marque la ligne courante ; sans script, les cinq lignes restent
+        lisibles et justes, seule la mise en évidence manque. */
+    }
+    <div data-level="2" class="rounded-3xl bg-paper p-5 sm:p-6">
+      <h3 class="text-base font-semibold text-ink">{results.scaleTitle}</h3>
+      <ul class="mt-3 grid gap-1" role="list">
+        {
+          paliers.map((p, i) => (
+            <li
+              data-palier={String(i)}
+              class="flex flex-wrap items-baseline justify-between gap-x-4 rounded-xl px-3 py-2"
+            >
+              <span class="text-base text-slate-700">{p.period}</span>
+              <span class="text-base font-semibold text-navy tabular-nums">{p.label}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    <div data-level="3" class="rounded-3xl bg-paper p-5 sm:p-6">
+      <h3 class="text-base font-semibold text-ink">{results.nextTitle}</h3>
+      <p id="sortie-out-suivant" data-tool-out aria-live="polite" class="text-base mt-2 text-ink">
+        {labels.pending}
+      </p>
+    </div>
+  </Fragment>
+</ToolPanel>
+
+<script is:inline define:vars={{ reglage }}>
+  /*
+   * Commission de retrait : le premier palier dont la borne n'est pas atteinte. Le dernier n'a pas de
+   * borne (`until: null`), il vaut au-delà de la durée de franchise.
+   */
+  (() => {
+    const groupe = document.querySelector('[data-tool="sortie"]');
+    if (!groupe) return;
+
+    const euro = new Intl.NumberFormat('fr-FR', {
+      style: 'currency',
+      currency: 'EUR',
+      maximumFractionDigits: 0,
+    });
+    const nombre = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 2 });
+    const val = (id) => {
+      const el = document.getElementById(id);
+      if (!el) return 0;
+      const n = parseFloat(String(el.value).replace(',', '.'));
+      return Number.isFinite(n) ? n : 0;
+    };
+    const ecrire = (id, texte) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = texte;
+    };
+    const lignes = [...groupe.ownerDocument.querySelectorAll('[data-palier]')];
+
+    const calcul = () => {
+      const montant = val('sortie-montant');
+      const annees = val('sortie-duree');
+
+      const index = reglage.paliers.findIndex((p) => p.until === null || annees < p.until);
+      const courant = reglage.paliers[index] || reglage.paliers[reglage.paliers.length - 1];
+      const cout = (montant * courant.rate) / 100;
+
+      ecrire('sortie-out-taux', nombre.format(courant.rate) + ' %');
+      ecrire('sortie-out-cout', euro.format(cout));
+      ecrire('sortie-out-net', euro.format(montant - cout));
+
+      /* Mise en évidence du palier courant : couleur et graisse, jamais la taille. */
+      lignes.forEach((li, i) => {
+        const actif = i === index;
+        li.classList.toggle('bg-white', actif);
+        li.classList.toggle('font-semibold', actif);
+        li.toggleAttribute('data-palier-courant', actif);
+      });
+
+      /* Palier suivant : ce que la patience éviterait de payer, sur ce montant. */
+      const suivant = reglage.paliers[index + 1];
+      if (!suivant || courant.until === null) {
+        ecrire('sortie-out-suivant', reglage.aucunSuivant);
+        return;
+      }
+      const economie = (montant * (courant.rate - suivant.rate)) / 100;
+      ecrire(
+        'sortie-out-suivant',
+        reglage.gabaritSuivant
+          .replace('{duree}', courant.until + ' ' + reglage.annees)
+          .replace('{taux}', nombre.format(suivant.rate) + ' %')
+          .replace('{economie}', euro.format(economie))
+      );
+    };
+
+    groupe.addEventListener('input', calcul);
+    groupe.addEventListener('change', calcul);
+    calcul();
+  })();
+</script>

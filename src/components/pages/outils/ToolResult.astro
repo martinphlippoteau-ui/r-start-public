@@ -11,6 +11,8 @@ interface Props {
   initial?: string;
   /** Mise en avant du résultat principal d'un bloc. */
   emphasis?: boolean;
+  /** Rang du niveau d'expertise à partir duquel le résultat apparaît. 1 par défaut. */
+  level?: 1 | 2 | 3;
   class?: string;
 }
 import { toolsPage } from '@/content/fr/toolsPage';
@@ -20,11 +22,15 @@ const {
   label,
   initial = toolsPage.labels.pending,
   emphasis = false,
+  level = 1,
   class: className = '',
 } = Astro.props as Props;
 ---
 
-<div class:list={['rounded-3xl border border-navy/12 p-5 sm:p-6', className]}>
+<div
+  data-level={String(level)}
+  class:list={['rounded-3xl border border-navy/12 p-5 sm:p-6', className]}
+>
   <p class="text-base font-medium text-slate-700">{label}</p>
   <p
     id={id}

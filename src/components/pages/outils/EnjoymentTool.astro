@@ -1,0 +1,130 @@
+---
+/**
+ * Outil 2 : à quelle date les parts entrent en jouissance.
+ *
+ * Trois niveaux :
+ *  1. une date d'encaissement, une date de jouissance ;
+ *  2. + l'attente en jours et le rythme des versements ;
+ *  3. + la règle appliquée, et ce que change le jour du mois où le règlement est encaissé.
+ *
+ * Entrer en jouissance n'est pas percevoir : l'outil donne une DATE, jamais un montant. Le délai vient
+ * de facts.income, rien n'est écrit en dur ici.
+ */
+import ToolField from './ToolField.astro';
+import ToolPanel from './ToolPanel.astro';
+import ToolResult from './ToolResult.astro';
+import { income } from '@/content/fr/facts';
+import { toolsPage } from '@/content/fr/toolsPage';
+
+const { enjoyment: outil, labels } = toolsPage;
+const { results } = outil;
+
+const reglage = { mois: income.enjoymentDelayMonths, pending: labels.pending };
+---
+
+<ToolPanel
+  id="jouissance"
+  title={outil.title}
+  intro={outil.intro}
+  risk={outil.risk}
+  noteId={outil.noteId}
+  levelNotes={outil.levelNotes}
+  tone="paper"
+  twoColumns={false}
+>
+  <Fragment slot="fields">
+    <ToolField id="jouissance-date" label={outil.fields.date} value="" type="date" />
+  </Fragment>
+
+  <Fragment slot="results">
+    <ToolResult id="jouissance-out-date" label={results.date} emphasis />
+    <ToolResult id="jouissance-out-attente" label={results.wait} level={2} />
+
+    <div data-level="2" class="rounded-3xl bg-white p-5 sm:p-6">
+      <p class="text-base font-medium text-slate-700">{results.frequency}</p>
+      <p class="text-lead mt-1 text-ink">{results.frequencyValue}</p>
+    </div>
+
+    {
+      /* Niveau expert : la règle telle qu'elle est écrite au bulletin, puis sa conséquence concrète.
+        Dans un même mois, le jour de l'encaissement ne change rien ; le mois suivant coûte un mois
+        entier. C'est la seule chose qui se joue vraiment, elle mérite d'être dite. */
+    }
+    <div data-level="3" class="rounded-3xl bg-white p-5 sm:p-6">
+      <h3 class="text-base font-semibold text-ink">{results.ruleTitle}</h3>
+      <p class="text-base mt-2 text-slate-700">{results.rule}</p>
+    </div>
+
+    <div data-level="3" class="rounded-3xl bg-white p-5 sm:p-6">
+      <h3 class="text-base font-semibold text-ink">{results.sameMonthTitle}</h3>
+      <p
+        id="jouissance-out-meme-mois"
+        data-tool-out
+        aria-live="polite"
+        class="text-base mt-2 text-slate-700"
+      >
+        {labels.pending}
+      </p>
+    </div>
+  </Fragment>
+</ToolPanel>
+
+<script is:inline define:vars={{ reglage, gabarit: results.sameMonthTemplate }}>
+  /*
+   * Jouissance : premier jour du Nième mois qui suit l'encaissement. Tout se joue sur le MOIS de
+   * l'encaissement, jamais sur le jour : `new Date(annee, mois + N, 1)` le dit en une ligne.
+   */
+  (() => {
+    const groupe = document.querySelector('[data-tool="jouissance"]');
+    if (!groupe) return;
+
+    const jourMois = new Intl.DateTimeFormat('fr-FR', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    });
+    /* « 1er mai », pas « 1 mai » : Intl ne connaît pas l'ordinal français du premier du mois, et toute
+       entrée en jouissance tombe précisément un premier. */
+    const dateLongue = (d) =>
+      d.getDate() === 1 ? jourMois.format(d).replace(/^1\b/, '1er') : jourMois.format(d);
+    const ecrire = (id, texte) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = texte;
+    };
+    const jouissance = (d) => new Date(d.getFullYear(), d.getMonth() + reglage.mois, 1);
+
+    const calcul = () => {
+      const champ = document.getElementById('jouissance-date');
+      const brut = champ && champ.value;
+      if (!brut) {
+        ecrire('jouissance-out-date', reglage.pending);
+        ecrire('jouissance-out-attente', reglage.pending);
+        ecrire('jouissance-out-meme-mois', reglage.pending);
+        return;
+      }
+      const d = new Date(brut + 'T00:00:00');
+      if (Number.isNaN(d.getTime())) return;
+
+      const cible = jouissance(d);
+      ecrire('jouissance-out-date', dateLongue(cible));
+      ecrire('jouissance-out-attente', Math.round((cible - d) / 86400000) + ' jours');
+
+      /* Bornes du mois d'encaissement, et le premier jour qui bascule au mois suivant. */
+      const debut = new Date(d.getFullYear(), d.getMonth(), 1);
+      const fin = new Date(d.getFullYear(), d.getMonth() + 1, 0);
+      const suivant = new Date(d.getFullYear(), d.getMonth() + 1, 1);
+      ecrire(
+        'jouissance-out-meme-mois',
+        gabarit
+          .replace('{debut}', dateLongue(debut))
+          .replace('{fin}', dateLongue(fin))
+          .replace('{jouissance}', dateLongue(cible))
+          .replace('{suivant}', dateLongue(suivant))
+      );
+    };
+
+    groupe.addEventListener('input', calcul);
+    groupe.addEventListener('change', calcul);
+    calcul();
+  })();
+</script>

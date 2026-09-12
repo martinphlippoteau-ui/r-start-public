@@ -6,6 +6,10 @@ const PAGES = [
   '/',
   '/frais/',
   '/outils/',
+  '/outil/simulateur-de-frais/',
+  '/outil/date-de-jouissance/',
+  '/outil/cout-de-sortie/',
+  '/outil/versements-programmes/',
   '/strategie/',
   '/a-propos/',
   '/documentation/',
@@ -106,6 +110,48 @@ test.describe('Qualité', () => {
       expect(overflow).toBeLessThanOrEqual(1);
     });
   }
+
+  /*
+   * Niveaux d'expertise des outils. La bascule est en CSS pure (global.css) : aucun typage ne la
+   * protège, et un sélecteur déplacé la casserait en silence. Le test vérifie les trois paliers, et
+   * surtout que le RÉSULTAT ne dépend pas du niveau : un champ masqué garde sa valeur, le calcul est
+   * le même. C'est la promesse faite au visiteur sous le sélecteur.
+   */
+  test('les niveaux d’expertise révèlent les champs sans changer le calcul', async ({ page }) => {
+    await page.goto('/outil/simulateur-de-frais/');
+    const champs = () => page.locator('[data-tool="frais"] input:visible').count();
+
+    expect(await champs()).toBe(2);
+    const totalDebutant = await page.locator('#frais-out-rstart').textContent();
+
+    await page.click('label[for="frais-niveau-intermediaire"]');
+    expect(await champs()).toBe(4);
+
+    await page.click('label[for="frais-niveau-expert"]');
+    expect(await champs()).toBe(6);
+    await expect(page.locator('#frais-out-detail-gestion')).toBeVisible();
+    expect(await page.locator('#frais-out-rstart').textContent()).toBe(totalDebutant);
+
+    await page.click('label[for="frais-niveau-debutant"]');
+    expect(await champs()).toBe(2);
+  });
+
+  /* Chaque carte de /outils doit mener à une page qui existe et porte son titre. */
+  test('les cartes de la page Outils mènent aux quatre outils', async ({ page }) => {
+    await page.goto('/outils/');
+    const liens = await page.locator('#liste article h3 a').all();
+    expect(liens).toHaveLength(4);
+
+    for (const lien of liens) {
+      const href = await lien.getAttribute('href');
+      const titre = (await lien.textContent())?.trim();
+      const reponse = await page.goto(href!);
+      expect(reponse?.status(), href!).toBe(200);
+      await expect(page.locator('h1')).toHaveText(titre!);
+      await expect(page.locator('[data-tool-level] fieldset')).toBeVisible();
+      await page.goBack();
+    }
+  });
 
   /*
    * Le comparateur ne compare que si ses DEUX colonnes sont à l'écran. Sur téléphone il se lit en cartes

@@ -1,0 +1,78 @@
+---
+/**
+ * Sélecteur du niveau d'expertise d'un outil : Débutant, Intermédiaire, Expert.
+ *
+ * Trois boutons radio dans un <fieldset>, et la bascule se fait en CSS pure (global.css, sélecteurs
+ * `[data-tool-level]:has(...)`). Aucun JavaScript n'est nécessaire : le niveau se change au clavier
+ * comme à la souris, et si le navigateur ignore `:has()`, tout reste affiché, ce qui ne cache rien.
+ *
+ * Le niveau ne change JAMAIS le calcul : un champ masqué garde sa valeur par défaut et l'outil applique
+ * les mêmes taux. Il ne change que le nombre de paramètres exposés et le détail rendu.
+ *
+ * Les libellés de rang sont posés par le composant appelant, sur `data-level` (1, 2 ou 3).
+ */
+import { levelPicker, toolLevels } from '@/content/fr/toolsPage';
+
+interface Props {
+  /** Préfixe d'identifiant, unique par outil : il nomme le groupe de boutons radio. */
+  name: string;
+  /** Phrase décrivant ce que chaque niveau ajoute, dans l'ordre des trois niveaux. */
+  notes: { debutant: string; intermediaire: string; expert: string };
+  class?: string;
+}
+const { name, notes, class: className = '' } = Astro.props as Props;
+const helpId = `${name}-niveau-aide`;
+---
+
+<fieldset class:list={['border-0 p-0', className]}>
+  <legend class="text-caption font-semibold tracking-wide text-slate-700 uppercase">
+    {levelPicker.legend}
+  </legend>
+
+  <div class="mt-3 flex flex-wrap gap-2">
+    {
+      toolLevels.map((niveau, i) => {
+        const id = `${name}-niveau-${niveau.id}`;
+        return (
+          <div>
+            {/* Le bouton radio est la source de vérité, lu par les sélecteurs CSS. Masqué à l'œil mais
+                pas au clavier ni aux lecteurs d'écran : c'est lui qui reçoit le focus, son étiquette
+                porte le rendu et le clic. */}
+            <input
+              type="radio"
+              id={id}
+              name={`${name}-niveau`}
+              value={String(niveau.rank)}
+              data-tool-level-input
+              checked={i === 0}
+              aria-describedby={helpId}
+              class="peer visually-hidden"
+            />
+            <label
+              for={id}
+              class="block cursor-pointer rounded-full border border-navy/20 px-4 py-2 text-base font-semibold text-slate-700 transition-colors peer-hover:border-navy/40 peer-checked:border-navy peer-checked:bg-navy peer-checked:text-white peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-navy"
+            >
+              {niveau.label}
+            </label>
+          </div>
+        );
+      })
+    }
+  </div>
+
+  <p id={helpId} class="text-caption mt-3 max-w-2xl text-slate-700">{levelPicker.help}</p>
+
+  {
+    /* Ce que le niveau courant ajoute. Les trois phrases sont dans le HTML, `data-level` n'en laisse
+      qu'une visible : la même règle CSS que pour les champs, aucun script. */
+  }
+  <p data-level="1" data-level-only class="text-caption mt-1 max-w-2xl text-slate-700">
+    {notes.debutant}
+  </p>
+  <p data-level="2" data-level-only class="text-caption mt-1 max-w-2xl text-slate-700">
+    {notes.intermediaire}
+  </p>
+  <p data-level="3" data-level-only class="text-caption mt-1 max-w-2xl text-slate-700">
+    {notes.expert}
+  </p>
+</fieldset>

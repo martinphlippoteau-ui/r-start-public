@@ -13,6 +13,10 @@ export type PageKey =
   | 'fees'
   | 'strategy'
   | 'tools'
+  | 'toolFees'
+  | 'toolEnjoyment'
+  | 'toolExit'
+  | 'toolSavings'
   | 'about'
   | 'documentation'
   | 'press'
@@ -30,6 +34,8 @@ export interface PageMeta {
   navLabel?: string;
   order: number;
   inMenu: boolean;
+  /** Page mère, pour un fil d'Ariane à plus de deux niveaux (Accueil › Outils › Simulateur de frais). */
+  parent?: PageKey;
 }
 
 export const pages: Record<PageKey, PageMeta> = {
@@ -57,6 +63,40 @@ export const pages: Record<PageKey, PageMeta> = {
     /** Après les frais : les outils chiffrent ce que la page Frais explique. */
     order: 4,
     inMenu: true,
+  },
+  /* Les quatre outils, un par page, sous /outil. Hors menu : on y entre par les cartes de /outils, le
+     menu ne porte que les grandes pages. `parent` leur donne le fil d'Ariane à trois niveaux. */
+  toolFees: {
+    key: 'toolFees',
+    path: '/outil/simulateur-de-frais',
+    label: 'Simulateur de frais',
+    order: 41,
+    inMenu: false,
+    parent: 'tools',
+  },
+  toolEnjoyment: {
+    key: 'toolEnjoyment',
+    path: '/outil/date-de-jouissance',
+    label: 'Date de jouissance',
+    order: 42,
+    inMenu: false,
+    parent: 'tools',
+  },
+  toolExit: {
+    key: 'toolExit',
+    path: '/outil/cout-de-sortie',
+    label: 'Coût d’une sortie anticipée',
+    order: 43,
+    inMenu: false,
+    parent: 'tools',
+  },
+  toolSavings: {
+    key: 'toolSavings',
+    path: '/outil/versements-programmes',
+    label: 'Versements programmés',
+    order: 44,
+    inMenu: false,
+    parent: 'tools',
   },
   about: {
     key: 'about',
@@ -117,5 +157,16 @@ export const menuPages = (Object.values(pages) as PageMeta[])
   .filter((p) => p.inMenu)
   .sort((a, b) => a.order - b.order);
 
-/** Fil d'Ariane d'une sous-page : Accueil › Page. */
-export const breadcrumb = (key: PageKey) => [pages.home, pages[key]];
+/**
+ * Fil d'Ariane d'une sous-page : Accueil › Page, et Accueil › Outils › Outil quand la page déclare une
+ * page mère. La chaîne est remontée puis retournée, l'accueil est toujours en tête.
+ */
+export const breadcrumb = (key: PageKey): PageMeta[] => {
+  const chaine: PageMeta[] = [];
+  let courante: PageMeta | undefined = pages[key];
+  while (courante && courante.key !== 'home') {
+    chaine.unshift(courante);
+    courante = courante.parent ? pages[courante.parent] : undefined;
+  }
+  return [pages.home, ...chaine];
+};

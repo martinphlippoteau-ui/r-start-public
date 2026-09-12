@@ -1,0 +1,120 @@
+---
+/**
+ * Une page par outil, sous /outil (12/09/2026).
+ * SiteNav → main#contenu : PageHero (fil d'Ariane à trois niveaux, H1, ligne risques visible sans
+ * défiler) → cadre commun aux quatre outils → l'outil, avec son sélecteur de niveau → renvois vers les
+ * trois autres → notes → Footer.
+ *
+ * Le chemin, le libellé et le fil d'Ariane viennent de src/config/pages.ts par `pageKey` : aucune URL
+ * n'est écrite ici. Le composant d'outil est choisi par ce même `pageKey`, l'association est donc
+ * vérifiée à la compilation.
+ *
+ * Règle de la page : aucun outil ne projette de performance. Le cadre le redit sur chaque page, parce
+ * qu'un visiteur peut arriver ici sans être passé par /outils.
+ */
+import type { GetStaticPaths } from 'astro';
+import Base from '@/layouts/Base.astro';
+import SiteNav from '@/components/SiteNav.astro';
+import Footer from '@/components/Footer.astro';
+import LegalNotes from '@/components/LegalNotes.astro';
+import Breadcrumb from '@/components/ui/Breadcrumb.astro';
+import Container from '@/components/ui/Container.astro';
+import PageHero from '@/components/ui/PageHero.astro';
+import RiskNote from '@/components/ui/RiskNote.astro';
+import Section from '@/components/ui/Section.astro';
+import EnjoymentTool from '@/components/pages/outils/EnjoymentTool.astro';
+import ExitTool from '@/components/pages/outils/ExitTool.astro';
+import FeeTool from '@/components/pages/outils/FeeTool.astro';
+import SavingsTool from '@/components/pages/outils/SavingsTool.astro';
+import ToolCard from '@/components/pages/outils/ToolCard.astro';
+import { pages, type PageKey } from '@/config/pages';
+import { notes, toolCards, toolsPage } from '@/content/fr/toolsPage';
+import { withBase } from '@/lib/href';
+import { breadcrumbJsonLd, organizationJsonLd, webPageJsonLd } from '@/lib/seo';
+
+/** Un composant par outil. La clé est celle de src/config/pages.ts : rien à synchroniser à la main. */
+const composants = {
+  toolFees: FeeTool,
+  toolEnjoyment: EnjoymentTool,
+  toolExit: ExitTool,
+  toolSavings: SavingsTool,
+} as const;
+
+export const getStaticPaths = (() =>
+  toolCards.map((outil) => ({
+    /* Le slug est la dernière portion du chemin déclaré dans src/config/pages.ts. */
+    params: { slug: pages[outil.pageKey].path.split('/').pop() },
+    props: { pageKey: outil.pageKey },
+  }))) satisfies GetStaticPaths;
+
+const { pageKey } = Astro.props as { pageKey: keyof typeof composants };
+const page = pages[pageKey as PageKey];
+const outil = toolCards.find((o) => o.pageKey === pageKey)!;
+const Outil = composants[pageKey];
+const { hero, frame, elsewhere, index } = toolsPage;
+
+const titre = `${page.label} | ${toolsPage.seo.title}`;
+const description = outil.card.teaser;
+
+const jsonLd = [
+  organizationJsonLd(),
+  webPageJsonLd({ path: page.path, title: titre, description }),
+  breadcrumbJsonLd(pageKey as PageKey),
+];
+
+/** Les trois autres outils, dans l'ordre, pour le renvoi de bas de page. */
+const autres = toolCards.filter((o) => o.pageKey !== pageKey);
+---
+
+<Base title={titre} description={description} path={page.path} jsonLd={jsonLd}>
+  <SiteNav />
+  <main id="contenu">
+    <PageHero eyebrow={hero.eyebrow} title={page.label} riskLine={hero.riskLine}>
+      <Breadcrumb slot="breadcrumb" key={pageKey as PageKey} tone="dark" />
+    </PageHero>
+
+    <Section id="cadre" tone="paper" spacing="compact" labelledBy="cadre-title">
+      <Container size="wide">
+        <h2 id="cadre-title" class="text-display-sm">{frame.title}</h2>
+        <div data-advantage class="text-lead mt-4 max-w-3xl text-ink">
+          <p>{frame.body}</p>
+        </div>
+        <RiskNote text={frame.risk} size="lead" class="mt-5" noteId={frame.noteId} />
+      </Container>
+    </Section>
+
+    <Outil />
+
+    <Section id="autres-outils" tone="paper" labelledBy="autres-outils-title">
+      <Container size="wide">
+        <h2 id="autres-outils-title" class="text-display-sm">{elsewhere.title}</h2>
+
+        <ul class="mt-8 grid gap-6 sm:grid-cols-3" role="list">
+          {
+            autres.map((o) => (
+              <li class="h-full">
+                <ToolCard
+                  href={pages[o.pageKey].path}
+                  eyebrow={o.card.eyebrow}
+                  title={pages[o.pageKey].label}
+                  question={o.card.question}
+                  teaser={o.card.teaser}
+                  cta={index.cardCta}
+                />
+              </li>
+            ))
+          }
+        </ul>
+
+        <p class="mt-8">
+          <a href={withBase(pages.tools.path)} class="text-base font-semibold text-navy">
+            {elsewhere.backLabel}
+          </a>
+        </p>
+      </Container>
+    </Section>
+
+    <LegalNotes notes={notes} />
+  </main>
+  <Footer />
+</Base>
