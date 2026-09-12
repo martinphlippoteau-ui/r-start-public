@@ -47,7 +47,7 @@ const data = scpis.map((s) => ({
 }));
 ---
 
-<Section id={id} tone="white" labelledBy={titleId}>
+<Section id={id} tone="white" labelledBy={titleId} class="max-md:pt-8">
   <Container size="wide">
     {
       /* Titre MASQUÉ VISUELLEMENT (12/09/2026, demande de l'équipe) : la page arrive directement sur le
@@ -68,24 +68,32 @@ const data = scpis.map((s) => ({
     </div>
 
     {
-      /* Défilement horizontal SOUS « sm » seulement. `overflow-x: auto` fait de l'enveloppe un conteneur
-        de défilement sur LES DEUX axes : un en-tête collant s'y collerait à l'enveloppe, pas à l'écran,
-        donc il ne bougerait jamais. Le tableau tient à partir de « sm ». */
+      /* AUCUNE enveloppe à défilement (12/09/2026). Il y en avait une sous « sm » et elle coûtait cher :
+        sur un téléphone, la colonne de la SCPI comparée et sa liste déroulante tombaient hors de l'écran,
+        le comparateur ne comparait plus rien. Sous 48 rem le tableau se lit maintenant en cartes (règles
+        dans global.css), au-dessus il tient en entier dans le conteneur. Au passage, `overflow-x: auto`
+        aurait de toute façon empêché les en-têtes de se coller à l'écran : un conteneur de défilement
+        retient ses enfants collants.
+
+        Les RÔLES sont posés à la main : `display: block` efface la sémantique de tableau, et sans elle le
+        lecteur d'écran énoncerait quatorze taux sans jamais dire de quelle SCPI ils viennent. */
     }
-    <div class="mt-8 max-sm:overflow-x-auto sm:mt-10">
-      <table data-comparator data-fee-block="comparateur-frais" class="w-full min-w-[34rem]">
+    <div class="mt-6 sm:mt-10">
+      <table role="table" data-comparator data-fee-block="comparateur-frais" class="w-full">
         <caption class="visually-hidden">{comparator.title}</caption>
-        <thead>
-          <tr>
+        <thead role="rowgroup">
+          <tr role="row">
             <th
+              role="columnheader"
               scope="col"
               class="sticky top-[calc(var(--spacing-nav-total)+0.5rem)] z-10 w-[34%] bg-white p-0"
             >
               <span class="visually-hidden">Frais</span>
             </th>
             <th
+              role="columnheader"
               scope="col"
-              class="sticky top-[calc(var(--spacing-nav-total)+0.5rem)] z-10 w-[33%] border-b border-navy/12 bg-white px-3 pb-5 align-bottom sm:px-5"
+              class="sticky top-[calc(var(--spacing-nav-total)+0.5rem)] z-10 w-[33%] border-b border-navy/12 bg-white px-3 pb-3 align-bottom sm:px-5 md:pb-5"
             >
               <Image
                 src={brandLogo}
@@ -94,41 +102,54 @@ const data = scpis.map((s) => ({
                 height={89}
                 loading="eager"
                 decoding="async"
-                class="mx-auto h-8 w-auto sm:h-10"
+                class="mx-auto h-7 w-auto sm:h-10"
               />
-              <span class="mt-2 block text-sm font-normal text-slate-700">
+              {
+                /* Le gestionnaire n'apparaît qu'à partir de 48 rem : sur téléphone l'en-tête est collant,
+                  chaque ligne qu'il porte est prise sur la hauteur de lecture. L'information n'est pas
+                  perdue, elle est sous le tableau, dans les sources. */
+              }
+              <span class="mt-2 hidden text-sm font-normal text-slate-700 md:block">
                 {comparator.leftManager}
               </span>
             </th>
             <th
+              role="columnheader"
               scope="col"
-              class="sticky top-[calc(var(--spacing-nav-total)+0.5rem)] z-10 w-[33%] border-b border-navy/12 bg-white px-3 pb-5 align-bottom sm:px-5"
+              class="sticky top-[calc(var(--spacing-nav-total)+0.5rem)] z-10 w-[33%] border-b border-navy/12 bg-white px-3 pb-3 align-bottom sm:px-5 md:pb-5"
             >
               <label for={selectId} class="visually-hidden">{comparator.selectLabel}</label>
               <select
                 id={selectId}
                 data-comparator-select
-                class="w-full rounded-2xl border border-navy/20 bg-white px-4 py-3 text-base font-semibold text-navy focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-navy"
+                class="w-full rounded-2xl border border-navy/20 bg-white px-3 py-2.5 text-base font-semibold text-navy focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-navy sm:px-4 sm:py-3"
               >
                 {scpis.map((s, i) => <option value={String(i)}>{s.name}</option>)}
               </select>
-              <span data-comparator-manager class="mt-2 block text-sm font-normal text-slate-700">
+              <span
+                data-comparator-manager
+                class="mt-2 hidden text-sm font-normal text-slate-700 md:block"
+              >
                 {scpis[0]?.manager}
               </span>
             </th>
           </tr>
         </thead>
-        <tbody>
+        <tbody role="rowgroup">
           {
             rows.map((row, i) => (
-              <tr class="border-t border-navy/12">
-                <th scope="row" class="py-5 pr-3 text-left align-top font-medium text-ink sm:pr-5">
+              <tr role="row" class="border-t border-navy/12">
+                <th
+                  role="rowheader"
+                  scope="row"
+                  class="py-5 pr-3 text-left align-top font-medium text-ink sm:pr-5"
+                >
                   {row.label}
                   <span class="text-caption mt-1 block font-normal text-slate-700">
                     {row.basis}
                   </span>
                 </th>
-                <td class="px-3 py-5 text-center align-top sm:px-5">
+                <td role="cell" class="px-3 py-5 text-center align-top sm:px-5">
                   <span data-fee-value class="text-display-sm text-navy">
                     {row.rstart}
                   </span>
@@ -139,7 +160,7 @@ const data = scpis.map((s) => ({
                     <span class="text-caption mt-1 block text-slate-700">{row.rstartDetail}</span>
                   )}
                 </td>
-                <td class="px-3 py-5 text-center align-top sm:px-5">
+                <td role="cell" class="px-3 py-5 text-center align-top sm:px-5">
                   <span data-comparator-cell={String(i)} class="text-display-sm text-slate-700">
                     {comparator.pendingLabel}
                   </span>

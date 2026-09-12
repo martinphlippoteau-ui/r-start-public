@@ -12,6 +12,7 @@ export type PageKey =
   | 'home'
   | 'fees'
   | 'strategy'
+  | 'tools'
   | 'about'
   | 'documentation'
   | 'press'
@@ -46,6 +47,15 @@ export const pages: Record<PageKey, PageMeta> = {
     path: '/strategie',
     label: 'Stratégie d’investissement',
     order: 3,
+    inMenu: true,
+  },
+  tools: {
+    key: 'tools',
+    path: '/outils',
+    label: 'Outils',
+    navLabel: 'Outils',
+    /** Après les frais : les outils chiffrent ce que la page Frais explique. */
+    order: 4,
     inMenu: true,
   },
   about: {

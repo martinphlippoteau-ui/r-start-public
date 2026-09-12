@@ -1,6 +1,18 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
+/** Toutes les pages publiées : un débordement horizontal se vérifie partout, pas au seul accueil. */
+const PAGES = [
+  '/',
+  '/frais/',
+  '/outils/',
+  '/strategie/',
+  '/a-propos/',
+  '/documentation/',
+  '/presse/',
+  '/salle-de-presse/',
+];
+
 test.describe('Qualité', () => {
   test('structure de page et SEO', async ({ page }) => {
     await page.goto('/');
@@ -79,12 +91,44 @@ test.describe('Qualité', () => {
     expect(serious.map((v) => `${v.id}: ${v.help} (${v.nodes.length})`)).toEqual([]);
   });
 
-  test('pas de débordement horizontal', async ({ page }) => {
-    await page.goto('/');
-    const overflow = await page.evaluate(
-      () => document.documentElement.scrollWidth - document.documentElement.clientWidth
-    );
-    expect(overflow).toBeLessThanOrEqual(1);
+  /*
+   * Toutes les pages, pas seulement l'accueil. Le 12/09/2026, /frais débordait de 154 px sur téléphone :
+   * le comparateur était un tableau à largeur minimale posé dans une enveloppe à défilement, et la
+   * colonne de la SCPI comparée, sa liste déroulante comprise, tombait hors de l'écran. Le test ne
+   * visitait que l'accueil, il n'a rien vu.
+   */
+  for (const route of PAGES) {
+    test(`pas de débordement horizontal (${route})`, async ({ page }) => {
+      await page.goto(route);
+      const overflow = await page.evaluate(
+        () => document.documentElement.scrollWidth - document.documentElement.clientWidth
+      );
+      expect(overflow).toBeLessThanOrEqual(1);
+    });
+  }
+
+  /*
+   * Le comparateur ne compare que si ses DEUX colonnes sont à l'écran. Sur téléphone il se lit en cartes
+   * (global.css, sous 48 rem) et la liste déroulante reste dans l'en-tête collant : c'est le seul moyen
+   * de changer de SCPI, elle doit rester atteignable et entièrement visible.
+   */
+  test('le comparateur de frais tient dans la largeur de l’écran', async ({ page }) => {
+    await page.goto('/frais/');
+    const select = page.locator('[data-comparator-select]');
+    await expect(select).toBeVisible();
+    const debord = await page.evaluate(() => {
+      const largeur = document.documentElement.clientWidth;
+      const cases = [
+        document.querySelector('[data-comparator-select]'),
+        document.querySelector('[data-comparator] thead img'),
+        ...document.querySelectorAll('[data-comparator] tbody [data-fee-value]'),
+        ...document.querySelectorAll('[data-comparator-cell]'),
+      ].filter(Boolean) as Element[];
+      return cases
+        .map((el) => el.getBoundingClientRect())
+        .filter((r) => r.right > largeur + 1 || r.left < -1).length;
+    });
+    expect(debord).toBe(0);
   });
 
   test('captures d’écran de la page', async ({ page }, testInfo) => {

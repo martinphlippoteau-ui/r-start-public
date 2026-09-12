@@ -1,0 +1,58 @@
+---
+/**
+ * Champ de saisie d'un outil : libellé, unité et aide facultative. Un vrai <label> lié au champ, et
+ * `inputmode="decimal"` pour que le clavier des téléphones propose des chiffres. Les valeurs se
+ * saisissent en clair, sans curseur : un montant se lit mieux qu'il ne se devine.
+ */
+interface Props {
+  id: string;
+  label: string;
+  /** Unité affichée à droite du champ (€, %, ans…). */
+  unit?: string;
+  hint?: string;
+  value: string | number;
+  min?: number;
+  max?: number;
+  step?: number;
+  type?: 'number' | 'date';
+  class?: string;
+}
+const {
+  id,
+  label,
+  unit,
+  hint,
+  value,
+  min,
+  max,
+  step,
+  type = 'number',
+  class: className = '',
+} = Astro.props as Props;
+const hintId = hint ? `${id}-hint` : undefined;
+---
+
+<div class:list={['flex flex-col gap-2', className]}>
+  <label for={id} class="text-base font-medium text-ink">{label}</label>
+  <div class="flex items-center gap-2">
+    <input
+      id={id}
+      type={type}
+      value={String(value)}
+      min={min}
+      max={max}
+      step={step}
+      inputmode={type === 'number' ? 'decimal' : undefined}
+      aria-describedby={hintId}
+      class="w-full rounded-2xl border border-navy/20 bg-white px-4 py-3 text-lg font-semibold text-navy tabular-nums focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-navy"
+    />
+    {unit && <span class="shrink-0 text-lg font-semibold text-slate-700">{unit}</span>}
+  </div>
+  {
+    hint && (
+      <p id={hintId} class="text-caption text-slate-700">
+        {hint}
+      </p>
+    )
+  }
+</div>

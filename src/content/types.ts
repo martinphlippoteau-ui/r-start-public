@@ -37,7 +37,15 @@ export interface LegalNote {
 }
 
 /** Position d'un CTA « Souscrire » pour l'analytics (dataLayer cta_position). */
-export type CtaPosition = 'nav' | 'hero' | 'frais' | 'souscrire' | 'faq' | 'footer' | 'mobile-bar';
+export type CtaPosition =
+  | 'nav'
+  | 'hero'
+  | 'frais'
+  | 'outils'
+  | 'souscrire'
+  | 'faq'
+  | 'footer'
+  | 'mobile-bar';
 
 export interface Cta {
   label: string;

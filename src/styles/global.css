@@ -1243,3 +1243,86 @@ body:has(#consent-banner:not([hidden])) [data-hero-scroll-hint] {
     opacity: 0;
   }
 }
+
+/* Comparateur de frais sous 48 rem (12/09/2026) : sept lignes sur trois colonnes ne tiennent pas sur un
+   téléphone. Avant, le tableau débordait dans une enveloppe à défilement horizontal et la colonne de la
+   SCPI comparée, sa liste déroulante comprise, restait hors de l'écran : le visiteur ne voyait que la
+   colonne R Start et rien ne l'invitait à pousser de côté.
+
+   Chaque ligne devient donc une carte : l'intitulé du frais en pleine largeur, les deux taux côte à côte
+   en dessous. Les deux en-têtes restent collés sous la barre de navigation, la liste déroulante reste
+   donc atteignable à tout moment. Plus aucun défilement horizontal.
+
+   Le tableau garde ses balises et ses rôles ARIA explicites (posés dans FeeComparator.astro) : `display:
+   block` efface la sémantique de tableau, les rôles la rendent. */
+@media (width < 48rem) {
+  [data-comparator],
+  [data-comparator] thead,
+  [data-comparator] tbody,
+  [data-comparator] tr,
+  [data-comparator] th,
+  [data-comparator] td {
+    display: block;
+  }
+
+  /* En-tête : les deux prétendants côte à côte, collés sous la barre de navigation.
+
+     Le collant est porté par le `thead`, PAS par le `tr` : un élément collant ne se décolle jamais de son
+     bloc conteneur, et celui du `tr` est le `thead`, haut de sa seule ligne. Posé là, il n'avait donc
+     aucune course à parcourir et ne collait à rien. Sur le `thead`, le bloc conteneur est le tableau
+     entier : l'en-tête suit les sept lignes. */
+  [data-comparator] thead {
+    position: sticky;
+    /* Collé PILE sous la barre de navigation, sans le demi-rem d'écart habituel, et l'écart est repris en
+       marge intérieure. Posé plus bas, il laissait une bande de huit pixels par laquelle les lignes du
+       tableau défilaient à découvert, entre le bas de la barre et le haut de l'en-tête. */
+    top: var(--spacing-nav-total);
+    z-index: 10;
+    padding-top: 0.5rem;
+    background-color: #fff;
+    /* Le filet passe sur l'en-tête entier. Porté par les deux cases, la gouttière le coupait en son
+       milieu et la ligne paraissait cassée. */
+    border-bottom: 1px solid color-mix(in oklab, var(--color-navy) 12%, transparent);
+  }
+
+  [data-comparator] thead th {
+    border-bottom: 0;
+  }
+
+  [data-comparator] thead tr {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: end;
+    column-gap: 0.75rem;
+  }
+
+  [data-comparator] thead th:first-child {
+    display: none;
+  }
+
+  /* Les cases d'en-tête ne collent plus une à une : c'est la ligne entière qui colle, d'un seul bloc.
+     Marge intérieure horizontale annulée : la liste déroulante prend toute sa colonne, et « Épargne
+     Pierre Europe » y tient sans être tronqué par le champ. */
+  [data-comparator] thead th {
+    position: static;
+    width: auto;
+    padding-inline: 0;
+  }
+
+  /* Une ligne de frais = une carte. L'intitulé occupe la largeur, les deux taux se partagent la suite. */
+  [data-comparator] tbody tr {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 0.75rem;
+    padding-block: 1.25rem;
+  }
+
+  [data-comparator] tbody th {
+    grid-column: 1 / -1;
+    padding: 0 0 0.875rem;
+  }
+
+  [data-comparator] tbody td {
+    padding: 0;
+  }
+}

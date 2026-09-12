@@ -13,7 +13,14 @@ import { test, expect } from '@playwright/test';
  * /strategie n'y figure pas : depuis le 10/09/2026 cette page rend la section Stratégie complète de
  * l'accueil (scène épinglée du mot d'ordre, texte mot à mot, tracés, parallaxe), qui exige le moteur GSAP.
  */
-const SOUS_PAGES = ['/frais/', '/a-propos/', '/documentation/', '/presse/', '/salle-de-presse/'];
+const SOUS_PAGES = [
+  '/frais/',
+  '/outils/',
+  '/a-propos/',
+  '/documentation/',
+  '/presse/',
+  '/salle-de-presse/',
+];
 
 test.describe('Performance', () => {
   for (const route of SOUS_PAGES) {

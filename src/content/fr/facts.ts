@@ -70,22 +70,34 @@ export const fees = {
      */
     label: 'de 0 % à 12 %',
     base: 'prélevés sur le montant HT de la vente',
+    /** `from` : plus-value à partir de laquelle le palier s'applique, en % du prix de vente (DIC, brochure p.4). */
     tiers: [
-      { condition: 'si la plus-value est inférieure à 7 %', rate: '0 %' },
-      { condition: 'si la plus-value est comprise entre 7 % et 13 %', rate: '6 %' },
-      { condition: 'si la plus-value est supérieure à 13 %', rate: '12 %' },
+      { condition: 'si la plus-value est inférieure à 7 %', rate: '0 %', from: 0 },
+      { condition: 'si la plus-value est comprise entre 7 % et 13 %', rate: '6 %', from: 7 },
+      { condition: 'si la plus-value est supérieure à 13 %', rate: '12 %', from: 13 },
     ],
     basisNote: 'Plus-value exprimée en pourcentage du prix de vente.', // brochure p.6
   }, // brochure p.4
   /** Commission de retrait anticipé, dégressive, calculée sur le prix de retrait */
   withdrawal: {
     base: 'prélevés sur la valeur de retrait',
+    /**
+     * `until` : durée de détention, en années, JUSQU'À laquelle le palier s'applique (borne exclue).
+     * « au cours de la 5e ou de la 6e année » couvre donc [4 ans, 6 ans[. Le dernier palier n'a pas de
+     * borne : il vaut au-delà de `zeroAfterYears`. Sans ces bornes, un calcul devrait déduire la durée
+     * d'une phrase, et se tromperait à la première reformulation.
+     */
     steps: [
-      { period: 'Retrait avant 4 ans de détention', short: '< 4 ans', rate: '10 %' },
-      { period: 'Retrait au cours de la 5e ou de la 6e année', short: '5e-6e année', rate: '7 %' },
-      { period: 'Retrait au cours de la 7e année', short: '7e année', rate: '5 %' },
-      { period: 'Retrait au cours de la 8e année', short: '8e année', rate: '3 %' },
-      { period: 'Retrait après 8 ans de détention', short: '> 8 ans', rate: '0 %' },
+      { period: 'Retrait avant 4 ans de détention', short: '< 4 ans', rate: '10 %', until: 4 },
+      {
+        period: 'Retrait au cours de la 5e ou de la 6e année',
+        short: '5e-6e année',
+        rate: '7 %',
+        until: 6,
+      },
+      { period: 'Retrait au cours de la 7e année', short: '7e année', rate: '5 %', until: 7 },
+      { period: 'Retrait au cours de la 8e année', short: '8e année', rate: '3 %', until: 8 },
+      { period: 'Retrait après 8 ans de détention', short: '> 8 ans', rate: '0 %', until: null },
     ],
     zeroAfterYears: 8,
     /** Cas d'exonération prévus par la note d'information (ch. III § 6, extraction du PDF hébergé) ; libellé exact à confirmer par CORUM. */

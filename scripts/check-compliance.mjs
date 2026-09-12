@@ -316,6 +316,7 @@ async function checkIndex() {
 async function checkSubPages() {
   for (const p of [
     'frais',
+    'outils',
     'strategie',
     'a-propos',
     'documentation',

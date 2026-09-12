@@ -1,0 +1,40 @@
+---
+/**
+ * Résultat d'un outil : un libellé et une valeur, mise à jour par le script. La valeur porte
+ * `data-tool-out` et `aria-live="polite"` : un lecteur d'écran annonce le nouveau montant quand la
+ * saisie change, sans interrompre la frappe.
+ */
+interface Props {
+  id: string;
+  label: string;
+  /** Valeur affichée avant tout calcul (le script la remplace). */
+  initial?: string;
+  /** Mise en avant du résultat principal d'un bloc. */
+  emphasis?: boolean;
+  class?: string;
+}
+import { toolsPage } from '@/content/fr/toolsPage';
+
+const {
+  id,
+  label,
+  initial = toolsPage.labels.pending,
+  emphasis = false,
+  class: className = '',
+} = Astro.props as Props;
+---
+
+<div class:list={['rounded-3xl border border-navy/12 p-5 sm:p-6', className]}>
+  <p class="text-base font-medium text-slate-700">{label}</p>
+  <p
+    id={id}
+    data-tool-out
+    aria-live="polite"
+    class:list={[
+      'mt-1 tabular-nums',
+      emphasis ? 'text-display-sm text-teal-700' : 'text-display-sm text-navy',
+    ]}
+  >
+    {initial}
+  </p>
+</div>
