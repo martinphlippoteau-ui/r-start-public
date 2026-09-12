@@ -99,7 +99,11 @@ export const difference = {
     ),
     noteId: 'difference-remuneration',
   },
-  /** Seul accès aux frais depuis l'accueil (11/09/2026 : la section Frais a quitté la page). */
-  cta: { label: 'Voir le comparateur', href: pages.fees.path },
+  /**
+   * Seul accès aux frais depuis l'accueil (11/09/2026 : la section Frais a quitté la page). Porté par
+   * la pastille flottante (components/StickyCta.astro) et par elle seule : le libellé nomme donc sa
+   * destination en entier, « le comparateur » tout court ne disait pas de quoi.
+   */
+  cta: { label: 'Voir le comparateur de frais', href: pages.fees.path },
   notes,
 } satisfies DifferenceContent;
