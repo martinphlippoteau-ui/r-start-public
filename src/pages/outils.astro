@@ -14,10 +14,10 @@ import Base from '@/layouts/Base.astro';
 import SiteNav from '@/components/SiteNav.astro';
 import Footer from '@/components/Footer.astro';
 import LegalNotes from '@/components/LegalNotes.astro';
+import ToolsGate from '@/components/pages/outils/ToolsGate.astro';
 import Breadcrumb from '@/components/ui/Breadcrumb.astro';
 import Container from '@/components/ui/Container.astro';
 import PageHero from '@/components/ui/PageHero.astro';
-import RiskNote from '@/components/ui/RiskNote.astro';
 import Section from '@/components/ui/Section.astro';
 import ToolCard from '@/components/pages/outils/ToolCard.astro';
 import { pages } from '@/config/pages';
@@ -25,7 +25,7 @@ import { notes, toolCards, toolsPage } from '@/content/fr/toolsPage';
 import { breadcrumbJsonLd, organizationJsonLd, webPageJsonLd } from '@/lib/seo';
 
 const page = pages.tools;
-const { seo, hero, frame, index } = toolsPage;
+const { seo, hero, index } = toolsPage;
 
 const jsonLd = [
   organizationJsonLd(),
@@ -40,20 +40,6 @@ const jsonLd = [
     <PageHero eyebrow={hero.eyebrow} title={hero.title} riskLine={hero.riskLine}>
       <Breadcrumb slot="breadcrumb" key="tools" tone="dark" />
     </PageHero>
-
-    {
-      /* Le cadre se lit AVANT la première carte : il dit ce que ces calculs sont, et ce qu'ils ne sont
-        pas. Son contre-poids est son frère direct, à la même taille, jamais animé. */
-    }
-    <Section id="cadre" tone="paper" spacing="compact" labelledBy="cadre-title">
-      <Container size="wide">
-        <h2 id="cadre-title" class="text-display-sm">{frame.title}</h2>
-        <div data-advantage class="text-lead mt-4 max-w-3xl text-ink">
-          <p>{frame.body}</p>
-        </div>
-        <RiskNote text={frame.risk} size="lead" class="mt-5" noteId={frame.noteId} />
-      </Container>
-    </Section>
 
     <Section id="liste" tone="white" labelledBy="liste-title">
       <Container size="wide">
@@ -82,4 +68,11 @@ const jsonLd = [
     <LegalNotes notes={notes} />
   </main>
   <Footer />
+
+  {
+    /* Fenêtre d'acceptation : rendue APRÈS le pied de page, en dernier enfant du document. Une modale
+      rend le reste inerte, elle n'a donc aucune raison de vivre dans le contenu, et hors de `main` elle
+      ne s'intercale pas dans la lecture linéaire de la page une fois acceptée. */
+  }
+  <ToolsGate />
 </Base>

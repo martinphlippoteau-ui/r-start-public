@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
 /** Toutes les pages publiées : un débordement horizontal se vérifie partout, pas au seul accueil. */
@@ -16,6 +16,20 @@ const PAGES = [
   '/presse/',
   '/salle-de-presse/',
 ];
+
+/**
+ * Accusé de lecture des outils, posé AVANT le script de la page : la fenêtre d'acceptation
+ * (ToolsGate.astro) ne s'ouvre pas. À utiliser dans les tests qui visent les outils eux-mêmes ; la
+ * fenêtre a son propre test, plus bas.
+ */
+const sauterLaFenetreOutils = (page: Page) =>
+  page.addInitScript(() => {
+    try {
+      sessionStorage.setItem('rstart_outils_compris', '1');
+    } catch {
+      /* stockage indisponible : la fenêtre s'ouvrira, le test le dira */
+    }
+  });
 
 test.describe('Qualité', () => {
   test('structure de page et SEO', async ({ page }) => {
@@ -237,12 +251,47 @@ test.describe('Qualité', () => {
   });
 
   /*
+   * Fenêtre d'acceptation des outils : elle barre l'entrée tant que le visiteur n'a pas accusé lecture.
+   * Ce qui est vérifié : elle s'ouvre en MODALE (le reste de la page devient inerte, ce qu'aucun
+   * bricolage maison ne reproduit), Échap ne la referme pas, le bouton reste inerte tant que la case
+   * n'est pas cochée, et l'accusé vaut pour la session entière.
+   */
+  test('la fenêtre d’acceptation barre l’entrée des outils', async ({ page }) => {
+    await page.goto('/outils/');
+
+    const fenetre = page.locator('[data-tools-gate]');
+    const entrer = page.locator('[data-tools-gate-enter]');
+
+    expect(
+      await page.evaluate(() => document.querySelector('[data-tools-gate]')!.matches(':modal'))
+    ).toBe(true);
+    /* Le contenu déplacé depuis la page est bien là, avantage ET contre-poids. */
+    await expect(fenetre.locator('[data-advantage]')).toHaveCount(1);
+    await expect(fenetre.locator('[data-risk]')).toHaveCount(1);
+    await expect(entrer).toBeDisabled();
+
+    await page.keyboard.press('Escape');
+    expect(await fenetre.evaluate((d: HTMLDialogElement) => d.open)).toBe(true);
+
+    await page.locator('[data-tools-gate-check]').check();
+    await expect(entrer).toBeEnabled();
+    await entrer.click();
+    expect(await fenetre.evaluate((d: HTMLDialogElement) => d.open)).toBe(false);
+    expect(await page.evaluate(() => sessionStorage.getItem('rstart_outils_compris'))).toBe('1');
+
+    /* L'accusé vaut pour la session : la page d'outil suivante n'ouvre plus rien. */
+    await page.goto('/outil/simulateur-de-frais/');
+    expect(await fenetre.evaluate((d: HTMLDialogElement) => d.open)).toBe(false);
+  });
+
+  /*
    * Niveaux d'expertise des outils. La bascule est en CSS pure (global.css) : aucun typage ne la
    * protège, et un sélecteur déplacé la casserait en silence. Le test vérifie les trois paliers, et
    * surtout que le RÉSULTAT ne dépend pas du niveau : un champ masqué garde sa valeur, le calcul est
    * le même. C'est la promesse faite au visiteur sous le sélecteur.
    */
   test('les niveaux d’expertise révèlent les champs sans changer le calcul', async ({ page }) => {
+    await sauterLaFenetreOutils(page);
     await page.goto('/outil/simulateur-de-frais/');
     const champs = () => page.locator('[data-tool="frais"] input:visible').count();
 
@@ -263,6 +312,7 @@ test.describe('Qualité', () => {
 
   /* Chaque carte de /outils doit mener à une page qui existe et porte son titre. */
   test('les cartes de la page Outils mènent aux quatre outils', async ({ page }) => {
+    await sauterLaFenetreOutils(page);
     await page.goto('/outils/');
     const liens = await page.locator('#liste article h3 a').all();
     expect(liens).toHaveLength(4);

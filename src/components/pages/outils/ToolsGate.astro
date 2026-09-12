@@ -1,0 +1,141 @@
+---
+/**
+ * Fenêtre d'acceptation des outils (12/09/2026, demande de l'équipe). Elle barre l'entrée de /outils et
+ * des quatre pages d'outils, et demande un accusé de lecture avant tout calcul.
+ *
+ * Elle porte EXACTEMENT le contenu qui occupait la section « cadre » au fil de la page : ce que ces
+ * outils font, ce qu'ils ne font pas, et son contre-poids risque. Le cadre pouvait être sauté d'un coup
+ * de molette ; ici, il faut le traverser.
+ *
+ * Deux issues, et deux seulement : cocher « J'ai compris » puis entrer, ou repartir vers l'accueil. La
+ * touche Échap ne referme pas la fenêtre, elle ferait une troisième sortie, silencieuse et sans accusé.
+ *
+ * SANS JAVASCRIPT, la fenêtre reste LISIBLE : un `<dialog>` fermé est `display: none`, et un
+ * avertissement de risque ne doit jamais dépendre d'un script pour exister. La règle `@media (scripting:
+ * none)` la remet donc dans le flux de la page, en simple encadré au-dessus du contenu. Le couple
+ * avantage / risque reste entier dans le HTML dans tous les cas, ce que vérifie scripts/check-compliance.
+ *
+ * L'accusé vaut pour la SESSION (`sessionStorage`) : passer d'un outil à l'autre ne le redemande pas,
+ * mais la prochaine visite le redemandera. Le stockage lève une exception en navigation privée sur
+ * certains navigateurs ; dans ce cas la fenêtre s'affiche, ce qui est le comportement le moins risqué.
+ */
+import Button from '@/components/ui/Button.astro';
+import RiskNote from '@/components/ui/RiskNote.astro';
+import { toolsPage } from '@/content/fr/toolsPage';
+import { pages } from '@/config/pages';
+
+const { frame } = toolsPage;
+const { gate } = frame;
+const titleId = 'outils-gate-title';
+---
+
+{
+  /* `tabindex="-1"` : le focus est posé sur la FENÊTRE et non sur la case à cocher. Par défaut,
+    `showModal()` vise la première commande, et sur un écran court le navigateur fait défiler pour
+    l'amener à l'œil : la fenêtre s'ouvrait déjà déroulée, titre et premier paragraphe hors champ. */
+}
+<dialog
+  data-tools-gate
+  tabindex="-1"
+  aria-labelledby={titleId}
+  class="tools-gate w-[min(38rem,calc(100vw-2rem))] rounded-3xl border border-navy/12 bg-white p-6 text-ink sm:p-8"
+>
+  <h2 id={titleId} class="text-display-sm text-balance">{frame.title}</h2>
+
+  {
+    /* L'avantage et son contre-poids restent FRÈRES, dans le même parent : c'est ce que le contrôle de
+      conformité mesure (longueur d'au moins 60 %, taille d'au moins 95 %). */
+  }
+  <div class="mt-4">
+    <p data-advantage class="text-lead text-ink">{frame.body}</p>
+    <RiskNote text={frame.risk} size="lead" class="mt-5" />
+  </div>
+
+  <form method="dialog" class="mt-8 grid gap-5">
+    <label class="flex cursor-pointer items-start gap-3">
+      <input
+        type="checkbox"
+        data-tools-gate-check
+        class="mt-1 size-5 shrink-0 cursor-pointer accent-navy focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-navy"
+      />
+      <span class="text-base font-medium text-ink">{gate.acknowledge}</span>
+    </label>
+
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+      {
+        /* `formmethod="dialog"` : le bouton referme la fenêtre sans quitter la page. Il reste inerte
+          tant que la case n'est pas cochée, et une phrase dit pourquoi plutôt que de le laisser
+          deviner. */
+      }
+      <button
+        type="submit"
+        data-tools-gate-enter
+        disabled
+        class="btn-motion inline-flex items-center justify-center gap-2 rounded-full border border-transparent bg-navy px-6 py-3 text-base font-semibold text-white no-underline transition-colors hover:bg-teal-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-navy disabled:cursor-not-allowed disabled:bg-navy/35 disabled:hover:bg-navy/35"
+      >
+        {gate.enter}
+      </button>
+
+      <Button href={pages.home.path} variant="ghost" size="md">{gate.back}</Button>
+    </div>
+
+    <p data-tools-gate-hint class="text-caption text-slate-700">{gate.hint}</p>
+  </form>
+</dialog>
+
+<script>
+  /*
+   * La fenêtre s'ouvre en MODALE : `showModal()` apporte le voile, le piège à focus et l'inertie du
+   * reste de la page, que rien ne reproduit à la main de façon fiable.
+   *
+   * `cancel` est annulé : la touche Échap sortirait sans accusé de lecture, ce qui est exactement ce
+   * que cette fenêtre existe pour empêcher. Le bouton « Retour à l'accueil » est la sortie prévue.
+   */
+  const gate = document.querySelector<HTMLDialogElement>('[data-tools-gate]');
+
+  if (gate) {
+    const CLE = 'rstart_outils_compris';
+    const check = gate.querySelector<HTMLInputElement>('[data-tools-gate-check]');
+    const enter = gate.querySelector<HTMLButtonElement>('[data-tools-gate-enter]');
+    const hint = gate.querySelector<HTMLElement>('[data-tools-gate-hint]');
+
+    const deja = () => {
+      try {
+        return sessionStorage.getItem(CLE) !== null;
+      } catch {
+        /* Stockage indisponible (navigation privée) : on redemande, c'est le moins risqué. */
+        return false;
+      }
+    };
+
+    if (!deja()) {
+      gate.showModal();
+      /* On se lit du haut : le focus va à la fenêtre, pas à sa première commande. */
+      gate.focus();
+      gate.scrollTop = 0;
+      gate.addEventListener('cancel', (event) => event.preventDefault());
+
+      check?.addEventListener('change', () => {
+        const ok = check.checked;
+        if (enter) enter.disabled = !ok;
+        /* La phrase d'aide n'a plus d'objet une fois la case cochée. */
+        if (hint) hint.hidden = ok;
+      });
+
+      /*
+       * L'accusé est écrit à la VALIDATION, pas à la fermeture : `close` est différé d'une tâche, et
+       * une navigation déclenchée dans la foulée pouvait partir avant lui, l'accusé se perdait alors et
+       * la fenêtre revenait à la page suivante. `submit` est synchrone avec le clic.
+       * C'est aussi la seule sortie qui vaut accusé : Échap est neutralisé, et « Retour à l'accueil »
+       * est un lien, il quitte la page sans rien valider.
+       */
+      gate.querySelector('form')?.addEventListener('submit', () => {
+        try {
+          sessionStorage.setItem(CLE, '1');
+        } catch {
+          /* Sans stockage, la fenêtre reviendra à la page suivante : rien de cassé. */
+        }
+      });
+    }
+  }
+</script>

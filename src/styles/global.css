@@ -1537,3 +1537,52 @@ body:has(#consent-banner:not([hidden])) [data-hero-scroll-hint] {
     transform: translateY(10px);
   }
 }
+
+/* Fenêtre d'acceptation des outils (components/pages/outils/ToolsGate.astro).
+   Le voile de la modale : sombre et flouté, la page reste devinée derrière sans distraire.
+   SANS JAVASCRIPT (`scripting: none`), la fenêtre revient dans le FLUX de la page, en simple encadré
+   au-dessus du contenu : un `<dialog>` fermé est `display: none`, et un avertissement de risque ne
+   doit jamais dépendre d'un script pour exister. Le bouton d'entrée, inutile alors, disparaît. */
+/* Centrage explicite : la feuille de style du navigateur centre une modale par `margin: auto`, et le
+   reset de Tailwind remet toutes les marges à zéro. Sans cette ligne, la fenêtre se colle en haut à
+   gauche de l'écran. Hauteur bornée et défilement interne : sur un écran court, le texte doit pouvoir
+   se lire en entier, boutons compris. */
+.tools-gate {
+  margin: auto;
+  max-height: calc(100svh - 3rem);
+  overflow-y: auto;
+}
+
+.tools-gate::backdrop {
+  background-color: rgb(2 75 103 / 0.55);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .tools-gate[open] {
+    animation: tools-gate-entree 320ms var(--ease-out-expo);
+  }
+}
+
+@keyframes tools-gate-entree {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+}
+
+@media (scripting: none) {
+  .tools-gate {
+    display: block;
+    position: static;
+    max-width: 48rem;
+    margin-inline: auto;
+    margin-block: 2rem;
+  }
+  .tools-gate [data-tools-gate-enter],
+  .tools-gate [data-tools-gate-hint],
+  .tools-gate label:has([data-tools-gate-check]) {
+    display: none;
+  }
+}

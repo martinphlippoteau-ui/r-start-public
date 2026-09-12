@@ -111,6 +111,20 @@ export const toolsPage = {
       `Un résultat affiché ici n’est ni un engagement, ni une simulation de performance. Le capital n’est pas garanti : vous pouvez perdre tout ou partie de la somme investie. Les revenus ne sont pas garantis. La revente de vos parts n’est pas garantie. Les frais s’appliquent quoi qu’il arrive, y compris quand la valeur de vos parts baisse.`
     ),
     noteId: 'outils-hypotheses',
+    /*
+     * Libellés de la fenêtre d'acceptation (12/09/2026, demande de l'équipe). Le cadre ne se lit plus
+     * au fil de la page, où il pouvait être sauté : il barre l'entrée des outils et demande un accusé
+     * de lecture. Deux issues et deux seulement, cocher puis entrer, ou repartir vers l'accueil.
+     */
+    gate: {
+      /** Nom accessible de la fenêtre, annoncé à son ouverture. */
+      ariaLabel: 'Avant d’utiliser les outils',
+      acknowledge: 'J’ai compris',
+      enter: 'Accéder aux outils',
+      back: 'Retour à l’accueil',
+      /** Dit pourquoi le bouton reste inerte, plutôt que de laisser le visiteur deviner. */
+      hint: 'Cochez la case pour continuer.',
+    },
   },
 
   /** 1. Simulateur de frais et point de bascule. */

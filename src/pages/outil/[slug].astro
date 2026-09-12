@@ -2,25 +2,26 @@
 /**
  * Une page par outil, sous /outil (12/09/2026).
  * SiteNav → main#contenu : PageHero (fil d'Ariane à trois niveaux, H1, ligne risques visible sans
- * défiler) → cadre commun aux quatre outils → l'outil, avec son sélecteur de niveau → renvois vers les
- * trois autres → notes → Footer.
+ * défiler) → l'outil, avec son sélecteur de niveau → renvois vers les trois autres → notes → Footer,
+ * puis la fenêtre d'acceptation, en dernier enfant du document.
  *
  * Le chemin, le libellé et le fil d'Ariane viennent de src/config/pages.ts par `pageKey` : aucune URL
  * n'est écrite ici. Le composant d'outil est choisi par ce même `pageKey`, l'association est donc
  * vérifiée à la compilation.
  *
- * Règle de la page : aucun outil ne projette de performance. Le cadre le redit sur chaque page, parce
- * qu'un visiteur peut arriver ici sans être passé par /outils.
+ * Règle de la page : aucun outil ne projette de performance. La fenêtre d'acceptation (ToolsGate) le
+ * dit sur chaque page et demande un accusé de lecture, parce qu'un visiteur peut arriver ici sans être
+ * passé par /outils.
  */
 import type { GetStaticPaths } from 'astro';
 import Base from '@/layouts/Base.astro';
 import SiteNav from '@/components/SiteNav.astro';
 import Footer from '@/components/Footer.astro';
 import LegalNotes from '@/components/LegalNotes.astro';
+import ToolsGate from '@/components/pages/outils/ToolsGate.astro';
 import Breadcrumb from '@/components/ui/Breadcrumb.astro';
 import Container from '@/components/ui/Container.astro';
 import PageHero from '@/components/ui/PageHero.astro';
-import RiskNote from '@/components/ui/RiskNote.astro';
 import Section from '@/components/ui/Section.astro';
 import EnjoymentTool from '@/components/pages/outils/EnjoymentTool.astro';
 import ExitTool from '@/components/pages/outils/ExitTool.astro';
@@ -51,7 +52,7 @@ const { pageKey } = Astro.props as { pageKey: keyof typeof composants };
 const page = pages[pageKey as PageKey];
 const outil = toolCards.find((o) => o.pageKey === pageKey)!;
 const Outil = composants[pageKey];
-const { hero, frame, elsewhere, index } = toolsPage;
+const { hero, elsewhere, index } = toolsPage;
 
 const titre = `${page.label} | ${toolsPage.seo.title}`;
 const description = outil.card.teaser;
@@ -72,16 +73,6 @@ const autres = toolCards.filter((o) => o.pageKey !== pageKey);
     <PageHero eyebrow={hero.eyebrow} title={page.label} riskLine={hero.riskLine}>
       <Breadcrumb slot="breadcrumb" key={pageKey as PageKey} tone="dark" />
     </PageHero>
-
-    <Section id="cadre" tone="paper" spacing="compact" labelledBy="cadre-title">
-      <Container size="wide">
-        <h2 id="cadre-title" class="text-display-sm">{frame.title}</h2>
-        <div data-advantage class="text-lead mt-4 max-w-3xl text-ink">
-          <p>{frame.body}</p>
-        </div>
-        <RiskNote text={frame.risk} size="lead" class="mt-5" noteId={frame.noteId} />
-      </Container>
-    </Section>
 
     <Outil />
 
@@ -117,4 +108,11 @@ const autres = toolCards.filter((o) => o.pageKey !== pageKey);
     <LegalNotes notes={notes} />
   </main>
   <Footer />
+
+  {
+    /* Fenêtre d'acceptation : rendue APRÈS le pied de page, en dernier enfant du document. Une modale
+      rend le reste inerte, elle n'a donc aucune raison de vivre dans le contenu, et hors de `main` elle
+      ne s'intercale pas dans la lecture linéaire de la page une fois acceptée. */
+  }
+  <ToolsGate />
 </Base>
