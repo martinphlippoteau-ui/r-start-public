@@ -8,6 +8,10 @@
  * n'est plus à l'écran, la pastille prend le relais. Elle se replie si le repère revient, au défilement
  * vers le haut. Les deux ne sont donc jamais visibles ensemble.
  *
+ * Elle se replie aussi À PARTIR d'une section de fin (`until`), dès son premier pixel : au-delà, le
+ * visiteur a dépassé ce que la pastille proposait, et elle empiéterait sur la section qui arrive.
+ * Elle revient si l'on remonte au-dessus.
+ *
  * « Ne plus être à l'écran » se mesure de DEUX façons, et il en faut deux. Sur téléphone, le repère sort
  * simplement du cadre. Sur grand écran, le hero est ÉPINGLÉ par le rideau de la section suivante : sa
  * boîte ne quitte jamais l'écran, elle reste à la même place pendant que le rideau la recouvre, et c'est
@@ -31,13 +35,16 @@ interface Props {
   href: string;
   /** Sélecteur du repère dont la disparition fait apparaître la pastille, et le retour la replie. */
   watch: string;
+  /** Sélecteur de la section à partir de laquelle la pastille se replie, dès son premier pixel. */
+  until: string;
 }
-const { label, href, watch } = Astro.props as Props;
+const { label, href, watch, until } = Astro.props as Props;
 ---
 
 <div
   data-sticky-cta
   data-watch={watch}
+  data-until={until}
   class="pointer-events-none fixed inset-x-0 bottom-4 z-30 flex justify-center px-4 sm:bottom-6"
 >
   <a
@@ -78,6 +85,8 @@ const { label, href, watch } = Astro.props as Props;
    */
   const box = document.querySelector<HTMLElement>('[data-sticky-cta]');
   const repere = box?.dataset.watch ? document.querySelector<HTMLElement>(box.dataset.watch) : null;
+  /* Borne de fin. Absente, la pastille reste jusqu'au bas de page : c'est le repli prévu. */
+  const fin = box?.dataset.until ? document.querySelector<HTMLElement>(box.dataset.until) : null;
 
   if (box && repere) {
     /* L'opacité se lit sur l'ENVELOPPE de défilement lié, celle que le moteur d'animation pilote ; le
@@ -92,10 +101,14 @@ const { label, href, watch } = Astro.props as Props;
       return parseFloat(getComputedStyle(enveloppe).opacity) > 0.05;
     };
 
+    /* « À partir de » : dès que la section de fin montre son premier pixel en bas de l'écran. La
+       pastille y est posée, elle empiéterait sur la section qui arrive. */
+    const finAtteinte = () => !!fin && fin.getBoundingClientRect().top < window.innerHeight;
+
     let frame = 0;
     const sync = () => {
       frame = 0;
-      box.toggleAttribute('data-on', !repereVisible());
+      box.toggleAttribute('data-on', !repereVisible() && !finAtteinte());
     };
 
     const onScroll = () => {

@@ -187,26 +187,38 @@ test.describe('Qualité', () => {
         const invitation = document.querySelector('[data-hero-scroll-hint]')!;
         const enveloppe = invitation.closest('[data-scrub]') ?? invitation;
         const r = invitation.getBoundingClientRect();
+        const fin = document.querySelector('#corum')!.getBoundingClientRect();
         return {
           invitation:
             r.bottom > 0 &&
             r.top < window.innerHeight &&
             parseFloat(getComputedStyle(enveloppe).opacity) > 0.05,
+          finAtteinte: fin.top < window.innerHeight,
           pastille: pastille.hasAttribute('data-on'),
         };
       });
 
-    for (const y of [0, 400, 1000, 3000]) {
+    /* Le début de « L'expérience derrière R Start », borne de repli, dépend du format : on le mesure
+       plutôt que de le supposer, et on balaie de part et d'autre. */
+    const debutFin = await page.evaluate(
+      () => document.querySelector('#corum')!.getBoundingClientRect().top + window.scrollY
+    );
+
+    for (const y of [0, 400, 1200, debutFin - 1200, debutFin - 200, debutFin + 600]) {
+      if (y < 0) continue;
       await page.evaluate((v) => window.scrollTo(0, v), y);
       await page.waitForTimeout(350);
-      const { invitation, pastille } = await releve();
-      expect(pastille, `à ${y} px, invitation visible = ${invitation}`).toBe(!invitation);
+      const { invitation, finAtteinte, pastille } = await releve();
+      expect(
+        pastille,
+        `à ${Math.round(y)} px : invitation = ${invitation}, fin atteinte = ${finAtteinte}`
+      ).toBe(!invitation && !finAtteinte);
     }
 
     /* Remontée : l'invitation revient, la pastille se replie. */
     await page.evaluate(() => window.scrollTo(0, 0));
     await page.waitForTimeout(600);
-    expect(await releve()).toEqual({ invitation: true, pastille: false });
+    expect(await releve()).toEqual({ invitation: true, finAtteinte: false, pastille: false });
   });
 
   /*
