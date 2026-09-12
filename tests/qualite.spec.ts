@@ -22,6 +22,36 @@ const PAGES = [
  * (ToolsGate.astro) ne s'ouvre pas. À utiliser dans les tests qui visent les outils eux-mêmes ; la
  * fenêtre a son propre test, plus bas.
  */
+/**
+ * Défiler jusqu'à `y` PUIS attendre que la page se soit posée, au lieu d'un délai à l'aveugle.
+ *
+ * L'accueil épingle ses sections avec GSAP : après un `scrollTo`, la géométrie et les opacités menées
+ * par le défilement sont recalculées dans la boucle d'animation de GSAP, qui n'est pas la nôtre. Lire
+ * l'état juste après revenait à lire la frame d'avant, et le test tombait une fois sur trois en
+ * parallèle, quand la machine est chargée.
+ *
+ * On lit donc l'empreinte de l'état jusqu'à ce que deux lectures consécutives soient identiques. C'est
+ * une attente de STABILITÉ, pas une attente du résultat voulu : elle ne masque aucun défaut, elle
+ * refuse seulement de juger une page en train de bouger.
+ */
+const allerA = async (page: Page, y: number, empreinte: () => Promise<string>) => {
+  await page.evaluate(
+    (v) =>
+      new Promise<void>((resolve) => {
+        window.scrollTo(0, v);
+        requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+      }),
+    y
+  );
+  let precedente = '';
+  for (let essai = 0; essai < 20; essai += 1) {
+    const courante = await empreinte();
+    if (courante === precedente) return;
+    precedente = courante;
+    await page.waitForTimeout(100);
+  }
+};
+
 const sauterLaFenetreOutils = (page: Page) =>
   page.addInitScript(() => {
     try {
@@ -181,44 +211,63 @@ test.describe('Qualité', () => {
     /* Après la séquence d'ouverture : avant, l'invitation n'est pas encore entrée. */
     await page.waitForTimeout(2400);
 
-    const releve = async () =>
+    /* Les deux mesures sont prises dans le MÊME passage : comparer deux relevés pris à des instants
+       différents ferait courir la géométrie contre l'état de la pastille, qui est calculé à la frame
+       précédente. C'est ce qui rendait ce test instable en parallèle. */
+    const releve = () =>
       page.evaluate(() => {
-        const pastille = document.querySelector('[data-sticky-cta]')!;
         const invitation = document.querySelector('[data-hero-scroll-hint]')!;
         const enveloppe = invitation.closest('[data-scrub]') ?? invitation;
         const r = invitation.getBoundingClientRect();
-        const fin = document.querySelector('#corum')!.getBoundingClientRect();
         return {
           invitation:
             r.bottom > 0 &&
             r.top < window.innerHeight &&
             parseFloat(getComputedStyle(enveloppe).opacity) > 0.05,
-          finAtteinte: fin.top < window.innerHeight,
-          pastille: pastille.hasAttribute('data-on'),
+          pastille: document.querySelector('[data-sticky-cta]')!.hasAttribute('data-on'),
         };
       });
 
-    /* Le début de « L'expérience derrière R Start », borne de repli, dépend du format : on le mesure
-       plutôt que de le supposer, et on balaie de part et d'autre. */
-    const debutFin = await page.evaluate(
-      () => document.querySelector('#corum')!.getBoundingClientRect().top + window.scrollY
-    );
+    const empreinte = async () => JSON.stringify(await releve());
 
-    for (const y of [0, 400, 1200, debutFin - 1200, debutFin - 200, debutFin + 600]) {
-      if (y < 0) continue;
-      await page.evaluate((v) => window.scrollTo(0, v), y);
-      await page.waitForTimeout(350);
-      const { invitation, finAtteinte, pastille } = await releve();
-      expect(
-        pastille,
-        `à ${Math.round(y)} px : invitation = ${invitation}, fin atteinte = ${finAtteinte}`
-      ).toBe(!invitation && !finAtteinte);
+    /*
+     * On attend que l'invitation soit ENTRÉE, au lieu d'un délai fixe. Elle est au rang 7 de la cascade
+     * d'ouverture et finit son entrée vers 2 350 ms : une attente de 2 400 ms ne laissait que cinquante
+     * millisecondes de marge, que la moindre charge machine mangeait. Le test tombait alors ici, sur une
+     * page qui n'avait pas fini de s'ouvrir.
+     */
+    await expect.poll(async () => (await releve()).invitation, { timeout: 8000 }).toBe(true);
+
+    /* En haut de page : l'invitation est là, la pastille attend son tour. */
+    expect(await releve()).toEqual({ invitation: true, pastille: false });
+
+    const hauteur = await page.evaluate(() => document.body.scrollHeight);
+
+    /*
+     * Le contrat, c'est qu'elles ne se CHEVAUCHENT jamais, et que le relais a bien lieu. On balaie la
+     * page sans mémoriser aucune position : les sections de l'accueil sont épinglées, et les cales
+     * d'épinglage déplacent tout en cours de route. Exiger un état à une hauteur PRÉCISE reviendrait à
+     * fixer une frontière qui bouge avec la longueur de la page et avec le format.
+     */
+    let relaisVu = false;
+    for (let y = 0; y <= hauteur; y += Math.round(hauteur / 12)) {
+      await allerA(page, y, empreinte);
+      const { invitation, pastille } = await releve();
+      expect(invitation && pastille, `les deux visibles à ${y} px`).toBe(false);
+      if (pastille) relaisVu = true;
     }
+    expect(relaisVu, 'la pastille ne s’est affichée nulle part sur la page').toBe(true);
 
-    /* Remontée : l'invitation revient, la pastille se replie. */
-    await page.evaluate(() => window.scrollTo(0, 0));
-    await page.waitForTimeout(600);
-    expect(await releve()).toEqual({ invitation: true, finAtteinte: false, pastille: false });
+    /*
+     * Remontée : l'invitation revient, la pastille se replie. On ATTEND que l'invitation soit revenue
+     * plutôt que de la lire une fois : remonter du bas au sommet traverse toutes les sections
+     * épinglées, et leur opacité, menée par le défilement, met plusieurs frames à se rétablir. C'est une
+     * attente du retour à l'état de repos, pas une attente du résultat voulu, la pastille est vérifiée
+     * juste après, sans indulgence.
+     */
+    await allerA(page, 0, empreinte);
+    await expect.poll(async () => (await releve()).invitation, { timeout: 5000 }).toBe(true);
+    expect((await releve()).pastille, 'la pastille reste affichée au sommet').toBe(false);
   });
 
   /*
@@ -232,42 +281,50 @@ test.describe('Qualité', () => {
     await page.locator('[data-consent-refuse]').click();
     await page.waitForTimeout(2400);
 
-    const reperes = await page.evaluate(() => ({
-      total: document.body.scrollHeight,
-      corum: document.querySelector('#corum')!.getBoundingClientRect().top + window.scrollY,
-      souscrire: document.querySelector('#souscrire')!.getBoundingClientRect().top + window.scrollY,
+    /*
+     * L'ordre des deux sections est la garantie de fond : la première pastille se replie à « corum »,
+     * la seconde arrive à « souscrire ». Si l'ordre s'inversait, elles se recouvriraient en bas d'écran.
+     */
+    const ordre = await page.evaluate(() => ({
+      corum: document.querySelector('#corum')!.getBoundingClientRect().top,
+      souscrire: document.querySelector('#souscrire')!.getBoundingClientRect().top,
     }));
-    /* Si l'ordre des sections s'inversait, les deux pastilles pourraient coexister : on le dit ici. */
-    expect(reperes.corum, 'Corum doit précéder Souscrire').toBeLessThan(reperes.souscrire);
+    expect(ordre.corum, 'Corum doit précéder Souscrire').toBeLessThan(ordre.souscrire);
 
-    const paliers = [
-      0,
-      500,
-      reperes.corum - 500,
-      reperes.corum + 200,
-      reperes.souscrire - 500,
-      reperes.souscrire + 400,
-      reperes.total - 950,
-    ];
+    /*
+     * Balayage par FRACTIONS de la page, sans mémoriser aucune position : les sections de l'accueil sont
+     * épinglées au défilement, et les cales d'épinglage allongent le document en cours de route. Une
+     * position relevée au sommet ne vaut plus rien cent pixels plus bas, ce qui rendait ce test
+     * dépendant du moment où il regardait.
+     */
+    const hauteur = await page.evaluate(() => document.body.scrollHeight);
 
-    for (const y of paliers) {
-      if (y < 0) continue;
-      await page.evaluate((v) => window.scrollTo(0, v), y);
-      await page.waitForTimeout(300);
+    const empreinte = async () =>
+      JSON.stringify(
+        await page.evaluate(() =>
+          [...document.querySelectorAll('[data-sticky-cta]')].map((b) => b.hasAttribute('data-on'))
+        )
+      );
+
+    for (let y = 0; y <= hauteur; y += Math.round(hauteur / 12)) {
+      await allerA(page, y, empreinte);
       const etats = await page.evaluate(() =>
         [...document.querySelectorAll('[data-sticky-cta]')].map((b) => b.hasAttribute('data-on'))
       );
-      expect(etats, `deux pastilles à ${Math.round(y)} px`).toHaveLength(2);
-      expect(etats.filter(Boolean).length, `à ${Math.round(y)} px`).toBeLessThanOrEqual(1);
+      expect(etats, 'deux pastilles attendues sur l’accueil').toHaveLength(2);
+      expect(
+        etats.filter(Boolean).length,
+        `deux pastilles ouvertes ensemble à ${y} px`
+      ).toBeLessThanOrEqual(1);
     }
 
     /* Au bas de la page, c'est celle de la souscription qui tient : elle n'a pas de borne de fin. */
-    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-    await page.waitForTimeout(400);
-    const fin = await page.evaluate(() =>
-      [...document.querySelectorAll('[data-sticky-cta]')].map((b) => b.hasAttribute('data-on'))
-    );
-    expect(fin).toEqual([false, true]);
+    await allerA(page, hauteur, empreinte);
+    expect(
+      await page.evaluate(() =>
+        [...document.querySelectorAll('[data-sticky-cta]')].map((b) => b.hasAttribute('data-on'))
+      )
+    ).toEqual([false, true]);
   });
 
   /*

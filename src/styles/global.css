@@ -186,29 +186,43 @@
   color: transparent;
 }
 
-/* Typographie fluide façon page produit */
+/* Typographie fluide façon page produit.
+   RECALIBRÉE LE 12/09/2026, pour le téléphone. Les paliers étaient écrits `clamp(plancher, Nvw, plafond)`
+   sans terme constant : le terme en `vw` ne rattrapait le plancher que vers 730 px de large, si bien que
+   TOUT téléphone recevait la même taille qu'une tablette. Un H2 restait figé à 40 px sur 390 px d'écran,
+   soit trois lignes pour « Pourquoi gagnant-gagnant ? » et un tiers de la hauteur utile.
+   La forme est maintenant `clamp(plancher, constante + Nvw, plafond)` : la droite passe par la taille
+   voulue à 390 px ET par celle que le grand écran avait DÉJÀ à 1440 px. Rien ne change donc au-dessus,
+   c'est le téléphone et la tablette qui descendent.
+
+   Les INTERLIGNES suivent. Un interligne de 1 ne tient que sur un titre d'une seule ligne, ce qui est le
+   cas sur grand écran et jamais sur téléphone, où les jambages de la ligne du dessus touchaient les
+   capitales de la suivante. */
 @utility text-display-xl {
-  /* Plancher 60 px : sur mobile le H1 doit rester plus grand que l'accroche (24 px), façon iPhone. */
-  font-size: clamp(3.75rem, 8vw, 7.5rem);
-  line-height: 0.95;
+  /* 44 px à 390, 115 px à 1440 (inchangé). Reste bien au-dessus de l'accroche, façon iPhone. */
+  font-size: clamp(2.75rem, 1.1rem + 6.76vw, 7.5rem);
+  line-height: 1;
   letter-spacing: -0.035em;
   font-weight: 700;
 }
 @utility text-display-lg {
-  font-size: clamp(2.5rem, 5.5vw, 5rem);
-  line-height: 1;
+  /* 30 px à 390, 80 px à 1440 (inchangé). */
+  font-size: clamp(1.875rem, 0.7rem + 4.76vw, 5rem);
+  line-height: 1.08;
   letter-spacing: -0.03em;
   font-weight: 700;
 }
 @utility text-display-md {
-  font-size: clamp(2rem, 4vw, 3.5rem);
-  line-height: 1.05;
+  /* 26 px à 390, 56 px à 1440 (inchangé). */
+  font-size: clamp(1.625rem, 0.93rem + 2.86vw, 3.5rem);
+  line-height: 1.1;
   letter-spacing: -0.025em;
   font-weight: 700;
 }
 @utility text-display-sm {
-  font-size: clamp(1.5rem, 2.6vw, 2.25rem);
-  line-height: 1.15;
+  /* 21 px à 390, 36 px à 1440 (inchangé). */
+  font-size: clamp(1.3125rem, 0.965rem + 1.43vw, 2.25rem);
+  line-height: 1.2;
   letter-spacing: -0.02em;
   font-weight: 600;
 }
@@ -218,8 +232,9 @@
   font-weight: 400;
 }
 @utility text-stat {
-  font-size: clamp(2.75rem, 6vw, 5.5rem);
-  line-height: 1;
+  /* 32 px à 390, 86 px à 1440 (inchangé) : même recalibrage que les titres. */
+  font-size: clamp(2rem, 0.75rem + 5.14vw, 5.5rem);
+  line-height: 1.05;
   letter-spacing: -0.04em;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
@@ -849,7 +864,11 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
    Repli sans `backdrop-filter` : un blanc presque plein, sans quoi le texte navy passerait sur ce qui
    défile dessous. */
 @utility cta-glass {
-  background-color: rgb(255 255 255 / 0.72);
+  /* 0,88 et non 0,72 comme la barre de navigation (12/09/2026) : celle-ci flotte au-dessus du haut de
+     page, souvent vide, alors que la pastille passe au ras du texte courant. À 0,72 les lignes du
+     dessous se lisaient à travers elle, et ni le texte de la page ni le libellé de la pastille n'étaient
+     lisibles. Le flou et la saturation restent : c'est toujours du verre, simplement plus dense. */
+  background-color: rgb(255 255 255 / 0.88);
   -webkit-backdrop-filter: saturate(185%) blur(24px);
   backdrop-filter: saturate(185%) blur(24px);
   box-shadow:
