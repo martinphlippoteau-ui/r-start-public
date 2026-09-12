@@ -339,18 +339,23 @@
 
   /* REFLET SPÉCULAIRE : la lumière prise par la moitié haute de la capsule, comme sur une vraie arête
      de verre. Posé DERRIÈRE le contenu (z-index négatif dans le contexte isolé) : il éclaire la matière,
-     jamais le texte. */
+     jamais le texte.
+     Sa boîte couvre TOUTE la pastille et c'est le dégradé qui s'éteint à mi-hauteur, jamais l'inverse.
+     Bornée à la moitié haute (`inset: 0 0 50% 0`), elle mesurait 28 px pour un rayon hérité de 28 : le
+     navigateur plafonne alors l'arrondi à la moitié de la hauteur, ses coins devenaient donc moins
+     ronds que ceux de la pastille et DÉPASSAIENT au-delà. Posée derrière le fond, elle ne se voyait
+     qu'à cet endroit, et dessinait un halo gris au-dessus des deux extrémités. */
   &::before {
     content: '';
     position: absolute;
-    inset: 0 0 50% 0;
+    inset: 0;
     z-index: -1;
     border-radius: inherit;
     background-image: linear-gradient(
       to bottom,
       rgb(255 255 255 / 0.35),
-      rgb(255 255 255 / 0.08) 50%,
-      transparent 100%
+      rgb(255 255 255 / 0.08) 25%,
+      transparent 50%
     );
     opacity: var(--nav-glass-on);
     pointer-events: none;
