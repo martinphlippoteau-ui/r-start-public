@@ -23,8 +23,13 @@
  * défilement (`data-curtain`) : un ancêtre transformé devient le bloc conteneur d'un enfant `fixed`, la
  * pastille se calerait alors sur la section au lieu du viewport.
  *
- * Direction artistique : celle du bouton secondaire (contour navy, texte navy, remplissage au survol),
- * posée sur du verre liquide, la même matière que la barre de navigation.
+ * Direction artistique en DEUX TEMPS (12/09/2026, demande de l'équipe), qui suit le pliage :
+ *  - REPLIÉE, la pastille n'est que son rond de chevron, en couleur de CTA primaire, navy plein. C'est
+ *    l'appel, réduit à un point ;
+ *  - DÉPLIÉE, elle s'ouvre en CTA secondaire, verre clair et contour navy, et le rond reste, à droite,
+ *    inchangé. Le point d'appel ne disparaît donc jamais, la pastille pousse autour de lui.
+ * Le rond est un élément à part (`data-sticky-dot`) : c'est le seul moyen qu'il garde sa taille et sa
+ * couleur pendant que tout le reste change autour.
  *
  * Elle disparaît tant que le bandeau cookies est déplié, il occupe la même place, et se retire du
  * parcours au clavier quand elle est invisible (`visibility`, pas seulement l'opacité).
@@ -49,8 +54,6 @@ interface Props {
   /** Lien interne. Sans valeur, la pastille mène au tunnel de souscription. */
   href?: string;
   position?: CtaPosition;
-  /** `primary` : pastille navy pleine. `secondary` : contour navy sur verre liquide. */
-  variant?: 'primary' | 'secondary';
   /** Sélecteur du repère dont la DISPARITION fait apparaître la pastille, et le retour la replie. */
   watch?: string;
   /** Sélecteur du repère dont l'ARRIVÉE fait apparaître la pastille, dès son premier pixel. */
@@ -58,27 +61,10 @@ interface Props {
   /** Sélecteur du repère à partir duquel la pastille se replie. Absent : elle reste jusqu'en bas. */
   until?: string;
 }
-const {
-  label,
-  href,
-  position = 'sticky',
-  variant = 'secondary',
-  watch,
-  from,
-  until,
-} = Astro.props as Props;
+const { label, href, position = 'sticky', watch, from, until } = Astro.props as Props;
 
 const souscription = !href;
 const lien = href ? withBase(href) : subscribeHref(position);
-
-const styles = {
-  /* Pastille pleine : c'est un appel à l'action, il ne se fond pas dans la page. */
-  primary:
-    'bg-navy text-white shadow-[0_2px_6px_rgb(2_75_103/0.14),0_16px_40px_-18px_rgb(2_75_103/0.5)] border border-transparent hover:bg-teal-700',
-  /* Contour sur verre liquide : un lien de lecture, présent sans réclamer. */
-  secondary:
-    'cta-glass border border-navy/60 text-navy hover:border-navy hover:bg-navy hover:text-white',
-};
 ---
 
 <div
@@ -94,10 +80,7 @@ const styles = {
     data-cta={souscription ? 'souscrire' : undefined}
     data-cta-position={souscription ? position : undefined}
     rel={souscription ? 'noopener' : undefined}
-    class:list={[
-      'pointer-events-auto inline-flex h-14 min-w-14 items-center justify-center rounded-full text-base font-semibold no-underline outline-offset-4 focus-visible:outline-3 focus-visible:outline-navy',
-      styles[variant],
-    ]}
+    class="cta-glass pointer-events-auto relative isolate inline-flex h-16 min-w-16 items-center justify-center rounded-full text-lg font-semibold no-underline outline-offset-4 focus-visible:outline-3 focus-visible:outline-navy"
   >
     {
       /* Le libellé est dans une grille à une colonne : sa largeur passe de 0fr à 1fr, ce qui se transite,
@@ -107,18 +90,24 @@ const styles = {
     <span data-sticky-label class="grid">
       <span class="overflow-hidden whitespace-nowrap">{label}</span>
     </span>
-    <svg
-      aria-hidden="true"
-      class="size-5 shrink-0"
-      viewBox="0 0 16 16"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="2"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-    >
-      <path d="M6 3.5 10.5 8 6 12.5"></path>
-    </svg>
+    {
+      /* Le rond, toujours là et toujours identique : c'est lui qu'on voit seul quand la pastille est
+        repliée, et il reste à droite quand elle s'ouvre. */
+    }
+    <span data-sticky-dot class="sticky-dot">
+      <svg
+        aria-hidden="true"
+        class="size-6"
+        viewBox="0 0 16 16"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d="M6 3.5 10.5 8 6 12.5"></path>
+      </svg>
+    </span>
   </a>
 </div>
 

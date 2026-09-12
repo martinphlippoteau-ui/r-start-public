@@ -25,6 +25,10 @@
  *    surtitre et accroche reculent vers le haut (y −20 px) et les CTA vers le bas (y +10 px), tous à
  *    35 % d'opacité (enveloppes `data-scrub`, transform/opacity, réversibles). Ils s'écartent ainsi de
  *    la ligne risques, hors de ces enveloppes, qui ne bouge pas et reste à opacité 1.
+ * Sous « sm », le contenu n'est PAS centré, il est calé en haut : centré, il chasserait les CTA et la
+ * ligne risques sous la ligne de flottaison d'un petit écran. Il reçoit donc une respiration explicite
+ * de 2,5 rem sous la barre (12/09/2026) : sans elle le surtitre démarrait exactement au bas de la barre,
+ * collé à elle. L'espace vient du bas, où l'invitation à défiler laissait une centaine de pixels vides.
  * Sous « sm » (11/09/2026) : CTA en taille md (16 px) et ligne risques en text-sm (14 px, soit ≥ 85 % du
  * libellé des CTA, tests/conformite.spec.ts), interligne serré, icône 16 px, blanc à 85 %, largeur bornée,
  * placée APRÈS les CTA (`order-last`) pour ne plus s'imposer d'entrée, toujours visible sans défiler et
@@ -124,12 +128,12 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
   </div>
   <Container
     size="wide"
-    class="pt-nav-total relative flex flex-1 flex-col pb-12 sm:justify-center sm:pb-20 lg:pb-44 [@media(min-height:56rem)]:lg:pb-nav-total"
+    class="pt-nav-total relative flex flex-1 flex-col pb-12 max-sm:pt-[calc(var(--spacing-nav-total)+2.5rem)] sm:justify-center sm:pb-20 lg:pb-44 [@media(min-height:56rem)]:lg:pb-nav-total"
   >
     <div data-hero-copy class="mx-auto flex max-w-4xl flex-col items-center text-center">
       {
         showEyebrow && (
-          <div {...copyScrubFar} class="mb-3 max-sm:order-1 sm:mb-6">
+          <div {...copyScrubFar} class="mb-5 max-sm:order-1 sm:mb-8">
             <p
               data-intro="2"
               data-intro-move
@@ -166,12 +170,12 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
           <p
             data-intro="3"
             data-intro-move
-            class="mt-4 max-w-2xl text-xl leading-snug font-semibold text-balance text-sand sm:mt-7 sm:text-display-sm"
+            class="mt-6 max-w-2xl text-xl leading-snug font-semibold text-balance text-sand sm:mt-8 sm:text-display-sm"
           >
             {hero.tagline}
           </p>
         </div>
-        <div {...copyScrubDown} class="mt-4 w-full max-sm:order-4 sm:mt-10 sm:w-auto">
+        <div {...copyScrubDown} class="mt-6 w-full max-sm:order-4 sm:mt-12 sm:w-auto">
           {
             /* `data-hero-cta` : repère stable pour la mesure et pour le test « les CTA du hero sont
             visibles sans scroller », il ne dépend pas du rang dans la cascade d'entrée.
@@ -219,7 +223,7 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
             noteId={hero.riskNoteId}
             tone="dark"
             size="base"
-            class:list={['mx-auto mt-4 max-w-3xl text-left sm:mt-8', riskMobile]}
+            class:list={['mx-auto mt-5 max-w-3xl text-left sm:mt-10', riskMobile]}
           />
         </div>
         {
@@ -229,7 +233,7 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
             ferme la séquence d'ouverture (rang 5). Sa portée est dite juste dessous : les avis parlent de
             CORUM L'Épargne, pas de R Start. */
         }
-        <div {...copyScrubDown} class="mx-auto mt-5 w-full max-w-md sm:mt-8">
+        <div {...copyScrubDown} class="mx-auto mt-6 w-full max-w-md sm:mt-10">
           <div data-intro="6" data-intro-move>
             <TrustBox template="horizontal" theme="dark" label={trust.trustpilot.widgetLabel!} />
             <p class="mt-2 text-sm leading-snug text-white/80">{trust.trustpilot.heroCaption}</p>

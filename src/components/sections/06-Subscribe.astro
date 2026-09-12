@@ -39,7 +39,6 @@
  * Contenu : src/content/fr/subscribe.ts (dont `app`). Le bloc MyCORUM dessine son téléphone en CSS :
  * plus aucune capture ni icône téléchargée depuis les magasins (AppMyCorum.astro).
  */
-import Button from '@/components/ui/Button.astro';
 import { Picture } from 'astro:assets';
 import AppMyCorum from '@/components/AppMyCorum.astro';
 import StoreBadge from '@/components/ui/StoreBadge.astro';
@@ -304,14 +303,11 @@ const OPTION_Y = 12;
       )
     }
 
-    <!-- CTA -->
-    <div
-      class="mt-10 flex flex-col items-stretch sm:mt-12 sm:flex-row sm:items-center"
-      data-animate="fade-up"
-    >
-      <Button position={subscribe.cta.position} variant="primary" size="lg"
-        >{subscribe.cta.label}</Button
-      >
-    </div>
+    {
+      /* Le CTA qui fermait la section est retiré (12/09/2026, demande de l'équipe) : la pastille
+        flottante le porte désormais, et elle apparaît précisément à l'arrivée de cette section. Deux
+        boutons identiques à quelques centaines de pixels l'un de l'autre ne servaient qu'à se
+        concurrencer. */
+    }
   </Container>
 </Section>

@@ -47,7 +47,7 @@ const data = scpis.map((s) => ({
 }));
 ---
 
-<Section id={id} tone="white" labelledBy={titleId} class="max-md:pt-8">
+<Section id={id} tone="white" labelledBy={titleId} class="pt-8 sm:pt-10 lg:pt-14">
   <Container size="wide">
     {
       /* Titre MASQUÉ VISUELLEMENT (12/09/2026, demande de l'équipe) : la page arrive directement sur le
@@ -86,14 +86,14 @@ const data = scpis.map((s) => ({
             <th
               role="columnheader"
               scope="col"
-              class="sticky top-[calc(var(--spacing-nav-total)+0.5rem)] z-10 w-[34%] bg-white p-0"
+              class="sticky top-nav-total z-10 w-[34%] bg-white p-0"
             >
               <span class="visually-hidden">Frais</span>
             </th>
             <th
               role="columnheader"
               scope="col"
-              class="sticky top-[calc(var(--spacing-nav-total)+0.5rem)] z-10 w-[33%] border-b border-navy/12 bg-white px-3 pb-3 align-bottom sm:px-5 md:pb-5"
+              class="sticky top-nav-total z-10 w-[33%] border-b border-navy/12 bg-white px-3 pb-3 align-bottom sm:px-5 md:pb-5"
             >
               <Image
                 src={brandLogo}
@@ -104,21 +104,23 @@ const data = scpis.map((s) => ({
                 decoding="async"
                 class="mx-auto h-7 w-auto sm:h-10"
               />
-              {
-                /* Le gestionnaire n'apparaît qu'à partir de 48 rem : sur téléphone l'en-tête est collant,
-                  chaque ligne qu'il porte est prise sur la hauteur de lecture. L'information n'est pas
-                  perdue, elle est sous le tableau, dans les sources. */
-              }
-              <span class="mt-2 hidden text-sm font-normal text-slate-700 md:block">
-                {comparator.leftManager}
-              </span>
             </th>
             <th
               role="columnheader"
               scope="col"
-              class="sticky top-[calc(var(--spacing-nav-total)+0.5rem)] z-10 w-[33%] border-b border-navy/12 bg-white px-3 pb-3 align-bottom sm:px-5 md:pb-5"
+              class="sticky top-nav-total z-10 w-[33%] border-b border-navy/12 bg-white px-3 pb-3 align-bottom sm:px-5 md:pb-5"
             >
-              <label for={selectId} class="visually-hidden">{comparator.selectLabel}</label>
+              {
+                /* Intitulé VISIBLE : il nomme ce que la colonne oppose à R Start, là où « SCPI à
+                  comparer » ne disait ni laquelle ni pourquoi. Il reste un <label> lié au champ, il sert
+                  donc toujours de nom accessible à la liste déroulante. */
+              }
+              <label
+                for={selectId}
+                class="mb-2 block text-sm font-medium text-balance text-slate-700"
+              >
+                {comparator.selectLabel}
+              </label>
               <select
                 id={selectId}
                 data-comparator-select
@@ -126,12 +128,6 @@ const data = scpis.map((s) => ({
               >
                 {scpis.map((s, i) => <option value={String(i)}>{s.name}</option>)}
               </select>
-              <span
-                data-comparator-manager
-                class="mt-2 hidden text-sm font-normal text-slate-700 md:block"
-              >
-                {scpis[0]?.manager}
-              </span>
             </th>
           </tr>
         </thead>
@@ -183,28 +179,34 @@ const data = scpis.map((s) => ({
       /* Périmètre et sources : obligatoires dès qu'une autre SCPI est nommée. Ils disent ce qui est
         comparé, des taux affichés, pas des coûts réels, et d'où viennent les chiffres. */
     }
-    <p class="text-lead mt-8 max-w-3xl text-ink">{comparator.perimeter}</p>
-
-    <p class="text-caption mt-4 max-w-3xl text-slate-700">{comparator.notPublishedNotice}</p>
-
-    <p class="text-caption mt-3 max-w-3xl text-slate-700">{comparator.vatNotice}</p>
+    <p class="text-lead mt-8 text-ink">{comparator.perimeter}</p>
 
     {
-      /* Sources, une ligne par colonne. Celle de droite suit la SCPI choisie : chaque relevé a sa page et
-        sa date, parce qu'un taux change et que la date fait foi. */
+      /* Les deux avertissements côte à côte à partir de « md » : ce sont deux notes courtes et
+        indépendantes, les empiler doublait leur hauteur sans rien ajouter. */
     }
-    <div class="mt-6 max-w-3xl border-t border-navy/12 pt-5">
+    <div class="text-caption mt-4 grid gap-3 text-slate-700 md:grid-cols-2 md:gap-8">
+      <p>{comparator.notPublishedNotice}</p>
+      <p>{comparator.vatNotice}</p>
+    </div>
+
+    {
+      /* Sources, une par colonne du tableau, côte à côte comme les colonnes qu'elles documentent. Celle
+        de droite suit la SCPI choisie : chaque relevé a sa page et sa date, parce qu'un taux change et
+        que la date fait foi. */
+    }
+    <div class="mt-6 border-t border-navy/12 pt-5">
       <h3 class="text-base font-semibold text-ink">{comparator.sourceLabel}</h3>
-      <dl class="text-caption mt-3 space-y-2 text-slate-700">
-        <div class="flex flex-wrap gap-x-2">
+      <dl class="text-caption mt-3 grid gap-3 text-slate-700 md:grid-cols-2 md:gap-8">
+        <div>
           <dt class="font-semibold">
             {comparator.leftLabel} ,{' '}{comparator.sourceRStartLabel} :
           </dt>
-          <dd>{comparator.sourceRStart}</dd>
+          <dd class="mt-0.5">{comparator.sourceRStart}</dd>
         </div>
-        <div class="flex flex-wrap gap-x-2">
+        <div>
           <dt data-comparator-source-name class="font-semibold">{scpis[0]?.name} :</dt>
-          <dd data-comparator-source>{comparator.sourceOthers}</dd>
+          <dd data-comparator-source class="mt-0.5">{comparator.sourceOthers}</dd>
         </div>
       </dl>
     </div>
@@ -237,7 +239,6 @@ const data = scpis.map((s) => ({
     const table = document.querySelector('[data-comparator]');
     const select = document.querySelector('[data-comparator-select]');
     if (!table || !select) return;
-    const manager = table.querySelector('[data-comparator-manager]');
     const pending = document.querySelector('[data-comparator-pending]');
     const source = document.querySelector('[data-comparator-source]');
     const sourceName = document.querySelector('[data-comparator-source-name]');
@@ -253,7 +254,6 @@ const data = scpis.map((s) => ({
     const render = () => {
       const scpi = data[Number(select.value)] || data[0];
       if (!scpi) return;
-      if (manager) manager.textContent = scpi.manager;
       let missing = 0;
       cells.forEach((cell, i) => {
         const value = scpi.values[i];

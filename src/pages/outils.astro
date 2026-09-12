@@ -43,10 +43,15 @@ const jsonLd = [
 
     <Section id="liste" tone="white" labelledBy="liste-title">
       <Container size="wide">
-        <h2 id="liste-title" class="text-display-lg text-balance">{index.title}</h2>
-        <p class="text-lead mt-6 max-w-3xl opacity-90">{index.intro}</p>
+        {
+          /* Titre et chapeau MASQUÉS VISUELLEMENT (12/09/2026, demande de l'équipe) : les quatre cartes
+            se présentent seules, chacune portant déjà sa question. Le titre reste dans le code parce que
+            la section a besoin d'un nom : sans lui elle n'est plus annonçable au lecteur d'écran, et
+            `labelledBy` pointerait dans le vide. */
+        }
+        <h2 id="liste-title" class="visually-hidden">{index.title}</h2>
 
-        <ul class="mt-10 grid gap-6 sm:grid-cols-2 lg:gap-8" role="list">
+        <ul class="grid gap-6 sm:grid-cols-2 lg:gap-8" role="list">
           {
             toolCards.map((outil) => (
               <li class="h-full">

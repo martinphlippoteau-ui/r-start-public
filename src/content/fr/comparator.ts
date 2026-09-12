@@ -69,7 +69,11 @@ export const comparator = {
   /** Colonne de gauche, toujours R Start. */
   leftLabel: product.name,
   leftManager: 'CORUM Asset Management',
-  selectLabel: 'SCPI à comparer avec R Start',
+  /* Intitulé VISIBLE au-dessus de la liste déroulante (12/09/2026, demande de l'équipe) : il dit en
+     deux mots ce que la colonne de droite oppose à R Start, là où « SCPI à comparer » ne disait pas
+     laquelle ni pourquoi. Les guillemets autour de « sans frais » sont ceux de la brochure : ces SCPI
+     ne prennent pas de commission de souscription, mais prélèvent des frais d'acquisition. */
+  selectLabel: 'Autres SCPI dites « sans frais »',
   /** Affiché tant que la SCPI n'a pas été documentée du tout (aucune source). */
   pendingLabel: 'À compléter',
   /**
@@ -105,8 +109,14 @@ export const comparator = {
    * ce qui ne l'est pas. Ce tableau compare des TAUX AFFICHÉS, SCPI par SCPI, ce n'est ni la moyenne de
    * marché de la brochure, ni une comparaison de résultats.
    */
+  /*
+   * La PREMIÈRE phrase qualifie « sans frais », et ce n'est pas une précaution de style : le contrôle de
+   * conformité interdit la formule absolue, qui laisserait croire qu'aucun frais n'est prélevé. Ces SCPI
+   * ne prennent pas de commission de souscription, elles se rémunèrent à l'achat des immeubles, et le
+   * tableau juste au-dessus le montre ligne par ligne.
+   */
   perimeter:
-    'Ce tableau compare les taux de frais affichés dans les documents de chaque SCPI, lus sous une même hypothèse de durée de détention. Quand les deux taux d’une ligne sont directement comparables, le plus bas est mis en avant : cette mise en avant ne porte que sur cette ligne et ne dit rien du coût total, qui dépend de ce que la SCPI encaisse et de votre durée de détention. Il ne compare pas les résultats. Il ne porte pas sur l’ensemble du marché : seules les SCPI de la liste y figurent. R Start n’a pas d’historique et aucune donnée de performance n’est communiquée sur ce site.',
+    'Une SCPI dite « sans frais » ne prélève pas de frais de souscription : elle se rémunère autrement, par des frais d’acquisition sur les immeubles qu’elle achète, que ce tableau détaille ligne par ligne. Ce tableau compare les taux de frais affichés dans les documents de chaque SCPI, lus sous une même hypothèse de durée de détention. Quand les deux taux d’une ligne sont directement comparables, le plus bas est mis en avant : cette mise en avant ne porte que sur cette ligne et ne dit rien du coût total, qui dépend de ce que la SCPI encaisse et de votre durée de détention. Il ne compare pas les résultats. Il ne porte pas sur l’ensemble du marché : seules les SCPI de la liste y figurent. R Start n’a pas d’historique et aucune donnée de performance n’est communiquée sur ce site.',
   /**
    * Base de comparaison HT / TTC. Sans elle, on opposerait un taux TTC à un taux HT sans le dire, ce que
    * l'AMF a déjà reproché à la brochure. R Start étant exonérée de TVA, ses deux montants sont égaux.

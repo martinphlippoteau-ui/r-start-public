@@ -65,6 +65,16 @@ const FORBIDDEN = [
     // croire qu'il n'y a aucun frais.
     allow:
       /n'est pas une scpi sans frais|frais de souscription|sans frais d['’](entrée|acquisition)/i,
+    /*
+     * Forme RAPPORTÉE : « … dites « sans frais » ». Le mot « dites » et les guillemets nomment une
+     * catégorie employée par le marché, ils n'affirment rien. C'est la formulation de la brochure pour
+     * désigner les SCPI sans commission de souscription.
+     * L'exemption est étroite à dessein : elle ne vaut que collée à « dites », et seulement si la page
+     * explique ailleurs ce que la catégorie recouvre (`requires`). Sans cette explication, l'exemption
+     * tombe et l'occurrence redevient une erreur, car plus rien ne protégerait le lecteur.
+     */
+    reported: /\bdites\s*[«"“]\s*$/i,
+    requires: /ne prélève pas de frais de souscription/i,
   },
   { re: /\bgratuit/gi, label: '« gratuit »', allow: /saisir gratuitement le médiateur/i },
   {
@@ -112,6 +122,10 @@ function checkForbidden(text, file) {
     for (const m of matches) {
       const ctx = text.slice(Math.max(0, m.index - 80), m.index + m[0].length + 80);
       if (rule.allow && rule.allow.test(ctx)) continue;
+      // Forme rapportée, et page qui explique la catégorie : ce n'est pas une affirmation.
+      const gauche = text.slice(Math.max(0, m.index - 30), m.index);
+      if (rule.reported && rule.reported.test(gauche) && rule.requires && rule.requires.test(text))
+        continue;
       errors.push(`${file} : formulation interdite ${rule.label}, « …${ctx.trim()}… »`);
     }
   }
