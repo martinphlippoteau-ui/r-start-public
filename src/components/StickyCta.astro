@@ -1,13 +1,20 @@
 ---
 /**
- * Pastille d'appel flottante, façon page produit Apple (11/09/2026, demande de l'équipe) : un petit lien
- * posé en bas de l'écran, qui apparaît une fois le premier écran passé et s'efface à l'arrivée du pied de
- * page. Elle remplace le bouton qui fermait la zone 2 : le lien vers le comparateur reste atteignable
- * pendant toute la lecture, au lieu d'être manqué si on saute la fin de la section.
+ * Pastille d'appel flottante (12/09/2026, demande de l'équipe). Un rond portant un chevron se pose en bas
+ * de l'écran, puis se DÉPLIE en pastille pour révéler son libellé. Il se replie et s'efface dès que la
+ * section de départ est passée.
+ *
+ * Déclenchement : le SURVOL de la section de départ sur un appareil à pointeur fin. Sur un écran tactile,
+ * où le survol n'existe pas, la pastille se pose dès que la section entre à l'écran : même service, même
+ * moment, sans geste qui n'existe pas. Une fois posée, elle reste tant que la section est à l'écran ;
+ * quitter la section du pointeur ne la referme pas, seul le défilement le fait.
  *
  * Rendue au niveau de la PAGE, jamais dans une section. Les sections de l'accueil sont épinglées au
  * défilement (`data-curtain`) : un ancêtre transformé devient le bloc conteneur d'un enfant `fixed`, la
  * pastille se calerait alors sur la section au lieu du viewport.
+ *
+ * Direction artistique : celle du bouton secondaire (contour navy, texte navy, remplissage au survol),
+ * posée sur du verre liquide, la même matière que la barre de navigation.
  *
  * Elle disparaît tant que le bandeau cookies est déplié, il occupe la même place, et se retire du
  * parcours au clavier quand elle est invisible (`visibility`, pas seulement l'opacité).
@@ -16,7 +23,7 @@
 interface Props {
   label: string;
   href: string;
-  /** Section à partir de laquelle elle apparaît (id). */
+  /** Section dont le survol fait apparaître la pastille, et dont la sortie la replie (id). */
   fromId: string;
 }
 const { label, href, fromId } = Astro.props as Props;
@@ -29,12 +36,20 @@ const { label, href, fromId } = Astro.props as Props;
 >
   <a
     href={href}
-    class="pointer-events-auto inline-flex items-center gap-2 rounded-full bg-navy px-5 py-3 text-sm font-semibold text-white no-underline shadow-float outline-offset-4 transition-colors hover:bg-ink focus-visible:outline-3 focus-visible:outline-navy"
+    data-sticky-link
+    class="cta-glass pointer-events-auto inline-flex h-14 min-w-14 items-center justify-center rounded-full border border-navy/60 text-base font-semibold text-navy no-underline outline-offset-4 hover:border-navy hover:bg-navy hover:text-white focus-visible:outline-3 focus-visible:outline-navy"
   >
-    {label}
+    {
+      /* Le libellé est dans une grille à une colonne : sa largeur passe de 0fr à 1fr, ce qui se transite,
+        là où `width: auto` ne se transite pas. L'enfant coupe ce qui dépasse et ne se coupe jamais en
+        deux lignes pendant le dépliage. */
+    }
+    <span data-sticky-label class="grid">
+      <span class="overflow-hidden whitespace-nowrap">{label}</span>
+    </span>
     <svg
       aria-hidden="true"
-      class="size-4"
+      class="size-5 shrink-0"
       viewBox="0 0 16 16"
       fill="none"
       stroke="currentColor"
@@ -49,24 +64,47 @@ const { label, href, fromId } = Astro.props as Props;
 
 <script>
   /*
-   * Visible entre le haut de la section de départ et l'arrivée du pied de page. Une seule lecture de
-   * défilement par frame, comme la barre de navigation. Aucune dépendance au moteur d'animation : la
-   * pastille doit vivre même si GSAP n'est pas chargé.
+   * Un seul attribut porte l'état : `data-on`. Le rond se pose, et le dépliage suit, retardé en CSS
+   * (global.css) : pas de minuterie à tenir en JavaScript, donc rien à annuler si l'on défile vite.
+   *
+   * Une seule lecture de défilement par frame, comme la barre de navigation, et aucune dépendance au
+   * moteur d'animation : la pastille doit vivre même si GSAP n'est pas chargé.
    */
   const box = document.querySelector<HTMLElement>('[data-sticky-cta]');
   const from = box?.dataset.from ? document.getElementById(box.dataset.from) : null;
-  const footer = document.querySelector<HTMLElement>('footer');
+
   if (box && from) {
+    /* Survol : seulement là où il existe vraiment. Sur un écran tactile, `pointerenter` se déclenche au
+       premier contact, c'est-à-dire trop tard et sur un geste que personne ne fera. */
+    const survol = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    let pose = false;
+
+    /* La section est-elle encore à l'écran ? Passée, la pastille se replie. */
+    const aLEcran = () => {
+      const r = from.getBoundingClientRect();
+      return r.top < window.innerHeight && r.bottom > 0;
+    };
+
+    const appliquer = () => box.toggleAttribute('data-on', pose && aLEcran());
+
+    const poser = () => {
+      if (pose) return;
+      pose = true;
+      appliquer();
+    };
+
     let frame = 0;
     const sync = () => {
       frame = 0;
-      const y = window.scrollY;
-      const start = from.getBoundingClientRect().top + y - window.innerHeight * 0.5;
-      const end = footer
-        ? footer.getBoundingClientRect().top + y - window.innerHeight
-        : Number.POSITIVE_INFINITY;
-      box.toggleAttribute('data-on', y > start && y < end);
+      /* Hors de la section, la pastille se replie ET oublie qu'elle avait été posée : revenir dessus
+         rejoue l'apparition, qui est le geste demandé. */
+      if (!aLEcran()) pose = false;
+      else if (!survol) poser();
+      appliquer();
     };
+
+    if (survol) from.addEventListener('pointerenter', poser);
+
     const onScroll = () => {
       if (!frame) frame = requestAnimationFrame(sync);
     };
