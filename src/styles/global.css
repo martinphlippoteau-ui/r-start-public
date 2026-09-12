@@ -225,6 +225,20 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* Chiffre de frais dans un bloc comparé (12/09/2026, page Frais). `text-stat` monte à 88 px : taillé
+   pour un nombre court posé seul (« 160 000 »), il fait passer « de 0 % à 12 % » à la ligne et écrase
+   ses voisins.
+   La TAILLE EST COMMUNE à tout le bloc, c'est une exigence AMF : aucun frais ne doit être affiché plus
+   petit que ses voisins (tests/conformite.spec.ts). Elle est donc calée sur la valeur la PLUS LONGUE,
+   pas sur « 0 % » : à 44 px, « de 0 % à 12 % » tient sur une ligne dans une colonne de tiers de page. */
+@utility text-fee-stat {
+  font-size: clamp(1.75rem, 3vw, 2.75rem);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
 /* Lien d'évitement */
 @utility skip-link {
   position: absolute;

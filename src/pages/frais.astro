@@ -120,24 +120,22 @@ const faqItems = faq.items.map((item) => {
         <ul
           role="list"
           aria-label={labels?.zeroHighlights}
-          class="grid gap-10 sm:grid-cols-3 sm:gap-8 lg:gap-12"
+          class="grid gap-10 sm:grid-cols-3 sm:grid-rows-[auto_auto_auto] sm:gap-8 lg:gap-12"
         >
           {
             zeroHighlights.map((item, i) => (
-              <li class="flex flex-col gap-3 border-t border-navy/15 pt-6 sm:pt-8">
-                <p class="flex flex-col gap-3">
-                  <span
-                    class="text-stat text-navy"
-                    data-fee-value
-                    data-fee-block="apercu-frais"
-                    data-animate="clip"
-                    data-animate-delay={String(i * 0.12)}
-                  >
-                    {item.value}
-                  </span>
-                  <span class="text-lead font-medium text-ink">{item.label}</span>
-                </p>
-                <p class="text-base leading-relaxed text-slate-700">{item.base}</p>
+              <li class="grid gap-3 border-t border-navy/15 pt-6 sm:row-span-3 sm:grid-rows-subgrid sm:pt-8">
+                <span
+                  class="text-fee-stat text-navy"
+                  data-fee-value
+                  data-fee-block="apercu-frais"
+                  data-animate="clip"
+                  data-animate-delay={String(i * 0.12)}
+                >
+                  {item.value}
+                </span>
+                <span class="text-lead font-medium text-ink">{item.label}</span>
+                <span class="text-base leading-relaxed text-slate-700">{item.base}</span>
               </li>
             ))
           }
@@ -147,13 +145,13 @@ const faqItems = faq.items.map((item) => {
         <ul
           role="list"
           aria-hidden="true"
-          class="mt-6 grid grid-cols-3 gap-3 border-t border-coral/40 pt-6 sm:gap-8 sm:pt-8"
+          class="mt-6 grid gap-6 border-t border-coral/40 pt-6 sm:grid-cols-3 sm:grid-rows-[auto_auto] sm:gap-8 sm:pt-8"
         >
           {
             counterweightRates.map((item) => (
-              <li class="flex flex-col gap-3">
+              <li class="grid gap-3 sm:row-span-2 sm:grid-rows-subgrid">
                 <span
-                  class="text-stat text-coral-700 tabular-nums"
+                  class="text-fee-stat text-coral-700 tabular-nums"
                   data-fee-value
                   data-fee-block="apercu-frais"
                 >
