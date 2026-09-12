@@ -18,7 +18,7 @@
  *    la vitesse finale nulle : à u = 0 le logo monte exactement avec le hero (il en fait encore partie),
  *    puis il décolle et freine en arrivant sur la ligne du logo de la barre. Aucun dépassement tant que
  *    la distance de vol reste < 3 × la hauteur à parcourir (FLIGHT_FACTOR = 2 le garantit) ;
- *  - horizontal : power3.out — il glisse tôt vers la gauche, l'arc reste à gauche des entrées du menu ;
+ *  - horizontal : power3.out, il glisse tôt vers la gauche, l'arc reste à gauche des entrées du menu ;
  *  - échelle : power2.out, de 1 au rapport largeur cible / largeur d'origine (origine 0 0).
  *  Distance de vol bornée à 60 % de la hauteur du viewport : le relais est terminé bien avant que le
  *  hero ait quitté l'écran.
@@ -136,7 +136,7 @@ const makeFlight = (
   const measure = (): Geometry | null => {
     gsap.set(flyer, { clearProps: 'transform,width' });
     // Point de départ : la COPIE laisse l'original en place (on mesure l'original) ; le déplacement, lui,
-    // vide son parent, qui réserve la place (`.hero-logo-wrap`) — c'est donc lui qu'il faut mesurer.
+    // vide son parent, qui réserve la place (`.hero-logo-wrap`), c'est donc lui qu'il faut mesurer.
     const homeRect = (clone ? source : home).getBoundingClientRect();
     const targetRect = target.getBoundingClientRect();
     if (!homeRect.width || !targetRect.width) return null;
@@ -230,7 +230,7 @@ const makeCtaHandover = (): (() => void) => {
   if (!target || !hero) return () => {};
   /* La matière de la barre suit le même avancement, mais elle est pilotée par le script de
      SiteNav.astro : le comportement doit être identique sur les sous-pages, qui ne chargent pas GSAP.
-     Même distance des deux côtés — max(160, 30 % de la hauteur du viewport) — donc sur l'accueil le verre
+     Même distance des deux côtés, max(160, 30 % de la hauteur du viewport), donc sur l'accueil le verre
      arrive exactement quand le logo et le CTA se posent. */
   let last = -1;
   const apply = (scroll: number) => {
@@ -259,7 +259,7 @@ const makeCtaHandover = (): (() => void) => {
 export const setupBrandFlight = (): (() => void) => {
   /* L'ouverture ne se joue qu'une fois par session : `intro` est retirée de <html> par
      public/intro-once.js au retour depuis une autre page. Sans elle, la barre est déjà pleine et le logo
-     reste dans le hero — il n'y a plus rien à faire voler. */
+     reste dans le hero, il n'y a plus rien à faire voler. */
   if (!document.documentElement.classList.contains('intro')) return () => {};
   const stops = [makeFlight('[data-brand-flight]', '[data-brand-target]'), makeCtaHandover()];
   return () => stops.forEach((stop) => stop());

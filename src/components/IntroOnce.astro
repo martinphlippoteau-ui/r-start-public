@@ -2,7 +2,7 @@
 /**
  * Charge le script qui joue l'ouverture de l'accueil une seule fois par session. À placer dans le <head>
  * de l'accueil UNIQUEMENT (`<IntroOnce slot="head" />`) : voir public/intro-once.js pour le détail.
- * `is:inline` : le fichier est servi tel quel depuis public/, il ne passe pas par le bundle — c'est ce
+ * `is:inline` : le fichier est servi tel quel depuis public/, il ne passe pas par le bundle, c'est ce
  * qui le rend classique et bloquant, donc exécuté avant le rendu du corps.
  */
 import { withBase } from '@/lib/href';

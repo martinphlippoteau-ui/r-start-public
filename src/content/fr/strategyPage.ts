@@ -3,7 +3,7 @@ import { product } from '@/content/fr/facts';
 import { shortRiskLine } from '@/content/fr/legal';
 
 /**
- * Page /strategie — « Stratégie d'investissement » : métadonnées et en-tête. Le corps de la page est la
+ * Page /strategie, « Stratégie d'investissement » : métadonnées et en-tête. Le corps de la page est la
  * section Stratégie de l'accueil rendue en entier (src/components/sections/04-Strategy.astro, contenu
  * strategy.ts), avec ses notes propres. Aucune donnée de performance, aucune promesse de résultat.
  */

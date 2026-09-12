@@ -102,7 +102,7 @@ export const comparator = {
     'Frais des autres SCPI : à relever dans le document d’informations clés et la note d’information de chacune, avec leur date d’arrêté. Un taux change : la date fait foi.',
   /**
    * Périmètre du comparatif, obligatoire dès qu'une autre SCPI est nommée : il dit ce qui est comparé et
-   * ce qui ne l'est pas. Ce tableau compare des TAUX AFFICHÉS, SCPI par SCPI — ce n'est ni la moyenne de
+   * ce qui ne l'est pas. Ce tableau compare des TAUX AFFICHÉS, SCPI par SCPI, ce n'est ni la moyenne de
    * marché de la brochure, ni une comparaison de résultats.
    */
   perimeter:
@@ -178,7 +178,7 @@ export const comparator = {
       manager: 'Iroko',
       /**
        * Taux repris MOT POUR MOT de la page « Nos frais » d'Iroko, consultée le 11/09/2026. Ils y sont
-       * exprimés TTC, là où ceux de R Start sont HT sauf cession et retrait — la comparaison tient parce
+       * exprimés TTC, là où ceux de R Start sont HT sauf cession et retrait, la comparaison tient parce
        * que R Start est exonérée de TVA (son HT égale son TTC), et le tableau le dit sous les sources.
        * À CONFIRMER SUR LA NOTE D'INFORMATION D'IROKO ZEN avant publication : une page marketing n'est pas
        * un document réglementaire, et un taux change.

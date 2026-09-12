@@ -64,7 +64,7 @@ export const subscribe = {
 
   /**
    * Quatre intitulés, sans description (11/09/2026, trame de l'équipe) : le parcours se lit d'un coup
-   * d'œil. Ce que portaient les descriptions n'est pas perdu — le délai de jouissance est un des six
+   * d'œil. Ce que portaient les descriptions n'est pas perdu, le délai de jouissance est un des six
    * repères de la zone 3, les moyens de règlement et le délai de rétractation sont dans les notes
    * appelées ici, et le suivi de l'épargne a sa place sur /documentation, avec MyCORUM.
    */

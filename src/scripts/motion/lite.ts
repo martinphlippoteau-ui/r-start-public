@@ -1,5 +1,5 @@
 /**
- * MOTEUR LÉGER — révélations `data-animate` sans GSAP (IntersectionObserver + transitions CSS).
+ * MOTEUR LÉGER, révélations `data-animate` sans GSAP (IntersectionObserver + transitions CSS).
  *
  * Pourquoi : les sous-pages (/frais, /documentation, /presse, /salle-de-presse, pages légales) ne
  * déclarent que des `data-animate`. Leur faire télécharger GSAP + ScrollTrigger (≈ 45 Ko gzip) pour
@@ -11,7 +11,7 @@
  * `lite.ts` n'est jamais importé. Aucune double animation possible.
  *
  * Équivalences avec `reveal.ts` (mêmes types, même rythme unique : 0,6 s / 20 px, titres 0,7 s / 24 px,
- * pas de cascade 0,08 s — constantes reprises à la main de shared.ts, qui importe gsap) :
+ * pas de cascade 0,08 s, constantes reprises à la main de shared.ts, qui importe gsap) :
  *   fade-up (défaut) · fade · scale · tilt · clip (médias seulement) · stagger
  *   data-animate-delay (s) · data-animate-stagger (s) · data-animate-y (px)
  * La courbe est l'équivalent CSS de `expo.out`, la seule employée côté moteur (--ease-out-expo).

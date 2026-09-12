@@ -138,12 +138,12 @@ const run = async () => {
     console.log(
       `${key.padEnd(30)} h=${String(p.hauteur).padStart(6)} px (${String(p.ecrans).padStart(4)} écrans)  ` +
         `js=${String(p.jsKo).padStart(6)} Ko  gsap=${p.moteurGsap ? 'oui' : 'non '}  ` +
-        `CTA/bandeau=${p.margeCtaBandeau ?? '—'}  risque/bandeau=${p.margeRisqueBandeau ?? '—'}  débordement=${p.debordement}`
+        `CTA/bandeau=${p.margeCtaBandeau ?? ','}  risque/bandeau=${p.margeRisqueBandeau ?? ','}  débordement=${p.debordement}`
     );
   }
   console.log(`\naxe : ${result.axe.violations.length} violation(s)`);
   for (const v of result.axe.violations)
-    console.log(`  ${v.page} — ${v.id} (${v.impact}, ${v.nodes})`);
+    console.log(`  ${v.page}, ${v.id} (${v.impact}, ${v.nodes})`);
 };
 
 await run();

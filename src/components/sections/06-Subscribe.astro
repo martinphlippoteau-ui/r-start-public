@@ -1,8 +1,8 @@
 ---
 /**
- * Section 6 — Souscrire (id « souscrire »). Deux rendus :
+ * Section 6, Souscrire (id « souscrire »). Deux rendus :
  *  - `compact` (accueil, trame du 11/09/2026 : entre Piliers 04 et La presse en parle 08b) : chapitre court
- *    qui raconte la souscription 100 % en ligne — surtitre, H2 `homeTitle`, `homeIntro`, le stepper des
+ *    qui raconte la souscription 100 % en ligne, surtitre, H2 `homeTitle`, `homeIntro`, le stepper des
  *    quatre étapes, puis le CTA. Le contre-poids qui suivait la liste (rappel du DIC, durée de placement,
  *    commission de retrait, rachat non garanti) a été retiré le 11/09/2026 à la demande de l'équipe ; la
  *    liste ne porte donc plus `data-advantage`, faute de contre-poids frère. Ni MyCORUM, ni options, ni
@@ -11,7 +11,7 @@
  * Fond white. Le guide de souscription vit sur /documentation.
  * Stepper vertical en quatre étapes numérotées (liste ordonnée, ligne de progression) face au bloc
  * MyCORUM (application de suivi, capture officielle du store, icône, liens App Store et Google Play en
- * nouvel onglet ; il remplace la photo d'illustration depuis le 10/09/2026) — anciennement face à la photo
+ * nouvel onglet ; il remplace la photo d'illustration depuis le 10/09/2026), anciennement face à la photo
  * (collante sur grand écran), deux options facultatives en cartes (versements programmés avec le
  * minimum confirmé, réinvestissement des dividendes) rendues en paire avantage / risque, rappels
  * « lisez le DIC » et commission de retrait en RiskNote pleine largeur (jamais animés), puis le CTA
@@ -33,7 +33,7 @@
  *  - MyCORUM (complet) entre par `fade-up` ;
  *  - les options (complet) : chaque carte contient sa RiskPair, donc la carte elle-même n'est jamais animée ;
  *    seul son bloc titre + badge entre par un `fade-up` court (12 px, modèle 02-Highlights : l'avantage
- *    seul) — pas de `tilt`, réservé aux cartes entières ;
+ *    seul), pas de `tilt`, réservé aux cartes entières ;
  *  - le CTA entre par `fade-up`. Les RiskNote restent intouchées.
  * Sans JS ou en reduced-motion : ligne dessinée, tout visible, rien ne bouge.
  * Contenu : src/content/fr/subscribe.ts (dont `app`). Le bloc MyCORUM dessine son téléphone en CSS :
@@ -62,14 +62,14 @@ interface Props {
 }
 const { compact = false } = Astro.props;
 /**
- * Accueil (11/09/2026) : la photo d'immeuble laisse la place au téléphone affichant R Start — un parcours
+ * Accueil (11/09/2026) : la photo d'immeuble laisse la place au téléphone affichant R Start, un parcours
  * 100 % en ligne se raconte mieux avec l'écran qu'avec une terrasse.
- * Le visuel est un PNG DÉTOURÉ : il n'a pas de fond, donc ni cadre, ni masque de fondu, ni recadrage —
+ * Le visuel est un PNG DÉTOURÉ : il n'a pas de fond, donc ni cadre, ni masque de fondu, ni recadrage ,
  * ses bords sont la silhouette du téléphone, et un masque y mordrait.
  * Largeur bornée à 19 rem sur grand écran (11/09/2026) pour que le BAS DES BADGES tombe sur la dernière
  * étape : le visuel mesure 1,586 fois sa largeur, plus 16 px d'écart et 46 px de badges, à caler sur les
  * 559 px que couvrent les quatre étapes. Le téléphone démarre un peu plus bas que l'étape 1 : le fichier
- * porte 10,6 % de marge transparente en haut, que seule une marge négative effacerait — elle ferait
+ * porte 10,6 % de marge transparente en haut, que seule une marge négative effacerait, elle ferait
  * remonter le visuel sur l'introduction. La source ne fait de toute façon que 338 px de large.
  */
 const photo = await resolveImage(media.app.src);
@@ -214,7 +214,7 @@ const OPTION_Y = 12;
             {
               /* Les deux magasins sous le visuel : ce sont de vrais liens vers les fiches MyCORUM
                 (src/content/fr/subscribe.ts). Ils remplacent les badges incrustés dans la photo, que le
-                recadrage retire — ceux-là portaient des noms de marque erronés. */
+                recadrage retire, ceux-là portaient des noms de marque erronés. */
               subscribe.app?.stores && (
                 <figcaption class="mt-4">
                   <span id={storeHintId} hidden>

@@ -19,7 +19,7 @@ import { refuse } from './dom';
 
 /**
  * RYTHME UNIQUE des entrées (11/09/2026, passe de sobriété) : une seule courbe, une seule gamme de durées
- * et de distances, partagées par reveal.ts, text.ts, counter.ts, draw.ts, scene.ts — et reprises à
+ * et de distances, partagées par reveal.ts, text.ts, counter.ts, draw.ts, scene.ts, et reprises à
  * l'identique par le moteur léger (lite.ts) et la cascade CSS d'ouverture (global.css, --ease-out-expo).
  *  - EASE `expo.out` : le mouvement finit avant que l'œil ne lise ; EASE_IN est son miroir, réservé aux
  *    sorties pilotées par le défilement (scène) ;

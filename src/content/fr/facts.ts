@@ -18,7 +18,7 @@ export const product = {
   name: 'R Start',
   legalName: 'R Start, Société Civile de Placement Immobilier à capital variable',
   type: 'SCPI de rendement à capital variable',
-  tagline: 'La SCPI nouvelle génération', // brochure partenaires 2026, p.1 — accroche rétablie par la réunion produit du 10/09/2026
+  tagline: 'La SCPI nouvelle génération', // brochure partenaires 2026, p.1, accroche rétablie par la réunion produit du 10/09/2026
   /**
    * Allégation de rang autorisée : périmètre limité à la gamme du groupe CORUM (arbitrage du
    * 10/09/2026). La version marché (« la première SCPI… » sans le groupe CORUM) reste interdite tant
@@ -42,13 +42,13 @@ export const product = {
 } as const;
 
 export const share = {
-  price: 200, // € — bulletin CGV
+  price: 200, // €, bulletin CGV
   priceLabel: '200 €',
-  nominal: 182, // € — bulletin CGV
-  premium: 18, // € — bulletin CGV (prime d'émission, dont 0 € de commission de souscription)
+  nominal: 182, // €, bulletin CGV
+  premium: 18, // €, bulletin CGV (prime d'émission, dont 0 € de commission de souscription)
   minimumShares: 1, // bulletin CGV
   minimumLabel: '200 €',
-  withdrawalPrice: 200, // € — bulletin CGV
+  withdrawalPrice: 200, // €, bulletin CGV
   fractions: 'dixièmes, centièmes, millièmes, dix millièmes', // bulletin CGV
 } as const;
 
@@ -63,7 +63,12 @@ export const fees = {
   management: { rate: 15, label: '15 %', base: 'prélevés sur les loyers HT encaissés' }, // brochure p.4, DIC
   /** Commission sur les cessions d'immeubles, par paliers de plus-value */
   disposal: {
-    label: '0 / 6 / 12 %',
+    /**
+     * Fourchette et non liste de paliers (12/09/2026, demande de l'équipe) : « de 0 % à 12 % » se lit,
+     * « 0 / 6 / 12 % » se déchiffre. Les trois paliers restent dans `tiers`, affichés sous la valeur
+     * partout où la place le permet.
+     */
+    label: 'de 0 % à 12 %',
     base: 'prélevés sur le montant HT de la vente',
     tiers: [
       { condition: 'si la plus-value est inférieure à 7 %', rate: '0 %' },
@@ -107,7 +112,7 @@ export const fees = {
 } as const;
 
 /**
- * Comparatif pédagogique des frais — brochure partenaires 2026, page 6.
+ * Comparatif pédagogique des frais, brochure partenaires 2026, page 6.
  * Moyennes de marché des SCPI « sans frais de souscription et avec frais d'acquisition », en regard du
  * modèle de R Start. Les valeurs de R Start ne sont PAS recopiées ici : elles viennent de `fees`
  * ci-dessus, seule source de vérité. La page 6 de la brochure abrège d'ailleurs les paliers de cession
@@ -248,7 +253,7 @@ export const subscription = {
       name: 'Plan Épargne Immobilier',
       description:
         'Versements programmés (fréquence mensuelle, trimestrielle, semestrielle ou annuelle)',
-      minimum: 50, // € — adhésion PEI 04/2026 (tous frais inclus), prélèvement le 25 du mois
+      minimum: 50, // €, adhésion PEI 04/2026 (tous frais inclus), prélèvement le 25 du mois
       minimumLabel: '50 €',
       minimumMonthlyLabel: '50 € par mois',
       requirement: 'Détenir au préalable au moins une part entière de R Start en pleine propriété', // adhésion PEI CGV
@@ -368,7 +373,7 @@ export const trust = {
       // « agréée et réglementée » : formulation demandée par l'AMF dans ses retours sur la brochure (09/2026).
       'CORUM Asset Management, société de gestion de portefeuille, est agréée et réglementée par l’AMF depuis le 14 avril 2011 sous le numéro GP-11000012, et relève de la directive AIFM depuis le 10 juillet 2014.', // bulletin CGV
     disclaimer:
-      'Le visa de l’AMF n’implique ni approbation de l’opportunité de l’opération ni authentification des éléments comptables et financiers présentés.', // formulation standard AMF — à valider par la Conformité
+      'Le visa de l’AMF n’implique ni approbation de l’opportunité de l’opération ni authentification des éléments comptables et financiers présentés.', // formulation standard AMF, à valider par la Conformité
     depositary: 'Société Générale', // DIC p.1
     depositarySentence:
       'Les actifs de R Start sont conservés par un dépositaire indépendant, Société Générale.', // DIC p.1-2

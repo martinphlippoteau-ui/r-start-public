@@ -50,7 +50,7 @@ test.describe('Conformité', () => {
 
   /**
    * Audit UX : le hero portait cinq blocs de texte avant ses boutons, qui tombaient sous le bandeau
-   * cookies au premier chargement — le lecteur voyait le produit mais pas comment y souscrire. Les deux
+   * cookies au premier chargement, le lecteur voyait le produit mais pas comment y souscrire. Les deux
    * phrases pédagogiques sont descendues dans « Ce qui change vraiment » ; ce test empêche le hero de
    * regrossir. Il ne dit rien de la ligne risques, vérifiée par les deux tests précédents.
    */
@@ -110,7 +110,7 @@ test.describe('Conformité', () => {
   /**
    * Un avertissement de risque ne doit jamais dépendre d'une action du visiteur pour apparaître : une
    * révélation AU SCROLL (`data-animate`, `data-scrub`, `data-reveal-text`) est donc interdite au-dessus
-   * d'un [data-risk] — on peut ne jamais atteindre le point qui la déclenche.
+   * d'un [data-risk], on peut ne jamais atteindre le point qui la déclenche.
    * `data-intro` a été SORTI de cette liste le 11/09/2026 : c'est la cascade de chargement du hero, elle
    * se joue seule dès l'ouverture de la page, se termine en moins de trois secondes sans aucune action,
    * et son état final est toujours l'élément pleinement visible (`animation-fill-mode: backwards`, aucun

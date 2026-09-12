@@ -1,5 +1,5 @@
 /**
- * Dessins et jauges à l'entrée dans le viewport (88 %, START), une seule fois — ou au scrub si demandé
+ * Dessins et jauges à l'entrée dans le viewport (88 %, START), une seule fois, ou au scrub si demandé
  * (lissage SCRUB 0,6). Courbe unique du moteur (EASE) pour les tracés joués une fois.
  *
  *  - data-draw : tracé progressif des formes SVG (path, line, polyline, polygon, circle, ellipse,

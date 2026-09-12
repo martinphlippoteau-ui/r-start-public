@@ -1,5 +1,5 @@
 /**
- * Moteur GSAP 3 + ScrollTrigger — chunk séparé, chargé par src/scripts/motion.ts via `import()` hors
+ * Moteur GSAP 3 + ScrollTrigger, chunk séparé, chargé par src/scripts/motion.ts via `import()` hors
  * `prefers-reduced-motion: reduce` (jamais téléchargé sinon). Vocabulaire et garde-fous : motion.ts.
  */
 import { gsap } from 'gsap';
@@ -30,7 +30,7 @@ export const start = (): void => {
     // Les effets qui ÉPINGLENT (scènes, rideaux, pins) sont réservés aux écrans larges (10/09/2026) :
     // sur mobile ils allongent le défilement (un pin ajoute sa durée à la hauteur de page) là où l'écran
     // est le plus petit, et l'accueil y atteignait 38 écrans. Sans eux, les [data-step] restent visibles
-    // et statiques — c'est déjà le repli sans JavaScript, donc rien n'est masqué ni perdu.
+    // et statiques, c'est déjà le repli sans JavaScript, donc rien n'est masqué ni perdu.
     mm.add('(min-width: 64rem)', () => {
       setupScenes();
       setupCurtains();

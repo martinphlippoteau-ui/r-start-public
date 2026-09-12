@@ -22,7 +22,7 @@ import {
 import manifest from '@/content/fr/media.manifest.json';
 
 /**
- * Page /frais (périmètre v2, plan §12) — version complète de la section « Frais » de l'accueil (fees.ts).
+ * Page /frais (périmètre v2, plan §12), version complète de la section « Frais » de l'accueil (fees.ts).
  * Sources : brochure R Start 2026 (p.4 : barème et mécanisme de réserve), DIC du 20/05/2026 (p.1 :
  * avertissement commission d'arbitrage ; p.3 : incidence des coûts), bulletin de souscription de mai 2026
  * (CGV : commission de retrait, rémunération des intermédiaires).

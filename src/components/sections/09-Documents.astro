@@ -1,6 +1,6 @@
 ---
 /**
- * Section 9 — Documents (id « documents »). HORS ACCUEIL depuis le 10/09/2026 (trame V2, src/pages/index.astro
+ * Section 9, Documents (id « documents »). HORS ACCUEIL depuis le 10/09/2026 (trame V2, src/pages/index.astro
  * HOME_ORDER) et plus rendue nulle part depuis le retrait de la page de prévisualisation
  * (src/pages/_sections-preview.astro, hors routage) ; conservée pour réemploi.
  * Fond white (conçue pour suivre la section Risques, fond ink) ; la liste des documents vit sur /documentation.
@@ -14,7 +14,7 @@
  * L'en-tête est rendu ici (et non par SectionHeading) pour poser les attributs motion sur le H2 et
  * le surtitre en teal-700 (AA sur white).
  *
- * Motion (src/scripts/motion.ts, attributs seulement) — même signature que 02-Highlights / 05-Income :
+ * Motion (src/scripts/motion.ts, attributs seulement), même signature que 02-Highlights / 05-Income :
  *  - en-tête : surtitre en fade-up, H2 mot à mot (data-reveal-text, titre court), intro en fade-up
  *    décalée de 0,15 s ;
  *  - la photo se dévoile par le bas (`data-animate="clip"`, réservé aux médias) ;
@@ -23,7 +23,7 @@
  *    pour ne pas concurrencer la révélation GSAP ;
  *  - le pictogramme PDF n'est pas tracé (pas de data-draw) : la durée par défaut du tracé (1,4 s +
  *    cascade, pensée pour la carte 04-Strategy) dépassait d'une seconde l'arrivée de la carte sur un
- *    picto de 28 px — la cascade des cartes suffit, comme dans 02-Highlights ;
+ *    picto de 28 px, la cascade des cartes suffit, comme dans 02-Highlights ;
  *  - le bloc mention 2 + renvois ne porte aucun attribut : visible d'emblée, jamais animé.
  * Sans JS ou en reduced-motion, tout est visible (l'état final est dans le HTML).
  *

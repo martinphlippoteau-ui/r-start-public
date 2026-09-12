@@ -70,7 +70,7 @@ const jsonLd = [
   <TrustpilotScript slot="head" />
   {
     /* Ouverture jouée une seule fois par session : le script retire la classe `intro` au retour depuis
-      une autre page du site. Accueil uniquement — voir public/intro-once.js. */
+      une autre page du site. Accueil uniquement, voir public/intro-once.js. */
   }
   <IntroOnce slot="head" />
   <SiteNav />
@@ -80,7 +80,7 @@ const jsonLd = [
     <LegalNotes />
   </main>
   {
-    /* Pastille d'appel flottante : au niveau de la page, jamais dans une section — les sections de
+    /* Pastille d'appel flottante : au niveau de la page, jamais dans une section, les sections de
       l'accueil sont épinglées au défilement, et un ancêtre transformé capturerait un enfant `fixed`. */
   }
   <StickyCta

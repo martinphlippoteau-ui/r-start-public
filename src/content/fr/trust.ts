@@ -5,7 +5,7 @@ import { corumGroup, product, risk as riskFacts, trust as trustFacts } from '@/c
 import { managementCompany, visaNotice } from '@/content/fr/legal';
 
 /**
- * Section « Confiance » (id : corum, sections.corum) — accueil, rappelée sur /frais et /documentation.
+ * Section « Confiance » (id : corum, sections.corum), accueil, rappelée sur /frais et /documentation.
  * Trois blocs factuels, chacun daté et sourcé : le cadre réglementaire (visa de la note d'information,
  * agrément de la société de gestion, dépositaire, autorité compétente au sens du DIC, classification SFDR),
  * l'instantané Trustpilot sur le distributeur CORUM L'Épargne et les chiffres clés du groupe CORUM. Aucun logo AMF,

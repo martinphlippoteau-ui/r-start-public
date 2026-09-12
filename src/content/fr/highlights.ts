@@ -2,7 +2,7 @@ import type { HighlightsContent, LegalNote } from '@/content/types';
 import { fees, income, product, risk, share, strategy, subscription } from '@/content/fr/facts';
 
 /**
- * Section 2 — « R Start en six repères » (id « points-forts »).
+ * Section 2, « R Start en six repères » (id « points-forts »).
  * Six encarts repris de la brochure partenaires 2026, p. 3 (ticket d'entrée, niveau de risque,
  * distribution des revenus potentiels, zone d'investissement, délai de jouissance), plus la
  * souscription 100 % en ligne (brochure p. 7).

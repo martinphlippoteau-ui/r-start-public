@@ -53,14 +53,14 @@ async function readHtml(rel) {
 
 function requirePhrase(text, phrase, label, file) {
   if (!text.toLowerCase().includes(norm(phrase).toLowerCase()))
-    errors.push(`${file} : mention absente — ${label}`);
+    errors.push(`${file} : mention absente, ${label}`);
 }
 
 const FORBIDDEN = [
   {
     re: /sans frais/gi,
     label: '« sans frais »',
-    // Autorisé : le démenti de la brochure et tout « sans frais » IMMÉDIATEMENT QUALIFIÉ — de
+    // Autorisé : le démenti de la brochure et tout « sans frais » IMMÉDIATEMENT QUALIFIÉ, de
     // souscription, d'entrée, d'acquisition. Reste interdit le « sans frais » absolu, qui laisserait
     // croire qu'il n'y a aucun frais.
     allow:
@@ -112,7 +112,7 @@ function checkForbidden(text, file) {
     for (const m of matches) {
       const ctx = text.slice(Math.max(0, m.index - 80), m.index + m[0].length + 80);
       if (rule.allow && rule.allow.test(ctx)) continue;
-      errors.push(`${file} : formulation interdite ${rule.label} — « …${ctx.trim()}… »`);
+      errors.push(`${file} : formulation interdite ${rule.label}, « …${ctx.trim()}… »`);
     }
   }
 }
@@ -150,13 +150,11 @@ function checkNoticeSize(html, file) {
     const small = stack.filter((t) => /(^|\s)text-xs(\s|$)/.test(t.cls));
     if (small.length)
       errors.push(
-        `${file} : mention 1 (caractère commercial) en text-xs via <${small.map((t) => t.name).join('>, <')}> — text-caption (14 px) minimum`
+        `${file} : mention 1 (caractère commercial) en text-xs via <${small.map((t) => t.name).join('>, <')}>, text-caption (14 px) minimum`
       );
   }
   if (!found)
-    warnings.push(
-      `${file} : aucun <p> ne commence par la mention 1 — contrôle de taille inopérant`
-    );
+    warnings.push(`${file} : aucun <p> ne commence par la mention 1, contrôle de taille inopérant`);
 }
 
 async function checkIndex() {
@@ -247,12 +245,12 @@ async function checkIndex() {
     ],
   ]) {
     const n = (text.match(re_) || []).length;
-    if (n) warnings.push(`${file} : ${n} occurrence(s) à défendre en compliance — ${quoi}`);
+    if (n) warnings.push(`${file} : ${n} occurrence(s) à défendre en compliance, ${quoi}`);
   }
 
   // « La presse en parle » : la section a quitté l'accueil le 11/09/2026 (la revue complète est sur /presse,
-  // au menu). Si elle y revient un jour, elle doit satisfaire les mêmes exigences que /presse — citations de
-  // tiers marquées data-press-quote, avertissement de couverture présent — d'où le contrôle conservé, mais
+  // au menu). Si elle y revient un jour, elle doit satisfaire les mêmes exigences que /presse, citations de
+  // tiers marquées data-press-quote, avertissement de couverture présent, d'où le contrôle conservé, mais
   // sans exiger sa présence.
   const pressMatch = html.match(/<section[^>]*id="presse-en-parle"[^>]*>[\s\S]*?<\/section>/i);
   if (pressMatch) {
@@ -279,10 +277,9 @@ async function checkIndex() {
   const noteIds = [...html.matchAll(/<li[^>]*\bid="notes-(\d+)"/g)].map((m) => m[1]);
   const noteRefs = new Set([...html.matchAll(/href="#notes-(\d+)"/g)].map((m) => m[1]));
   const orphans = noteIds.filter((n) => !noteRefs.has(n));
-  if (!noteIds.length)
-    warnings.push(`${file} : aucune note (li id="notes-N") — contrôle inopérant`);
+  if (!noteIds.length) warnings.push(`${file} : aucune note (li id="notes-N"), contrôle inopérant`);
   if (orphans.length)
-    warnings.push(`${file} : note(s) sans appel dans la page — notes-${orphans.join(', notes-')}`);
+    warnings.push(`${file} : note(s) sans appel dans la page, notes-${orphans.join(', notes-')}`);
 
   // Mentions obligatoires : jamais en text-xs (12 px), ni sur le <p> ni par un ancêtre.
   checkNoticeSize(html, file);
@@ -299,7 +296,7 @@ async function checkIndex() {
     try {
       await fs.access(path.join(DIST, local));
     } catch {
-      errors.push(`${file} : PDF manquant dans dist — ${local}`);
+      errors.push(`${file} : PDF manquant dans dist, ${local}`);
     }
   }
 
@@ -310,7 +307,7 @@ async function checkIndex() {
     try {
       JSON.parse(body);
     } catch (e) {
-      errors.push(`${file} : JSON-LD invalide — ${e.message}`);
+      errors.push(`${file} : JSON-LD invalide, ${e.message}`);
     }
   }
 }
@@ -360,12 +357,11 @@ async function checkSubPages() {
       const nonDocumentees = comparator.scpis.filter((s) => !s.unavailable && !s.source);
       if (nonDocumentees.length)
         warnings.push(
-          `${file} : comparateur INCOMPLET — ${nonDocumentees.length} SCPI sur ${scpis} sans source : ` +
+          `${file} : comparateur INCOMPLET, ${nonDocumentees.length} SCPI sur ${scpis} sans source : ` +
             nonDocumentees.map((s) => s.name).join(', ') +
             '. Ne pas mettre en ligne tant qu’elles opposent les frais de R Start à des cases vides.'
         );
-      if (!/Sources/.test(text))
-        errors.push(file + ' : comparateur sans ligne de sources');
+      if (!/Sources/.test(text)) errors.push(file + ' : comparateur sans ligne de sources');
     }
     if (p === 'documentation') {
       // Avertissements reproduits in extenso, descendus de l'accueil le 11/09/2026 : ils doivent rester
@@ -397,9 +393,12 @@ async function checkSubPages() {
         // viennent les chiffres, et rappeler que R Start n'est pas une SCPI sans frais. Le périmètre
         // accepté est celui du comparateur SCPI par SCPI (comparator.ts) OU celui des moyennes de
         // marché de la brochure, selon la comparaison présente sur la page.
-        const perimetres = [comparator.perimeter.slice(0, 80), marketComparison.perimeterLead.slice(0, 80)];
+        const perimetres = [
+          comparator.perimeter.slice(0, 80),
+          marketComparison.perimeterLead.slice(0, 80),
+        ];
         if (!perimetres.some((ph) => text.toLowerCase().includes(norm(ph).toLowerCase())))
-          errors.push(file + ' : mention absente — périmètre du comparatif');
+          errors.push(file + ' : mention absente, périmètre du comparatif');
         requirePhrase(
           text,
           legal.innovationNotRevolution.title,
@@ -407,7 +406,7 @@ async function checkSubPages() {
           file
         );
         if (!/Sources\s*:/.test(text))
-          errors.push(file + ' : mention absente — sources du comparatif');
+          errors.push(file + ' : mention absente, sources du comparatif');
       }
     }
     for (const [, body] of html.matchAll(
@@ -416,7 +415,7 @@ async function checkSubPages() {
       try {
         JSON.parse(body);
       } catch (e) {
-        errors.push(file + ' : JSON-LD invalide — ' + e.message);
+        errors.push(file + ' : JSON-LD invalide, ' + e.message);
       }
     }
   }
@@ -454,7 +453,7 @@ async function checkNoSourceFiles() {
   };
   const files = await walk(DIST);
   const leaked = files.filter((p) => /assets r start|brochure/i.test(p));
-  for (const p of leaked) errors.push('source de rédaction publiée dans dist — ' + p);
+  for (const p of leaked) errors.push('source de rédaction publiée dans dist, ' + p);
 }
 
 await checkIndex();

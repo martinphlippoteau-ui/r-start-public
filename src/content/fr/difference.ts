@@ -5,13 +5,13 @@ import { corumGroup, fees as feeFacts, product } from '@/content/fr/facts';
 import { arbitrageWarningBullets } from '@/content/fr/legal';
 
 /**
- * Section 2 — « Pourquoi gagnant-gagnant ? » (zone 2 de la V2). Titre et copie fournis par l'équipe le
+ * Section 2, « Pourquoi gagnant-gagnant ? » (zone 2 de la V2). Titre et copie fournis par l'équipe le
  * 11/09/2026 et repris tels quels. DEUX POINTS À ARBITRER EN COMPLIANCE, tous deux signalés en
  * avertissement par scripts/check-compliance.mjs pour rester traçables :
- *  1. « nous, on ne touche rien tant que vous n'avez pas gagné d'argent » — inexact en lecture stricte :
+ *  1. « nous, on ne touche rien tant que vous n'avez pas gagné d'argent », inexact en lecture stricte :
  *     les frais de gestion sont prélevés sur les loyers encaissés, y compris quand la valeur des parts
  *     baisse ; la société de gestion peut donc se rémunérer alors que l'épargnant est en perte ;
- *  2. « La première SCPI sans frais d'entrée ni frais d'acquisition » — allégation de rang SANS périmètre
+ *  2. « La première SCPI sans frais d'entrée ni frais d'acquisition », allégation de rang SANS périmètre
  *     de marché. Le périmètre (les cinq SCPI du groupe CORUM) est porté par l'appel de note qui la suit.
  * Explique quand la société de gestion se rémunère, sans jamais promettre de résultat : deux moteurs
  * (les loyers encaissés puis redistribués, la plus-value réalisée à la vente), la formule d'alignement
@@ -40,7 +40,7 @@ export const notes: LegalNote[] = [
     /**
      * Cette note est le PÉRIMÈTRE de l'allégation affichée juste au-dessus, que l'équipe a voulue courte
      * (« La première SCPI sans frais d'entrée ni frais d'acquisition. »). Elle ouvre donc sur la
-     * formulation bornée exacte — « la première SCPI DU GROUPE CORUM… » — avant d'en donner la portée :
+     * formulation bornée exacte, « la première SCPI DU GROUPE CORUM… », avant d'en donner la portée :
      * sans elle, l'accueil ne porterait plus que la version non bornée.
      */
     text: nb(
@@ -58,7 +58,7 @@ export const notes: LegalNote[] = [
 export const difference = {
   eyebrow: 'Le modèle',
   /** Titre et copie fournis par l'équipe le 11/09/2026, repris tels quels (deux points à défendre en
-   *  compliance, signalés en avertissement par scripts/check-compliance.mjs — voir l'en-tête du fichier). */
+   *  compliance, signalés en avertissement par scripts/check-compliance.mjs, voir l'en-tête du fichier). */
   title: 'Pourquoi gagnant-gagnant ?',
   intro: 'Qui a envie de payer avant de gagner ?',
   lead: 'Quand vous détenez des parts de R Start, on ne vous prélève des frais que dans deux situations :',
@@ -85,7 +85,7 @@ export const difference = {
     },
     /**
      * Conclusion de l'équipe, reprise mot pour mot (11/09/2026). À DÉFENDRE EN COMPLIANCE : en lecture
-     * stricte elle est inexacte — les frais de gestion sont prélevés sur les loyers encaissés, y compris
+     * stricte elle est inexacte, les frais de gestion sont prélevés sur les loyers encaissés, y compris
      * quand la valeur des parts baisse, donc la société de gestion peut se rémunérer alors que l'épargnant
      * est en perte. Le contre-poids chiffré `risk` suit dans le même bloc et à la même taille.
      */

@@ -1,9 +1,9 @@
 /**
- * data-reveal-text — révélation mot à mot d'un TITRE COURT (≤ 12 mots, texte simple sans balises).
+ * data-reveal-text, révélation mot à mot d'un TITRE COURT (≤ 12 mots, texte simple sans balises).
  * Le texte original est conservé pour les technologies d'assistance (span visually-hidden) ; les mots
  * animés sont dans un span aria-hidden non sélectionnable (`.reveal-words`, user-select: none) pour
  * que la copie ne renvoie pas le texte deux fois. Réservé aux titres : sur un paragraphe, la
- * duplication gênerait la recherche dans la page (Ctrl+F) — refusé au-delà de 12 mots.
+ * duplication gênerait la recherche dans la page (Ctrl+F), refusé au-delà de 12 mots.
  * Sans JS ou en reduced-motion, le texte est intact.
  * Usage (sobriété du 11/09/2026) : réservé aux H2 de chapitre ; les valeurs, libellés et sous-titres
  * entrent par un simple fade-up ou restent statiques.

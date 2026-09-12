@@ -2,7 +2,7 @@
 /**
  * Grand chiffre façon page produit, avec compteur animé optionnel (valeur finale toujours dans le
  * HTML ; `numeric` déclenche `data-counter` : ease power3, format fr-FR, préfixe/suffixe/décimales,
- * départ à 85 % du viewport, une seule fois — voir src/scripts/motion.ts). Le moteur réserve la
+ * départ à 85 % du viewport, une seule fois, voir src/scripts/motion.ts). Le moteur réserve la
  * largeur finale du chiffre pendant le comptage (aucun décalage autour).
  * `from` : valeur de départ du compteur (défaut 0) ; `duration` : secondes (défaut 1,6).
  */
@@ -10,7 +10,7 @@ interface Props {
   value: string;
   /**
    * `display` : très grand chiffre en dégradé de marque (scène d'ouverture).
-   * `solid` : plus petit, encre pleine, chiffres à chasse fixe — pour une grille de chiffres que l'on
+   * `solid` : plus petit, encre pleine, chiffres à chasse fixe, pour une grille de chiffres que l'on
    * compare du regard (11/09/2026 : à 86 px et en dégradé, la grille CORUM était illisible).
    */
   size?: 'display' | 'solid';

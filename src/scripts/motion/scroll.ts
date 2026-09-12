@@ -16,7 +16,7 @@
  *    par-dessus (z-index, coins arrondis et ombre posés par la CSS `[data-curtain]`). Le recul
  *    (scale 0.96 + opacity 0.6) n'est appliqué QUE si la section précédente ne contient aucun
  *    [data-risk] : un contre-poids réglementaire n'est jamais atténué. Sinon, pin + recouvrement
- *    seuls (avertissement en développement) — en pratique le recul est réservé aux sections purement
+ *    seuls (avertissement en développement), en pratique le recul est réservé aux sections purement
  *    visuelles. Après le passage, la précédente reste décalée derrière le rideau (comportement
  *    ScrollTrigger sans espace réservé) : la section rideau doit donc mesurer au moins la hauteur du
  *    viewport.

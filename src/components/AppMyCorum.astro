@@ -6,7 +6,7 @@
  * passe sous le texte.
  * Le téléphone est un visuel DÉTOURÉ fourni par l'équipe (src/content/fr/media.ts, `app`) : il porte déjà
  * sa perspective et son ombre, la CSS ne lui en ajoute plus (`phone-shot`). Il illustre l'application :
- * rien de ce qu'il montre ne doit être lu comme une donnée de performance — à vérifier à chaque
+ * rien de ce qu'il montre ne doit être lu comme une donnée de performance, à vérifier à chaque
  * remplacement du visuel.
  * Contenu : src/content/fr/subscribe.ts (`app`). Badges : ui/StoreBadge.astro (voir l'avertissement sur
  * les chartes de marque Apple et Google avant mise en ligne).
@@ -64,7 +64,7 @@ const stores = (app?.stores ?? []).map((store, i) => ({
         </div>
 
         {/* Photo fournie par l'équipe (11/09/2026) : téléphone affichant l'application, à la place de la
-          maquette dessinée en CSS. Décorative pour la conformité — elle n'énonce aucun avantage. */}
+          maquette dessinée en CSS. Décorative pour la conformité, elle n'énonce aucun avantage. */}
         <figure class="justify-self-center">
           <Picture
             src={phone}

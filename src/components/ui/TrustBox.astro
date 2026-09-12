@@ -1,18 +1,18 @@
 ---
 /**
- * TrustBox Trustpilot — widget OFFICIEL fourni par Trustpilot (code d'intégration remis par l'équipe le
+ * TrustBox Trustpilot, widget OFFICIEL fourni par Trustpilot (code d'intégration remis par l'équipe le
  * 11/09/2026). Le contenu (logo, note, étoiles, avis) est rendu par Trustpilot dans une iframe : il n'est
  * ni composé ni sélectionné par CORUM, et il n'entre donc pas dans le périmètre du contrôle des
  * formulations du site (scripts/check-compliance.mjs ne voit que le lien de repli).
  *
  * C'est précisément ce qui rend l'intégration défendable : le carrousel est réglé sur `data-stars`
  * « 1,2,3,4,5 », donc il diffuse TOUTES les notes, y compris les avis négatifs. Aucun tri favorable n'est
- * opéré — l'obligation d'information sur les avis en ligne (art. L111-7-2 du code de la consommation) est
+ * opéré, l'obligation d'information sur les avis en ligne (art. L111-7-2 du code de la consommation) est
  * tenue par ce réglage et par la note légale `confiance-trustpilot`.
  *
  * Le script d'amorçage doit être chargé UNE SEULE FOIS par page, dans le <head> :
  * components/TrustpilotScript.astro, passé à Base.astro par le slot « head ». Sans lui, le contenu du
- * <div> reste tel quel — d'où le lien de repli vers le profil public, qui garde la mention accessible.
+ * <div> reste tel quel, d'où le lien de repli vers le profil public, qui garde la mention accessible.
  *
  * Identifiants : src/content/fr/facts.ts (`trust.trustpilot.widgets`). Ne jamais les inventer : ils sont
  * propres au compte Trustpilot de CORUM et viennent de son back-office.

@@ -1,14 +1,14 @@
 /**
- * MOTEUR D'ANIMATION DÉCLARATIF (GSAP 3 + ScrollTrigger) — référence pour toutes les sections.
+ * MOTEUR D'ANIMATION DÉCLARATIF (GSAP 3 + ScrollTrigger), référence pour toutes les sections.
  * Tout se pilote par attributs dans le HTML ; aucune section n'écrit de code GSAP.
  *
  * Ce fichier est le point d'entrée LÉGER (sans GSAP, dans le chunk principal avec consent/analytics) :
  * classes d'état (data-on-load, data-in-view), puis chargement d'un moteur en chunk séparé via
- * `import()` — au premier temps d'inactivité (requestIdleCallback, 1 s maximum), jamais en
+ * `import()`, au premier temps d'inactivité (requestIdleCallback, 1 s maximum), jamais en
  * `prefers-reduced-motion: reduce` (rien n'est alors téléchargé).
  * DEUX MOTEURS, un seul par page, choisi d'après ce que la page déclare :
  *  - motion/engine.ts (GSAP + ScrollTrigger, ≈ 45 Ko gzip + 4 Ko) dès qu'un effet de la liste
- *    BESOIN_GSAP est présent — épinglage, défilement lié, tracé, compteur, texte mot à mot.
+ *    BESOIN_GSAP est présent, épinglage, défilement lié, tracé, compteur, texte mot à mot.
  *    Aujourd'hui : l'accueil et /strategie ;
  *  - motion/lite.ts (≈ 1 Ko, IntersectionObserver + transitions CSS) sinon : il rend les révélations
  *    `data-animate` avec les mêmes types, les mêmes durées et LES MÊMES GARDE-FOUS. Les sous-pages ne
@@ -27,18 +27,18 @@
  * │  data-on-load="classe"        classe ajoutée à `load` (états CSS, ex. dézoom hero).          │
  * │  data-in-view="classe"        classe posée tant que l'élément est dans le viewport (IO) :     │
  * │                               animations CSS continues jouées seulement à l'écran.            │
- * │ Révélations uniques (once, interruptibles, 88 % du viewport) — motion/reveal.ts              │
+ * │ Révélations uniques (once, interruptibles, 88 % du viewport), motion/reveal.ts              │
  * │  data-animate="fade-up|fade|scale|tilt|clip|stagger"  + data-animate-delay / -stagger / -y   │
  * │                               rythme unique (shared.ts) : 0,6 s / 20 px / expo.out, titres    │
  * │                               0,7 s / 24 px, cascade 0,08 s ; `tilt` réservé à un objet visuel │
  * │                               isolé (picto), `clip` aux médias (sinon fade-up) ; un élément    │
  * │                               déjà à l'écran à l'init n'est pas animé (pas de flash).         │
- * │  data-reveal-text[="scrub"]   mot à mot — H2 de chapitre (≤ 12 mots) uniquement. → text.ts    │
+ * │  data-reveal-text[="scrub"]   mot à mot, H2 de chapitre (≤ 12 mots) uniquement. → text.ts    │
  * │  data-counter="160000"        + -prefix / -suffix / -decimals / -from / -duration (fr-FR) ;   │
  * │                               chiffres non réglementaires seulement (jamais un frais, un SRI) │
  * │  data-draw[="width"]          tracé SVG (stroke-dashoffset) ou barre (scaleX) ; data-draw-scrub│
  * │  data-fill="0.57"             jauge (scaleX, ou scaleY avec data-fill-axis="y")               │
- * │ Scènes au scroll (lissage SCRUB 0,6 partout, transform/opacity) — motion/scroll.ts, scene.ts │
+ * │ Scènes au scroll (lissage SCRUB 0,6 partout, transform/opacity), motion/scroll.ts, scene.ts │
  * │  data-parallax="0.15"         + -trigger / -start / -end                                      │
  * │  data-scrub="scale:1,1.08|opacity:1,0"  + -trigger / -start / -end / -ease                    │
  * │  data-scene + data-scene-end="+=120%"   enfants [data-step] (+ data-step-stay), classe        │
@@ -59,7 +59,7 @@
  *
  * GARDE-FOUS (appliqués par le moteur, contrôlés par scripts/check-compliance.mjs et tests/) :
  *  - Jamais d'effet sur le H1, sur un [data-risk] (ligne risques, contre-poids, avertissements
- *    réglementaires) ni sur les mentions du footer — ni directement, ni PAR UN ANCÊTRE : tout
+ *    réglementaires) ni sur les mentions du footer, ni directement, ni PAR UN ANCÊTRE : tout
  *    attribut est refusé sur un élément qui contient un risque (révélation, scrub, parallaxe, intro,
  *    reveal-text, scène) ; les enfants d'un `stagger` qui en contiennent restent visibles ; le recul
  *    du rideau est supprimé si la section précédente en contient un. Une révélation n'enveloppe donc

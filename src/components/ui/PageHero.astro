@@ -6,11 +6,11 @@
  * Le fil d'Ariane se place dans le slot « breadcrumb » (au-dessus du surtitre).
  *
  * SLOT « aside » (audit UX) : le texte est borné à 4xl pour rester lisible, ce qui laissait la moitié
- * droite de l'écran vide sur grand écran — un demi-écran de dégradé avant le premier contenu utile.
+ * droite de l'écran vide sur grand écran, un demi-écran de dégradé avant le premier contenu utile.
  * À partir de `lg`, la grille passe à 12 colonnes : le texte en occupe 7, l'aside 5, aligné en bas sur
  * la ligne risques. L'aside ne dit rien de neuf : il remonte une information déjà présente plus bas
  * dans la page (repère chiffré, sommaire, médias, contacts), jamais un texte inventé pour l'occasion.
- * Sous `lg`, il passe sous le texte — ou n'est simplement pas fourni par la page quand l'information
+ * Sous `lg`, il passe sous le texte, ou n'est simplement pas fourni par la page quand l'information
  * se trouve juste en dessous (cas de /documentation et /salle-de-presse, où la barre d'ancres et la
  * section contacts suivent immédiatement).
  * L'aside n'est jamais animé : sur /frais il porte des valeurs de frais, qui ne peuvent ni bouger ni
@@ -19,7 +19,7 @@
  * Rythme vertical calibré pour la navigation collée (bandeau blanc dans le flux, non superposé).
  * Sous `sm`, les marges hautes sont resserrées et l'introduction comme la ligne risques passent
  * ensemble à `text-base` : avec le bandeau cookies déplié au premier chargement, la ligne risques
- * passait dessous sur plusieurs sous-pages. Les deux changent de taille ENSEMBLE — l'égalité entre le
+ * passait dessous sur plusieurs sous-pages. Les deux changent de taille ENSEMBLE, l'égalité entre le
  * texte équilibré et son contre-poids est une exigence AMF, et le test la vérifie.
  * Contenu : props issues du fichier de contenu de la page (PageHero de types-v2.ts).
  */

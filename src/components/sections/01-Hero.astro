@@ -1,6 +1,6 @@
 ---
 /**
- * Section 1 — Hero (id « apercu »). Référence visuelle des autres sections.
+ * Section 1, Hero (id « apercu »). Référence visuelle des autres sections.
  * Fond ink + couche de halo de marque (`brand-halo`, dérive lente `brand-halo-drift` jouée seulement quand la
  * section est à l'écran via `data-in-view`) + grain. La photo plein cadre du 10/09 et son voile sont
  * retirés (11/09/2026, jugés datés) : l'effet « waou » est désormais le vol de la marque au défilement.
@@ -12,16 +12,16 @@
  * SiteNav.astro) et lui passe le relais en fondu croisé (src/scripts/motion/brandflight.ts, ≥ 40 rem,
  * no-preference). Le H1 réserve la place du logo en CSS (.hero-logo-wrap) : aucun décalage de mise en
  * page. Puis surtitre + pastille, accroche, ligne risques (jamais animée, opacité 1), deux CTA.
- * LCP : le logo (eager) ou l'accroche — jamais d'animation d'opacité dessus : l'accroche entre par
- * transform seul (`data-intro-move`) — c'est le cas de TOUS les textes et des CTA depuis le 11/09/2026 :
+ * LCP : le logo (eager) ou l'accroche, jamais d'animation d'opacité dessus : l'accroche entre par
+ * transform seul (`data-intro-move`), c'est le cas de TOUS les textes et des CTA depuis le 11/09/2026 :
  * un contrôle d'accessibilité qui mesure la page pendant la cascade voyait le bouton à 30 % d'opacité, donc
  * un contraste de 1,19:1 (axe, reproductible). Le logo n'a ni data-intro ni data-animate ; plus d'image à
  * précharger (src/lib/hero-image.ts est vide).
- * Motion (src/scripts/motion.ts) — orchestration d'ouverture (11/09/2026) :
+ * Motion (src/scripts/motion.ts), orchestration d'ouverture (11/09/2026) :
  *  - la marque est le point fixe : peinte au premier rendu (candidat LCP, descendante du H1 : le moteur
  *    refuse tout effet sur elle), elle est le rang 0 autour duquel la cascade `data-intro` (CSS pur,
  *    500 ms expo.out, 70 ms par rang) se construit : surtitre (1, opacité + transform), accroche (2,
- *    transform seul), CTA (3) — jamais le H1 ni la RiskNote, qui sont là d'emblée. Son vol vers la barre
+ *    transform seul), CTA (3), jamais le H1 ni la RiskNote, qui sont là d'emblée. Son vol vers la barre
  *    (data-brand-flight) est le second temps, piloté par le défilement ;
  *  - second temps du vol : pendant qu'il a lieu (du défilement 0 à la moitié d'un écran, repère `html`),
  *    surtitre et accroche reculent vers le haut (y −20 px) et les CTA vers le bas (y +10 px), tous à
@@ -29,12 +29,12 @@
  *    la ligne risques, hors de ces enveloppes, qui ne bouge pas et reste à opacité 1.
  * Sous « sm » (11/09/2026) : CTA en taille md (16 px) et ligne risques en text-sm (14 px, soit ≥ 85 % du
  * libellé des CTA, tests/conformite.spec.ts), interligne serré, icône 16 px, blanc à 85 %, largeur bornée,
- * placée APRÈS les CTA (`order-last`) pour ne plus s'imposer d'entrée — toujours visible sans défiler et
+ * placée APRÈS les CTA (`order-last`) pour ne plus s'imposer d'entrée, toujours visible sans défiler et
  * au-dessus du bandeau cookies (Pixel 5, iPhone 13). À partir de « sm », ordre et tailles ne changent pas
  * (CTA lg, risque text-base). CENTRAGE VERTICAL (11/09/2026) : à partir de 64 rem de large ET 56 rem de
  * haut, la copie est exactement centrée dans la section (paddings haut et bas égaux) ; elle ne remonte que
  * TANT QUE LE BANDEAU COOKIES EST DÉPLIÉ, par une règle de global.css accrochée à
- * `#consent-banner:not([hidden])`. Une fois le choix fait — l'état d'une visite normale — le hero est
+ * `#consent-banner:not([hidden])`. Une fois le choix fait, l'état d'une visite normale, le hero est
  * centré. Sous 56 rem de haut (écran de 800 px), le bandeau prend jusqu'à 190 px en permanence au premier
  * écran : la copie y reste calée haut, seule façon de garder la ligne risques découverte. iPhone SE
  * (320 × 568) reste hors de portée : le bandeau y couvre un tiers de l'écran.
@@ -176,9 +176,9 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
         <div {...copyScrubDown} class="mt-4 w-full max-sm:order-4 sm:mt-10 sm:w-auto">
           {
             /* `data-hero-cta` : repère stable pour la mesure et pour le test « les CTA du hero sont
-            visibles sans scroller » — il ne dépend pas du rang dans la cascade d'entrée.
+            visibles sans scroller », il ne dépend pas du rang dans la cascade d'entrée.
             `sm:justify-center` (11/09/2026) : l'enveloppe commune au logo, à l'accroche, aux CTA et à la
-            ligne risques prend la largeur du plus large — la ligne risques. Sans cette règle, la rangée
+            ligne risques prend la largeur du plus large, la ligne risques. Sans cette règle, la rangée
             de boutons se collait à son bord gauche au lieu de rester centrée sous l'accroche. */
           }
           <div
@@ -226,8 +226,8 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
         </div>
         {
           /* TrustBox officiel (11/09/2026, code d'intégration fourni par l'équipe) : la réassurance sur le
-            distributeur arrive au premier écran, sous la ligne risques. Jamais dans une enveloppe animée —
-            il est voisin de [data-risk], que le moteur doit trouver hors de tout parent animé — mais il
+            distributeur arrive au premier écran, sous la ligne risques. Jamais dans une enveloppe animée ,
+            il est voisin de [data-risk], que le moteur doit trouver hors de tout parent animé, mais il
             ferme la séquence d'ouverture (rang 5). Sa portée est dite juste dessous : les avis parlent de
             CORUM L'Épargne, pas de R Start. */
         }
@@ -241,14 +241,14 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
     </div>
 
     {
-      /* Invitation à descendre (11/09/2026) : posée dans le vide au bas du hero, en ABSOLU — la copie est
+      /* Invitation à descendre (11/09/2026) : posée dans le vide au bas du hero, en ABSOLU, la copie est
         centrée par `justify-content`, un frère dans le flux en décalerait l'axe. Lien d'ancre réel : il
         fonctionne sans script, et `scroll-padding-top` (global.css) empêche la section d'arriver sous la
         barre. Elle s'efface au défilement comme les CTA, et disparaît tant que le bandeau cookies est
         déplié : elle serait dessous.
         Plus de cercle depuis le 11/09/2026 (demande de l'équipe) : le libellé « Découvrir R Start » et le
-        chevron, rien d'autre. Le libellé est VISIBLE, il nomme donc le lien pour tout le monde — plus
-        d'aria-label, qui ferait doublon — et il donne au passage une cible large au doigt. */
+        chevron, rien d'autre. Le libellé est VISIBLE, il nomme donc le lien pour tout le monde, plus
+        d'aria-label, qui ferait doublon, et il donne au passage une cible large au doigt. */
     }
     {
       hero.scrollHint && (

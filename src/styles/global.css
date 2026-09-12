@@ -1,4 +1,4 @@
-/* Feuille de style globale — Tailwind 4 + design tokens R Start.
+/* Feuille de style globale, Tailwind 4 + design tokens R Start.
    Tokens dérivés du logo R Start (dégradé #024b68 → #14a4ba, encre #024b67) et de la brochure 2026. */
 @import 'tailwindcss';
 @import '@fontsource-variable/plus-jakarta-sans';
@@ -91,7 +91,7 @@
     color: var(--color-navy);
   }
   /* Anneau de focus double : navy (9,5:1 sur blanc) doublé d'un liseré blanc (14:1 sur ink), lisible
-     sur fond clair comme sur fond sombre ou photo — WCAG 1.4.11 (≥ 3:1) sur toutes les surfaces. */
+     sur fond clair comme sur fond sombre ou photo, WCAG 1.4.11 (≥ 3:1) sur toutes les surfaces. */
   :focus-visible {
     outline: 3px solid var(--color-navy);
     outline-offset: 3px;
@@ -165,7 +165,7 @@
 
 /* Typographie fluide façon page produit */
 @utility text-display-xl {
-  /* Plancher 60 px : sur mobile le H1 doit rester plus grand que l'accroche (24 px) — façon iPhone. */
+  /* Plancher 60 px : sur mobile le H1 doit rester plus grand que l'accroche (24 px), façon iPhone. */
   font-size: clamp(3.75rem, 8vw, 7.5rem);
   line-height: 0.95;
   letter-spacing: -0.035em;
@@ -265,7 +265,7 @@
   border-radius: var(--radius-nav);
   background-color: rgb(255 255 255 / calc(var(--nav-glass-tint) * var(--nav-glass-on)));
   /* La SATURATION suit `--nav-glass-on` elle aussi (11/09/2026) : à 0, seul le flou était annulé et le
-     `saturate(185%)` continuait de sursaturer l'en-tête derrière la pastille — elle se dessinait en clair
+     `saturate(185%)` continuait de sursaturer l'en-tête derrière la pastille, elle se dessinait en clair
      alors que son fond était transparent. À 0 le filtre vaut saturate(100%) blur(0), c'est-à-dire rien. */
   -webkit-backdrop-filter: saturate(calc(100% + 85% * var(--nav-glass-on)))
     blur(calc(24px * var(--nav-glass-on)));
@@ -311,10 +311,10 @@
 
 /* Avant le premier défilement (11/09/2026, demande de l'équipe) : sur TOUTE page dont l'en-tête est
    sombre (`[data-page-header="dark"]` : le hero de l'accueil et le PageHero des sous-pages), la barre n'a
-   AUCUNE matière — ni verre, ni flou, ni liseré, ni ombre — et son contenu passe en blanc sur l'en-tête.
+   AUCUNE matière, ni verre, ni flou, ni liseré, ni ombre, et son contenu passe en blanc sur l'en-tête.
    Sur téléphone, seul le bouton Menu s'y voit ; sur grand écran, les entrées du menu l'accompagnent.
    La matière se pose ensuite au défilement : `--nav-glass-on` est poussé de 0 à 1 par le script de
-   SiteNav.astro, sur la même distance que le relais d'ouverture du hero — sur l'accueil, le verre arrive
+   SiteNav.astro, sur la même distance que le relais d'ouverture du hero, sur l'accueil, le verre arrive
    donc exactement quand le logo et le CTA se posent dans la barre.
    Les pages à fond clair (mentions légales, 404) n'ont pas ce marqueur : la barre y reste pleine et leur
    contenu réserve sa hauteur en padding.
@@ -322,7 +322,7 @@
    fois la ferait traîner derrière le doigt.
    La règle ne dépend PLUS de `prefers-reduced-motion` (11/09/2026) : masquer la barre n'est pas du
    mouvement, et la faire dépendre de ce réglage donnait une barre pleine à qui a activé « réduire les
-   animations » — un comportement impossible à expliquer. En mouvement réduit, le script bascule la
+   animations », un comportement impossible à expliquer. En mouvement réduit, le script bascule la
    matière d'un coup au lieu de la doser au défilement. Sans script, la barre reste pleine (scripting).
    PÉRIMÈTRE (11/09/2026) : l'ACCUEIL SEULEMENT (`[data-brand-flight]`, le bloc logo du hero), et
    seulement tant que l'ouverture est jouée (`html.intro`, retirée par public/intro-once.js au retour
@@ -359,7 +359,7 @@
      couleurs, un bouton plein et des entrées posés à même l'en-tête, sans verre dessous, se lisaient comme
      des éléments flottants. Ne reste que le bouton Menu, en blanc. Les trois blocs se révèlent avec le
      verre : leur opacité EST `--nav-glass-on`. Sur l'accueil, les scripts du vol d'ouverture posent une
-     opacité en ligne sur la marque et le CTA — elle l'emporte, et c'est voulu : le relais garde son propre
+     opacité en ligne sur la marque et le CTA, elle l'emporte, et c'est voulu : le relais garde son propre
      fondu croisé. `pointer-events` suit, pour qu'on ne clique pas un élément invisible ; le clavier, lui,
      ramène tout (`:focus-within`), sinon la navigation deviendrait inatteignable au premier écran. */
   html.intro
@@ -384,7 +384,7 @@
 
   /* Tant que la barre est vide, le bouton Menu est le SEUL repère : il existe donc aussi sur grand écran,
      où il cède la place aux entrées dès que la barre prend sa matière. Et il n'y montre que ses trois
-     barres — le mot « Menu » reste dans le DOM, masqué visuellement, sans quoi le bouton perdrait son
+     barres, le mot « Menu » reste dans le DOM, masqué visuellement, sans quoi le bouton perdrait son
      nom accessible (le chevron est décoratif). */
   @media (width >= 64rem) {
     html.intro
@@ -419,7 +419,7 @@
 
 /* Pastille d'appel flottante (components/StickyCta.astro) : absente tant que le défilement n'a pas
    atteint sa section de départ, puis posée en bas de l'écran jusqu'au pied de page. `visibility` en plus
-   de l'opacité — sans elle, un lien invisible resterait dans le parcours au clavier. Elle s'efface aussi
+   de l'opacité, sans elle, un lien invisible resterait dans le parcours au clavier. Elle s'efface aussi
    tant que le bandeau cookies est déplié : il occupe la même place. */
 [data-sticky-cta] {
   opacity: 0;
@@ -453,7 +453,7 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
 /* Halo de la valeur mise en avant dans le comparateur de frais (12/09/2026) : une lueur douce derrière
    le taux le plus bas d'une ligne. Elle est POSÉE DERRIÈRE le texte (::before, z-index négatif dans un
    contexte isolé) : la couleur du chiffre n'est pas touchée, donc son contraste non plus. Elle ne change
-   pas non plus sa taille — un frais affiché plus petit que ses voisins est ce que l'AMF refuse. */
+   pas non plus sa taille, un frais affiché plus petit que ses voisins est ce que l'AMF refuse. */
 @utility fee-halo {
   position: relative;
   isolation: isolate;
@@ -475,7 +475,7 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
 }
 
 /* Tiroir du menu (SiteNav.astro) : il entre par la DROITE et le voile se pose derrière lui. L'état ouvert
-   est porté par `data-open`, jamais par `hidden` — celui-ci ne revient qu'à la fin de la sortie, pour que
+   est porté par `data-open`, jamais par `hidden`, celui-ci ne revient qu'à la fin de la sortie, pour que
    le glissement ait lieu. Sans transition en mouvement réduit : le tiroir est simplement là. */
 [data-menu-panel] [data-menu-drawer] {
   transform: translateX(100%);
@@ -560,14 +560,14 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
 }
 
 /* Visuel produit détouré posé sans cadre (11/09/2026) : ses bords se fondent dans la page au lieu d'être
-   coupés net par un rectangle. Masque radial — le cœur reste parfaitement opaque jusqu'à 56 %, donc le
+   coupés net par un rectangle. Masque radial, le cœur reste parfaitement opaque jusqu'à 56 %, donc le
    sujet n'est jamais atténué, seule la marge de fond s'efface. À n'utiliser que sur un visuel dont le
    fond est proche de celui de la section (ici, blanc sur blanc), sinon le dégradé se voit. */
 @utility photo-fade {
   position: relative;
   overflow: hidden;
   /* DEUX dégradés croisés plutôt qu'un masque radial (11/09/2026) : un cercle centré sur une boîte que le
-     sujet remplit presque ne peut pas à la fois effacer les coins et épargner le sujet — il laissait les
+     sujet remplit presque ne peut pas à la fois effacer les coins et épargner le sujet, il laissait les
      coins à 80 % d'opacité, donc le bord restait net. Ici, chaque bord a sa bande de fondu et le centre
      n'est jamais touché ; `intersect` les croise, ce qui efface les coins deux fois.
      Les bandes sont calées sur la place du sujet dans le cadre : 20 % à gauche et à droite (le téléphone
@@ -747,9 +747,9 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   }
 }
 
-/* Navigation unique (SiteNav.astro) : pastille derrière la page courante — elle glisse (transform) et
+/* Navigation unique (SiteNav.astro) : pastille derrière la page courante, elle glisse (transform) et
    se « morphe » à la largeur du lien (width, élément absolu vide : coût nul ; hauteur et position
-   verticale posées sans transition) — et CTA compacté après 40 % du défilement du document par
+   verticale posées sans transition), et CTA compacté après 40 % du défilement du document par
    transform seul (scale 0.92, origine à droite : aucune propriété de mise en page animée, aucun
    relayout). `data-compact` est posé par le script inline de SiteNav, sans GSAP, sur toutes les pages. */
 @utility subnav-pill {
@@ -884,18 +884,18 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
 }
 /* Ouverture du hero (11/09/2026) : LE LOGO SEUL, puis les éléments apparaissent.
    La page se pose sur la marque : pendant la première seconde, elle est le seul élément du hero à
-   l'écran. Tout le reste est réellement INVISIBLE — découpé à zéro par `clip-path`, pas simplement
-   décalé — puis chacun se dévoile à son tour. Un déplacement de quelques pixels ne se voyait pas dans un
+   l'écran. Tout le reste est réellement INVISIBLE, découpé à zéro par `clip-path`, pas simplement
+   décalé, puis chacun se dévoile à son tour. Un déplacement de quelques pixels ne se voyait pas dans un
    hero de cette taille ; une apparition, oui.
    Pourquoi `clip-path` et pas `opacity` : un contrôle d'accessibilité mesure les contrastes pendant la
    cascade et lisait des textes à mi-fondu. Le découpage ne change aucune couleur.
    La marque, elle, n'est jamais découpée : c'est le plus grand élément affiché, donc le candidat LCP.
-   Elle GRANDIT depuis son centre, de 35 % à sa taille — une apparition façon PowerPoint (demande de
-   l'équipe, 11/09/2026) — sur une courbe qui dépasse sa cible avant de s'y poser. Échelle seule, sans
+   Elle GRANDIT depuis son centre, de 35 % à sa taille, une apparition façon PowerPoint (demande de
+   l'équipe, 11/09/2026), sur une courbe qui dépasse sa cible avant de s'y poser. Échelle seule, sans
    déplacement ni opacité.
    La ligne risques fait partie de la séquence depuis le 11/09/2026 (demande de l'équipe) : elle arrive
    entre les CTA et les avis, donc le risque précède la réassurance. Le garde-fou de
-   tests/conformite.spec.ts est resserré en conséquence — une révélation AU SCROLL reste interdite
+   tests/conformite.spec.ts est resserré en conséquence, une révélation AU SCROLL reste interdite
    au-dessus d'un [data-risk], la cascade de chargement est admise : elle se termine seule, en moins de
    trois secondes, sans aucune action du visiteur.
    Les rangs disent l'ordre d'apparition (01-Hero.astro) : 1 la marque, 2 le surtitre, 3 l'accroche,
@@ -906,7 +906,7 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
     animation-delay: var(--intro-delay, 0ms);
     animation-timing-function: var(--ease-out-expo);
   }
-  /* 1 — LA MARQUE, seule à l'écran pendant toute son entrée. */
+  /* 1, LA MARQUE, seule à l'écran pendant toute son entrée. */
   html.intro #apercu [data-intro='1'] {
     animation-name: intro-hero-brand;
     animation-timing-function: cubic-bezier(0.22, 1.14, 0.32, 1);
@@ -914,38 +914,38 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
     --intro-delay: 100ms;
     --intro-dur: 1100ms;
   }
-  /* 2 — le surtitre se dévoile au-dessus d'elle. */
+  /* 2, le surtitre se dévoile au-dessus d'elle. */
   html.intro #apercu [data-intro='2'] {
     animation-name: intro-hero-eyebrow;
     --intro-delay: 950ms;
     --intro-dur: 700ms;
   }
-  /* 3 — l'accroche, le geste le plus ample après la marque. */
+  /* 3, l'accroche, le geste le plus ample après la marque. */
   html.intro #apercu [data-intro='3'] {
     animation-name: intro-hero-tagline;
     --intro-delay: 1160ms;
     --intro-dur: 800ms;
   }
-  /* 4 — les CTA. */
+  /* 4, les CTA. */
   html.intro #apercu [data-intro='4'] {
     animation-name: intro-hero-cta;
     --intro-delay: 1400ms;
     --intro-dur: 650ms;
   }
-  /* 5 — la ligne risques : le risque arrive avant la réassurance. */
+  /* 5, la ligne risques : le risque arrive avant la réassurance. */
   html.intro #apercu [data-intro='5'] {
     animation-name: intro-hero-risk;
     --intro-delay: 1580ms;
     --intro-dur: 600ms;
   }
-  /* 6 — les avis, EN MÊME TEMPS que la ligne risques (11/09/2026, demande de l'équipe) : même délai,
+  /* 6, les avis, EN MÊME TEMPS que la ligne risques (11/09/2026, demande de l'équipe) : même délai,
      même durée. Les deux forment le bas du hero, les séparer donnait une cascade qui traînait. */
   html.intro #apercu [data-intro='6'] {
     animation-name: intro-hero-trust;
     --intro-delay: 1580ms;
     --intro-dur: 600ms;
   }
-  /* 7 — la flèche ferme l'ouverture. */
+  /* 7, la flèche ferme l'ouverture. */
   html.intro #apercu [data-intro='7'] {
     animation-name: intro-hero-hint;
     --intro-delay: 1800ms;
@@ -958,7 +958,7 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
    L'opacité est ADMISE ICI, alors qu'elle est proscrite partout ailleurs dans le hero : ce qui l'interdit
    sur les autres rangs, c'est le contrôle des contrastes, qui ne porte que sur du TEXTE. La marque est une
    image décorative (aria-hidden, alt vide) : aucun contraste à mesurer.
-   Le fondu est BREF — pleine opacité à 35 % de la durée, soit environ 480 ms — parce que c'est le plus
+   Le fondu est BREF, pleine opacité à 35 % de la durée, soit environ 480 ms, parce que c'est le plus
    grand élément affiché, donc le candidat LCP, et qu'un élément à opacité nulle n'est pas peint. Allonger
    ce fondu retarderait d'autant la mesure de performance. */
 @keyframes intro-hero-brand {
@@ -1016,7 +1016,7 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
     clip-path: inset(0 0 0 0);
   }
 }
-/* La ligne risques : dévoilement sobre, sans déplacement appuyé — elle s'annonce, elle ne se met pas en
+/* La ligne risques : dévoilement sobre, sans déplacement appuyé, elle s'annonce, elle ne se met pas en
    scène. `backwards` seulement : à la fin de la cascade elle est toujours pleinement visible. */
 @keyframes intro-hero-risk {
   from {
@@ -1072,10 +1072,10 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
 }
 
 /* Invitation à descendre, au bas du hero (01-Hero.astro). Elle respire lentement : un objet posé qui
-   attend, plutôt qu'un pictogramme figé — la respiration est sur le CHEVRON, pas sur le lien, dont la
+   attend, plutôt qu'un pictogramme figé, la respiration est sur le CHEVRON, pas sur le lien, dont la
    transform est déjà prise par le scrub de défilement. Rien en mouvement réduit.
    Elle s'efface tant que le bandeau cookies est déplié : il la recouvrirait. `visibility` et non
-   `opacity`, parce que le scrub pose une opacité en ligne qui l'emporterait — et parce que cela la
+   `opacity`, parce que le scrub pose une opacité en ligne qui l'emporterait, et parce que cela la
    retire aussi du parcours au clavier. */
 @media (prefers-reduced-motion: no-preference) {
   [data-hero-scroll-hint] svg {
@@ -1116,7 +1116,7 @@ body:has(#consent-banner:not([hidden])) [data-hero-scroll-hint] {
    aucun décalage non plus au chargement de l'image. */
 .hero-logo-wrap {
   display: block;
-  /* Sous 40 rem : la marque occupe l'écran (64 vw, 11/09/2026 — le logo paraissait timide sur téléphone),
+  /* Sous 40 rem : la marque occupe l'écran (64 vw, 11/09/2026, le logo paraissait timide sur téléphone),
      tout en laissant la ligne risques ET les deux boutons au-dessus du bandeau cookies au premier
      chargement (tests/conformite.spec.ts : Pixel 5 et iPhone 13). */
   width: min(52vw, 13.5rem);

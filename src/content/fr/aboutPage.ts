@@ -5,7 +5,7 @@ import { corumGroup, product } from '@/content/fr/facts';
 import { shortRiskLine } from '@/content/fr/legal';
 
 /**
- * Page /a-propos — la société de gestion : métadonnées, en-tête, et les blocs qui suivaient « Le groupe
+ * Page /a-propos, la société de gestion : métadonnées, en-tête, et les blocs qui suivaient « Le groupe
  * CORUM en chiffres » sur l'accueil jusqu'au 11/09/2026 (ambiance des bureaux, gamme des cinq SCPI).
  * Les notes sont celles de corum.ts, filtrées sur celles réellement appelées ici.
  */

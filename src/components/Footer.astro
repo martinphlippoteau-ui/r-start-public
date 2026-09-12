@@ -4,7 +4,7 @@
  * cookies » (data-consent-open), puis le bloc légal. Textes : footer.ts (qui assemble les mentions de
  * legal.ts à l'identique). Logos R Start et CORUM L'Épargne ; aucun logo AMF.
  * Plan des titres : un H2 masqué (`footer.navLabel`, « Pied de page ») chapeaute les quatre colonnes,
- * dont les titres sont des H3 — le pied de page n'introduit plus quatre H2 de premier niveau dans le
+ * dont les titres sont des H3, le pied de page n'introduit plus quatre H2 de premier niveau dans le
  * plan de la page ; le bloc légal garde son H2 masqué et ses H3.
  * Tailles : le bloc des mentions obligatoires (commercialNotice, documentsNotice, visa) reste en
  * text-caption (14 px, contrôlé par scripts/check-compliance.mjs : jamais text-xs) ; les blocs
@@ -20,7 +20,7 @@ import { withBase } from '@/lib/href';
 const hint = footer.externalLinkHint;
 /**
  * Plan V2 §4 : alléger le pied de page sans rien retirer. Le premier bloc légal porte les mentions
- * obligatoires et le visa AMF — il reste déplié. Les suivants (identité, RGPD, médiation, hébergeur)
+ * obligatoires et le visa AMF, il reste déplié. Les suivants (identité, RGPD, médiation, hébergeur)
  * passent dans un <details> : le texte reste dans le document, seul son affichage est replié.
  */
 const legalBlocks = footer.legalBlocks ?? [];
@@ -123,7 +123,7 @@ const collapsible = legalBlocks.slice(1);
       }
       {
         /* Replié par défaut : identité de l'éditeur, de la société de gestion, RGPD, médiation, hébergeur.
-          Rien n'est retiré — <details> garde le texte dans le document, lisible par les moteurs et les
+          Rien n'est retiré, <details> garde le texte dans le document, lisible par les moteurs et les
           lecteurs d'écran, et la page reste utilisable sans JavaScript. */
       }
       {

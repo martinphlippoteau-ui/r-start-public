@@ -1,6 +1,6 @@
 ---
 /**
- * Section 3 — Frais en bref (id « frais »). Fond paper (alternance avec Points forts, blanc, et
+ * Section 3, Frais en bref (id « frais »). Fond paper (alternance avec Points forts, blanc, et
  * Stratégie, ink). C'est le CHAPITRE de la page /frais, pas son double : depuis l'audit UX, le barème
  * complet, la frise de la commission de retrait et le comparatif ont quitté l'accueil pour ne vivre
  * que sur /frais. L'accueil garde ce qui fait comprendre le modèle et ce que la réglementation impose
@@ -13,16 +13,16 @@
  *    1440×900, 671 à 1280×800, 678 à 1366×768 (11/09/2026 ; à 1024×768, 854 px : repli statique prévu).
  *    Avant, 944 px pour 828 disponibles : plus aucun épinglage.
  *    les trois « 0 % » (navy uni, AA sur paper) sont chacun un [data-step][data-step-stay]
- *    et arrivent un à un au fil du défilement, le premier visible d'emblée — son chiffre reçoit un simple
+ *    et arrivent un à un au fil du défilement, le premier visible d'emblée, son chiffre reçoit un simple
  *    accent d'échelle à l'entrée (span inline-flex data-animate="scale" : opacité + scale 0,95, 0,6 s ;
  *    pas `inline-block` : ce nom de classe est détourné par le jeton --spacing-block de global.css).
  *    JAMAIS de compteur sur un taux réglementaire qui partirait d'une valeur fausse ; puis un quatrième
  *    step (data-step-stay) fait « basculer » vers les frais réellement prélevés : 15 % de gestion,
  *    commission sur les cessions, commission de retrait avec ses cinq paliers. Cette rangée n'est plus
  *    aria-hidden : le barème ayant quitté l'accueil, elle est le seul endroit de la page où ces taux
- *    figurent, elle doit donc être lue. Le contre-poids rédigé — avantage (data-advantage, qui porte
+ *    figurent, elle doit donc être lue. Le contre-poids rédigé, avantage (data-advantage, qui porte
  *    l'appel de la note « incidence des coûts du DIC ») + RiskNote, même taille (text-lead ; text-lg dès
- *    lg, voir ci-dessus) — est HORS des steps, dans la scène : visible du premier au dernier instant
+ *    lg, voir ci-dessus), est HORS des steps, dans la scène : visible du premier au dernier instant
  *    (aucun step ne contient de [data-risk] ; le moteur refuserait de l'animer). Les steps ne sont pas superposés (pas de
  *    `scene-stack`) : ils gardent leur place en flux. Départ du pin sous la barre collée (3,5 rem) :
  *    data-scene-start="top 72px" (ScrollTrigger ne lit pas les rem).
@@ -30,8 +30,8 @@
  *    même classe sur tous les [data-fee-value] du bloc « apercu-accueil ») : text-display-md à toutes
  *    les largeurs (51 px à 1280, 56 px dès 1400 : chiffre géant qui ne concurrence plus le H2 en
  *    display-lg) ; « 10 à 0 % » tient sur une ligne à 1280 comme à 1440 px.
- *    Mobile (< sm) : une colonne, chaque frais est une LIGNE — valeur à gauche sur une largeur fixe
- *    (w-32, alignement commun aux deux listes), libellé puis assiette/détail à droite — car trois
+ *    Mobile (< sm) : une colonne, chaque frais est une LIGNE, valeur à gauche sur une largeur fixe
+ *    (w-32, alignement commun aux deux listes), libellé puis assiette/détail à droite, car trois
  *    colonnes de 109 px cassaient « 0 à 12 % » sur deux lignes et les libellés sur cinq. L'ordre DOM
  *    reste valeur → libellé.
  *    Sans JS / reduced-motion : aucun pin, tout est visible et statique.
@@ -44,7 +44,7 @@
  *    /frais, rendu uniquement lorsque src/pages/frais.astro existe (vérification au build : pas de lien
  *    mort tant que la page n'est pas livrée).
  * L'en-tête est rendu ici (surtitre en teal-700, AA sur paper, statique ; H2 mot à mot via data-reveal-text ;
- * introduction en fade-up décalée de 0,1 s — signature commune des chapitres, 11/09/2026) plutôt que par
+ * introduction en fade-up décalée de 0,1 s, signature commune des chapitres, 11/09/2026) plutôt que par
  * SectionHeading. L'introduction porte un appel de note : pas d'opacité réduite (contraste).
  * Chaque <NoteRef> est collé à son mot et enveloppé dans un span `whitespace-nowrap` : le gabarit de
  * NoteRef émet un blanc avant le numéro, qui sinon peut passer seul à la ligne.
@@ -106,7 +106,7 @@ const feeItemClass =
       </p>
     </header>
 
-    <!-- Scène épinglée : les trois 0 %, un à un, puis leur contre-poids — RiskNote hors des steps, toujours visible -->
+    <!-- Scène épinglée : les trois 0 %, un à un, puis leur contre-poids, RiskNote hors des steps, toujours visible -->
     <div
       data-scene
       data-scene-start="top 72px"

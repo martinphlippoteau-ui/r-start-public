@@ -4,11 +4,11 @@
  * corum.fr/mentions-legales.
  */
 
-/** Mention 1 — caractère commercial (obligatoire depuis août 2021). */
+/** Mention 1, caractère commercial (obligatoire depuis août 2021). */
 export const commercialNotice =
   "Cette communication a un caractère commercial, n'est pas un document contractuel ou d'information requis par une disposition législative, et n'est pas suffisante pour prendre une décision d'investissement.";
 
-/** Mention 2 — invitation à consulter les documents d'information. */
+/** Mention 2, invitation à consulter les documents d'information. */
 export const documentsNotice =
   "Vous êtes invité à consulter les documents d'information (Note d'information et DIC) présentant les caractéristiques, risques et frais avant toute décision. Disponibles sur www.corum.fr.";
 
@@ -20,7 +20,7 @@ export const visaNotice =
 export const dicWarning =
   "Vous êtes sur le point d'acheter un produit qui n'est pas simple et qui peut être difficile à comprendre comportant un risque de perte en capital et un risque de change.";
 
-/** Avertissement commission d'arbitrage (DIC p.1, brochure p.2, bulletin p.4) — 3 puces à l'identique. */
+/** Avertissement commission d'arbitrage (DIC p.1, brochure p.2, bulletin p.4), 3 puces à l'identique. */
 export const arbitrageWarningTitle =
   "L'attention des investisseurs est attirée sur certaines caractéristiques de la commission d'arbitrage, à savoir :";
 export const arbitrageWarningBullets = [
@@ -65,7 +65,7 @@ export const publisher = {
     'Mandataire non exclusif en opérations de banque et services de paiement',
   ],
   supervisors: "Placée sous le contrôle de l'ACPR et de l'AMF",
-  publicationDirector: 'Anne Carrizo', // corum.fr/mentions-legales — à confirmer
+  publicationDirector: 'Anne Carrizo', // corum.fr/mentions-legales, à confirmer
   phone: '01 53 75 87 48',
   email: 'corum@corum.fr',
 } as const;

@@ -1,19 +1,19 @@
 ---
 /**
- * Section 8 — Risques (id « risques »). Contre-poids global de la page : section pleine sur fond ink
+ * Section 8, Risques (id « risques »). Contre-poids global de la page : section pleine sur fond ink
  * avec le même poids typographique que les sections avantages (H2 text-display-lg, intro text-lead).
  * Six risques en grille (titre text-display-sm, description text-lead). Les avertissements reproduits
  * in extenso (bulletin de souscription, DIC, commission d'arbitrage) ont quitté cette section le
  * 11/09/2026 à la demande de l'équipe : ils sont désormais sur /documentation, à côté des documents
  * dont ils sont extraits (components/pages/documentation/MandatoryWarnings.astro).
  * Motion (src/scripts/motion.ts) :
- *  - transition de chapitre en rideau (`data-curtain` sur la section) : la section précédente — sur
+ *  - transition de chapitre en rideau (`data-curtain` sur la section) : la section précédente, sur
  *    l'accueil « La presse en parle » (08b) depuis la trame du 10/09/2026 (src/pages/index.astro,
- *    HOME_ORDER) — est épinglée quand son bas touche le bas du viewport pendant que cette section monte
+ *    HOME_ORDER), est épinglée quand son bas touche le bas du viewport pendant que cette section monte
  *    par-dessus (coins arrondis et ombre posés par la CSS `[data-curtain]`). Comme elle contient un
  *    [data-risk] (avertissement de la revue de presse), le moteur n'applique ni recul ni atténuation à
  *    la section recouverte : pin + recouvrement seuls ;
- *  - rien d'autre ne bouge (sobriété du 11/09/2026 : les six intitulés n'entrent plus en fade-up — le
+ *  - rien d'autre ne bouge (sobriété du 11/09/2026 : les six intitulés n'entrent plus en fade-up, le
  *    contre-poids global de la page est en place d'emblée) : ni le H2, ni l'intro, ni les six risques.
  * Sans JS ou en reduced-motion : aucun pin, aucun rideau, tout est visible et stable.
  * Contenu : src/content/fr/risks.ts (textes réglementaires reproduits à l'identique depuis legal.ts) ;

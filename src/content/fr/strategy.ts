@@ -3,7 +3,7 @@ import { pages } from '@/config/pages';
 import { corumGroup, product, risk, strategy as strategyFacts } from '@/content/fr/facts';
 
 /**
- * Section 4 — Stratégie (id « strategie »). Depuis le 10/09/2026, la section complète vit sur la page
+ * Section 4, Stratégie (id « strategie »). Depuis le 10/09/2026, la section complète vit sur la page
  * /strategie (src/pages/strategie.astro, en-tête dans strategyPage.ts) ; l'accueil n'en rend que le
  * chapitre court (mot d'ordre, introduction, contre-poids, lien).
  * « Acheter décoté, valoriser, revendre » (facts.strategy.motto) avec son contre-poids visible

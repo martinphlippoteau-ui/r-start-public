@@ -41,7 +41,7 @@ import { innovationNotRevolution, managementCompany, publisher } from '@/content
  * révolution » est importé de legal.ts à l'identique.
  */
 
-/** Espace insécable avant % € : ; ? ! — appliquée à toutes les questions, réponses et notes. */
+/** Espace insécable avant % € : ; ? !, appliquée à toutes les questions, réponses et notes. */
 const nb = (s: string): string => s.replace(/ ([%€:;?!])/g, ' $1');
 const lowerFirst = (s: string): string => s.charAt(0).toLowerCase() + s.slice(1);
 
@@ -316,7 +316,7 @@ const HOME_FAQ = [
 const homeItems = rawItems.filter((item) => HOME_FAQ.includes(item.question));
 if (homeItems.length !== HOME_FAQ.length) {
   const manquantes = HOME_FAQ.filter((q) => !rawItems.some((item) => item.question === q));
-  throw new Error(`faq.ts : questions de l’accueil introuvables — ${manquantes.join(' ; ')}`);
+  throw new Error(`faq.ts : questions de l’accueil introuvables, ${manquantes.join(' ; ')}`);
 }
 
 /** Notes appelées par les six questions de l'accueil ; `notes` reste complet pour /documentation. */

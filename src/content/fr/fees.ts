@@ -9,7 +9,7 @@ import {
 } from '@/content/fr/legal';
 
 /**
- * Section 3 — Frais en bref (id « frais »), titre « Ce que vous payez, et quand. » : la section annonce
+ * Section 3, Frais en bref (id « frais »), titre « Ce que vous payez, et quand. » : la section annonce
  * ce qu'elle montre (les frais et leur moment) plutôt qu'un « 0 % » isolé en H2.
  * Les trois « 0 % » sont contrebalancés immédiatement (counterweight, même taille), puis le barème
  * complet est présenté : 15 % de frais de gestion, commission sur les cessions 0 / 6 / 12 %, commission

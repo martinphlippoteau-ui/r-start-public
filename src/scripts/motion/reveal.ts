@@ -1,12 +1,12 @@
 /**
- * data-animate — révélation unique à l'entrée dans le viewport (88 %), interruptible (once).
+ * data-animate, révélation unique à l'entrée dans le viewport (88 %), interruptible (once).
  * Rythme unique (shared.ts, 11/09/2026) : 0,6 s, 20 px, expo.out ; les grands titres (h2, h3,
  * text-display-*) 0,7 s / 24 px, même courbe. Le mouvement finit avant que l'œil ne lise.
  *  - "fade-up" (défaut) : opacity 0 → 1, y 20 → 0
  *  - "fade"             : opacity 0 → 1
  *  - "scale"            : opacity 0 → 1, scale 0.95 → 1
  *  - "tilt"             : opacity 0 → 1, y 24 → 0, rotationX 6° → 0 (perspective 900 px). Réservé à un
- *                         objet visuel isolé (picto, image) — jamais un titre ni une carte entière.
+ *                         objet visuel isolé (picto, image), jamais un titre ni une carte entière.
  *  - "clip"             : clip-path inset bas → 0. Réservé aux médias (img, picture, svg, video,
  *                         figure) : la propriété n'est pas composée sur le GPU. Sur tout autre
  *                         élément, rendu en fade-up (avertissement en développement).
@@ -19,7 +19,7 @@
  *
  * Garde-fous :
  *  - refusé sur le H1, sur un [data-risk] et sur tout élément qui en contient : une révélation
- *    n'enveloppe jamais un risque — on anime l'avantage seul (modèle : 02-Highlights) ;
+ *    n'enveloppe jamais un risque, on anime l'avantage seul (modèle : 02-Highlights) ;
  *  - "stagger" : seuls les enfants sans risque cascadent, les autres restent visibles d'emblée ;
  *  - un élément déjà dans le viewport à l'initialisation (arrivée par une ancre, moteur chargé après
  *    le premier rendu) reste tel quel : l'éteindre pour le rallumer serait un flash et retarderait

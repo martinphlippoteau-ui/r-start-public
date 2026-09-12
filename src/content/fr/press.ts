@@ -5,7 +5,7 @@ import { fees, press as pressFacts } from '@/content/fr/facts';
 import { shortRiskLine } from '@/content/fr/legal';
 
 /**
- * Page /presse — « La presse en parle » (grand public, arbitrage du 10/09/2026).
+ * Page /presse, « La presse en parle » (grand public, arbitrage du 10/09/2026).
  * Trois citations mises en avant, la revue des neuf articles avec leur média et leur date, puis
  * l'avertissement livré par CORUM. Les communiqués, les contacts et le kit média ont quitté cette page :
  * ils vivent sur /salle-de-presse (pressRoom.ts), en pied de page seulement.

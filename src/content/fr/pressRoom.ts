@@ -13,7 +13,7 @@ import {
 import { managementCompany, publisher, shortRiskLine } from '@/content/fr/legal';
 
 /**
- * Page /salle-de-presse — destinée aux journalistes (arbitrage du 10/09/2026 : lien en pied de page
+ * Page /salle-de-presse, destinée aux journalistes (arbitrage du 10/09/2026 : lien en pied de page
  * seulement, `inMenu: false`). Communiqués, contacts presse, kit média et texte de présentation.
  * La revue de presse et les citations vivent sur /presse (press.ts, « La presse en parle »).
  *

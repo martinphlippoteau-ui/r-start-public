@@ -55,7 +55,7 @@ const gate = ({ salt, iv, payload }) => `<!doctype html>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex, nofollow" />
-    <title>Accès protégé — R Start</title>
+    <title>Accès protégé, R Start</title>
     <style>
       :root { color-scheme: dark; }
       * { box-sizing: border-box; }

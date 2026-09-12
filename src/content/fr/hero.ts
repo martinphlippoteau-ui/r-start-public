@@ -4,10 +4,10 @@ import { fees, product } from '@/content/fr/facts';
 import { shortRiskLine } from '@/content/fr/legal';
 
 /**
- * Section 1 — Hero (id « apercu »), version minimale (décision du 10/09/2026, deux allègements successifs) :
+ * Section 1, Hero (id « apercu »), version minimale (décision du 10/09/2026, deux allègements successifs) :
  * H1 unique « R Start », pastille « Nouveau », accroche (facts.product.tagline), ligne risques importée de
  * legal.ts (jamais recopiée, jamais animée), deux CTA, photo plein cadre. Rien d'autre : ni définition, ni
- * frais, ni phrases pédagogiques — tout cela ouvre la zone 2 « Ce qui change vraiment » (difference.ts :
+ * frais, ni phrases pédagogiques, tout cela ouvre la zone 2 « Ce qui change vraiment » (difference.ts :
  * claim + pedagogy + counterweight), où l'allégation de rang est immédiatement suivie des frais réels,
  * dans le même bloc et à la même taille (règle AMF).
  */
@@ -46,7 +46,7 @@ export const hero = {
    * Contre-poids unique du hero. La phrase qui énumérait les frais prélevés a été retirée le 11/09/2026
    * à la demande de l'équipe : le bloc ne porte plus que la ligne risques de legal.ts, reproduite mot
    * pour mot et jamais réécrite. Le détail des frais reste À UN CLIC, dans la note `hero-frais` appelée
-   * en fin de ligne — c'est elle qui garde les 15 % de frais de gestion sur l'accueil.
+   * en fin de ligne, c'est elle qui garde les 15 % de frais de gestion sur l'accueil.
    * À défendre en compliance : l'accroche annonce une absence de frais d'entrée et les frais réellement
    * prélevés ne sont plus énoncés au même endroit, seulement en note.
    */

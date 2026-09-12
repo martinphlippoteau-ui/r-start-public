@@ -51,7 +51,6 @@ const {
   counterweight,
   counterweightRates,
   groups,
-  withdrawal,
   lossMechanism,
   arbitrageWarning,
   faq,
@@ -80,7 +79,6 @@ const ids = {
 };
 
 /** Frise de retrait : le dernier palier (0 %) est mis en avant. */
-const lastStep = withdrawal.steps.length - 1;
 
 /** FAQ : découpage avantage / risque de chaque réponse (item.riskFrom), comme sur l'accueil. */
 const faqItems = faq.items.map((item) => {
@@ -101,7 +99,7 @@ const faqItems = faq.items.map((item) => {
       {
         /* En-tête MINIMALISTE (11/09/2026, demande de l'équipe) : le tableau des taux qui l'occupait est
           parti, pour qu'on arrive au comparateur sans défiler. Les 0 % ne sont donc plus annoncés seuls
-          en haut de page — c'est justement ce que l'AMF reproche — et le comparateur qui suit les montre
+          en haut de page, c'est justement ce que l'AMF reproche, et le comparateur qui suit les montre
           avec les frais réellement prélevés, dans le même tableau. */
       }
     </PageHero>
@@ -111,7 +109,7 @@ const faqItems = faq.items.map((item) => {
       /* Comparateur SCPI par SCPI, PREMIER ÉLÉMENT de la page (11/09/2026, demande de l'équipe) : on
         compare d'abord des taux, on comprend ensuite ce qu'ils recouvrent. Tout ce qui suit explique les
         frais de R Start à partir de la brochure partenaires et du document d'informations clés.
-        NON PUBLIABLE tant que les taux des autres SCPI ne sont pas relevés — le composant l'affiche et le
+        NON PUBLIABLE tant que les taux des autres SCPI ne sont pas relevés, le composant l'affiche et le
         script de conformité le signale. */
     }
     <FeeComparator id="comparateur" />
@@ -278,76 +276,12 @@ const faqItems = faq.items.map((item) => {
       </Container>
     </Section>
 
-    <!-- 3. Commission de retrait dégressive, exonérations -->
-    <Section id={ids.withdrawal} tone="white" labelledBy={ids.withdrawal + '-title'}>
-      <Container size="wide">
-        {
-          labels?.eyebrows.withdrawal && (
-            <p class="text-eyebrow mb-4 text-teal-700">{labels.eyebrows.withdrawal}</p>
-          )
-        }
-        <h2 id={ids.withdrawal + '-title'} class="text-display-lg max-w-4xl">{withdrawal.title}</h2>
-        <p class="text-lead mt-6 max-w-3xl">
-          {withdrawal.intro}<span class="whitespace-nowrap"
-            ><FeesNoteRef id="frais-page-retrait" /></span
-          >
-        </p>
-        <ol
-          aria-label={labels?.steps}
-          class="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-5 sm:gap-5 lg:gap-6"
-          data-animate="stagger"
-        >
-          {
-            withdrawal.steps.map((step, i) => {
-              const last = i === lastStep;
-              return (
-                <li
-                  class:list={[
-                    'flex flex-col justify-between gap-6 rounded-3xl p-6 lg:p-8',
-                    last
-                      ? 'bg-navy text-white shadow-float max-sm:col-span-2'
-                      : 'bg-paper text-ink ring-1 ring-navy/5',
-                  ]}
-                >
-                  <span
-                    class:list={['text-display-md tabular-nums', last ? 'text-sand' : 'text-navy']}
-                    data-fee-value
-                    data-fee-block="retrait-frais"
-                  >
-                    {step.rate}
-                  </span>
-                  <span
-                    class:list={[
-                      'text-base leading-snug font-medium',
-                      last ? 'text-white' : 'text-ink',
-                    ]}
-                  >
-                    {step.period}
-                  </span>
-                </li>
-              );
-            })
-          }
-        </ol>
-
-        <div
-          class="mt-14 grid gap-6 border-t border-navy/15 pt-8 lg:mt-20 lg:grid-cols-2 lg:gap-12 lg:pt-10"
-        >
-          <div data-advantage class="text-lead">
-            <h3 class="text-display-sm text-ink">
-              {withdrawal.exemptionsTitle}<span class="whitespace-nowrap"
-                ><FeesNoteRef id="frais-page-exoneration-retrait" /></span
-              >
-            </h3>
-            <ul role="list" class="mt-4 space-y-3">
-              {withdrawal.exemptions.map((item) => <li>{item}</li>)}
-            </ul>
-          </div>
-          <RiskNote text={withdrawal.note} size="lead" class="lg:mt-1" />
-        </div>
-      </Container>
-    </Section>
-
+    {
+      /* Section « À la sortie » retirée le 12/09/2026 à la demande de l'équipe. Le barème de retrait
+        n'est pas perdu : le comparateur le porte, sous la valeur de la ligne « frais de retrait
+        anticipé », avec tous ses paliers. Les cas d'exonération restent dans la note d'information,
+        citée sur /documentation. */
+    }
     <!-- 4. Moins-value, encadré et avertissement (jamais animés) -->
     <Section
       id={ids.loss}
@@ -396,7 +330,7 @@ const faqItems = faq.items.map((item) => {
     {
       /* Retirés le 11/09/2026 à la demande de l'équipe : « L'incidence des coûts selon le DIC », la
         bascule des frais et le bloc « Document d'informations clés ». Les mentions que portait la bascule
-        — périmètre du comparatif, sources et encadré « Une innovation, pas une révolution » — ont suivi
+       , périmètre du comparatif, sources et encadré « Une innovation, pas une révolution », ont suivi
         le comparateur, qui est désormais ce qui nomme d'autres SCPI sur la page. Le document
         d'informations clés reste accessible depuis /documentation et le pied de page. */
     }

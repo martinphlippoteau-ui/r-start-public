@@ -326,7 +326,7 @@ export interface DocumentationContent {
   /**
    * FAQ de la page : seulement les questions dont le sujet est un document ou la souscription (la
    * sélection est faite dans documentation.ts). `fullFaqLink` renvoie vers la foire aux questions
-   * complète de l'accueil, où les autres questions restent lisibles — elles ne sont plus dupliquées.
+   * complète de l'accueil, où les autres questions restent lisibles, elles ne sont plus dupliquées.
    */
   faq: {
     title: string;

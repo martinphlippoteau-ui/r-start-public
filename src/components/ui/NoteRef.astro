@@ -13,7 +13,7 @@ import type { LegalNote } from '@/content/types';
  * cas où l'ancêtre ne porte pas la classe attendue (ex. carte claire posée dans une section sombre).
  * aria-label « Voir la note n » depuis nav.ts. Zone tactile élargie par un pseudo-élément (after:-inset-2,
  * ≈ 32 px) sans changer le rendu : les exposants restent lisibles et cliquables au doigt (WCAG 2.5.8).
- * `interactive={false}` : marqueur visuel seul (span, sans lien) — pour un usage à l'intérieur d'un
+ * `interactive={false}` : marqueur visuel seul (span, sans lien), pour un usage à l'intérieur d'un
  * ancêtre déjà interactif (ex. <summary>), où un <a> imbriqué serait une violation d'accessibilité
  * (« nested-interactive »). Le lien accessible équivalent doit alors exister ailleurs dans le contenu
  * (ex. FAQ : marqueur décoratif dans la question, lien réel dans la réponse).

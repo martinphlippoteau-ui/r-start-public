@@ -1,6 +1,6 @@
 ---
 /**
- * Section 10 — FAQ (id « faq »). Six questions depuis le 11/09/2026 (faq.items, sélection HOME_FAQ) ;
+ * Section 10, FAQ (id « faq »). Six questions depuis le 11/09/2026 (faq.items, sélection HOME_FAQ) ;
  * la FAQ complète est sur /documentation, atteinte par `faq.moreLink`. Fond paper (après Risques, ink) ; dernière section de l'accueil avant les Notes.
  * Deux colonnes sur grand écran : en-tête collant (surtitre, H2 en text-display-md : la FAQ clôt la page, un
  * cran sous les chapitres) face à la liste des dix questions en accordéons natifs <details name="faq"> (un
@@ -14,7 +14,7 @@
  * L'en-tête est rendu ici (et non par SectionHeading) pour poser les attributs motion sur le H2 ; le
  * surtitre est en teal-700 (AA sur paper).
  *
- * Motion (src/scripts/motion.ts, attributs seulement) — même signature que 02-Highlights / 05-Income :
+ * Motion (src/scripts/motion.ts, attributs seulement), même signature que 02-Highlights / 05-Income :
  *  - en-tête, dans son enveloppe collante (les attributs sont sur les enfants, jamais sur l'élément
  *    sticky) : surtitre statique, H2 mot à mot (data-reveal-text, titre court), intro en fade-up
  *    décalée de 0,1 s ;
@@ -38,7 +38,7 @@
  * <NoteRef> (lien) n'y est jamais imbriqué (violation d'accessibilité « nested-interactive », HTML
  * invalide de surcroît). Quand item.noteId est défini, la question porte un marqueur décoratif
  * (`interactive={false}`, span non focusable) et le lien réel équivalent est accolé au dernier
- * paragraphe risque de la réponse (RiskNote `noteId`), toujours présent quel que soit item.riskFrom —
+ * paragraphe risque de la réponse (RiskNote `noteId`), toujours présent quel que soit item.riskFrom ,
  * accessible dès l'ouverture, jamais en même temps que le marqueur de la question.
  * Contenu : src/content/fr/faq.ts.
  */

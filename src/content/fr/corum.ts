@@ -88,7 +88,7 @@ const APPELEES_SUR_ACCUEIL = ['confiance-trustpilot'];
 export const homeNotes: LegalNote[] = notes.filter((n) => APPELEES_SUR_ACCUEIL.includes(n.id));
 if (homeNotes.length !== APPELEES_SUR_ACCUEIL.length) {
   throw new Error(
-    `corum.ts : ${homeNotes.length} note(s) trouvée(s) sur ${APPELEES_SUR_ACCUEIL.length} — un id a changé.`
+    `corum.ts : ${homeNotes.length} note(s) trouvée(s) sur ${APPELEES_SUR_ACCUEIL.length}, un id a changé.`
   );
 }
 

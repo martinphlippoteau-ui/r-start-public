@@ -1,6 +1,6 @@
 ---
 /**
- * Section 2 — Points forts (id « points-forts »). Fond blanc, juste après le hero (ink) et avant « Ce qui
+ * Section 2, Points forts (id « points-forts »). Fond blanc, juste après le hero (ink) et avant « Ce qui
  * change vraiment » (paper) : trame du 10/09/2026, comprendre le produit avant le modèle de frais.
  * En-tête centré façon page produit, puis six cartes. L'en-tête est rendu ici (et non par
  * SectionHeading) pour poser les attributs motion sur le H2.
@@ -8,7 +8,7 @@
  * « 3 sur 7 », « Chaque mois »…) est rendue en très grand (text-display-lg) comme élément visuel principal,
  * même utilitaire pour les six cartes (chiffres et valeurs en toutes lettres : aucune hiérarchie de taille
  * entre elles). Libellé en text-lead sous la valeur, puis description et contre-poids.
- * Motion (src/scripts/motion.ts) — modèle « l'avantage s'anime seul, jamais son enveloppe », passe de
+ * Motion (src/scripts/motion.ts), modèle « l'avantage s'anime seul, jamais son enveloppe », passe de
  * sobriété du 11/09/2026 (un seul effet d'entrée par bloc) :
  *  - en-tête : surtitre statique, H2 mot à mot (data-reveal-text ; H1 interdit, H2 autorisé), intro en
  *    fade-up décalée de 0,1 s ;
@@ -17,10 +17,10 @@
  *    délai dépend de la COLONNE (0 / 0,08 s), pas de l'index : en 2e rangée desktop comme sur mobile (une
  *    colonne), une carte qui entre seule n'attend pas la cascade des précédentes ; la RiskNote est leur
  *    sœur dans la carte, jamais enveloppée par un élément animé : aucun ancêtre d'un [data-risk] n'est
- *    animé (règle AMF « aucun avertissement masqué ») — la carte elle-même (li) ne porte donc aucun
+ *    animé (règle AMF « aucun avertissement masqué »), la carte elle-même (li) ne porte donc aucun
  *    attribut motion ;
- *  - valeurs : statiques et exactes (plus de compteur — « 200 € », « 3 sur 7 », « 6 mois » sont des
- *    caractéristiques réglementaires, « 100 % » ressemblerait à un taux en cours de comptage — ni mot à
+ *  - valeurs : statiques et exactes (plus de compteur, « 200 € », « 3 sur 7 », « 6 mois » sont des
+ *    caractéristiques réglementaires, « 100 % » ressemblerait à un taux en cours de comptage, ni mot à
  *    mot, réservé aux H2 de chapitre). Retirés le 11/09/2026 : tilt du H3, fade-up de la description.
  * Sans JS / reduced-motion : HTML complet et statique, valeurs exactes.
  * Contenu : src/content/fr/highlights.ts.
@@ -60,7 +60,7 @@ const titleId = sections.highlights.id + '-title';
 
     {
       /* Six blocs simples en 3 × 2 (11/09/2026) : un libellé, une valeur, un appel de note. Ni
-        pictogramme, ni description, ni contre-poids par bloc — celui de la section les remplace, sous la
+        pictogramme, ni description, ni contre-poids par bloc, celui de la section les remplace, sous la
         grille. Les blocs ne portent donc pas `data-advantage` : ce sont des caractéristiques du produit,
         pas des arguments, et le contrôle d'équilibre AMF compte le couple de la section. */
     }
@@ -84,7 +84,7 @@ const titleId = sections.highlights.id + '-title';
 
     {
       /* Bloc À PART (11/09/2026) : comment on souscrit et ce qu'on peut automatiser. Un filet et un titre
-        le détachent des six repères, et il est rendu sans encadré — ce ne sont pas des caractéristiques
+        le détachent des six repères, et il est rendu sans encadré, ce ne sont pas des caractéristiques
         du produit, mais des modalités. */
       highlights.subscriptionItems && highlights.subscriptionItems.length > 0 && (
         <div class="mt-chapter border-t border-navy/15 pt-8 sm:pt-10">

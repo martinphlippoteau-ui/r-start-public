@@ -1,5 +1,5 @@
 /**
- * data-on-load="classe" — pose la classe indiquée à `load` (ex. dézoom CSS de l'image du hero :
+ * data-on-load="classe", pose la classe indiquée à `load` (ex. dézoom CSS de l'image du hero :
  * l'image n'est jamais transformée par JS, la CSS gère la transition, neutralisée en reduced-motion).
  * Sans GSAP ; actif aussi en reduced-motion : la classe marque un état, la CSS décide de l'animer ou non.
  */

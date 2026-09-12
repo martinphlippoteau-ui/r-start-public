@@ -1,7 +1,7 @@
 ---
 /**
  * Comparateur de frais (11/09/2026) : R Start à gauche, une SCPI choisie dans une liste à droite, sept
- * lignes de frais. Le choix se fait sans rechargement — toutes les valeurs sont dans le HTML, le script
+ * lignes de frais. Le choix se fait sans rechargement, toutes les valeurs sont dans le HTML, le script
  * ne fait qu'afficher la colonne demandée. Sans script, la première SCPI reste affichée : le tableau est
  * complet et lisible.
  *
@@ -51,10 +51,10 @@ const data = scpis.map((s) => ({
   <Container size="wide">
     {
       /* Titre MASQUÉ VISUELLEMENT (12/09/2026, demande de l'équipe) : la page arrive directement sur le
-        tableau. Il reste dans le code parce que la section a besoin d'un nom — sans lui, elle n'est plus
+        tableau. Il reste dans le code parce que la section a besoin d'un nom, sans lui, elle n'est plus
         annonçable au lecteur d'écran, et `labelledBy` pointerait dans le vide.
         L'introduction et l'hypothèse de lecture ont été retirées à la même occasion. L'hypothèse des huit
-        ans n'est pas perdue : chaque taux de retrait porte sa condition juste en dessous — « au-delà de
+        ans n'est pas perdue : chaque taux de retrait porte sa condition juste en dessous, « au-delà de
         6 ans ; avant, 6,00 % TTC du capital retiré ». L'information est au plus près du chiffre. */
     }
     <h2 id={titleId} class="visually-hidden">{comparator.title}</h2>
@@ -160,7 +160,7 @@ const data = scpis.map((s) => ({
 
     {
       /* Périmètre et sources : obligatoires dès qu'une autre SCPI est nommée. Ils disent ce qui est
-        comparé — des taux affichés, pas des coûts réels — et d'où viennent les chiffres. */
+        comparé, des taux affichés, pas des coûts réels, et d'où viennent les chiffres. */
     }
     <p class="text-lead mt-8 max-w-3xl text-ink">{comparator.perimeter}</p>
 
@@ -177,7 +177,7 @@ const data = scpis.map((s) => ({
       <dl class="text-caption mt-3 space-y-2 text-slate-700">
         <div class="flex flex-wrap gap-x-2">
           <dt class="font-semibold">
-            {comparator.leftLabel} —{' '}{comparator.sourceRStartLabel} :
+            {comparator.leftLabel} ,{' '}{comparator.sourceRStartLabel} :
           </dt>
           <dd>{comparator.sourceRStart}</dd>
         </div>
@@ -189,7 +189,7 @@ const data = scpis.map((s) => ({
     </div>
 
     {
-      /* Encadré de la brochure (p.4) : un comparatif de frais ne part jamais sans lui — il dit que R Start
+      /* Encadré de la brochure (p.4) : un comparatif de frais ne part jamais sans lui, il dit que R Start
         n'est pas une SCPI sans frais et que son coût total n'est pas connu à la souscription. */
     }
     <div class="mt-8 rounded-3xl border border-navy/15 p-6 sm:p-8 lg:mt-10 lg:p-10">
@@ -210,7 +210,7 @@ const data = scpis.map((s) => ({
   /*
    * Changement de colonne sans rechargement. Les valeurs sont passées telles quelles : le script ne
    * calcule rien, il recopie. Une valeur absente reste le libellé « à compléter » et l'avertissement
-   * reste affiché — c'est la seule règle métier ici.
+   * reste affiché, c'est la seule règle métier ici.
    */
   (() => {
     const table = document.querySelector('[data-comparator]');
@@ -250,14 +250,14 @@ const data = scpis.map((s) => ({
       /*
        * Taux le plus bas de la ligne. Marqué SEULEMENT si les deux cases portent un pourcentage unique :
        * un barème à paliers (« 0 / 6 / 12 % ») ne se compare pas à un taux unique, et deux taux égaux ne
-       * départagent rien. Hors de ces cas, aucune marque — mieux vaut ne rien dire que suggérer un
+       * départagent rien. Hors de ces cas, aucune marque, mieux vaut ne rien dire que suggérer un
        * classement que les chiffres ne portent pas.
        */
       const seul = (t) => {
         if (!t) return null;
         /*
          * La case doit contenir UN taux et rien d'autre : « 14,40 % TTC » oui, « 0 / 6 / 12 % » non.
-         * Chercher simplement un pourcentage ne suffisait pas — dans « 0 / 6 / 12 % », seul le dernier
+         * Chercher simplement un pourcentage ne suffisait pas, dans « 0 / 6 / 12 % », seul le dernier
          * nombre est suivi du signe, la valeur était donc lue comme un taux unique de 12 %.
          */
         const m = t.trim().match(/^(\d+(?:[,.]\d+)?)\s*%(?:\s*(?:TTC|HT))?$/);
@@ -273,7 +273,7 @@ const data = scpis.map((s) => ({
         ligne.marqueDroite.hidden = !gagneDroite;
         /*
          * Mise en avant par la COULEUR et la GRAISSE seulement : la taille reste identique d'une case à
-         * l'autre, sans quoi un frais serait affiché plus petit que son voisin — ce que l'AMF refuse.
+         * l'autre, sans quoi un frais serait affiché plus petit que son voisin, ce que l'AMF refuse.
          * Le perdant est atténué, jamais effacé : il reste parfaitement lisible.
          */
         const peindre = (cell, gagne, perd) => {

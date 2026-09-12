@@ -5,7 +5,7 @@
  * qui contient la barre et le panneau plein écran des petits écrans.
  *
  * Forme (11/09/2026, demande de l'équipe) : ce n'est plus un bandeau pleine largeur mais une PASTILLE
- * FLOTTANTE — décollée du haut et des bords de `--spacing-nav-gap`, gros rayon (`--radius-nav`),
+ * FLOTTANTE, décollée du haut et des bords de `--spacing-nav-gap`, gros rayon (`--radius-nav`),
  * matière « liquid glass » (@utility nav-glass). Elle RECOUVRE le contenu au lieu de le pousser vers le
  * bas (marge basse négative de `--spacing-nav-total`) : l'en-tête sombre de chaque page passe derrière
  * elle. Sans ce recouvrement, la pastille claire était posée sur le fond clair du document, donc
@@ -13,11 +13,11 @@
  * cette hauteur en padding haut. L'écart entre dans `scroll-padding-top` (global.css) et
  * dans le calage de la barre d'ancres de /documentation, pour qu'aucune ancre ne passe dessous.
  * Sur téléphone, le libellé « Menu » est désormais visible à côté du chevron (il était en `sr-only`) :
- * au premier écran de l'accueil, le logo et le CTA sont encore à opacité 0 — ils arrivent par le vol
- * d'ouverture — et la barre paraissait vide.
+ * au premier écran de l'accueil, le logo et le CTA sont encore à opacité 0, ils arrivent par le vol
+ * d'ouverture, et la barre paraissait vide.
  *
  * Entrées : uniquement les pages du menu (src/config/pages.ts, `menuPages`), l'accueil compris, sur
- * toutes les pages — jamais d'ancre de section (décision du 10/09/2026). Aucun libellé en dur :
+ * toutes les pages, jamais d'ancre de section (décision du 10/09/2026). Aucun libellé en dur :
  * src/config/pages.ts et src/content/fr/nav.ts.
  *
  * Reprise de l'ancienne sous-navigation :
@@ -39,7 +39,7 @@
  *  - un TIROIR qui entre par la droite (aria-expanded / aria-controls, Échap, piège à focus, retour du
  *    focus sur le bouton, voile cliquable) et liste les mêmes entrées à la verticale. Il vaut à toutes
  *    les largeurs : au premier écran, le bouton Menu est le seul repère de la barre, y compris sur grand
- *    écran, et il n'y montre que ses trois barres — le mot « Menu » n'y est que pour les lecteurs
+ *    écran, et il n'y montre que ses trois barres, le mot « Menu » n'y est que pour les lecteurs
  *    d'écran tant que la barre n'a pas pris sa matière.
  *
  * Matière : sur une page à en-tête sombre (`[data-page-header="dark"]`), la barre est transparente au
@@ -306,7 +306,7 @@ const linkClass =
 
     /*
      * Matière de la barre (11/09/2026). Sur toute page dont l'en-tête est sombre, la barre est
-     * TRANSPARENTE au premier écran — ni verre, ni flou, ni ombre, contenu en blanc — puis le verre se
+     * TRANSPARENTE au premier écran, ni verre, ni flou, ni ombre, contenu en blanc, puis le verre se
      * pose au défilement. `--nav-glass-on` porte cet avancement (global.css) et `data-landed`, franchi à
      * mi-course, rend au bouton Menu et aux entrées leur couleur navy.
      * La distance est celle du relais d'ouverture du hero (motion/brandflight.ts) : sur l'accueil, le
@@ -382,7 +382,7 @@ const linkClass =
 
       /*
        * Tiroir (11/09/2026) : le panneau entre par la DROITE. `hidden` le retire de l'arbre quand il est
-       * fermé — c'est ce qui le sort du parcours au clavier — mais il doit être présent AVANT que le
+       * fermé, c'est ce qui le sort du parcours au clavier, mais il doit être présent AVANT que le
        * glissement commence : on l'affiche, on force un calcul de mise en page pour que le navigateur
        * enregistre la position fermée, puis on pose `data-open`. À la fermeture, l'inverse : on retire
        * `data-open`, on laisse glisser, on masque à la fin. L'état ouvert se lit sur `data-open`, jamais
@@ -401,7 +401,7 @@ const linkClass =
         opener.setAttribute('aria-expanded', 'true');
         document.documentElement.style.overflow = 'hidden';
         /* Le bouton « Fermer », pas le voile : `[data-menu-close]:not(a)` attrapait le <div> du voile,
-           qui n'est pas focalisable. Le focus restait alors sur le bouton Menu — donc hors du dialogue,
+           qui n'est pas focalisable. Le focus restait alors sur le bouton Menu, donc hors du dialogue,
            et le `:focus-within` de la barre rallumait ses entrées derrière le tiroir. */
         panel.querySelector<HTMLElement>('button[data-menu-close]')?.focus();
       };
