@@ -222,6 +222,55 @@ test.describe('Qualité', () => {
   });
 
   /*
+   * Les DEUX pastilles de l'accueil se relaient sans jamais se croiser : celle du comparateur se replie
+   * à « L'expérience derrière R Start », celle de la souscription arrive à « Souscrire en 4 étapes »,
+   * qui vient après, et reste jusqu'au bas de la page. Deux pastilles à la même place en bas d'écran
+   * se recouvriraient : le test balaie la page et interdit qu'elles soient ouvertes ensemble.
+   */
+  test('les deux pastilles d’appel ne se croisent jamais', async ({ page }) => {
+    await page.goto('/');
+    await page.locator('[data-consent-refuse]').click();
+    await page.waitForTimeout(2400);
+
+    const reperes = await page.evaluate(() => ({
+      total: document.body.scrollHeight,
+      corum: document.querySelector('#corum')!.getBoundingClientRect().top + window.scrollY,
+      souscrire: document.querySelector('#souscrire')!.getBoundingClientRect().top + window.scrollY,
+    }));
+    /* Si l'ordre des sections s'inversait, les deux pastilles pourraient coexister : on le dit ici. */
+    expect(reperes.corum, 'Corum doit précéder Souscrire').toBeLessThan(reperes.souscrire);
+
+    const paliers = [
+      0,
+      500,
+      reperes.corum - 500,
+      reperes.corum + 200,
+      reperes.souscrire - 500,
+      reperes.souscrire + 400,
+      reperes.total - 950,
+    ];
+
+    for (const y of paliers) {
+      if (y < 0) continue;
+      await page.evaluate((v) => window.scrollTo(0, v), y);
+      await page.waitForTimeout(300);
+      const etats = await page.evaluate(() =>
+        [...document.querySelectorAll('[data-sticky-cta]')].map((b) => b.hasAttribute('data-on'))
+      );
+      expect(etats, `deux pastilles à ${Math.round(y)} px`).toHaveLength(2);
+      expect(etats.filter(Boolean).length, `à ${Math.round(y)} px`).toBeLessThanOrEqual(1);
+    }
+
+    /* Au bas de la page, c'est celle de la souscription qui tient : elle n'a pas de borne de fin. */
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await page.waitForTimeout(400);
+    const fin = await page.evaluate(() =>
+      [...document.querySelectorAll('[data-sticky-cta]')].map((b) => b.hasAttribute('data-on'))
+    );
+    expect(fin).toEqual([false, true]);
+  });
+
+  /*
    * Navigation d'une page à l'autre : la barre ne doit pas bouger d'un pixel, et l'indicateur doit se
    * poser sur le nouveau lien actif. C'est ce que garantissent les `view-transition-name` posés sur la
    * barre et sur l'indicateur (global.css) ; un nom effacé casserait la continuité en silence.

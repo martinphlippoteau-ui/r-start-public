@@ -16,6 +16,7 @@ import StickyCta from '@/components/StickyCta.astro';
 import { seo } from '@/content/fr/seo';
 import { faq } from '@/content/fr/faq';
 import { difference } from '@/content/fr/difference';
+import { subscribe } from '@/content/fr/subscribe';
 import { withBase } from '@/lib/href';
 import { faqJsonLd, organizationJsonLd, webPageJsonLd } from '@/lib/seo';
 
@@ -88,5 +89,12 @@ const jsonLd = [
     watch="[data-hero-scroll-hint]"
     until="#corum"
   />
+
+  {
+    /* Seconde pastille, celle de la souscription : elle arrive AVEC la section qui la propose et reste
+      jusqu'en bas de page. Les deux ne se croisent jamais, la première se repliant à « L'expérience
+      derrière R Start », qui précède « Souscrire en 4 étapes ». */
+  }
+  <StickyCta label={subscribe.cta.label} variant="primary" from="#souscrire" />
   <Footer />
 </Base>

@@ -42,7 +42,7 @@
  * accessible dès l'ouverture, jamais en même temps que le marqueur de la question.
  * Contenu : src/content/fr/faq.ts.
  */
-import Button from '@/components/ui/Button.astro';
+import { withBase } from '@/lib/href';
 import Container from '@/components/ui/Container.astro';
 import NoteRef from '@/components/ui/NoteRef.astro';
 import RiskNote from '@/components/ui/RiskNote.astro';
@@ -140,18 +140,25 @@ const items = faq.items.map((item) => {
           }
         </ul>
 
-        <!-- CTA -->
-        <div class="mt-10 flex flex-col items-stretch sm:mt-12 sm:flex-row sm:items-center">
-          <Button position={faq.cta.position} variant="primary" size="lg">{faq.cta.label}</Button>
-          {
-            /* Six questions sur l'accueil (11/09/2026) : les seize vivent sur /documentation. */
-            faq.moreLink && (
-              <Button href={faq.moreLink.href} variant="secondary" size="lg">
+        {
+          /* Le CTA de souscription qui fermait la FAQ est retiré (12/09/2026, demande de l'équipe) :
+            la pastille flottante le porte désormais, de « Souscrire en 4 étapes » jusqu'au bas de la
+            page, et il faisait doublon avec elle à quelques centaines de pixels d'intervalle.
+            Le renvoi vers les seize questions reste, en LIEN et non en bouton : ce n'est pas un appel à
+            l'action, c'est la suite de la lecture. */
+        }
+        {
+          faq.moreLink && (
+            <p class="mt-10 sm:mt-12">
+              <a
+                href={withBase(faq.moreLink.href)}
+                class="text-lead font-semibold text-navy underline-offset-4 hover:underline"
+              >
                 {faq.moreLink.label}
-              </Button>
-            )
-          }
-        </div>
+              </a>
+            </p>
+          )
+        }
       </div>
     </div>
   </Container>

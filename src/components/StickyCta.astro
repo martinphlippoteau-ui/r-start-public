@@ -28,29 +28,76 @@
  *
  * Elle disparaît tant que le bandeau cookies est déplié, il occupe la même place, et se retire du
  * parcours au clavier quand elle est invisible (`visibility`, pas seulement l'opacité).
- * Ce n'est pas un CTA de souscription : pas d'attribut `data-cta`, rien à compter côté conformité.
+ *
+ * DEUX DÉCLENCHEURS, un par usage, et il faut en donner exactement un :
+ *  - `watch` : la pastille apparaît quand ce repère N'EST PLUS à l'écran (la pastille du comparateur
+ *    prend le relais de l'invitation à défiler du hero) ;
+ *  - `from` : elle apparaît quand ce repère EST ATTEINT, premier pixel en bas de l'écran (la pastille
+ *    de souscription arrive avec la section qui la propose).
+ * `until` borne la fin ; sans elle, la pastille reste jusqu'au bas de la page.
+ *
+ * SANS `href`, c'est un CTA vers le tunnel de souscription : URL centralisée, `data-cta` pour la mesure
+ * d'audience, exactement comme le composant Button. Avec `href`, c'est un lien interne, sans `data-cta`,
+ * rien à compter côté conformité.
  */
+import { subscribeHref } from '@/config/site';
+import { withBase } from '@/lib/href';
+import type { CtaPosition } from '@/content/types';
+
 interface Props {
   label: string;
-  href: string;
-  /** Sélecteur du repère dont la disparition fait apparaître la pastille, et le retour la replie. */
-  watch: string;
-  /** Sélecteur de la section à partir de laquelle la pastille se replie, dès son premier pixel. */
-  until: string;
+  /** Lien interne. Sans valeur, la pastille mène au tunnel de souscription. */
+  href?: string;
+  position?: CtaPosition;
+  /** `primary` : pastille navy pleine. `secondary` : contour navy sur verre liquide. */
+  variant?: 'primary' | 'secondary';
+  /** Sélecteur du repère dont la DISPARITION fait apparaître la pastille, et le retour la replie. */
+  watch?: string;
+  /** Sélecteur du repère dont l'ARRIVÉE fait apparaître la pastille, dès son premier pixel. */
+  from?: string;
+  /** Sélecteur du repère à partir duquel la pastille se replie. Absent : elle reste jusqu'en bas. */
+  until?: string;
 }
-const { label, href, watch, until } = Astro.props as Props;
+const {
+  label,
+  href,
+  position = 'sticky',
+  variant = 'secondary',
+  watch,
+  from,
+  until,
+} = Astro.props as Props;
+
+const souscription = !href;
+const lien = href ? withBase(href) : subscribeHref(position);
+
+const styles = {
+  /* Pastille pleine : c'est un appel à l'action, il ne se fond pas dans la page. */
+  primary:
+    'bg-navy text-white shadow-[0_2px_6px_rgb(2_75_103/0.14),0_16px_40px_-18px_rgb(2_75_103/0.5)] border border-transparent hover:bg-teal-700',
+  /* Contour sur verre liquide : un lien de lecture, présent sans réclamer. */
+  secondary:
+    'cta-glass border border-navy/60 text-navy hover:border-navy hover:bg-navy hover:text-white',
+};
 ---
 
 <div
   data-sticky-cta
   data-watch={watch}
+  data-from={from}
   data-until={until}
   class="pointer-events-none fixed inset-x-0 bottom-4 z-30 flex justify-center px-4 sm:bottom-6"
 >
   <a
-    href={href}
+    href={lien}
     data-sticky-link
-    class="cta-glass pointer-events-auto inline-flex h-14 min-w-14 items-center justify-center rounded-full border border-navy/60 text-base font-semibold text-navy no-underline outline-offset-4 hover:border-navy hover:bg-navy hover:text-white focus-visible:outline-3 focus-visible:outline-navy"
+    data-cta={souscription ? 'souscrire' : undefined}
+    data-cta-position={souscription ? position : undefined}
+    rel={souscription ? 'noopener' : undefined}
+    class:list={[
+      'pointer-events-auto inline-flex h-14 min-w-14 items-center justify-center rounded-full text-base font-semibold no-underline outline-offset-4 focus-visible:outline-3 focus-visible:outline-navy',
+      styles[variant],
+    ]}
   >
     {
       /* Le libellé est dans une grille à une colonne : sa largeur passe de 0fr à 1fr, ce qui se transite,
@@ -80,35 +127,52 @@ const { label, href, watch, until } = Astro.props as Props;
    * Un seul attribut porte l'état : `data-on`. Le rond se pose, et le dépliage suit, retardé en CSS
    * (global.css) : pas de minuterie à tenir en JavaScript, donc rien à annuler si l'on défile vite.
    *
-   * Une seule lecture de défilement par frame, comme la barre de navigation, et aucune dépendance au
-   * moteur d'animation : la pastille doit vivre même si GSAP n'est pas chargé.
+   * PLUSIEURS pastilles peuvent cohabiter sur une page, chacune avec son déclencheur : la boucle les
+   * traite toutes, et un seul écouteur de défilement les met à jour ensemble, une fois par frame.
+   * Aucune dépendance au moteur d'animation : elles doivent vivre même si GSAP n'est pas chargé.
    */
-  const box = document.querySelector<HTMLElement>('[data-sticky-cta]');
-  const repere = box?.dataset.watch ? document.querySelector<HTMLElement>(box.dataset.watch) : null;
-  /* Borne de fin. Absente, la pastille reste jusqu'au bas de page : c'est le repli prévu. */
-  const fin = box?.dataset.until ? document.querySelector<HTMLElement>(box.dataset.until) : null;
+  const pastilles = [...document.querySelectorAll<HTMLElement>('[data-sticky-cta]')];
 
-  if (box && repere) {
-    /* L'opacité se lit sur l'ENVELOPPE de défilement lié, celle que le moteur d'animation pilote ; le
-       repère lui-même garde son opacité propre. Sans moteur, il n'y a pas d'enveloppe et l'opacité vaut
-       1 : seule la géométrie décide alors, ce qui est exactement le bon repli, puisque sans moteur le
-       hero n'est pas épinglé non plus et sort du cadre normalement. */
-    const enveloppe = repere.closest<HTMLElement>('[data-scrub]') ?? repere;
+  if (pastilles.length) {
+    /* Un repère est ATTEINT dès que son premier pixel entre par le bas de l'écran. */
+    const atteint = (el: Element | null) =>
+      !!el && el.getBoundingClientRect().top < window.innerHeight;
 
-    const repereVisible = () => {
-      const r = repere.getBoundingClientRect();
+    /*
+     * Un repère est VISIBLE s'il est dans le cadre ET pas effacé par le défilement lié.
+     * Les deux mesures comptent. Sur téléphone, le repère sort simplement du cadre. Sur grand écran, le
+     * hero est ÉPINGLÉ par le rideau de la section suivante : sa boîte ne quitte jamais l'écran, elle
+     * reste à la même place pendant que le rideau la recouvre, et c'est son opacité, menée par le
+     * défilement lié, qui tombe à zéro. La géométrie seule ferait apparaître la pastille mille pixels
+     * trop tard sur grand écran ; l'opacité seule serait aveugle sans moteur d'animation, qui est
+     * justement absent quand le hero n'est pas épinglé.
+     */
+    const visible = (el: HTMLElement | null) => {
+      if (!el) return false;
+      const r = el.getBoundingClientRect();
       if (r.bottom <= 0 || r.top >= window.innerHeight) return false;
+      const enveloppe = el.closest<HTMLElement>('[data-scrub]') ?? el;
       return parseFloat(getComputedStyle(enveloppe).opacity) > 0.05;
     };
 
-    /* « À partir de » : dès que la section de fin montre son premier pixel en bas de l'écran. La
-       pastille y est posée, elle empiéterait sur la section qui arrive. */
-    const finAtteinte = () => !!fin && fin.getBoundingClientRect().top < window.innerHeight;
+    const cible = (sel: string | undefined) =>
+      sel ? document.querySelector<HTMLElement>(sel) : null;
+
+    const reglees = pastilles.map((box) => ({
+      box,
+      /* Disparition d'un repère, ou arrivée d'un autre : exactement un des deux est renseigné. */
+      surDisparition: cible(box.dataset.watch),
+      surArrivee: cible(box.dataset.from),
+      fin: cible(box.dataset.until),
+    }));
 
     let frame = 0;
     const sync = () => {
       frame = 0;
-      box.toggleAttribute('data-on', !repereVisible() && !finAtteinte());
+      for (const p of reglees) {
+        const ouverte = p.surArrivee ? atteint(p.surArrivee) : !visible(p.surDisparition);
+        p.box.toggleAttribute('data-on', ouverte && !atteint(p.fin));
+      }
     };
 
     const onScroll = () => {

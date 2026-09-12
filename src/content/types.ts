@@ -43,6 +43,7 @@ export type CtaPosition =
   | 'frais'
   | 'outils'
   | 'souscrire'
+  | 'sticky'
   | 'faq'
   | 'footer'
   | 'mobile-bar';
