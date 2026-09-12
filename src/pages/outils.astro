@@ -37,11 +37,15 @@ const jsonLd = [
 <Base title={seo.title} description={seo.description} path={page.path} jsonLd={jsonLd}>
   <SiteNav />
   <main id="contenu">
-    <PageHero eyebrow={hero.eyebrow} title={hero.title} riskLine={hero.riskLine}>
+    {
+      /* En-tête plus court encore que celui des autres sous-pages (13/09/2026, demande de l'équipe) :
+        cette page n'est qu'un sommaire, les quatre cartes doivent être sous les yeux tout de suite. */
+    }
+    <PageHero eyebrow={hero.eyebrow} title={hero.title} riskLine={hero.riskLine} compact>
       <Breadcrumb slot="breadcrumb" key="tools" tone="dark" />
     </PageHero>
 
-    <Section id="liste" tone="white" labelledBy="liste-title">
+    <Section id="liste" tone="white" labelledBy="liste-title" class="pt-10 sm:pt-12 lg:pt-14">
       <Container size="wide">
         {
           /* Titre et chapeau MASQUÉS VISUELLEMENT (12/09/2026, demande de l'équipe) : les quatre cartes

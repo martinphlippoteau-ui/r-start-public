@@ -77,10 +77,20 @@ const autres = toolCards.filter((o) => o.pageKey !== pageKey);
         doit la porter (scripts/check-compliance.mjs), et elle reste ici au-dessus de la ligne de
         flottaison sur grand écran. */
     }
-    <Section id="en-tete" tone="paper" spacing="compact" labelledBy="en-tete-title">
+    {
+      /* La barre flottante est collée en haut et recouvre le début de la page : sa hauteur est réservée
+        dans la marge haute, faute de quoi le fil d'Ariane passe dessous. */
+    }
+    <Section
+      id="en-tete"
+      tone="paper"
+      spacing="none"
+      labelledBy="en-tete-title"
+      class="pt-[calc(var(--spacing-nav-total)+1rem)] pb-2 sm:pb-4 lg:pt-[calc(var(--spacing-nav-total)+1.5rem)] lg:pb-6"
+    >
       <Container size="wide">
         <Breadcrumb key={pageKey as PageKey} tone="light" />
-        <h1 id="en-tete-title" class="text-display-md mt-4 text-balance">{page.label}</h1>
+        <h1 id="en-tete-title" class="text-display-md mt-3 text-balance">{page.label}</h1>
       </Container>
     </Section>
 

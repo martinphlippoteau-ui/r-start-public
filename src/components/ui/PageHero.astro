@@ -41,6 +41,13 @@ interface Props {
    * section contacts de /salle-de-presse) : l'y répéter ferait défiler deux fois la même chose.
    */
   asideOnLarge?: boolean;
+  /**
+   * En-tête encore plus court sur grand écran. Réservé aux pages qui ne sont qu'un sommaire, où le
+   * contenu doit être sous les yeux tout de suite. C'est une PROP et non une classe passée de
+   * l'extérieur : deux utilitaires de même propriété se départagent par leur ordre dans la feuille
+   * compilée, pas par l'ordre de l'attribut, et le surclassement ne prenait pas.
+   */
+  compact?: boolean;
   class?: string;
 }
 const {
@@ -51,6 +58,7 @@ const {
   tone = 'ink',
   id = 'en-tete',
   asideOnLarge = false,
+  compact = false,
   class: className = '',
 } = Astro.props;
 const titleId = id + '-title';
@@ -66,15 +74,25 @@ const hasAside = Astro.slots.has('aside');
   class:list={[
     'brand-halo grain relative overflow-hidden text-white',
     tones[tone],
-    /* La navigation flottante recouvre le haut de l'en-tête : sa hauteur est réservée ici. */
-    'pt-[calc(var(--spacing-nav-total)+0.75rem)] pb-10 sm:pt-[calc(var(--spacing-nav-total)+3.5rem)] sm:pb-20 lg:pt-[calc(var(--spacing-nav-total)+5rem)] lg:pb-24',
+    /* La navigation flottante recouvre le haut de l'en-tête : sa hauteur est réservée ici.
+       RESSERRÉ SUR GRAND ÉCRAN (13/09/2026, demande de l'équipe) : 5 rem au-dessus du titre et 6 en
+       dessous poussaient l'en-tête à 700 px sur un écran de 900, et tout le contenu utile sous la ligne
+       de flottaison. 2 rem et 3, soit une centaine de pixels rendus à la page. Le téléphone et la
+       tablette ne changent pas, ils n'avaient pas ce défaut. */
+    'pt-[calc(var(--spacing-nav-total)+0.75rem)] pb-10 sm:pt-[calc(var(--spacing-nav-total)+3.5rem)] sm:pb-20',
+    compact
+      ? 'lg:pt-[calc(var(--spacing-nav-total)+1rem)] lg:pb-8'
+      : 'lg:pt-[calc(var(--spacing-nav-total)+2rem)] lg:pb-12',
     className,
   ]}
 >
   <Container size="wide" class="relative">
     <slot name="breadcrumb" />
     <div
-      class:list={['mt-2 sm:mt-8', hasAside && 'lg:grid lg:grid-cols-12 lg:items-end lg:gap-12']}
+      class:list={[
+        'mt-2 sm:mt-8 lg:mt-5',
+        hasAside && 'lg:grid lg:grid-cols-12 lg:items-end lg:gap-12',
+      ]}
     >
       {
         /* 64 rem à partir de « lg » (13/09/2026) : à 80 px, « Comparer et comprendre » réclame 942 px et

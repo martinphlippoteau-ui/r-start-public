@@ -59,29 +59,28 @@ const resultId = `${id}-resultat`;
         `data-tool-level` enveloppe les DEUX colonnes : le sélecteur est à gauche, les champs qu'il
         ouvre et ferme sont à droite. */
     }
+    {
+      /* TROIS blocs et non deux, placés à la main sur la grille à partir de « lg » : le niveau, le
+        tunnel, puis le propos de l'outil. Sur grand écran, niveau et propos occupent la colonne de
+        gauche l'un sous l'autre, le tunnel tient la droite sur les deux rangs.
+        Sur téléphone, ils se suivent dans l'ordre du code : le niveau, PUIS LA QUESTION, et le propos
+        après. En colonne unique, mettre toute la colonne de gauche avant le tunnel repoussait la
+        première question à 836 px, soit bien au-delà de l'écran. */
+    }
     <div
       data-tool-level={id}
       data-funnel={id}
-      class="grid gap-12 lg:grid-cols-12 lg:items-start lg:gap-16"
+      class="grid gap-10 lg:grid-cols-12 lg:items-start lg:gap-x-16 lg:gap-y-10"
     >
-      <div class="lg:col-span-5 lg:sticky lg:top-[calc(var(--spacing-nav-total)+2rem)]">
-        {
-          /* Le niveau vient EN PREMIER : c'est le réglage qui décide du nombre de questions, on le pose
-            avant de commencer, pas après avoir répondu. */
-        }
+      {
+        /* Le niveau vient EN PREMIER : c'est le réglage qui décide du nombre de questions, on le pose
+          avant de commencer, pas après avoir répondu. */
+      }
+      <div class="lg:col-span-5 lg:col-start-1 lg:row-start-1">
         <ToolLevels name={id} notes={levelNotes} />
-        <h2 id={titleId} class="text-display-sm mt-10 text-balance">{title}</h2>
-        <p class="text-lead mt-4 opacity-90">{intro}</p>
-        {
-          /* Ligne risques de la page, descendue ici depuis l'en-tête (13/09/2026, demande de l'équipe).
-            Elle ne pouvait pas être retirée : elle est exigée sur toute sous-page produit. Dans cette
-            colonne, elle reste sous les yeux pendant toute la simulation, au lieu de disparaître au
-            premier défilement. */
-        }
-        <RiskNote text={shortRiskLine} class="mt-6" />
       </div>
 
-      <div class="lg:col-span-7">
+      <div class="lg:col-span-7 lg:col-start-6 lg:row-span-2 lg:row-start-1">
         {
           /* Fil d'étapes. Une liste ordonnée, parce que c'en est une : le lecteur d'écran annonce « 2 sur
           4 » sans qu'on ait à le lui écrire. Les puces sont des boutons : on revient sur une étape déjà
@@ -125,9 +124,12 @@ const resultId = `${id}-resultat`;
                 aria-labelledby={etapeId(i + 1)}
                 class="funnel-step"
               >
-                <h3 id={etapeId(i + 1)} class="text-display-sm text-balance" tabindex="-1">
+                {/* h2, comme le titre de l'outil : celui-ci est placé APRÈS le tunnel dans le code, pour
+                    que la question vienne en premier sur téléphone, et un h3 en tête aurait fait sauter
+                    le document de h1 à h3. Tous frères au niveau 2 ; les cartes de résultat sont en h3. */}
+                <h2 id={etapeId(i + 1)} class="text-display-sm text-balance" tabindex="-1">
                   {titre}
-                </h3>
+                </h2>
                 <div class="mt-6 grid gap-6 sm:grid-cols-2">
                   {i === 0 && <slot name="step-1" />}
                   {i === 1 && <slot name="step-2" />}
@@ -141,9 +143,9 @@ const resultId = `${id}-resultat`;
           }
 
           <section data-funnel-step="result" aria-labelledby={resultId} class="funnel-step">
-            <h3 id={resultId} class="text-display-sm text-balance" tabindex="-1">
+            <h2 id={resultId} class="text-display-sm text-balance" tabindex="-1">
               {funnel.resultTitle}
-            </h3>
+            </h2>
 
             {
               /* Le temps que le résultat paraisse, la marque tourne. C'est une attente FEINTE, le calcul
@@ -205,6 +207,18 @@ const resultId = `${id}-resultat`;
           la question elle-même et l'on n'entrait dans la simulation qu'après un pavé d'explications.
           Ici, il est ce qu'il est : un réglage, qu'on va chercher quand on veut aller plus loin. */
         }
+      </div>
+
+      <div class="lg:col-span-5 lg:col-start-1 lg:row-start-2">
+        <h2 id={titleId} class="text-display-sm text-balance">{title}</h2>
+        <p class="text-lead mt-4 opacity-90">{intro}</p>
+        {
+          /* Ligne risques de la page, descendue ici depuis l'en-tête (13/09/2026, demande de l'équipe).
+            Elle ne pouvait pas être retirée : elle est exigée sur toute sous-page produit. Dans cette
+            colonne, elle reste sous les yeux pendant toute la simulation, au lieu de disparaître au
+            premier défilement. */
+        }
+        <RiskNote text={shortRiskLine} class="mt-6" />
       </div>
     </div>
 
@@ -341,7 +355,7 @@ const resultId = `${id}-resultat`;
       rendre(sens);
       /* L'attente ne se rejoue pas si l'on était déjà sur le résultat (changement de niveau, retour). */
       jouerAttente(estResultat(active) && avant !== active);
-      if (focaliser) active.querySelector<HTMLElement>('h3')?.focus();
+      if (focaliser) active.querySelector<HTMLElement>('h2')?.focus();
     };
 
     /* Les champs de l'étape doivent être valides avant d'avancer : le navigateur dit lui-même pourquoi. */
