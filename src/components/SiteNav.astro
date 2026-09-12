@@ -178,14 +178,14 @@ const linkClass =
     role="dialog"
     aria-modal="true"
     aria-label={menuAriaLabel}
-    class="fixed inset-0 z-50"
+    class="fixed inset-0 z-60"
     hidden
   >
     {/* Voile : il assombrit la page derrière le tiroir et le referme au clic. */}
     <div data-menu-close data-menu-scrim class="absolute inset-0 bg-ink/70"></div>
     <div
       data-menu-drawer
-      class="surface-glass-dark absolute inset-y-0 right-0 flex w-full max-w-sm flex-col overflow-y-auto text-white"
+      class="surface-glass-dark absolute inset-y-0 right-0 flex w-full max-w-sm flex-col overflow-y-auto text-white max-sm:max-w-none"
     >
       <Container size="wide" class="flex h-subnav shrink-0 items-center justify-between gap-4">
         <a

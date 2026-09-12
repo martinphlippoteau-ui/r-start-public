@@ -489,6 +489,30 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
 [data-menu-panel][data-open] [data-menu-scrim] {
   opacity: 1;
 }
+/* Le tiroir est un dialogue modal (`aria-modal`) : rien ne doit passer devant, le bandeau de
+   consentement compris, qui recouvrait son bouton « Souscrire en ligne ». Poser un `z-index` sur le
+   panneau ne suffisait pas : il vit dans le contexte d'empilement de la barre, collante et `z-40`, donc
+   tout entière SOUS le bandeau (`z-50`). C'est la barre qui passe devant, le temps de l'ouverture.
+
+   L'accroche est `:not([hidden])` et non `[data-open]` : `hidden` ne revient qu'à la fin de la sortie,
+   la barre ne redescend donc pas d'un cran pendant que le tiroir glisse encore. */
+[data-sitenav]:has([data-menu-panel]:not([hidden])) {
+  z-index: 60;
+}
+
+/* Sous 40 rem le tiroir occupe tout l'écran. Le verre dépoli n'a alors plus rien à laisser voir, et il
+   coûtait la lisibilité : le texte blanc passait devant ce qui défilait dessous, clair ou sombre selon
+   la section traversée, et la couture entre deux sections se lisait en travers du menu. Fond plein,
+   contraste constant. Au-dessus de 40 rem le tiroir ne couvre qu'une partie de la page, le verre garde
+   son sens. */
+@media (width < 40rem) {
+  [data-menu-drawer] {
+    background-color: var(--color-ink);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
 @media (prefers-reduced-motion: no-preference) {
   [data-menu-panel] [data-menu-drawer] {
     transition: transform 420ms var(--ease-out-expo);
