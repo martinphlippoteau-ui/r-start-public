@@ -64,8 +64,10 @@ export const comparator = {
   pendingNotice:
     'Les taux de cette SCPI ne sont pas encore relevés. Tant qu’ils manquent, ce tableau ne compare rien : il ne montre que les frais de R Start. Aucune conclusion ne peut en être tirée.',
   /** Source à afficher sous le tableau. Celle de R Start est connue ; celles des autres SCPI viendront. */
-  sourceLabel: 'Sources',
-  sourceRStart: `Frais de ${product.name} : document d’informations clés du ${product.dicDate.label}, note d’information visée par l’AMF et brochure partenaires 2026.`,
+  sourceLabel: 'Sources des données',
+  /** Qui publie les chiffres de la colonne de gauche, et dans quels documents. */
+  sourceRStartLabel: 'CORUM Asset Management',
+  sourceRStart: `document d’informations clés du ${product.dicDate.label}, note d’information visée par l’AMF et brochure partenaires 2026.`,
   sourceOthers:
     'Frais des autres SCPI : à relever dans le document d’informations clés et la note d’information de chacune, avec leur date d’arrêté. Un taux change : la date fait foi.',
   /**
@@ -163,8 +165,9 @@ export const comparator = {
         disposal: 'sur le prix de vente, en cas de plus-value',
         withdrawal: 'sur le capital retiré, 0 % après 6 ans',
       },
+      /** Le nom de la SCPI est déjà l'intitulé de la ligne de sources : il ne se répète pas ici. */
       source:
-        'Iroko Zen : taux publiés sur iroko.eu/nos-frais, consultés le 11 septembre 2026. À confirmer sur la note d’information d’Iroko Zen avant publication.',
+        'taux publiés sur iroko.eu/nos-frais, consultés le 11 septembre 2026. À confirmer sur la note d’information avant publication.',
     },
     { name: 'Transitions Europe', manager: 'Arkéa REIM' },
     { name: 'Comète', manager: 'Alderan' },

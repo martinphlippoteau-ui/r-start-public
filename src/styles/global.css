@@ -450,6 +450,30 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   }
 }
 
+/* Halo de la valeur mise en avant dans le comparateur de frais (12/09/2026) : une lueur douce derrière
+   le taux le plus bas d'une ligne. Elle est POSÉE DERRIÈRE le texte (::before, z-index négatif dans un
+   contexte isolé) : la couleur du chiffre n'est pas touchée, donc son contraste non plus. Elle ne change
+   pas non plus sa taille — un frais affiché plus petit que ses voisins est ce que l'AMF refuse. */
+@utility fee-halo {
+  position: relative;
+  isolation: isolate;
+  display: inline-block;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: -0.35em -0.8em;
+    z-index: -1;
+    border-radius: 9999px;
+    background: radial-gradient(
+      62% 62% at 50% 50%,
+      rgb(11 122 147 / 0.18),
+      rgb(11 122 147 / 0) 72%
+    );
+    pointer-events: none;
+  }
+}
+
 /* Tiroir du menu (SiteNav.astro) : il entre par la DROITE et le voile se pose derrière lui. L'état ouvert
    est porté par `data-open`, jamais par `hidden` — celui-ci ne revient qu'à la fin de la sortie, pour que
    le glissement ait lieu. Sans transition en mouvement réduit : le tiroir est simplement là. */

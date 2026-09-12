@@ -87,13 +87,16 @@ const faqItems = faq.items.map((item) => {
   const from = Math.min(Math.max(item.riskFrom ?? item.answer.length, 0), item.answer.length);
   return { ...item, advantage: item.answer.slice(0, from), risks: item.answer.slice(from) };
 });
-
 ---
 
 <Base title={seo.title} description={seo.description} path={page.path} jsonLd={jsonLd}>
   <SiteNav />
   <main id="contenu">
-    <PageHero eyebrow={hero.eyebrow} title={hero.title} intro={hero.intro} riskLine={hero.riskLine}>
+    {
+      /* Plus d'introduction dans l'en-tête (12/09/2026, demande de l'équipe) : titre, ligne risques, puis
+        le comparateur. `hero.intro` reste dans le contenu, elle n'est simplement plus rendue ici. */
+    }
+    <PageHero eyebrow={hero.eyebrow} title={hero.title} riskLine={hero.riskLine}>
       <Breadcrumb slot="breadcrumb" key="fees" tone="dark" />
       {
         /* En-tête MINIMALISTE (11/09/2026, demande de l'équipe) : le tableau des taux qui l'occupait est

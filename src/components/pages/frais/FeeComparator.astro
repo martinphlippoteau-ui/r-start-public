@@ -155,11 +155,25 @@ const data = scpis.map((s) => ({
 
     <p class="text-caption mt-4 max-w-3xl text-slate-700">{comparator.vatNotice}</p>
 
-    <p class="text-caption mt-4 max-w-3xl text-slate-700">
-      <strong class="font-semibold">{comparator.sourceLabel} :</strong>{' '}
-      {comparator.sourceRStart}{' '}
-      <span data-comparator-source>{comparator.sourceOthers}</span>
-    </p>
+    {
+      /* Sources, une ligne par colonne. Celle de droite suit la SCPI choisie : chaque relevé a sa page et
+        sa date, parce qu'un taux change et que la date fait foi. */
+    }
+    <div class="mt-6 max-w-3xl border-t border-navy/12 pt-5">
+      <h3 class="text-base font-semibold text-ink">{comparator.sourceLabel}</h3>
+      <dl class="text-caption mt-3 space-y-2 text-slate-700">
+        <div class="flex flex-wrap gap-x-2">
+          <dt class="font-semibold">
+            {comparator.leftLabel} —{' '}{comparator.sourceRStartLabel} :
+          </dt>
+          <dd>{comparator.sourceRStart}</dd>
+        </div>
+        <div class="flex flex-wrap gap-x-2">
+          <dt data-comparator-source-name class="font-semibold">{scpis[0]?.name} :</dt>
+          <dd data-comparator-source>{comparator.sourceOthers}</dd>
+        </div>
+      </dl>
+    </div>
 
     {
       /* Encadré de la brochure (p.4) : un comparatif de frais ne part jamais sans lui — il dit que R Start
@@ -185,6 +199,7 @@ const data = scpis.map((s) => ({
     const manager = table.querySelector('[data-comparator-manager]');
     const pending = document.querySelector('[data-comparator-pending]');
     const source = document.querySelector('[data-comparator-source]');
+    const sourceName = document.querySelector('[data-comparator-source-name]');
     const cells = [...table.querySelectorAll('[data-comparator-cell]')];
     const details = [...table.querySelectorAll('[data-comparator-detail]')];
     const lignes = [...table.querySelectorAll('tbody tr')].map((tr) => ({
@@ -209,6 +224,7 @@ const data = scpis.map((s) => ({
         if (detail) detail.textContent = (value && scpi.details[i]) || '';
       });
       if (pending) pending.hidden = missing === 0;
+      if (sourceName) sourceName.textContent = scpi.name + ' :';
       if (source) source.textContent = scpi.source || sourceFallback;
 
       /*
@@ -243,6 +259,7 @@ const data = scpis.map((s) => ({
         const peindre = (cell, gagne, perd) => {
           cell.classList.toggle('font-bold', gagne);
           cell.classList.toggle('text-teal-700', gagne);
+          cell.classList.toggle('fee-halo', gagne);
           cell.classList.toggle('text-slate-600', perd);
           cell.classList.toggle('text-navy', !gagne && !perd);
         };
