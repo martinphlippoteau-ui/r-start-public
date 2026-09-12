@@ -28,12 +28,14 @@ import { resolveImage } from '@/lib/images';
 const id = sections.difference.id;
 const titleId = id + '-title';
 /**
- * Photo d'illustration à droite de la démonstration (11/09/2026) : la section n'avait plus aucune image
- * depuis qu'elle a été réduite au texte. Purement décorative pour la conformité, elle n'énonce aucun
- * avantage, elle n'entre donc dans aucun couple avantage / risque. Crédit visible : R Start n'a pas de
- * patrimoine, la photo ne représente aucun immeuble détenu.
+ * Photo d'illustration à droite de la démonstration. Changée le 12/09/2026 : la précédente venait du jeu
+ * `strategy`, déjà employé par la section Stratégie, ce qui faisait doublon sur le site. Celle-ci n'est
+ * utilisée nulle part ailleurs.
+ * Purement décorative pour la conformité, elle n'énonce aucun avantage, elle n'entre donc dans aucun
+ * couple avantage / risque. Crédit visible : R Start n'a pas de patrimoine, la photo ne représente aucun
+ * immeuble détenu.
  */
-const photo = await resolveImage(media.strategy[0].src);
+const photo = await resolveImage(media.documents.src);
 
 /**
  * Les deux situations, découpées autour du mot à mettre en valeur : le contenu reste du texte brut
@@ -136,7 +138,7 @@ const situations = (difference.situations ?? []).map((s) => {
         <div class="img-frame aspect-[4/3]">
           <Picture
             src={photo}
-            alt={media.strategy[0].alt}
+            alt={media.documents.alt}
             widths={[480, 800, 1200]}
             sizes="(min-width: 64rem) 26rem, 100vw"
             formats={['avif', 'webp']}
@@ -147,9 +149,9 @@ const situations = (difference.situations ?? []).map((s) => {
           />
         </div>
         {
-          media.strategy[0].credit && (
+          media.documents.credit && (
             <figcaption class="text-caption mt-3 text-slate-700">
-              {media.strategy[0].credit}
+              {media.documents.credit}
             </figcaption>
           )
         }

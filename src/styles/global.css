@@ -533,6 +533,67 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   }
 }
 
+/* Fond vivant du hero (12/09/2026, demande de l'équipe : « du mouvement, un peu dynamique »).
+   Le halo dérivait déjà, mais d'un seul bloc : le mouvement se lisait comme une translation unique.
+   Deux lueurs supplémentaires dérivent maintenant SÉPARÉMENT, sur des trajets et des durées premiers
+   entre eux (29 s et 41 s) : la composition ne se répète qu'au bout de vingt minutes, donc l'œil ne
+   voit pas de boucle.
+   Ce sont des dégradés radiaux, pas des formes floutées : un `filter: blur()` sur un élément de cette
+   taille coûte une passe de rendu à chaque image, le dégradé ne coûte rien. Transform seul, comme tout
+   le reste du décor.
+   Opacités volontairement basses. Le halo a déjà été abaissé une fois parce qu'il faisait tomber le
+   contraste de la ligne risques sous le seuil : ces couches s'ajoutent à la luminance du fond, elles
+   restent donc discrètes et le contraste est vérifié après coup. */
+.halo-blob {
+  position: absolute;
+  pointer-events: none;
+  opacity: 0;
+  will-change: transform;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .is-in-view > .halo-blob {
+    opacity: 1;
+  }
+  .halo-blob-a {
+    top: -14%;
+    left: -10%;
+    width: 62%;
+    height: 58%;
+    background-image: radial-gradient(closest-side, rgb(20 164 186 / 0.26), transparent 100%);
+    animation: halo-blob-a 29s ease-in-out infinite alternate;
+  }
+  .halo-blob-b {
+    right: -12%;
+    bottom: -16%;
+    width: 56%;
+    height: 52%;
+    background-image: radial-gradient(closest-side, rgb(17 152 175 / 0.22), transparent 100%);
+    animation: halo-blob-b 41s ease-in-out infinite alternate;
+  }
+}
+@keyframes halo-blob-a {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(34%, 20%, 0) scale(1.25);
+  }
+  to {
+    transform: translate3d(12%, 38%, 0) scale(0.88);
+  }
+}
+@keyframes halo-blob-b {
+  from {
+    transform: translate3d(0, 0, 0) scale(1.08);
+  }
+  50% {
+    transform: translate3d(-36%, -16%, 0) scale(0.86);
+  }
+  to {
+    transform: translate3d(-14%, -34%, 0) scale(1.22);
+  }
+}
+
 /* Grain léger optionnel (SVG turbulence en data URI, mode overlay, ~4 % d'opacité). */
 @utility grain {
   &::after {
