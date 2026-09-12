@@ -3,15 +3,14 @@
  * Section 1, Hero (id « apercu »). Référence visuelle des autres sections.
  * Fond ink + couche de halo de marque (`brand-halo`, dérive lente `brand-halo-drift` jouée seulement quand la
  * section est à l'écran via `data-in-view`) + grain. La photo plein cadre du 10/09 et son voile sont
- * retirés (11/09/2026, jugés datés) : l'effet « waou » est désormais le vol de la marque au défilement.
+ * retirés (11/09/2026, jugés datés) : l'effet « waou » est la séquence d'ouverture du hero.
  * La section est `isolate` ; sa hauteur minimale est le premier écran moins la barre (3,5 rem, dans le
  * flux) : le hero remplit exactement la première vue.
  * H1 porté par le logo R Start (texte du titre en visually-hidden ; image décorative, aria-hidden). Le
- * bloc logo (.hero-logo-stack) porte `data-brand-flight` : au défilement il se détache, monte avec la
- * page puis glisse et rétrécit jusqu'à la position exacte du logo de la barre (`data-brand-target`,
- * SiteNav.astro) et lui passe le relais en fondu croisé (src/scripts/motion/brandflight.ts, ≥ 40 rem,
- * no-preference). Le H1 réserve la place du logo en CSS (.hero-logo-wrap) : aucun décalage de mise en
- * page. Puis surtitre + pastille, accroche, ligne risques (jamais animée, opacité 1), deux CTA.
+ * H1 réserve la place du logo en CSS (.hero-logo-wrap) : aucun décalage de mise en page. Puis surtitre +
+ * pastille, accroche, ligne risques (jamais animée, opacité 1), deux CTA.
+ * Le VOL DE LA MARQUE vers la barre est retiré le 12/09/2026 : la barre est désormais identique sur tout
+ * le site, pleine dès le premier pixel, il n'y a plus de place vide où poser le logo.
  * LCP : le logo (eager) ou l'accroche, jamais d'animation d'opacité dessus : l'accroche entre par
  * transform seul (`data-intro-move`), c'est le cas de TOUS les textes et des CTA depuis le 11/09/2026 :
  * un contrôle d'accessibilité qui mesure la page pendant la cascade voyait le bouton à 30 % d'opacité, donc
@@ -21,9 +20,8 @@
  *  - la marque est le point fixe : peinte au premier rendu (candidat LCP, descendante du H1 : le moteur
  *    refuse tout effet sur elle), elle est le rang 0 autour duquel la cascade `data-intro` (CSS pur,
  *    500 ms expo.out, 70 ms par rang) se construit : surtitre (1, opacité + transform), accroche (2,
- *    transform seul), CTA (3), jamais le H1 ni la RiskNote, qui sont là d'emblée. Son vol vers la barre
- *    (data-brand-flight) est le second temps, piloté par le défilement ;
- *  - second temps du vol : pendant qu'il a lieu (du défilement 0 à la moitié d'un écran, repère `html`),
+ *    transform seul), CTA (3), jamais le H1 ni la RiskNote, qui sont là d'emblée ;
+ *  - second temps, au défilement (du défilement 0 à la moitié d'un écran, repère `html`),
  *    surtitre et accroche reculent vers le haut (y −20 px) et les CTA vers le bas (y +10 px), tous à
  *    35 % d'opacité (enveloppes `data-scrub`, transform/opacity, réversibles). Ils s'écartent ainsi de
  *    la ligne risques, hors de ces enveloppes, qui ne bouge pas et reste à opacité 1.
@@ -56,10 +54,10 @@ const titleId = sections.hero.id + '-title';
 const showEyebrow = hero.eyebrow.trim() !== '';
 /**
  * Transition d'ouverture (11/09/2026, mécanique observée sur revolut.com) : le hero est épinglé par le rideau
- * de la section suivante (02-Highlights, data-curtain) qui glisse par-dessus ; pendant ce temps le logo vole
- * vers la barre (brandflight.ts), les textes montent et s'effacent vite, sur les 30 premiers % d'un écran de
- * défilement (repère `html`, `top top`), et le halo se pose (dézoom, couche de fond ci-dessous). La ligne
- * risques n'est dans aucune de ces enveloppes : elle reste en place jusqu'à être recouverte.
+ * de la section suivante (02-Highlights, data-curtain) qui glisse par-dessus ; pendant ce temps les textes
+ * montent et s'effacent vite, sur les 30 premiers % d'un écran de défilement (repère `html`, `top top`), et
+ * le halo se pose (dézoom, couche de fond ci-dessous). La ligne risques n'est dans aucune de ces
+ * enveloppes : elle reste en place jusqu'à être recouverte.
  */
 /*
  * Sortie du hero au défilement : chaque élément part avec SON amplitude, jamais la même (idée reprise de
@@ -83,7 +81,7 @@ const copyScrubUp = { 'data-scrub': 'y:0,-48|opacity:1,0', ...flightScrub };
  * scrub le relève (axe, reproductible une fois sur cinq). Seule l'accroche, en grand, garde le fondu.
  */
 const copyScrubFar = { 'data-scrub': 'y:0,-72|opacity:1,0', ...flightScrub };
-/** CTA : recul et EFFACEMENT (11/09/2026) pendant que celui de la barre apparaît (brandflight.ts).
+/** CTA : recul et EFFACEMENT (11/09/2026), celui de la barre prenant le relais à l'écran.
  *  Le fondu avait été retiré parce qu'un contrôle d'accessibilité surprenait le bouton à mi-opacité, avec
  *  un contraste sous 4,5:1 ; la cause réelle était la cascade d'entrée, corrigée depuis (data-intro-move
  *  partout dans le hero). Le fondu du défilement est donc rétabli, et le contrôle est rejoué en série. */
@@ -153,13 +151,7 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
           {
             /* Rang 2 de l'ouverture : le logo entre par déplacement seul (candidat LCP, jamais d'opacité). */
           }
-          <span
-            class="hero-logo-stack"
-            data-brand-flight
-            aria-hidden="true"
-            data-intro="1"
-            data-intro-move
-          >
+          <span class="hero-logo-stack" aria-hidden="true" data-intro="1" data-intro-move>
             <Image
               src={brandLogo}
               alt=""

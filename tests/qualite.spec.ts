@@ -112,6 +112,49 @@ test.describe('Qualité', () => {
   }
 
   /*
+   * La barre de navigation est IDENTIQUE sur toutes les pages (12/09/2026, demande de l'équipe). Elle
+   * portait jusque-là un voile propre à l'accueil, transparent au premier écran. Le test relève une
+   * empreinte par page, avant tout défilement, et exige qu'elles se réduisent à UNE SEULE : hauteur,
+   * verre, flou, et présence de chacun des quatre repères.
+   */
+  test('la barre de navigation est identique sur toutes les pages', async ({ page }) => {
+    const empreintes = new Map<string, string>();
+
+    for (const route of PAGES) {
+      await page.goto(route);
+      /* Après la séquence d'ouverture de l'accueil : c'est l'état stable qui doit coïncider. */
+      await page.waitForTimeout(2200);
+      empreintes.set(
+        route,
+        await page.evaluate(() => {
+          const nav = document.querySelector('[data-sitenav]')!;
+          const pastille = nav.querySelector('.nav-glass')!;
+          const cs = getComputedStyle(pastille);
+          const vu = (sel: string) => {
+            const el = nav.querySelector(sel);
+            if (!el) return 'absent';
+            const r = el.getBoundingClientRect();
+            return r.width > 0 && getComputedStyle(el).opacity !== '0' ? 'visible' : 'masqué';
+          };
+          return [
+            Math.round(nav.getBoundingClientRect().height),
+            Math.round(pastille.getBoundingClientRect().height),
+            cs.backgroundColor,
+            cs.backdropFilter,
+            vu('[data-nav-brand]'),
+            vu('[data-sitenav-list]'),
+            vu('.subnav-cta'),
+            vu('[data-menu-open]'),
+          ].join(' | ');
+        })
+      );
+    }
+
+    const distinctes = new Set(empreintes.values());
+    expect([...distinctes], JSON.stringify([...empreintes], null, 1)).toHaveLength(1);
+  });
+
+  /*
    * Niveaux d'expertise des outils. La bascule est en CSS pure (global.css) : aucun typage ne la
    * protège, et un sélecteur déplacé la casserait en silence. Le test vérifie les trois paliers, et
    * surtout que le RÉSULTAT ne dépend pas du niveau : un champ masqué garde sa valeur, le calcul est

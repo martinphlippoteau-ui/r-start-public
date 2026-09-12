@@ -85,9 +85,9 @@ const IDLE_TIMEOUT = 1000;
  * Effets qui exigent GSAP + ScrollTrigger : épinglage, défilement lié, tracé, compteur, découpe de
  * texte. Une page qui n'en déclare aucun n'a besoin que des révélations `data-animate`, rendues par
  * le moteur léger (motion/lite.ts) : elle ne télécharge pas les 45 Ko gzip de la bibliothèque.
- * La navigation (src/components/SiteNav.astro) ne dépend d'aucun moteur (plus de barre de progression,
- * CTA compact géré par son script inline) ; seul l'accueil, dont le hero porte `[data-brand-flight]`,
- * charge GSAP pour le vol de la marque vers la barre (motion/brandflight.ts, recréé le 11/09/2026).
+ * La navigation (src/components/SiteNav.astro) ne dépend d'aucun moteur : ni barre de progression, ni
+ * vol de la marque (retiré le 12/09/2026, la barre est identique sur tout le site), et le CTA compact
+ * est géré par son script en ligne.
  */
 const BESOIN_GSAP = [
   '[data-scene]',
@@ -99,7 +99,6 @@ const BESOIN_GSAP = [
   '[data-fill]',
   '[data-counter]',
   '[data-reveal-text]',
-  '[data-brand-flight]',
 ].join(',');
 
 const boot = () => {

@@ -255,8 +255,9 @@
    Au défilement (`data-stuck`), le blanc se densifie et l'ombre se creuse : la barre se détache du
    contenu qui passe dessous.
    `--nav-glass-on` (0 → 1) règle la PRÉSENCE de la matière d'un seul geste : blanc, flou, liseré, ombre
-   et nappe en dépendent tous. Il vaut 1 partout, sauf sur l'accueil où le vol d'ouverture le pousse de
-   0 à 1 (bloc « barre sans matière » plus bas). */
+   et nappe en dépendent tous. Il vaut 1 partout depuis le 12/09/2026, la barre étant identique sur tout
+   le site ; la variable reste, elle garde ce réglage en un seul point si l'équipe veut un jour le
+   rejouer. */
 @utility nav-glass {
   --nav-glass-tint: 0.72;
   --nav-glass-on: 1;
@@ -309,113 +310,13 @@
   }
 }
 
-/* Avant le premier défilement (11/09/2026, demande de l'équipe) : sur TOUTE page dont l'en-tête est
-   sombre (`[data-page-header="dark"]` : le hero de l'accueil et le PageHero des sous-pages), la barre n'a
-   AUCUNE matière, ni verre, ni flou, ni liseré, ni ombre, et son contenu passe en blanc sur l'en-tête.
-   Sur téléphone, seul le bouton Menu s'y voit ; sur grand écran, les entrées du menu l'accompagnent.
-   La matière se pose ensuite au défilement : `--nav-glass-on` est poussé de 0 à 1 par le script de
-   SiteNav.astro, sur la même distance que le relais d'ouverture du hero, sur l'accueil, le verre arrive
-   donc exactement quand le logo et le CTA se posent dans la barre.
-   Les pages à fond clair (mentions légales, 404) n'ont pas ce marqueur : la barre y reste pleine et leur
-   contenu réserve sa hauteur en padding.
-   La transition de la matière est coupée ici : elle est pilotée au défilement, la lisser une seconde
-   fois la ferait traîner derrière le doigt.
-   La règle ne dépend PLUS de `prefers-reduced-motion` (11/09/2026) : masquer la barre n'est pas du
-   mouvement, et la faire dépendre de ce réglage donnait une barre pleine à qui a activé « réduire les
-   animations », un comportement impossible à expliquer. En mouvement réduit, le script bascule la
-   matière d'un coup au lieu de la doser au défilement. Sans script, la barre reste pleine (scripting).
-   PÉRIMÈTRE (11/09/2026) : l'ACCUEIL SEULEMENT (`[data-brand-flight]`, le bloc logo du hero), et
-   seulement tant que l'ouverture est jouée (`html.intro`, retirée par public/intro-once.js au retour
-   depuis une autre page). Sur les sous-pages, et au retour sur l'accueil, la barre est pleine d'emblée :
-   on ne fait pas redécouvrir la navigation à quelqu'un qui l'a déjà vue. */
-@media (scripting: enabled) {
-  html.intro body:has([data-brand-flight]) [data-sitenav-bar] {
-    --nav-glass-on: 0;
-    transition-property: none;
-  }
-  @media (prefers-reduced-motion: no-preference) {
-    html.intro body:has([data-brand-flight]) [data-sitenav-bar] [data-menu-open],
-    html.intro body:has([data-brand-flight]) [data-sitenav-bar] [data-sitenav-list] a {
-      transition: color 240ms var(--ease-out-expo);
-    }
-  }
-  html.intro body:has([data-brand-flight]) [data-sitenav-bar]:not([data-landed]) [data-menu-open],
-  html.intro
-    body:has([data-brand-flight])
-    [data-sitenav-bar]:not([data-landed])
-    [data-sitenav-list]
-    a {
-    color: #fff;
-  }
-  /* Seul sur l'en-tête, le bouton Menu ne peut pas s'éclaircir avec un voile sombre au survol. */
-  html.intro
-    body:has([data-brand-flight])
-    [data-sitenav-bar]:not([data-landed])
-    [data-menu-open]:hover {
-    background-color: rgb(255 255 255 / 0.16);
-  }
-
-  /* Tant que la barre n'a pas de matière, son CONTENU est masqué lui aussi (11/09/2026) : une marque en
-     couleurs, un bouton plein et des entrées posés à même l'en-tête, sans verre dessous, se lisaient comme
-     des éléments flottants. Ne reste que le bouton Menu, en blanc. Les trois blocs se révèlent avec le
-     verre : leur opacité EST `--nav-glass-on`. Sur l'accueil, les scripts du vol d'ouverture posent une
-     opacité en ligne sur la marque et le CTA, elle l'emporte, et c'est voulu : le relais garde son propre
-     fondu croisé. `pointer-events` suit, pour qu'on ne clique pas un élément invisible ; le clavier, lui,
-     ramène tout (`:focus-within`), sinon la navigation deviendrait inatteignable au premier écran. */
-  html.intro
-    body:has([data-brand-flight])
-    [data-sitenav-bar]
-    :is([data-nav-brand], [data-sitenav-list], [data-cta-target]) {
-    opacity: var(--nav-glass-on);
-  }
-  html.intro
-    body:has([data-brand-flight])
-    [data-sitenav-bar]:not([data-landed])
-    :is([data-nav-brand], [data-sitenav-list], [data-cta-target]) {
-    pointer-events: none;
-  }
-  html.intro
-    body:has([data-brand-flight])
-    [data-sitenav-bar]:focus-within
-    :is([data-nav-brand], [data-sitenav-list], [data-cta-target]) {
-    opacity: 1;
-    pointer-events: auto;
-  }
-
-  /* Tant que la barre est vide, le bouton Menu est le SEUL repère : il existe donc aussi sur grand écran,
-     où il cède la place aux entrées dès que la barre prend sa matière. Et il n'y montre que ses trois
-     barres, le mot « Menu » reste dans le DOM, masqué visuellement, sans quoi le bouton perdrait son
-     nom accessible (le chevron est décoratif). */
-  @media (width >= 64rem) {
-    html.intro
-      body:has([data-brand-flight])
-      [data-sitenav-bar]:not([data-landed])
-      [data-menu-open] {
-      display: inline-flex;
-      /* La barre est une grille de trois colonnes : sans placement, ce quatrième élément s'ouvrirait une
-         deuxième ligne et s'étirerait sur toute la largeur. Il partage la colonne de droite avec le CTA,
-         invisible tant que la barre est vide, et disparaît dès qu'elle prend sa matière. */
-      grid-column: 3;
-      grid-row: 1;
-      justify-self: end;
-    }
-  }
-  html.intro
-    body:has([data-brand-flight])
-    [data-sitenav-bar]:not([data-landed])
-    [data-menu-open]
-    > span {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-  }
-}
+/* La barre est IDENTIQUE SUR TOUT LE SITE (12/09/2026, demande de l'équipe). Il y avait ici un voile
+   propre à l'accueil : avant le premier défilement, la pastille n'avait aucune matière et seul le bouton
+   Menu s'y voyait, en blanc, puis le verre se posait au défilement en même temps que le logo du hero
+   venait s'y ranger. C'était une coupure d'expérience avec les huit sous-pages, où la barre était pleine
+   d'emblée. Tout est retiré : logo, entrées et CTA sont là dès le premier pixel, partout.
+   L'ouverture du HERO, elle, est intacte (`html.intro [data-intro]`, plus bas) : c'est l'accueil qui
+   s'anime, plus la navigation. */
 
 /* Pastille d'appel flottante (components/StickyCta.astro) : absente tant que le défilement n'a pas
    atteint sa section de départ, puis posée en bas de l'écran jusqu'au pied de page. `visibility` en plus
@@ -845,8 +746,8 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   width: 0;
   height: 0;
   border-radius: 9999px;
-  /* Elle appartient à la matière de la barre : invisible tant que le verre n'est pas là (accueil, avant
-     le vol d'ouverture), elle apparaît avec lui. `opacity` reste pilotée en ligne par le script. */
+  /* Elle appartient à la matière de la barre et suit sa présence. `opacity` reste pilotée en ligne par
+     le script. */
   background: rgb(2 75 103 / calc(0.08 * var(--nav-glass-on, 1)));
   opacity: 0;
   pointer-events: none;
@@ -1196,9 +1097,8 @@ body:has(#consent-banner:not([hidden])) [data-hero-scroll-hint] {
   }
 }
 
-/* --- Marque du hero (H1) et son vol vers la navigation (data-brand-flight, motion/brandflight.ts) ---
-   Le H1 réserve la place du logo en CSS : l'image passe dans son calque fixe sans décaler la page, et
-   aucun décalage non plus au chargement de l'image. */
+/* --- Marque du hero (H1) ---
+   Le H1 réserve la place du logo en CSS : aucun décalage de page au chargement de l'image. */
 .hero-logo-wrap {
   display: block;
   /* Sous 40 rem : la marque occupe l'écran (64 vw, 11/09/2026, le logo paraissait timide sur téléphone),
@@ -1222,8 +1122,7 @@ body:has(#consent-banner:not([hidden])) [data-hero-scroll-hint] {
   }
 }
 
-/* Bloc logo du hero : remplit la place réservée par .hero-logo-wrap ; déplacé tel quel dans le calque
-   pendant le vol (la hauteur 100 % y devient auto : même largeur, même rapport, même rendu). */
+/* Bloc logo du hero : il remplit la place réservée par .hero-logo-wrap. */
 .hero-logo-stack {
   display: block;
   width: 100%;
@@ -1235,38 +1134,7 @@ body:has(#consent-banner:not([hidden])) [data-hero-scroll-hint] {
   height: auto;
 }
 
-/* Calque du logo pendant le vol : fixe, hors de tout ancêtre transformé, jamais cliquable. Au-dessus de
-   la barre (z 40) pour se poser net sur le verre plutôt que flouté sous lui, sous le panneau du menu
-   (z 50). Origine 0 0 : x/y désignent le coin supérieur gauche, comme les mesures du script. */
-.brand-flyer {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 45;
-  transform-origin: 0 0;
-  pointer-events: none;
-  will-change: transform, opacity;
-}
-.brand-flyer img {
-  display: block;
-  width: 100%;
-  height: auto;
-}
 
-/* Le logo de la barre est l'arrivée du vol : sur les pages qui le portent, il est masqué dès le rendu
-   serveur (aucun scintillement au chargement du moteur, la marque n'existe qu'une fois à l'écran) ; le
-   script règle ensuite son opacité pour le passage de relais. Rétabli partout où le vol n'a pas lieu :
-   sous 40 rem, en reduced-motion, sans script (`scripting: enabled` ; un navigateur qui ignore cette
-   requête média garde le logo visible et le script le masque au démarrage), et sur les autres pages. */
-/* Pendant le vol d'ouverture, la barre cède ses deux repères au calque : le logo (`data-brand-target`) et
-   le CTA (`data-cta-target`). Ils sont rendus opaques par le script au fondu croisé. Plus de borne de
-   largeur depuis le 11/09/2026 : le vol a lieu aussi sur téléphone. */
-@media (prefers-reduced-motion: no-preference) and (scripting: enabled) {
-  body:has([data-brand-flight]) [data-brand-target],
-  body:has([data-brand-flight]) [data-cta-target] {
-    opacity: 0;
-  }
-}
 
 /* Comparateur de frais sous 48 rem (12/09/2026) : sept lignes sur trois colonnes ne tiennent pas sur un
    téléphone. Avant, le tableau débordait dans une enveloppe à défilement horizontal et la colonne de la
