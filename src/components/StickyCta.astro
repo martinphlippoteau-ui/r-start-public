@@ -1,13 +1,19 @@
 ---
 /**
  * Pastille d'appel flottante (12/09/2026, demande de l'équipe). Un rond portant un chevron se pose en bas
- * de l'écran, puis se DÉPLIE en pastille pour révéler son libellé. Il se replie et s'efface dès que la
- * section de départ est passée.
+ * de l'écran, puis se DÉPLIE en pastille pour révéler son libellé.
  *
- * Déclenchement : le SURVOL de la section de départ sur un appareil à pointeur fin. Sur un écran tactile,
- * où le survol n'existe pas, la pastille se pose dès que la section entre à l'écran : même service, même
- * moment, sans geste qui n'existe pas. Une fois posée, elle reste tant que la section est à l'écran ;
- * quitter la section du pointeur ne la referme pas, seul le défilement le fait.
+ * Déclenchement : la disparition d'un REPÈRE de la page, l'invitation à défiler du hero (« Découvrir
+ * R Start »). Tant qu'on la voit, elle dit déjà où aller et la pastille n'a rien à faire là ; dès qu'elle
+ * n'est plus à l'écran, la pastille prend le relais. Elle se replie si le repère revient, au défilement
+ * vers le haut. Les deux ne sont donc jamais visibles ensemble.
+ *
+ * « Ne plus être à l'écran » se mesure de DEUX façons, et il en faut deux. Sur téléphone, le repère sort
+ * simplement du cadre. Sur grand écran, le hero est ÉPINGLÉ par le rideau de la section suivante : sa
+ * boîte ne quitte jamais l'écran, elle reste à la même place pendant que le rideau la recouvre, et c'est
+ * son opacité, menée par le défilement lié, qui tombe à zéro. Ne regarder que la géométrie ferait
+ * apparaître la pastille mille pixels trop tard sur grand écran ; ne regarder que l'opacité la rendrait
+ * aveugle sans le moteur d'animation. On regarde les deux.
  *
  * Rendue au niveau de la PAGE, jamais dans une section. Les sections de l'accueil sont épinglées au
  * défilement (`data-curtain`) : un ancêtre transformé devient le bloc conteneur d'un enfant `fixed`, la
@@ -23,15 +29,15 @@
 interface Props {
   label: string;
   href: string;
-  /** Section dont le survol fait apparaître la pastille, et dont la sortie la replie (id). */
-  fromId: string;
+  /** Sélecteur du repère dont la disparition fait apparaître la pastille, et le retour la replie. */
+  watch: string;
 }
-const { label, href, fromId } = Astro.props as Props;
+const { label, href, watch } = Astro.props as Props;
 ---
 
 <div
   data-sticky-cta
-  data-from={fromId}
+  data-watch={watch}
   class="pointer-events-none fixed inset-x-0 bottom-4 z-30 flex justify-center px-4 sm:bottom-6"
 >
   <a
@@ -71,39 +77,26 @@ const { label, href, fromId } = Astro.props as Props;
    * moteur d'animation : la pastille doit vivre même si GSAP n'est pas chargé.
    */
   const box = document.querySelector<HTMLElement>('[data-sticky-cta]');
-  const from = box?.dataset.from ? document.getElementById(box.dataset.from) : null;
+  const repere = box?.dataset.watch ? document.querySelector<HTMLElement>(box.dataset.watch) : null;
 
-  if (box && from) {
-    /* Survol : seulement là où il existe vraiment. Sur un écran tactile, `pointerenter` se déclenche au
-       premier contact, c'est-à-dire trop tard et sur un geste que personne ne fera. */
-    const survol = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-    let pose = false;
+  if (box && repere) {
+    /* L'opacité se lit sur l'ENVELOPPE de défilement lié, celle que le moteur d'animation pilote ; le
+       repère lui-même garde son opacité propre. Sans moteur, il n'y a pas d'enveloppe et l'opacité vaut
+       1 : seule la géométrie décide alors, ce qui est exactement le bon repli, puisque sans moteur le
+       hero n'est pas épinglé non plus et sort du cadre normalement. */
+    const enveloppe = repere.closest<HTMLElement>('[data-scrub]') ?? repere;
 
-    /* La section est-elle encore à l'écran ? Passée, la pastille se replie. */
-    const aLEcran = () => {
-      const r = from.getBoundingClientRect();
-      return r.top < window.innerHeight && r.bottom > 0;
-    };
-
-    const appliquer = () => box.toggleAttribute('data-on', pose && aLEcran());
-
-    const poser = () => {
-      if (pose) return;
-      pose = true;
-      appliquer();
+    const repereVisible = () => {
+      const r = repere.getBoundingClientRect();
+      if (r.bottom <= 0 || r.top >= window.innerHeight) return false;
+      return parseFloat(getComputedStyle(enveloppe).opacity) > 0.05;
     };
 
     let frame = 0;
     const sync = () => {
       frame = 0;
-      /* Hors de la section, la pastille se replie ET oublie qu'elle avait été posée : revenir dessus
-         rejoue l'apparition, qui est le geste demandé. */
-      if (!aLEcran()) pose = false;
-      else if (!survol) poser();
-      appliquer();
+      box.toggleAttribute('data-on', !repereVisible());
     };
-
-    if (survol) from.addEventListener('pointerenter', poser);
 
     const onScroll = () => {
       if (!frame) frame = requestAnimationFrame(sync);

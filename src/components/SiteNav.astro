@@ -16,7 +16,7 @@
  * au premier écran de l'accueil, le logo et le CTA sont encore à opacité 0, ils arrivent par le vol
  * d'ouverture, et la barre paraissait vide.
  *
- * Entrées : uniquement les pages du menu (src/config/pages.ts, `menuPages`), l'accueil compris, sur
+ * Entrées : uniquement les pages du menu (src/config/pages.ts, `menuPages`), l'accueil excepté, sur
  * toutes les pages, jamais d'ancre de section (décision du 10/09/2026). Aucun libellé en dur :
  * src/config/pages.ts et src/content/fr/nav.ts.
  *
@@ -73,13 +73,21 @@ interface Entry {
   current: boolean;
 }
 
-/** Le menu ne contient que des pages (décision du 10/09/2026), l'accueil compris, sur toutes les pages. */
-const entries: Entry[] = menuPages.map((p) => ({
-  key: p.key,
-  label: p.navLabel ?? p.label,
-  href: withBase(p.path),
-  current: isCurrent(p.path),
-}));
+/**
+ * Le menu ne contient que des pages (décision du 10/09/2026), jamais d'ancre de section.
+ * L'ACCUEIL en est retiré (12/09/2026, demande de l'équipe) : le logo de la barre y mène déjà, une
+ * entrée de plus ferait doublon et volerait une place aux cinq autres. Le filtre est ICI et non dans
+ * `menuPages` : le pied de page et la page 404 construisent leur liste à partir de la même source et
+ * n'ont, eux, pas de logo cliquable, ils gardent donc leur lien vers l'accueil.
+ */
+const entries: Entry[] = menuPages
+  .filter((p) => p.key !== 'home')
+  .map((p) => ({
+    key: p.key,
+    label: p.navLabel ?? p.label,
+    href: withBase(p.path),
+    current: isCurrent(p.path),
+  }));
 
 /** Le logo ramène toujours à l'accueil (aucune ancre dans la navigation). */
 const logoHref = withBase(pages.home.path);

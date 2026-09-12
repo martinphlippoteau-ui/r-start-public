@@ -155,6 +155,47 @@ test.describe('Qualité', () => {
   });
 
   /*
+   * La pastille d'appel et l'invitation à défiler du hero se relaient : jamais visibles ensemble, jamais
+   * absentes ensemble une fois le hero passé. Le test descend la page et vérifie la complémentarité à
+   * chaque palier. Sur grand écran le hero est ÉPINGLÉ, la boîte de l'invitation ne quitte donc jamais
+   * l'écran et c'est son opacité qui tombe : les deux mesures comptent, et une seule des deux laisserait
+   * passer un décalage de mille pixels.
+   */
+  test('la pastille d’appel prend le relais de l’invitation à défiler', async ({ page }) => {
+    await page.goto('/');
+    await page.locator('[data-consent-refuse]').click();
+    /* Après la séquence d'ouverture : avant, l'invitation n'est pas encore entrée. */
+    await page.waitForTimeout(2400);
+
+    const releve = async () =>
+      page.evaluate(() => {
+        const pastille = document.querySelector('[data-sticky-cta]')!;
+        const invitation = document.querySelector('[data-hero-scroll-hint]')!;
+        const enveloppe = invitation.closest('[data-scrub]') ?? invitation;
+        const r = invitation.getBoundingClientRect();
+        return {
+          invitation:
+            r.bottom > 0 &&
+            r.top < window.innerHeight &&
+            parseFloat(getComputedStyle(enveloppe).opacity) > 0.05,
+          pastille: pastille.hasAttribute('data-on'),
+        };
+      });
+
+    for (const y of [0, 400, 1000, 3000]) {
+      await page.evaluate((v) => window.scrollTo(0, v), y);
+      await page.waitForTimeout(350);
+      const { invitation, pastille } = await releve();
+      expect(pastille, `à ${y} px, invitation visible = ${invitation}`).toBe(!invitation);
+    }
+
+    /* Remontée : l'invitation revient, la pastille se replie. */
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.waitForTimeout(600);
+    expect(await releve()).toEqual({ invitation: true, pastille: false });
+  });
+
+  /*
    * Navigation d'une page à l'autre : la barre ne doit pas bouger d'un pixel, et l'indicateur doit se
    * poser sur le nouveau lien actif. C'est ce que garantissent les `view-transition-name` posés sur la
    * barre et sur l'indicateur (global.css) ; un nom effacé casserait la continuité en silence.

@@ -16,7 +16,6 @@ import StickyCta from '@/components/StickyCta.astro';
 import { seo } from '@/content/fr/seo';
 import { faq } from '@/content/fr/faq';
 import { difference } from '@/content/fr/difference';
-import { sections } from '@/config/sections';
 import { withBase } from '@/lib/href';
 import { faqJsonLd, organizationJsonLd, webPageJsonLd } from '@/lib/seo';
 
@@ -86,7 +85,7 @@ const jsonLd = [
   <StickyCta
     label={difference.cta.label}
     href={withBase(difference.cta.href)}
-    fromId={sections.difference.id}
+    watch="[data-hero-scroll-hint]"
   />
   <Footer />
 </Base>

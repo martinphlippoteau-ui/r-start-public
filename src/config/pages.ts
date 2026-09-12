@@ -52,6 +52,9 @@ export const pages: Record<PageKey, PageMeta> = {
     key: 'strategy',
     path: '/strategie',
     label: 'Stratégie d’investissement',
+    /* Les libellés de navigation portent tous un article (12/09/2026) : « Les frais », « La stratégie »,
+       « Les outils », « La presse en parle ». `label` reste le nom complet de la page. */
+    navLabel: 'La stratégie',
     order: 3,
     inMenu: true,
   },
@@ -59,7 +62,7 @@ export const pages: Record<PageKey, PageMeta> = {
     key: 'tools',
     path: '/outils',
     label: 'Outils',
-    navLabel: 'Outils',
+    navLabel: 'Les outils',
     /** Après les frais : les outils chiffrent ce que la page Frais explique. */
     order: 4,
     inMenu: true,
