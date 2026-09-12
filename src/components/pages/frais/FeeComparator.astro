@@ -49,14 +49,21 @@ const data = scpis.map((s) => ({
 
 <Section id={id} tone="white" labelledBy={titleId}>
   <Container size="wide">
-    <h2 id={titleId} class="text-display-lg text-balance">{comparator.title}</h2>
-    <p class="text-lead mt-6 max-w-3xl opacity-90">{comparator.intro}</p>
+    {
+      /* Titre MASQUÉ VISUELLEMENT (12/09/2026, demande de l'équipe) : la page arrive directement sur le
+        tableau. Il reste dans le code parce que la section a besoin d'un nom — sans lui, elle n'est plus
+        annonçable au lecteur d'écran, et `labelledBy` pointerait dans le vide.
+        L'introduction et l'hypothèse de lecture ont été retirées à la même occasion. L'hypothèse des huit
+        ans n'est pas perdue : chaque taux de retrait porte sa condition juste en dessous — « au-delà de
+        6 ans ; avant, 6,00 % TTC du capital retiré ». L'information est au plus près du chiffre. */
+    }
+    <h2 id={titleId} class="visually-hidden">{comparator.title}</h2>
 
     {
       /* Avertissement tant que les taux des autres SCPI ne sont pas relevés. Le script le masque dès que
         la SCPI choisie est complète. */
     }
-    <div data-comparator-pending class="mt-8">
+    <div data-comparator-pending>
       <RiskNote text={comparator.pendingNotice} size="lead" />
     </div>
 

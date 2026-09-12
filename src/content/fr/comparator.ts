@@ -44,8 +44,23 @@ export interface ComparedScpi {
 export type ComparatorRowKey =
   'subscription' | 'acquisition' | 'broker' | 'management' | 'works' | 'disposal' | 'withdrawal';
 
-/** Barème de retrait de R Start, reconstruit depuis facts : jamais réécrit à la main. */
-const withdrawalLabel = fees.withdrawal.steps.map((s) => s.rate).join(' / ');
+/**
+ * Hypothèse de lecture du tableau (12/09/2026, demande de l'équipe) : le souscripteur garde ses parts au
+ * moins huit ans, la durée après laquelle R Start ne prélève plus de commission de retrait. Elle est dite
+ * en clair sous le tableau, parce qu'elle change la ligne « retrait » de toutes les SCPI.
+ */
+const HOLDING_YEARS = fees.withdrawal.zeroAfterYears;
+
+/** Fourchette d'un barème à paliers : « de 0 % à 12 % » se lit mieux que « 0 / 6 / 12 % ». */
+const range = (rates: readonly string[]): string => {
+  const nums = rates.map((r) => parseFloat(r.replace(',', '.')));
+  const min = Math.min(...nums);
+  const max = Math.max(...nums);
+  return min === max ? `${min} %` : `de ${min} % à ${max} %`;
+};
+
+/** Taux de retrait de R Start au-delà de la durée retenue : le dernier palier du barème. */
+const withdrawalAfterHolding = fees.withdrawal.steps[fees.withdrawal.steps.length - 1].rate;
 
 export const comparator = {
   title: 'Comparer les frais, SCPI par SCPI',
@@ -73,6 +88,8 @@ export const comparator = {
   /** Bandeau d'avertissement tant qu'une seule valeur manque pour la SCPI choisie. */
   pendingNotice:
     'Les taux de cette SCPI ne sont pas encore relevés. Tant qu’ils manquent, ce tableau ne compare rien : il ne montre que les frais de R Start. Aucune conclusion ne peut en être tirée.',
+  /** Hypothèse de lecture, affichée au-dessus du tableau : elle change la ligne « retrait ». */
+  holdingNotice: `La ligne « frais de retrait anticipé » suppose une détention d’au moins ${HOLDING_YEARS} ans, la durée de placement recommandée de ${product.name}. Sortir plus tôt coûte davantage : le barème complet de chaque SCPI figure sous son taux.`,
   /** Rappel permanent sous le tableau : une case vide n'est pas un zéro. */
   notPublishedNotice:
     'Une ligne « non publié » signifie que le document consulté ne mentionne pas ce frais. Cela ne veut pas dire qu’il n’est pas prélevé.',
@@ -89,7 +106,7 @@ export const comparator = {
    * marché de la brochure, ni une comparaison de résultats.
    */
   perimeter:
-    'Ce tableau compare les taux de frais affichés dans les documents de chaque SCPI. Quand les deux taux d’une ligne sont directement comparables, le plus bas est mis en avant : cette mise en avant ne porte que sur cette ligne et ne dit rien du coût total, qui dépend de ce que la SCPI encaisse et de votre durée de détention. Il ne compare pas les résultats. Il ne porte pas sur l’ensemble du marché : seules les SCPI de la liste y figurent. R Start n’a pas d’historique et aucune donnée de performance n’est communiquée sur ce site.',
+    'Ce tableau compare les taux de frais affichés dans les documents de chaque SCPI, lus sous une même hypothèse de durée de détention. Quand les deux taux d’une ligne sont directement comparables, le plus bas est mis en avant : cette mise en avant ne porte que sur cette ligne et ne dit rien du coût total, qui dépend de ce que la SCPI encaisse et de votre durée de détention. Il ne compare pas les résultats. Il ne porte pas sur l’ensemble du marché : seules les SCPI de la liste y figurent. R Start n’a pas d’historique et aucune donnée de performance n’est communiquée sur ce site.',
   /**
    * Base de comparaison HT / TTC. Sans elle, on opposerait un taux TTC à un taux HT sans le dire, ce que
    * l'AMF a déjà reproché à la brochure. R Start étant exonérée de TVA, ses deux montants sont égaux.
@@ -135,16 +152,19 @@ export const comparator = {
       key: 'disposal' as const,
       label: 'Frais de cession d’immeubles',
       basis: 'en % du prix de vente',
-      rstart: fees.disposal.label,
-      /** Le taux dépend de la plus-value réalisée : le détail des paliers accompagne la valeur. */
+      rstart: range(fees.disposal.tiers.map((t) => t.rate)),
+      /** Le taux dépend de la plus-value réalisée : le détail des paliers accompagne la fourchette. */
       rstartDetail: fees.disposal.tiers.map((t) => `${t.rate} ${t.condition}`).join(', '),
     },
     {
       key: 'withdrawal' as const,
       label: 'Frais de retrait anticipé',
       basis: 'en % de la valeur de retrait',
-      rstart: withdrawalLabel,
-      rstartDetail: fees.withdrawal.steps.map((s) => `${s.rate} ${s.short}`).join(', '),
+      rstart: withdrawalAfterHolding,
+      rstartDetail: `au-delà de ${HOLDING_YEARS} ans de détention ; avant, le barème est dégressif : ${fees.withdrawal.steps
+        .slice(0, -1)
+        .map((s) => `${s.rate} ${s.short}`)
+        .join(', ')}`,
     },
   ],
 
@@ -170,13 +190,13 @@ export const comparator = {
         management: '14,40 % TTC',
         works: '6,00 % TTC',
         disposal: '5 % TTC',
-        withdrawal: '6,00 % TTC',
+        withdrawal: '0 %',
       },
       details: {
         broker: 'taux 2025 des acquisitions de gré à gré, plafonné à 6,00 % TTC',
         management: 'sur les loyers perçus',
         disposal: 'sur le prix de vente, en cas de plus-value',
-        withdrawal: 'sur le capital retiré, 0 % après 6 ans',
+        withdrawal: 'au-delà de 6 ans ; avant, 6,00 % TTC du capital retiré',
       },
       /** Le nom de la SCPI est déjà l'intitulé de la ligne de sources : il ne se répète pas ici. */
       source:
@@ -255,12 +275,12 @@ export const comparator = {
         management: '15,36 % TTC',
         works: '6,00 % TTC',
         disposal: '5 % TTC',
-        withdrawal: '6,00 % TTC',
+        withdrawal: '0 %',
       },
       details: {
         management: 'des loyers perçus',
         disposal: 'sur le prix de vente d’un actif, en cas de plus-value seulement',
-        withdrawal: 'sur le capital retiré, en cas de sortie avant 6 ans ; 0 % après 6 ans',
+        withdrawal: 'au-delà de 6 ans ; avant, 6,00 % TTC du capital retiré',
       },
       source:
         'page « Nos frais » d’Iroko, colonne Iroko Atlas, consultée le 12 septembre 2026 sur iroko.eu. Les frais de brokerage n’y figurent que pour Iroko Zen : la ligne reste vide pour Atlas.',
@@ -316,7 +336,7 @@ export const comparator = {
         management: '14,40 % TTC',
         works: '1,80 % TTC',
         disposal: '3,00 % TTC',
-        withdrawal: '5,00 % TTC',
+        withdrawal: '0 %',
       },
       details: {
         subscription: '2,00 % HT du prix de souscription, primes d’émission incluses',
@@ -324,7 +344,7 @@ export const comparator = {
         management: '12,00 % HT des produits locatifs et financiers encaissés',
         works: '1,50 % HT, pour tout programme supérieur à 100 000 € HT',
         disposal: '2,50 % HT du prix de vente du bien cédé',
-        withdrawal: '4,17 % HT du montant remboursé, pour les parts détenues depuis moins de 8 ans',
+        withdrawal: 'au-delà de 8 ans ; avant, 4,17 % HT (5,00 % TTC) du montant remboursé',
       },
       source:
         'note d’information, version de juillet 2026, chapitre III, consultée le 12 septembre 2026 sur sofidy.com.',
@@ -356,14 +376,14 @@ export const comparator = {
         acquisition: '5 % TTC',
         management: '18 % TTC',
         works: '5 % TTC',
-        withdrawal: '5 % TTC',
+        withdrawal: '0 %',
       },
       details: {
         acquisition: '4,17 % HT du prix d’acquisition net vendeur',
         management: '15 % HT des produits locatifs et autres produits encaissés',
         works: '4,17 % HT du montant des travaux de gros entretien et d’investissement',
         withdrawal:
-          '4,17 % HT du montant remboursé, pour les parts détenues depuis moins de 5 ans ; exonérations prévues',
+          'au-delà de 5 ans ; avant, 4,17 % HT (5 % TTC) du montant remboursé, avec exonérations prévues',
       },
       source:
         'note d’information du 30 juin 2026, consultée le 12 septembre 2026 sur remake.fr. Aucune commission de cession d’immeubles ni d’intermédiation n’y figure : ces lignes restent vides.',
@@ -472,7 +492,7 @@ export const comparator = {
         acquisition: '0 %',
         management: '12 % TTC',
         works: '6 % TTC',
-        disposal: '1 % à 5 %',
+        disposal: 'de 1 % à 5 %',
       },
       details: {
         subscription: '10 % HT maximum du prix de souscription, inclus dans la prime d’émission',
@@ -502,7 +522,7 @@ export const comparator = {
         management: '12 % TTC',
         works: '1,20 % TTC',
         disposal: '1,20 % TTC',
-        withdrawal: 'Néant',
+        withdrawal: '0 %',
       },
       details: {
         subscription: '8 % HT du montant de la souscription',
@@ -511,6 +531,7 @@ export const comparator = {
         management: '10 % HT maximum des produits locatifs et autres produits encaissés',
         works: '1 % HT maximum du montant des travaux réalisés',
         disposal: '1 % HT maximum du prix de vente hors droits, en cas de plus-value seulement',
+        withdrawal: 'la note d’information ne prévoit aucune commission de retrait',
       },
       source:
         'page produit de Pierre 1er Gestion, consultée le 12 septembre 2026 sur pierrepremiergestion.fr, qui renvoie au document d’informations clés et à la note d’information.',
