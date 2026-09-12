@@ -480,6 +480,11 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
     background-color: transparent;
     border-color: transparent;
     box-shadow: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  [data-sticky-cta]:not([data-on]) [data-sticky-link]::after {
+    opacity: 0;
   }
   [data-sticky-cta]:not([data-on]) [data-sticky-label] {
     grid-template-columns: 0fr;
@@ -508,12 +513,22 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
       background-color 320ms ease,
       border-color 320ms ease,
       box-shadow 320ms ease,
+      /* Le flou est dans la liste, sinon le retard ne s'y applique pas : il revenait avant le fond, et
+         l'on voyait une tache floutée autour du rond pendant que la pastille était encore vide. */ -webkit-backdrop-filter
+        320ms ease,
+      backdrop-filter 320ms ease,
       color 320ms ease;
+  }
+  [data-sticky-link]::before,
+  [data-sticky-link]::after {
+    transition: opacity 320ms ease;
   }
   [data-sticky-label] {
     transition: grid-template-columns 420ms var(--ease-spring);
   }
-  [data-sticky-cta][data-on] :is([data-sticky-link], [data-sticky-label]) {
+  [data-sticky-cta][data-on] :is([data-sticky-link], [data-sticky-label]),
+  [data-sticky-cta][data-on] [data-sticky-link]::before,
+  [data-sticky-cta][data-on] [data-sticky-link]::after {
     transition-delay: 300ms;
   }
   /* Le survol ne doit pas attendre le retard du dépliage pour répondre. */
@@ -876,26 +891,17 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
  * Appel flottant (components/StickyCta.astro), en deux temps qui suivent le pliage.
  *
  * REPLIÉ, on ne voit que le ROND du chevron, bleu plein, chevron blanc : la pastille qui l'entoure est
- * transparente, sans contour ni ombre, et mesure exactement le rond plus ses huit pixels de marge.
- * DÉPLIÉ, la pastille s'ouvre en BLANC PLEIN, libellé navy, et le rond ne bouge pas : il garde sa taille
- * et sa couleur pendant que tout pousse autour de lui.
+ * transparente, sans matière, et mesure exactement le rond plus ses huit pixels de marge.
+ * DÉPLIÉ, elle s'ouvre et prend la MATIÈRE DE LA BARRE DE NAVIGATION, libellé navy, le rond inchangé.
  *
- * PAS DE VERRE ICI (12/09/2026, demande de l'équipe). La barre de navigation en porte, la pastille non :
- * elle passe au ras du texte courant, et translucide, les lignes du dessous se lisaient à travers elle.
- * Un blanc plein règle la lisibilité d'un coup et fait de la pastille un objet posé sur la page, pas une
- * vitre. Le libellé navy y tient 9,7:1, le chevron blanc sur le rond bleu 9,7:1 également.
+ * La matière n'est pas réécrite ici : la pastille porte l'utilitaire `nav-glass`, celui de la barre. Une
+ * copie approchante aurait dérivé au premier réglage ; en partageant l'utilitaire, les deux restent
+ * raccord par construction. Cette règle ne pose que ce qui DIFFÈRE : le rayon, plein rond au lieu du
+ * rayon de la barre, la couleur du texte, et l'état replié.
  */
 @utility sticky-skin {
-  background-color: #fff;
+  border-radius: 9999px;
   color: var(--color-navy);
-  border: 1px solid color-mix(in oklab, var(--color-navy) 18%, transparent);
-  box-shadow:
-    0 2px 6px rgb(2 75 103 / 0.1),
-    0 16px 40px -18px rgb(2 75 103 / 0.45);
-
-  &:hover {
-    border-color: color-mix(in oklab, var(--color-navy) 45%, transparent);
-  }
 }
 
 /* Le rond du chevron : couleur de CTA primaire, taille fixe. 3 rem dans une pastille de 4 rem, soit
