@@ -100,8 +100,15 @@ const linkClass =
   class="pt-nav-gap -mb-nav-total sticky top-0 z-40"
 >
   <div class="mx-auto w-full max-w-7xl px-3 sm:px-5">
+    {
+      /* `view-transition-name` : le navigateur extrait cette pastille des deux captures de page et
+        l'anime à part. Aux mêmes coordonnées d'une page à l'autre, elle ne bouge donc pas et ne
+        clignote pas. Le nom est ici et non sur le <nav>, qui porte aussi le tiroir en `position: fixed`
+        (un élément capturé devient le bloc conteneur de ses descendants fixes). */
+    }
     <div
       data-sitenav-bar
+      style="view-transition-name: barre-nav"
       class="nav-glass flex h-subnav items-center gap-2 px-3 sm:gap-4 sm:px-4 lg:grid lg:grid-cols-[1fr_auto_1fr]"
     >
       <a
@@ -126,11 +133,30 @@ const linkClass =
         class="scrollbar-none scroll-fade-x relative -my-2 -mr-2 -ml-3 hidden min-w-0 flex-1 items-center gap-0.5 overflow-x-auto py-2 pr-2 pl-3 sm:-mx-2 sm:gap-1 sm:px-2 lg:flex lg:justify-self-center"
         role="list"
       >
-        <li aria-hidden="true" data-subnav-pill class="subnav-pill"></li>
+        {
+          /* Deux éléments et non un : l'enveloppe porte le DÉPLACEMENT (translateX, posé en ligne par
+            le script), la peau porte l'ÉTIREMENT (scaleX, une animation). Sur un seul élément les deux
+            se disputeraient la propriété `transform`, et la dernière écrirait par-dessus l'autre.
+            `view-transition-name` sur l'enveloppe : d'une page à l'autre, le navigateur interpole
+            lui-même ses coordonnées, la pastille glisse du lien quitté vers le nouveau. */
+        }
+        <li
+          aria-hidden="true"
+          data-subnav-pill
+          style="view-transition-name: pastille-nav"
+          class="subnav-pill"
+        >
+          <span data-subnav-pill-skin class="subnav-pill-skin"></span>
+        </li>
         {
           entries.map((e) => (
             <li class="relative shrink-0">
-              <a href={e.href} aria-current={e.current ? 'page' : undefined} class={linkClass}>
+              <a
+                href={e.href}
+                aria-current={e.current ? 'page' : undefined}
+                data-astro-prefetch="hover"
+                class={linkClass}
+              >
                 {e.label}
               </a>
             </li>
@@ -228,6 +254,7 @@ const linkClass =
                 <a
                   href={e.href}
                   data-menu-close
+                  data-astro-prefetch="hover"
                   aria-current={e.current ? 'page' : undefined}
                   class="text-display-sm block rounded-2xl px-3 py-2.5 text-white/85 no-underline transition-colors hover:text-white aria-[current]:text-white aria-[current]:underline aria-[current]:decoration-2 aria-[current]:underline-offset-8"
                 >
@@ -261,17 +288,21 @@ const linkClass =
     /* La pastille marque la page courante (le menu ne contient que des pages). */
     const currentLink = list?.querySelector<HTMLAnchorElement>('a[aria-current="page"]') ?? null;
 
-    /* Pastille : position et taille du lien courant (lectures groupées, puis écritures). */
-    const placePill = () => {
+    /*
+     * Pastille : position et taille d'un lien (lectures groupées, puis écritures).
+     * Sans argument, elle se cale sur la page courante ; avec, sur le lien visé, ce qui sert au retour
+     * visuel immédiat du clic.
+     */
+    const placePill = (cible: HTMLAnchorElement | null = currentLink) => {
       if (!pill) return;
-      if (!currentLink) {
+      if (!cible) {
         pill.style.opacity = '0';
         return;
       }
-      const item = currentLink.parentElement as HTMLElement;
+      const item = cible.parentElement as HTMLElement;
       const { offsetLeft, offsetTop, offsetWidth, offsetHeight } = item;
       // Première apparition : placée sans transition de position ni de largeur, seul le fondu joue ;
-      // ensuite (redimensionnement, polices) elle glisse et se morphe.
+      // ensuite (redimensionnement, polices, clic) elle glisse et se morphe.
       const appearing = pill.style.opacity !== '1';
       if (appearing) pill.style.transitionProperty = 'opacity';
       pill.style.width = offsetWidth + 'px';
@@ -287,6 +318,42 @@ const linkClass =
         });
       }
     };
+
+    /*
+     * Retour visuel AU CLIC, avant même que la page suivante réponde : la pastille part vers le lien
+     * visé et s'étire dans le sens du trajet. La transition de vue reprend ensuite le mouvement là où
+     * il en est, les deux visent le même point, le glissement se lit d'une seule pièce.
+     *
+     * Clics rapides à la suite : l'étirement est relancé en le RETIRANT puis en le reposant après un
+     * reflow forcé, sans quoi le navigateur ignore une animation déjà en cours. Rien ne s'empile : le
+     * déplacement est une transition, elle repart toujours de la position réelle du moment.
+     */
+    const skin = pill?.querySelector<HTMLElement>('[data-subnav-pill-skin]') ?? null;
+    let etirement = 0;
+    const glisserVers = (lien: HTMLAnchorElement) => {
+      if (!pill || lien === currentLink) return;
+      pill.removeAttribute('data-sliding');
+      if (skin) void skin.offsetWidth;
+      pill.setAttribute('data-sliding', '');
+      placePill(lien);
+      window.clearTimeout(etirement);
+      etirement = window.setTimeout(() => pill.removeAttribute('data-sliding'), 560);
+    };
+
+    list?.addEventListener('click', (event) => {
+      const lien = (event.target as HTMLElement).closest<HTMLAnchorElement>('a[href]');
+      /* Un clic modifié ou un clic du milieu ouvre un onglet : la page ne change pas, l'indicateur non
+         plus. */
+      const e = event as MouseEvent;
+      if (!lien || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+      glisserVers(lien);
+    });
+
+    /*
+     * Retour arrière du navigateur : la page revient du cache (bfcache) avec son indicateur là où il
+     * était au départ. `pageshow` le remet sur le lien courant de CETTE page.
+     */
+    window.addEventListener('pageshow', () => placePill());
 
     /* Fondu latéral : uniquement quand la liste déborde réellement. */
     const syncOverflow = () => {
@@ -304,7 +371,9 @@ const linkClass =
     const syncScroll = () => {
       scrollFrame = 0;
       const y = window.scrollY;
-      bar?.toggleAttribute('data-stuck', y > 2);
+      /* Seuil à 40 px (12/09/2026) : la barre prend son ombre ET se contracte légèrement une fois la
+         page franchement défilée, pas au premier pixel d'un rebond élastique. */
+      bar?.toggleAttribute('data-stuck', y > 40);
       const range = document.documentElement.scrollHeight - window.innerHeight;
       const compact = range > 0 && y / range >= compactAt;
       if (compact !== root.hasAttribute('data-compact'))

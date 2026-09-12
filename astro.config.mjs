@@ -18,6 +18,12 @@ export default defineConfig({
   base: BASE_PATH,
   trailingSlash: 'ignore',
   compressHTML: true,
+  /*
+   * Préchargement au SURVOL (12/09/2026) : la page cible est demandée pendant que le doigt approche, la
+   * transition n'attend donc jamais le réseau. `hover` et non `viewport` : précharger tout ce qui entre
+   * à l'écran ferait télécharger huit pages à chaque visite, pour un site qui tient à sa légèreté.
+   */
+  prefetch: { defaultStrategy: 'hover' },
   build: {
     inlineStylesheets: 'auto',
   },

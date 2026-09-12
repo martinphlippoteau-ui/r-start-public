@@ -155,6 +155,47 @@ test.describe('Qualité', () => {
   });
 
   /*
+   * Navigation d'une page à l'autre : la barre ne doit pas bouger d'un pixel, et l'indicateur doit se
+   * poser sur le nouveau lien actif. C'est ce que garantissent les `view-transition-name` posés sur la
+   * barre et sur l'indicateur (global.css) ; un nom effacé casserait la continuité en silence.
+   */
+  test('la barre ne bouge pas d’une page à l’autre et l’indicateur suit', async ({ page }) => {
+    const boite = () =>
+      page.evaluate(() => {
+        const r = document.querySelector('[data-sitenav-bar]')!.getBoundingClientRect();
+        return [r.x, r.y, r.width, r.height].map(Math.round).join(',');
+      });
+
+    await page.goto('/frais/');
+    const noms = await page.evaluate(() => ({
+      barre: getComputedStyle(document.querySelector('[data-sitenav-bar]')!).viewTransitionName,
+      indicateur: getComputedStyle(document.querySelector('[data-subnav-pill]')!)
+        .viewTransitionName,
+    }));
+    expect(noms.barre).toBe('barre-nav');
+    expect(noms.indicateur).toBe('pastille-nav');
+
+    const avant = await boite();
+    await page.goto('/a-propos/');
+    expect(await boite()).toBe(avant);
+
+    /* L'indicateur n'existe qu'à partir de « lg », là où la liste est affichée. */
+    const aLaListe = await page.locator('[data-sitenav-list]').isVisible();
+    if (aLaListe) {
+      const aligne = await page.evaluate(() => {
+        const pastille = document.querySelector('[data-subnav-pill]')!.getBoundingClientRect();
+        const actif = document.querySelector('[data-sitenav-list] a[aria-current="page"]')!;
+        return {
+          texte: actif.textContent?.trim(),
+          ecart: Math.abs(pastille.x - actif.getBoundingClientRect().x),
+        };
+      });
+      expect(aligne.texte).toBe('À propos');
+      expect(aligne.ecart).toBeLessThan(4);
+    }
+  });
+
+  /*
    * Niveaux d'expertise des outils. La bascule est en CSS pure (global.css) : aucun typage ne la
    * protège, et un sélecteur déplacé la casserait en silence. Le test vérifie les trois paliers, et
    * surtout que le RÉSULTAT ne dépend pas du niveau : un champ masqué garde sa valeur, le calcul est

@@ -43,6 +43,25 @@
      il déborde d'un cheveu et revient. Réservé aux ouvertures, jamais aux fermetures, qui doivent être
      nettes, ni aux couleurs, qu'un dépassement rendrait sales. */
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  /* Ressort de la pastille de navigation : une vraie courbe de ressort échantillonnée, qui dépasse puis
+     oscille avant de se poser, là où une cubique ne sait faire qu'un seul dépassement. Repli en cubique
+     plus bas pour les navigateurs sans `linear()`. */
+  --ease-spring-nav: linear(
+    0,
+    0.006,
+    0.025 2.8%,
+    0.101 6.1%,
+    0.539 18.9%,
+    0.721 25.3%,
+    0.849 31.5%,
+    0.937 38.1%,
+    0.968 41.8%,
+    0.991 45.7%,
+    1.006 50.1%,
+    1.015 55%,
+    1.017 63.9%,
+    1.001
+  );
 
   --shadow-card: 0 1px 2px rgb(2 75 103 / 0.06), 0 12px 32px -12px rgb(2 75 103 / 0.18);
   --shadow-float: 0 24px 64px -24px rgb(2 75 103 / 0.35);
@@ -276,36 +295,94 @@
     blur(calc(24px * var(--nav-glass-on)));
   backdrop-filter: saturate(calc(100% + 85% * var(--nav-glass-on)))
     blur(calc(24px * var(--nav-glass-on)));
+  /* Épaisseur du verre, de haut en bas : arête supérieure claire, arête inférieure sombre, diffusion
+     interne, puis deux ombres portées, une serrée pour le décollement et une très diffuse pour la
+     profondeur. Le liseré blanc uniforme sur les quatre côtés a disparu : c'est l'arête en dégradé
+     (::after) qui le remplace, plus claire en haut à gauche, éteinte au milieu.
+     Les ombres portées sont en navy et non en noir : sur ce site, une ombre noire grise les fonds
+     `paper` au lieu de les creuser. */
   box-shadow:
-    inset 0 0 0 1px rgb(255 255 255 / calc(0.45 * var(--nav-glass-on))),
-    inset 0 1px 0 rgb(255 255 255 / calc(0.75 * var(--nav-glass-on))),
-    0 1px 2px rgb(2 75 103 / calc(0.05 * var(--nav-glass-on))),
-    0 12px 32px -16px rgb(2 75 103 / calc(0.3 * var(--nav-glass-on)));
+    inset 0 1px 0 rgb(255 255 255 / calc(0.55 * var(--nav-glass-on))),
+    inset 0 -1px 0 rgb(2 75 103 / calc(0.06 * var(--nav-glass-on))),
+    inset 0 0 20px rgb(255 255 255 / calc(0.1 * var(--nav-glass-on))),
+    0 1px 2px rgb(2 75 103 / calc(0.06 * var(--nav-glass-on))),
+    0 8px 32px -8px rgb(2 75 103 / calc(0.14 * var(--nav-glass-on)));
 
+  /* REFLET SPÉCULAIRE : la lumière prise par la moitié haute de la capsule, comme sur une vraie arête
+     de verre. Posé DERRIÈRE le contenu (z-index négatif dans le contexte isolé) : il éclaire la matière,
+     jamais le texte. */
   &::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 50% 0;
+    z-index: -1;
+    border-radius: inherit;
+    background-image: linear-gradient(
+      to bottom,
+      rgb(255 255 255 / 0.35),
+      rgb(255 255 255 / 0.08) 50%,
+      transparent 100%
+    );
+    opacity: var(--nav-glass-on);
+    pointer-events: none;
+  }
+
+  /* ARÊTE EN DÉGRADÉ : un trait d'un pixel plus lumineux en haut à gauche et en bas à droite, éteint au
+     milieu, comme la tranche d'une lentille prise en lumière rasante. Un dégradé ne peut pas être une
+     bordure : on peint donc le rectangle entier et l'on EXCLUT son intérieur au masque, il ne reste que
+     le pourtour d'un pixel. Ce masque remplace l'ancien liseré en ombre interne, qui était de la même
+     clarté sur les quatre côtés et n'évoquait aucune épaisseur. */
+  &::after {
     content: '';
     position: absolute;
     inset: 0;
     z-index: -1;
     border-radius: inherit;
-    background-image: linear-gradient(to bottom, rgb(255 255 255 / 0.5), rgb(255 255 255 / 0) 58%);
+    padding: 1px;
+    background-image: linear-gradient(
+      135deg,
+      rgb(255 255 255 / 0.65) 0%,
+      rgb(255 255 255 / 0.1) 40%,
+      rgb(255 255 255 / 0.05) 60%,
+      rgb(255 255 255 / 0.35) 100%
+    );
     opacity: var(--nav-glass-on);
     pointer-events: none;
+    -webkit-mask-image:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    mask-image:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
   }
 
   &[data-stuck] {
     --nav-glass-tint: 0.84;
+    /* Contraction au défilement : par TRANSFORM seul, jamais par la hauteur. `--spacing-subnav` sert de
+       repère à tout ce qui se colle sous la barre (le sommet des sections, l'en-tête du comparateur de
+       frais) ; la changer décalerait la moitié du site d'un demi-centimètre à chaque défilement. La
+       barre paraît passer de 56 à 53 px, sa boîte n'a pas bougé d'un pixel. */
+    @media (prefers-reduced-motion: no-preference) {
+      transform: scale(0.95);
+    }
     box-shadow:
-      inset 0 0 0 1px rgb(255 255 255 / calc(0.5 * var(--nav-glass-on))),
-      inset 0 1px 0 rgb(255 255 255 / calc(0.8 * var(--nav-glass-on))),
-      0 2px 4px rgb(2 75 103 / calc(0.06 * var(--nav-glass-on))),
-      0 18px 40px -18px rgb(2 75 103 / calc(0.38 * var(--nav-glass-on)));
+      inset 0 1px 0 rgb(255 255 255 / calc(0.6 * var(--nav-glass-on))),
+      inset 0 -1px 0 rgb(2 75 103 / calc(0.08 * var(--nav-glass-on))),
+      inset 0 0 20px rgb(255 255 255 / calc(0.12 * var(--nav-glass-on))),
+      0 2px 4px rgb(2 75 103 / calc(0.07 * var(--nav-glass-on))),
+      0 14px 40px -10px rgb(2 75 103 / calc(0.2 * var(--nav-glass-on)));
   }
+
+  transform-origin: 50% 0;
 
   @media (prefers-reduced-motion: no-preference) {
     transition:
       background-color 320ms var(--ease-out-expo),
-      box-shadow 320ms var(--ease-out-expo);
+      box-shadow 320ms var(--ease-out-expo),
+      /* Courbe standard d'Apple pour une contraction : longue détente, arrivée nette. */ transform
+        400ms cubic-bezier(0.32, 0.72, 0, 1);
   }
 
   /* Sans flou d'arrière-plan (Firefox ancien), le blanc devient opaque : la barre reste lisible. */
@@ -730,6 +807,21 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   &[aria-current='page']::after {
     transform: scaleX(1);
   }
+
+  /* Soulèvement au survol, compression à l'appui : la même grammaire que les boutons du site, à une
+     amplitude moindre, une entrée de menu n'étant pas un bouton d'action. Transform seul. */
+  @media (prefers-reduced-motion: no-preference) {
+    transition:
+      transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1),
+      color 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+    &:hover {
+      transform: translateY(-1px);
+    }
+    &:active {
+      transform: scale(0.96);
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     &::after {
       transition: none;
@@ -820,16 +912,50 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   width: 0;
   height: 0;
   border-radius: 9999px;
-  /* Elle appartient à la matière de la barre et suit sa présence. `opacity` reste pilotée en ligne par
-     le script. */
-  background: rgb(2 75 103 / calc(0.08 * var(--nav-glass-on, 1)));
   opacity: 0;
   pointer-events: none;
+  /* Seul l'indicateur porte `will-change` : c'est la seule chose de la barre qui se déplace vraiment,
+     et en distribuer partout coûterait une couche GPU par élément pour rien. */
+  will-change: transform;
   @media (prefers-reduced-motion: no-preference) {
     transition:
-      transform 320ms var(--ease-out-expo),
-      width 320ms var(--ease-out-expo),
+      transform 550ms var(--ease-spring-nav),
+      width 550ms var(--ease-spring-nav),
       opacity 200ms ease;
+  }
+}
+
+/* Peau de l'indicateur : un verre plus dense que celui de la barre, avec sa propre arête claire. Elle
+   ne porte que l'ÉTIREMENT, jamais le déplacement, qui est à l'enveloppe (SiteNav.astro). */
+@utility subnav-pill-skin {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  background: rgb(2 75 103 / calc(0.08 * var(--nav-glass-on, 1)));
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.6),
+    0 2px 8px rgb(2 75 103 / 0.1);
+}
+
+/* Étirement de la goutte : la pastille s'allonge dans le sens du trajet à mi-course, puis reprend sa
+   forme. Une ANIMATION et non une transition : une transition ne sait pas repasser par un état
+   intermédiaire. Posée par le script au moment où la pastille change de lien. */
+@media (prefers-reduced-motion: no-preference) {
+  [data-subnav-pill][data-sliding] .subnav-pill-skin {
+    animation: pastille-etirement 550ms var(--ease-out-expo);
+  }
+}
+
+@keyframes pastille-etirement {
+  0% {
+    transform: scaleX(1);
+  }
+  45% {
+    transform: scaleX(1.18);
+  }
+  100% {
+    transform: scaleX(1);
   }
 }
 @utility subnav-cta {
@@ -1314,4 +1440,86 @@ body:has(#consent-banner:not([hidden])) [data-hero-scroll-hint] {
 [data-tool-level]:has([data-tool-level-input][value='3']:checked)
   :is([data-level-only][data-level='1'], [data-level-only][data-level='2']) {
   display: none;
+}
+
+/* ===========================================================================================
+   TRANSITIONS DE PAGE (12/09/2026, demande de l'équipe)
+   ===========================================================================================
+   Le site est multipage. `@view-transition { navigation: auto }` suffit : le navigateur fige la page
+   qu'on quitte, charge la suivante et fond l'une dans l'autre. Aucun JavaScript, aucun routeur client,
+   donc aucun des scripts en ligne du site n'a besoin d'être rejoué : ils repartent avec leur page.
+   Le navigateur qui ne connaît pas la règle navigue comme avant, sans transition : c'est le repli.
+
+   La BARRE et sa pastille portent un `view-transition-name` : le navigateur les extrait des deux
+   captures et les anime SÉPARÉMENT du reste. Aux mêmes coordonnées d'une page à l'autre, la barre ne
+   bouge donc pas d'un pixel et ne clignote pas ; la pastille, elle, glisse du lien quitté vers le
+   nouveau, puisque ses coordonnées changent.
+   Le nom est posé sur la PASTILLE de verre (`[data-sitenav-bar]`), pas sur le `<nav>` : celui-ci
+   contient aussi le tiroir en `position: fixed`, et un élément capturé devient le bloc conteneur de ses
+   descendants fixes, le tiroir se calerait alors sur la barre au lieu de l'écran. */
+@supports not (animation-timing-function: linear(0, 1)) {
+  :root {
+    --ease-spring-nav: cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+}
+
+@view-transition {
+  navigation: auto;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Contenu : fondu doux et légère montée. 350 ms, la durée au-delà de laquelle une navigation se met à
+     paraître lente. La sortie est plus courte que l'entrée : on quitte vite, on arrive posément. */
+  ::view-transition-old(root) {
+    animation: 140ms ease-out both vt-sortie;
+  }
+  ::view-transition-new(root) {
+    animation: 350ms 60ms var(--ease-out-expo) both vt-entree;
+  }
+
+  /* La barre ne participe à rien : aucune animation sur son groupe, elle est simplement là, continue. */
+  ::view-transition-group(barre-nav) {
+    animation-duration: 0s;
+  }
+  ::view-transition-old(barre-nav),
+  ::view-transition-new(barre-nav) {
+    animation: none;
+    mix-blend-mode: normal;
+  }
+
+  /* La pastille glisse d'un lien à l'autre, au ressort, en s'étirant dans le sens du trajet : c'est le
+     groupe que le navigateur interpole entre les deux positions, il suffit de lui donner sa courbe. */
+  ::view-transition-group(pastille-nav) {
+    animation-duration: 550ms;
+    animation-timing-function: var(--ease-spring-nav);
+  }
+  ::view-transition-old(pastille-nav),
+  ::view-transition-new(pastille-nav) {
+    animation: none;
+    mix-blend-mode: normal;
+  }
+}
+
+/* En mouvement réduit, la navigation reste instantanée : pas de fondu, pas de glissement. La règle
+   `@view-transition` demeure, le navigateur passe d'une page à l'autre sans rien animer. */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
+@keyframes vt-sortie {
+  to {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes vt-entree {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
 }
