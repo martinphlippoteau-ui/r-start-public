@@ -21,7 +21,6 @@ interface Props {
   class?: string;
 }
 const { name, notes, class: className = '' } = Astro.props as Props;
-const helpId = `${name}-niveau-aide`;
 ---
 
 <fieldset class:list={['border-0 p-0', className]}>
@@ -45,7 +44,6 @@ const helpId = `${name}-niveau-aide`;
               value={String(niveau.rank)}
               data-tool-level-input
               checked={i === 0}
-              aria-describedby={helpId}
               class="peer visually-hidden"
             />
             <label
@@ -59,8 +57,6 @@ const helpId = `${name}-niveau-aide`;
       })
     }
   </div>
-
-  <p id={helpId} class="text-caption mt-3 max-w-2xl text-slate-700">{levelPicker.help}</p>
 
   {
     /* Ce que le niveau courant ajoute. Les trois phrases sont dans le HTML, `data-level` n'en laisse

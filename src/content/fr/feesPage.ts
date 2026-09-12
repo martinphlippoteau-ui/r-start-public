@@ -385,7 +385,9 @@ const raw = {
 
   hero: {
     eyebrow: `Frais · SCPI ${product.name}`,
-    title: `Comparer et comprendre les frais de ${product.name}`,
+    /* Césure voulue (12/09/2026, demande de l'équipe) : « Comparer et comprendre » tient sa ligne, le
+       complément la sienne. PageHero respecte le saut de ligne. */
+    title: `Comparer et comprendre\nles frais de ${product.name}`,
     intro: `R Start ne prélève rien à la souscription ni à l’achat des immeubles. Sa société de gestion se rémunère sur les loyers encaissés, sur les plus-values à la vente et, avant ${zeroAfter} ans, sur les retraits.`,
     riskLine: shortRiskLine,
   },

@@ -94,6 +94,8 @@ export type ToolLevelId = (typeof toolLevels)[number]['id'];
  */
 export const funnel = {
   stepperLabel: 'Étapes de la simulation',
+  /** Écran d'attente du résultat : le logo tourne le temps du calcul. */
+  loading: 'Calcul en cours',
   /** Repère parlé et affiché : « Étape 2 sur 4 ». */
   progressTemplate: 'Étape {n} sur {total}',
   previous: 'Précédent',
@@ -161,13 +163,15 @@ export const toolsPage = {
       expert:
         'Ajoute les taux de la SCPI comparée et le détail poste par poste de ce que prélève R Start.',
     },
-    /* Une question par étape : on répond, on avance. Les étapes 3 et 4 n'existent qu'aux niveaux
-       intermédiaire et expert, puisque leurs champs y apparaissent. */
+    /* UNE SEULE question par écran. Les étapes 3 et 4 n'existent qu'à partir du niveau intermédiaire,
+       les étapes 5 et 6 qu'au niveau expert : ce sont leurs champs qui décident. */
     steps: [
       'Combien souhaitez-vous investir ?',
       'Quels loyers imaginez-vous percevoir ?',
-      'Combien de temps gardez-vous vos parts, et à quel prix les revendez-vous ?',
-      'Quels sont les frais de la SCPI que vous comparez ?',
+      'Combien de temps gardez-vous vos parts ?',
+      'À quel prix les revendez-vous ?',
+      'Quels frais la SCPI comparée prend-elle à l’entrée ?',
+      'Et quels frais de gestion prend-elle ?',
     ],
     title: 'Ce que R Start prélève, et à partir de quand c’est plus cher',
     intro:
@@ -229,7 +233,14 @@ export const toolsPage = {
     fields: { date: 'Date d’encaissement de votre règlement' },
     results: {
       date: 'Vos parts entrent en jouissance le',
-      wait: 'Soit une attente de',
+      /*
+       * Le compte à rebours en jours est retiré (13/09/2026, demande de l'équipe) : « 158 jours » n'est
+       * qu'une soustraction, et se lit comme une pénalité. Ce qui compte, c'est POURQUOI ce délai
+       * existe. La dernière phrase reste indispensable : expliquer le délai ne doit pas laisser entendre
+       * qu'un revenu suivra.
+       */
+      whyTitle: 'Pourquoi ce délai',
+      why: 'Votre versement ne produit rien tant qu’il n’est pas investi. Ce délai laisse à la société de gestion le temps de chercher, de négocier et d’acquérir des immeubles, plutôt que de faire entrer vos parts en jouissance sur de la trésorerie. Il ne préjuge d’aucun revenu : les dividendes potentiels dépendront des loyers réellement encaissés.',
       frequency: 'Rythme des versements',
       frequencyValue: income.frequencyLabel,
       ruleTitle: 'La règle appliquée',

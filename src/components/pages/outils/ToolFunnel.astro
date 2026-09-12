@@ -23,11 +23,14 @@
  * frère `data-risk` d'au moins 60 % de sa longueur et 95 % de sa taille de police. Le RiskNote en bas
  * remplit ce rôle, et il n'est jamais animé.
  */
+import { Image } from 'astro:assets';
+import brandLogoWhite from '@/assets/logos/r-start-blanc.svg';
 import Container from '@/components/ui/Container.astro';
 import RiskNote from '@/components/ui/RiskNote.astro';
 import Section from '@/components/ui/Section.astro';
 import ToolLevels from './ToolLevels.astro';
 import { funnel } from '@/content/fr/toolsPage';
+import { shortRiskLine } from '@/content/fr/legal';
 
 interface Props {
   /** Identifiant de section, aussi préfixe des boutons radio et valeur de `data-tool`. */
@@ -47,110 +50,161 @@ const etapeId = (n: number) => `${id}-etape-${n}`;
 const resultId = `${id}-resultat`;
 ---
 
-<Section id={id} tone={tone} labelledBy={titleId}>
+<Section id={id} tone={tone} labelledBy={titleId} class="pt-10 sm:pt-12 lg:pt-16">
   <Container size="wide">
-    <h2 id={titleId} class="text-display-lg text-balance">{title}</h2>
-    <p class="text-lead mt-6 max-w-3xl opacity-90">{intro}</p>
-
-    <div data-tool-level={id} data-funnel={id} class="mt-10">
-      <ToolLevels name={id} notes={levelNotes} />
-
-      {
-        /* Fil d'étapes. Une liste ordonnée, parce que c'en est une : le lecteur d'écran annonce « 2 sur
-          4 » sans qu'on ait à le lui écrire. Les puces sont des boutons : on revient sur une étape déjà
-          franchie d'un clic, sans repasser par « Précédent ». */
-      }
-      <ol
-        data-funnel-stepper
-        aria-label={funnel.stepperLabel}
-        class="funnel-stepper mt-8 flex flex-wrap items-center gap-x-2 gap-y-3"
-      >
+    {
+      /* DEUX COLONNES (13/09/2026, demande de l'équipe) : à gauche ce qui ne bouge pas, le niveau puis
+        le propos de l'outil ; à droite les questions, qui défilent. On ne relit pas l'introduction à
+        chaque étape, et la colonne de droite garde la même hauteur d'un écran à l'autre.
+        `data-tool-level` enveloppe les DEUX colonnes : le sélecteur est à gauche, les champs qu'il
+        ouvre et ferme sont à droite. */
+    }
+    <div
+      data-tool-level={id}
+      data-funnel={id}
+      class="grid gap-12 lg:grid-cols-12 lg:items-start lg:gap-16"
+    >
+      <div class="lg:col-span-5 lg:sticky lg:top-[calc(var(--spacing-nav-total)+2rem)]">
         {
-          steps.map((titre, i) => (
-            <li data-funnel-dot={String(i + 1)} class="funnel-dot">
-              <button type="button" data-funnel-goto={String(i + 1)} class="funnel-dot-btn">
-                <span class="funnel-dot-num" aria-hidden="true">
-                  {i + 1}
-                </span>
-                <span class="funnel-dot-label">{titre}</span>
-              </button>
-            </li>
-          ))
+          /* Le niveau vient EN PREMIER : c'est le réglage qui décide du nombre de questions, on le pose
+            avant de commencer, pas après avoir répondu. */
         }
-        <li data-funnel-dot="result" class="funnel-dot">
-          <button type="button" data-funnel-goto="result" class="funnel-dot-btn">
-            <span class="funnel-dot-num" aria-hidden="true">✓</span>
-            <span class="funnel-dot-label">{funnel.resultShort}</span>
-          </button>
-        </li>
-      </ol>
-
-      {
-        /* Le gabarit voyage en attribut : le script ne connaît aucun texte, tout vient du contenu. */
-      }
-      <p
-        data-funnel-progress
-        data-modele={funnel.progressTemplate}
-        aria-live="polite"
-        class="text-caption mt-4 text-slate-700"
-      >
-      </p>
-
-      {
-        /* La piste. `data-tool` est ici et nulle part ailleurs : c'est le point d'écoute unique de
-          l'outil, il reçoit les frappes de toutes les étapes. */
-      }
-      <div data-funnel-track data-tool={id} class="funnel-track mt-6">
+        <ToolLevels name={id} notes={levelNotes} />
+        <h2 id={titleId} class="text-display-sm mt-10 text-balance">{title}</h2>
+        <p class="text-lead mt-4 opacity-90">{intro}</p>
         {
-          steps.map((titre, i) => (
-            <section
-              data-funnel-step={String(i + 1)}
-              aria-labelledby={etapeId(i + 1)}
-              class="funnel-step"
-            >
-              <h3 id={etapeId(i + 1)} class="text-display-sm text-balance" tabindex="-1">
-                {titre}
-              </h3>
-              <div class="mt-6 grid gap-6 sm:grid-cols-2">
-                {i === 0 && <slot name="step-1" />}
-                {i === 1 && <slot name="step-2" />}
-                {i === 2 && <slot name="step-3" />}
-                {i === 3 && <slot name="step-4" />}
-              </div>
-            </section>
-          ))
+          /* Ligne risques de la page, descendue ici depuis l'en-tête (13/09/2026, demande de l'équipe).
+            Elle ne pouvait pas être retirée : elle est exigée sur toute sous-page produit. Dans cette
+            colonne, elle reste sous les yeux pendant toute la simulation, au lieu de disparaître au
+            premier défilement. */
         }
-
-        <section data-funnel-step="result" aria-labelledby={resultId} class="funnel-step">
-          <h3 id={resultId} class="text-display-sm text-balance" tabindex="-1">
-            {funnel.resultTitle}
-          </h3>
-          <div class="mt-6 grid gap-4 sm:grid-cols-2">
-            <slot name="results" />
-          </div>
-        </section>
+        <RiskNote text={shortRiskLine} class="mt-6" />
       </div>
 
-      {
-        /* Commandes. Masquées sans script : sans lui toutes les étapes sont là, il n'y a nulle part où
+      <div class="lg:col-span-7">
+        {
+          /* Fil d'étapes. Une liste ordonnée, parce que c'en est une : le lecteur d'écran annonce « 2 sur
+          4 » sans qu'on ait à le lui écrire. Les puces sont des boutons : on revient sur une étape déjà
+          franchie d'un clic, sans repasser par « Précédent ». */
+        }
+        {
+          /* Une BARRE SEGMENTÉE plutôt qu'un fil à puces portant chaque question : six intitulés écrits en
+          entier au-dessus du tunnel occupaient plus de place que la question elle-même. Un segment par
+          étape, rempli jusqu'à celle où l'on est, et le compte en toutes lettres à côté. Le gabarit du
+          compte voyage en attribut : le script ne connaît aucun texte, tout vient du contenu. */
+        }
+        <div class="funnel-stepper mt-8 flex items-center gap-4">
+          <ol data-funnel-stepper-bar aria-hidden="true" class="flex flex-1 items-center gap-1.5">
+            {
+              [...steps, funnel.resultShort].map((_, i) => (
+                <li
+                  data-funnel-dot={i === steps.length ? 'result' : String(i + 1)}
+                  class="funnel-seg"
+                />
+              ))
+            }
+          </ol>
+          <p
+            data-funnel-progress
+            data-modele={funnel.progressTemplate}
+            aria-live="polite"
+            class="text-caption shrink-0 font-medium text-slate-700"
+          >
+          </p>
+        </div>
+
+        {
+          /* La piste. `data-tool` est ici et nulle part ailleurs : c'est le point d'écoute unique de
+          l'outil, il reçoit les frappes de toutes les étapes. */
+        }
+        <div data-funnel-track data-tool={id} class="funnel-track mt-6">
+          {
+            steps.map((titre, i) => (
+              <section
+                data-funnel-step={String(i + 1)}
+                aria-labelledby={etapeId(i + 1)}
+                class="funnel-step"
+              >
+                <h3 id={etapeId(i + 1)} class="text-display-sm text-balance" tabindex="-1">
+                  {titre}
+                </h3>
+                <div class="mt-6 grid gap-6 sm:grid-cols-2">
+                  {i === 0 && <slot name="step-1" />}
+                  {i === 1 && <slot name="step-2" />}
+                  {i === 2 && <slot name="step-3" />}
+                  {i === 3 && <slot name="step-4" />}
+                  {i === 4 && <slot name="step-5" />}
+                  {i === 5 && <slot name="step-6" />}
+                </div>
+              </section>
+            ))
+          }
+
+          <section data-funnel-step="result" aria-labelledby={resultId} class="funnel-step">
+            <h3 id={resultId} class="text-display-sm text-balance" tabindex="-1">
+              {funnel.resultTitle}
+            </h3>
+
+            {
+              /* Le temps que le résultat paraisse, la marque tourne. C'est une attente FEINTE, le calcul
+              est instantané : elle marque la bascule entre les questions et la réponse, et laisse à
+              l'œil le temps de changer de registre. Retirée en mouvement réduit, où elle ne serait plus
+              qu'un délai. */
+            }
+            <div data-funnel-loader hidden class="funnel-loader mt-10">
+              {
+                /* Même vocabulaire que la pastille d'appel : un rond bleu qui arrive au ressort, un anneau
+                qui tourne autour, et la marque au centre. Ce n'est pas un sablier, c'est la marque qui
+                travaille. */
+              }
+              <span class="funnel-loader-disc" aria-hidden="true">
+                <span class="funnel-loader-ring"></span>
+                <Image
+                  src={brandLogoWhite}
+                  alt=""
+                  width={290}
+                  height={89}
+                  loading="lazy"
+                  decoding="async"
+                  class="funnel-loader-logo"
+                />
+              </span>
+              <p class="text-caption mt-5 text-slate-700">{funnel.loading}</p>
+            </div>
+
+            <div data-funnel-results class="mt-6 grid gap-4 sm:grid-cols-2">
+              <slot name="results" />
+            </div>
+          </section>
+        </div>
+
+        {
+          /* Commandes. Masquées sans script : sans lui toutes les étapes sont là, il n'y a nulle part où
           aller. */
-      }
-      <div data-funnel-nav class="funnel-nav mt-8 flex flex-wrap items-center gap-3">
-        <button type="button" data-funnel-prev class="funnel-btn funnel-btn-ghost">
-          {funnel.previous}
-        </button>
-        <button
-          type="button"
-          data-funnel-next
-          data-suivant={funnel.next}
-          data-voir={funnel.see}
-          class="funnel-btn funnel-btn-primary"
-        >
-          <span data-funnel-next-label>{funnel.next}</span>
-        </button>
-        <button type="button" data-funnel-restart class="funnel-btn funnel-btn-ghost">
-          {funnel.restart}
-        </button>
+        }
+        <div data-funnel-nav class="funnel-nav mt-8 flex flex-wrap items-center gap-3">
+          <button type="button" data-funnel-prev class="funnel-btn funnel-btn-ghost">
+            {funnel.previous}
+          </button>
+          <button
+            type="button"
+            data-funnel-next
+            data-suivant={funnel.next}
+            data-voir={funnel.see}
+            class="funnel-btn funnel-btn-primary"
+          >
+            <span data-funnel-next-label>{funnel.next}</span>
+          </button>
+          <button type="button" data-funnel-restart class="funnel-btn funnel-btn-ghost">
+            {funnel.restart}
+          </button>
+        </div>
+
+        {
+          /* Le choix du niveau est passé SOUS le tunnel (12/09/2026) : au-dessus, il pesait plus lourd que
+          la question elle-même et l'on n'entrait dans la simulation qu'après un pavé d'explications.
+          Ici, il est ce qu'il est : un réglage, qu'on va chercher quand on veut aller plus loin. */
+        }
       </div>
     </div>
 
@@ -173,6 +227,10 @@ const resultId = `${id}-resultat`;
   for (const funnel of document.querySelectorAll<HTMLElement>('[data-funnel]')) {
     const etapes = [...funnel.querySelectorAll<HTMLElement>('[data-funnel-step]')];
     const puces = [...funnel.querySelectorAll<HTMLElement>('[data-funnel-dot]')];
+    const attente = funnel.querySelector<HTMLElement>('[data-funnel-loader]');
+    const resultats = funnel.querySelector<HTMLElement>('[data-funnel-results]');
+    const douceur = window.matchMedia('(prefers-reduced-motion: no-preference)').matches;
+    let minuterie = 0;
     const progres = funnel.querySelector<HTMLElement>('[data-funnel-progress]');
     const precedent = funnel.querySelector<HTMLButtonElement>('[data-funnel-prev]');
     const suivant = funnel.querySelector<HTMLButtonElement>('[data-funnel-next]');
@@ -228,9 +286,6 @@ const resultId = `${id}-resultat`;
         puce.hidden = rang === -1;
         puce.toggleAttribute('data-done', rang > -1 && rang < courante);
         puce.toggleAttribute('data-current', rang === courante);
-        puce
-          .querySelector('button')
-          ?.setAttribute('aria-current', rang === courante ? 'step' : 'false');
       }
 
       const dernier = courante === liste.length - 1;
@@ -250,13 +305,42 @@ const resultId = `${id}-resultat`;
           .replace('{total}', String(liste.length));
     };
 
+    /*
+     * Bascule vers le résultat : la marque tourne un instant, puis la réponse paraît. L'attente est
+     * FEINTE, le calcul est déjà fait ; elle marque le passage des questions à la réponse. `aria-busy`
+     * le dit aux lecteurs d'écran, qui annoncent alors le résultat une fois, à la fin, et non pendant.
+     * En mouvement réduit, rien de tout cela : le résultat est là.
+     */
+    const ATTENTE_MS = 900;
+    const jouerAttente = (versResultat: boolean) => {
+      window.clearTimeout(minuterie);
+      if (!attente || !resultats) return;
+      if (!versResultat || !douceur) {
+        attente.hidden = true;
+        resultats.hidden = false;
+        resultats.removeAttribute('aria-busy');
+        return;
+      }
+      attente.hidden = false;
+      resultats.hidden = true;
+      resultats.setAttribute('aria-busy', 'true');
+      minuterie = window.setTimeout(() => {
+        attente.hidden = true;
+        resultats.hidden = false;
+        resultats.removeAttribute('aria-busy');
+      }, ATTENTE_MS);
+    };
+
     const aller = (rang: number, focaliser = true) => {
       const liste = ouvertes();
       const depart = liste.indexOf(active);
       const cible = Math.min(Math.max(rang, 0), liste.length - 1);
       const sens = cible > depart ? 'avant' : cible < depart ? 'arriere' : 'aucun';
+      const avant = active;
       active = liste[cible] ?? active;
       rendre(sens);
+      /* L'attente ne se rejoue pas si l'on était déjà sur le résultat (changement de niveau, retour). */
+      jouerAttente(estResultat(active) && avant !== active);
       if (focaliser) active.querySelector<HTMLElement>('h3')?.focus();
     };
 
@@ -307,5 +391,6 @@ const resultId = `${id}-resultat`;
 
     funnel.dataset.funnelReady = '';
     rendre();
+    jouerAttente(false);
   }
 </script>

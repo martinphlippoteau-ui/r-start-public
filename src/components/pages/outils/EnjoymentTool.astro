@@ -44,7 +44,13 @@ const reglage = { mois: income.enjoymentDelayMonths, pending: labels.pending };
 
   <Fragment slot="results">
     <ToolResult id="jouissance-out-date" label={results.date} emphasis />
-    <ToolResult id="jouissance-out-attente" label={results.wait} level={2} />
+    {
+      /* Pas de compte à rebours en jours : l'explication du délai, qui est ce qu'on cherche vraiment. */
+    }
+    <div class="rounded-3xl bg-white p-5 sm:col-span-2 sm:p-6">
+      <h4 class="text-base font-semibold text-ink">{results.whyTitle}</h4>
+      <p class="text-base mt-2 text-slate-700">{results.why}</p>
+    </div>
 
     <div data-level="2" class="rounded-3xl bg-white p-5 sm:p-6">
       <p class="text-base font-medium text-slate-700">{results.frequency}</p>
@@ -104,7 +110,6 @@ const reglage = { mois: income.enjoymentDelayMonths, pending: labels.pending };
       const brut = champ && champ.value;
       if (!brut) {
         ecrire('jouissance-out-date', reglage.pending);
-        ecrire('jouissance-out-attente', reglage.pending);
         ecrire('jouissance-out-meme-mois', reglage.pending);
         return;
       }
@@ -113,7 +118,6 @@ const reglage = { mois: income.enjoymentDelayMonths, pending: labels.pending };
 
       const cible = jouissance(d);
       ecrire('jouissance-out-date', dateLongue(cible));
-      ecrire('jouissance-out-attente', Math.round((cible - d) / 86400000) + ' jours');
 
       /* Bornes du mois d'encaissement, et le premier jour qui bascule au mois suivant. */
       const debut = new Date(d.getFullYear(), d.getMonth(), 1);

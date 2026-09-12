@@ -476,11 +476,12 @@ test.describe('Qualité', () => {
      * tenue par l'étape, pas par son rang ; un rang mémorisé aurait désigné la troisième question.
      */
     await page.click('label[for="frais-niveau-expert"]');
-    expect(await progres()).toBe('Étape 5 sur 5');
+    /* Six questions au niveau expert, plus le résultat : le fil s'allonge sans qu'on quitte la réponse. */
+    expect(await progres()).toBe('Étape 7 sur 7');
     await expect(page.locator('[data-funnel-restart]')).toBeVisible();
 
     await page.click('[data-funnel-restart]');
-    expect(await progres()).toBe('Étape 1 sur 5');
+    expect(await progres()).toBe('Étape 1 sur 7');
   });
 
   /* Chaque carte de /outils doit mener à une page qui existe et porte son titre. */
