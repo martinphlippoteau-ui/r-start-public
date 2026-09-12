@@ -480,11 +480,6 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
     background-color: transparent;
     border-color: transparent;
     box-shadow: none;
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-  }
-  [data-sticky-cta]:not([data-on]) [data-sticky-link]::after {
-    opacity: 0;
   }
   [data-sticky-cta]:not([data-on]) [data-sticky-label] {
     grid-template-columns: 0fr;
@@ -515,14 +510,10 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
       box-shadow 320ms ease,
       color 320ms ease;
   }
-  [data-sticky-link]::after {
-    transition: opacity 320ms ease;
-  }
   [data-sticky-label] {
     transition: grid-template-columns 420ms var(--ease-spring);
   }
-  [data-sticky-cta][data-on]
-    :is([data-sticky-link], [data-sticky-label], [data-sticky-link]::after) {
+  [data-sticky-cta][data-on] :is([data-sticky-link], [data-sticky-label]) {
     transition-delay: 300ms;
   }
   /* Le survol ne doit pas attendre le retard du dépliage pour répondre. */
@@ -884,58 +875,26 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
 /*
  * Appel flottant (components/StickyCta.astro), en deux temps qui suivent le pliage.
  *
- * REPLIÉ, on ne voit que le ROND du chevron, en couleur de CTA primaire : la pastille qui l'entoure est
+ * REPLIÉ, on ne voit que le ROND du chevron, bleu plein, chevron blanc : la pastille qui l'entoure est
  * transparente, sans contour ni ombre, et mesure exactement le rond plus ses huit pixels de marge.
- * DÉPLIÉ, la pastille s'ouvre en CTA SECONDAIRE, verre clair et contour navy, et le rond ne bouge pas :
- * il garde sa taille et sa couleur pendant que tout pousse autour de lui.
+ * DÉPLIÉ, la pastille s'ouvre en BLANC PLEIN, libellé navy, et le rond ne bouge pas : il garde sa taille
+ * et sa couleur pendant que tout pousse autour de lui.
  *
- * Le blanc du verre ne descend pas plus bas que 0,88 : la pastille passe au ras du texte courant, et
- * plus translucide, les lignes du dessous se lisaient à travers elle. Composé, le texte navy y tient
- * 7,7:1, et le blanc du chevron 5,9:1 sur le rond navy. AA dans les deux cas.
+ * PAS DE VERRE ICI (12/09/2026, demande de l'équipe). La barre de navigation en porte, la pastille non :
+ * elle passe au ras du texte courant, et translucide, les lignes du dessous se lisaient à travers elle.
+ * Un blanc plein règle la lisibilité d'un coup et fait de la pastille un objet posé sur la page, pas une
+ * vitre. Le libellé navy y tient 9,7:1, le chevron blanc sur le rond bleu 9,7:1 également.
  */
-@utility cta-glass {
-  background-color: rgb(255 255 255 / 0.88);
+@utility sticky-skin {
+  background-color: #fff;
   color: var(--color-navy);
-  border: 1px solid color-mix(in oklab, var(--color-navy) 60%, transparent);
-  -webkit-backdrop-filter: saturate(185%) blur(24px);
-  backdrop-filter: saturate(185%) blur(24px);
+  border: 1px solid color-mix(in oklab, var(--color-navy) 18%, transparent);
   box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.8),
-    0 2px 6px rgb(2 75 103 / 0.08),
-    0 16px 40px -18px rgb(2 75 103 / 0.4);
+    0 2px 6px rgb(2 75 103 / 0.1),
+    0 16px 40px -18px rgb(2 75 103 / 0.45);
 
   &:hover {
-    border-color: var(--color-navy);
-  }
-
-  /* Sans flou d'arrière-plan, le blanc devient presque opaque : le texte navy reste lisible. */
-  @supports not (backdrop-filter: blur(1px)) {
-    background-color: rgb(255 255 255 / 0.96);
-  }
-
-  /* Arête en dégradé, plus claire en haut à gauche, comme la barre de navigation. */
-  &::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    padding: 1px;
-    background-image: linear-gradient(
-      135deg,
-      rgb(255 255 255 / 0.75) 0%,
-      rgb(255 255 255 / 0.12) 40%,
-      rgb(255 255 255 / 0.06) 60%,
-      rgb(255 255 255 / 0.45) 100%
-    );
-    pointer-events: none;
-    -webkit-mask-image:
-      linear-gradient(#000 0 0) content-box,
-      linear-gradient(#000 0 0);
-    mask-image:
-      linear-gradient(#000 0 0) content-box,
-      linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
+    border-color: color-mix(in oklab, var(--color-navy) 45%, transparent);
   }
 }
 

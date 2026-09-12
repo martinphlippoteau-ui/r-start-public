@@ -26,8 +26,8 @@
  * Direction artistique en DEUX TEMPS (12/09/2026, demande de l'équipe), qui suit le pliage :
  *  - REPLIÉE, la pastille n'est que son rond de chevron, en couleur de CTA primaire, navy plein. C'est
  *    l'appel, réduit à un point ;
- *  - DÉPLIÉE, elle s'ouvre en CTA secondaire, verre clair et contour navy, et le rond reste, à droite,
- *    inchangé. Le point d'appel ne disparaît donc jamais, la pastille pousse autour de lui.
+ *  - DÉPLIÉE, elle s'ouvre en BLANC PLEIN, libellé navy, et le rond reste, à droite, inchangé. Le point
+ *    d'appel ne disparaît donc jamais, la pastille pousse autour de lui.
  * Le rond est un élément à part (`data-sticky-dot`) : c'est le seul moyen qu'il garde sa taille et sa
  * couleur pendant que tout le reste change autour.
  *
@@ -80,7 +80,7 @@ const lien = href ? withBase(href) : subscribeHref(position);
     data-cta={souscription ? 'souscrire' : undefined}
     data-cta-position={souscription ? position : undefined}
     rel={souscription ? 'noopener' : undefined}
-    class="cta-glass pointer-events-auto relative isolate inline-flex h-16 min-w-16 items-center justify-center rounded-full text-lg font-semibold no-underline outline-offset-4 focus-visible:outline-3 focus-visible:outline-navy"
+    class="sticky-skin pointer-events-auto relative isolate inline-flex h-16 min-w-16 items-center justify-center rounded-full text-lg font-semibold no-underline outline-offset-4 focus-visible:outline-3 focus-visible:outline-navy"
   >
     {
       /* Le libellé est dans une grille à une colonne : sa largeur passe de 0fr à 1fr, ce qui se transite,
