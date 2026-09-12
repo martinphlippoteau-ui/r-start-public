@@ -95,6 +95,11 @@ const data = scpis.map((s) => ({
               scope="col"
               class="sticky top-nav-total z-10 w-[33%] border-b border-navy/12 bg-white px-3 pb-3 align-bottom sm:px-5 md:pb-5"
             >
+              {
+                /* Le logo prend la hauteur de la colonne de droite, intitulé plus liste déroulante : les
+                  deux en-têtes pèsent alors pareil, au lieu d'un logo timide face à un bloc deux fois
+                  plus haut. Sa proportion est conservée, seule la hauteur change. */
+              }
               <Image
                 src={brandLogo}
                 alt={comparator.leftLabel}
@@ -102,7 +107,7 @@ const data = scpis.map((s) => ({
                 height={89}
                 loading="eager"
                 decoding="async"
-                class="mx-auto h-7 w-auto sm:h-10"
+                class="mx-auto h-16 w-auto md:h-[4.75rem]"
               />
             </th>
             <th

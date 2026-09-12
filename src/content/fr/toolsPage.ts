@@ -86,6 +86,24 @@ export const toolLevels = [
 
 export type ToolLevelId = (typeof toolLevels)[number]['id'];
 
+/**
+ * Vocabulaire du tunnel (12/09/2026, demande de l'équipe). Chaque outil ne pose plus toutes ses questions
+ * d'un coup : il les pose UNE PAR ÉTAPE, avec un fil d'étapes au-dessus, et finit sur le résultat.
+ * Une étape dont tous les champs sont masqués par le niveau choisi n'existe pas : le fil se raccourcit,
+ * et « Suivant » l'enjambe.
+ */
+export const funnel = {
+  stepperLabel: 'Étapes de la simulation',
+  /** Repère parlé et affiché : « Étape 2 sur 4 ». */
+  progressTemplate: 'Étape {n} sur {total}',
+  previous: 'Précédent',
+  next: 'Suivant',
+  see: 'Voir le résultat',
+  restart: 'Recommencer',
+  resultTitle: 'Votre résultat',
+  resultShort: 'Résultat',
+};
+
 export const levelPicker = {
   legend: 'Niveau de détail',
   help: 'Changez de niveau à tout moment : les champs masqués gardent leur valeur par défaut et le calcul reste le même.',
@@ -143,6 +161,14 @@ export const toolsPage = {
       expert:
         'Ajoute les taux de la SCPI comparée et le détail poste par poste de ce que prélève R Start.',
     },
+    /* Une question par étape : on répond, on avance. Les étapes 3 et 4 n'existent qu'aux niveaux
+       intermédiaire et expert, puisque leurs champs y apparaissent. */
+    steps: [
+      'Combien souhaitez-vous investir ?',
+      'Quels loyers imaginez-vous percevoir ?',
+      'Combien de temps gardez-vous vos parts, et à quel prix les revendez-vous ?',
+      'Quels sont les frais de la SCPI que vous comparez ?',
+    ],
     title: 'Ce que R Start prélève, et à partir de quand c’est plus cher',
     intro:
       'R Start ne prend rien à l’entrée et se rémunère sur les loyers. Une SCPI à frais d’entrée prend l’inverse : beaucoup au départ, moins ensuite. Posez vos hypothèses, l’outil calcule les deux et vous dit à partir de quel niveau de loyers le modèle R Start devient le plus coûteux.',
@@ -197,6 +223,7 @@ export const toolsPage = {
       intermediaire: 'Ajoute l’attente en jours et le rythme des versements.',
       expert: 'Ajoute la règle appliquée et ce que change le jour du mois où vous êtes encaissé.',
     },
+    steps: ['Quand votre règlement sera-t-il encaissé ?'],
     title: 'Quand vos parts commencent à produire des revenus',
     intro: `Vos parts n’ouvrent droit aux versements qu’après un délai de ${income.enjoymentDelayLabel}. Indiquez la date à laquelle votre règlement sera encaissé.`,
     fields: { date: 'Date d’encaissement de votre règlement' },
@@ -230,6 +257,10 @@ export const toolsPage = {
       intermediaire: 'Ajoute le barème complet, palier courant en évidence.',
       expert: 'Ajoute ce que vous gagneriez à attendre le palier suivant.',
     },
+    steps: [
+      'Quel montant souhaitez-vous retirer ?',
+      'Depuis combien de temps détenez-vous vos parts ?',
+    ],
     title: 'Ce que coûte une sortie avant l’échéance',
     intro: `La commission de retrait diminue avec la durée de détention et disparaît après ${fees.withdrawal.zeroAfterYears} ans. Indiquez le montant que vous souhaitez retirer et depuis combien de temps vous détenez vos parts.`,
     fields: { amount: 'Montant du retrait, à la valeur de retrait', years: 'Durée de détention' },
@@ -267,6 +298,11 @@ export const toolsPage = {
         'Ajoute le minimum du plan, sa condition d’accès et la jouissance du premier versement.',
       expert: 'Ajoute le prix de part retenu, pour mesurer l’effet d’une révision.',
     },
+    steps: [
+      'Combien versez-vous chaque mois ?',
+      'Pendant combien de temps ?',
+      'À quel prix de part voulez-vous calculer ?',
+    ],
     title: 'Ce que représente un versement programmé',
     intro: `À partir de ${share.priceLabel} la part, fractionnable, vos versements achètent des parts entières et des fractions de part. L’outil calcule ce que vous aurez versé et combien de parts cela représente au prix actuel.`,
     fields: {
