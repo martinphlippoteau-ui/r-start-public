@@ -1,0 +1,311 @@
+---
+/**
+ * Tunnel de simulation (12/09/2026, demande de l'équipe). Un outil ne pose plus toutes ses questions sur
+ * un seul écran : il en pose UNE PAR ÉTAPE, avec un fil d'étapes au-dessus, et finit sur le résultat.
+ *
+ * Chaque outil n'apporte que ses champs, répartis dans les emplacements `step-1` à `step-4`, et ses
+ * résultats dans `results`. Les titres d'étapes viennent du contenu (toolsPage.ts).
+ *
+ * NIVEAU D'EXPERTISE ET ÉTAPES. Le sélecteur de niveau reste : il décide quels CHAMPS existent, et donc
+ * quelles étapes existent. Une étape dont tous les champs sont masqués par le niveau est retirée du fil
+ * et « Suivant » l'enjambe. Le fil se raccourcit donc tout seul : deux étapes en débutant, quatre en
+ * expert, sans qu'aucune liste d'étapes soit maintenue à la main quelque part.
+ *
+ * SANS JAVASCRIPT, toutes les étapes sont affichées à la suite, comme avant : c'est le script qui n'en
+ * laisse qu'une. Un tunnel qui exigerait un script pour livrer ses champs ne serait pas un repli, ce
+ * serait une page vide.
+ *
+ * `data-tool` est posé UNE FOIS sur la piste, pas sur chaque étape : les événements `input` et `change`
+ * y remontent depuis n'importe quel champ, quelle que soit l'étape affichée, et le calcul de l'outil
+ * reste un seul écouteur.
+ *
+ * L'introduction sert aussi de `data-advantage` : le contrôle de conformité exige qu'un avantage ait un
+ * frère `data-risk` d'au moins 60 % de sa longueur et 95 % de sa taille de police. Le RiskNote en bas
+ * remplit ce rôle, et il n'est jamais animé.
+ */
+import Container from '@/components/ui/Container.astro';
+import RiskNote from '@/components/ui/RiskNote.astro';
+import Section from '@/components/ui/Section.astro';
+import ToolLevels from './ToolLevels.astro';
+import { funnel } from '@/content/fr/toolsPage';
+
+interface Props {
+  /** Identifiant de section, aussi préfixe des boutons radio et valeur de `data-tool`. */
+  id: string;
+  title: string;
+  intro: string;
+  risk: string;
+  noteId: string;
+  levelNotes: { debutant: string; intermediaire: string; expert: string };
+  /** Titres des étapes, dans l'ordre. Une question par étape. */
+  steps: readonly string[];
+  tone?: 'paper' | 'white';
+}
+const { id, title, intro, risk, noteId, levelNotes, steps, tone = 'white' } = Astro.props as Props;
+const titleId = `${id}-title`;
+const etapeId = (n: number) => `${id}-etape-${n}`;
+const resultId = `${id}-resultat`;
+---
+
+<Section id={id} tone={tone} labelledBy={titleId}>
+  <Container size="wide">
+    <h2 id={titleId} class="text-display-lg text-balance">{title}</h2>
+    <p class="text-lead mt-6 max-w-3xl opacity-90">{intro}</p>
+
+    <div data-tool-level={id} data-funnel={id} class="mt-10">
+      <ToolLevels name={id} notes={levelNotes} />
+
+      {
+        /* Fil d'étapes. Une liste ordonnée, parce que c'en est une : le lecteur d'écran annonce « 2 sur
+          4 » sans qu'on ait à le lui écrire. Les puces sont des boutons : on revient sur une étape déjà
+          franchie d'un clic, sans repasser par « Précédent ». */
+      }
+      <ol
+        data-funnel-stepper
+        aria-label={funnel.stepperLabel}
+        class="funnel-stepper mt-8 flex flex-wrap items-center gap-x-2 gap-y-3"
+      >
+        {
+          steps.map((titre, i) => (
+            <li data-funnel-dot={String(i + 1)} class="funnel-dot">
+              <button type="button" data-funnel-goto={String(i + 1)} class="funnel-dot-btn">
+                <span class="funnel-dot-num" aria-hidden="true">
+                  {i + 1}
+                </span>
+                <span class="funnel-dot-label">{titre}</span>
+              </button>
+            </li>
+          ))
+        }
+        <li data-funnel-dot="result" class="funnel-dot">
+          <button type="button" data-funnel-goto="result" class="funnel-dot-btn">
+            <span class="funnel-dot-num" aria-hidden="true">✓</span>
+            <span class="funnel-dot-label">{funnel.resultShort}</span>
+          </button>
+        </li>
+      </ol>
+
+      {
+        /* Le gabarit voyage en attribut : le script ne connaît aucun texte, tout vient du contenu. */
+      }
+      <p
+        data-funnel-progress
+        data-modele={funnel.progressTemplate}
+        aria-live="polite"
+        class="text-caption mt-4 text-slate-700"
+      >
+      </p>
+
+      {
+        /* La piste. `data-tool` est ici et nulle part ailleurs : c'est le point d'écoute unique de
+          l'outil, il reçoit les frappes de toutes les étapes. */
+      }
+      <div data-funnel-track data-tool={id} class="funnel-track mt-6">
+        {
+          steps.map((titre, i) => (
+            <section
+              data-funnel-step={String(i + 1)}
+              aria-labelledby={etapeId(i + 1)}
+              class="funnel-step"
+            >
+              <h3 id={etapeId(i + 1)} class="text-display-sm text-balance" tabindex="-1">
+                {titre}
+              </h3>
+              <div class="mt-6 grid gap-6 sm:grid-cols-2">
+                {i === 0 && <slot name="step-1" />}
+                {i === 1 && <slot name="step-2" />}
+                {i === 2 && <slot name="step-3" />}
+                {i === 3 && <slot name="step-4" />}
+              </div>
+            </section>
+          ))
+        }
+
+        <section data-funnel-step="result" aria-labelledby={resultId} class="funnel-step">
+          <h3 id={resultId} class="text-display-sm text-balance" tabindex="-1">
+            {funnel.resultTitle}
+          </h3>
+          <div class="mt-6 grid gap-4 sm:grid-cols-2">
+            <slot name="results" />
+          </div>
+        </section>
+      </div>
+
+      {
+        /* Commandes. Masquées sans script : sans lui toutes les étapes sont là, il n'y a nulle part où
+          aller. */
+      }
+      <div data-funnel-nav class="funnel-nav mt-8 flex flex-wrap items-center gap-3">
+        <button type="button" data-funnel-prev class="funnel-btn funnel-btn-ghost">
+          {funnel.previous}
+        </button>
+        <button
+          type="button"
+          data-funnel-next
+          data-suivant={funnel.next}
+          data-voir={funnel.see}
+          class="funnel-btn funnel-btn-primary"
+        >
+          <span data-funnel-next-label>{funnel.next}</span>
+        </button>
+        <button type="button" data-funnel-restart class="funnel-btn funnel-btn-ghost">
+          {funnel.restart}
+        </button>
+      </div>
+    </div>
+
+    <div data-advantage class="visually-hidden">{intro}</div>
+    <RiskNote text={risk} size="lead" class="mt-10" noteId={noteId} />
+  </Container>
+</Section>
+
+<script>
+  /*
+   * Un tunnel par outil, tous pilotés par le même script. Il ne sait rien des outils : il ne fait
+   * qu'afficher une étape à la fois, tenir le fil à jour et enjamber les étapes vides.
+   *
+   * Une étape est DISPONIBLE si au moins un de ses champs n'est pas masqué par le niveau choisi. On lit
+   * le `display` calculé du champ, et non sa position à l'écran : un champ dans une étape masquée n'a
+   * pas de position, mais son `display` propre, lui, dit toujours la vérité sur le niveau.
+   */
+  const FUNNEL_CLE = 'data-funnel-step';
+
+  for (const funnel of document.querySelectorAll<HTMLElement>('[data-funnel]')) {
+    const etapes = [...funnel.querySelectorAll<HTMLElement>('[data-funnel-step]')];
+    const puces = [...funnel.querySelectorAll<HTMLElement>('[data-funnel-dot]')];
+    const progres = funnel.querySelector<HTMLElement>('[data-funnel-progress]');
+    const precedent = funnel.querySelector<HTMLButtonElement>('[data-funnel-prev]');
+    const suivant = funnel.querySelector<HTMLButtonElement>('[data-funnel-next]');
+    const suivantTexte = funnel.querySelector<HTMLElement>('[data-funnel-next-label]');
+    const recommencer = funnel.querySelector<HTMLButtonElement>('[data-funnel-restart]');
+    if (!etapes.length) continue;
+
+    const cle = (e: HTMLElement) => e.getAttribute(FUNNEL_CLE) ?? '';
+    const estResultat = (e: HTMLElement) => cle(e) === 'result';
+
+    const disponible = (e: HTMLElement) => {
+      if (estResultat(e)) return true;
+      const champs = [...e.querySelectorAll<HTMLElement>('[data-level]')];
+      return champs.some((c) => getComputedStyle(c).display !== 'none');
+    };
+
+    /** Les étapes qui comptent, dans l'ordre, au niveau d'expertise du moment. */
+    const ouvertes = () => etapes.filter(disponible);
+
+    /*
+     * La position est tenue par l'ÉTAPE elle-même, jamais par son rang. Changer de niveau change le
+     * nombre d'étapes : un rang mémorisé désignerait alors une autre étape, et l'on retombait sur la
+     * troisième question en quittant le résultat pour passer en expert.
+     */
+    let active: HTMLElement = etapes[0];
+
+    const rendre = (sens: 'avant' | 'arriere' | 'aucun' = 'aucun') => {
+      const liste = ouvertes();
+      /* L'étape courante a pu disparaître avec le niveau : on retombe sur la plus proche avant elle. */
+      if (!liste.includes(active)) {
+        const rangBrut = etapes.indexOf(active);
+        active =
+          [...liste].reverse().find((e) => etapes.indexOf(e) <= rangBrut) ?? liste[0] ?? etapes[0];
+      }
+      const courante = liste.indexOf(active);
+
+      for (const e of etapes) {
+        const visible = e === active;
+        e.toggleAttribute('data-current', visible);
+        e.hidden = !visible;
+        if (visible && sens !== 'aucun') {
+          e.setAttribute('data-enter', sens);
+          /* L'animation est relancée à chaque passage : on la retire et on force un reflow. */
+          void e.offsetWidth;
+        } else {
+          e.removeAttribute('data-enter');
+        }
+      }
+
+      for (const puce of puces) {
+        const etape = etapes.find((e) => cle(e) === puce.getAttribute('data-funnel-dot'));
+        const rang = etape ? liste.indexOf(etape) : -1;
+        puce.hidden = rang === -1;
+        puce.toggleAttribute('data-done', rang > -1 && rang < courante);
+        puce.toggleAttribute('data-current', rang === courante);
+        puce
+          .querySelector('button')
+          ?.setAttribute('aria-current', rang === courante ? 'step' : 'false');
+      }
+
+      const dernier = courante === liste.length - 1;
+      if (precedent) precedent.hidden = courante === 0;
+      if (suivant) suivant.hidden = dernier;
+      if (recommencer) recommencer.hidden = !dernier;
+      /* Sur l'avant-dernière étape, le bouton annonce ce qui vient : le résultat, pas « Suivant ». */
+      if (suivantTexte && suivant)
+        suivantTexte.textContent =
+          courante === liste.length - 2
+            ? (suivant.dataset.voir ?? '')
+            : (suivant.dataset.suivant ?? '');
+
+      if (progres)
+        progres.textContent = (progres.dataset.modele ?? '')
+          .replace('{n}', String(courante + 1))
+          .replace('{total}', String(liste.length));
+    };
+
+    const aller = (rang: number, focaliser = true) => {
+      const liste = ouvertes();
+      const depart = liste.indexOf(active);
+      const cible = Math.min(Math.max(rang, 0), liste.length - 1);
+      const sens = cible > depart ? 'avant' : cible < depart ? 'arriere' : 'aucun';
+      active = liste[cible] ?? active;
+      rendre(sens);
+      if (focaliser) active.querySelector<HTMLElement>('h3')?.focus();
+    };
+
+    /* Les champs de l'étape doivent être valides avant d'avancer : le navigateur dit lui-même pourquoi. */
+    const valide = () => {
+      if (!active) return true;
+      for (const champ of active.querySelectorAll<HTMLInputElement>('input')) {
+        if (!champ.checkValidity()) {
+          champ.reportValidity();
+          return false;
+        }
+      }
+      return true;
+    };
+
+    const rang = () => ouvertes().indexOf(active);
+
+    suivant?.addEventListener('click', () => {
+      if (valide()) aller(rang() + 1);
+    });
+    precedent?.addEventListener('click', () => aller(rang() - 1));
+    recommencer?.addEventListener('click', () => aller(0));
+
+    for (const puce of puces) {
+      puce.querySelector('button')?.addEventListener('click', () => {
+        const etape = etapes.find((e) => cle(e) === puce.getAttribute('data-funnel-dot'));
+        const cible = etape ? ouvertes().indexOf(etape) : -1;
+        if (cible === -1) return;
+        /* On ne saute en avant qu'après avoir rempli l'étape courante. */
+        if (cible > rang() && !valide()) return;
+        aller(cible);
+      });
+    }
+
+    /* Entrée dans un champ : c'est « Suivant », pas un envoi de formulaire. */
+    funnel.addEventListener('keydown', (event) => {
+      const e = event as KeyboardEvent;
+      if (e.key !== 'Enter') return;
+      const cible = e.target as HTMLElement;
+      if (cible.tagName !== 'INPUT') return;
+      e.preventDefault();
+      if (valide()) aller(rang() + 1);
+    });
+
+    /* Changer de niveau ajoute ou retire des étapes : le fil et la position sont recalculés. */
+    for (const radio of funnel.querySelectorAll('[data-tool-level-input]'))
+      radio.addEventListener('change', () => rendre());
+
+    funnel.dataset.funnelReady = '';
+    rendre();
+  }
+</script>

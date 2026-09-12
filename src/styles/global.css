@@ -1670,3 +1670,193 @@ body:has(#consent-banner:not([hidden])) [data-hero-scroll-hint] {
     display: none;
   }
 }
+
+/* ===========================================================================================
+   TUNNEL DE SIMULATION (components/pages/outils/ToolFunnel.astro, 12/09/2026)
+   ===========================================================================================
+   Une question par étape, un fil au-dessus, le résultat à la fin.
+
+   SANS SCRIPT, rien de tout cela n'a de sens : toutes les étapes sont là, à la suite, et il n'y a nulle
+   part où aller. Le fil, le compteur et les commandes n'apparaissent donc qu'une fois le script en
+   place (`data-funnel-ready`), et les étapes restent empilées jusque-là. C'est le repli, pas une
+   dégradation : tous les champs sont accessibles, le calcul fonctionne, seul le tunnel manque. */
+.funnel-stepper,
+.funnel-nav,
+[data-funnel-progress] {
+  display: none;
+}
+
+[data-funnel-ready] .funnel-stepper {
+  display: flex;
+}
+[data-funnel-ready] .funnel-nav {
+  display: flex;
+}
+[data-funnel-ready] [data-funnel-progress] {
+  display: block;
+}
+
+/* L'entrée d'une étape glisse horizontalement : la piste CLIPPE, sinon la page déborde le temps du
+   mouvement et un écran étroit rebondit sur l'axe horizontal. `clip` et non `hidden` : `hidden` ferait
+   de la piste un conteneur de défilement, et les anneaux de focus des champs y seraient rognés. */
+.funnel-track {
+  overflow-x: clip;
+}
+
+/* Sans script, les étapes s'empilent avec un filet entre elles : on voit que ce sont des groupes. */
+.funnel-step + .funnel-step {
+  margin-top: 2.5rem;
+  padding-top: 2.5rem;
+  border-top: 1px solid color-mix(in oklab, var(--color-navy) 12%, transparent);
+}
+[data-funnel-ready] .funnel-step + .funnel-step {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+
+/* Le titre d'étape reçoit le focus à chaque passage : il est focusable mais ne se signale pas. */
+.funnel-step > h3:focus {
+  outline: none;
+}
+.funnel-step > h3:focus-visible {
+  outline: 3px solid var(--color-navy);
+  outline-offset: 4px;
+}
+
+/* --- Fil d'étapes --- */
+.funnel-dot-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 0.875rem 0.375rem 0.375rem;
+  border-radius: 9999px;
+  border: 1px solid color-mix(in oklab, var(--color-navy) 15%, transparent);
+  background-color: transparent;
+  color: var(--color-slate-700);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  @media (prefers-reduced-motion: no-preference) {
+    transition:
+      background-color 200ms ease,
+      border-color 200ms ease,
+      color 200ms ease;
+  }
+  &:focus-visible {
+    outline: 3px solid var(--color-navy);
+    outline-offset: 2px;
+  }
+}
+
+.funnel-dot-num {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 9999px;
+  background-color: color-mix(in oklab, var(--color-navy) 10%, transparent);
+  color: var(--color-navy);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+/* L'étape franchie : discrète mais cliquable, on y revient. */
+[data-funnel-dot][data-done] .funnel-dot-num {
+  background-color: var(--color-teal-700);
+  color: #fff;
+}
+
+/* L'étape courante : pleine, c'est là qu'on est. */
+[data-funnel-dot][data-current] .funnel-dot-btn {
+  border-color: var(--color-navy);
+  background-color: var(--color-navy);
+  color: #fff;
+}
+[data-funnel-dot][data-current] .funnel-dot-num {
+  background-color: rgb(255 255 255 / 0.2);
+  color: #fff;
+}
+
+/* Sur téléphone, le fil garde ses numéros et perd les intitulés : cinq questions écrites en entier y
+   prendraient cinq lignes, et c'est le rang qui sert de repère, pas le libellé. */
+.funnel-dot-label {
+  display: none;
+}
+@media (width >= 48rem) {
+  .funnel-dot-label {
+    display: inline;
+  }
+}
+
+/* --- Entrée d'une étape --- */
+@media (prefers-reduced-motion: no-preference) {
+  .funnel-step[data-enter='avant'] {
+    animation: funnel-avant 320ms var(--ease-out-expo) both;
+  }
+  .funnel-step[data-enter='arriere'] {
+    animation: funnel-arriere 320ms var(--ease-out-expo) both;
+  }
+}
+
+@keyframes funnel-avant {
+  from {
+    opacity: 0;
+    transform: translateX(1.5rem);
+  }
+}
+
+@keyframes funnel-arriere {
+  from {
+    opacity: 0;
+    transform: translateX(-1.5rem);
+  }
+}
+
+/* --- Commandes --- */
+.funnel-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3rem;
+  padding-inline: 1.5rem;
+  border-radius: 9999px;
+  border: 1px solid transparent;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  @media (prefers-reduced-motion: no-preference) {
+    transition:
+      background-color 200ms ease,
+      border-color 200ms ease,
+      color 200ms ease,
+      transform 180ms var(--ease-out-expo);
+  }
+  &:active {
+    transform: scale(0.97);
+  }
+  &:focus-visible {
+    outline: 3px solid var(--color-navy);
+    outline-offset: 2px;
+  }
+}
+
+.funnel-btn-primary {
+  background-color: var(--color-navy);
+  color: #fff;
+  &:hover {
+    background-color: var(--color-teal-700);
+  }
+}
+
+.funnel-btn-ghost {
+  border-color: color-mix(in oklab, var(--color-navy) 40%, transparent);
+  color: var(--color-navy);
+  &:hover {
+    border-color: var(--color-navy);
+    background-color: color-mix(in oklab, var(--color-navy) 6%, transparent);
+  }
+}

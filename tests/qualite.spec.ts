@@ -411,7 +411,20 @@ test.describe('Qualité', () => {
   test('les niveaux d’expertise révèlent les champs sans changer le calcul', async ({ page }) => {
     await sauterLaFenetreOutils(page);
     await page.goto('/outil/simulateur-de-frais/');
-    const champs = () => page.locator('[data-tool="frais"] input:visible').count();
+
+    /*
+     * On compte les champs OUVERTS par le niveau, pas les champs à l'écran : depuis le passage en
+     * tunnel, une seule étape s'affiche à la fois. Un champ masqué par le niveau a `display: none` sur
+     * son enveloppe, et cette valeur reste lisible même quand son étape est repliée, là où une mesure
+     * de visibilité ne verrait que l'étape courante.
+     */
+    const champs = () =>
+      page.evaluate(
+        () =>
+          [...document.querySelectorAll('[data-tool="frais"] [data-level]')].filter(
+            (e) => e.querySelector('input') && getComputedStyle(e).display !== 'none'
+          ).length
+      );
 
     expect(await champs()).toBe(2);
     const totalDebutant = await page.locator('#frais-out-rstart').textContent();
@@ -421,11 +434,53 @@ test.describe('Qualité', () => {
 
     await page.click('label[for="frais-niveau-expert"]');
     expect(await champs()).toBe(6);
-    await expect(page.locator('#frais-out-detail-gestion')).toBeVisible();
     expect(await page.locator('#frais-out-rstart').textContent()).toBe(totalDebutant);
 
     await page.click('label[for="frais-niveau-debutant"]');
     expect(await champs()).toBe(2);
+  });
+
+  /*
+   * Le tunnel de simulation : une étape à la fois, un fil qui suit, et le niveau qui décide du nombre
+   * d'étapes. Sans script toutes les étapes seraient là, ce qui reste le repli ; avec script il ne doit
+   * y en avoir qu'une, et « Suivant » doit mener au résultat en enjambant les étapes fermées.
+   */
+  test('le tunnel de simulation avance étape par étape', async ({ page }) => {
+    await sauterLaFenetreOutils(page);
+    await page.goto('/outil/simulateur-de-frais/');
+    await expect(page.locator('[data-funnel][data-funnel-ready]')).toHaveCount(1);
+
+    const visibles = () =>
+      page.evaluate(
+        () =>
+          [...document.querySelectorAll('[data-funnel-step]')].filter(
+            (e) => !(e as HTMLElement).hidden
+          ).length
+      );
+    const progres = () => page.locator('[data-funnel-progress]').textContent();
+
+    /* Débutant : deux questions, puis le résultat. */
+    expect(await visibles()).toBe(1);
+    expect(await progres()).toBe('Étape 1 sur 3');
+
+    await page.click('[data-funnel-next]');
+    expect(await progres()).toBe('Étape 2 sur 3');
+    await page.click('[data-funnel-next]');
+    expect(await progres()).toBe('Étape 3 sur 3');
+    expect(await visibles()).toBe(1);
+    await expect(page.locator('[data-funnel-next]')).toBeHidden();
+    await expect(page.locator('[data-funnel-restart]')).toBeVisible();
+
+    /*
+     * Expert depuis le résultat : deux étapes s'ouvrent, et l'on RESTE sur le résultat. La position est
+     * tenue par l'étape, pas par son rang ; un rang mémorisé aurait désigné la troisième question.
+     */
+    await page.click('label[for="frais-niveau-expert"]');
+    expect(await progres()).toBe('Étape 5 sur 5');
+    await expect(page.locator('[data-funnel-restart]')).toBeVisible();
+
+    await page.click('[data-funnel-restart]');
+    expect(await progres()).toBe('Étape 1 sur 5');
   });
 
   /* Chaque carte de /outils doit mener à une page qui existe et porte son titre. */

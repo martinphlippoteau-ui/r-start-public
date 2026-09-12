@@ -11,7 +11,7 @@
  * de facts.income, rien n'est écrit en dur ici.
  */
 import ToolField from './ToolField.astro';
-import ToolPanel from './ToolPanel.astro';
+import ToolFunnel from './ToolFunnel.astro';
 import ToolResult from './ToolResult.astro';
 import { income } from '@/content/fr/facts';
 import { toolsPage } from '@/content/fr/toolsPage';
@@ -22,18 +22,24 @@ const { results } = outil;
 const reglage = { mois: income.enjoymentDelayMonths, pending: labels.pending };
 ---
 
-<ToolPanel
+<ToolFunnel
   id="jouissance"
   title={outil.title}
   intro={outil.intro}
   risk={outil.risk}
   noteId={outil.noteId}
   levelNotes={outil.levelNotes}
+  steps={outil.steps}
   tone="paper"
-  twoColumns={false}
 >
-  <Fragment slot="fields">
-    <ToolField id="jouissance-date" label={outil.fields.date} value="" type="date" />
+  <Fragment slot="step-1">
+    <ToolField
+      id="jouissance-date"
+      label={outil.fields.date}
+      value=""
+      type="date"
+      class="sm:col-span-2"
+    />
   </Fragment>
 
   <Fragment slot="results">
@@ -67,7 +73,7 @@ const reglage = { mois: income.enjoymentDelayMonths, pending: labels.pending };
       </p>
     </div>
   </Fragment>
-</ToolPanel>
+</ToolFunnel>
 
 <script is:inline define:vars={{ reglage, gabarit: results.sameMonthTemplate }}>
   /*

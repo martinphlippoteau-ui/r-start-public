@@ -12,7 +12,7 @@
  */
 import NoteRef from '@/components/ui/NoteRef.astro';
 import ToolField from './ToolField.astro';
-import ToolPanel from './ToolPanel.astro';
+import ToolFunnel from './ToolFunnel.astro';
 import ToolResult from './ToolResult.astro';
 import { fees, marketComparison } from '@/content/fr/facts';
 import { toolsPage } from '@/content/fr/toolsPage';
@@ -36,16 +36,17 @@ const bareme = {
 };
 ---
 
-<ToolPanel
+<ToolFunnel
   id="frais"
   title={outil.title}
   intro={outil.intro}
   risk={outil.risk}
   noteId={outil.noteId}
   levelNotes={outil.levelNotes}
+  steps={outil.steps}
   tone="white"
 >
-  <Fragment slot="fields">
+  <Fragment slot="step-1">
     <ToolField
       id="frais-montant"
       label={fields.amount}
@@ -53,7 +54,11 @@ const bareme = {
       value={10000}
       min={200}
       step={100}
+      class="sm:col-span-2"
     />
+  </Fragment>
+
+  <Fragment slot="step-2">
     <ToolField
       id="frais-loyers"
       label={fields.rent}
@@ -62,7 +67,11 @@ const bareme = {
       min={0}
       step={100}
       hint={hints.rent}
+      class="sm:col-span-2"
     />
+  </Fragment>
+
+  <Fragment slot="step-3">
     <ToolField
       id="frais-duree"
       label={fields.years}
@@ -83,6 +92,9 @@ const bareme = {
       hint={hints.gain}
       level={2}
     />
+  </Fragment>
+
+  <Fragment slot="step-4">
     <ToolField
       id="frais-entree-rivale"
       label={fields.rivalEntry}
@@ -161,7 +173,7 @@ const bareme = {
       <p class="text-caption mt-3 text-slate-700">{results.detailNone}</p>
     </div>
   </Fragment>
-</ToolPanel>
+</ToolFunnel>
 
 <script is:inline define:vars={{ bareme }}>
   /*

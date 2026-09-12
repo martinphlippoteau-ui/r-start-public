@@ -11,7 +11,7 @@
  * capitalisation, aucune valeur future. Le prix par défaut est celui en vigueur (facts.share).
  */
 import ToolField from './ToolField.astro';
-import ToolPanel from './ToolPanel.astro';
+import ToolFunnel from './ToolFunnel.astro';
 import ToolResult from './ToolResult.astro';
 import { income, share, subscription } from '@/content/fr/facts';
 import { toolsPage } from '@/content/fr/toolsPage';
@@ -26,16 +26,17 @@ const reglage = {
 };
 ---
 
-<ToolPanel
+<ToolFunnel
   id="versements"
   title={outil.title}
   intro={outil.intro}
   risk={outil.risk}
   noteId={outil.noteId}
   levelNotes={outil.levelNotes}
+  steps={outil.steps}
   tone="paper"
 >
-  <Fragment slot="fields">
+  <Fragment slot="step-1">
     <ToolField
       id="versements-mensuel"
       label={outil.fields.monthly}
@@ -44,7 +45,11 @@ const reglage = {
       min={subscription.options.pei.minimum}
       step={10}
       hint={outil.hints.monthly}
+      class="sm:col-span-2"
     />
+  </Fragment>
+
+  <Fragment slot="step-2">
     <ToolField
       id="versements-duree"
       label={outil.fields.months}
@@ -52,7 +57,11 @@ const reglage = {
       value={60}
       min={1}
       max={480}
+      class="sm:col-span-2"
     />
+  </Fragment>
+
+  <Fragment slot="step-3">
     <ToolField
       id="versements-prix"
       label={outil.fields.sharePrice}
@@ -92,7 +101,7 @@ const reglage = {
       <p class="text-caption mt-2 text-slate-700">{results.firstEnjoymentHint}</p>
     </div>
   </Fragment>
-</ToolPanel>
+</ToolFunnel>
 
 <script is:inline define:vars={{ reglage }}>
   /*

@@ -11,7 +11,7 @@
  * calcul suppose un retrait possible, ce qui n'est jamais garanti.
  */
 import ToolField from './ToolField.astro';
-import ToolPanel from './ToolPanel.astro';
+import ToolFunnel from './ToolFunnel.astro';
 import ToolResult from './ToolResult.astro';
 import { fees } from '@/content/fr/facts';
 import { toolsPage } from '@/content/fr/toolsPage';
@@ -34,16 +34,17 @@ const reglage = {
 };
 ---
 
-<ToolPanel
+<ToolFunnel
   id="sortie"
   title={outil.title}
   intro={outil.intro}
   risk={outil.risk}
   noteId={outil.noteId}
   levelNotes={outil.levelNotes}
+  steps={outil.steps}
   tone="white"
 >
-  <Fragment slot="fields">
+  <Fragment slot="step-1">
     <ToolField
       id="sortie-montant"
       label={outil.fields.amount}
@@ -51,7 +52,11 @@ const reglage = {
       value={10000}
       min={0}
       step={100}
+      class="sm:col-span-2"
     />
+  </Fragment>
+
+  <Fragment slot="step-2">
     <ToolField
       id="sortie-duree"
       label={outil.fields.years}
@@ -59,6 +64,7 @@ const reglage = {
       value={3}
       min={0}
       max={30}
+      class="sm:col-span-2"
     />
   </Fragment>
 
@@ -96,7 +102,7 @@ const reglage = {
       </p>
     </div>
   </Fragment>
-</ToolPanel>
+</ToolFunnel>
 
 <script is:inline define:vars={{ reglage }}>
   /*
