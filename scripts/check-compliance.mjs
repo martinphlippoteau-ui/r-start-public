@@ -357,12 +357,12 @@ async function checkSubPages() {
       // mise en ligne. Avertissement tant que le comparateur est en construction ; à passer en erreur le
       // jour où la page part en production.
       const scpis = (html.match(/<option value="\d+"/g) || []).length;
-      const manquants = (html.match(/À compléter/g) || []).length;
-      if (manquants)
+      const nonDocumentees = comparator.scpis.filter((s) => !s.unavailable && !s.source);
+      if (nonDocumentees.length)
         warnings.push(
-          `${file} : comparateur INCOMPLET — ${scpis} SCPI proposées, des taux manquent. ` +
-            'Ne pas mettre en ligne : le tableau opposerait les frais de R Start à des cases vides. ' +
-            'Relever les sept taux de chaque SCPI dans son DIC et sa note d’information, avec la date.'
+          `${file} : comparateur INCOMPLET — ${nonDocumentees.length} SCPI sur ${scpis} sans source : ` +
+            nonDocumentees.map((s) => s.name).join(', ') +
+            '. Ne pas mettre en ligne tant qu’elles opposent les frais de R Start à des cases vides.'
         );
       if (!/Sources/.test(text))
         errors.push(file + ' : comparateur sans ligne de sources');

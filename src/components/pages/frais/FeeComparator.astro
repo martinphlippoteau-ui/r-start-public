@@ -23,7 +23,7 @@ import brandLogo from '@/assets/logos/r-start-couleur.svg';
 import Container from '@/components/ui/Container.astro';
 import RiskNote from '@/components/ui/RiskNote.astro';
 import Section from '@/components/ui/Section.astro';
-import { comparator } from '@/content/fr/comparator';
+import { comparator, comparatorScpis } from '@/content/fr/comparator';
 
 interface Props {
   id: string;
@@ -31,7 +31,9 @@ interface Props {
 const { id } = Astro.props as Props;
 const titleId = id + '-title';
 const selectId = id + '-select';
-const { rows, scpis } = comparator;
+const { rows } = comparator;
+/** Les SCPI vérifiées : celles qu'on n'a pas pu vérifier ne sont pas proposées (champ `unavailable`). */
+const scpis = comparatorScpis;
 
 /** Valeurs par SCPI, sérialisées pour le script : une seule source, aucun texte dupliqué dans le HTML. */
 const data = scpis.map((s) => ({
@@ -40,6 +42,8 @@ const data = scpis.map((s) => ({
   values: rows.map((r) => s.values?.[r.key] ?? null),
   details: rows.map((r) => s.details?.[r.key] ?? null),
   source: s.source ?? null,
+  /** Source consultée : une case vide veut alors dire « non publié », et non « pas encore relevé ». */
+  documentee: Boolean(s.source),
 }));
 ---
 
@@ -153,7 +157,9 @@ const data = scpis.map((s) => ({
     }
     <p class="text-lead mt-8 max-w-3xl text-ink">{comparator.perimeter}</p>
 
-    <p class="text-caption mt-4 max-w-3xl text-slate-700">{comparator.vatNotice}</p>
+    <p class="text-caption mt-4 max-w-3xl text-slate-700">{comparator.notPublishedNotice}</p>
+
+    <p class="text-caption mt-3 max-w-3xl text-slate-700">{comparator.vatNotice}</p>
 
     {
       /* Sources, une ligne par colonne. Celle de droite suit la SCPI choisie : chaque relevé a sa page et
@@ -186,7 +192,14 @@ const data = scpis.map((s) => ({
   </Container>
 </Section>
 
-<script is:inline define:vars={{ data, pendingLabel: comparator.pendingLabel }}>
+<script
+  is:inline
+  define:vars={{
+    data,
+    pendingLabel: comparator.pendingLabel,
+    notPublishedLabel: comparator.notPublishedLabel,
+  }}
+>
   /*
    * Changement de colonne sans rechargement. Les valeurs sont passées telles quelles : le script ne
    * calcule rien, il recopie. Une valeur absente reste le libellé « à compléter » et l'avertissement
@@ -216,10 +229,10 @@ const data = scpis.map((s) => ({
       let missing = 0;
       cells.forEach((cell, i) => {
         const value = scpi.values[i];
-        cell.textContent = value || pendingLabel;
+        cell.textContent = value || (scpi.documentee ? notPublishedLabel : pendingLabel);
         cell.classList.toggle('text-navy', Boolean(value));
         cell.classList.toggle('text-slate-700', !value);
-        if (!value) missing += 1;
+        if (!value && !scpi.documentee) missing += 1;
         const detail = details[i];
         if (detail) detail.textContent = (value && scpi.details[i]) || '';
       });
