@@ -1,3 +1,4 @@
+import type { Cta } from '@/content/types';
 import type { PageHero, PageSeo } from '@/content/types-v2';
 import { product } from '@/content/fr/facts';
 import { shortRiskLine } from '@/content/fr/legal';
@@ -7,7 +8,7 @@ import { shortRiskLine } from '@/content/fr/legal';
  * section Stratégie de l'accueil rendue en entier (src/components/sections/04-Strategy.astro, contenu
  * strategy.ts), avec ses notes propres. Aucune donnée de performance, aucune promesse de résultat.
  */
-export const strategyPage: { seo: PageSeo; hero: PageHero } = {
+export const strategyPage: { seo: PageSeo; hero: PageHero; cta: Cta } = {
   seo: {
     /** ≤ 60 caractères. */
     title: 'Stratégie R Start, SCPI CORUM : Europe et Canada',
@@ -22,4 +23,7 @@ export const strategyPage: { seo: PageSeo; hero: PageHero } = {
       'R Start achète des immeubles décotés, les valorise puis les revend, en Europe et au Canada. Cette page détaille ses deux leviers, ses trois piliers, sa zone d’investissement, les types d’actifs visés et le recours à l’emprunt.',
     riskLine: shortRiskLine,
   },
+  /* Appel à l'action de la page (13/09/2026) : ni l'en-tête ni le corps n'en portaient, la page se
+     lisait et s'arrêtait là. Même libellé que partout ailleurs. */
+  cta: { label: 'Souscrire en ligne', position: 'strategie' },
 };

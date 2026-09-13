@@ -1,18 +1,23 @@
 ---
 /**
- * Page « La presse en parle », La revue de presse (id « revue-de-presse »). Fond white.
+ * Page « La presse en parle », La revue de presse (id « revue-de-presse », fond white) suivie de son
+ * avertissement dans une section à part (id « avertissement-presse », fond ink, refonte du 13/09/2026).
+ * La revue faisait 2 909 px sur téléphone, pour neuf articles : les cartes sont désormais de simples
+ * lignes séparées d'un filet sous `sm` (média, titre, date), et ne reprennent leur forme de carte qu'à
+ * partir de deux colonnes. L'avertissement, qui fermait la section dans un encadré, a sa propre bande
+ * sombre : il se lit comme une fin de chapitre et non comme un post-scriptum.
  * Introduction (qui rappelle, dans le même bloc, que R Start n'est pas une SCPI sans frais et cite les
  * frais réellement prélevés) et avertissement de fin (facts.press.coverageDisclaimer) en texte normal,
- * jamais animés. Entre les deux, une grille de cartes : média (surtitre), titre de l'article, date.
+ * jamais animés. Entre les deux, la liste : média (surtitre), titre de l'article, date.
  *  - article dont l'adresse est vérifiée : le titre est un lien externe (nouvel onglet, rel noopener
  *    noreferrer, mention « nouvelle fenêtre » portée par aria-describedby vers un span caché commun),
- *    étendu à toute la carte par ::after ;
+ *    étendu à toute la ligne par ::after ;
  *  - article sans adresse : le titre s'affiche sans lien, avec son média et sa date (arbitrage du
  *    10/09/2026 ; les adresses manquantes sont attendues de CORUM).
  * Les titres sont des citations de tiers : ils portent `data-press-quote`, ce qui les exclut du contrôle
  * des formulations interdites de scripts/check-compliance.mjs, ils sont couverts par l'avertissement.
  * Aucun logo de média : les noms sont en typographie (aucune licence).
- * Animation : révélation en cascade de la grille seulement.
+ * Animation : révélation en cascade de la liste seulement.
  * Contenu : src/content/fr/press.ts (coverage, labels).
  */
 import Container from '@/components/ui/Container.astro';
@@ -21,6 +26,7 @@ import PressNoteRef from '@/components/pages/presse/PressNoteRef.astro';
 import { press } from '@/content/fr/press';
 
 const id = 'revue-de-presse';
+const disclaimerId = 'avertissement-presse';
 const { coverage } = press;
 const labels = press.labels ?? {};
 
@@ -30,7 +36,7 @@ const linkHintId = `${id}-link-hint`;
 const hasLinks = coverage.items.some((item) => item.url);
 
 /** Classes communes aux titres, liés ou non : même taille des deux côtés. */
-const titleClass = 'text-xl font-semibold leading-snug tracking-tight text-ink sm:text-2xl';
+const titleClass = 'text-lg font-semibold leading-snug tracking-tight text-ink sm:text-2xl';
 ---
 
 <Section id={id} tone="white">
@@ -49,15 +55,19 @@ const titleClass = 'text-xl font-semibold leading-snug tracking-tight text-ink s
       )
     }
 
+    {
+      /* Sous `sm` : une ligne par article, séparée d'un filet (neuf cartes empilées faisaient presque
+        deux écrans à elles seules). Dès `sm` : la grille de cartes d'origine. */
+    }
     <ul
       role="list"
       aria-label={labels.coverageListLabel}
-      class="mt-10 grid gap-5 sm:grid-cols-2 lg:mt-14 lg:grid-cols-3 lg:gap-6"
+      class="mt-8 grid border-t border-navy/10 sm:mt-10 sm:grid-cols-2 sm:gap-5 sm:border-0 lg:mt-14 lg:grid-cols-3 lg:gap-6"
       data-animate="stagger"
     >
       {
         coverage.items.map((item) => (
-          <li class="group relative flex flex-col gap-4 rounded-3xl bg-paper p-6 ring-1 ring-navy/5 transition-shadow duration-300 hover:shadow-card focus-within:shadow-card sm:p-8">
+          <li class="group relative flex flex-col gap-2 border-b border-navy/10 py-5 transition-shadow duration-300 focus-within:shadow-card sm:gap-4 sm:rounded-3xl sm:border-0 sm:bg-paper sm:p-8 sm:ring-1 sm:ring-navy/5 sm:hover:shadow-card">
             <p class="text-eyebrow text-teal-700">{item.media}</p>
             <h3 class={titleClass}>
               {item.url ? (
@@ -67,7 +77,7 @@ const titleClass = 'text-xl font-semibold leading-snug tracking-tight text-ink s
                   rel="noopener noreferrer"
                   aria-describedby={linkHint ? linkHintId : undefined}
                   data-press-quote
-                  class="text-ink no-underline after:absolute after:inset-0 after:rounded-3xl group-hover:text-navy focus-visible:shadow-none focus-visible:outline-none focus-visible:after:outline-3 focus-visible:after:outline-offset-2 focus-visible:after:outline-navy"
+                  class="text-ink no-underline after:absolute after:inset-0 sm:after:rounded-3xl group-hover:text-navy focus-visible:shadow-none focus-visible:outline-none focus-visible:after:outline-3 focus-visible:after:outline-offset-2 focus-visible:after:outline-navy"
                 >
                   {item.title}
                 </a>
@@ -75,7 +85,7 @@ const titleClass = 'text-xl font-semibold leading-snug tracking-tight text-ink s
                 <span data-press-quote>{item.title}</span>
               )}
             </h3>
-            <p class="mt-auto flex items-center justify-between gap-4 pt-2 text-base text-slate-700">
+            <p class="mt-auto flex items-center justify-between gap-4 pt-1 text-base text-slate-700 sm:pt-2">
               <span>
                 {item.dateIso ? <time datetime={item.dateIso}>{item.date}</time> : item.date}
               </span>
@@ -98,10 +108,17 @@ const titleClass = 'text-xl font-semibold leading-snug tracking-tight text-ink s
         ))
       }
     </ul>
+  </Container>
+</Section>
 
-    <!-- Avertissement (texte normal, jamais animé) -->
-    <div class="mt-12 rounded-3xl bg-paper p-6 sm:p-10 lg:mt-16 lg:p-12">
-      <p class="text-lead max-w-4xl text-ink">{coverage.disclaimer}</p>
+{/* Avertissement (texte normal, jamais animé), dans sa propre bande : il ferme le chapitre */}
+<Section id={disclaimerId} tone="ink" spacing="compact">
+  <Container size="wide">
+    <div class="max-w-4xl">
+      <h2 id={disclaimerId + '-title'} class="text-display-sm text-sand">
+        {coverage.disclaimerTitle}
+      </h2>
+      <p class="text-lead mt-5 text-white">{coverage.disclaimer}</p>
     </div>
   </Container>
 </Section>

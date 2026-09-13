@@ -53,6 +53,8 @@ export const strategy = {
   /** Contre-poids du mot d'ordre, affiché sous l'introduction dans la même taille (jamais animé). */
   mottoRisk: `Cette formule décrit une intention de gestion, non un résultat. ${corumGroup.disposalsDisclaimer}`,
   leversTitle: 'Deux leviers',
+  leversIntro:
+    'La performance d’une SCPI peut venir de deux sources. R Start vise les deux : ni l’une ni l’autre n’est acquise d’avance.',
   levers: [
     {
       title: strategyFacts.levers[0],
@@ -65,7 +67,9 @@ export const strategy = {
         'Un immeuble revendu plus cher qu’il n’a été acheté peut dégager une plus-value, après commission sur la cession. Une revente peut aussi se solder par une moins-value.',
     },
   ],
-  pillarsTitle: 'Trois piliers : comment, où, quoi',
+  pillarsTitle: 'Trois piliers : comment, où, quoi',
+  pillarsIntro:
+    'La méthode d’achat, la zone d’investissement et le type d’immeubles visés. Chacun de ces choix a sa contrepartie, indiquée avec lui.',
   pillars: [
     {
       kicker: 'Comment',

@@ -2,8 +2,8 @@
 /**
  * Page /presse, « La presse en parle » (grand public) : SiteNav collée en haut → main#contenu
  * (PageHero avec le fil d'Ariane dans son slot et la ligne risques visible sans scroller → citations
- * mises en avant → revue de presse et avertissement → renvoi vers la salle de presse → notes propres à
- * la page) → Footer.
+ * mises en avant → revue de presse → avertissement dans sa propre bande sombre → renvoi vers la salle
+ * de presse → notes propres à la page) → Footer.
  * Les communiqués, les contacts et le kit média ont quitté cette page : ils vivent sur /salle-de-presse,
  * accessible depuis le pied de page (arbitrage du 10/09/2026).
  * Métadonnées (title, description, canonical) depuis press.seo, chemin depuis src/config/pages.ts ;
@@ -14,6 +14,8 @@ import SiteNav from '@/components/SiteNav.astro';
 import Footer from '@/components/Footer.astro';
 import LegalNotes from '@/components/LegalNotes.astro';
 import Breadcrumb from '@/components/ui/Breadcrumb.astro';
+import Button from '@/components/ui/Button.astro';
+import StickyCta from '@/components/StickyCta.astro';
 import Container from '@/components/ui/Container.astro';
 import PageHero from '@/components/ui/PageHero.astro';
 import Section from '@/components/ui/Section.astro';
@@ -43,6 +45,9 @@ const { pressRoomLink } = press;
       riskLine={press.hero.riskLine}
     >
       <Breadcrumb slot="breadcrumb" key="press" tone="dark" />
+      <Button slot="cta" position={press.cta.position} variant="light" size="lg">
+        {press.cta.label}
+      </Button>
       {
         /* Les médias des citations mises en avant, avec leur date : sur grand écran ils occupent la
           moitié droite restée vide et annoncent qui parle, avant même la première citation. Aucun
@@ -98,5 +103,20 @@ const { pressRoomLink } = press;
 
     <LegalNotes notes={press.notes} />
   </main>
+
+  {
+    /* Pastille d'appel : elle arrive avec la première section de contenu et reste jusqu'au bas de page.
+      Rendue au niveau de la page, jamais dans une section. */
+  }
+  {
+    /* Pastille d'appel : elle prend le RELAIS du CTA de l'en-tête, dès que celui-ci n'est plus à
+      l'écran, et reste jusqu'au bas de page. Accrochée à une section, elle laissait un trou pendant
+      lequel la page ne portait plus aucun appel. */
+  }
+  <StickyCta
+    label={press.cta.label}
+    position={press.cta.position}
+    watch="#en-tete a[data-cta='souscrire']"
+  />
   <Footer />
 </Base>

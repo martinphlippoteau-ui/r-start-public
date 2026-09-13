@@ -43,6 +43,9 @@ export type CtaPosition =
   | 'frais'
   | 'outils'
   | 'souscrire'
+  | 'strategie'
+  | 'presse'
+  | 'a-propos'
   | 'sticky'
   | 'faq'
   | 'footer'
@@ -225,11 +228,15 @@ export interface StrategyContent {
    * ne préjugent pas de leurs performances futures ».
    */
   mottoRisk?: string;
-  /** Surtitre du bloc des deux leviers (ex. « Deux leviers »). */
+  /** Titre de la section des deux leviers (ex. « Deux leviers »). */
   leversTitle?: string;
+  /** Introduction de la section des deux leviers, sous son titre. */
+  leversIntro?: string;
   levers: { title: string; description: string }[];
-  /** Surtitre du bloc des piliers (ex. « Trois piliers »). */
+  /** Titre de la section des piliers (ex. « Trois piliers : comment, où, quoi »). */
   pillarsTitle?: string;
+  /** Introduction de la section des piliers, sous son titre. */
+  pillarsIntro?: string;
   pillars: StrategyPillar[];
   zone: {
     title: string;

@@ -1,8 +1,9 @@
 ---
 /**
  * Page /a-propos, la société de gestion (11/09/2026) : SiteNav → main#contenu : PageHero (fil d'Ariane,
- * H1, intro, ligne risques visible sans défiler) → ambiance des bureaux et gamme des cinq SCPI
- * (CorumRange.astro, blocs descendus de l'accueil) → notes de la page → Footer.
+ * H1, intro, ligne risques visible sans défiler, CTA souscrire) → les chiffres du groupe (#corum),
+ * la photo des bureaux en pleine largeur et la gamme des cinq SCPI (#gamme) (CorumRange.astro,
+ * blocs descendus de l'accueil) → notes de la page → Footer.
  * Métadonnées et JSON-LD depuis aboutPage.ts, config/pages.ts et src/lib/seo.ts : aucun texte en dur.
  */
 import Base from '@/layouts/Base.astro';
@@ -10,6 +11,8 @@ import SiteNav from '@/components/SiteNav.astro';
 import Footer from '@/components/Footer.astro';
 import LegalNotes from '@/components/LegalNotes.astro';
 import Breadcrumb from '@/components/ui/Breadcrumb.astro';
+import Button from '@/components/ui/Button.astro';
+import StickyCta from '@/components/StickyCta.astro';
 import PageHero from '@/components/ui/PageHero.astro';
 import CorumRange from '@/components/pages/a-propos/CorumRange.astro';
 import { pages } from '@/config/pages';
@@ -31,9 +34,28 @@ const jsonLd = [
   <main id="contenu">
     <PageHero eyebrow={hero.eyebrow} title={hero.title} intro={hero.intro} riskLine={hero.riskLine}>
       <Breadcrumb slot="breadcrumb" key="about" tone="dark" />
+      <Button slot="cta" position={aboutPage.cta.position} variant="light" size="lg">
+        {aboutPage.cta.label}
+      </Button>
     </PageHero>
     <CorumRange notes={notes} />
     <LegalNotes notes={notes} />
   </main>
+
+  {
+    /* Pastille d'appel : elle arrive avec la première section de contenu et reste jusqu'au bas de page.
+      Rendue au niveau de la page, jamais dans une section. */
+  }
+  {
+    /* Pastille d'appel : elle prend le RELAIS du CTA de l'en-tête, dès que celui-ci n'est plus à
+      l'écran, et reste jusqu'au bas de page. Accrochée à la première section de contenu, elle
+      s'affichait alors que le CTA de l'en-tête était encore visible : deux appels identiques à quelques
+      centimètres l'un de l'autre. */
+  }
+  <StickyCta
+    label={aboutPage.cta.label}
+    position={aboutPage.cta.position}
+    watch="#en-tete a[data-cta='souscrire']"
+  />
   <Footer />
 </Base>

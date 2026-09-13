@@ -96,6 +96,8 @@ export const press = {
     ),
     items: articles,
     disclaimer: pressFacts.coverageDisclaimer,
+    /** Titre de la section qui porte l'avertissement, isolée après la revue depuis le 13/09/2026. */
+    disclaimerTitle: 'À lire avec cette revue de presse',
   },
 
   /** Renvoi vers /salle-de-presse, absente du menu principal (arbitrage du 10/09/2026). */
@@ -107,6 +109,10 @@ export const press = {
   },
 
   /** Micro-textes du composant (libellés d'accessibilité). */
+  /* Appel à l'action de la page (13/09/2026) : elle n'en portait aucun, on lisait la revue de presse et
+     la page s'arrêtait là. */
+  cta: { label: 'Souscrire en ligne', position: 'presse' as const },
+
   labels: {
     newTabHint: 'nouvelle fenêtre',
     coverageListLabel: 'Articles de presse sur R Start',

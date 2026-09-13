@@ -526,6 +526,42 @@ test.describe('Qualité', () => {
     expect(debord).toBe(0);
   });
 
+  /*
+   * Refonte du 13/09/2026 : /strategie, /a-propos et /presse tenaient chacune dans une ou deux sections
+   * interminables (la Stratégie faisait à elle seule 8,5 écrans sur téléphone, sans titre intermédiaire).
+   * Le garde-fou vérifie ce qui rendait ces pages illisibles, pas la mise en page du jour : plusieurs
+   * sections, un titre visible par section, et aucune section qui reparte en pavé de plusieurs écrans.
+   */
+  const PAGES_REFONDUES = [
+    { chemin: '/strategie/', mini: 5 },
+    { chemin: '/a-propos/', mini: 2 },
+    { chemin: '/presse/', mini: 4 },
+  ];
+  for (const { chemin, mini } of PAGES_REFONDUES) {
+    test(`${chemin} se lit en sections courtes et titrées`, async ({ page }) => {
+      await page.goto(chemin);
+      const releve = await page.evaluate(() => {
+        const ecran = window.innerHeight;
+        return [...document.querySelectorAll('main > section')].map((s) => {
+          const titre = document.getElementById(s.getAttribute('aria-labelledby') ?? '');
+          return {
+            id: s.id,
+            ecrans: s.getBoundingClientRect().height / ecran,
+            titre: (titre?.textContent ?? '').trim(),
+            cache: titre?.classList.contains('visually-hidden') ?? true,
+          };
+        });
+      });
+      /* Les notes ne comptent pas : elles ferment toutes les pages, elles ne font pas la structure. */
+      const contenu = releve.filter((s) => s.id !== 'notes');
+      expect(contenu.length).toBeGreaterThanOrEqual(mini);
+      expect(contenu.filter((s) => !s.titre || s.cache).map((s) => s.id)).toEqual([]);
+      expect(
+        contenu.filter((s) => s.ecrans > 4).map((s) => `${s.id} ${s.ecrans.toFixed(1)} écrans`)
+      ).toEqual([]);
+    });
+  }
+
   test('captures d’écran de la page', async ({ page }, testInfo) => {
     await page.goto('/');
     await page.locator('[data-consent-refuse]').click();

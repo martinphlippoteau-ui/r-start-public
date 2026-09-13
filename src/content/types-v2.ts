@@ -412,9 +412,18 @@ export interface PressContent {
   seo: PageSeo;
   hero: PageHero;
   quotes: { title: string; intro?: string; items: PressQuote[] };
-  coverage: { title: string; intro: string; items: PressArticle[]; disclaimer: string };
+  coverage: {
+    title: string;
+    intro: string;
+    items: PressArticle[];
+    disclaimer: string;
+    /** Titre de la section qui porte l'avertissement, rendue après la revue. */
+    disclaimerTitle?: string;
+  };
   /** Renvoi vers /salle-de-presse, absente du menu principal. */
   pressRoomLink: { title: string; body: string; label: string; href: string };
+  /** Appel à l'action de la page : en-tête et pastille flottante. */
+  cta: Cta;
   labels?: PressLabels;
   notes: LegalNote[];
 }

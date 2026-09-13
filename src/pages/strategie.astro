@@ -2,8 +2,9 @@
 /**
  * Page /strategie, « Stratégie d'investissement » (menu, décision du 10/09/2026 : la stratégie quitte
  * l'accueil, qui n'en garde que le chapitre court). SiteNav → main#contenu : PageHero (fil d'Ariane, H1,
- * intro, ligne risques visible sans scroller) → section Stratégie complète (04-Strategy.astro, contenu
- * strategy.ts, appels de note résolus dans les notes de la page) → notes → Footer. Métadonnées et
+ * intro, ligne risques visible sans scroller, CTA souscrire) → les cinq sections de la stratégie
+ * (04-Strategy.astro : #strategie, #leviers, #piliers, #zone-d-investissement, #effet-de-levier,
+ * contenu strategy.ts, appels de note résolus dans les notes de la page) → notes → Footer. Métadonnées et
  * JSON-LD (Organization, WebPage, BreadcrumbList) depuis strategyPage.ts, config/pages.ts et src/lib/seo.ts.
  */
 import Base from '@/layouts/Base.astro';
@@ -11,6 +12,8 @@ import SiteNav from '@/components/SiteNav.astro';
 import Footer from '@/components/Footer.astro';
 import LegalNotes from '@/components/LegalNotes.astro';
 import Breadcrumb from '@/components/ui/Breadcrumb.astro';
+import Button from '@/components/ui/Button.astro';
+import StickyCta from '@/components/StickyCta.astro';
 import PageHero from '@/components/ui/PageHero.astro';
 import Strategy from '@/components/sections/04-Strategy.astro';
 import { pages } from '@/config/pages';
@@ -33,9 +36,24 @@ const jsonLd = [
   <main id="contenu">
     <PageHero eyebrow={hero.eyebrow} title={hero.title} intro={hero.intro} riskLine={hero.riskLine}>
       <Breadcrumb slot="breadcrumb" key="strategy" tone="dark" />
+      <Button slot="cta" position={strategyPage.cta.position} variant="light" size="lg">
+        {strategyPage.cta.label}
+      </Button>
     </PageHero>
     <Strategy pageNotes={notes} />
     <LegalNotes notes={notes} />
   </main>
+
+  {
+    /* Pastille d'appel : elle prend le RELAIS du CTA de l'en-tête, dès que celui-ci n'est plus à
+      l'écran, et reste jusqu'au bas de page. Accrochée à la première section de contenu, elle
+      s'affichait alors que le CTA de l'en-tête était encore visible : deux appels identiques à
+      quelques centimètres l'un de l'autre. Rendue au niveau de la page, jamais dans une section. */
+  }
+  <StickyCta
+    label={strategyPage.cta.label}
+    position={strategyPage.cta.position}
+    watch="#en-tete a[data-cta='souscrire']"
+  />
   <Footer />
 </Base>

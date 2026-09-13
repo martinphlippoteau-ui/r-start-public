@@ -1,5 +1,5 @@
 import type { PageHero, PageSeo } from '@/content/types-v2';
-import type { LegalNote } from '@/content/types';
+import type { Cta, LegalNote } from '@/content/types';
 import { notes as corumNotes } from '@/content/fr/corum';
 import { corumGroup, product } from '@/content/fr/facts';
 import { shortRiskLine } from '@/content/fr/legal';
@@ -9,7 +9,7 @@ import { shortRiskLine } from '@/content/fr/legal';
  * CORUM en chiffres » sur l'accueil jusqu'au 11/09/2026 (ambiance des bureaux, gamme des cinq SCPI).
  * Les notes sont celles de corum.ts, filtrées sur celles réellement appelées ici.
  */
-export const aboutPage: { seo: PageSeo; hero: PageHero; notes: LegalNote[] } = {
+export const aboutPage: { seo: PageSeo; hero: PageHero; notes: LegalNote[]; cta: Cta } = {
   seo: {
     /** ≤ 60 caractères. */
     title: 'À propos de CORUM, société de gestion de R Start',
@@ -24,4 +24,6 @@ export const aboutPage: { seo: PageSeo; hero: PageHero; notes: LegalNote[] } = {
   },
   /** Seules les notes appelées par les blocs de cette page. */
   notes: corumNotes.filter((note) => ['confiance-chiffres', 'corum-gamme'].includes(note.id)),
+  /* Appel à l'action de la page (13/09/2026) : elle n'en portait aucun. */
+  cta: { label: 'Souscrire en ligne', position: 'a-propos' },
 };

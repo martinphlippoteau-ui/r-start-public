@@ -1,7 +1,13 @@
 ---
 /**
- * Page /a-propos (section unique, deux chapitres de même niveau) : les quatre chiffres du groupe CORUM, la photo d'ambiance des bureaux et la gamme des
- * cinq SCPI, avec la tuile R Start marquée « Nouveau ». Ces blocs étaient sur l'accueil jusqu'au 11/09/2026 ; ils ont leur place ici, où le sujet est la société de gestion.
+ * Page /a-propos, la société de gestion : DEUX sections séparées par une photo pleine largeur
+ * (refonte du 13/09/2026). Jusqu'ici les deux chapitres tenaient dans une seule section blanche de
+ * 1 575 px, sans repère entre eux :
+ *  1. #corum  (white) « Le groupe CORUM en chiffres », les quatre chiffres du groupe ;
+ *  2. bande photo pleine largeur, hors section (décorative, sans titre : elle n'a donc pas d'ancre) ;
+ *  3. #gamme  (paper) la gamme des cinq SCPI, tuile R Start marquée « Nouveau », et son contre-poids.
+ * Ces blocs étaient sur l'accueil jusqu'au 11/09/2026 ; ils ont leur place ici, où le sujet est la
+ * société de gestion.
  * La photo n'a PAS de parallaxe : `data-parallax` exige le moteur GSAP, que cette page n'a aucune autre
  * raison de télécharger (tests/performance.spec.ts). Elle se révèle par `data-animate="clip"`, rendu par le
  * moteur léger.
@@ -35,74 +41,77 @@ const LOGO_STAGGER = 0.08;
 const QUIET_TITLE_Y = 12;
 ---
 
+{/* 1. Le groupe CORUM en chiffres */}
 <Section id="corum" tone={tone} labelledBy="chiffres-title">
   <Container size="wide">
-    <!-- Le groupe CORUM en chiffres -->
-    <div>
-      <h2 id="chiffres-title" class="text-display-sm" data-animate="fade-up">
-        {stats.title}
-        <NoteRef notes={notes} id="confiance-chiffres" tone="light" />
-      </h2>
-      <!--
-        Grille 2 × 2 sur 8/12 : en 4 colonnes, « 160 000 » en text-stat déborde de sa cellule (texte dégradé
-        tronqué) ; sur 7/12, « 9,6 Md€ » (328 px à 1440 px) dépasse la cellule de 325 px et se replie sur deux lignes.
-      -->
-      <div class="mt-10 grid gap-10 lg:mt-12 lg:grid-cols-12 lg:gap-16">
-        <!-- Les quatre chiffres comptent depuis 0, en place, avec une durée liée à leur ordre de grandeur. -->
-        <ul role="list" class="grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:col-span-12 lg:grid-cols-4">
-          {
-            stats.items.map((s) => (
-              <li>
-                <Stat size="solid" value={s.value} suffix={s.suffix} label={s.label} />
-              </li>
-            ))
-          }
-        </ul>
-        {
-          /* Le contre-poids « Ces chiffres sont ceux du groupe CORUM… » et la ligne de source ont été retirés
-            d'ici le 11/09/2026 (décision de l'équipe). Le rappel « cette expérience ne préjuge pas des résultats
-            de R Start, qui n'a pas d'historique propre » reste porté par l'introduction de la section
-            (corum.intro), dans le même chapitre. Les chiffres ne sont donc plus marqués [data-advantage]. */
-        }
-      </div>
-    </div>
-
+    <h2 id="chiffres-title" class="text-display-md max-w-4xl" data-animate="fade-up">
+      {stats.title}
+      <NoteRef notes={notes} id="confiance-chiffres" tone="light" />
+    </h2>
+    <!--
+      Grille 2 × 2 sur téléphone, quatre colonnes dès `lg` : en 4 colonnes plus étroites, « 160 000 »
+      en text-stat déborde de sa cellule (texte dégradé tronqué).
+    -->
+    <ul role="list" class="mt-10 grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:mt-14 lg:grid-cols-4">
+      {
+        /* Les quatre chiffres comptent depuis 0, en place, avec une durée liée à leur ordre de grandeur. */
+      }
+      {
+        stats.items.map((s) => (
+          <li>
+            <Stat size="solid" value={s.value} suffix={s.suffix} label={s.label} />
+          </li>
+        ))
+      }
+    </ul>
     {
-      /* Photo d'ambiance des bureaux : respiration visuelle de la bande blanche, et seule image de la page
-        qui illustre la société de gestion. Décorative, aucun avantage, donc aucun contre-poids attendu. */
+      /* Le contre-poids « Ces chiffres sont ceux du groupe CORUM… » et la ligne de source ont été retirés
+        d'ici le 11/09/2026 (décision de l'équipe). Le rappel « cette expérience ne préjuge pas des résultats
+        de R Start, qui n'a pas d'historique propre » reste porté par l'introduction de l'en-tête de la
+        page (aboutPage.hero.intro). Les chiffres ne sont donc plus marqués [data-advantage]. */
     }
-    <figure class="mt-16 lg:mt-24" data-animate="clip">
-      <div class="img-frame aspect-[3/2] sm:aspect-[21/9]">
-        <div class="absolute inset-x-0 -top-[12%] h-[124%]">
-          <Picture
-            src={officePhoto}
-            alt={media.corum[0].alt}
-            widths={[640, 1024, 1600, 2400]}
-            sizes="(min-width: 80rem) 72rem, 100vw"
-            formats={['avif', 'webp']}
-            loading="lazy"
-            decoding="async"
-            pictureAttributes={{ class: 'block h-full w-full' }}
-            class="h-full w-full object-cover"
-          />
-        </div>
-      </div>
-    </figure>
+  </Container>
+</Section>
 
-    <!-- La gamme -->
-    <div class="mt-10 sm:mt-16 grid gap-10 lg:mt-24 lg:grid-cols-12 lg:gap-16">
+{
+  /* 2. Photo d'ambiance des bureaux, PLEINE LARGEUR (13/09/2026) : elle sépare les deux chapitres et
+    donne à la page sa seule respiration visuelle. Décorative, aucun avantage, donc aucun contre-poids
+    attendu. Hors <Section> : sans titre, elle n'aurait aucune ancre à désigner en aria-labelledby. */
+}
+<figure class="relative" data-animate="clip">
+  <div
+    class="relative h-[42vh] min-h-64 w-full overflow-hidden sm:h-[52vh] sm:min-h-80 lg:h-[60vh]"
+  >
+    <Picture
+      src={officePhoto}
+      alt={media.corum[0].alt}
+      widths={[640, 1024, 1600, 2400]}
+      sizes="100vw"
+      formats={['avif', 'webp']}
+      loading="lazy"
+      decoding="async"
+      pictureAttributes={{ class: 'block h-full w-full' }}
+      class="h-full w-full object-cover"
+    />
+  </div>
+</figure>
+
+{/* 3. La gamme des cinq SCPI */}
+<Section id="gamme" tone="paper" labelledBy="gamme-title">
+  <Container size="wide">
+    <div class="grid gap-10 lg:grid-cols-12 lg:gap-16">
       <div class="lg:col-span-5">
         <!-- Titre suivi d'un paragraphe visible d'emblée : fade-up court pour ne pas chevaucher sa première ligne. -->
         <h2
           id="gamme-title"
-          class="text-display-sm"
+          class="text-display-md text-ink"
           data-animate="fade-up"
           data-animate-y={String(QUIET_TITLE_Y)}
         >
           {corum.range.title}
           <NoteRef notes={notes} id="corum-gamme" tone="light" />
         </h2>
-        <p class="mt-4 text-lead">{corum.range.description}</p>
+        <p class="text-lead mt-5 text-pretty text-slate-700 sm:mt-6">{corum.range.description}</p>
       </div>
       <div class="lg:col-span-7">
         <ul
@@ -118,7 +127,7 @@ const QUIET_TITLE_Y = 12;
                   'flex min-h-24 items-center justify-center rounded-2xl border p-5 text-center text-lg font-semibold sm:p-6',
                   current
                     ? 'border-teal-400 bg-teal-100 text-navy'
-                    : 'border-mist bg-paper text-navy',
+                    : 'border-mist bg-white text-navy',
                 ]}
                 aria-current={current ? 'true' : undefined}
               >
