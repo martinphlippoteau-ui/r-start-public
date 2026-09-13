@@ -23,7 +23,9 @@ export const aboutPage: { seo: PageSeo; hero: PageHero; notes: LegalNote[]; cta:
     riskLine: shortRiskLine,
   },
   /** Seules les notes appelées par les blocs de cette page. */
-  notes: corumNotes.filter((note) => ['confiance-chiffres', 'corum-gamme'].includes(note.id)),
+  notes: corumNotes.filter((note) =>
+    ['confiance-chiffres', 'corum-savoir-faire', 'corum-gamme'].includes(note.id)
+  ),
   /* Appel à l'action de la page (13/09/2026) : elle n'en portait aucun. */
   cta: { label: 'Souscrire en ligne', position: 'a-propos' },
 };

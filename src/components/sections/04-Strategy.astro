@@ -5,13 +5,15 @@
  * Jusqu'ici tout tenait dans une seule section sombre de 4 632 px (5 651 px sur téléphone, plus de
  * huit écrans) : aucun repère, aucun titre intermédiaire, aucune respiration. Le découpage reprend le
  * rythme de l'accueil et de /frais, une idée par section, avec alternance des fonds :
- *  1. #strategie          (ink)   le mot d'ordre, l'introduction et son contre-poids ;
+ *  1. #strategie          (paper) le mot d'ordre, l'introduction et son contre-poids ;
  *  2. #leviers            (white) les deux leviers, numérotés ;
  *  3. #piliers            (paper) les trois piliers avec leur contre-poids, puis les photos ;
  *  4. #zone               (ink)   la carte, la zone d'investissement et les types d'actifs ;
  *  5. #effet-de-levier    (white) l'endettement, avantage et risque dans le même bloc.
- * La carte reste sur fond sombre : ses aplats et sa trame (teal-400 à faible opacité) sont dessinés
- * pour l'ink, ils disparaîtraient sur un fond clair.
+ * UN SEUL fond sombre, celui de la carte (13/09/2026, demande de l'équipe) : l'en-tête de la page est
+ * déjà sombre, une première section ink enchaînait deux pavés sombres sans coupure et la page semblait
+ * commencer au deuxième écran. La carte, elle, garde l'ink : ses aplats et sa trame (teal-400 à faible
+ * opacité) sont dessinés pour ce fond, ils disparaîtraient sur un fond clair.
  * Chaque section porte un H2 et son introduction, et chaque avantage garde son contre-poids DANS le
  * même bloc (RiskNote de même taille, jamais animé, aucun ancêtre d'un [data-risk] n'est animé).
  * Props : `pageNotes` (notes propres à /strategie) numérote les appels de note.
@@ -103,7 +105,7 @@ const mottoScene = mottoSteps.length === 3;
 ---
 
 {/* 1. Le mot d'ordre : la promesse et son contre-poids, dans le même bloc */}
-<Section id={id} tone="ink" class="overflow-hidden">
+<Section id={id} tone="paper" class="overflow-hidden">
   <Container size="wide" class="relative">
     <header>
       <h2 id={titleId} class="text-display-lg" data-reveal-text>{strategy.title}</h2>
@@ -113,7 +115,7 @@ const mottoScene = mottoSteps.length === 3;
       mottoScene ? (
         <div class="mt-chapter">
           <div data-scene data-scene-start="top 72px" data-scene-end="+=60%" class="py-4">
-            <p class="text-display-lg lg:text-display-xl text-sand">
+            <p class="text-display-lg lg:text-display-xl text-navy">
               {mottoSteps.map((step, i) =>
                 i < mottoSteps.length - 1 ? (
                   <span data-step data-step-stay class="block">
@@ -127,16 +129,15 @@ const mottoScene = mottoSteps.length === 3;
                 )
               )}
             </p>
-            <div class="mt-8 grid gap-6 text-white sm:grid-cols-2 lg:mt-10 lg:gap-10">
-              <p data-advantage class="text-lead">
+            <div class="mt-8 grid gap-6 sm:grid-cols-2 lg:mt-10 lg:gap-10">
+              <p data-advantage class="text-lead text-slate-700">
                 {strategy.intro}
               </p>
               {strategy.mottoRisk && (
                 <RiskNote
                   text={strategy.mottoRisk}
-                  tone="dark"
                   size="lead"
-                  class="border-t border-white/15 pt-5 sm:border-t-0 sm:pt-0"
+                  class="border-t border-navy/15 pt-5 sm:border-t-0 sm:pt-0"
                 />
               )}
             </div>
@@ -145,26 +146,27 @@ const mottoScene = mottoSteps.length === 3;
       ) : (
         <div class="mt-chapter grid gap-6 lg:grid-cols-12 lg:gap-10">
           {strategy.motto && (
-            <p class="text-display-md text-sand lg:col-span-7" data-animate="fade-up">
+            <p class="text-display-md text-navy lg:col-span-7" data-animate="fade-up">
               {strategy.motto}
               <NoteRef notes={pageNotes} id="strategie-mot-d-ordre" />
             </p>
           )}
           <div
-            class:list={[
-              'max-w-2xl text-white',
-              strategy.motto ? 'lg:col-span-5 lg:pt-2' : 'lg:col-span-12',
-            ]}
+            class:list={['max-w-2xl', strategy.motto ? 'lg:col-span-5 lg:pt-2' : 'lg:col-span-12']}
           >
-            <p data-advantage class="text-lead" data-animate="fade-up" data-animate-delay="0.1">
+            <p
+              data-advantage
+              class="text-lead text-slate-700"
+              data-animate="fade-up"
+              data-animate-delay="0.1"
+            >
               {strategy.intro}
             </p>
             {strategy.mottoRisk && (
               <RiskNote
                 text={strategy.mottoRisk}
-                tone="dark"
                 size="lead"
-                class="mt-5 border-t border-white/15 pt-5"
+                class="mt-5 border-t border-navy/15 pt-5"
               />
             )}
           </div>

@@ -367,6 +367,16 @@ export interface CorumContent {
     /** Pastille sur la tuile de R Start dans la gamme (« Nouveau ») ; absente : rien. */
     currentBadge?: string;
   };
+  /**
+   * Les familles de solutions d'épargne du groupe (page /a-propos). Absent = section non rendue.
+   * `risk` est le contre-poids du bloc, rendu avec lui et à la même taille, jamais animé.
+   */
+  expertise?: {
+    title: string;
+    intro: string;
+    items: { kicker: string; icon: string; title: string; description: string }[];
+    risk: string;
+  };
   /** Titre du bloc facultatif sur la rémunération de CORUM lors des cessions. Absent = bloc non rendu. */
   alignmentTitle?: string;
   /** Corps du bloc « rémunération sur les ventes ». À défaut, le composant retombe sur `intro`. */

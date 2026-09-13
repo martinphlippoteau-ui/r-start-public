@@ -562,6 +562,34 @@ test.describe('Qualité', () => {
     });
   }
 
+  /*
+   * Demande de l'équipe du 13/09/2026 : jamais de bloc sombre juste après l'en-tête, lui-même sombre.
+   * Sur /strategie, le mot d'ordre enchaînait deux pavés ink sans coupure et la page semblait commencer
+   * au deuxième écran. La règle vaut pour toutes les sous-pages, pas seulement celle qui l'a révélée.
+   */
+  test('aucune sous-page n’enchaîne deux blocs sombres après l’en-tête', async ({ page }) => {
+    const fautifs: string[] = [];
+    for (const chemin of PAGES.filter((p) => p !== '/')) {
+      await page.goto(chemin);
+      const releve = await page.evaluate(() => {
+        /* Luminance relative approchée du fond : 0 = noir, 1 = blanc. */
+        const clarte = (el: Element) => {
+          const canaux = getComputedStyle(el).backgroundColor.match(/\d+/g);
+          if (!canaux) return 1;
+          const [r, v, b] = canaux.map(Number);
+          return (0.2126 * r + 0.7152 * v + 0.0722 * b) / 255;
+        };
+        const entete = document.querySelector('#en-tete');
+        const premiere = document.querySelector('main > section:not(#en-tete)');
+        if (!entete || !premiere) return null;
+        return { entete: clarte(entete), premiere: clarte(premiere), id: premiere.id };
+      });
+      if (releve && releve.entete < 0.5 && releve.premiere < 0.5)
+        fautifs.push(`${chemin} → #${releve.id}`);
+    }
+    expect(fautifs).toEqual([]);
+  });
+
   test('captures d’écran de la page', async ({ page }, testInfo) => {
     await page.goto('/');
     await page.locator('[data-consent-refuse]').click();

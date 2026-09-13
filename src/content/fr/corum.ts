@@ -53,6 +53,10 @@ const corumNotes: LegalNote[] = [
     text: `Nombre de SCPI gérées, ancienneté du groupe et nombre de bureaux : source CORUM, brochure partenaires 2026, p. 7. ${otherScpi} sont des SCPI distinctes de R Start. Chacune a sa propre stratégie et ses propres frais. Leurs résultats ne préjugent pas de ceux de R Start.`,
   },
   {
+    id: 'corum-savoir-faire',
+    text: `Familles de solutions d’épargne du groupe CORUM (SCPI, fonds obligataires, assurance vie et plan d’épargne retraite) : texte de présentation de CORUM L’Épargne remis avec le kit média, et corum.fr consulté le ${corumGroup.statsDate.label}. Ces solutions sont distinctes de R Start. Elles ne sont ni proposées ni décrites sur ce site : chacune a ses propres documents réglementaires, ses propres frais et ses propres risques.`,
+  },
+  {
     id: 'corum-compensation',
     text: 'Mécanisme de compensation des moins-values : lorsqu’une vente génère une moins-value, celle-ci est enregistrée dans une réserve dédiée. Aucune commission sur les cessions n’est perçue tant que cette réserve n’est pas intégralement compensée par des plus-values futures. Détail au chapitre III, section 4 de la note d’information de R Start.',
   },
@@ -65,6 +69,7 @@ const readingOrder = [
   'confiance-visa',
   'confiance-trustpilot',
   'confiance-chiffres',
+  'corum-savoir-faire',
   'corum-gamme',
   'corum-compensation',
 ];
@@ -111,6 +116,43 @@ export const corum = {
   statsRisk: nb(
     `Ces chiffres décrivent le groupe CORUM, pas R Start. Ils peuvent évoluer. La taille du groupe ne préjuge ni des résultats de R Start, ni de la liquidité de ses parts. Le capital investi n’est pas garanti.`
   ),
+
+  /**
+   * Les trois familles de solutions du groupe (page /a-propos, demande du 13/09/2026). Le site ne parle
+   * que de R Start : ce bloc dit ce que fait le groupe, il ne propose rien d'autre et ne décrit aucun
+   * de ces produits. Chaque description reste au niveau de l'activité (ce que c'est), jamais du produit
+   * (ce qu'il rapporte) : aucun chiffre, aucune performance, aucune comparaison.
+   * SOURCE À VALIDER PAR CORUM : le texte de présentation du kit média (facts.press.mediaKit.boilerplate,
+   * lui-même « à valider ») cite « SCPI, assurance vie, fonds obligataires » ; le plan d'épargne retraite
+   * vient du nommage des visuels livrés par CORUM (assets, dossier ambiance). À confirmer avant diffusion.
+   */
+  expertise: {
+    title: 'Les trois savoir-faire de CORUM L’Épargne',
+    intro: `CORUM L’Épargne est la marque de distribution du groupe CORUM, indépendant, créé en 2011. Le groupe conçoit et gère trois familles de solutions d’épargne. R Start relève de la première.`,
+    items: [
+      {
+        kicker: 'Immobilier',
+        icon: 'equipe',
+        title: 'Les SCPI',
+        description: `CORUM Asset Management gère ${corumGroup.scpiCount} SCPI depuis ${corumGroup.scpiSince}. Une SCPI achète et loue des immeubles d’entreprise, puis reverse à ses associés les loyers encaissés, après frais. R Start est la plus récente des cinq.`,
+      },
+      {
+        kicker: 'Obligations',
+        icon: 'argent',
+        title: 'Les fonds obligataires',
+        description:
+          'Le groupe gère aussi des fonds investis en obligations d’entreprises, c’est-à-dire en dette émise par des sociétés. Le fonctionnement, l’horizon de placement et les risques n’ont rien de commun avec ceux d’une SCPI.',
+      },
+      {
+        kicker: 'Épargne de long terme',
+        icon: 'calendrier',
+        title: 'L’assurance vie et le plan d’épargne retraite',
+        description:
+          'CORUM L’Épargne distribue un contrat d’assurance vie et un plan d’épargne retraite. Ce sont des enveloppes, avec leur propre fiscalité, leurs propres frais et leurs propres conditions de sortie.',
+      },
+    ],
+    risk: 'Chacune de ces solutions a ses propres risques et ses propres frais, décrits dans ses documents réglementaires. L’étendue de la gamme ne réduit aucun des risques de R Start : le capital investi y reste exposé à une perte.',
+  },
 
   range: {
     title: `Des SCPI gérées depuis ${corumGroup.scpiSince}`,

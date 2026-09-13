@@ -1,13 +1,17 @@
 ---
 /**
- * Page /a-propos, la société de gestion : DEUX sections séparées par une photo pleine largeur
- * (refonte du 13/09/2026). Jusqu'ici les deux chapitres tenaient dans une seule section blanche de
- * 1 575 px, sans repère entre eux :
- *  1. #corum  (white) « Le groupe CORUM en chiffres », les quatre chiffres du groupe ;
+ * Page /a-propos, la société de gestion : TROIS sections et une photo pleine largeur (refonte du
+ * 13/09/2026). Jusqu'ici les deux chapitres tenaient dans une seule section blanche de 1 575 px,
+ * sans repère entre eux :
+ *  1. #corum         (white) « Le groupe CORUM en chiffres », les quatre chiffres du groupe ;
  *  2. bande photo pleine largeur, hors section (décorative, sans titre : elle n'a donc pas d'ancre) ;
- *  3. #gamme  (paper) la gamme des cinq SCPI, tuile R Start marquée « Nouveau », et son contre-poids.
+ *  3. #savoir-faire  (paper) les trois familles de solutions du groupe, avec leur contre-poids ;
+ *  4. #gamme         (white) la gamme des cinq SCPI, tuile R Start marquée « Nouveau », et son contre-poids.
  * Ces blocs étaient sur l'accueil jusqu'au 11/09/2026 ; ils ont leur place ici, où le sujet est la
- * société de gestion.
+ * société de gestion. Les savoir-faire sont arrivés le 13/09/2026 : la page disait qui gère R Start,
+ * pas ce que fait le groupe par ailleurs. Ils DÉCRIVENT une activité, ils ne proposent rien : aucune
+ * de ces solutions n'est vendue ni détaillée sur ce site, et le contre-poids le dit dans le même bloc.
+ * Le bloc n'est rendu que si `corum.expertise` existe.
  * La photo n'a PAS de parallaxe : `data-parallax` exige le moteur GSAP, que cette page n'a aucune autre
  * raison de télécharger (tests/performance.spec.ts). Elle se révèle par `data-animate="clip"`, rendu par le
  * moteur léger.
@@ -18,6 +22,7 @@
 import { Picture } from 'astro:assets';
 import Container from '@/components/ui/Container.astro';
 import NoteRef from '@/components/ui/NoteRef.astro';
+import Picto, { isPictoKey } from '@/components/ui/Picto.astro';
 import RiskNote from '@/components/ui/RiskNote.astro';
 import Section from '@/components/ui/Section.astro';
 import Stat from '@/components/ui/Stat.astro';
@@ -39,6 +44,13 @@ const stats = trust.stats;
 const range = corum.range.scpiNames.map((name) => ({ name, current: name === product.name }));
 const LOGO_STAGGER = 0.08;
 const QUIET_TITLE_Y = 12;
+/** Décalage de la cascade entre deux savoir-faire (secondes) : un déclencheur par colonne lg. */
+const STAGGER = 0.08;
+const expertise = corum.expertise;
+const savoirFaire = (expertise?.items ?? []).map((item) => {
+  if (!isPictoKey(item.icon)) throw new Error(`Pictogramme inconnu dans corum.ts : ${item.icon}`);
+  return { ...item, icon: item.icon };
+});
 ---
 
 {/* 1. Le groupe CORUM en chiffres */}
@@ -49,10 +61,14 @@ const QUIET_TITLE_Y = 12;
       <NoteRef notes={notes} id="confiance-chiffres" tone="light" />
     </h2>
     <!--
-      Grille 2 × 2 sur téléphone, quatre colonnes dès `lg` : en 4 colonnes plus étroites, « 160 000 »
-      en text-stat déborde de sa cellule (texte dégradé tronqué).
+      Deux colonnes dès le téléphone (13/09/2026) : en une seule, les quatre chiffres prenaient un écran
+      pour quatre nombres. Quatre colonnes dès `lg` seulement : plus étroites, « 160 000 » en text-stat
+      déborde de sa cellule (texte dégradé tronqué).
     -->
-    <ul role="list" class="mt-10 grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:mt-14 lg:grid-cols-4">
+    <ul
+      role="list"
+      class="mt-10 grid grid-cols-2 gap-x-6 gap-y-10 sm:gap-x-8 lg:mt-14 lg:grid-cols-4"
+    >
       {
         /* Les quatre chiffres comptent depuis 0, en place, avec une durée liée à leur ordre de grandeur. */
       }
@@ -96,8 +112,53 @@ const QUIET_TITLE_Y = 12;
   </div>
 </figure>
 
-{/* 3. La gamme des cinq SCPI */}
-<Section id="gamme" tone="paper" labelledBy="gamme-title">
+{
+  /* 3. Les trois savoir-faire du groupe : ce que fait CORUM L'Épargne au-delà de R Start. Chaque carte
+    décrit une activité, jamais un produit (aucun chiffre, aucune performance, aucune comparaison), et
+    le contre-poids commun ferme le bloc : l'étendue de la gamme ne retire rien aux risques de R Start. */
+}
+{
+  expertise && (
+    <Section id="savoir-faire" tone="paper" labelledBy="savoir-faire-title">
+      <Container size="wide">
+        <header class="max-w-4xl">
+          <h2
+            id="savoir-faire-title"
+            class="text-display-md text-ink"
+            data-animate="fade-up"
+            data-animate-y={String(QUIET_TITLE_Y)}
+          >
+            {expertise.title}
+            <NoteRef notes={notes} id="corum-savoir-faire" tone="light" />
+          </h2>
+          <p class="text-lead mt-5 text-pretty text-slate-700 sm:mt-6">{expertise.intro}</p>
+        </header>
+
+        <ul role="list" class="mt-10 grid gap-5 lg:mt-14 lg:grid-cols-3 lg:gap-6">
+          {savoirFaire.map((item, i) => (
+            <li class="flex flex-col rounded-3xl bg-white p-6 shadow-card sm:p-8">
+              <span
+                class="block w-fit"
+                data-animate="tilt"
+                data-animate-delay={String(i * STAGGER)}
+              >
+                <Picto name={item.icon} class="size-12 text-teal-700 sm:size-14" />
+              </span>
+              <p class="text-eyebrow mt-6 text-teal-700">{item.kicker}</p>
+              <h3 class="text-display-sm mt-2 text-ink">{item.title}</h3>
+              <p class="mt-4 text-base leading-relaxed text-slate-700">{item.description}</p>
+            </li>
+          ))}
+        </ul>
+
+        <RiskNote text={expertise.risk} size="lead" class="mt-8 max-w-4xl lg:mt-10" />
+      </Container>
+    </Section>
+  )
+}
+
+{/* 4. La gamme des cinq SCPI */}
+<Section id="gamme" tone="white" labelledBy="gamme-title">
   <Container size="wide">
     <div class="grid gap-10 lg:grid-cols-12 lg:gap-16">
       <div class="lg:col-span-5">
@@ -127,7 +188,7 @@ const QUIET_TITLE_Y = 12;
                   'flex min-h-24 items-center justify-center rounded-2xl border p-5 text-center text-lg font-semibold sm:p-6',
                   current
                     ? 'border-teal-400 bg-teal-100 text-navy'
-                    : 'border-mist bg-white text-navy',
+                    : 'border-mist bg-paper text-navy',
                 ]}
                 aria-current={current ? 'true' : undefined}
               >
