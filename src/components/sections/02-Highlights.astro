@@ -49,13 +49,17 @@ const titleId = sections.highlights.id + '-title';
     }
     <header>
       <h2 id={titleId} class="text-display-lg text-balance" data-reveal-text>{highlights.title}</h2>
-      <p
-        data-animate="fade-up"
-        data-animate-delay="0.1"
-        class="mt-6 max-w-3xl text-lead opacity-90"
-      >
-        {highlights.intro}
-      </p>
+      {
+        highlights.intro && (
+          <p
+            data-animate="fade-up"
+            data-animate-delay="0.1"
+            class="text-lead mt-6 max-w-3xl opacity-90"
+          >
+            {highlights.intro}
+          </p>
+        )
+      }
     </header>
 
     {

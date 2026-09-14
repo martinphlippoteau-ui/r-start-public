@@ -46,6 +46,7 @@ import Container from '@/components/ui/Container.astro';
 import NoteRef from '@/components/ui/NoteRef.astro';
 import Section from '@/components/ui/Section.astro';
 import SectionHeading from '@/components/ui/SectionHeading.astro';
+import Stat from '@/components/ui/Stat.astro';
 import TrustBox from '@/components/ui/TrustBox.astro';
 import { pages } from '@/config/pages';
 import { withBase } from '@/lib/href';
@@ -80,6 +81,41 @@ const hint = trustpilot.externalLinkHint;
         intro={corum.intro}
         motion
       />
+
+      {
+        /* LES QUATRE CHIFFRES DU GROUPE, remis sur l'accueil le 14/09/2026 : le document de l'équipe les
+          énumère sous ce titre, et ils en avaient disparu. Ils comptent depuis 0, en place.
+          « 15 ans d'expertise ET D'OBJECTIFS TENUS » du document s'arrête à l'expertise : la seconde
+          moitié est une allégation de performance, refusée par le contrôle de conformité et déjà écartée
+          de la brochure. Le « (10 ?) » du document devant les milliards n'a pas été tranché : la valeur
+          reste celle de facts.corumGroup, 9,6, relevée sur corum.fr. */
+      }
+      <ul
+        role="list"
+        class="mt-12 grid grid-cols-2 gap-x-8 gap-y-10 lg:mt-16 lg:grid-cols-4"
+        data-animate="stagger"
+        data-animate-stagger="0.08"
+      >
+        {
+          trust.stats.items.map((chiffre) => (
+            <li>
+              <Stat
+                size="solid"
+                value={chiffre.value}
+                numeric={chiffre.numeric}
+                prefix={chiffre.prefix}
+                suffix={chiffre.suffix}
+                label={chiffre.label}
+                class="[&>span:first-child]:text-teal-200"
+              />
+            </li>
+          ))
+        }
+      </ul>
+      <p data-risk class="text-base mt-8 leading-relaxed text-white lg:mt-10">
+        <strong class="font-semibold text-sand">Bon à savoir :</strong>
+        {trust.stats.risk}
+      </p>
 
       {
         /* Le cadre réglementaire (visa, agrément, dépositaire, autorité, SFDR) a quitté l'accueil le

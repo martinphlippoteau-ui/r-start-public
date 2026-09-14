@@ -133,7 +133,7 @@ export const notes: LegalNote[] = rawNotes.map((n) => ({ ...n, text: nb(n.text) 
 const rawItems: FaqContent['items'] = [
   {
     /** Réponse fournie par l'équipe produit pour « Une SCPI, c'est quoi ? », portée par le libellé SEO. */
-    question: 'Qu’est-ce qu’une SCPI ?',
+    question: 'Une SCPI, c’est quoi ?',
     riskFrom: 2,
     answer: [
       'Une société civile de placement immobilier, ou SCPI, achète et gère des immeubles professionnels. Elle les loue à des entreprises. Vous achetez des parts de cette société, pas les immeubles eux-mêmes.',
@@ -144,7 +144,7 @@ const rawItems: FaqContent['items'] = [
   },
   {
     /** Réponse fournie par l'équipe produit ; les deux leviers viennent de facts.strategy.levers (brochure p.3). */
-    question: 'Comment R Start compte-t-elle créer de la performance ?',
+    question: 'Comment R Start compte-t-elle créer de la performance, et en faire profiter ses clients ?',
     riskFrom: 2,
     noteId: 'faq-leviers',
     answer: [
@@ -174,7 +174,7 @@ const rawItems: FaqContent['items'] = [
     ],
   },
   {
-    question: 'Les frais sur les achats d’immeubles, c’est quoi ?',
+    question: 'Les frais d’acquisition, c’est quoi ?',
     riskFrom: 2,
     noteId: 'faq-frais-achats',
     answer: [
@@ -194,7 +194,7 @@ const rawItems: FaqContent['items'] = [
     ],
   },
   {
-    question: 'Pourquoi R Start n’affiche-t-elle pas d’objectif de rendement ?',
+    question: 'Pourquoi R Start n’affiche-t-elle pas d’objectif de performance ?',
     riskFrom: 1,
     noteId: 'faq-objectif',
     answer: [
@@ -204,7 +204,7 @@ const rawItems: FaqContent['items'] = [
     ],
   },
   {
-    question: 'Quand reçoit-on les premiers revenus avec R Start ?',
+    question: 'Quand reçoit-on les premiers revenus et les premières plus-values potentielles avec R Start ?',
     riskFrom: 1,
     noteId: 'faq-jouissance',
     answer: [
@@ -300,18 +300,22 @@ const rawItems: FaqContent['items'] = [
 ];
 
 /**
- * Questions rendues sur l'accueil (allègement du 11/09/2026) : six questions, une par objectif de la page
- * (comprendre la SCPI, le modèle de frais, le coût réel, les revenus, qui gère, comment souscrire en ligne).
- * Les seize questions restent rendues en entier sur /documentation, qui porte la FAQ complète ; le contrôle
- * ci-dessous échoue au build si un libellé change, plutôt que de réduire la FAQ de l'accueil en silence.
+ * Questions rendues sur l'accueil : LA SÉLECTION DU DOCUMENT DE L'ÉQUIPE (14/09/2026), dans son ordre.
+ * Elle remplace celle du 11/09/2026, qui suivait les objectifs de la page ; le document demande les
+ * deux questions sur les frais d'entrée et d'acquisition, et celle sur l'absence d'objectif de
+ * performance, qui vivaient jusque-là sur /documentation seulement.
+ * Les réponses restent celles du registre : le document laisse deux d'entre elles vides et une
+ * troisième inachevée, elles ne pouvaient donc pas être reprises telles quelles.
+ * Les seize questions restent rendues en entier sur /documentation, qui porte la FAQ complète ; le
+ * contrôle ci-dessous échoue au build si un libellé change, plutôt que de réduire la FAQ en silence.
  */
 const HOME_FAQ = [
-  'Qu’est-ce qu’une SCPI ?',
-  'Pourquoi R Start affiche-t-elle 0 % de frais de souscription ?',
-  'Combien coûte réellement la SCPI R Start ?',
-  'Quand reçoit-on les premiers revenus avec R Start ?',
-  'Qui gère la SCPI R Start ?',
-  'Comment souscrire à R Start en ligne ?',
+  'Une SCPI, c’est quoi ?',
+  'Comment R Start compte-t-elle créer de la performance, et en faire profiter ses clients ?',
+  'Les frais d’entrée, c’est quoi ?',
+  'Les frais d’acquisition, c’est quoi ?',
+  'Pourquoi R Start n’affiche-t-elle pas d’objectif de performance ?',
+  'Quand reçoit-on les premiers revenus et les premières plus-values potentielles avec R Start ?',
 ];
 const homeItems = rawItems.filter((item) => HOME_FAQ.includes(item.question));
 if (homeItems.length !== HOME_FAQ.length) {

@@ -109,7 +109,11 @@ export interface HighlightCard {
 export interface HighlightsContent {
   eyebrow: string;
   title: string;
-  intro: string;
+  /**
+   * Facultative depuis le 14/09/2026 : le document de l'équipe ouvre la section sur le tableau, sans
+   * texte d'introduction, et la définition de la SCPI qui vivait ici ouvre désormais la FAQ.
+   */
+  intro?: string;
   cards: HighlightCard[];
   /**
    * Bloc à part sous les six repères (11/09/2026) : comment on souscrit et ce qu'on peut automatiser.

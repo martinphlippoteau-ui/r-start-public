@@ -76,54 +76,66 @@ export const notes: LegalNote[] = [
   },
 ];
 
-export const highlights = {
+/*
+ * Type DÉCLARÉ et non `satisfies` : `intro` est désormais facultative et absente de ce contenu.
+ * Avec `satisfies`, le type déduit est celui du littéral, et le composant qui lit `highlights.intro`
+ * ne compilait plus. L'annotation garde le contrôle du littéral et expose le champ optionnel.
+ */
+export const highlights: HighlightsContent = {
   eyebrow: 'Points forts',
-  title: 'R Start en six repères',
-  intro: nb(
-    'R Start est une SCPI : une société qui achète des immeubles loués à des entreprises et vous en reverse les loyers, après frais de gestion. Vous achetez des parts de cette société, pas les immeubles.'
-  ),
   /**
-   * Six repères en blocs simples (11/09/2026, trame de l'équipe) : un libellé, une valeur, un appel de
-   * note. Les descriptions et les contre-poids par carte ont disparu ; un seul contre-poids couvre
-   * désormais la section, sous la grille.
-   * TROIS VALEURS DE LA TRAME NE SONT PAS REPRISES TELLES QUELLES, elles contredisaient les documents :
-   *  - niveau de risque « 4/7 » : le document d'informations clés du produit dit 3 sur 7. Une
-   *    communication commerciale ne peut pas contredire le DIC (retour AMF sur la brochure) ;
-   *  - zone « Monde » : le DIC borne la zone aux pays du Conseil de l'Europe et au Canada ;
-   *  - approche « Diversifiée » : le mot est interdit comme acquis (le patrimoine peut rester concentré
-   *    au démarrage). La valeur reprend le terme du DIC, la valorisation.
+   * TABLEAU DU DOCUMENT DE L'ÉQUIPE, repris au plus près (14/09/2026) : son titre, ses sept lignes,
+   * son ordre, « 100 % Digital » remonté du second bloc dans le tableau, et le second bloc réduit aux
+   * deux options automatiques. L'introduction qui définissait la SCPI a quitté cette section : la même
+   * explication ouvre la FAQ, là où le document la place.
+   *
+   * TROIS VALEURS DU DOCUMENT NE SONT PAS REPRISES TELLES QUELLES, chacune pour une raison écrite :
+   *  - « Niveau de risque 4/7 » : le document d'informations clés dit 3 sur 7. Une communication
+   *    commerciale ne peut pas contredire le DIC (retour AMF sur la brochure). La valeur vient donc de
+   *    facts.risk.sriLabel, qui suit le DIC ;
+   *  - « Zone d'investissement : Monde » : le DIC borne la zone aux pays du Conseil de l'Europe, en
+   *    zone euro et hors zone euro, et au Canada. Ni les États-Unis, ni l'Asie, ni l'Amérique latine ;
+   *  - « Approche : Diversifiée » : le contrôle de conformité refuse le mot présenté comme acquis, et
+   *    il le serait ici, R Start n'ayant pas encore de patrimoine à diversifier. Il l'admet dès qu'il
+   *    est annoncé comme un objectif, ce qu'il est. (« Diversification visée » ne passe pas non plus :
+   *    la règle cherche « vise », et « visée » ne le contient pas.)
    * Aucun chiffre en dur : tout vient de src/content/fr/facts.ts.
    */
+  title: 'R Start en un clin d’œil',
   cards: [
     { label: 'Ticket d’entrée', value: nb(share.priceLabel), noteId: 'points-forts-prix-de-part' },
     { label: 'Niveau de risque', value: risk.sriLabel, noteId: 'points-forts-risque' },
     /** income.frequency vaut « Mensuelle » ; accordé ici au libellé (« revenus »). */
     { label: 'Revenus potentiels', value: 'Mensuels', noteId: 'points-forts-distribution' },
-    { label: 'Approche', value: 'Valorisation', noteId: 'points-forts-approche' },
+    { label: 'Approche', value: 'Objectif de diversification', noteId: 'points-forts-approche' },
     { label: 'Zone d’investissement', value: 'Europe et Canada', noteId: 'points-forts-zone' },
     {
       label: 'Délai de jouissance',
       value: nb(income.enjoymentDelayLabel),
       noteId: 'points-forts-jouissance',
     },
+    {
+      label: '100 % Digital',
+      value: nb(subscription.onlineLabel),
+      noteId: 'points-forts-en-ligne',
+    },
   ],
   /**
-   * Les trois dernières informations de la trame vivent à part (11/09/2026) : ce ne sont pas des
-   * caractéristiques du produit mais la façon d'y souscrire et ce qu'on peut automatiser ensuite.
+   * Les deux options automatiques vivent à part : ce ne sont pas des caractéristiques du produit mais
+   * ce qu'on peut automatiser après la souscription. « 100 % Digital » les a quittées pour le tableau.
    */
   subscriptionTitle: 'Souscription et options disponibles',
   subscriptionItems: [
-    { label: 'Souscription', value: nb(subscription.onlineLabel), noteId: 'points-forts-en-ligne' },
     {
       label: 'Versements automatiques',
       value: nb(`dès ${subscription.options.pei.minimumMonthlyLabel}`),
       noteId: 'points-forts-automatique',
     },
-    { label: 'Réinvestissement automatique', value: 'des dividendes potentiels' },
+    { label: 'Réinvestissement automatique', value: 'des dividendes' },
   ],
   /** Contre-poids unique de la section : les six repères sont des caractéristiques, pas des promesses. */
   risk: nb(
     `Ces repères décrivent le produit, ils ne réduisent aucun de ses risques. Le capital n’est pas garanti : vous pouvez perdre tout ou partie de la somme investie. Les revenus ne sont pas garantis et varient. La revente de vos parts n’est pas garantie et une commission de retrait s’applique avant ${fees.withdrawal.zeroAfterYears} ans. R Start peut investir hors zone euro : le cours des devises peut réduire la valeur de vos parts. Durée de placement recommandée : ${risk.recommendedHoldingLabel}.`
   ),
   notes,
-} satisfies HighlightsContent;
+};
