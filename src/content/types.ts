@@ -213,56 +213,35 @@ export interface FeesContent {
   notes: LegalNote[];
 }
 
-export interface StrategyPillar {
-  icon: string;
-  /** Mot-clé court au-dessus du titre (« Comment », « Où », « Quoi »). */
-  kicker?: string;
+/**
+ * Un chapitre de /strategie : un surtitre facultatif, un titre, la phrase qui annonce la liste, la
+ * liste, et la phrase qui la referme. Les trois chapitres de la page ont exactement cette forme dans
+ * le document fourni par l'équipe, c'est lui qui donne le type.
+ */
+export interface StrategyChapter {
+  /** Mot-clé au-dessus du titre (« Quoi », « Où »). Le premier chapitre n'en a pas. */
+  eyebrow?: string;
   title: string;
-  description: string;
-  risk: string;
+  /** Annonce de la liste, deux points compris. */
+  intro: string;
+  /** `lead` porte l'accent (gras du document), `rest` la suite de la phrase quand il y en a une. */
+  items: { lead: string; rest?: string }[];
+  /** Phrase qui referme le chapitre, sous la liste. */
+  outro: string;
 }
 
+/**
+ * /strategie, contenu du 14/09/2026 : trois chapitres, ni plus ni moins.
+ * Ce que le type ne porte plus, parce que la page ne le dit plus : le mot d'ordre et son contre-poids,
+ * les trois piliers, la zone Conseil de l'Europe + Canada et sa carte, les types d'actifs du DIC,
+ * l'effet de levier. Plus de `notes` non plus : la page n'appelle aucune source.
+ */
 export interface StrategyContent {
   eyebrow: string;
   title: string;
-  /** Titre du chapitre court sur l'accueil (zone 6 de la trame), si différent de `title`. */
-  homeTitle?: string;
-  intro: string;
-  /** Mot d'ordre affiché en très grand au-dessus de l'introduction (ex. « Acheter décoté, valoriser, revendre »). */
-  motto?: string;
-  /**
-   * Contre-poids visible du mot d'ordre et de l'introduction, rendu dans le même bloc en RiskNote
-   * (même taille que l'introduction, jamais animé) : ex. « les cessions réalisées par les SCPI CORUM
-   * ne préjugent pas de leurs performances futures ».
-   */
-  mottoRisk?: string;
-  /** Titre de la section des deux leviers (ex. « Deux leviers »). */
-  leversTitle?: string;
-  /** Introduction de la section des deux leviers, sous son titre. */
-  leversIntro?: string;
-  levers: { title: string; description: string }[];
-  /** Titre de la section des piliers (ex. « Trois piliers : comment, où, quoi »). */
-  pillarsTitle?: string;
-  /** Introduction de la section des piliers, sous son titre. */
-  pillarsIntro?: string;
-  pillars: StrategyPillar[];
-  zone: {
-    title: string;
-    description: string;
-    countriesLabel: string;
-    risk: string;
-    /** Libellés des deux volets de la carte (Canada, Conseil de l’Europe) et de sa légende. */
-    mapLabels?: { canada: string; europe: string; legend: string };
-  };
-  /** Libellé de la liste des types d'actifs (ex. « Types d'actifs visés »). */
-  assetTypesLabel?: string;
-  assetTypes: string[];
-  /** Titre du bloc effet de levier (ex. « L'effet de levier »). */
-  leverageTitle?: string;
-  leverage: AdvantageRisk;
-  /** Sur l'accueil (chapitre court), lien vers la page Stratégie d'investissement. */
-  pageLink?: { label: string; href: string };
-  notes: LegalNote[];
+  engines: StrategyChapter;
+  what: StrategyChapter;
+  where: StrategyChapter;
 }
 
 /** Frise « mois 1 → mois N » de l'entrée en jouissance (micro-textes de la section Revenus). */

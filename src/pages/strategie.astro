@@ -2,22 +2,21 @@
 /**
  * Page /strategie, « Stratégie d'investissement » (menu, décision du 10/09/2026 : la stratégie quitte
  * l'accueil, qui n'en garde que le chapitre court). SiteNav → main#contenu : PageHero (fil d'Ariane, H1,
- * intro, ligne risques visible sans scroller, CTA souscrire) → les cinq sections de la stratégie
- * (04-Strategy.astro : #strategie, #leviers, #piliers, #zone-d-investissement, #effet-de-levier,
- * contenu strategy.ts, appels de note résolus dans les notes de la page) → notes → Footer. Métadonnées et
+ * ligne risques visible sans scroller, CTA souscrire) → les trois sections de la stratégie
+ * (04-Strategy.astro : #strategie, #quoi, #ou, contenu strategy.ts) → Footer. PLUS DE BLOC « Notes »
+ * depuis le 14/09/2026 : le texte fourni par l'équipe ne porte aucun appel de note, et le bloc affichait
+ * un « Sources et précisions (0) » à déplier sur rien. Métadonnées et
  * JSON-LD (Organization, WebPage, BreadcrumbList) depuis strategyPage.ts, config/pages.ts et src/lib/seo.ts.
  */
 import Base from '@/layouts/Base.astro';
 import SiteNav from '@/components/SiteNav.astro';
 import Footer from '@/components/Footer.astro';
-import LegalNotes from '@/components/LegalNotes.astro';
 import Breadcrumb from '@/components/ui/Breadcrumb.astro';
 import Button from '@/components/ui/Button.astro';
 import StickyCta from '@/components/StickyCta.astro';
 import PageHero from '@/components/ui/PageHero.astro';
 import Strategy from '@/components/sections/04-Strategy.astro';
 import { pages } from '@/config/pages';
-import { notes } from '@/content/fr/strategy';
 import { strategyPage } from '@/content/fr/strategyPage';
 import { breadcrumbJsonLd, organizationJsonLd, webPageJsonLd } from '@/lib/seo';
 
@@ -40,8 +39,7 @@ const jsonLd = [
         {strategyPage.cta.label}
       </Button>
     </PageHero>
-    <Strategy pageNotes={notes} />
-    <LegalNotes notes={notes} />
+    <Strategy />
   </main>
 
   {

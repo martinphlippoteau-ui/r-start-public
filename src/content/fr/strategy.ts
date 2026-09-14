@@ -1,125 +1,56 @@
-import type { LegalNote, StrategyContent } from '@/content/types';
-import { pages } from '@/config/pages';
-import { corumGroup, product, risk, strategy as strategyFacts } from '@/content/fr/facts';
+import type { StrategyContent } from '@/content/types';
 
 /**
- * Section 4, Stratégie (id « strategie »). Depuis le 10/09/2026, la section complète vit sur la page
- * /strategie (src/pages/strategie.astro, en-tête dans strategyPage.ts) ; l'accueil n'en rend que le
- * chapitre court (mot d'ordre, introduction, contre-poids, lien).
- * « Acheter décoté, valoriser, revendre » (facts.strategy.motto) avec son contre-poids visible
- * (mottoRisk : intention de gestion, cessions passées des SCPI CORUM ne préjugeant pas de l'avenir),
- * deux leviers, trois piliers avec leur contre-poids, zone Conseil de l'Europe + Canada (risque de
- * change), types d'actifs du DIC, effet de levier (endettement jusqu'à 40 %) contrebalancé dans le
- * même bloc.
+ * Page /strategie, « Stratégie d'investissement ». CONTENU FOURNI PAR L'ÉQUIPE le 14/09/2026 et repris
+ * mot pour mot, « ni plus ni moins » : trois chapitres, les deux moteurs de performance, le « Quoi » et
+ * le « Où ». L'en-tête de la page porte le titre (strategyPage.ts) ; ce fichier porte le corps.
+ *
+ * CE QUI A QUITTÉ LA PAGE, et ne vit plus nulle part sur le site : le mot d'ordre « Acheter décoté,
+ * valoriser, revendre » et son contre-poids, les trois piliers avec les leurs, la carte des pays du
+ * Conseil de l'Europe et du Canada (elle disait l'inverse de « partout dans le monde »), la liste des
+ * types d'actifs du DIC, l'effet de levier et son plafond d'endettement, et les quatre notes de sources
+ * (la page n'a donc plus de bloc « Notes » : il n'aurait rien à déplier). Les chiffres correspondants
+ * restent dans facts.ts, d'où les autres pages les tirent.
+ *
+ * LE TEXTE N'EST PAS CONTREBALANCÉ dans la page, sur demande expresse de l'équipe (« ne prends pas en
+ * compte les gardes fous »). La seule mention de risque de /strategie est donc celle de l'en-tête,
+ * visible sans défiler (shortRiskLine). Aucun [data-advantage] n'est posé ici : le garde-fou qui exige
+ * un contre-poids dans le même bloc ne s'applique qu'à ce qui en porte un.
  */
 
-/** Espace insécable avant % et € : les libellés de facts.ts utilisent une espace simple. */
-const nb = (s: string): string => s.replace(/ ([%€:;?!])/g, '\u00A0$1');
-/** Apostrophe typographique (’) : certains libellés de facts.ts sont saisis avec l'apostrophe droite. */
-const typo = (s: string): string => nb(s.replace(/'/g, '’'));
-const lowerFirst = (s: string): string => s.charAt(0).toLowerCase() + s.slice(1);
-const capitalize = (s: string): string => s.charAt(0).toUpperCase() + s.slice(1);
-
-export const notes: LegalNote[] = [
-  {
-    id: 'strategie-mot-d-ordre',
-    text: `« ${strategyFacts.motto} » est la formule de la brochure R Start 2026. Elle décrit une intention de gestion, non un résultat. ${corumGroup.disposalsDisclaimer}`,
-  },
-  {
-    id: 'strategie-objectif',
-    text: `Objectif de R Start selon le DIC du ${product.dicDate.label} : constituer un patrimoine de biens immobiliers au sein des pays du Conseil de l’Europe (en zone euro et hors zone euro) et au Canada, dans le cadre d’une « ${typo(lowerFirst(strategyFacts.approach))} ».`,
-  },
-  {
-    id: 'strategie-actifs',
-    text: `Types d’actifs cités par le DIC, sans que la liste soit limitative : ${strategyFacts.assetTypes.map(typo).join(', ')}. ${capitalize(strategyFacts.acquisitionModes)}.`,
-  },
-  {
-    id: 'strategie-endettement',
-    text: `R Start peut recourir à l’endettement dans la limite de ${nb(risk.maxLeverage)} de la valeur d’expertise de ses actifs immobiliers, majorée des fonds collectés nets de frais non encore investis. Le montant maximum de l’emprunt est voté en assemblée générale. Source : DIC du ${product.dicDate.label}.`,
-  },
-];
-
-export const strategy = {
+export const strategy: StrategyContent = {
   eyebrow: 'Stratégie',
-  /** « Monde » à la place d'« Europe et Canada » (14/09/2026, demande de l'équipe). */
-  title: 'De l’immobilier partout dans le monde.',
-  /** Accueil (zone 6 de la trame) : la question qui introduit les trois piliers. */
-  homeTitle: 'Comment R Start investit-elle l’argent de ses clients ?',
-  /**
-   * Affiché en très grand juste avant l'introduction, qui le commente (« C’est le mot d’ordre… »).
-   * Optionnel dans le type, mais requis pour cette section : sans lui, l'introduction serait orpheline.
-   */
-  motto: strategyFacts.motto,
-  intro: `C’est le mot d’ordre de R Start. Deux leviers sont visés, les loyers distribués et les plus-values réalisées. Son approche est plus dynamique que celle des autres SCPI CORUM, en contrepartie d’un risque plus élevé.`,
-  /** Contre-poids du mot d'ordre, affiché sous l'introduction dans la même taille (jamais animé). */
-  mottoRisk: `Cette formule décrit une intention de gestion, non un résultat. ${corumGroup.disposalsDisclaimer}`,
-  leversTitle: 'Deux leviers',
-  leversIntro:
-    'La performance d’une SCPI peut venir de deux sources. R Start vise les deux : ni l’une ni l’autre n’est acquise d’avance.',
-  levers: [
-    {
-      title: strategyFacts.levers[0],
-      description:
-        'Les loyers encaissés sur les immeubles alimentent, après frais de gestion, les dividendes potentiels versés chaque mois. Ils ne sont pas garantis et varient avec le marché.',
-    },
-    {
-      title: strategyFacts.levers[1],
-      description:
-        'Un immeuble revendu plus cher qu’il n’a été acheté peut dégager une plus-value, après commission sur la cession. Une revente peut aussi se solder par une moins-value.',
-    },
-  ],
-  pillarsTitle: 'Trois piliers : comment, où, quoi',
-  pillarsIntro:
-    'La méthode d’achat, la zone d’investissement et le type d’immeubles visés. Chacun de ces choix a sa contrepartie, indiquée avec lui.',
-  pillars: [
-    {
-      kicker: 'Comment',
-      icon: 'analyse',
-      title: 'Les bons immeubles, au bon prix',
-      description:
-        'R Start cherche des immeubles vendus sous leur valeur, les améliore, puis les revend quand le marché le permet. Elle tient compte de la position de chaque pays dans son cycle immobilier et économique.',
-      risk: 'R Start est récente et n’a pas d’historique propre. Une valorisation n’est jamais acquise : un immeuble peut se revendre moins cher que son prix d’achat.',
-    },
-    {
-      kicker: 'Où',
-      icon: 'exploration',
-      title: 'Une vaste zone d’investissement',
-      description:
-        'Selon l’analyse de CORUM Asset Management, R Start investit là où sa société de gestion identifie une opportunité : dans les pays du Conseil de l’Europe et au Canada, tous secteurs confondus.',
-      risk: 'Le patrimoine se constitue au fil des collectes. Au démarrage, il peut être concentré sur peu d’immeubles, de pays ou de secteurs, ce qui accroît le risque.',
-    },
-    {
-      kicker: 'Quoi',
-      icon: 'equipe',
-      title: 'Des immeubles offrant un double potentiel',
-      description:
-        'Les équipes ciblent des immeubles présentant à la fois un potentiel de revenus locatifs et un potentiel de plus-value, principalement de taille intermédiaire, un segment où la concurrence est plus limitée.',
-      risk: 'Certains immeubles sont achetés en état futur d’achèvement : ils ne produisent aucun loyer avant leur livraison. Un actif livré peut ensuite rester vacant ou perdre de la valeur. Ni le loyer ni la plus-value ne sont acquis d’avance.',
-    },
-  ],
-  zone: {
-    title: typo(strategyFacts.zoneLabel),
-    mapLabels: {
-      canada: 'Canada',
-      europe: 'États membres du Conseil de l’Europe',
-      legend:
-        'Pays où R Start peut investir. Carte simplifiée, sans lien avec un patrimoine existant.',
-    },
-    description:
-      'R Start peut investir dans les pays du Conseil de l’Europe, en zone euro ou non, et au Canada. Le choix des pays dépend de leur position dans le cycle immobilier et économique.',
-    countriesLabel: 'Pays où R Start peut investir',
-    risk: 'Hors zone euro, vos revenus et la valeur de vos parts dépendent aussi du cours des devises. La couverture de change n’est pas systématique : une devise qui baisse face à l’euro réduit ce que vous percevez.',
+  /** Titre de la page, répété de l'en-tête : le corps commence directement au premier chapitre. */
+  title: 'Comment R Start investit l’argent de ses clients ?',
+
+  engines: {
+    title: 'R Start table sur deux moteurs de performance',
+    intro: '',
+    items: [
+      { lead: 'Les loyers', rest: 'versés par les entreprises locataires' },
+      { lead: 'Les plus-values', rest: 'réalisées sur les ventes d’immeuble' },
+    ],
+    outro:
+      'Les opportunités ne tombent pas du ciel : nous suivons une méthode d’investissement précise pour dénicher les bons immeubles, loués par les bonnes entreprises, et générer du rendement potentiel.',
   },
-  assetTypesLabel: 'Types d’actifs visés, liste non limitative',
-  /** Libellés du DIC (minuscules dans facts.ts) : majuscule initiale et apostrophe typographique pour l'affichage. */
-  assetTypes: strategyFacts.assetTypes.map((type) => capitalize(typo(type))),
-  leverageTitle: 'L’effet de levier',
-  leverage: {
-    advantage:
-      'R Start peut recourir à l’emprunt. Cet effet de levier lui permet d’acheter plus d’immeubles que sa seule collecte ne le permettrait. Elle peut ainsi saisir une opportunité sans attendre.',
-    risk: `L’endettement peut atteindre ${nb(risk.maxLeverage)} de la valeur des immeubles. Il amplifie les pertes comme les gains. Si les prix baissent, la valeur de vos parts recule davantage et les intérêts restent dus.`,
+
+  what: {
+    eyebrow: 'Quoi',
+    title: 'Des immeubles offrant un double potentiel',
+    intro: 'L’équipe cible des immeubles avec à la fois :',
+    items: [{ lead: 'Un fort potentiel de rendement locatif ;' }, { lead: 'Et un fort potentiel de plus-value.' }],
+    outro:
+      'Il s’agit principalement d’immeubles de taille intermédiaire, un secteur où la concurrence est relativement limitée.',
   },
-  /** Accueil : le chapitre s'arrête après le mot d'ordre et renvoie vers la page complète. */
-  pageLink: { label: 'Découvrir la stratégie', href: pages.strategy.path },
-  notes,
-} satisfies StrategyContent;
+
+  where: {
+    eyebrow: 'Où',
+    title: 'Une vaste zone d’investissement',
+    intro: 'Pas de limite ! R Start investit :',
+    items: [
+      { lead: 'partout dans le monde' },
+      { lead: 'et dans tous les secteurs', rest: '(bureaux, commerces, santé, logistique, hôtellerie…)' },
+    ],
+    outro: 'Seul mot d’ordre : identifier une opportunité.',
+  },
+};

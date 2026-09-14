@@ -26,7 +26,8 @@ export interface PageHero {
   eyebrow: string;
   /** H1 unique de la page. */
   title: string;
-  intro: string;
+  /** Facultative depuis le 14/09/2026 : /strategie ouvre directement sur son premier chapitre. */
+  intro?: string;
   /** Ligne risques visible sans scroller, même taille que l'intro. Jamais animée. */
   riskLine: string;
 }

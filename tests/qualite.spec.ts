@@ -568,7 +568,9 @@ test.describe('Qualité', () => {
    * sections, un titre visible par section, et aucune section qui reparte en pavé de plusieurs écrans.
    */
   const PAGES_REFONDUES = [
-    { chemin: '/strategie/', mini: 5 },
+    /* 5 → 3 le 14/09/2026 : l'équipe a fourni le texte exact de /strategie, il tient en trois
+       chapitres. Le garde-fou reste celui d'origine (plusieurs sections, chacune titrée et courte). */
+    { chemin: '/strategie/', mini: 3 },
     { chemin: '/a-propos/', mini: 2 },
     { chemin: '/presse/', mini: 4 },
   ];
