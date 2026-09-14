@@ -1,10 +1,19 @@
 ---
-/** Injecte un bloc JSON-LD. Le type ld+json n'est pas exécuté : compatible CSP stricte. */
+/**
+ * Injecte un bloc JSON-LD. Le type ld+json n'est pas exécuté : compatible CSP stricte.
+ *
+ * Le `<` est échappé en `\u003c`, séquence que JSON.parse relit comme un `<` mais que l'analyseur HTML
+ * ne reconnaît pas comme une ouverture de balise. Sans cela, un `</script>` présent dans un texte de
+ * contenu fermerait le bloc et tout ce qui suit serait interprété comme du HTML, script exécutable
+ * compris. La ligne précédente écrivait `'\u003c'` en littéral JavaScript, c'est-à-dire le caractère
+ * `<` lui-même : le remplacement ne faisait rien. Vérifié par sonde le 14/09/2026, la sortie de balise
+ * fonctionnait. La barre oblique inverse doit être échappée pour que ce soient bien six caractères.
+ */
 interface Props {
   data: Record<string, unknown> | Record<string, unknown>[];
 }
 const { data } = Astro.props;
-const json = JSON.stringify(data).replace(/</g, '\u003c');
+const json = JSON.stringify(data).replace(/</g, '\\u003c');
 ---
 
 <script type="application/ld+json" is:inline set:html={json} />

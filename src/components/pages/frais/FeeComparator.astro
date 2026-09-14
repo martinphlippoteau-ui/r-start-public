@@ -24,6 +24,7 @@ import Container from '@/components/ui/Container.astro';
 import RiskNote from '@/components/ui/RiskNote.astro';
 import Section from '@/components/ui/Section.astro';
 import { comparator, comparatorScpis } from '@/content/fr/comparator';
+import { jsonScript } from '@/lib/jsonScript';
 
 interface Props {
   id: string;
@@ -223,32 +224,45 @@ const data = scpis.map((s) => ({
   </Container>
 </Section>
 
+{
+  /* Réglages dans un bloc de DONNÉES, non exécutable : la politique de sécurité du contenu
+  ne le soumet pas à `script-src`, il voyage donc sans nonce. Le script qui suit n'est plus
+  « en ligne » : Astro le sort dans un fichier, que `script-src 'self'` autorise. */
+}
 <script
+  type="application/json"
+  data-reglages="comparateur"
   is:inline
-  define:vars={{
+  set:html={jsonScript({
     data,
     pendingLabel: comparator.pendingLabel,
     notPublishedLabel: comparator.notPublishedLabel,
-  }}
->
+  })}
+/>
+
+<script>
   /*
    * Changement de colonne sans rechargement. Les valeurs sont passées telles quelles : le script ne
    * calcule rien, il recopie. Une valeur absente reste le libellé « à compléter » et l'avertissement
    * reste affiché, c'est la seule règle métier ici.
    */
   (() => {
+    const bloc = document.querySelector('[data-reglages="comparateur"]');
+    if (!bloc?.textContent) return;
+    const reglages = JSON.parse(bloc.textContent);
+    const { data, pendingLabel, notPublishedLabel } = reglages;
     const table = document.querySelector('[data-comparator]');
-    const select = document.querySelector('[data-comparator-select]');
+    const select = document.querySelector<HTMLSelectElement>('[data-comparator-select]');
     if (!table || !select) return;
-    const pending = document.querySelector('[data-comparator-pending]');
+    const pending = document.querySelector<HTMLElement>('[data-comparator-pending]');
     const source = document.querySelector('[data-comparator-source]');
     const sourceName = document.querySelector('[data-comparator-source-name]');
-    const cells = [...table.querySelectorAll('[data-comparator-cell]')];
+    const cells = [...table.querySelectorAll<HTMLElement>('[data-comparator-cell]')];
     const details = [...table.querySelectorAll('[data-comparator-detail]')];
     const lignes = [...table.querySelectorAll('tbody tr')].map((tr) => ({
       gauche: tr.querySelector('[data-fee-value]'),
-      marqueGauche: tr.querySelector('[data-comparator-best="left"]'),
-      marqueDroite: tr.querySelector('[data-comparator-best="right"]'),
+      marqueGauche: tr.querySelector<HTMLElement>('[data-comparator-best="left"]'),
+      marqueDroite: tr.querySelector<HTMLElement>('[data-comparator-best="right"]'),
     }));
     const sourceFallback = source ? source.textContent : '';
 
@@ -275,7 +289,7 @@ const data = scpis.map((s) => ({
        * départagent rien. Hors de ces cas, aucune marque, mieux vaut ne rien dire que suggérer un
        * classement que les chiffres ne portent pas.
        */
-      const seul = (t) => {
+      const seul = (t: string | null | undefined) => {
         if (!t) return null;
         /*
          * La case doit contenir UN taux et rien d'autre : « 14,40 % TTC » oui, « 0 / 6 / 12 % » non.
@@ -286,19 +300,20 @@ const data = scpis.map((s) => ({
         return m ? parseFloat(m[1].replace(',', '.')) : null;
       };
       lignes.forEach((ligne, i) => {
-        const g = seul(ligne.gauche.textContent);
+        const g = seul(ligne.gauche?.textContent);
         const d = seul(scpi.values[i]);
         const comparable = g !== null && d !== null && g !== d;
         const gagneGauche = comparable && g < d;
         const gagneDroite = comparable && d < g;
-        ligne.marqueGauche.hidden = !gagneGauche;
-        ligne.marqueDroite.hidden = !gagneDroite;
+        if (ligne.marqueGauche) ligne.marqueGauche.hidden = !gagneGauche;
+        if (ligne.marqueDroite) ligne.marqueDroite.hidden = !gagneDroite;
         /*
          * Mise en avant par la COULEUR et la GRAISSE seulement : la taille reste identique d'une case à
          * l'autre, sans quoi un frais serait affiché plus petit que son voisin, ce que l'AMF refuse.
          * Le perdant est atténué, jamais effacé : il reste parfaitement lisible.
          */
-        const peindre = (cell, gagne, perd) => {
+        const peindre = (cell: Element | null | undefined, gagne: boolean, perd: boolean) => {
+          if (!cell) return;
           cell.classList.toggle('font-bold', gagne);
           cell.classList.toggle('text-teal-700', gagne);
           cell.classList.toggle('fee-halo', gagne);

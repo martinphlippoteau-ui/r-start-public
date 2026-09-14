@@ -15,6 +15,7 @@ import ToolFunnel from './ToolFunnel.astro';
 import ToolResult from './ToolResult.astro';
 import { income, share, subscription } from '@/content/fr/facts';
 import { toolsPage } from '@/content/fr/toolsPage';
+import { jsonScript } from '@/lib/jsonScript';
 
 const { savings: outil, labels } = toolsPage;
 const { results } = outil;
@@ -103,13 +104,29 @@ const reglage = {
   </Fragment>
 </ToolFunnel>
 
-<script is:inline define:vars={{ reglage }}>
+{
+  /* Réglages dans un bloc de DONNÉES, non exécutable : la politique de sécurité du contenu
+  ne le soumet pas à `script-src`, il voyage donc sans nonce. Le script qui suit n'est plus
+  « en ligne » : Astro le sort dans un fichier, que `script-src 'self'` autorise. */
+}
+<script
+  type="application/json"
+  data-reglages="outil-versements"
+  is:inline
+  set:html={jsonScript({ reglage })}
+/>
+
+<script>
   /*
    * Total versé et nombre de parts au prix retenu. Le prix vient d'un champ : à l'expert de le changer
    * pour mesurer l'effet d'une révision. Un prix nul ou vide retombe sur le prix en vigueur, sans quoi
    * la division renverrait l'infini.
    */
   (() => {
+    const bloc = document.querySelector('[data-reglages="outil-versements"]');
+    if (!bloc?.textContent) return;
+    const reglages = JSON.parse(bloc.textContent);
+    const { reglage } = reglages;
     const groupe = document.querySelector('[data-tool="versements"]');
     if (!groupe) return;
 
@@ -126,15 +143,15 @@ const reglage = {
     });
     /* « 1er mai », pas « 1 mai » : Intl ne connaît pas l'ordinal français du premier du mois, et toute
        entrée en jouissance tombe précisément un premier. */
-    const dateLongue = (d) =>
+    const dateLongue = (d: Date) =>
       d.getDate() === 1 ? jourMois.format(d).replace(/^1\b/, '1er') : jourMois.format(d);
-    const val = (id) => {
-      const el = document.getElementById(id);
+    const val = (id: string) => {
+      const el = document.querySelector<HTMLInputElement>('#' + id);
       if (!el) return 0;
       const n = parseFloat(String(el.value).replace(',', '.'));
       return Number.isFinite(n) ? n : 0;
     };
-    const ecrire = (id, texte) => {
+    const ecrire = (id: string, texte: string) => {
       const el = document.getElementById(id);
       if (el) el.textContent = texte;
     };

@@ -15,6 +15,7 @@ import ToolFunnel from './ToolFunnel.astro';
 import ToolResult from './ToolResult.astro';
 import { fees } from '@/content/fr/facts';
 import { toolsPage } from '@/content/fr/toolsPage';
+import { jsonScript } from '@/lib/jsonScript';
 
 const { exit: outil, labels } = toolsPage;
 const { results } = outil;
@@ -104,12 +105,28 @@ const reglage = {
   </Fragment>
 </ToolFunnel>
 
-<script is:inline define:vars={{ reglage }}>
+{
+  /* Réglages dans un bloc de DONNÉES, non exécutable : la politique de sécurité du contenu
+  ne le soumet pas à `script-src`, il voyage donc sans nonce. Le script qui suit n'est plus
+  « en ligne » : Astro le sort dans un fichier, que `script-src 'self'` autorise. */
+}
+<script
+  type="application/json"
+  data-reglages="outil-sortie"
+  is:inline
+  set:html={jsonScript({ reglage })}
+/>
+
+<script>
   /*
    * Commission de retrait : le premier palier dont la borne n'est pas atteinte. Le dernier n'a pas de
    * borne (`until: null`), il vaut au-delà de la durée de franchise.
    */
   (() => {
+    const bloc = document.querySelector('[data-reglages="outil-sortie"]');
+    if (!bloc?.textContent) return;
+    const reglages = JSON.parse(bloc.textContent);
+    const { reglage } = reglages;
     const groupe = document.querySelector('[data-tool="sortie"]');
     if (!groupe) return;
 
@@ -119,13 +136,13 @@ const reglage = {
       maximumFractionDigits: 0,
     });
     const nombre = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 2 });
-    const val = (id) => {
-      const el = document.getElementById(id);
+    const val = (id: string) => {
+      const el = document.querySelector<HTMLInputElement>('#' + id);
       if (!el) return 0;
       const n = parseFloat(String(el.value).replace(',', '.'));
       return Number.isFinite(n) ? n : 0;
     };
-    const ecrire = (id, texte) => {
+    const ecrire = (id: string, texte: string) => {
       const el = document.getElementById(id);
       if (el) el.textContent = texte;
     };
@@ -135,7 +152,9 @@ const reglage = {
       const montant = val('sortie-montant');
       const annees = val('sortie-duree');
 
-      const index = reglage.paliers.findIndex((p) => p.until === null || annees < p.until);
+      const index = reglage.paliers.findIndex(
+        (p: { until: number | null }) => p.until === null || annees < p.until
+      );
       const courant = reglage.paliers[index] || reglage.paliers[reglage.paliers.length - 1];
       const cout = (montant * courant.rate) / 100;
 

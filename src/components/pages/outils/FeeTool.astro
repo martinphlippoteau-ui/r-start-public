@@ -16,6 +16,7 @@ import ToolFunnel from './ToolFunnel.astro';
 import ToolResult from './ToolResult.astro';
 import { fees, marketComparison } from '@/content/fr/facts';
 import { toolsPage } from '@/content/fr/toolsPage';
+import { jsonScript } from '@/lib/jsonScript';
 
 const { feeSimulator: outil, labels } = toolsPage;
 const { fields, hints, results } = outil;
@@ -181,12 +182,28 @@ const bareme = {
   </Fragment>
 </ToolFunnel>
 
-<script is:inline define:vars={{ bareme }}>
+{
+  /* Réglages dans un bloc de DONNÉES, non exécutable : la politique de sécurité du contenu
+  ne le soumet pas à `script-src`, il voyage donc sans nonce. Le script qui suit n'est plus
+  « en ligne » : Astro le sort dans un fichier, que `script-src 'self'` autorise. */
+}
+<script
+  type="application/json"
+  data-reglages="outil-frais"
+  is:inline
+  set:html={jsonScript({ bareme })}
+/>
+
+<script>
   /*
    * Le calcul ne dépend JAMAIS du niveau affiché : il lit les six champs, masqués compris, qui gardent
    * alors leur valeur par défaut. Un champ vide vaut zéro plutôt que NaN.
    */
   (() => {
+    const bloc = document.querySelector('[data-reglages="outil-frais"]');
+    if (!bloc?.textContent) return;
+    const reglages = JSON.parse(bloc.textContent);
+    const { bareme } = reglages;
     const groupe = document.querySelector('[data-tool="frais"]');
     if (!groupe) return;
 
@@ -195,20 +212,22 @@ const bareme = {
       currency: 'EUR',
       maximumFractionDigits: 0,
     });
-    const val = (id) => {
-      const el = document.getElementById(id);
+    const val = (id: string) => {
+      const el = document.querySelector<HTMLInputElement>('#' + id);
       if (!el) return 0;
       const n = parseFloat(String(el.value).replace(',', '.'));
       return Number.isFinite(n) ? n : 0;
     };
-    const ecrire = (id, texte) => {
+    const ecrire = (id: string, texte: string) => {
       const el = document.getElementById(id);
       if (el) el.textContent = texte;
     };
 
     /* Premier palier de retrait dont la borne n'est pas atteinte ; le dernier, sans borne, vaut au-delà. */
-    const tauxRetrait = (annees) => {
-      const palier = bareme.withdrawalSteps.find((s) => s.until === null || annees < s.until);
+    const tauxRetrait = (annees: number) => {
+      const palier = bareme.withdrawalSteps.find(
+        (s: { until: number | null }) => s.until === null || annees < s.until
+      );
       return palier ? palier.rate : 0;
     };
 
@@ -225,7 +244,7 @@ const bareme = {
       let cession = 0;
       if (plusValue > 0) {
         const palier = bareme.disposalTiers.reduce(
-          (acc, t) => (plusValue >= t.from ? t.rate : acc),
+          (acc: number, t: { from: number; rate: number }) => (plusValue >= t.from ? t.rate : acc),
           0
         );
         cession = (montant * (1 + plusValue / 100) * palier) / 100;

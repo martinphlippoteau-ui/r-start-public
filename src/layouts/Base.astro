@@ -42,6 +42,26 @@ const {
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    {
+      /*
+       * Défenses posées en BALISE, faute de pouvoir poser des en-têtes (14/09/2026). GitHub Pages ne
+       * sert aucun en-tête personnalisé et ignore deploy/azure/staticwebapp.config.json : sans ces deux
+       * balises, le site n'avait aucune politique de sécurité du contenu et aucune politique de
+       * référent. La balise couvre la CSP et le référent ; elle ne peut PAS porter `frame-ancestors`,
+       * `report-uri` ni `X-Frame-Options`, que les navigateurs n'acceptent qu'en en-tête. La protection
+       * contre l'encadrement arrivera donc avec Azure, voir deploy/azure/README.md.
+       *
+       * La politique est celle du fichier Azure, à deux exceptions près, imposées par la balise :
+       * `frame-ancestors` retiré, et `style-src 'unsafe-inline'` conservé (Astro pose des styles de
+       * portée sur les éléments). Elle est APPLIQUÉE, pas en observation : aucun script exécutable en
+       * ligne ne subsiste depuis la conversion des outils et du comparateur en blocs de données.
+       */
+    }
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self' https://*.googletagmanager.com https://widget.trustpilot.com; connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://*.trustpilot.com; img-src 'self' data: https://*.googletagmanager.com https://*.google-analytics.com https://*.trustpilot.com; style-src 'self' 'unsafe-inline'; font-src 'self' https://*.trustpilot.com; frame-src https://widget.trustpilot.com; base-uri 'self'; object-src 'none'; form-action 'self'"
+    />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
     <Seo {title} {description} {path} {noindex} {ogImage} {ogImageAlt} />
     <link rel="preload" href={plusJakartaLatinUrl} as="font" type="font/woff2" crossorigin />
     <link rel="icon" href={withBase('/favicon.ico')} sizes="32x32" />

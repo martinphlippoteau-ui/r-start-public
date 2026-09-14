@@ -15,6 +15,7 @@ import ToolFunnel from './ToolFunnel.astro';
 import ToolResult from './ToolResult.astro';
 import { income } from '@/content/fr/facts';
 import { toolsPage } from '@/content/fr/toolsPage';
+import { jsonScript } from '@/lib/jsonScript';
 
 const { enjoyment: outil, labels } = toolsPage;
 const { results } = outil;
@@ -81,12 +82,28 @@ const reglage = { mois: income.enjoymentDelayMonths, pending: labels.pending };
   </Fragment>
 </ToolFunnel>
 
-<script is:inline define:vars={{ reglage, gabarit: results.sameMonthTemplate }}>
+{
+  /* Réglages dans un bloc de DONNÉES, non exécutable : la politique de sécurité du contenu
+  ne le soumet pas à `script-src`, il voyage donc sans nonce. Le script qui suit n'est plus
+  « en ligne » : Astro le sort dans un fichier, que `script-src 'self'` autorise. */
+}
+<script
+  type="application/json"
+  data-reglages="outil-jouissance"
+  is:inline
+  set:html={jsonScript({ reglage, gabarit: results.sameMonthTemplate })}
+/>
+
+<script>
   /*
    * Jouissance : premier jour du Nième mois qui suit l'encaissement. Tout se joue sur le MOIS de
    * l'encaissement, jamais sur le jour : `new Date(annee, mois + N, 1)` le dit en une ligne.
    */
   (() => {
+    const bloc = document.querySelector('[data-reglages="outil-jouissance"]');
+    if (!bloc?.textContent) return;
+    const reglages = JSON.parse(bloc.textContent);
+    const { reglage, gabarit } = reglages;
     const groupe = document.querySelector('[data-tool="jouissance"]');
     if (!groupe) return;
 
@@ -97,17 +114,17 @@ const reglage = { mois: income.enjoymentDelayMonths, pending: labels.pending };
     });
     /* « 1er mai », pas « 1 mai » : Intl ne connaît pas l'ordinal français du premier du mois, et toute
        entrée en jouissance tombe précisément un premier. */
-    const dateLongue = (d) =>
+    const dateLongue = (d: Date) =>
       d.getDate() === 1 ? jourMois.format(d).replace(/^1\b/, '1er') : jourMois.format(d);
-    const ecrire = (id, texte) => {
+    const ecrire = (id: string, texte: string) => {
       const el = document.getElementById(id);
       if (el) el.textContent = texte;
     };
-    const jouissance = (d) => new Date(d.getFullYear(), d.getMonth() + reglage.mois, 1);
+    const jouissance = (d: Date) => new Date(d.getFullYear(), d.getMonth() + reglage.mois, 1);
 
     const calcul = () => {
-      const champ = document.getElementById('jouissance-date');
-      const brut = champ && champ.value;
+      const champ = document.querySelector<HTMLInputElement>('#jouissance-date');
+      const brut = champ?.value;
       if (!brut) {
         ecrire('jouissance-out-date', reglage.pending);
         ecrire('jouissance-out-meme-mois', reglage.pending);
