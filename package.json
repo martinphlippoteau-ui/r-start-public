@@ -9,7 +9,7 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro check && astro build",
+    "build": "astro check && astro build && find dist -name \".DS_Store\" -delete",
     "preview": "astro preview --host 127.0.0.1 --port 4321",
     "check": "astro check",
     "format": "prettier --write .",
@@ -18,7 +18,8 @@
     "test:compliance": "node scripts/check-compliance.mjs",
     "test:e2e": "playwright test",
     "test:lhci": "lhci autorun",
-    "verify": "pnpm build && pnpm test:html && pnpm test:compliance && pnpm test:e2e && pnpm test:lhci"
+    "verify": "pnpm build && pnpm test:html && pnpm test:compliance && pnpm test:e2e && pnpm test:lhci",
+    "serve": "node scripts/serve-dist.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.0",
