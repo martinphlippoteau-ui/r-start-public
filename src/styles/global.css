@@ -433,8 +433,31 @@
    Menu s'y voyait, en blanc, puis le verre se posait au défilement en même temps que le logo du hero
    venait s'y ranger. C'était une coupure d'expérience avec les huit sous-pages, où la barre était pleine
    d'emblée. Tout est retiré : logo, entrées et CTA sont là dès le premier pixel, partout.
-   L'ouverture du HERO, elle, est intacte (`html.intro [data-intro]`, plus bas) : c'est l'accueil qui
-   s'anime, plus la navigation. */
+   L'ouverture du HERO, elle, est intacte (`html.intro [data-intro]`, plus bas).
+   LA BARRE SE DÉROULE À NOUVEAU sur l'accueil depuis le 14/09/2026 (demande de l'équipe), mais elle ne
+   change plus d'apparence : elle est pleine dès le premier pixel, elle s'OUVRE simplement, du centre
+   vers ses deux bords, comme une pastille d'appel qui se déplie. Voir plus bas, `html.intro
+   [data-sitenav-bar]` : c'est une entrée, pas un état propre à l'accueil. */
+
+/* La barre de navigation se déroule, premier temps de l'ouverture (0 ms).
+   Même geste que la pastille d'appel qui s'ouvre : un découpage qui part du centre et gagne les deux
+   bords. Le rayon suit celui de la barre, sans quoi les extrémités seraient coupées au carré pendant
+   l'ouverture. `clip-path` seul : ni largeur, ni échelle, donc aucune remise en page et aucun texte
+   déformé pendant le déroulé. La classe `intro` n'existant que sur l'accueil, les sous-pages ne sont
+   pas concernées. */
+@media (prefers-reduced-motion: no-preference) {
+  html.intro [data-sitenav-bar] {
+    animation: intro-nav-deroule 700ms var(--ease-out-expo) backwards;
+  }
+}
+@keyframes intro-nav-deroule {
+  from {
+    clip-path: inset(0 50% 0 50% round 9999px);
+  }
+  to {
+    clip-path: inset(0 0 0 0 round 9999px);
+  }
+}
 
 /* Pastille d'appel flottante (components/StickyCta.astro, réécrite le 12/09/2026).
    Trois temps, portés par le seul attribut `data-on` :
@@ -1204,160 +1227,149 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
     --intro-i: 5;
   }
 }
-/* Ouverture du hero (11/09/2026) : LE LOGO SEUL, puis les éléments apparaissent.
-   La page se pose sur la marque : pendant la première seconde, elle est le seul élément du hero à
-   l'écran. Tout le reste est réellement INVISIBLE, découpé à zéro par `clip-path`, pas simplement
-   décalé, puis chacun se dévoile à son tour. Un déplacement de quelques pixels ne se voyait pas dans un
-   hero de cette taille ; une apparition, oui.
-   Pourquoi `clip-path` et pas `opacity` : un contrôle d'accessibilité mesure les contrastes pendant la
-   cascade et lisait des textes à mi-fondu. Le découpage ne change aucune couleur.
-   La marque, elle, n'est jamais découpée : c'est le plus grand élément affiché, donc le candidat LCP.
-   Elle GRANDIT depuis son centre, de 35 % à sa taille, une apparition façon PowerPoint (demande de
-   l'équipe, 11/09/2026), sur une courbe qui dépasse sa cible avant de s'y poser. Échelle seule, sans
-   déplacement ni opacité.
-   La ligne risques fait partie de la séquence depuis le 11/09/2026 (demande de l'équipe) : elle arrive
-   entre les CTA et les avis, donc le risque précède la réassurance. Le garde-fou de
-   tests/conformite.spec.ts est resserré en conséquence, une révélation AU SCROLL reste interdite
-   au-dessus d'un [data-risk], la cascade de chargement est admise : elle se termine seule, en moins de
-   trois secondes, sans aucune action du visiteur.
-   Les rangs disent l'ordre d'apparition (01-Hero.astro) : 1 la marque, 2 le surtitre, 3 l'accroche,
-   4 les CTA, puis la ligne risques ET les avis ENSEMBLE (5 et 6, même délai), 7 la flèche. L'identifiant #apercu l'emporte sur la règle générale. */
+/* Ouverture de l'accueil, RÉÉCRITE le 14/09/2026 (cadence donnée par l'équipe).
+   Sept temps, en millisecondes depuis le premier rendu :
+     0    la barre de navigation se déroule, comme une pastille d'appel qui s'ouvre ;
+     100  le surtitre paraît en resserrant son interlettrage ;
+     200  le logo : le pictogramme grandit, puis « start » se découvre de gauche à droite ;
+     400  l'accroche, mot à mot, 70 ms d'écart ;
+     600  les boutons et la ligne risques, ensemble, sans décalage entre eux ;
+     800  les avis et la flèche, en fondu ; la flèche enchaîne sur son oscillation, en boucle.
+   Trois principes hérités et conservés :
+    - la classe `intro` est posée côté serveur sur <html> (Base.astro) : la décision est prise avant
+      tout rendu, sans script, donc sans flash quel que soit le réseau (la CSP interdit l'inline) ;
+    - `backwards` : l'état de départ ne vaut que pendant le délai, aucune valeur résiduelle ensuite ;
+    - rien de tout cela en `prefers-reduced-motion`.
+   LE TEXTE NE SE FOND PAS. Les fondus demandés sont rendus par `clip-path` partout où il y a du texte :
+   un contrôle d'accessibilité mesure les contrastes et lisait des textes à mi-opacité, à 1,19:1. Le
+   découpage ne change aucune couleur. L'opacité reste admise là où il n'y a pas de texte à mesurer :
+   le logo (image décorative), le cadre d'avis Trustpilot et la flèche. */
 @media (prefers-reduced-motion: no-preference) {
   html.intro #apercu [data-intro] {
     animation-duration: var(--intro-dur, 700ms);
     animation-delay: var(--intro-delay, 0ms);
     animation-timing-function: var(--ease-out-expo);
   }
-  /* 1, LA MARQUE, seule à l'écran pendant toute son entrée. */
+
+  /* 100 ms, le surtitre : fondu et resserrement de l'interlettrage.
+     L'effet ne tient que sur un texte déjà très espacé, ce qui est le cas ici. Il part de 0,42 em et
+     revient à la valeur de repos, 0,14 em, qui ne change pas : c'est le geste qui est ajouté, pas une
+     nouvelle typographie. `letter-spacing` ne se compose pas, il ne peut pas vivre dans un `transform` :
+     il est animé directement, et coûte une remise en page par image. Admis sur une ligne courte, isolée,
+     pendant une demi-seconde. */
+  html.intro #apercu [data-intro='2'] {
+    animation-name: intro-hero-eyebrow;
+    --intro-delay: 100ms;
+    --intro-dur: 900ms;
+  }
+
+  /* 200 ms, le logo. Le pictogramme et le mot-symbole n'entrent pas ensemble : l'ensemble grandit de
+     0,96 à 1 alors que seul le pictogramme est visible, puis le découpage s'ouvre vers la droite et
+     découvre « start ».
+     Le fichier est une image unique, sans groupe séparant les deux : la césure est géométrique. Le
+     pictogramme occupe les 31 premiers pour cent de la largeur du dessin (viewBox 290,2 ; la forme
+     s'arrête à 89,5), d'où le découpage de départ à 69 % par la droite.
+     Aucun tracé au `stroke-dashoffset` : le R est une forme pleine, pas un trait, le rendu serait bancal. */
   html.intro #apercu [data-intro='1'] {
     animation-name: intro-hero-brand;
     animation-timing-function: cubic-bezier(0.22, 1.14, 0.32, 1);
-    transform-origin: 50% 50%;
-    --intro-delay: 100ms;
-    --intro-dur: 1100ms;
+    transform-origin: 0% 50%;
+    --intro-delay: 200ms;
+    --intro-dur: 1000ms;
   }
-  /* 2, le surtitre se dévoile au-dessus d'elle. */
-  html.intro #apercu [data-intro='2'] {
-    animation-name: intro-hero-eyebrow;
-    --intro-delay: 950ms;
-    --intro-dur: 700ms;
+
+  /* 400 ms, l'accroche mot à mot. Le paragraphe ne porte plus d'animation, ses mots en portent une
+     chacun, décalée de 70 ms (`--mot`, posé dans 01-Hero.astro). `inline-block` : un span en ligne
+     ignore `transform`. */
+  html.intro #apercu [data-intro='3'] [data-intro-mot] {
+    display: inline-block;
+    animation: intro-hero-mot 700ms var(--ease-out-expo) backwards;
+    animation-delay: calc(400ms + var(--mot, 0) * 70ms);
   }
-  /* 3, l'accroche, le geste le plus ample après la marque. */
-  html.intro #apercu [data-intro='3'] {
-    animation-name: intro-hero-tagline;
-    --intro-delay: 1160ms;
-    --intro-dur: 800ms;
-  }
-  /* 4, les CTA. */
+
+  /* 600 ms, les boutons et la ligne risques, ENSEMBLE et sans décalage entre eux : c'est la demande.
+     Les boutons montent de 12 px, la ligne risques ne bouge pas, elle s'annonce, elle ne se met pas en
+     scène. */
   html.intro #apercu [data-intro='4'] {
     animation-name: intro-hero-cta;
-    --intro-delay: 1400ms;
-    --intro-dur: 650ms;
+    --intro-delay: 600ms;
+    --intro-dur: 700ms;
   }
-  /* 5, la ligne risques : le risque arrive avant la réassurance. */
   html.intro #apercu [data-intro='5'] {
     animation-name: intro-hero-risk;
-    --intro-delay: 1580ms;
-    --intro-dur: 600ms;
+    --intro-delay: 600ms;
+    --intro-dur: 700ms;
   }
-  /* 6, les avis, EN MÊME TEMPS que la ligne risques (11/09/2026, demande de l'équipe) : même délai,
-     même durée. Les deux forment le bas du hero, les séparer donnait une cascade qui traînait. */
-  html.intro #apercu [data-intro='6'] {
-    animation-name: intro-hero-trust;
-    --intro-delay: 1580ms;
-    --intro-dur: 600ms;
-  }
-  /* 7, la flèche ferme l'ouverture. */
+
+  /* 800 ms, les avis et la flèche, en fondu seul. Ni l'un ni l'autre ne porte de texte dont le contraste
+     soit mesuré : le cadre d'avis est une iframe Trustpilot, la flèche un dessin. */
+  html.intro #apercu [data-intro='6'],
   html.intro #apercu [data-intro='7'] {
-    animation-name: intro-hero-hint;
-    --intro-delay: 1800ms;
-    --intro-dur: 550ms;
+    animation-name: intro-hero-fondu;
+    --intro-delay: 800ms;
+    --intro-dur: 700ms;
   }
 }
-/* La marque APPARAÎT EN FONDU puis GRANDIT depuis son centre (11/09/2026, demande de l'équipe : « comme
-   une apparition PowerPoint »). Au tout premier instant elle est invisible, puis elle se révèle en
-   grandissant de 35 % à sa taille.
-   L'opacité est ADMISE ICI, alors qu'elle est proscrite partout ailleurs dans le hero : ce qui l'interdit
-   sur les autres rangs, c'est le contrôle des contrastes, qui ne porte que sur du TEXTE. La marque est une
-   image décorative (aria-hidden, alt vide) : aucun contraste à mesurer.
-   Le fondu est BREF, pleine opacité à 35 % de la durée, soit environ 480 ms, parce que c'est le plus
-   grand élément affiché, donc le candidat LCP, et qu'un élément à opacité nulle n'est pas peint. Allonger
-   ce fondu retarderait d'autant la mesure de performance. */
+
+/* Le logo : il grandit depuis sa GAUCHE, le pictogramme d'abord seul, puis « start » se découvre.
+   L'opacité est admise ici, elle l'est partout où il n'y a pas de texte : c'est une image décorative
+   (aria-hidden, alt vide). Le fondu est bref, pleine opacité à 30 % de la durée, parce que c'est le plus
+   grand élément affiché, donc le candidat LCP, et qu'un élément à opacité nulle n'est pas peint. */
 @keyframes intro-hero-brand {
   from {
     opacity: 0;
-    transform: scale(0.35);
+    transform: scale(0.96);
+    clip-path: inset(0 69% 0 0);
   }
-  35% {
+  30% {
     opacity: 1;
+  }
+  45% {
+    transform: scale(1);
+    clip-path: inset(0 69% 0 0);
   }
   to {
     opacity: 1;
     transform: scale(1);
+    clip-path: inset(0 0 0 0);
   }
 }
-/* Le surtitre : absent, puis dévoilé de bas en haut. */
+
+/* Le surtitre : l'interlettrage se resserre pendant que la ligne se découvre. */
 @keyframes intro-hero-eyebrow {
   from {
-    transform: translate3d(0, 18px, 0);
-    clip-path: inset(100% 0 0 0);
-  }
-  75% {
-    clip-path: inset(0 0 0 0);
-  }
-  to {
-    transform: translate3d(0, 0, 0);
-    clip-path: inset(0 0 0 0);
-  }
-}
-/* L'accroche : même geste, plus ample. */
-@keyframes intro-hero-tagline {
-  from {
-    transform: translate3d(0, 34px, 0);
-    clip-path: inset(100% 0 0 0);
+    letter-spacing: 0.42em;
+    clip-path: inset(0 0 100% 0);
   }
   60% {
     clip-path: inset(0 0 0 0);
   }
   to {
+    letter-spacing: 0.14em;
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+/* Un mot de l'accroche : il monte de 20 px en se découvrant. */
+@keyframes intro-hero-mot {
+  from {
+    transform: translate3d(0, 20px, 0);
+    clip-path: inset(0 0 100% 0);
+  }
+  65% {
+    clip-path: inset(0 0 0 0);
+  }
+  to {
     transform: translate3d(0, 0, 0);
     clip-path: inset(0 0 0 0);
   }
 }
-/* Les CTA : dévoilement franc et rapide, la rangée arrive d'un bloc. */
+
+/* Les boutons : la rangée arrive d'un bloc, de 12 px plus bas. */
 @keyframes intro-hero-cta {
   from {
-    transform: translate3d(0, 24px, 0);
-    clip-path: inset(100% 0 0 0);
-  }
-  45% {
-    clip-path: inset(0 0 0 0);
-  }
-  to {
-    transform: translate3d(0, 0, 0);
-    clip-path: inset(0 0 0 0);
-  }
-}
-/* La ligne risques : dévoilement sobre, sans déplacement appuyé, elle s'annonce, elle ne se met pas en
-   scène. `backwards` seulement : à la fin de la cascade elle est toujours pleinement visible. */
-@keyframes intro-hero-risk {
-  from {
-    transform: translate3d(0, 14px, 0);
-    clip-path: inset(100% 0 0 0);
-  }
-  55% {
-    clip-path: inset(0 0 0 0);
-  }
-  to {
-    transform: translate3d(0, 0, 0);
-    clip-path: inset(0 0 0 0);
-  }
-}
-/* Les avis : le geste le plus léger. */
-@keyframes intro-hero-trust {
-  from {
-    transform: translate3d(0, 16px, 0);
-    clip-path: inset(100% 0 0 0);
+    transform: translate3d(0, 12px, 0);
+    clip-path: inset(0 0 100% 0);
   }
   50% {
     clip-path: inset(0 0 0 0);
@@ -1367,18 +1379,24 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
     clip-path: inset(0 0 0 0);
   }
 }
-/* La flèche : elle se pose, sans déplacement notable. */
-@keyframes intro-hero-hint {
+
+/* La ligne risques : elle se découvre sur place, sans déplacement. */
+@keyframes intro-hero-risk {
   from {
-    transform: translate3d(0, 10px, 0);
-    clip-path: inset(100% 0 0 0);
-  }
-  60% {
-    clip-path: inset(0 0 0 0);
+    clip-path: inset(0 0 100% 0);
   }
   to {
-    transform: translate3d(0, 0, 0);
     clip-path: inset(0 0 0 0);
+  }
+}
+
+/* Les avis et la flèche : fondu seul, aucun déplacement. */
+@keyframes intro-hero-fondu {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }
 @keyframes intro-in {
@@ -1398,10 +1416,14 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
    transform est déjà prise par le scrub de défilement. Rien en mouvement réduit.
    Elle s'efface tant que le bandeau cookies est déplié : il la recouvrirait. `visibility` et non
    `opacity`, parce que le scrub pose une opacité en ligne qui l'emporterait, et parce que cela la
-   retire aussi du parcours au clavier. */
+   retire aussi du parcours au clavier.
+   DEUX SECONDES et un départ RETARDÉ depuis le 14/09/2026 (cadence donnée par l'équipe) : la flèche
+   paraît d'abord en fondu au rang 7, à 800 ms, puis enchaîne sur son oscillation. Le retard couvre
+   l'entrée, 800 ms de délai et 700 ms de durée. Au retour depuis une autre page, l'ouverture ne se
+   rejoue pas et la flèche attend simplement ce même temps avant de respirer. */
 @media (prefers-reduced-motion: no-preference) {
   [data-hero-scroll-hint] svg {
-    animation: hint-bob 2.4s var(--ease-in-out-quart) infinite;
+    animation: hint-bob 2s var(--ease-in-out-quart) 1500ms infinite;
   }
 }
 @keyframes hint-bob {

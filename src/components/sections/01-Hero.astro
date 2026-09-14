@@ -167,12 +167,29 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
           </span>
         </h1>
         <div {...copyScrubUp} class="flex flex-col items-center max-sm:order-3">
+          {
+            /*
+             * Accroche découpée EN MOTS (14/09/2026, demande de l'équipe) : chaque mot monte de 20 px et
+             * se dévoile, 70 ms après le précédent. Par mots et non par lettres : sur une accroche de
+             * deux mots, le lettre par lettre ferait gadget.
+             * L'attribut data-intro reste sur le paragraphe, la cascade se joue sur les mots (`--mot`).
+             * L'espace entre les mots est rendu HORS des spans, sinon il disparaît avec le découpage.
+             */
+          }
           <p
             data-intro="3"
-            data-intro-move
             class="mt-6 max-w-2xl text-xl leading-snug font-semibold text-balance text-sand sm:mt-8 sm:text-display-sm"
           >
-            {hero.tagline}
+            {
+              hero.tagline.split(' ').map((mot, i) => (
+                <>
+                  {i > 0 && ' '}
+                  <span data-intro-mot style={`--mot:${i}`}>
+                    {mot}
+                  </span>
+                </>
+              ))
+            }
           </p>
         </div>
         <div {...copyScrubDown} class="mt-6 w-full max-sm:order-4 sm:mt-12 sm:w-auto">
