@@ -485,9 +485,10 @@ export const press = {
     },
   ],
   /**
-   * Revue de presse « La presse en parle » : sélection livrée par CORUM le 10/09/2026, neuf articles,
-   * dans l'ordre de la sélection. Titres et dates reproduits tels que fournis ; ce sont des citations de
-   * tiers, couvertes par `coverageDisclaimer`, jamais des formulations du site.
+   * Revue de presse « La presse en parle » : onze articles. Les neuf premiers sont la sélection livrée
+   * par CORUM le 10/09/2026, dans l'ordre de la sélection ; les deux derniers ont été ajoutés par
+   * l'équipe le 14/09/2026. Titres et dates reproduits tels que fournis ou relevés sur la page ; ce sont
+   * des citations de tiers, couvertes par `coverageDisclaimer`, jamais des formulations du site.
    * `url` n'est renseignée QUE POUR LES ADRESSES OUVERTES ET VÉRIFIÉES, titre de page à l'appui : un
    * article sans adresse s'affiche avec son média et sa date, sans lien (arbitrage du 10/09/2026).
    * Une adresse fausse sur un site financier réglementé coûte plus cher qu'un lien manquant, donc rien
@@ -566,6 +567,27 @@ export const press = {
          le titre et le chapô, ce qui reste préférable à un article sans lien du tout. */
       url: 'https://www.cfnewsimmo.net/L-actualite/Levee-de-fonds/Vehicule/La-nouvelle-proposition-de-valeur-que-formule-R-Start-aux-epargnants-500106',
     },
+    /*
+     * DEUX AJOUTS DE L'ÉQUIPE le 14/09/2026, hors de la sélection livrée par CORUM le 10/09/2026 et
+     * arbitrés ce jour-là. Placés EN FIN DE LISTE, pas à leur rang chronologique : les neuf premiers
+     * gardent l'ordre exact de la sélection, qui est une décision éditoriale de CORUM, et le composant
+     * n'applique aucun tri. Adresses et dates relevées sur les pages elles-mêmes.
+     */
+    {
+      media: 'CFNews Immo',
+      title: 'SCPI : Corum Start relance le débat sur les commissions',
+      // Publié le 24/04/2026, mis à jour le 04/05/2026 (dates lues sur la page).
+      date: { label: '24 avril 2026', iso: '2026-04-24' },
+      url: 'https://www.cfnewsimmo.net/L-actualite/Tete-d-affiche/SCPI-Corum-Start-relance-le-debat-sur-les-commissions-498556',
+    },
+    {
+      /* Dépêche d'agence : la page ouverte est celle de Combourse, la source qu'elle affiche est
+         Agefi.fr. Le média est nommé tel quel, on ne crédite pas un média dont on n'ouvre pas la page. */
+      media: 'Combourse, dépêche Agefi.fr',
+      title: 'Corum lance R Start, une SCPI sans frais de souscription',
+      date: { label: '19 mai 2026', iso: '2026-05-19' },
+      url: 'https://www.combourse.com/News/Corum_lance_R_Start_une_SCPI_sans_frais_de_souscription__3143146.html',
+    },
   ],
   /**
    * Articles identifiés le 08/09/2026 mais hors de la sélection livrée le 10/09/2026 : adresses
@@ -573,18 +595,6 @@ export const press = {
    * publient par ailleurs des avis de plateforme de distribution, pas des articles d'information).
    */
   coverageArchive: [
-    /* Transmis par l'équipe le 14/09/2026 mais ABSENTS de la sélection livrée par CORUM le 10/09/2026 :
-       à arbitrer avant de les faire remonter dans `coverage`, la sélection est une décision éditoriale. */
-    {
-      media: 'CFNews Immo',
-      title: 'SCPI : Corum Start relance le débat sur les commissions',
-      url: 'https://www.cfnewsimmo.net/L-actualite/Tete-d-affiche/SCPI-Corum-Start-relance-le-debat-sur-les-commissions-498556',
-    },
-    {
-      media: 'Combourse, dépêche Agefi.fr',
-      title: 'Corum lance R Start, une SCPI sans frais de souscription',
-      url: 'https://www.combourse.com/News/Corum_lance_R_Start_une_SCPI_sans_frais_de_souscription__3143146.html',
-    },
     {
       media: 'Pierre Papier',
       title: 'Corum propose un nouveau modèle de frais avec la SCPI R Start',
