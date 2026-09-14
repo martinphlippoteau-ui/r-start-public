@@ -41,7 +41,15 @@ const COLUMNS = 2;
 const titleId = sections.highlights.id + '-title';
 ---
 
-<Section id={sections.highlights.id} tone="white">
+{
+  /*
+   * FOND SOMBRE depuis le 14/09/2026 (demande de l'équipe) : le tableau prend l'ink, et « L'expérience
+   * derrière R Start » prend le blanc en échange. C'est ce qui règle le rendu du carrousel Trustpilot,
+   * qui pose ses propres cartes blanches et s'accommodait mal d'un fond bleu.
+   * Les repères passent donc en verre clair sur l'ink, valeurs en sand, appels de note en teal-200.
+   */
+}
+<Section id={sections.highlights.id} tone="ink">
   <Container size="wide">
     {
       /* Aligné à gauche comme tous les autres titres de section depuis le 11/09/2026 : c'était le seul
@@ -72,20 +80,20 @@ const titleId = sections.highlights.id + '-title';
       {
         cards.map((card, i) => (
           <li
-            class="rounded-3xl border border-navy/12 bg-paper p-6 sm:p-8"
+            class="rounded-3xl border border-white/15 bg-white/5 p-6 sm:p-8"
             data-animate="fade-up"
             data-animate-delay={String((i % COLUMNS) * STAGGER)}
           >
             {/* Sans libellé, la valeur se suffit à elle-même et l'appel de note la suit (« 100 % Digital »). */}
             {card.label && (
-              <p class="text-base font-medium text-slate-700">
+              <p class="text-base font-medium text-white/80">
                 {card.label}
-                {card.noteId && <NoteRef id={card.noteId} />}
+                {card.noteId && <NoteRef id={card.noteId} tone="dark" />}
               </p>
             )}
-            <p class:list={['text-display-sm text-navy', card.label && 'mt-2']}>
+            <p class:list={['text-display-sm text-sand', card.label && 'mt-2']}>
               {card.value}
-              {!card.label && card.noteId && <NoteRef id={card.noteId} />}
+              {!card.label && card.noteId && <NoteRef id={card.noteId} tone="dark" />}
             </p>
           </li>
         ))
@@ -97,18 +105,18 @@ const titleId = sections.highlights.id + '-title';
         le détachent des six repères, et il est rendu sans encadré, ce ne sont pas des caractéristiques
         du produit, mais des modalités. */
       highlights.subscriptionItems && highlights.subscriptionItems.length > 0 && (
-        <div class="mt-chapter border-t border-navy/15 pt-8 sm:pt-10">
+        <div class="mt-chapter border-t border-white/20 pt-8 sm:pt-10">
           {highlights.subscriptionTitle && (
-            <h3 class="text-display-sm text-ink">{highlights.subscriptionTitle}</h3>
+            <h3 class="text-display-sm text-white">{highlights.subscriptionTitle}</h3>
           )}
           <ul role="list" class="mt-6 grid gap-6 sm:grid-cols-3 sm:gap-8 lg:mt-8">
             {highlights.subscriptionItems.map((item) => (
-              <li class="border-t border-navy/10 pt-4 sm:border-t-0 sm:pt-0">
-                <p class="text-base font-medium text-slate-700">
+              <li class="border-t border-white/15 pt-4 sm:border-t-0 sm:pt-0">
+                <p class="text-base font-medium text-white/80">
                   {item.label}
-                  {item.noteId && <NoteRef id={item.noteId} />}
+                  {item.noteId && <NoteRef id={item.noteId} tone="dark" />}
                 </p>
-                <p class="text-lead mt-1 font-semibold text-navy">{item.value}</p>
+                <p class="text-lead mt-1 font-semibold text-sand">{item.value}</p>
               </li>
             ))}
           </ul>

@@ -65,8 +65,8 @@ const hint = trustpilot.externalLinkHint;
 }
 ---
 
-<Section id={id} tone="ink" spacing="none">
-  <!-- Bande ink : en-tête + cadre réglementaire -->
+<Section id={id} tone="white" spacing="none">
+  <!-- Bande blanche : en-tête, avis Trustpilot, renvoi vers /a-propos -->
   <div class="py-section">
     <Container size="wide">
       {
@@ -87,35 +87,39 @@ const hint = trustpilot.externalLinkHint;
       <SectionHeading id={id} eyebrow={corum.eyebrow} title={corum.title} motion />
 
       {
-        /* LES AVIS REJOIGNENT CE BLOC (14/09/2026, demande de l'équipe) : ils occupaient une bande
-          blanche à part, ils ferment maintenant « L'expérience derrière R Start », dont ils sont la
-          suite naturelle, les chiffres du groupe puis ce qu'en disent ses clients.
-          TrustBox en thème sombre, comme dans le hero, et le lien en teal-200, lisible sur l'ink. */
+        /* LES AVIS REJOIGNENT CE BLOC (14/09/2026, demande de l'équipe) : ils occupaient une bande à
+          part, ils ferment maintenant « L'expérience derrière R Start ». La section entière est passée
+          en blanc, et le tableau « en un clin d'œil » a pris l'ink en échange : c'est ce qui règle le
+          rendu du carrousel, qui pose ses propres cartes blanches et s'accommodait mal d'un fond bleu. */
       }
       <div class="mt-section-sm">
-        <h3 class="text-display-sm text-white" data-animate="fade-up">
+        <h3 class="text-display-sm text-ink" data-animate="fade-up">
           {trustpilot.title}
-          <NoteRef id="confiance-trustpilot" tone="dark" />
+          <NoteRef id="confiance-trustpilot" tone="light" />
         </h3>
         {
           /* TrustBox officiel « carrousel » (11/09/2026) : la note figée et son compteur ont laissé la
             place aux avis servis en direct par Trustpilot, toutes notes confondues (`stars` 1 à 5). Rien
             n'est composé ni trié ici : le contenu arrive dans une iframe Trustpilot. */
         }
+        {
+          /*
+           * Plus d'enveloppe blanche autour du carrousel depuis que la section entière est blanche
+           * (14/09/2026) : le composant embarqué pose ses propres cartes blanches sur un fond de même
+           * couleur, ce qu'il attend. Et surtout PAS de `theme="dark"` : le thème sombre de Trustpilot
+           * passe le nom et la date des avis en gris clair sur ces mêmes cartes restées blanches, six
+           * violations de contraste à 1,85:1 mesurées dans l'iframe le 14/09/2026.
+           */
+        }
         <div class="mt-6">
-          {
-            /* PAS de `theme="dark"` sur le carrousel, contrairement au bandeau du hero : le thème
-              sombre de Trustpilot passe le nom et la date des avis en gris clair, alors que les cartes
-              d'avis, elles, restent blanches. Résultat mesuré le 14/09/2026, six violations de
-              contraste à 1,85:1 dans l'iframe. Le thème clair garde leurs cartes lisibles ; elles
-              posent leur propre fond blanc sur l'ink, ce qui convient à un composant embarqué. */
-          }
           <TrustBox template="carousel" label={trustpilot.widgetLabel!} />
+        </div>
+        <div>
           <a
             href={trustpilot.url}
             target="_blank"
             rel="noopener noreferrer"
-            class="link-underline mt-4 inline-flex items-center gap-2 text-base font-semibold text-teal-200 no-underline hover:text-white"
+            class="link-underline mt-4 inline-flex items-center gap-2 text-base font-semibold text-teal-700 no-underline hover:text-navy"
           >
             {trustpilot.linkLabel}
             {hint && <span class="visually-hidden">({hint})</span>}
@@ -145,7 +149,7 @@ const hint = trustpilot.externalLinkHint;
           l'ink depuis que la bande blanche a disparu avec le déplacement des avis. */
       }
       <div class="mt-section-sm">
-        <Button href={withBase(pages.about.path)} variant="outline-light" size="lg">
+        <Button href={withBase(pages.about.path)} variant="secondary" size="lg">
           {corum.aboutLink}
         </Button>
       </div>

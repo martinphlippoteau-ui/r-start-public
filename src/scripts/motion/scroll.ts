@@ -89,9 +89,19 @@ export const setupCurtains = (): void => {
     const prev = section.previousElementSibling as HTMLElement | null;
     if (!prev || prev.matches('nav, header')) return;
     if (!allowed(prev, 'data-curtain (section précédente)')) return;
+    /*
+     * Point de déclenchement RÉGLABLE par la valeur de `data-curtain` (14/09/2026), pour les cas où la
+     * section précédente dépasse la hauteur du viewport. Par défaut `bottom bottom` : l'épinglage part
+     * dès que son bas touche le bas de l'écran, ce qui suppose qu'on l'a lue en entier à ce moment-là,
+     * vrai seulement si elle tient dans un écran. Une section plus haute se fige alors qu'on vient d'y
+     * entrer, et le rideau la recouvre aussitôt. `data-curtain="bottom center"` repousse l'épinglage
+     * jusqu'à ce que son bas atteigne le milieu de l'écran : elle défile normalement d'abord, et le
+     * recouvrement ne dure plus qu'un demi-écran.
+     */
+    const start = section.getAttribute('data-curtain')?.trim() || 'bottom bottom';
     ScrollTrigger.create({
       trigger: prev,
-      start: 'bottom bottom',
+      start,
       endTrigger: section,
       end: 'top top',
       pin: prev,

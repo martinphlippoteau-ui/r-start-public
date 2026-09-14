@@ -32,24 +32,22 @@ const id = sections.risks.id;
 
 {
   /*
-   * PLUS DE RIDEAU (14/09/2026) : « le bloc des risques apparaît trop tôt au scroll ».
+   * RIDEAU DÉCLENCHÉ PLUS TARD (14/09/2026) : « le bloc des risques apparaît trop tôt au scroll ».
    *
-   * La règle d'emploi du rideau (src/scripts/motion/scroll.ts) prévoyait un seul rideau sur l'accueil,
-   * celui-ci, POSÉ SUR 08b-Presse. Or 08b-Presse a quitté HOME_ORDER : la section qui précède est
-   * maintenant 06-Souscrire, et le moteur épingle simplement `previousElementSibling`, sans savoir
-   * laquelle c'est. Le rideau s'appliquait donc à une section qu'il n'a jamais visée.
+   * La règle d'emploi du rideau (src/scripts/motion/scroll.ts) le prévoyait POSÉ SUR 08b-Presse. Or
+   * 08b-Presse a quitté HOME_ORDER : la section qui précède est maintenant 06-Souscrire, et le moteur
+   * épingle simplement `previousElementSibling`. Avec le déclenchement par défaut, `bottom bottom`,
+   * l'épinglage part dès que le bas de Souscrire touche le bas de l'écran, ce qui suppose qu'on l'a
+   * lue en entier à ce moment-là : vrai pour une section qui tient dans un écran, faux ici. Mesuré sur
+   * 1440 × 900, Souscrire fait 1 110 px, soit 1,23 écran ; son bas atteignait le bas du viewport après
+   * 250 px de défilement, et les Risques montaient par-dessus dans la foulée.
    *
-   * Mesuré sur 1440 × 900 : Souscrire fait 1 110 px, soit 1,23 écran. Son bas touche le bas du viewport
-   * après 250 px de défilement seulement, l'épinglage se déclenche là, et les Risques commencent à
-   * monter par-dessus dans la foulée. Le lecteur n'a jamais la section pour lui seul : à peine
-   * encadrée, elle est déjà recouverte. Sans le rideau, Souscrire défile à son rythme et les Risques
-   * arrivent normalement.
-   *
-   * Pour le rétablir : remettre 08b-Presse juste avant dans HOME_ORDER, ou n'appliquer le rideau que
-   * si la section précédente tient dans un écran.
+   * `bottom center` repousse l'épinglage jusqu'à ce que le bas de Souscrire atteigne le milieu de
+   * l'écran : elle défile normalement d'abord, le rideau ne couvre plus qu'un demi-écran, et la
+   * transition de chapitre reste. Si 08b-Presse revenait juste avant, la valeur par défaut suffirait.
    */
 }
-<Section id={id} tone="ink">
+<Section id={id} tone="ink" data-curtain="bottom center">
   <Container size="wide" class="relative">
     <SectionHeading id={id} title={risks.title} intro={risks.intro} />
 
