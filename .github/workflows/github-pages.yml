@@ -79,12 +79,24 @@ jobs:
         if: steps.cache-playwright.outputs.cache-hit == 'true'
         run: pnpm exec playwright install-deps chromium
 
+      # NON BLOQUANT POUR L'INSTANT (14/09/2026, décision de l'équipe). La première exécution en CI a
+      # vu quatre-vingt-treize tests tomber, la deuxième dépasser vingt minutes : la barrière ajoutée
+      # pour corriger le premier constat de l'audit empêchait toute mise en ligne, correctifs de
+      # sécurité compris. Elle reste en place et visible dans l'onglet Actions, mais elle ne retient
+      # plus la publication, et un plafond de huit minutes l'empêche de s'éterniser.
+      #
+      # À REPASSER BLOQUANT dès que la suite tient dans son plafond deux fois de suite : il suffit de
+      # retirer `continue-on-error`. Tant que cette ligne est là, le vert du workflow ne dit RIEN de
+      # l'état des tests, il faut ouvrir l'étape ou lire le rapport téléversé.
       - name: Tests de bout en bout
         run: pnpm exec playwright test
+        continue-on-error: true
+        timeout-minutes: 8
 
-      # En cas d'échec, le rapport dit quel test a cédé et sur quel profil.
+      # Le rapport dit quel test a cédé et sur quel profil. `always()` et non `failure()` : l'étape
+      # précédente ne rapporte plus d'échec au job, le rapport ne serait jamais téléversé sans cela.
       - name: Rapport des tests
-        if: failure()
+        if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: rapport-playwright

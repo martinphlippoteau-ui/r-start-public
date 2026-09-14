@@ -16,11 +16,12 @@ export default defineConfig({
    */
   workers: process.env.CI ? 2 : undefined,
   /*
-   * Une reprise en intégration continue, aucune en local. Le but n'est pas de masquer une
-   * intermittence, qui doit rester visible là où on développe, mais d'éviter qu'un hoquet de runner
-   * bloque une mise en ligne. Une reprise qui devient habituelle est un test à réparer, pas à tolérer.
+   * Aucune reprise, nulle part. Elle avait été autorisée en intégration continue pour qu'un hoquet de
+   * runner ne bloque pas une mise en ligne ; l'étape n'étant plus bloquante, elle ne sert plus à rien
+   * et double le temps dès qu'un échec est systématique, ce qui était le cas. À reconsidérer le jour
+   * où l'étape redeviendra bloquante.
    */
-  retries: process.env.CI ? 1 : 0,
+  retries: 0,
   reporter: [['list']],
   use: {
     baseURL: 'http://127.0.0.1:4321',
