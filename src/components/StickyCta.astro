@@ -42,11 +42,12 @@
  *    de souscription arrive avec la section qui la propose).
  * `until` borne la fin ; sans elle, la pastille reste jusqu'au bas de la page.
  *
- * SANS `href`, c'est un CTA vers le tunnel de souscription : URL centralisée, `data-cta` pour la mesure
- * d'audience, exactement comme le composant Button. Avec `href`, c'est un lien interne, sans `data-cta`,
- * rien à compter côté conformité.
+ * SANS `href`, c'est un CTA de souscription : `data-cta` pour la mesure d'audience, exactement comme le
+ * composant Button, et même destination (config/site.ts, ctaHref) : le tunnel si la souscription est
+ * ouverte, sinon la documentation, le clic ouvrant la fenêtre « la souscription arrive bientôt ».
+ * Avec `href`, c'est un lien interne, sans `data-cta`, rien à compter côté conformité.
  */
-import { subscribeHref } from '@/config/site';
+import { ctaHref, site } from '@/config/site';
 import { withBase } from '@/lib/href';
 import type { CtaPosition } from '@/content/types';
 
@@ -65,7 +66,7 @@ interface Props {
 const { label, href, position = 'sticky', watch, from, until } = Astro.props as Props;
 
 const souscription = !href;
-const lien = href ? withBase(href) : subscribeHref(position);
+const lien = href ? withBase(href) : ctaHref(position);
 ---
 
 <div
@@ -80,7 +81,7 @@ const lien = href ? withBase(href) : subscribeHref(position);
     data-sticky-link
     data-cta={souscription ? 'souscrire' : undefined}
     data-cta-position={souscription ? position : undefined}
-    rel={souscription ? 'noopener' : undefined}
+    rel={souscription && site.subscribeOpen ? 'noopener' : undefined}
     class="sticky-skin pointer-events-auto relative isolate inline-flex h-16 min-w-16 items-center justify-center rounded-full text-lg font-semibold no-underline outline-offset-4 focus-visible:outline-3 focus-visible:outline-navy"
   >
     {

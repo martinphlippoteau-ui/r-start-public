@@ -58,6 +58,17 @@ export default defineConfig({
         optional: true,
         default: 'https://www.corum.fr/?tunnel=r-start#placeholder',
       }),
+      // « true » le jour où le tunnel de souscription ouvre. Tant que la valeur est vide ou « false »,
+      // tous les CTA « Souscrire » ouvrent la fenêtre « la souscription arrive bientôt » au lieu de
+      // quitter le site. Interrupteur EXPLICITE : la détection précédente cherchait le mot
+      // « placeholder » dans l'URL du tunnel, et ce marqueur était mangé par le découpage des
+      // commentaires du .env (tout ce qui suit un « # »), donc la fenêtre ne s'affichait jamais.
+      PUBLIC_SUBSCRIBE_OPEN: envField.string({
+        context: 'client',
+        access: 'public',
+        optional: true,
+        default: '',
+      }),
       // « true » sur une prévisualisation : robots.txt en Disallow et meta robots noindex partout.
       PUBLIC_NOINDEX: envField.string({
         context: 'client',

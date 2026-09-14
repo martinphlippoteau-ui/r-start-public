@@ -590,6 +590,41 @@ test.describe('Qualité', () => {
     expect(fautifs).toEqual([]);
   });
 
+  /*
+   * Tant que la souscription n'est pas ouverte (config/site.ts, subscribeOpen), AUCUN CTA « Souscrire »
+   * ne doit quitter le site : le clic ouvre la fenêtre d'attente. Le repérage se faisait par le mot
+   * « placeholder » dans l'URL du tunnel, et ce marqueur était mangé par le découpage des commentaires
+   * du .env : la fenêtre n'était rendue nulle part et tous les boutons partaient sur corum.fr.
+   */
+  test('les CTA de souscription ouvrent la fenêtre d’attente', async ({ page }) => {
+    for (const chemin of PAGES) {
+      await page.goto(chemin);
+      const nb = await page.locator('[data-cta="souscrire"]').count();
+      expect(nb, `${chemin} ne porte aucun CTA de souscription`).toBeGreaterThan(0);
+
+      /* Aucun CTA ne pointe hors du site : sans JavaScript, on reste sur la documentation. */
+      const cibles = await page
+        .locator('[data-cta="souscrire"]')
+        .evaluateAll((liens) => liens.map((a) => a.getAttribute('href') ?? ''));
+      expect(
+        cibles.filter((h) => /^https?:/i.test(h)),
+        chemin
+      ).toEqual([]);
+
+      const fenetre = page.locator('[data-subscribe-soon]');
+      await expect(fenetre, chemin).toHaveCount(1);
+      await page
+        .locator('[data-cta="souscrire"]')
+        .first()
+        .evaluate((a: HTMLElement) => a.click());
+      await expect(fenetre, chemin).toHaveAttribute('open', '');
+      /* Échap referme, et le lien n'a pas navigué. */
+      await page.keyboard.press('Escape');
+      await expect(fenetre, chemin).not.toHaveAttribute('open', '');
+      expect(new URL(page.url()).pathname.replace(/\/$/, '')).toContain(chemin.replace(/\/$/, ''));
+    }
+  });
+
   test('captures d’écran de la page', async ({ page }, testInfo) => {
     await page.goto('/');
     await page.locator('[data-consent-refuse]').click();

@@ -57,7 +57,7 @@ const {
     <a href="#contenu" class="skip-link">{nav.skipLink}</a>
     <slot />
     <Consent />
-    {site.subscribeIsPlaceholder && <SubscribeSoon />}
+    {!site.subscribeOpen && <SubscribeSoon />}
     <script>
       import '@/scripts/consent';
       import '@/scripts/analytics';
