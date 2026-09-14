@@ -64,7 +64,12 @@ export const experienceStats: StatItem[] = [
     value: nb(corumGroup.experienceLabel),
     numeric: corumGroup.experienceYears,
     suffix: ' ans',
-    label: 'à investir en immobilier d’entreprise',
+    /**
+     * Libellé du document de l'équipe (14/09/2026), « objectifs tenus » compris. C'est une allégation
+     * de performance : le contrôle de conformité ne la bloque plus mais la signale à chaque exécution,
+     * pour l'arbitrage de la compliance.
+     */
+    label: 'd’expertise et d’objectifs tenus',
   },
   {
     value: nb(savings.value),

@@ -107,7 +107,7 @@ const rawNotes: LegalNote[] = [
   },
   {
     id: 'faq-sri',
-    text: `Indicateur synthétique de risque (SRI) : échelle de 1 (risque le plus faible) à ${risk.sriMax} (risque le plus élevé), établie en supposant que vous conservez le produit ${risk.recommendedHoldingLabel}. R Start y est classée ${risk.sriLabel} dans son document d’informations clés du ${product.dicDate.label}, qui seul fait foi. Source : document d’informations clés de R Start, p. 2.`,
+    text: `Indicateur synthétique de risque (SRI) : échelle de 1 (risque le plus faible) à ${risk.sriMax} (risque le plus élevé), établie en supposant que vous conservez le produit ${risk.recommendedHoldingLabel}. R Start y est classée ${risk.sriLabel}, valeur communiquée par CORUM. Source : CORUM, brochure partenaires 2026, p. 3. Le document d’informations clés du ${product.dicDate.label} reste le seul document qui fait foi : lisez-le avant toute décision.`,
   },
   {
     id: 'faq-fiscalite',
@@ -144,7 +144,8 @@ const rawItems: FaqContent['items'] = [
   },
   {
     /** Réponse fournie par l'équipe produit ; les deux leviers viennent de facts.strategy.levers (brochure p.3). */
-    question: 'Comment R Start compte-t-elle créer de la performance, et en faire profiter ses clients ?',
+    question:
+      'Comment R Start compte-t-elle créer de la performance, et en faire profiter ses clients ?',
     riskFrom: 2,
     noteId: 'faq-leviers',
     answer: [
@@ -204,7 +205,8 @@ const rawItems: FaqContent['items'] = [
     ],
   },
   {
-    question: 'Quand reçoit-on les premiers revenus et les premières plus-values potentielles avec R Start ?',
+    question:
+      'Quand reçoit-on les premiers revenus et les premières plus-values potentielles avec R Start ?',
     riskFrom: 1,
     noteId: 'faq-jouissance',
     answer: [
@@ -241,7 +243,7 @@ const rawItems: FaqContent['items'] = [
     answer: [
       'R Start est un investissement immobilier de long terme. Le capital investi n’est pas garanti : la valeur de vos parts peut baisser, et vous pourriez perdre tout ou partie de votre investissement. Les revenus ne sont pas garantis et varient selon le marché immobilier et le cours des devises.',
       `S’y ajoutent trois risques spécifiques. Le risque de liquidité : le rachat des parts n’est pas garanti. Le risque de change : R Start peut investir hors zone euro, sans couverture systématique. L’effet de levier : R Start peut recourir à l’endettement jusqu’à ${risk.maxLeverage} de la valeur d’expertise de ses actifs, ce qui amplifie les variations à la hausse comme à la baisse.`,
-      `R Start est classée ${risk.sriLabel} sur l’indicateur synthétique de risque, une ${risk.sriClass}, dans son document d’informations clés du ${product.dicDate.label}. Cet indicateur suppose une détention de ${risk.recommendedHoldingLabel} et n’intègre ni le risque de change, ni le risque de liquidité, ni l’effet de levier. Enfin, la commission d’arbitrage a des effets de seuil et peut capter une partie significative de la plus-value.`,
+      `R Start est classée ${risk.sriLabel} sur l’indicateur synthétique de risque, une ${risk.sriClass}, valeur communiquée par CORUM. Cet indicateur suppose une détention de ${risk.recommendedHoldingLabel} et n’intègre ni le risque de change, ni le risque de liquidité, ni l’effet de levier. Enfin, la commission d’arbitrage a des effets de seuil et peut capter une partie significative de la plus-value.`,
     ],
   },
   {

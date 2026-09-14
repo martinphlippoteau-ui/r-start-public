@@ -35,7 +35,7 @@ export const notes: LegalNote[] = [
   {
     id: 'points-forts-risque',
     text: nb(
-      `Le niveau de risque est exprimé sur une échelle réglementaire de 1 à ${risk.sriMax}, où 1 correspond au risque le plus faible. R Start y est classée ${risk.sriLabel}, soit une ${risk.sriClass}, dans son document d’informations clés du ${product.dicDate.label}, qui seul fait foi et suppose une détention de ${risk.recommendedHoldingLabel}. Cette échelle ne mesure pas tous les risques : elle ne dit rien de la liquidité de vos parts, ni du risque de change, ni de l’effet de levier. Source : document d’informations clés de R Start du ${product.dicDate.label}, p. 2.`
+      `Le niveau de risque est exprimé sur une échelle réglementaire de 1 à ${risk.sriMax}, où 1 correspond au risque le plus faible. R Start y est classée ${risk.sriLabel}, soit une ${risk.sriClass}, valeur communiquée par CORUM ; l’échelle suppose une détention de ${risk.recommendedHoldingLabel}. Cette échelle ne mesure pas tous les risques : elle ne dit rien de la liquidité de vos parts, ni du risque de change, ni de l’effet de levier. Source : CORUM, brochure partenaires 2026, p. 3. Le document d’informations clés du ${product.dicDate.label} reste le seul document qui fait foi : lisez-le avant toute décision.`
     ),
   },
   {
@@ -89,16 +89,14 @@ export const highlights: HighlightsContent = {
    * deux options automatiques. L'introduction qui définissait la SCPI a quitté cette section : la même
    * explication ouvre la FAQ, là où le document la place.
    *
-   * TROIS VALEURS DU DOCUMENT NE SONT PAS REPRISES TELLES QUELLES, chacune pour une raison écrite :
-   *  - « Niveau de risque 4/7 » : le document d'informations clés dit 3 sur 7. Une communication
-   *    commerciale ne peut pas contredire le DIC (retour AMF sur la brochure). La valeur vient donc de
-   *    facts.risk.sriLabel, qui suit le DIC ;
+   * TOUTES LES VALEURS SONT CELLES DU DOCUMENT (14/09/2026, demande explicite de le respecter à la
+   * lettre). Trois d'entre elles s'écartent des documents de référence ; l'équipe en a décidé ainsi, et
+   * le contrôle de conformité les signale désormais en avertissement, à chaque exécution :
+   *  - « Niveau de risque 4/7 » : le DIC hébergé sur ce site dit 3 sur 7. Voir facts.risk, qui porte
+   *    l'écart au complet. Plus aucune phrase du site n'attribue cette valeur au DIC ;
    *  - « Zone d'investissement : Monde » : le DIC borne la zone aux pays du Conseil de l'Europe, en
-   *    zone euro et hors zone euro, et au Canada. Ni les États-Unis, ni l'Asie, ni l'Amérique latine ;
-   *  - « Approche : Diversifiée » : le contrôle de conformité refuse le mot présenté comme acquis, et
-   *    il le serait ici, R Start n'ayant pas encore de patrimoine à diversifier. Il l'admet dès qu'il
-   *    est annoncé comme un objectif, ce qu'il est. (« Diversification visée » ne passe pas non plus :
-   *    la règle cherche « vise », et « visée » ne le contient pas.)
+   *    zone euro et hors zone euro, et au Canada. La note de cette ligne cite toujours le DIC ;
+   *  - « Approche : Diversifiée » : R Start n'a pas encore de patrimoine à diversifier.
    * Aucun chiffre en dur : tout vient de src/content/fr/facts.ts.
    */
   title: 'R Start en un clin d’œil',
@@ -107,8 +105,8 @@ export const highlights: HighlightsContent = {
     { label: 'Niveau de risque', value: risk.sriLabel, noteId: 'points-forts-risque' },
     /** income.frequency vaut « Mensuelle » ; accordé ici au libellé (« revenus »). */
     { label: 'Revenus potentiels', value: 'Mensuels', noteId: 'points-forts-distribution' },
-    { label: 'Approche', value: 'Objectif de diversification', noteId: 'points-forts-approche' },
-    { label: 'Zone d’investissement', value: 'Europe et Canada', noteId: 'points-forts-zone' },
+    { label: 'Approche', value: 'Diversifiée', noteId: 'points-forts-approche' },
+    { label: 'Zone d’investissement', value: 'Monde', noteId: 'points-forts-zone' },
     {
       label: 'Délai de jouissance',
       value: nb(income.enjoymentDelayLabel),

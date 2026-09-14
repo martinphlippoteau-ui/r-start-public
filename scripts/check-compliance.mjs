@@ -101,18 +101,12 @@ const FORBIDDEN = [
     label: 'pourcentage de performance',
   },
   { re: /\bcrédit\b/gi, label: 'mention du crédit', allow: /carte de crédit/i },
-  { re: /objectifs? tenus?/gi, label: '« objectifs tenus » (allégation de performance)' },
-  // NOTE (11/09/2026) : la formule d'alignement (« on ne touche rien tant que vous n'avez pas gagné
-  // d'argent ») et l'allégation de rang sans périmètre sont désormais SIGNALÉES EN AVERTISSEMENT plus bas,
-  // et non plus bloquées : l'équipe les a reprises mot pour mot dans la zone 2. Elles restent tracées à
-  // chaque exécution pour l'arbitrage de la compliance.
-  {
-    // « Diversification » n'est admis qu'accompagné de sa limite (« ne supprime pas / ne garantit
-    // pas le risque… ») ou présenté comme un objectif (« objectif », « vise »), jamais comme un acquis.
-    re: /\bdiversifi/gi,
-    label: '« diversifié » présenté comme un acquis',
-    allow: /ne (supprime|garantit)|objectif|vise/i,
-  },
+  // NOTE (11/09/2026, complétée le 14/09/2026) : quatre formulations ne sont plus BLOQUÉES mais
+  // SIGNALÉES EN AVERTISSEMENT plus bas, l'équipe les ayant reprises mot pour mot dans son document.
+  // La formule d'alignement (« on ne touche rien tant que vous n'avez pas gagné d'argent ») et
+  // l'allégation de rang sans périmètre depuis le 11/09 ; « objectifs tenus » et « diversifié » depuis
+  // le 14/09, demande explicite de l'équipe de respecter son document à la lettre. Elles restent
+  // tracées à chaque exécution, pour l'arbitrage de la compliance.
 ];
 
 function checkForbidden(text, file) {
@@ -256,6 +250,11 @@ async function checkIndex() {
     [
       /premi[èe]re\s+SCPI(?!\s+du groupe CORUM)/gi,
       'allégation de rang « première SCPI » sans périmètre de marché (le périmètre est en note)',
+    ],
+    [/objectifs? tenus?/gi, '« objectifs tenus » (allégation de performance)'],
+    [
+      /\bdiversifi/gi,
+      '« diversifié » présenté comme un acquis (R Start n’a pas encore de patrimoine à diversifier)',
     ],
   ]) {
     const n = (text.match(re_) || []).length;
