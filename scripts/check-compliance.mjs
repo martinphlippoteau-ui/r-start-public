@@ -218,7 +218,13 @@ async function checkIndex() {
     file
   );
   requirePhrase(text, 'visa S.C.P.I. n° 26-06 en date du 4 mars 2026', 'visa AMF', file);
-  requirePhrase(text, legal.shortRiskLine, 'ligne risques courte', file);
+  /*
+   * NEUTRALISÉ le 14/09/2026 avec les « Bon à savoir » : « supprime tous les bon à savoir du site. Le
+   * service conformité va les placer manuellement plus tard. » RiskNote.astro ne rend plus rien, ces
+   * contrôles n'ont donc plus d'objet tant que la Conformité n'a pas replacé les mentions. Ils sont
+   * COMMENTÉS, pas supprimés : ils reprennent effet en même temps que RiskNote.
+   */
+  // requirePhrase(text, legal.shortRiskLine, 'ligne risques courte', file);
   requirePhrase(text, legal.gdpr.dpoEmail, 'e-mail DPO', file);
   requirePhrase(text, product.definition, 'ligne de définition du hero', file);
   requirePhrase(text, 'groupe CORUM', 'périmètre de l’allégation de rang', file);
@@ -242,9 +248,9 @@ async function checkIndex() {
   if (!heroMatch) errors.push(`${file} : section #apercu introuvable`);
   else {
     const hero = heroMatch[0];
+    /* Voir le bandeau ci-dessus : plus de [data-risk] rendu, ce contrôle attend le retour de RiskNote. */
     const risk = hero.match(/<p[^>]*data-risk[^>]*>/i);
-    if (!risk) errors.push(`${file} : aucune ligne risques ([data-risk]) dans le hero`);
-    else if (/data-animate/i.test(risk[0]))
+    if (risk && /data-animate/i.test(risk[0]))
       errors.push(`${file} : la ligne risques du hero est animée`);
     if (!/data-cta="souscrire"/i.test(hero))
       errors.push(`${file} : aucun CTA de souscription dans le hero`);
@@ -255,9 +261,12 @@ async function checkIndex() {
     ) || [];
   if (risksAnimated.length)
     errors.push(`${file} : ${risksAnimated.length} bloc(s) risque animé(s)`);
+  /* Voir le bandeau ci-dessus. Les [data-advantage] restent en place dans les pages : ils sont la carte
+     de ce que la Conformité a à contrebalancer. Le décompte reprendra avec RiskNote. */
   const nAdv = (html.match(/data-advantage/g) || []).length;
   const nRisk = (html.match(/data-risk/g) || []).length;
-  if (nAdv > nRisk) errors.push(`${file} : ${nAdv} avantages pour ${nRisk} risques`);
+  // if (nAdv > nRisk) errors.push(`${file} : ${nAdv} avantages pour ${nRisk} risques`);
+  void [nAdv, nRisk];
 
   // Indicateur synthétique de risque : toute occurrence « N sur 7 » doit être la valeur de facts.ts
   // (risk.sriLabel). Un « 3 sur 7 » hérité du DIC hébergé ou une coquille est une erreur.
@@ -411,10 +420,15 @@ async function checkSubPages() {
       if (!/Sources/.test(text)) errors.push(file + ' : comparateur sans ligne de sources');
     }
     if (p === 'documentation') {
-      // Avertissements reproduits in extenso, descendus de l'accueil le 11/09/2026 : ils doivent rester
-      // publiés quelque part sur le site, à côté des documents dont ils sont extraits.
-      requirePhrase(text, legal.bulletinWarning.slice(0, 120), 'avertissement du bulletin', file);
-      requirePhrase(text, legal.dicWarning, 'avertissement du DIC', file);
+      /*
+       * Avertissements reproduits in extenso, descendus de l'accueil le 11/09/2026. Ils étaient rendus
+       * par RiskNote sur les fiches de documents : ils sont donc partis le 14/09/2026 avec tous les
+       * « Bon à savoir », et ces deux exigences sont commentées comme les autres. CE SONT DEUX TEXTES
+       * RÉGLEMENTAIRES, pas des contre-poids rédigés : ils figurent en tête de la liste de ce que la
+       * Conformité a à replacer. Leur contenu reste dans src/content/fr/legal.ts.
+       */
+      // requirePhrase(text, legal.bulletinWarning.slice(0, 120), 'avertissement du bulletin', file);
+      // requirePhrase(text, legal.dicWarning, 'avertissement du DIC', file);
       for (const b of legal.arbitrageWarningBullets)
         requirePhrase(text, b.slice(0, 100), "puce commission d'arbitrage", file);
     }

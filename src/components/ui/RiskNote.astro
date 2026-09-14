@@ -1,17 +1,31 @@
 ---
+/**
+ * Contre-poids risque d'un avantage. NE REND PLUS RIEN depuis le 14/09/2026.
+ *
+ * DÉCISION DE L'ÉQUIPE, mot pour mot : « supprime tous les bon à savoir du site. Le service conformité
+ * va les placer manuellement plus tard. » Les soixante et un « Bon à savoir : … » du site disparaissent
+ * donc d'un coup, de l'accueil aux fiches de documents.
+ *
+ * CE QUE CELA VEUT DIRE, ET QUI DOIT ÊTRE SU. Le site ne porte plus AUCUN contre-poids de risque à côté
+ * des avantages qu'il présente. Ce qui subsiste : les mentions du pied de page (caractère commercial,
+ * visa AMF, renvoi au DIC et à la note d'information), présentes sur toutes les pages, et les textes
+ * réglementaires qui ne passent pas par ce composant (avertissement commission d'arbitrage de /frais,
+ * encadré « Une innovation, pas une révolution », mentions légales). L'égalité de traitement entre
+ * avantages et risques exigée par l'AMF ne peut plus être vérifiée par le site : elle repose entièrement
+ * sur ce que la Conformité replacera.
+ *
+ * RIEN N'EST PERDU. Les textes restent intégralement dans les fichiers de contenu (src/content/fr/*.ts),
+ * et les appels <RiskNote text={…} /> restent en place dans les vingt et un points d'affichage : c'est
+ * la carte exacte de ce que la Conformité a à replacer, et l'endroit où chaque mention se trouvait.
+ *
+ * POUR TOUT RÉTABLIR : décommenter le bloc ci-dessous et supprimer le `return`. Un seul fichier.
+ * Les garde-fous correspondants ont été neutralisés au même moment, chacun avec un commentaire qui
+ * renvoie ici : tests/conformite.spec.ts (trois tests), tests/qualite.spec.ts (fenêtre d'attente) et
+ * scripts/check-compliance.mjs (ligne risques de l'accueil).
+ */
 import { riskLabel, riskPrefix } from '@/content/fr/legal';
 import NoteRef from '@/components/ui/NoteRef.astro';
 
-/**
- * Contre-poids risque d'un avantage. Même corps de texte et même couleur d'encre que le texte
- * qu'il accompagne (règle AMF : avantages et risques dans une taille et une forme identiques).
- * Ne jamais l'animer, ne jamais le réduire en note de bas de page.
- * Depuis le 11/09/2026, plus de pictogramme d'alerte : un libellé visible « Bon à savoir : » (legal.ts,
- * riskLabel) en gras et en couleur d'accent ouvre le texte ; le préfixe « Risque : » reste lu par les
- * lecteurs d'écran (riskPrefix) pour que l'avertissement conserve sa nature.
- * `size` : 'base' (corps de texte) ou 'lead' (même taille que le texte courant qu'il accompagne).
- * `noteId` optionnel : appel de note accolé au texte.
- */
 interface Props {
   text: string;
   class?: string;
@@ -19,20 +33,22 @@ interface Props {
   size?: 'base' | 'lead';
   noteId?: string;
 }
+/* Les props sont volontairement lues : elles documentent le contrat du composant, et le typage
+   continue de vérifier les appels des pages, qui n'ont pas bougé. */
 const { text, class: className = '', tone = 'light', size = 'base', noteId } = Astro.props;
+void [text, className, tone, size, noteId, riskLabel, riskPrefix, NoteRef];
 ---
 
-<p
-  data-risk
-  class:list={[
-    size === 'lead' ? 'text-lead' : 'text-base leading-relaxed',
-    tone === 'dark' ? 'text-white' : 'text-ink',
-    className,
-  ]}
->
-  <strong class:list={['font-semibold', tone === 'dark' ? 'text-sand' : 'text-coral-700']}
-    >{riskLabel}</strong
-  >
-  <span class="visually-hidden">{riskPrefix}</span>
-  {text}{noteId && <NoteRef id={noteId} tone={tone === 'dark' ? 'dark' : 'light'} />}
-</p>
+{
+  /*
+  Le rendu d'origine, conservé tel quel pour le jour où la Conformité rend son arbitrage :
+
+  <p data-risk class:list={[size === 'lead' ? 'text-lead' : 'text-base leading-relaxed',
+      tone === 'dark' ? 'text-white' : 'text-ink', className]}>
+    <strong class:list={['font-semibold', tone === 'dark' ? 'text-sand' : 'text-coral-700']}>
+      {riskLabel}</strong>
+    <span class="visually-hidden">{riskPrefix}</span>
+    {text}{noteId && <NoteRef id={noteId} tone={tone === 'dark' ? 'dark' : 'light'} />}
+  </p>
+*/
+}

@@ -4,6 +4,16 @@ import { test, expect } from '@playwright/test';
 test.describe('Conformité', () => {
   test('la ligne risques du hero est visible sans scroller', async ({ page }) => {
     await page.goto('/');
+    /*
+     * EN SOMMEIL depuis le 14/09/2026 : « supprime tous les bon à savoir du site. Le service conformité
+     * va les placer manuellement plus tard. » RiskNote.astro ne rend plus rien, il n'y a plus de
+     * [data-risk] dans le DOM. Le test est CONSERVÉ ENTIER, pas supprimé : il se réarme tout seul le
+     * jour où la Conformité replace les mentions, et il vérifiera exactement ce qu'il vérifiait avant.
+     */
+    test.skip(
+      (await page.locator('[data-risk]').count()) === 0,
+      'aucun [data-risk] rendu : voir src/components/ui/RiskNote.astro'
+    );
     const risk = page.locator('#apercu [data-risk]').first();
     await expect(risk).toBeVisible();
     const box = await risk.boundingBox();
@@ -35,6 +45,16 @@ test.describe('Conformité', () => {
 
   test('le bandeau cookies ne recouvre pas la ligne risques du hero', async ({ page }) => {
     await page.goto('/');
+    /*
+     * EN SOMMEIL depuis le 14/09/2026 : « supprime tous les bon à savoir du site. Le service conformité
+     * va les placer manuellement plus tard. » RiskNote.astro ne rend plus rien, il n'y a plus de
+     * [data-risk] dans le DOM. Le test est CONSERVÉ ENTIER, pas supprimé : il se réarme tout seul le
+     * jour où la Conformité replace les mentions, et il vérifiera exactement ce qu'il vérifiait avant.
+     */
+    test.skip(
+      (await page.locator('[data-risk]').count()) === 0,
+      'aucun [data-risk] rendu : voir src/components/ui/RiskNote.astro'
+    );
     // Le bandeau n'est déplié que par le script de consentement, au premier chargement.
     await expect(page.locator('#consent-banner')).toBeVisible();
     const geo = await page.evaluate(() => {
@@ -81,6 +101,16 @@ test.describe('Conformité', () => {
 
   test('chaque avantage a un risque de longueur comparable', async ({ page }) => {
     await page.goto('/');
+    /*
+     * EN SOMMEIL depuis le 14/09/2026 : « supprime tous les bon à savoir du site. Le service conformité
+     * va les placer manuellement plus tard. » RiskNote.astro ne rend plus rien, il n'y a plus de
+     * [data-risk] dans le DOM. Le test est CONSERVÉ ENTIER, pas supprimé : il se réarme tout seul le
+     * jour où la Conformité replace les mentions, et il vérifiera exactement ce qu'il vérifiait avant.
+     */
+    test.skip(
+      (await page.locator('[data-risk]').count()) === 0,
+      'aucun [data-risk] rendu : voir src/components/ui/RiskNote.astro'
+    );
     const pairs = await page.locator('[data-advantage]').evaluateAll((nodes) =>
       nodes.map((adv) => {
         const parent = adv.parentElement;
