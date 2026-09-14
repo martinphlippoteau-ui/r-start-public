@@ -439,24 +439,73 @@
    vers ses deux bords, comme une pastille d'appel qui se déplie. Voir plus bas, `html.intro
    [data-sitenav-bar]` : c'est une entrée, pas un état propre à l'accueil. */
 
-/* La barre de navigation se déroule, premier temps de l'ouverture (0 ms).
-   Même geste ET MÊMES RÉGLAGES que la pastille d'appel qui s'ouvre (14/09/2026, demande de l'équipe) :
-   420 ms sur `--ease-spring`, exactement ce que la pastille applique à son dépliage (`gap`,
-   `padding-inline`, `grid-template-columns`, plus bas). Le ressort dépasse sa cible avant de s'y poser ;
-   sur un découpage, ce dépassement ouvre au-delà des bords, sans effet visible, et c'est le début de la
-   course qui porte le caractère.
-   Le découpage part du centre et gagne les deux bords. Le rayon suit celui de la barre, sans quoi les
-   extrémités seraient coupées au carré pendant l'ouverture. `clip-path` seul : ni largeur, ni échelle,
-   donc aucune remise en page et aucun texte déformé pendant le déroulé.
-   La classe `intro` n'existant que sur l'accueil, les sous-pages ne sont pas concernées. */
+/* La barre de navigation : LE GESTE COMPLET DE LA PASTILLE D'APPEL (14/09/2026, demande de l'équipe).
+   Deux temps, ceux de la pastille, avec ses durées et ses courbes :
+    1. elle se POSE, 300 ms sur `--ease-out-expo`, en fondu et en grandissant de 0,6 à 1, réduite à un
+       rond de 3 rem au centre, comme la pastille repliée ;
+    2. elle se DÉPLOIE, 420 ms sur `--ease-spring`, après le même retard de 300 ms : le rond s'ouvre
+       vers ses deux bords et découvre la barre entière.
+   Les valeurs ne sont pas approchées, elles sont recopiées de `[data-sticky-cta]` et
+   `[data-sticky-label]`, plus bas dans ce fichier : 240 à 300 ms pour la pose, 420 ms et le ressort
+   pour le dépliage, 300 ms de retard entre les deux.
+   Le déploiement est un `clip-path` et non une largeur : la barre garde sa mise en page pendant tout le
+   geste, aucun texte ne se comprime ni ne se replie. Le rayon suit celui de la barre, sans quoi les
+   extrémités seraient coupées au carré pendant l'ouverture. L'échelle du premier temps ne déforme rien
+   de lisible : à cet instant, il n'y a qu'un rond de verre à l'écran.
+   `:has(#apercu)` EST INDISPENSABLE : contrairement à ce que laisse croire son nom, la classe `intro`
+   est rendue sur TOUTES les pages, et seul l'accueil charge le script qui la retire
+   (public/intro-once.js). Sans cette condition, la barre se repliait puis se dépliait à chaque
+   chargement de chaque sous-page, et pour toujours, puisque rien n'y retire la classe. Repéré par le
+   test « la barre ne bouge pas d'une page à l'autre », qui l'a surprise à mi-course entre /frais et
+   /a-propos. Les règles voisines n'avaient pas ce défaut : elles sont préfixées de `#apercu`, qui
+   n'existe que sur l'accueil. */
 @media (prefers-reduced-motion: no-preference) {
-  html.intro [data-sitenav-bar] {
-    animation: intro-nav-deroule 420ms var(--ease-spring) backwards;
+  html.intro:has(#apercu) [data-sitenav-bar] {
+    transform-origin: 50% 50%;
+    animation:
+      intro-nav-pose 300ms var(--ease-out-expo) backwards,
+      intro-nav-deroule 420ms var(--ease-spring) 300ms backwards;
+  }
+  /*
+   * Le contenu de la barre reste CACHÉ pendant le premier temps : sans cela, le rond de verre laisse
+   * voir un fragment de mot pris au milieu d'une entrée du menu (« utils », relevé à 200 ms), là où la
+   * pastille repliée, elle, montre un chevron choisi. Le rond est donc du verre nu, et logo, entrées et
+   * bouton paraissent dès que l'ouverture commence.
+   * `visibility` et non `opacity` : la propriété bascule d'un coup au lieu de traverser des valeurs
+   * intermédiaires, et un contrôle d'accessibilité qui mesurerait les contrastes pendant l'ouverture ne
+   * lirait jamais un texte à mi-fondu. Elle retire aussi ces éléments du parcours au clavier le temps
+   * du geste, ce qui est cohérent : ils ne sont pas encore là.
+   */
+  html.intro:has(#apercu) [data-sitenav-bar] > * {
+    animation: intro-nav-contenu 420ms linear 300ms backwards;
   }
 }
+@keyframes intro-nav-contenu {
+  from {
+    visibility: hidden;
+  }
+  15% {
+    visibility: visible;
+  }
+  to {
+    visibility: visible;
+  }
+}
+/* Temps 1 : elle se pose, comme la pastille qui arrive en grandissant. */
+@keyframes intro-nav-pose {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+/* Temps 2 : le rond s'ouvre vers ses deux bords. `backwards` le maintient replié pendant le retard. */
 @keyframes intro-nav-deroule {
   from {
-    clip-path: inset(0 50% 0 50% round 9999px);
+    clip-path: inset(0 calc(50% - 1.5rem) 0 calc(50% - 1.5rem) round 9999px);
   }
   to {
     clip-path: inset(0 0 0 0 round 9999px);
