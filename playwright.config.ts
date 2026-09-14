@@ -3,12 +3,25 @@ import { defineConfig, devices } from '@playwright/test';
 export default defineConfig({
   testDir: './tests',
   timeout: 60_000,
-  retries: 0,
+  /*
+   * Une reprise en intégration continue, aucune en local. Le but n'est pas de masquer une
+   * intermittence, qui doit rester visible là où on développe, mais d'éviter qu'un hoquet de runner
+   * bloque une mise en ligne. Une reprise qui devient habituelle est un test à réparer, pas à tolérer.
+   */
+  retries: process.env.CI ? 1 : 0,
   reporter: [['list']],
   use: {
     baseURL: 'http://127.0.0.1:4321',
     trace: 'retain-on-failure',
     locale: 'fr-FR',
+    /*
+     * `--disable-dev-shm-usage` : sur un runner GitHub, /dev/shm est minuscule et Chromium y place ses
+     * tampons de rendu. Le 14/09/2026, la première exécution en CI a vu TOUT le profil « bureau »
+     * échouer, les profils téléphone passer, et l'étape durer douze minutes au lieu d'une : un grand
+     * viewport consomme bien plus de mémoire partagée qu'un écran de téléphone. Le drapeau renvoie ces
+     * tampons vers /tmp. Sans effet sur une machine de développement, où /dev/shm est généreux.
+     */
+    launchOptions: { args: ['--disable-dev-shm-usage'] },
   },
   /*
    * `pnpm preview` SE DÉTACHE : `astro preview` rend la main aussitôt et laisse un serveur
