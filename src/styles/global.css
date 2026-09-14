@@ -440,14 +440,18 @@
    [data-sitenav-bar]` : c'est une entrée, pas un état propre à l'accueil. */
 
 /* La barre de navigation se déroule, premier temps de l'ouverture (0 ms).
-   Même geste que la pastille d'appel qui s'ouvre : un découpage qui part du centre et gagne les deux
-   bords. Le rayon suit celui de la barre, sans quoi les extrémités seraient coupées au carré pendant
-   l'ouverture. `clip-path` seul : ni largeur, ni échelle, donc aucune remise en page et aucun texte
-   déformé pendant le déroulé. La classe `intro` n'existant que sur l'accueil, les sous-pages ne sont
-   pas concernées. */
+   Même geste ET MÊMES RÉGLAGES que la pastille d'appel qui s'ouvre (14/09/2026, demande de l'équipe) :
+   420 ms sur `--ease-spring`, exactement ce que la pastille applique à son dépliage (`gap`,
+   `padding-inline`, `grid-template-columns`, plus bas). Le ressort dépasse sa cible avant de s'y poser ;
+   sur un découpage, ce dépassement ouvre au-delà des bords, sans effet visible, et c'est le début de la
+   course qui porte le caractère.
+   Le découpage part du centre et gagne les deux bords. Le rayon suit celui de la barre, sans quoi les
+   extrémités seraient coupées au carré pendant l'ouverture. `clip-path` seul : ni largeur, ni échelle,
+   donc aucune remise en page et aucun texte déformé pendant le déroulé.
+   La classe `intro` n'existant que sur l'accueil, les sous-pages ne sont pas concernées. */
 @media (prefers-reduced-motion: no-preference) {
   html.intro [data-sitenav-bar] {
-    animation: intro-nav-deroule 700ms var(--ease-out-expo) backwards;
+    animation: intro-nav-deroule 420ms var(--ease-spring) backwards;
   }
 }
 @keyframes intro-nav-deroule {
@@ -1263,19 +1267,18 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
     --intro-dur: 900ms;
   }
 
-  /* 200 ms, le logo. Le pictogramme et le mot-symbole n'entrent pas ensemble : l'ensemble grandit de
-     0,96 à 1 alors que seul le pictogramme est visible, puis le découpage s'ouvre vers la droite et
-     découvre « start ».
-     Le fichier est une image unique, sans groupe séparant les deux : la césure est géométrique. Le
-     pictogramme occupe les 31 premiers pour cent de la largeur du dessin (viewBox 290,2 ; la forme
-     s'arrête à 89,5), d'où le découpage de départ à 69 % par la droite.
-     Aucun tracé au `stroke-dashoffset` : le R est une forme pleine, pas un trait, le rendu serait bancal. */
+  /* 200 ms, le logo : UNE APPARITION FAÇON POWERPOINT (14/09/2026, demande de l'équipe). Il surgit de
+     tout petit et invisible, 20 % de sa taille, et grandit depuis son centre jusqu'à la sienne, sur une
+     courbe qui dépasse légèrement sa cible avant de s'y poser.
+     Le dévoilement du mot-symbole par masque, essayé la veille, est abandonné : les deux gestes se
+     contrariaient, un découpage sur une image qui grandit se lit mal. Le logo entre donc d'un bloc.
+     Aucun tracé au `stroke-dashoffset` non plus : le R est une forme pleine, pas un trait. */
   html.intro #apercu [data-intro='1'] {
     animation-name: intro-hero-brand;
     animation-timing-function: cubic-bezier(0.22, 1.14, 0.32, 1);
-    transform-origin: 0% 50%;
+    transform-origin: 50% 50%;
     --intro-delay: 200ms;
-    --intro-dur: 1000ms;
+    --intro-dur: 1100ms;
   }
 
   /* 400 ms, l'accroche mot à mot. Le paragraphe ne porte plus d'animation, ses mots en portent une
@@ -1311,27 +1314,24 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   }
 }
 
-/* Le logo : il grandit depuis sa GAUCHE, le pictogramme d'abord seul, puis « start » se découvre.
-   L'opacité est admise ici, elle l'est partout où il n'y a pas de texte : c'est une image décorative
-   (aria-hidden, alt vide). Le fondu est bref, pleine opacité à 30 % de la durée, parce que c'est le plus
-   grand élément affiché, donc le candidat LCP, et qu'un élément à opacité nulle n'est pas peint. */
+/* Le logo : invisible et minuscule, puis il grandit depuis son centre jusqu'à sa taille.
+   L'opacité est admise ici, elle l'est partout où il n'y a pas de texte à mesurer : c'est une image
+   décorative (aria-hidden, alt vide). Le fondu est BREF, pleine opacité à 30 % de la durée, parce que
+   c'est le plus grand élément affiché, donc le candidat LCP, et qu'un élément à opacité nulle n'est pas
+   peint : allonger ce fondu retarderait d'autant la mesure de performance.
+   L'échelle, elle, continue jusqu'au bout, et la courbe la fait dépasser sa cible avant de s'y poser :
+   c'est ce léger rebond qui donne l'effet d'apparition. */
 @keyframes intro-hero-brand {
   from {
     opacity: 0;
-    transform: scale(0.96);
-    clip-path: inset(0 69% 0 0);
+    transform: scale(0.2);
   }
   30% {
     opacity: 1;
   }
-  45% {
-    transform: scale(1);
-    clip-path: inset(0 69% 0 0);
-  }
   to {
     opacity: 1;
     transform: scale(1);
-    clip-path: inset(0 0 0 0);
   }
 }
 
