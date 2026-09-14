@@ -533,6 +533,8 @@ export interface FooterContent {
   /** aria-label de la navigation unique du pied de page qui englobe les colonnes de liens. */
   navLabel?: string;
   manageCookiesLabel: string;
+  /** Libellé du retour en haut de page. Absent : le lien n'est pas rendu. */
+  backToTopLabel?: string;
   copyright: string;
   /** Titre H2 de la section Notes (ex. « Notes et sources »). */
   notesTitle?: string;
@@ -548,7 +550,11 @@ export interface FooterContent {
   /** Mention lue par les lecteurs d'écran sur les liens externes (ex. « nouvelle fenêtre »). */
   externalLinkHint?: string;
   /** Alt des logos du pied de page. */
-  logos?: { brandAlt: string; publisherAlt: string };
+  /**
+   * Signature du pied de page : logo R Start, `byLabel` (« par »), logo de l'éditeur.
+   * Sans `byLabel`, les deux logos sont simplement posés côte à côte.
+   */
+  logos?: { brandAlt: string; publisherAlt: string; byLabel?: string };
   /** Blocs de mentions légales, composés depuis legal.ts (reproduits à l'identique). */
   legalBlocks?: { title: string; paragraphs: string[] }[];
 }

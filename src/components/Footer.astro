@@ -1,11 +1,22 @@
 ---
 /**
- * Pied de page réglementaire : une navigation unique (colonnes de liens titrées), « Gérer les
- * cookies » (data-consent-open), puis le bloc légal. Textes : footer.ts (qui assemble les mentions de
- * legal.ts à l'identique). Logos R Start et CORUM L'Épargne ; aucun logo AMF.
+ * Pied de page réglementaire, REFONDU le 14/09/2026. Il empilait logos, quatre colonnes, bouton
+ * cookies, mur de mentions et copyright dans une suite de blocs de même poids, sans repère ni retour
+ * possible vers le haut : sur /frais, quinze écrans plus bas, la seule issue était de remonter à la
+ * main. Ce qui change :
+ *  - un filet de marque animé ferme la page par le haut (dégradé qui glisse lentement, arrêté en
+ *    reduced-motion) ;
+ *  - les logos et le RETOUR EN HAUT partagent la première ligne : le lien pointe vers #contenu, il
+ *    fonctionne donc sans JavaScript, et le défilement doux vient de `scroll-behavior` ;
+ *  - les colonnes passent de `text-sm` à `text-base`, sur deux colonnes dès le téléphone (elles
+ *    s'empilaient une par une) et quatre dès `lg` ; chaque lien a une zone tactile d'au moins 44 px ;
+ *  - les liens prennent le soulignement de survol du site (utilitaire `link-underline`) ;
+ *  - révélation en cascade des colonnes à l'arrivée du pied de page (data-animate, moteur léger ;
+ *    rien sans JavaScript ni en reduced-motion, tout reste visible).
+ * Textes : footer.ts (qui assemble les mentions de legal.ts à l'identique). Logos R Start et
+ * CORUM L'Épargne ; aucun logo AMF.
  * Plan des titres : un H2 masqué (`footer.navLabel`, « Pied de page ») chapeaute les quatre colonnes,
- * dont les titres sont des H3, le pied de page n'introduit plus quatre H2 de premier niveau dans le
- * plan de la page ; le bloc légal garde son H2 masqué et ses H3.
+ * dont les titres sont des H3 ; le bloc légal garde son H2 masqué et ses H3.
  * Tailles : le bloc des mentions obligatoires (commercialNotice, documentsNotice, visa) reste en
  * text-caption (14 px, contrôlé par scripts/check-compliance.mjs : jamais text-xs) ; les blocs
  * d'identité repliés et le copyright peuvent être en text-xs.
@@ -26,40 +37,101 @@ const hint = footer.externalLinkHint;
 const legalBlocks = footer.legalBlocks ?? [];
 const alwaysVisible = legalBlocks.slice(0, 1);
 const collapsible = legalBlocks.slice(1);
+/**
+ * Retour en haut : ancre vers #contenu, la même cible que le lien d'évitement de Base.astro, écrite
+ * en dur des deux côtés. Un <a> et non un <button> : sans JavaScript il fonctionne quand même, et le
+ * défilement doux est celui de la feuille de style.
+ */
+const topLabel = footer.backToTopLabel;
 ---
 
-<footer class="border-t border-mist bg-white text-ink">
+<footer class="relative border-t border-mist bg-white text-ink">
+  {
+    /* Filet de marque : il ferme la page. Décoratif, donc aria-hidden ; le dégradé glisse lentement
+      et s'arrête net en reduced-motion (l'animation est déclarée dans la media query). */
+  }
+  <span aria-hidden="true" class="footer-filet"></span>
+
   <Container size="wide" class="py-section-sm">
-    <div class="flex flex-wrap items-center gap-x-10 gap-y-6">
-      <Image
-        src={brandLogo}
-        alt={footer.logos?.brandAlt ?? ''}
-        height={40}
-        width={130}
-        class="h-10 w-auto"
-      />
-      <Image
-        src={publisherLogo}
-        alt={footer.logos?.publisherAlt ?? ''}
-        height={40}
-        width={130}
-        class="h-10 w-auto"
-      />
+    <div class="flex flex-wrap items-center justify-between gap-x-10 gap-y-6">
+      {
+        /* Signature : R Start « par » CORUM L'Épargne. Les deux `alt` et le mot les reliant se lisent
+          d'affilée, la ligne a donc le même sens à l'oreille qu'à l'œil. */
+      }
+      <div class="flex flex-wrap items-center gap-x-5 gap-y-4">
+        <Image
+          src={brandLogo}
+          alt={footer.logos?.brandAlt ?? ''}
+          height={40}
+          width={130}
+          class="h-10 w-auto"
+        />
+        {
+          footer.logos?.byLabel && (
+            <span class="text-base text-slate-700">{footer.logos.byLabel}</span>
+          )
+        }
+        <Image
+          src={publisherLogo}
+          alt={footer.logos?.publisherAlt ?? ''}
+          height={40}
+          width={130}
+          class="h-10 w-auto"
+        />
+      </div>
+
+      {
+        topLabel && (
+          <a
+            href="#contenu"
+            data-footer-top
+            class="footer-top group inline-flex items-center gap-2.5 rounded-full border border-navy/25 px-5 py-3 text-base font-semibold text-navy no-underline transition-colors hover:border-navy hover:bg-navy hover:text-white focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-navy"
+          >
+            {topLabel}
+            <svg
+              aria-hidden="true"
+              class="footer-top-fleche size-4"
+              viewBox="0 0 16 16"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M8 13V3M3.5 7.5 8 3l4.5 4.5" />
+            </svg>
+          </a>
+        )
+      }
     </div>
 
-    <nav aria-labelledby="footer-nav-title" class="mt-12">
+    <nav aria-labelledby="footer-nav-title" class="mt-12 border-t border-mist pt-10 lg:mt-14">
       <h2 id="footer-nav-title" class="visually-hidden">{footer.navLabel}</h2>
-      <div class="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+      {
+        /* Colonnes CSS et non grille : les quatre blocs n'ont pas le même nombre de liens (huit d'un
+          côté, deux de l'autre) et une grille laissait un trou d'un demi-écran sous le bloc court avant
+          la rangée suivante. Le flux en colonnes répartit les blocs à hauteur égale ; `break-inside`
+          interdit qu'un bloc soit coupé en deux. L'ordre du document ne change pas.
+          Dès `lg`, retour à la GRILLE, une colonne par bloc : les colonnes CSS équilibrent par la
+          hauteur, et le bloc de huit liens en remplissait une à lui seul, les trois autres se
+          tassaient dans la deuxième et la quatrième restait vide. Une grille ignore `column-count`,
+          il n'y a donc rien à annuler. */
+      }
+      <div
+        class="columns-2 gap-x-8 lg:grid lg:grid-cols-4 lg:gap-x-10 [&>div]:mb-10 [&>div]:break-inside-avoid lg:[&>div]:mb-0"
+        data-animate="stagger"
+        data-animate-stagger="0.07"
+      >
         {
           footer.columns.map((col) => (
             <div>
-              <h3 class="text-sm font-semibold text-navy">{col.title}</h3>
-              <ul class="mt-4 space-y-2.5" role="list">
+              <h3 class="text-eyebrow text-navy">{col.title}</h3>
+              <ul class="mt-4 space-y-0.5" role="list">
                 {col.links.map((link) => (
                   <li>
                     <a
                       href={link.external ? link.href : withBase(link.href)}
-                      class="nav-link inline-flex items-center gap-1 text-sm text-slate-700 hover:text-navy"
+                      class="link-underline inline-flex min-h-11 items-center gap-1.5 py-1.5 text-base text-slate-700 hover:text-navy"
                       target={link.external ? '_blank' : undefined}
                       rel={link.external ? 'noopener noreferrer' : undefined}
                     >
@@ -68,7 +140,7 @@ const collapsible = legalBlocks.slice(1);
                         <>
                           <svg
                             aria-hidden="true"
-                            class="size-3.5 text-slate"
+                            class="size-3.5 shrink-0 text-slate"
                             viewBox="0 0 16 16"
                             fill="none"
                             stroke="currentColor"
@@ -129,7 +201,7 @@ const collapsible = legalBlocks.slice(1);
       {
         collapsible.length > 0 && (
           <details class="footer-legal mt-6 border-t border-mist pt-6 text-xs">
-            <summary class="cursor-pointer list-none font-semibold text-navy underline underline-offset-4 hover:text-teal-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-navy">
+            <summary class="cursor-pointer list-none font-semibold text-navy underline decoration-1 underline-offset-[0.3em] hover:text-teal-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-navy">
               {footer.legalToggleLabel ?? footer.legalTitle ?? ''}
             </summary>
             <div class="mt-6 space-y-6">
@@ -150,3 +222,51 @@ const collapsible = legalBlocks.slice(1);
     <p class="mt-10 text-xs text-slate-700">{footer.copyright}</p>
   </Container>
 </footer>
+
+<style>
+  /*
+   * Filet de marque en haut du pied de page : un dégradé deux fois plus large que l'écran, qui glisse
+   * d'une demi-longueur en boucle. `background-position` seul, aucune géométrie ne bouge, donc aucun
+   * recalcul de mise en page. Immobile en reduced-motion (l'animation n'est déclarée que dans la
+   * media query, le dégradé reste alors posé, visible et net).
+   */
+  .footer-filet {
+    position: absolute;
+    inset-inline: 0;
+    top: -1px;
+    height: 3px;
+    background-image: linear-gradient(
+      90deg,
+      #024b68 0%,
+      #0b7a93 18%,
+      #14a4ba 32%,
+      #f3e6cf 50%,
+      #14a4ba 68%,
+      #0b7a93 82%,
+      #024b68 100%
+    );
+    background-size: 200% 100%;
+    background-position: 0% 0;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .footer-filet {
+      animation: footer-filet 18s linear infinite;
+    }
+  }
+  @keyframes footer-filet {
+    to {
+      background-position: -200% 0;
+    }
+  }
+
+  /* Retour en haut : la flèche monte d'un cheveu au survol, le bouton ne bouge pas. Transform seul. */
+  @media (prefers-reduced-motion: no-preference) {
+    .footer-top-fleche {
+      transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .footer-top:hover .footer-top-fleche,
+    .footer-top:focus-visible .footer-top-fleche {
+      transform: translateY(-3px);
+    }
+  }
+</style>

@@ -52,6 +52,39 @@ const allerA = async (page: Page, y: number, empreinte: () => Promise<string>) =
   }
 };
 
+/**
+ * Descend jusqu'au bas RÉEL du document, puis attend que l'affichage se stabilise.
+ * `document.body.scrollHeight` relevé au sommet ne vaut rien ici : les sections épinglées de l'accueil
+ * posent leurs cales au fil du défilement et le document s'allonge en cours de route. Viser la hauteur
+ * de départ laissait donc le test à un ou deux écrans du bas, là où la première pastille n'a pas encore
+ * dépassé sa borne de fin. On redescend tant que la position gagne du terrain.
+ */
+const allerEnBas = async (page: Page, empreinte: () => Promise<string>) => {
+  let precedent = -1;
+  for (let essai = 0; essai < 30; essai += 1) {
+    const y = await page.evaluate(
+      () =>
+        new Promise<number>((resolve) => {
+          window.scrollTo(0, document.documentElement.scrollHeight);
+          requestAnimationFrame(() =>
+            requestAnimationFrame(() => resolve(Math.round(window.scrollY)))
+          );
+        })
+    );
+    if (y === precedent) break;
+    precedent = y;
+    await page.waitForTimeout(120);
+  }
+  /* Même stabilisation qu'ailleurs : deux relevés identiques d'affilée. */
+  let avant = '';
+  for (let essai = 0; essai < 20; essai += 1) {
+    const courante = await empreinte();
+    if (courante === avant) return;
+    avant = courante;
+    await page.waitForTimeout(100);
+  }
+};
+
 const sauterLaFenetreOutils = (page: Page) =>
   page.addInitScript(() => {
     try {
@@ -319,12 +352,14 @@ test.describe('Qualité', () => {
     }
 
     /* Au bas de la page, c'est celle de la souscription qui tient : elle n'a pas de borne de fin. */
-    await allerA(page, hauteur, empreinte);
-    expect(
-      await page.evaluate(() =>
-        [...document.querySelectorAll('[data-sticky-cta]')].map((b) => b.hasAttribute('data-on'))
+    await allerEnBas(page, empreinte);
+    await expect
+      .poll(() =>
+        page.evaluate(() =>
+          [...document.querySelectorAll('[data-sticky-cta]')].map((b) => b.hasAttribute('data-on'))
+        )
       )
-    ).toEqual([false, true]);
+      .toEqual([false, true]);
   });
 
   /*
@@ -622,6 +657,58 @@ test.describe('Qualité', () => {
       await page.keyboard.press('Escape');
       await expect(fenetre, chemin).not.toHaveAttribute('open', '');
       expect(new URL(page.url()).pathname.replace(/\/$/, '')).toContain(chemin.replace(/\/$/, ''));
+    }
+  });
+
+  /*
+   * Survol d'un lien de contenu (14/09/2026, « le trait est sur le texte ») : le soulignement doit
+   * apparaître AU SURVOL, sous les jambages, et une seule fois. Avant, `hover:underline` posait le
+   * trait d'un coup à 0,2 em du texte, et là où la classe accompagnait `nav-link`, deux traits se
+   * dessinaient, celui du navigateur et celui du pseudo-élément.
+   */
+  test('le soulignement des liens apparaît au survol, sous le texte', async ({ page }) => {
+    await page.goto('/presse/');
+    const lien = page.locator('#salle-de-presse-renvoi a').first();
+    await lien.scrollIntoViewIfNeeded();
+
+    /*
+     * Relevés en `expect.poll` des deux côtés : la couleur du trait est en TRANSITION (220 ms), et la
+     * feuille de style peut ne pas être encore appliquée au premier coup d'œil. Un relevé unique
+     * tombait tantôt sur l'état de départ, tantôt sur un état intermédiaire.
+     */
+    const couleur = () => lien.evaluate((el) => getComputedStyle(el).textDecorationColor);
+    await expect.poll(couleur, { message: 'au repos, aucun trait visible' }).toMatch(/,\s*0\)$/);
+
+    await lien.hover();
+    await expect
+      .poll(couleur, { message: 'au survol, le trait se colore' })
+      .not.toMatch(/,\s*0\)$/);
+
+    /* Assez bas pour passer sous les jambages, et il les contourne. */
+    const pose = await lien.evaluate((el) => {
+      const s = getComputedStyle(el);
+      return { ecart: parseFloat(s.textUnderlineOffset), skip: s.textDecorationSkipInk };
+    });
+    expect(pose.ecart).toBeGreaterThanOrEqual(3);
+    expect(pose.skip).toBe('auto');
+  });
+
+  /*
+   * Pied de page (refonte du 14/09/2026) : un retour en haut sur chaque page, et des liens réellement
+   * cliquables au doigt. Les pages font jusqu'à quinze écrans, on n'y remontait qu'à la main.
+   */
+  test('le pied de page ramène en haut et ses liens se touchent au doigt', async ({ page }) => {
+    for (const chemin of ['/', '/frais/', '/a-propos/']) {
+      await page.goto(chemin);
+      const retour = page.locator('footer [data-footer-top]');
+      await expect(retour, chemin).toHaveCount(1);
+      await expect(retour, chemin).toHaveAttribute('href', '#contenu');
+      await expect(page.locator('#contenu'), chemin).toHaveCount(1);
+
+      const petits = await page
+        .locator('footer nav a')
+        .evaluateAll((liens) => liens.filter((a) => a.getBoundingClientRect().height < 44).length);
+      expect(petits, `${chemin} : cibles tactiles trop petites`).toBe(0);
     }
   });
 

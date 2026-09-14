@@ -57,13 +57,21 @@ export const footer = {
   /** aria-label de la navigation du pied de page ; sert aussi de H2 masqué au-dessus des colonnes (H3). */
   navLabel: 'Pied de page',
   manageCookiesLabel: 'Gérer les cookies',
+  /** Retour en haut, à côté des logos : ancre vers #contenu, comme le lien d'évitement. */
+  backToTopLabel: 'Haut de page',
   copyright: `© 2026 ${publisher.name}. Tous droits réservés.`,
   notesTitle: 'Notes et sources',
   /** `{n}` : nombre de notes de la page, calculé par LegalNotes.astro. */
   notesToggleLabel: 'Notes et sources ({n})',
   legalTitle: 'Mentions légales',
   externalLinkHint: 'nouvelle fenêtre',
-  logos: { brandAlt: product.name, publisherAlt: publisher.name },
+  /*
+   * Signature « R Start par CORUM L'Épargne » (14/09/2026). Il n'existe pas de logo CORUM seul
+   * dans le dépôt (src/assets/logos ne contient que corum-lepargne-couleur.svg) : c'est donc
+   * l'éditeur du site qui signe, ce que répète le copyright et que détaillent les mentions
+   * légales (éditeur, société de gestion) juste en dessous.
+   */
+  logos: { brandAlt: product.name, publisherAlt: publisher.name, byLabel: 'par' },
   /**
    * Libellé du repli des blocs d'identité (plan V2 §4, « alléger sans retirer »). Le premier bloc,
    * « Communication commerciale », reste déplié : il porte les mentions obligatoires et le visa.
