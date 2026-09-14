@@ -154,64 +154,6 @@ export interface WithdrawalStep {
   rate: string;
 }
 
-export interface FeesContent {
-  eyebrow: string;
-  title: string;
-  intro: string;
-  /** Les trois « 0 % » mis en avant. */
-  zeroHighlights: { value: string; label: string; base: string }[];
-  /** aria-label de la liste des trois « 0 % » (ex. « Les trois frais à 0 % »). */
-  zeroHighlightsLabel?: string;
-  /**
-   * Libellé accessible de la rangée des frais réellement prélevés, face aux « 0 % ». Depuis le
-   * retrait du barème complet de l'accueil, cette rangée n'est plus une répétition : elle est lue.
-   */
-  counterRowsLabel?: string;
-  /** Contre-poids immédiat des 0 % (même taille). */
-  /** Optionnel depuis le 11/09/2026 : l'accueil ne rend plus de couple rédigé sous les frais. */
-  counterweight?: AdvantageRisk;
-  rows: FeeRow[];
-  /**
-   * Micro-textes du tableau compact du barème : légende visible, en-têtes de colonnes et libellé de
-   * chaque groupe de lignes (par nature de frais, FeeRow.kind).
-   */
-  table?: {
-    caption: string;
-    columns: { fee: string; base: string; value: string };
-    groups: Record<FeeKind, string>;
-  };
-  withdrawal: {
-    title: string;
-    intro: string;
-    steps: WithdrawalStep[];
-    note: string;
-    /** aria-label de la frise des paliers (ex. « Commission de retrait selon la durée de détention »). */
-    stepsLabel?: string;
-  };
-  /** Encadré « Une innovation, pas une révolution ». */
-  innovationBox: { title: string; body: string };
-  /** Avertissement commission d'arbitrage (3 puces du DIC, à l'identique). */
-  arbitrageWarning: { title: string; bullets: string[] };
-  htNote: string;
-  cta: Cta;
-  /** Lien secondaire vers la page Frais détaillée (config/pages.ts). */
-  detailsLink?: { label: string; href: string };
-  /**
-   * Résumé du comparatif des frais sur l'accueil (plan V2, zone 5) : la bascule complète vit sur /frais.
-   * Aucune SCPI tierce n'est nommée ; le périmètre et la source sont portés par la note `noteId`.
-   */
-  marketSummary?: {
-    title: string;
-    intro: string;
-    /** Intitulés des deux modèles comparés, dans l'ordre des valeurs de chaque ligne. */
-    sides: [string, string];
-    rows: { moment: string; values: [string, string] }[];
-    noteId?: string;
-    link: { label: string; href: string };
-  };
-  notes: LegalNote[];
-}
-
 /**
  * Un chapitre de /strategie : un surtitre facultatif, un titre, la phrase qui annonce la liste, la
  * liste, et la phrase qui la referme. Les trois chapitres de la page ont exactement cette forme dans
@@ -246,41 +188,6 @@ export interface StrategyContent {
   what: StrategyChapter;
   where: StrategyChapter;
   how: StrategyChapter;
-}
-
-/** Frise « mois 1 → mois N » de l'entrée en jouissance (micro-textes de la section Revenus). */
-export interface EnjoymentTimeline {
-  /** aria-label de la liste (ex. « Calendrier de l'entrée en jouissance… »). */
-  label: string;
-  /** Préfixe de chaque pastille (ex. « Mois »). */
-  monthPrefix: string;
-  /** Nombre de pastilles (la dernière est mise en avant). */
-  count: number;
-  /** Légende sous la première pastille (ex. « Souscription réglée »). */
-  startCaption: string;
-  /** Légende sous la dernière pastille (ex. « Premiers dividendes potentiels »). */
-  endCaption: string;
-}
-
-export interface IncomeContent {
-  eyebrow: string;
-  title: string;
-  intro: string;
-  distribution: AdvantageRisk & { value: string; label: string };
-  enjoyment: AdvantageRisk & { value: string; label: string; timeline?: EnjoymentTimeline };
-  sri: {
-    value: number;
-    max: number;
-    label: string;
-    description: string;
-    /** aria-label complet de la jauge (ex. « Indicateur synthétique de risque : 3 sur 7… »). */
-    ariaLabel?: string;
-    /** Légendes des extrémités de la jauge. */
-    scaleLow?: string;
-    scaleHigh?: string;
-  };
-  horizon: { value: string; label: string; description: string };
-  notes: LegalNote[];
 }
 
 export interface StepItem {
@@ -415,26 +322,6 @@ export interface DocumentItem {
   file: string;
   version: string;
   kb?: number;
-}
-
-export interface DocumentsContent {
-  eyebrow: string;
-  title: string;
-  intro: string;
-  items: DocumentItem[];
-  corumLink: { label: string; href: string };
-  /** Lien interne vers la page Documentation (ex. « Toute la documentation »). */
-  allDocumentsLink?: { label: string; href: string };
-  /** Libellé du type de fichier affiché sur chaque carte (ex. « PDF »). */
-  fileTypeLabel?: string;
-  /** Unité du poids affiché après le nombre (ex. « ko »). */
-  sizeUnit?: string;
-  /** Mention lue par les lecteurs d'écran sur les liens qui ouvrent un nouvel onglet (ex. « nouvelle fenêtre »). */
-  newTabHint?: string;
-  /** aria-label de la liste des documents (ex. « Documents réglementaires de R Start »). */
-  listLabel?: string;
-  mention: string;
-  notes: LegalNote[];
 }
 
 export interface FaqItem {

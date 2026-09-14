@@ -291,10 +291,11 @@ async function checkIndex() {
 
   checkHeroClaims(text, file);
 
-  // « La presse en parle » : la section a quitté l'accueil le 11/09/2026 (la revue complète est sur /presse,
-  // au menu). Si elle y revient un jour, elle doit satisfaire les mêmes exigences que /presse, citations de
-  // tiers marquées data-press-quote, avertissement de couverture présent, d'où le contrôle conservé, mais
-  // sans exiger sa présence.
+  // « La presse en parle » : la section a quitté l'accueil le 11/09/2026, puis son composant
+  // (08b-Press.astro) et son contenu (pressHome.ts) ont été SUPPRIMÉS le 15/09/2026. Ce contrôle ne peut
+  // donc plus se déclencher aujourd'hui. Il est gardé tel quel : il est le filet qui attend le retour
+  // d'une revue de presse sur l'accueil, et il exigera alors ce qu'exige déjà /presse, citations de tiers
+  // marquées data-press-quote et avertissement de couverture présent. Rien à corriger tant qu'il dort.
   const pressMatch = html.match(/<section[^>]*id="presse-en-parle"[^>]*>[\s\S]*?<\/section>/i);
   if (pressMatch) {
     const press = pressMatch[0];
@@ -306,8 +307,8 @@ async function checkIndex() {
     );
     const quotes = press.match(/<blockquote\b[^>]*>/gi) || [];
     const unmarked = quotes.filter((q) => !/\sdata-press-quote\b/i.test(q));
-    // À passer en erreur après ajout de l'attribut dans 08b-Press.astro (hors lot) : aujourd'hui les
-    // blockquotes de l'accueil ne portent pas data-press-quote.
+    // À passer en erreur le jour où une revue de presse revient sur l'accueil : le composant devra
+    // alors poser data-press-quote sur chaque citation, comme le fait déjà /presse.
     if (unmarked.length)
       warnings.push(
         `${file} : ${unmarked.length} <blockquote> de #presse-en-parle sans data-press-quote`
