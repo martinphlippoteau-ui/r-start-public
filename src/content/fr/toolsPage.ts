@@ -114,8 +114,9 @@ export const levelPicker = {
 export const toolsPage = {
   seo: {
     title: `Outils et simulateurs de frais | ${product.name}`,
+    /** 140-155 caractères : la précédente en faisait 184, Google la coupait. */
     description:
-      'Calculez ce que R Start prélève selon vos propres hypothèses, la date de vos premiers revenus potentiels, le coût d’une sortie anticipée et le nombre de parts d’un versement programmé.',
+      'Quatre simulateurs pour chiffrer les frais de R Start, la date de vos premiers revenus, le coût d’une sortie et un versement programmé. Capital à risque.',
   },
   hero: {
     eyebrow: `Outils · SCPI ${product.name}`,
@@ -150,6 +151,18 @@ export const toolsPage = {
   /** 1. Simulateur de frais et point de bascule. */
   feeSimulator: {
     pageKey: 'toolFees' as const,
+    /*
+     * Métadonnées PROPRES à l'outil (14/09/2026). La page composait auparavant
+     * `${page.label} | ${toolsPage.seo.title}`, et ce dernier contient déjà « | R Start » : le titre
+     * portait deux barres verticales et montait jusqu'à 70 caractères, la description reprenait le
+     * teaser de la carte et dépassait 200 caractères. Gabarit du projet (types-v2.ts) : titre ≤ 60,
+     * description de 140 à 155 avec rappel de risque.
+     */
+    seo: {
+      title: 'Simulateur de frais R Start, SCPI CORUM',
+      description:
+        'Chiffrez ce que R Start prélève selon vos hypothèses et le niveau de loyers où son modèle devient plus cher. Capital et revenus non garantis.',
+    },
     card: {
       eyebrow: 'Frais',
       question: 'Combien R Start me prélèvera-t-il, et à partir de quand est-ce plus cher ?',
@@ -217,6 +230,18 @@ export const toolsPage = {
   /** 2. Calendrier de jouissance. */
   enjoyment: {
     pageKey: 'toolEnjoyment' as const,
+    /*
+     * Métadonnées PROPRES à l'outil (14/09/2026). La page composait auparavant
+     * `${page.label} | ${toolsPage.seo.title}`, et ce dernier contient déjà « | R Start » : le titre
+     * portait deux barres verticales et montait jusqu'à 70 caractères, la description reprenait le
+     * teaser de la carte et dépassait 200 caractères. Gabarit du projet (types-v2.ts) : titre ≤ 60,
+     * description de 140 à 155 avec rappel de risque.
+     */
+    seo: {
+      title: 'Date de jouissance R Start, SCPI CORUM',
+      description:
+        'Calculez quand vos parts R Start entrent en jouissance et quand les premiers dividendes peuvent tomber. Revenus non garantis, capital à risque.',
+    },
     card: {
       eyebrow: 'Calendrier',
       question: 'À partir de quand mes parts ouvrent-elles droit aux versements ?',
@@ -258,6 +283,18 @@ export const toolsPage = {
   /** 3. Coût d'une sortie anticipée. */
   exit: {
     pageKey: 'toolExit' as const,
+    /*
+     * Métadonnées PROPRES à l'outil (14/09/2026). La page composait auparavant
+     * `${page.label} | ${toolsPage.seo.title}`, et ce dernier contient déjà « | R Start » : le titre
+     * portait deux barres verticales et montait jusqu'à 70 caractères, la description reprenait le
+     * teaser de la carte et dépassait 200 caractères. Gabarit du projet (types-v2.ts) : titre ≤ 60,
+     * description de 140 à 155 avec rappel de risque.
+     */
+    seo: {
+      title: 'Coût d’une sortie anticipée, SCPI R Start',
+      description:
+        'Estimez la commission de retrait R Start avant 8 ans et ce qu’il vous resterait. Liquidité limitée, capital non garanti, revenus non garantis.',
+    },
     card: {
       eyebrow: 'Sortie',
       question: 'Combien me coûte une sortie avant l’échéance ?',
@@ -298,6 +335,18 @@ export const toolsPage = {
   /** 4. Versements programmés. */
   savings: {
     pageKey: 'toolSavings' as const,
+    /*
+     * Métadonnées PROPRES à l'outil (14/09/2026). La page composait auparavant
+     * `${page.label} | ${toolsPage.seo.title}`, et ce dernier contient déjà « | R Start » : le titre
+     * portait deux barres verticales et montait jusqu'à 70 caractères, la description reprenait le
+     * teaser de la carte et dépassait 200 caractères. Gabarit du projet (types-v2.ts) : titre ≤ 60,
+     * description de 140 à 155 avec rappel de risque.
+     */
+    seo: {
+      title: 'Versements programmés R Start, SCPI CORUM',
+      description:
+        'Estimez le nombre de parts R Start qu’un versement programmé permet d’acquérir. Un placement régulier ne réduit pas le risque de perte en capital.',
+    },
     card: {
       eyebrow: 'Versements',
       question: 'Que représente un versement programmé, en parts ?',

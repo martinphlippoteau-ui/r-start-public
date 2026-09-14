@@ -53,8 +53,14 @@ const outil = toolCards.find((o) => o.pageKey === pageKey)!;
 const Outil = composants[pageKey];
 const { elsewhere, index } = toolsPage;
 
-const titre = `${page.label} | ${toolsPage.seo.title}`;
-const description = outil.card.teaser;
+/*
+ * Métadonnées propres à l'outil (14/09/2026). La concaténation `${page.label} | ${toolsPage.seo.title}`
+ * produisait des titres de 61 à 70 caractères, à deux barres verticales, et la description reprenait le
+ * teaser de la carte, écrit pour convaincre et non pour tenir en 155 caractères. Repli sur l'ancienne
+ * composition si un outil n'a pas encore son bloc `seo`.
+ */
+const titre = outil.seo?.title ?? `${page.label} | ${toolsPage.seo.title}`;
+const description = outil.seo?.description ?? outil.card.teaser;
 
 const jsonLd = [
   organizationJsonLd(),

@@ -53,8 +53,19 @@ import manifest from '@/content/fr/media.manifest.json';
  * d'acquisition », comme dans la brochure : ces SCPI ne prélèvent pas de commission de souscription.
  */
 
-/** Drapeau de la bascule des frais (brochure p.6) : le passer à false retire le bloc en une ligne. */
-export const SHOW_MARKET_COMPARISON = true;
+/**
+ * Drapeau de la bascule pédagogique des frais (brochure p.6).
+ *
+ * FAUX depuis le 14/09/2026, et le composant qui le lisait (FeeSwitcher.astro) est supprimé : il
+ * n'était importé par aucune page depuis plusieurs semaines, alors que le drapeau restait à `true` et
+ * que l'en-tête de /frais décrivait encore une « section 6 » rendue. C'est le seul code mort qui
+ * comptait : il portait des moyennes de marché et un panel de SCPI concurrentes, contenu sensible que
+ * personne ne relisait plus, et que `check-compliance.mjs` ne voyait pas non plus, puisqu'il ne lit
+ * que le HTML publié. Le contenu lui-même (`marketComparison`, ci-dessous) reste dans ce fichier :
+ * il est toujours utilisé par le simulateur de frais de /outil/simulateur-de-frais.
+ * Pour rétablir la bascule : repasser à `true`, réécrire le composant, et le faire relire.
+ */
+export const SHOW_MARKET_COMPARISON = false;
 
 /**
  * Typographie française : apostrophe typographique, espace insécable (U+00A0, en échappement) avant % € : ; ? !,

@@ -15,8 +15,8 @@
  *     puis l'avertissement commission d'arbitrage, reproduit à l'identique depuis legal.ts, jamais animé
  *     (l'encadré « Une innovation, pas une révolution » accompagne désormais la bascule, en 6) ;
  *  5. l'incidence des coûts du DIC (trois durées, méthode, risque : coûts, jamais de performance) ;
- *  6. la bascule pédagogique des frais (FeeSwitcher, brochure p.6), rendue uniquement si
- *     SHOW_MARKET_COMPARISON et marketComparison.enabled ;
+ *  6. (supprimée le 14/09/2026) la bascule pédagogique des frais : le composant FeeSwitcher n'était
+ *     plus importé, il a été retiré et SHOW_MARKET_COMPARISON est repassé à false ;
  *  7. le document de référence (carte PDF data-doc, ou lien externe vers corum.fr tant que le DIC est en
  *     attente : rel noopener noreferrer, mention « nouvelle fenêtre ») ;
  *  8. la FAQ en accordéons natifs <details data-faq> (JSON-LD FAQPage émis par la page) ;
@@ -246,7 +246,7 @@ const faqItems = faq.items.map((item) => {
 
         <!--
           L'encadré « Une innovation, pas une révolution » n'est plus rendu ici : il accompagne
-          désormais la bascule des frais (FeeSwitcher, section 6), comme demandé par le plan §3 bis.
+          la bascule des frais, retirée le 14/09/2026 avec son composant.
         -->
         <div class="mt-16 lg:mt-24">
           <Card lift={false} class="lg:p-10">

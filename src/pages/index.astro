@@ -19,8 +19,6 @@ import { difference } from '@/content/fr/difference';
 import { subscribe } from '@/content/fr/subscribe';
 import { withBase } from '@/lib/href';
 import { faqJsonLd, organizationJsonLd, webPageJsonLd } from '@/lib/seo';
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const modules = import.meta.glob<{ default: any }>('/src/components/sections/*.astro', {
   eager: true,
 });

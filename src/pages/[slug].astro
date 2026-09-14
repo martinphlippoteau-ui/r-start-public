@@ -2,7 +2,10 @@
 /**
  * Pages légales (/mentions-legales, /politique-de-confidentialite, /cookies) générées depuis
  * src/content/fr/pages.ts (legalPages). Mise en page sobre : SiteNav, fil d'Ariane, H1, sections H2.
- * /cookies est en noindex (plan §7). Aucun texte en dur.
+ * /cookies est en noindex (plan §7) : son contenu double le bandeau de consentement, il n'a rien à
+ * apporter en résultat de recherche. Les mentions légales et la politique de confidentialité restent
+ * indexables À DESSEIN : un site réglementé gagne à ce qu'on les trouve. L'écart n'est pas un oubli.
+ * Aucun texte en dur.
  */
 import type { GetStaticPaths } from 'astro';
 import Base from '@/layouts/Base.astro';
