@@ -135,11 +135,14 @@
   strong {
     font-weight: 600;
   }
-  /* Liens : soulignement fin décalé, transition douce ; les composants (boutons, nav) le retirent. */
+  /* Liens : soulignement fin décalé sous les jambages, transition douce ; les composants (boutons,
+     nav) le retirent. L'écart était de 0,2 em, le trait passait dans les jambages des « p », « g »
+     et « q » : le soulignement se lisait comme une rature (14/09/2026). */
   a {
     color: inherit;
     text-decoration-thickness: 1px;
-    text-underline-offset: 0.2em;
+    text-underline-offset: 0.25em;
+    text-decoration-skip-ink: auto;
     transition:
       color 150ms ease,
       opacity 150ms ease,
@@ -848,10 +851,14 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
 @utility nav-link {
   position: relative;
   text-decoration: none;
+  /* Retrait de la barre par rapport aux bords : 0,875 rem épouse le rembourrage des pastilles du menu.
+     Un lien moins rembourré le règle à sa mesure (`[--nav-link-inset:0.5rem]`) ; sans rembourrage du
+     tout, c'est `link-underline` qu'il lui faut, pas cette barre. */
+  --nav-link-inset: 0.875rem;
   &::after {
     content: '';
     position: absolute;
-    inset-inline: 0.875rem;
+    inset-inline: var(--nav-link-inset);
     bottom: 0.35rem;
     height: 2px;
     border-radius: 1px;
@@ -884,6 +891,37 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
     &::after {
       transition: none;
     }
+  }
+}
+
+/*
+ * Lien de contenu : le soulignement APPARAÎT au survol et au focus, en fondu, posé sous les jambages.
+ *
+ * Remplace `hover:underline` (14/09/2026, demande de l'équipe : « le trait est sur le texte »). Trois
+ * défauts cumulés :
+ *  - l'écart de 0,2 em plaçait le trait dans les jambages des « p », « g », « q » ;
+ *  - le trait apparaissait d'un coup, sans transition, `text-decoration` n'étant pas animable ;
+ *  - là où la classe accompagnait `nav-link`, DEUX traits se dessinaient, celui du pseudo-élément et
+ *    celui du navigateur.
+ * `text-decoration-color` est animable, lui : le trait existe toujours, il passe de transparent à la
+ * couleur du texte. Il suit donc les retours à la ligne, ce qu'un trait dessiné en fond ne fait pas,
+ * et `skip-ink` lui fait contourner ce qui dépasse.
+ */
+@utility link-underline {
+  text-decoration-line: underline;
+  text-decoration-color: transparent;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 0.3em;
+  text-decoration-skip-ink: auto;
+  transition:
+    text-decoration-color 220ms var(--ease-out-expo),
+    color 180ms ease;
+  &:hover,
+  &:focus-visible {
+    text-decoration-color: currentColor;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
   }
 }
 

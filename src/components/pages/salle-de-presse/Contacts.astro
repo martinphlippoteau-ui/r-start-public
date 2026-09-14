@@ -56,7 +56,7 @@ const telHref = (phone: string) => 'tel:' + phone.replace(/[^\d+]/g, '');
                 <dd class="min-w-0">
                   <a
                     href={telHref(c.phone)}
-                    class="whitespace-nowrap font-semibold text-navy underline-offset-4 hover:text-teal-700 hover:underline"
+                    class="whitespace-nowrap font-semibold text-navy underline-offset-4 hover:text-teal-700 link-underline"
                   >
                     {c.phone.replace(/ /g, ' ')}
                   </a>
@@ -72,7 +72,7 @@ const telHref = (phone: string) => 'tel:' + phone.replace(/[^\d+]/g, '');
                   <dd class="min-w-0 break-all">
                     <a
                       href={'mailto:' + c.email}
-                      class="font-semibold text-navy underline-offset-4 hover:text-teal-700 hover:underline"
+                      class="font-semibold text-navy underline-offset-4 hover:text-teal-700 link-underline"
                     >
                       {c.email}
                     </a>

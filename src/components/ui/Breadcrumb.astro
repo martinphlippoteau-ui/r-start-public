@@ -3,6 +3,10 @@
  * Fil d'Ariane d'une sous-page : Accueil › Page (src/config/pages.ts → breadcrumb(key)).
  * Liste ordonnée dans un <nav aria-label> (libellé : nav.breadcrumbLabel) ; la page courante porte
  * aria-current="page" et n'est pas un lien. Le séparateur est décoratif (aria-hidden).
+ * Survol : `link-underline`, le soulignement des liens de contenu, et non `nav-link` (14/09/2026).
+ * La barre de `nav-link` est dessinée à 0,875 rem de chaque bord, une mesure faite pour les pastilles
+ * rembourrées du menu : sur « Accueil », sans aucun rembourrage, il n'en restait qu'un moignon d'une
+ * vingtaine de pixels flottant au milieu du mot, à la hauteur des jambages.
  * Le JSON-LD BreadcrumbList correspondant vient de src/lib/seo.ts (breadcrumbJsonLd).
  */
 import { breadcrumb, type PageKey } from '@/config/pages';
@@ -39,7 +43,7 @@ const dark = tone === 'dark';
             ) : (
               <a
                 href={withBase(p.path)}
-                class:list={['nav-link', dark ? 'hover:text-white' : 'hover:text-navy']}
+                class:list={['link-underline', dark ? 'hover:text-white' : 'hover:text-navy']}
               >
                 {p.navLabel ?? p.label}
               </a>

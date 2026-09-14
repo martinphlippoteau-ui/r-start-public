@@ -49,7 +49,7 @@ const bodyShort = consent.bodyShort ?? consent.body;
           <span class="hidden sm:inline">{consent.body}</span>
           <a
             href={withBase(consent.policyHref)}
-            class="ml-1 font-medium text-teal-700 underline underline-offset-4"
+            class="ml-1 font-medium text-teal-700 underline underline-offset-[0.3em] decoration-1"
             >{consent.policyLabel}</a
           >
         </p>
@@ -75,7 +75,7 @@ const bodyShort = consent.bodyShort ?? consent.body;
           type="button"
           data-consent-customize
           aria-expanded="false"
-          class="min-h-10 rounded-full px-1.5 py-2.5 text-sm font-semibold text-navy underline underline-offset-4 transition hover:text-teal-700 sm:px-5"
+          class="min-h-10 rounded-full px-1.5 py-2.5 text-sm font-semibold text-navy underline decoration-1 underline-offset-[0.3em] transition hover:text-teal-700 sm:px-5"
         >
           {consent.customize}
         </button>
