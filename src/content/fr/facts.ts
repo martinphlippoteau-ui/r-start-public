@@ -444,7 +444,13 @@ export const trust = {
   },
 } as const;
 
-/** Espace presse (périmètre v2). Contacts relevés sur corum.fr/conseillers#presse le 08/09/2026 ; e-mails à confirmer. */
+/**
+ * Espace presse (périmètre v2). Contacts relevés sur corum.fr/conseillers#presse le 08/09/2026 ;
+ * e-mails à confirmer.
+ * AGENCE CORRIGÉE le 14/09/2026 par l'équipe : Hugues de Tournemire est chez Rud Pedersen France, et
+ * non chez Bien Commun Advisory comme l'indiquait la page consultée le 08/09/2026. C'est le nom donné
+ * par l'équipe qui fait foi, pas le relevé.
+ */
 export const press = {
   contacts: [
     {
@@ -455,7 +461,7 @@ export const press = {
       email: '', // à confirmer par CORUM
     },
     {
-      organisation: "Bien Commun Advisory, pour CORUM L'Épargne",
+      organisation: "Rud Pedersen France, pour CORUM L'Épargne",
       name: 'Hugues de Tournemire',
       role: 'Relations presse',
       phone: '+33 6 67 07 22 33',
