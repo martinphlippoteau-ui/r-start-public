@@ -488,9 +488,14 @@ export const press = {
    * Revue de presse « La presse en parle » : sélection livrée par CORUM le 10/09/2026, neuf articles,
    * dans l'ordre de la sélection. Titres et dates reproduits tels que fournis ; ce sont des citations de
    * tiers, couvertes par `coverageDisclaimer`, jamais des formulations du site.
-   * `url` n'est renseignée que pour les adresses vérifiées le 08/09/2026 : un article sans adresse
-   * s'affiche avec son média et sa date, sans lien (arbitrage du 10/09/2026). Les adresses manquantes
-   * sont attendues de CORUM (README, « Points en attente »).
+   * `url` n'est renseignée QUE POUR LES ADRESSES OUVERTES ET VÉRIFIÉES, titre de page à l'appui : un
+   * article sans adresse s'affiche avec son média et sa date, sans lien (arbitrage du 10/09/2026).
+   * Une adresse fausse sur un site financier réglementé coûte plus cher qu'un lien manquant, donc rien
+   * n'est écrit ici sur la foi d'un résultat de recherche.
+   * Apport du 14/09/2026 : l'équipe a transmis une liste d'adresses, toutes TRONQUÉES au collage. Les
+   * quatre qui ont pu être reconstituées ont été rouvertes une à une ; deux répondent en 200 avec le
+   * bon titre et sont écrites ci-dessous, deux renvoient un 403 anti-robot (Les Echos, Business Immo)
+   * et attendent une confirmation au navigateur, leur adresse candidate étant notée sur place.
    */
   coverage: [
     {
@@ -498,6 +503,10 @@ export const press = {
       title:
         'Immobilier : CORUM, le géant des SCPI, joue à son tour la carte du « sans frais d’entrée »',
       date: { label: 'Mai 2026', iso: '2026-05' },
+      /* ADRESSE CANDIDATE, NON VÉRIFIÉE (14/09/2026), à ouvrir au navigateur avant de la coller ici :
+         https://www.lesechos.fr/patrimoine/immobilier/immobilier-corum-le-geant-des-scpi-joue-a-son-tour-la-carte-du-sans-frais-dentree-2232391
+         lesechos.fr renvoie un 403 anti-robot, la capture d'archive du 21/05/2026 est elle-même une page
+         « Access Denied » : le chemin est cohérent, le contenu n'est pas confirmé. */
       url: '',
     },
     {
@@ -517,6 +526,10 @@ export const press = {
       media: 'Business Immo',
       title: 'Quand Corum innove sur le marché des SCPI',
       date: { label: '21 mai 2026', iso: '2026-05-21' },
+      /* ADRESSE CANDIDATE, NON VÉRIFIÉE (14/09/2026), à ouvrir au navigateur avant de la coller ici :
+         https://www.businessimmo.com/actualites/article/1776557328/quand-corum-innove-sur-le-marche-des-scpi
+         403 anti-robot, aucune capture d'archive. Deux index concordants seulement (businessimmo.com et
+         son miroir CoStar, même identifiant d'article, même titre) : plausible, pas prouvé. */
       url: '',
     },
     {
@@ -536,7 +549,8 @@ export const press = {
       media: 'Profession CGP',
       title: 'Corum lance la SCPI R Start',
       date: { label: 'Mai 2026', iso: '2026-05' },
-      url: '',
+      // Ouverte le 14/09/2026 : 200, <title> « Corum lance la SCPI R Start - Profession CGP ».
+      url: 'https://www.professioncgp.com/article/produits-services/pierre-papier/corum-lance-la-scpi-r-start.html',
     },
     {
       media: 'Investissements Conseils',
@@ -548,7 +562,9 @@ export const press = {
       media: 'CFNews Immo',
       title: 'La nouvelle proposition de valeur que formule R Start aux épargnants',
       date: { label: 'Mai 2026', iso: '2026-05' },
-      url: '',
+      /* Ouverte le 14/09/2026 : 200, titre exact. Mur payant (« 93 % reste à lire ») : le lecteur voit
+         le titre et le chapô, ce qui reste préférable à un article sans lien du tout. */
+      url: 'https://www.cfnewsimmo.net/L-actualite/Levee-de-fonds/Vehicule/La-nouvelle-proposition-de-valeur-que-formule-R-Start-aux-epargnants-500106',
     },
   ],
   /**
@@ -557,6 +573,18 @@ export const press = {
    * publient par ailleurs des avis de plateforme de distribution, pas des articles d'information).
    */
   coverageArchive: [
+    /* Transmis par l'équipe le 14/09/2026 mais ABSENTS de la sélection livrée par CORUM le 10/09/2026 :
+       à arbitrer avant de les faire remonter dans `coverage`, la sélection est une décision éditoriale. */
+    {
+      media: 'CFNews Immo',
+      title: 'SCPI : Corum Start relance le débat sur les commissions',
+      url: 'https://www.cfnewsimmo.net/L-actualite/Tete-d-affiche/SCPI-Corum-Start-relance-le-debat-sur-les-commissions-498556',
+    },
+    {
+      media: 'Combourse, dépêche Agefi.fr',
+      title: 'Corum lance R Start, une SCPI sans frais de souscription',
+      url: 'https://www.combourse.com/News/Corum_lance_R_Start_une_SCPI_sans_frais_de_souscription__3143146.html',
+    },
     {
       media: 'Pierre Papier',
       title: 'Corum propose un nouveau modèle de frais avec la SCPI R Start',
