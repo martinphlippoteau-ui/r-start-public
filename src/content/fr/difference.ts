@@ -55,7 +55,12 @@ export const notes: LegalNote[] = [
   },
 ];
 
-export const difference = {
+/*
+ * Type DÉCLARÉ et non `satisfies` : `claim.noteId` est facultatif et absent de ce contenu depuis que
+ * la phrase porte son périmètre en elle. Avec `satisfies`, le type déduit est celui du littéral, et le
+ * composant qui teste `claim.noteId` ne compilait plus.
+ */
+export const difference: DifferenceContent = {
   eyebrow: 'Le modèle',
   /** Titre et copie fournis par l'équipe le 11/09/2026, repris tels quels (deux points à défendre en
    *  compliance, signalés en avertissement par scripts/check-compliance.mjs, voir l'en-tête du fichier). */
@@ -73,15 +78,19 @@ export const difference = {
   counterweight: {
     title: undefined,
     /**
-     * Allégation de rang de l'équipe, reprise mot pour mot le 11/09/2026 : elle N'EST PAS bornée au
-     * périmètre du groupe CORUM, contrairement à `product.definition`. Le périmètre est donc porté par
-     * l'appel de note `difference-definition`, qui le dit en toutes lettres (les cinq SCPI du groupe,
-     * comparaison qui ne porte pas sur l'ensemble du marché). Jamais affichée sans cet appel.
-     * À arbitrer en compliance : le script la signale en avertissement.
+     * ALLÉGATION BORNÉE DANS SA PROPRE PHRASE depuis le 14/09/2026, et c'est une conséquence directe du
+     * retrait des notes de l'accueil. Jusque-là, la formule de l'équipe était affichée non bornée (« La
+     * première SCPI sans frais d'entrée ni frais d'acquisition ») et son périmètre tenait dans l'appel
+     * de note `difference-definition`, qui disait « du groupe CORUM » et précisait que la comparaison
+     * ne porte pas sur l'ensemble du marché. Le commentaire d'alors le disait : jamais affichée sans
+     * cet appel. Les notes parties, la page ne portait plus qu'une allégation de rang sur tout le
+     * marché, sans périmètre ni preuve.
+     * La phrase affichée est donc désormais celle de la brochure (facts.product.definition, p. 4 et
+     * p. 6), qui porte son périmètre en elle : quatre mots de plus, aucun bloc de plus, et le contrôle
+     * de conformité retrouve la mention qu'il exige.
      */
     claim: {
-      text: 'La première SCPI sans frais d’entrée ni frais d’acquisition.',
-      noteId: 'difference-definition',
+      text: `${product.definition}.`,
     },
     /**
      * Conclusion de l'équipe, reprise mot pour mot (11/09/2026). À DÉFENDRE EN COMPLIANCE : en lecture
@@ -106,4 +115,4 @@ export const difference = {
    */
   cta: { label: 'Voir le comparateur de frais', href: pages.fees.path },
   notes,
-} satisfies DifferenceContent;
+};

@@ -10,7 +10,6 @@ import Base from '@/layouts/Base.astro';
 import TrustpilotScript from '@/components/TrustpilotScript.astro';
 import IntroOnce from '@/components/IntroOnce.astro';
 import SiteNav from '@/components/SiteNav.astro';
-import LegalNotes from '@/components/LegalNotes.astro';
 import Footer from '@/components/Footer.astro';
 import StickyCta from '@/components/StickyCta.astro';
 import { seo } from '@/content/fr/seo';
@@ -75,7 +74,13 @@ const jsonLd = [
   <main id="contenu">
     {hero && <hero.Component />}
     {rest.map(({ path, Component }) => <Component {...propsFor(path)} />)}
-    <LegalNotes />
+    {
+      /* PLUS DE SECTION « Notes et sources » SUR L'ACCUEIL (14/09/2026, demande de l'équipe), et plus
+        aucun appel de note en exposant : le registre de l'accueil (content/fr/notes.ts) est vide, et
+        NoteRef ne rend rien pour un identifiant qu'il n'y trouve pas. Les notes elles-mêmes vivent
+        toujours dans les fichiers de contenu et restent rendues sur les sous-pages, qui passent leur
+        propre liste à LegalNotes. */
+    }
   </main>
   {
     /* Pastille d'appel flottante : au niveau de la page, jamais dans une section, les sections de

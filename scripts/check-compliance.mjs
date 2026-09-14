@@ -290,7 +290,14 @@ async function checkIndex() {
   const noteIds = [...html.matchAll(/<li[^>]*\bid="notes-(\d+)"/g)].map((m) => m[1]);
   const noteRefs = new Set([...html.matchAll(/href="#notes-(\d+)"/g)].map((m) => m[1]));
   const orphans = noteIds.filter((n) => !noteRefs.has(n));
-  if (!noteIds.length) warnings.push(`${file} : aucune note (li id="notes-N"), contrôle inopérant`);
+  /*
+   * Une page sans note NI appel de note est un état cohérent, plus un contrôle en panne : l'accueil est
+   * dans ce cas depuis le 14/09/2026 (registre vidé dans content/fr/notes.ts, section retirée de
+   * index.astro). L'avertissement ne se déclenche donc que si l'un des deux existe sans l'autre, ce qui
+   * signale un exposant qui ne mène nulle part, ou une note que personne n'appelle.
+   */
+  if (!noteIds.length && noteRefs.size)
+    errors.push(`${file} : ${noteRefs.size} appel(s) de note sans section #notes (ancres mortes)`);
   if (orphans.length)
     warnings.push(`${file} : note(s) sans appel dans la page, notes-${orphans.join(', notes-')}`);
 

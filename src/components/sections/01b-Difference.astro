@@ -45,7 +45,7 @@ const situations = (difference.situations ?? []).map((s) => {
   const i = s.strong ? s.text.indexOf(s.strong) : -1;
   return i < 0
     ? { before: s.text, strong: '', after: '' }
-    : { before: s.text.slice(0, i), strong: s.strong, after: s.text.slice(i + s.strong.length) };
+    : { before: s.text.slice(0, i), strong: s.strong!, after: s.text.slice(i + s.strong!.length) };
 });
 ---
 
@@ -123,11 +123,14 @@ const situations = (difference.situations ?? []).map((s) => {
               <span aria-hidden="true" class="text-teal-700">
                 →
               </span>
+              {/* L'appel de note n'existe plus que si la phrase ne porte pas son périmètre en elle. */}
               <span>
                 {difference.counterweight.claim.text}
-                <span class="whitespace-nowrap">
-                  <NoteRef id={difference.counterweight.claim.noteId} />
-                </span>
+                {difference.counterweight.claim.noteId && (
+                  <span class="whitespace-nowrap">
+                    <NoteRef id={difference.counterweight.claim.noteId} />
+                  </span>
+                )}
               </span>
             </p>
           )

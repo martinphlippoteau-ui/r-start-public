@@ -64,8 +64,13 @@ test.describe('Performance', () => {
    * Les notes légales sont repliées dans un <details> : suivre un appel de note doit rester immédiat.
    * On clique un appel, le bloc s'ouvre, la note visée est visible et porte le focus.
    */
+  /*
+   * Sur /frais et non sur l'accueil : depuis le 14/09/2026 l'accueil ne porte plus ni appel de note ni
+   * section « Notes et sources » (registre vidé dans content/fr/notes.ts). Le mécanisme lui-même n'a pas
+   * bougé et reste rendu par toutes les sous-pages, qui passent leur propre liste à LegalNotes.
+   */
   test('un appel de note ouvre le bloc des notes et y amène le focus', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/frais/');
     await page.locator('[data-consent-refuse]').click();
     const details = page.locator('[data-legal-notes]');
     await expect(details).toHaveJSProperty('open', false);

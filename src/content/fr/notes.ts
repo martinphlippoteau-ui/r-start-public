@@ -1,11 +1,4 @@
 import type { LegalNote } from '@/content/types';
-import { notes as heroNotes } from '@/content/fr/hero';
-import { notes as highlightsNotes } from '@/content/fr/highlights';
-import { notes as differenceNotes } from '@/content/fr/difference';
-import { homeNotes as corumNotes } from '@/content/fr/corum';
-import { homeNotes as subscribeNotes } from '@/content/fr/subscribe';
-import { notes as risksNotes } from '@/content/fr/risks';
-import { homeNotes as faqNotes } from '@/content/fr/faq';
 
 /**
  * Registre des notes légales numérotées (façon Apple).
@@ -17,20 +10,23 @@ import { homeNotes as faqNotes } from '@/content/fr/faq';
  * sont numérotées que sur /strategie (prop `pageNotes`), jamais ici. Souscrire en chapitre court (06,
  * `compact`, entre Stratégie et Presse) n'appelle que les notes de ses étapes (`homeNotes`).
  */
-export const allNotes: LegalNote[] = [
-  ...heroNotes,
-  ...differenceNotes,
-  ...highlightsNotes,
-  ...corumNotes,
-  ...subscribeNotes,
-  ...risksNotes,
-  ...faqNotes,
-  // Hors accueil : Revenus et Documents (10/09/2026) ; « La presse en parle » (11/09/2026 : la revue
-  // complète est sur /presse, au menu) ; la section Frais entière (11/09/2026 : elle vit
-  // sur /frais, atteinte par le CTA « Découvrir les frais » de la zone 2) ; le cadre réglementaire, dix des seize questions de
-  // la FAQ et le guide complet de souscription (11/09/2026), d'où les registres partiels `homeNotes` de
-  // corum.ts, faq.ts et subscribe.ts (06 en `compact` n'appelle que les notes de ses étapes).
-];
+/*
+ * REGISTRE VIDE depuis le 14/09/2026 (demande de l'équipe) : l'accueil ne porte plus d'appels de note
+ * en exposant, ni de section « Notes et sources » en bas de page. `noteNumber` renvoie donc `null`
+ * pour tout identifiant, et NoteRef ne rend rien : aucun exposant orphelin, aucune ancre morte.
+ *
+ * CE QUI EST PERDU, pour que ce soit dit : les sources des valeurs affichées sur l'accueil ne sont plus
+ * atteignables depuis l'accueil. Le prix de la part, le niveau de risque, la zone d'investissement, le
+ * délai de jouissance, la fréquence des dividendes avaient chacun leur note, qui citait le document et
+ * sa page. Les notes elles-mêmes n'ont pas disparu du dépôt : chaque fichier de contenu les exporte
+ * toujours, et les sous-pages les rendent (/frais, /strategie, /a-propos, /presse, /documentation,
+ * /salle-de-presse), chacune passant sa propre liste à LegalNotes.
+ *
+ * Pour les rétablir sur l'accueil : remettre les imports et les listes ci-dessous, et le
+ * `<LegalNotes />` dans src/pages/index.astro.
+ *   hero · difference · highlights · corum (homeNotes) · subscribe (homeNotes) · risks · faq (homeNotes)
+ */
+export const allNotes: LegalNote[] = [];
 
 export const noteNumber = (id: string): number | null => {
   const index = allNotes.findIndex((n) => n.id === id);

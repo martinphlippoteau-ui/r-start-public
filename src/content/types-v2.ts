@@ -122,7 +122,12 @@ export interface DifferenceContent {
     /** Conclusion de l'équipe, en ouverture du bloc de démonstration. */
     pedagogy?: string[];
     /** Allégation de rang : jamais affichée sans son appel de note, qui en porte le périmètre. */
-    claim?: { text: string; noteId: string };
+    /**
+     * Allégation de rang. `noteId` est FACULTATIF depuis le 14/09/2026 : quand la phrase porte son
+     * périmètre en elle (facts.product.definition, « du groupe CORUM »), elle n'a plus besoin d'un
+     * appel de note pour le dire, et l'accueil n'en rend plus.
+     */
+    claim?: { text: string; noteId?: string };
   };
   /** Mécanisme de réserve en cas de moins-value, résumé en deux phrases (brochure partenaires 2026, p.4). */
   /** Mécanisme de réserve : plus rendu sur l'accueil depuis le 11/09/2026. */
