@@ -31,11 +31,29 @@ const readCookie = (): ConsentStatus => {
   return value === 'granted' || value === 'denied' ? value : 'unset';
 };
 
+/**
+ * Domaine du cookie : `.r-start.com` dès que le site y est servi, pour que le choix vaille AUSSI sur le
+ * sous-domaine du tunnel de souscription (14/09/2026) ; sans cela le tunnel redemanderait le
+ * consentement à un visiteur qui vient de le donner. Vide partout ailleurs, sur localhost comme sur la
+ * prévisualisation github.io : un cookie portant un domaine étranger à l'hôte est simplement rejeté.
+ */
+const cookieDomain = (): string => {
+  const hote = location.hostname;
+  return hote === 'r-start.com' || hote.endsWith('.r-start.com') ? '; Domain=.r-start.com' : '';
+};
+
 const writeCookie = (status: Exclude<ConsentStatus, 'unset'>) => {
   const maxAge = maxAgeDays * 24 * 60 * 60;
   const secure = location.protocol === 'https:' ? '; Secure' : '';
   document.cookie =
-    cookieName + '=' + status + '; Max-Age=' + maxAge + '; Path=/; SameSite=Lax' + secure;
+    cookieName +
+    '=' +
+    status +
+    '; Max-Age=' +
+    maxAge +
+    '; Path=/; SameSite=Lax' +
+    cookieDomain() +
+    secure;
 };
 
 let gtmLoaded = false;
@@ -48,6 +66,28 @@ const loadGtm = () => {
   s.src = 'https://www.googletagmanager.com/gtm.js?id=' + encodeURIComponent(gtmId);
   document.head.appendChild(s);
 };
+
+/**
+ * Le choix du visiteur, envoyé au dataLayer. Indispensable pour interpréter tout le reste : sans lui on
+ * ne sait pas quelle part du trafic est mesurée, et les écarts avec les journaux serveur sont
+ * inexplicables. Envoyé même sur un refus : la file est rejouée si le conteneur se charge un jour, et
+ * un refus qui n'arrive jamais ressemble à une visite qui n'a rien choisi.
+ */
+const pousserChoix = (
+  choix: 'accepte' | 'refuse' | 'personnalise',
+  origine: 'bandeau' | 'reouverture'
+) => {
+  window.dataLayer = window.dataLayer || [];
+  window.dataLayer.push({
+    event: 'consentement',
+    choix,
+    origine,
+    page_type: document.body.dataset.pageType || 'inconnu',
+  });
+};
+
+/** Le bandeau a-t-il été rouvert depuis le pied de page, ou est-ce le premier affichage ? */
+let rouvert = false;
 
 const applyConsent = (status: ConsentStatus) => {
   if (status === 'granted') {
@@ -95,19 +135,23 @@ if (current === 'unset') {
 
 banner?.addEventListener('click', (e) => {
   const target = e.target as HTMLElement | null;
+  const origine = rouvert ? 'reouverture' : 'bandeau';
   if (target?.closest('[data-consent-accept]')) {
     writeCookie('granted');
     applyConsent('granted');
+    pousserChoix('accepte', origine);
     hide();
   } else if (target?.closest('[data-consent-refuse]')) {
     writeCookie('denied');
     applyConsent('denied');
+    pousserChoix('refuse', origine);
     hide();
   } else if (target?.closest('[data-consent-save]')) {
     const checkbox = banner.querySelector<HTMLInputElement>('[data-consent-analytics]');
     const status = checkbox?.checked ? 'granted' : 'denied';
     writeCookie(status);
     applyConsent(status);
+    pousserChoix('personnalise', origine);
     hide();
   } else if (target?.closest('[data-consent-customize]')) {
     const panel = banner.querySelector<HTMLElement>('[data-consent-panel]');
@@ -126,6 +170,7 @@ document.addEventListener('click', (e) => {
     e.preventDefault();
     const checkbox = banner?.querySelector<HTMLInputElement>('[data-consent-analytics]');
     if (checkbox) checkbox.checked = readCookie() === 'granted';
+    rouvert = true;
     show();
   }
 });

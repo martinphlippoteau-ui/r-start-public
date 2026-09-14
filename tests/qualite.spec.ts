@@ -712,6 +712,104 @@ test.describe('Qualité', () => {
     }
   });
 
+  /*
+   * Plan de taggage du 14/09/2026. Un plan sans test se dégrade au premier remaniement : un attribut
+   * renommé, un sélecteur déplacé, et l'événement disparaît sans que rien ne le dise. Les mesures ne
+   * reviennent jamais rétroactivement, contrairement à un bug d'affichage.
+   * La file `dataLayer` existe avant le chargement de GTM et lui est rejouée : on peut donc tout
+   * vérifier sans conteneur, ce qui est exactement l'état du site tant que PUBLIC_GTM_ID est vide.
+   */
+  const evenements = (page: Page) =>
+    page.evaluate(() =>
+      ((window as unknown as { dataLayer?: Record<string, unknown>[] }).dataLayer ?? [])
+        .filter((x) => x && typeof x.event === 'string')
+        .map((x) => x as Record<string, unknown>)
+    );
+
+  test('la campagne d’entrée est retenue puis jointe aux événements', async ({ page }) => {
+    await page.goto('/?utm_source=linkedin&utm_medium=social&utm_campaign=lancement-2026');
+    const retenue = await page.evaluate(() => sessionStorage.getItem('rstart_campagne'));
+    expect(retenue, 'campagne retenue à l’arrivée').toContain('linkedin');
+
+    /* PREMIÈRE CAMPAGNE GAGNANTE : une page sans paramètre ne doit pas l'effacer. */
+    await page.goto('/frais/');
+    expect(await page.evaluate(() => sessionStorage.getItem('rstart_campagne'))).toContain(
+      'linkedin'
+    );
+
+    await page.locator('[data-comparator-select]').selectOption({ index: 1 });
+    const [premier] = await evenements(page);
+    expect(premier?.campagne_source, 'la campagne accompagne chaque événement').toBe('linkedin');
+    expect(premier?.campagne_nom).toBe('lancement-2026');
+    expect(premier?.page_type).toBe('frais');
+  });
+
+  test('les événements du plan de taggage partent bien', async ({ page }) => {
+    await sauterLaFenetreOutils(page);
+
+    /* Consentement : indispensable pour interpréter tout le reste. */
+    await page.goto('/frais/');
+    await page.locator('[data-consent-refuse]').click();
+    await expect
+      .poll(async () => (await evenements(page)).map((x) => x.event))
+      .toContain('consentement');
+
+    /* Comparateur : à quoi le visiteur compare R Start. */
+    await page.locator('[data-comparator-select]').selectOption({ index: 1 });
+    await expect
+      .poll(async () => (await evenements(page)).map((x) => x.event))
+      .toContain('comparateur_scpi');
+
+    /* Profondeur de lecture : quatre paliers au maximum, jamais un par section. */
+    await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+    await expect
+      .poll(
+        async () => (await evenements(page)).filter((x) => x.event === 'lecture_profondeur').length
+      )
+      .toBeGreaterThan(0);
+    const paliers = (await evenements(page))
+      .filter((x) => x.event === 'lecture_profondeur')
+      .map((x) => x.palier);
+    expect(paliers.length, 'quatre paliers au plus').toBeLessThanOrEqual(4);
+    expect(new Set(paliers).size, 'aucun palier envoyé deux fois').toBe(paliers.length);
+
+    /* Simulateur : ouverture, niveau nommé, progression. */
+    await page.goto('/outil/cout-de-sortie/');
+    await expect
+      .poll(async () => (await evenements(page)).map((x) => x.event))
+      .toContain('outil_ouvert');
+    const ouverture = (await evenements(page)).find((x) => x.event === 'outil_ouvert');
+    expect(ouverture?.outil).toBe('sortie');
+    expect(ouverture?.souscription_ouverte, 'état du tunnel joint à chaque envoi').toBe('non');
+
+    /* Le bouton radio est `visually-hidden` : c'est l'étiquette qu'un visiteur touche, et elle seule. */
+    await page.locator('label[for="sortie-niveau-expert"]').click();
+    await expect
+      .poll(async () => (await evenements(page)).find((x) => x.event === 'outil_niveau')?.niveau)
+      .toBe('expert');
+
+    /* Page introuvable : détecte les liens morts diffusés à l'extérieur. */
+    await page.goto('/page-qui-nexiste-pas');
+    await expect
+      .poll(async () => (await evenements(page)).map((x) => x.event))
+      .toContain('page_introuvable');
+  });
+
+  /*
+   * Aucune donnée personnelle ni aucun montant saisi ne doit atteindre la file : les hypothèses
+   * patrimoniales d'un visiteur n'ont rien à faire dans un outil de mesure d'audience.
+   */
+  test('aucun montant saisi ne part dans la mesure', async ({ page }) => {
+    await sauterLaFenetreOutils(page);
+    await page.goto('/outil/cout-de-sortie/');
+    /* Le premier champ seulement : les suivants ne sont révélés qu'aux étapes d'après. */
+    await page.locator('#sortie-montant').fill('123456');
+    await page.waitForTimeout(400);
+    const contenu = JSON.stringify(await evenements(page));
+    expect(contenu, 'le montant saisi ne doit jamais être poussé').not.toContain('123456');
+    expect(contenu).not.toMatch(/@|mailto|password|iban/i);
+  });
+
   test('captures d’écran de la page', async ({ page }, testInfo) => {
     await page.goto('/');
     await page.locator('[data-consent-refuse]').click();

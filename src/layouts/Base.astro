@@ -34,6 +34,24 @@ const {
   jsonLd,
   bodyClass = '',
 } = Astro.props;
+
+/**
+ * Type de page, joint à chaque événement de mesure (plan de taggage du 14/09/2026). Déduit du chemin
+ * plutôt que passé en prop : une page qui oublierait la prop serait comptée « inconnu » sans que
+ * personne ne le voie, alors que le chemin, lui, est toujours juste.
+ * `souscriptionOuverte` accompagne chaque événement pour la même raison : tant que le tunnel n'est pas
+ * ouvert, tous les appels à souscrire aboutissent à une fenêtre d'attente. Sans ce repère, les taux de
+ * la période d'attente seraient comparés à ceux d'après l'ouverture, et la comparaison n'aurait
+ * aucun sens.
+ */
+const chemin = (path ?? Astro.url.pathname).replace(/^\/+|\/+$/g, '');
+const typeDePage = !chemin
+  ? 'accueil'
+  : chemin.startsWith('outil/')
+    ? 'outil'
+    : ['mentions-legales', 'politique-de-confidentialite', 'cookies'].includes(chemin)
+      ? 'legal'
+      : chemin.replace(/\//g, '-');
 ---
 
 <!doctype html>
@@ -73,13 +91,18 @@ const {
     {jsonLd && <JsonLd data={jsonLd} />}
     <slot name="head" />
   </head>
-  <body class:list={['min-h-svh bg-paper text-ink', bodyClass]}>
+  <body
+    class:list={['min-h-svh bg-paper text-ink', bodyClass]}
+    data-page-type={typeDePage}
+    data-souscription-ouverte={site.subscribeOpen ? 'oui' : 'non'}
+  >
     <a href="#contenu" class="skip-link">{nav.skipLink}</a>
     <slot />
     <Consent />
     {!site.subscribeOpen && <SubscribeSoon />}
     <script>
       import '@/scripts/consent';
+      import '@/scripts/campagne';
       import '@/scripts/analytics';
       import '@/scripts/motion';
     </script>

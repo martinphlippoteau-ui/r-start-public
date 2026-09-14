@@ -30,6 +30,8 @@ env:
   # Vide tant que le tunnel de souscription n'a pas ouvert : les CTA ouvrent la fenêtre d'attente.
   # Le jour de l'ouverture, passer à 'true' ET renseigner PUBLIC_SUBSCRIBE_URL.
   PUBLIC_SUBSCRIBE_OPEN: ''
+  # Conteneur GTM (14/09/2026). Chargé seulement après accord du visiteur, jamais dans le <head>.
+  PUBLIC_GTM_ID: GTM-K7B4GX8Z
 
 jobs:
   build:
