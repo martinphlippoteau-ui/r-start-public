@@ -5,7 +5,8 @@
  * sans repère entre eux :
  *  1. #corum         (white) « Le groupe CORUM en chiffres », les quatre chiffres du groupe ;
  *  2. bande photo pleine largeur, hors section (décorative, sans titre : elle n'a donc pas d'ancre) ;
- *  3. #savoir-faire  (paper) les trois familles de solutions du groupe, avec leur contre-poids ;
+ *  3. #savoir-faire  (paper) les trois familles de solutions du groupe, une photo par carte
+ *                            (media.expertise, 14/09/2026, à la place des pictogrammes), contre-poids compris ;
  *  4. #gamme         (white) la gamme des cinq SCPI, tuile R Start marquée « Nouveau », et son contre-poids.
  * Ces blocs étaient sur l'accueil jusqu'au 11/09/2026 ; ils ont leur place ici, où le sujet est la
  * société de gestion. Les savoir-faire sont arrivés le 13/09/2026 : la page disait qui gère R Start,
@@ -22,13 +23,12 @@
 import { Picture } from 'astro:assets';
 import Container from '@/components/ui/Container.astro';
 import NoteRef from '@/components/ui/NoteRef.astro';
-import Picto, { isPictoKey } from '@/components/ui/Picto.astro';
 import RiskNote from '@/components/ui/RiskNote.astro';
 import Section from '@/components/ui/Section.astro';
 import Stat from '@/components/ui/Stat.astro';
 import { corum } from '@/content/fr/corum';
 import { trust } from '@/content/fr/trust';
-import { media } from '@/content/fr/media';
+import { media, type MediaImage } from '@/content/fr/media';
 import { product } from '@/content/fr/facts';
 import { resolveImage } from '@/lib/images';
 import type { LegalNote } from '@/content/types';
@@ -44,13 +44,26 @@ const stats = trust.stats;
 const range = corum.range.scpiNames.map((name) => ({ name, current: name === product.name }));
 const LOGO_STAGGER = 0.08;
 const QUIET_TITLE_Y = 12;
-/** Décalage de la cascade entre deux savoir-faire (secondes) : un déclencheur par colonne lg. */
-const STAGGER = 0.08;
 const expertise = corum.expertise;
-const savoirFaire = (expertise?.items ?? []).map((item) => {
-  if (!isPictoKey(item.icon)) throw new Error(`Pictogramme inconnu dans corum.ts : ${item.icon}`);
-  return { ...item, icon: item.icon };
-});
+/*
+ * Une PHOTO par savoir-faire (14/09/2026) à la place du pictogramme : media.expertise donne les
+ * visuels dans l'ordre de corum.expertise.items. Le champ `icon` reste dans le contenu, il ne sert
+ * plus au rendu. Erreur explicite si les deux listes se désalignent, plutôt qu'une carte sans image.
+ */
+const savoirFaire = await Promise.all(
+  (expertise?.items ?? []).map(async (item, i) => {
+    /* Typé explicitement : sans annotation, TypeScript déduit le littéral de chaque entrée et
+      `credit`, absent de deux des trois photos, n'existerait pas sur l'union. */
+    const visuel: MediaImage | undefined = media.expertise[i];
+    if (!visuel)
+      throw new Error(
+        `media.expertise n'a pas de photo pour le savoir-faire « ${item.title} » (rang ${i}).`
+      );
+    return { ...item, visuel, image: await resolveImage(visuel.src) };
+  })
+);
+/** Trois colonnes dès `lg` : la photo ne dépasse jamais le tiers de la grille. */
+const EXPERTISE_SIZES = '(min-width: 1024px) 400px, (min-width: 640px) 50vw, 100vw';
 ---
 
 {/* 1. Le groupe CORUM en chiffres */}
@@ -134,19 +147,37 @@ const savoirFaire = (expertise?.items ?? []).map((item) => {
           <p class="text-lead mt-5 text-pretty text-slate-700 sm:mt-6">{expertise.intro}</p>
         </header>
 
-        <ul role="list" class="mt-10 grid gap-5 lg:mt-14 lg:grid-cols-3 lg:gap-6">
-          {savoirFaire.map((item, i) => (
-            <li class="flex flex-col rounded-3xl bg-white p-6 shadow-card sm:p-8">
-              <span
-                class="block w-fit"
-                data-animate="tilt"
-                data-animate-delay={String(i * STAGGER)}
-              >
-                <Picto name={item.icon} class="size-12 text-teal-700 sm:size-14" />
-              </span>
-              <p class="text-eyebrow mt-6 text-teal-700">{item.kicker}</p>
-              <h3 class="text-display-sm mt-2 text-ink">{item.title}</h3>
-              <p class="mt-4 text-base leading-relaxed text-slate-700">{item.description}</p>
+        <ul
+          role="list"
+          class="mt-10 grid gap-5 lg:mt-14 lg:grid-cols-3 lg:gap-6"
+          data-animate="stagger"
+          data-animate-stagger="0.1"
+        >
+          {savoirFaire.map((item) => (
+            <li class="flex flex-col overflow-hidden rounded-3xl bg-white shadow-card">
+              {/* La photo occupe toute la largeur de la carte : aucun rembourrage au-dessus d'elle. */}
+              <div class="relative aspect-[16/10] w-full overflow-hidden">
+                <Picture
+                  src={item.image}
+                  alt={item.visuel.alt}
+                  widths={[480, 800, 1200]}
+                  sizes={EXPERTISE_SIZES}
+                  formats={['avif', 'webp']}
+                  loading="lazy"
+                  decoding="async"
+                  pictureAttributes={{ class: 'block h-full w-full' }}
+                  class="h-full w-full object-cover"
+                />
+              </div>
+              <div class="flex flex-1 flex-col p-6 sm:p-8">
+                <p class="text-eyebrow text-teal-700">{item.kicker}</p>
+                <h3 class="text-display-sm mt-2 text-ink">{item.title}</h3>
+                <p class="mt-4 text-base leading-relaxed text-slate-700">{item.description}</p>
+                {/* Mention obligatoire sous une photo d'immeuble : R Start n'a pas de patrimoine. */}
+                {item.visuel.credit && (
+                  <p class="text-caption mt-5 text-slate-700">{item.visuel.credit}</p>
+                )}
+              </div>
             </li>
           ))}
         </ul>

@@ -42,6 +42,11 @@ export interface MediaContent {
   subscribe: MediaImage;
   /** Ambiance des bureaux CORUM (section « CORUM »). */
   corum: readonly MediaImage[];
+  /**
+   * Une photo par savoir-faire du groupe (page /a-propos), DANS L'ORDRE de corum.expertise.items :
+   * immobilier, obligations, assurance vie et plan d'épargne retraite.
+   */
+  expertise: readonly MediaImage[];
   documents?: MediaImage;
   /**
    * Pas d'image Open Graph photographique : diffusée seule sur les réseaux sociaux, une photo d'immeuble
@@ -116,6 +121,35 @@ export const media = {
       alt: 'Espace d’accueil des bureaux de CORUM, logo au mur, deux collaborateurs en discussion à l’arrière-plan',
     },
     // 2000 × 1336. Salon des bureaux CORUM, sans personne, teintes fauve et bleu canard.
+    {
+      src: 'ambiance/wttj-salon.jpg',
+      alt: 'Salon des bureaux de CORUM, deux fauteuils en cuir fauve, tapis bleu canard et tables basses en verre',
+    },
+  ],
+  /*
+   * Les trois savoir-faire (page /a-propos, 14/09/2026) : des photos à la place des pictogrammes.
+   * Tri fait sur les 30 photos d'ambiance du dossier Assets ; les mêmes règles que le reste du fichier
+   * ont éliminé la quasi-totalité des candidates évidentes :
+   *  - assurance-vie-per-1 à 6 : personnes identifiables au premier plan (familles, portraits), et
+   *    un texte lisible sur un vêtement ;
+   *  - indigo-group, tarmac, michelin, bollore-quimper, total-qatar… : logo de tiers parfaitement
+   *    lisible, ce qui suggérerait un lien entre R Start et ces sociétés ;
+   *  - fibre-excellence, poznan : visage identifiable au premier plan.
+   * Restent trois photos qui ne nomment ni n'identifient personne.
+   */
+  expertise: [
+    // 1024 × 869. Façade d'un immeuble de bureaux à la tombée du jour, aucune personne, aucune enseigne.
+    {
+      src: 'immeubles/saint-ouen-bureaux.jpg',
+      alt: 'Façade d’un immeuble de bureaux à la tombée du jour, loggias sombres et hall vitré éclairé',
+      credit: illustration,
+    },
+    // 2048 × 1373. Atelier de production, opérateurs en combinaison intégrale : aucun visage, aucune marque.
+    {
+      src: 'ambiance/blue-solutions.jpg',
+      alt: 'Atelier de production, trois opérateurs en combinaison intégrale devant des machines',
+    },
+    // 2000 × 1336. Salon des bureaux CORUM, sans personne (même lieu que la bande, autre pièce).
     {
       src: 'ambiance/wttj-salon.jpg',
       alt: 'Salon des bureaux de CORUM, deux fauteuils en cuir fauve, tapis bleu canard et tables basses en verre',
