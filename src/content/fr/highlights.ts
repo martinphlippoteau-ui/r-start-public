@@ -131,9 +131,16 @@ export const highlights: HighlightsContent = {
     },
     { label: 'Réinvestissement automatique', value: 'des dividendes' },
   ],
-  /** Contre-poids unique de la section : les six repères sont des caractéristiques, pas des promesses. */
-  risk: nb(
-    `Ces repères décrivent le produit, ils ne réduisent aucun de ses risques. Le capital n’est pas garanti : vous pouvez perdre tout ou partie de la somme investie. Les revenus ne sont pas garantis et varient. La revente de vos parts n’est pas garantie et une commission de retrait s’applique avant ${fees.withdrawal.zeroAfterYears} ans. R Start peut investir hors zone euro : le cours des devises peut réduire la valeur de vos parts. Durée de placement recommandée : ${risk.recommendedHoldingLabel}.`
-  ),
+  /*
+   * PAS DE CONTRE-POIDS SOUS LE TABLEAU depuis le 14/09/2026 (demande de l'équipe) : le document
+   * n'en porte pas, le tableau s'arrête à ses sept lignes. Le champ reste optionnel dans le type, il
+   * suffit de le réécrire ici pour le faire revenir. Le texte retiré était : « Ces repères décrivent le
+   * produit, ils ne réduisent aucun de ses risques. Le capital n'est pas garanti… Durée de placement
+   * recommandée : 10 ans. »
+   * Ce qu'il portait n'est pas perdu pour autant : la ligne risques du hero, jamais animée, ouvre la
+   * page avec la perte en capital, les revenus non garantis, la liquidité limitée et le risque de
+   * change ; la section Risques les détaille ; et chaque ligne du tableau garde son appel de note, qui
+   * donne sa source et sa limite.
+   */
   notes,
 };

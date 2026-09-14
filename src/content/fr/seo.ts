@@ -75,7 +75,7 @@ export const seoH2: Record<string, string> = {
   /** Formulation autorisée, à contrebalancer immédiatement par `counterweight` (15 % de gestion, cessions, retrait). */
   fees: '0 % de frais de souscription.',
   /** Requête « SCPI Europe Canada ». Le mot d’ordre « Acheter décoté, valoriser, revendre » vit dans l’intro. */
-  strategy: 'De l’immobilier en Europe et au Canada.',
+  strategy: 'De l’immobilier partout dans le monde.',
   /** Requête « SCPI distribution mensuelle ». « Potentiels » est indispensable : revenus non garantis. */
   income: 'Des revenus potentiels chaque mois.',
   /** Requête « souscrire SCPI en ligne ». */

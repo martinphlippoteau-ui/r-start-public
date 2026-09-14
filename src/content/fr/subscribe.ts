@@ -53,7 +53,12 @@ export const notes: LegalNote[] = [
  */
 const withdrawalReminder = `R Start est un placement de long terme : ${risk.recommendedHoldingLabel} recommandés. Si vous retirez vos parts avant ${zeroAfter} ans de détention, une commission est prélevée sur la somme que vous récupérez ; elle diminue chaque année et disparaît après ${zeroAfter} ans. Le détail année par année figure dans la section Frais. ${withdrawalExemptions} Le rachat de vos parts n’est pas garanti : vous ne récupérez votre argent que si un autre épargnant les achète.`;
 
-export const subscribe = {
+/*
+ * Type DÉCLARÉ et non `satisfies` : `homeIntro` est optionnelle et désormais absente. Avec
+ * `satisfies`, le type déduit est celui du littéral, et le composant qui lit `subscribe.homeIntro`
+ * ne compilait plus. L'annotation garde le contrôle du littéral et expose le champ optionnel.
+ */
+export const subscribe: SubscribeContent = {
   eyebrow: 'Souscrire',
   /** « R Start » en espace insécable : le nom de marque ne se coupe jamais dans le H2 (mobile 375 px). */
   title: `Souscrire à R Start, ${nb(subscription.onlineLabel)}.`,
@@ -62,8 +67,13 @@ export const subscribe = {
      une phrase suivie. */
   /** Au mot du document de l'équipe (14/09/2026) : « 4 étapes pour souscrire, 100 % en ligne ». */
   homeTitle: `4 étapes pour souscrire, ${nb(subscription.onlineLabel)}.`,
-  /** Accueil, ≤ 30 mots, factuel : en ligne, minimum, signature électronique, moyens de règlement, suivi. */
-  homeIntro: `Tout se fait en ligne, à partir de ${nb(share.priceLabel)} la part : profil investisseur, signature électronique, règlement par virement ou prélèvement, suivi de vos parts sur votre espace privé et l’application MyCORUM.`,
+  /*
+   * PAS D'INTRODUCTION SUR L'ACCUEIL depuis le 14/09/2026 (demande de l'équipe) : le titre enchaîne
+   * directement sur les quatre étapes, qui se lisent d'elles-mêmes. Le champ reste optionnel dans le
+   * type, il suffit de le réécrire ici pour la faire revenir. Le texte retiré était : « Tout se fait en
+   * ligne, à partir de 200 € la part : profil investisseur, signature électronique, règlement par
+   * virement ou prélèvement, suivi de vos parts sur votre espace privé et l'application MyCORUM. »
+   */
   intro: `La souscription se fait entièrement en ligne, en quatre étapes, à partir d’une part de ${nb(share.priceLabel)}. Aucune souscription papier n’est possible. R Start vise une stratégie patrimoniale plus dynamique, en contrepartie d’un risque plus élevé. Avant de vous engager, lisez le DIC et la note d’information. R Start comporte un risque de perte en capital.`,
 
   /**
@@ -132,7 +142,7 @@ export const subscribe = {
   cta: { label: 'Souscrire en ligne', position: 'souscrire' },
 
   notes,
-} satisfies SubscribeContent;
+};
 
 /** Notes appelées par les étapes (rendues sur l'accueil en `compact`) ; `notes` reste complet pour le guide. */
 const idsAppeles = subscribe.steps.map((step) => step.noteId).filter(Boolean);

@@ -239,7 +239,13 @@ export const risk = {
 } as const;
 
 export const strategy = {
-  zoneLabel: "Pays du Conseil de l'Europe et Canada",
+  // LIBELLÉ D'AFFICHAGE, « Monde » (14/09/2026, demande de l'équipe). Il sert de titre à la section
+  // Zone de /strategie et de ligne « Zone d'investissement » dans le kit média.
+  // ÉCART À CONNAÎTRE : `zoneDetail` juste en dessous garde la zone du DIC, et c'est lui que citent les
+  // notes légales. Le site affiche donc « Monde » et écrit, en note, la zone réelle du document
+  // réglementaire. Un site ne peut pas faire dire au DIC qu'il héberge autre chose que ce qu'il
+  // contient : la note reste la référence, le libellé est la formulation de l'équipe.
+  zoneLabel: 'Monde',
   zoneDetail: "Pays du Conseil de l'Europe (en zone euro et hors zone euro) et Canada", // DIC p.1
   approach:
     "Stratégie d'investissement privilégiant la valorisation du patrimoine au regard du positionnement du pays étudié dans son cycle immobilier et économique", // DIC p.1

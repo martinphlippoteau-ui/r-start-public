@@ -41,7 +41,8 @@ export const notes: LegalNote[] = [
 
 export const strategy = {
   eyebrow: 'Stratégie',
-  title: 'De l’immobilier en Europe et au Canada.',
+  /** « Monde » à la place d'« Europe et Canada » (14/09/2026, demande de l'équipe). */
+  title: 'De l’immobilier partout dans le monde.',
   /** Accueil (zone 6 de la trame) : la question qui introduit les trois piliers. */
   homeTitle: 'Comment R Start investit-elle l’argent de ses clients ?',
   /**

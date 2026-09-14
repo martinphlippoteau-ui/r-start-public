@@ -11,16 +11,16 @@ import { shortRiskLine } from '@/content/fr/legal';
 export const strategyPage: { seo: PageSeo; hero: PageHero; cta: Cta } = {
   seo: {
     /** ≤ 60 caractères. */
-    title: 'Stratégie R Start, SCPI CORUM : Europe et Canada',
+    title: 'Stratégie R Start, SCPI CORUM : investir dans le monde',
     /** 140-155 caractères, avec rappel de risque. */
     description:
-      'Stratégie de R Start, SCPI CORUM : acheter décoté, valoriser, revendre en Europe et au Canada. Revenus non garantis, risque de perte en capital.',
+      'Stratégie de R Start, SCPI CORUM : acheter décoté, valoriser, revendre partout dans le monde. Revenus non garantis, risque de perte en capital.',
   },
   hero: {
     eyebrow: `Stratégie · SCPI ${product.name}`,
     title: 'Stratégie d’investissement',
     intro:
-      'R Start achète des immeubles décotés, les valorise puis les revend, en Europe et au Canada. Cette page détaille ses deux leviers, ses trois piliers, sa zone d’investissement, les types d’actifs visés et le recours à l’emprunt.',
+      'R Start achète des immeubles décotés, les valorise puis les revend, partout dans le monde. Cette page détaille ses deux leviers, ses trois piliers, sa zone d’investissement, les types d’actifs visés et le recours à l’emprunt.',
     riskLine: shortRiskLine,
   },
   /* Appel à l'action de la page (13/09/2026) : ni l'en-tête ni le corps n'en portaient, la page se

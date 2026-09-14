@@ -82,7 +82,13 @@ const storeHintId = 'souscrire-stores-hint';
 
 const id = sections.subscribe.id;
 const title = compact && subscribe.homeTitle ? subscribe.homeTitle : subscribe.title;
-const intro = compact && subscribe.homeIntro ? subscribe.homeIntro : subscribe.intro;
+/*
+ * Sur l'accueil, l'introduction est celle du chapitre court, ET RIEN D'AUTRE : elle a été retirée le
+ * 14/09/2026 (demande de l'équipe), le titre enchaîne donc directement sur les quatre étapes. Pas de
+ * repli sur `subscribe.intro`, qui ramènerait le texte de la version complète, celui-là même qu'on
+ * vient d'enlever. SectionHeading ne rend rien quand l'introduction est absente.
+ */
+const intro = compact ? subscribe.homeIntro : subscribe.intro;
 /** Contre-poids unique du chapitre court (≥ 60 % du texte cumulé des étapes, voir subscribe.ts). */
 const OptionTitle = subscribe.optionsTitle ? 'h4' : 'h3';
 /** Identifiant du dégradé SVG du segment de ligne d'une étape (unique dans la page). */
