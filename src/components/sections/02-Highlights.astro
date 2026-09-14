@@ -76,11 +76,17 @@ const titleId = sections.highlights.id + '-title';
             data-animate="fade-up"
             data-animate-delay={String((i % COLUMNS) * STAGGER)}
           >
-            <p class="text-base font-medium text-slate-700">
-              {card.label}
-              {card.noteId && <NoteRef id={card.noteId} />}
+            {/* Sans libellé, la valeur se suffit à elle-même et l'appel de note la suit (« 100 % Digital »). */}
+            {card.label && (
+              <p class="text-base font-medium text-slate-700">
+                {card.label}
+                {card.noteId && <NoteRef id={card.noteId} />}
+              </p>
+            )}
+            <p class:list={['text-display-sm text-navy', card.label && 'mt-2']}>
+              {card.value}
+              {!card.label && card.noteId && <NoteRef id={card.noteId} />}
             </p>
-            <p class="text-display-sm mt-2 text-navy">{card.value}</p>
           </li>
         ))
       }

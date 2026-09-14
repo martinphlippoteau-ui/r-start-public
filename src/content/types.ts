@@ -94,8 +94,12 @@ export interface HeroContent {
 }
 
 export interface HighlightCard {
-  /** Libellé du repère (ex. « Ticket d'entrée »), au-dessus de la valeur. */
-  label: string;
+  /**
+   * Libellé du repère (ex. « Ticket d'entrée »), au-dessus de la valeur. Facultatif depuis le
+   * 14/09/2026 : le document de l'équipe termine son tableau par « 100 % Digital », qui se suffit à
+   * lui-même. Sans libellé, le bloc ne rend que la valeur.
+   */
+  label?: string;
   /** Valeur mise en avant (ex. « 200 € »). */
   value: string;
   /** Appel de note : source et portée de la valeur. */

@@ -30,8 +30,26 @@ import { risks } from '@/content/fr/risks';
 const id = sections.risks.id;
 ---
 
-<!-- data-curtain : la section monte par-dessus la section précédente épinglée (voir src/scripts/motion/scroll.ts). -->
-<Section id={id} tone="ink" data-curtain="">
+{
+  /*
+   * PLUS DE RIDEAU (14/09/2026) : « le bloc des risques apparaît trop tôt au scroll ».
+   *
+   * La règle d'emploi du rideau (src/scripts/motion/scroll.ts) prévoyait un seul rideau sur l'accueil,
+   * celui-ci, POSÉ SUR 08b-Presse. Or 08b-Presse a quitté HOME_ORDER : la section qui précède est
+   * maintenant 06-Souscrire, et le moteur épingle simplement `previousElementSibling`, sans savoir
+   * laquelle c'est. Le rideau s'appliquait donc à une section qu'il n'a jamais visée.
+   *
+   * Mesuré sur 1440 × 900 : Souscrire fait 1 110 px, soit 1,23 écran. Son bas touche le bas du viewport
+   * après 250 px de défilement seulement, l'épinglage se déclenche là, et les Risques commencent à
+   * monter par-dessus dans la foulée. Le lecteur n'a jamais la section pour lui seul : à peine
+   * encadrée, elle est déjà recouverte. Sans le rideau, Souscrire défile à son rythme et les Risques
+   * arrivent normalement.
+   *
+   * Pour le rétablir : remettre 08b-Presse juste avant dans HOME_ORDER, ou n'appliquer le rideau que
+   * si la section précédente tient dans un écran.
+   */
+}
+<Section id={id} tone="ink">
   <Container size="wide" class="relative">
     <SectionHeading id={id} title={risks.title} intro={risks.intro} />
 

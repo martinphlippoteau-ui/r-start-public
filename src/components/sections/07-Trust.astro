@@ -46,7 +46,6 @@ import Container from '@/components/ui/Container.astro';
 import NoteRef from '@/components/ui/NoteRef.astro';
 import Section from '@/components/ui/Section.astro';
 import SectionHeading from '@/components/ui/SectionHeading.astro';
-import Stat from '@/components/ui/Stat.astro';
 import TrustBox from '@/components/ui/TrustBox.astro';
 import { pages } from '@/config/pages';
 import { withBase } from '@/lib/href';
@@ -74,78 +73,49 @@ const hint = trustpilot.externalLinkHint;
         /* Zone 4 de la trame : en-tête de corum.ts (« L'expérience derrière R Start »), dont l'introduction porte
           l'avantage et son contre-poids dans la même phrase. trust.ts garde les cartes, chiffres et sources. */
       }
-      <SectionHeading
-        id={id}
-        eyebrow={corum.eyebrow}
-        title={corum.title}
-        intro={corum.intro}
-        motion
-      />
+      {
+        /*
+         * TITRE SEUL (14/09/2026, demande de l'équipe) : ni introduction, ni chiffres, ni contre-poids.
+         * Le bloc enchaîne directement sur les avis, et le bouton renvoie à /a-propos, où les quatre
+         * chiffres du groupe, la gamme des cinq SCPI et les bureaux sont détaillés avec leurs sources
+         * et leurs contre-poids.
+         * Retirés d'ici : l'introduction « R Start s'appuie sur 15 ans d'expertise… », les quatre
+         * chiffres (15 ans, 9,6 Md€, + 160 000 épargnants, 5 SCPI) et leur contre-poids « Ces chiffres
+         * sont ceux du groupe CORUM, pas ceux de R Start… ». Ils n'ont pas disparu du site.
+         */
+      }
+      <SectionHeading id={id} eyebrow={corum.eyebrow} title={corum.title} motion />
 
       {
-        /* LES QUATRE CHIFFRES DU GROUPE, remis sur l'accueil le 14/09/2026 : le document de l'équipe les
-          énumère sous ce titre, et ils en avaient disparu. Ils comptent depuis 0, en place.
-          « 15 ans d'expertise ET D'OBJECTIFS TENUS » du document s'arrête à l'expertise : la seconde
-          moitié est une allégation de performance, refusée par le contrôle de conformité et déjà écartée
-          de la brochure. Le « (10 ?) » du document devant les milliards n'a pas été tranché : la valeur
-          reste celle de facts.corumGroup, 9,6, relevée sur corum.fr. */
+        /* LES AVIS REJOIGNENT CE BLOC (14/09/2026, demande de l'équipe) : ils occupaient une bande
+          blanche à part, ils ferment maintenant « L'expérience derrière R Start », dont ils sont la
+          suite naturelle, les chiffres du groupe puis ce qu'en disent ses clients.
+          TrustBox en thème sombre, comme dans le hero, et le lien en teal-200, lisible sur l'ink. */
       }
-      <ul
-        role="list"
-        class="mt-12 grid grid-cols-2 gap-x-8 gap-y-10 lg:mt-16 lg:grid-cols-4"
-        data-animate="stagger"
-        data-animate-stagger="0.08"
-      >
-        {
-          trust.stats.items.map((chiffre) => (
-            <li>
-              <Stat
-                size="solid"
-                value={chiffre.value}
-                numeric={chiffre.numeric}
-                prefix={chiffre.prefix}
-                suffix={chiffre.suffix}
-                label={chiffre.label}
-                class="[&>span:first-child]:text-teal-200"
-              />
-            </li>
-          ))
-        }
-      </ul>
-      <p data-risk class="text-base mt-8 leading-relaxed text-white lg:mt-10">
-        <strong class="font-semibold text-sand">Bon à savoir :</strong>
-        {trust.stats.risk}
-      </p>
-
-      {
-        /* Le cadre réglementaire (visa, agrément, dépositaire, autorité, SFDR) a quitté l'accueil le
-          11/09/2026 : il vit sur /documentation (RegulatoryFrame.astro), avec les documents qu'il décrit.
-          Le visa et l'agrément restent dans le pied de page, sur toutes les pages. */
-      }
-    </Container>
-  </div>
-
-  <!-- Bande white : avis clients + groupe CORUM -->
-  <div class="bg-white py-section text-ink">
-    <Container size="wide">
-      <!-- Avis clients -->
-      <div class="grid gap-8 lg:grid-cols-12 lg:gap-16">
-        <h3 class="text-display-sm lg:col-span-12" data-animate="fade-up">
+      <div class="mt-section-sm">
+        <h3 class="text-display-sm text-white" data-animate="fade-up">
           {trustpilot.title}
-          <NoteRef id="confiance-trustpilot" tone="light" />
+          <NoteRef id="confiance-trustpilot" tone="dark" />
         </h3>
         {
           /* TrustBox officiel « carrousel » (11/09/2026) : la note figée et son compteur ont laissé la
             place aux avis servis en direct par Trustpilot, toutes notes confondues (`stars` 1 à 5). Rien
             n'est composé ni trié ici : le contenu arrive dans une iframe Trustpilot. */
         }
-        <div class="lg:col-span-12">
+        <div class="mt-6">
+          {
+            /* PAS de `theme="dark"` sur le carrousel, contrairement au bandeau du hero : le thème
+              sombre de Trustpilot passe le nom et la date des avis en gris clair, alors que les cartes
+              d'avis, elles, restent blanches. Résultat mesuré le 14/09/2026, six violations de
+              contraste à 1,85:1 dans l'iframe. Le thème clair garde leurs cartes lisibles ; elles
+              posent leur propre fond blanc sur l'ink, ce qui convient à un composant embarqué. */
+          }
           <TrustBox template="carousel" label={trustpilot.widgetLabel!} />
           <a
             href={trustpilot.url}
             target="_blank"
             rel="noopener noreferrer"
-            class="mt-4 inline-flex items-center gap-2 text-base font-semibold text-teal-700 no-underline hover:text-navy link-underline"
+            class="link-underline mt-4 inline-flex items-center gap-2 text-base font-semibold text-teal-200 no-underline hover:text-white"
           >
             {trustpilot.linkLabel}
             {hint && <span class="visually-hidden">({hint})</span>}
@@ -170,15 +140,12 @@ const hint = trustpilot.externalLinkHint;
       </div>
 
       {
-        /* « Le groupe CORUM en chiffres » a quitté l'accueil le 11/09/2026 : les quatre chiffres vivent sur
-          /a-propos, avec l'ambiance des bureaux et la gamme. L'accueil garde l'en-tête et les avis clients. */
+        /* La photo d'ambiance, la gamme des cinq SCPI et les quatre chiffres détaillés vivent sur
+          /a-propos (components/pages/a-propos/CorumRange.astro), atteinte par ce bouton. En clair sur
+          l'ink depuis que la bande blanche a disparu avec le déplacement des avis. */
       }
-      {
-        /* La photo d'ambiance et la gamme des cinq SCPI ont quitté l'accueil le 11/09/2026 : elles vivent
-          sur /a-propos (components/pages/a-propos/CorumRange.astro), atteinte par le bouton ci-dessous. */
-      }
-      <div class="mt-10 sm:mt-16 lg:mt-24">
-        <Button href={withBase(pages.about.path)} variant="secondary" size="lg">
+      <div class="mt-section-sm">
+        <Button href={withBase(pages.about.path)} variant="outline-light" size="lg">
           {corum.aboutLink}
         </Button>
       </div>

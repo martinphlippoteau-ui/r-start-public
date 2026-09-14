@@ -1,5 +1,5 @@
 import type { HighlightsContent, LegalNote } from '@/content/types';
-import { fees, income, product, risk, share, strategy, subscription } from '@/content/fr/facts';
+import { income, product, risk, share, strategy, subscription } from '@/content/fr/facts';
 
 /**
  * Section 2, « R Start en six repères » (id « points-forts »).
@@ -112,18 +112,19 @@ export const highlights: HighlightsContent = {
       value: nb(income.enjoymentDelayLabel),
       noteId: 'points-forts-jouissance',
     },
-    {
-      label: '100 % Digital',
-      value: nb(subscription.onlineLabel),
-      noteId: 'points-forts-en-ligne',
-    },
+    /*
+     * PAS DE LIGNE « 100 % Digital » dans le tableau (14/09/2026, demande de l'équipe) : elle disait la
+     * même chose que « Souscription : 100 % en ligne », juste en dessous, où l'information est à sa
+     * place. Le tableau s'en tient donc aux six caractéristiques du produit.
+     */
   ],
   /**
-   * Les deux options automatiques vivent à part : ce ne sont pas des caractéristiques du produit mais
-   * ce qu'on peut automatiser après la souscription. « 100 % Digital » les a quittées pour le tableau.
+   * La souscription et les deux options automatiques vivent à part : ce ne sont pas des
+   * caractéristiques du produit mais la façon d'y souscrire et ce qu'on peut automatiser ensuite.
    */
   subscriptionTitle: 'Souscription et options disponibles',
   subscriptionItems: [
+    { label: 'Souscription', value: nb(subscription.onlineLabel), noteId: 'points-forts-en-ligne' },
     {
       label: 'Versements automatiques',
       value: nb(`dès ${subscription.options.pei.minimumMonthlyLabel}`),
