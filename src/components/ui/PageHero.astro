@@ -37,8 +37,8 @@ import Container from '@/components/ui/Container.astro';
 interface Props {
   eyebrow: string;
   title: string;
-  /** Facultative depuis le 12/09/2026 : la page Frais n'en a plus, on y va droit au comparateur. */
-  intro?: string;
+  /** Facultative ; un tableau rend un paragraphe par entrée. */
+  intro?: string | string[];
   /** Phrase-clé sous l'introduction, en gras, MÊME TAILLE que l'introduction et la ligne risques. */
   punchline?: string;
   /** Facultative depuis le 14/09/2026 : voir PageHero dans types-v2.ts. Une seule page s'en passe. */
@@ -74,6 +74,8 @@ const {
   class: className = '',
 } = Astro.props;
 const titleId = id + '-title';
+/** Une chaîne ou plusieurs : le rendu ne connaît qu'un tableau, vide quand il n'y a pas d'intro. */
+const intros = intro === undefined ? [] : Array.isArray(intro) ? intro : [intro];
 const tones = { ink: 'bg-ink', brand: 'bg-brand-gradient-dark' };
 const hasAside = Astro.slots.has('aside');
 ---
@@ -133,11 +135,16 @@ const hasAside = Astro.slots.has('aside');
           }
         </h1>
         {
-          intro && (
-            <p class="text-lead mt-3 max-w-3xl text-pretty text-white max-sm:text-base max-sm:leading-snug sm:mt-6">
-              {intro}
+          intros.map((paragraphe, i) => (
+            <p
+              class:list={[
+                'text-lead max-w-3xl text-pretty text-white max-sm:text-base max-sm:leading-snug',
+                i === 0 ? 'mt-3 sm:mt-6' : 'mt-3 sm:mt-4',
+              ]}
+            >
+              {paragraphe}
             </p>
-          )
+          ))
         }
         {
           /* Phrase-clé : même taille que l'introduction et que la ligne risques qui suit, seule la

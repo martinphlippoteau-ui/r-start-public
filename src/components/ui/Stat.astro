@@ -12,8 +12,11 @@ interface Props {
    * `display` : très grand chiffre en dégradé de marque (scène d'ouverture).
    * `solid` : plus petit, encre pleine, chiffres à chasse fixe, pour une grille de chiffres que l'on
    * compare du regard (11/09/2026 : à 86 px et en dégradé, la grille CORUM était illisible).
+   * `solid-compact` : même encre, un cran plus bas, pour une grille SERRÉE. Introduit le 14/09/2026,
+   * quand le groupe CORUM est passé à cinq chiffres : à cinq colonnes, « 9,6 Md€ » et « + 160 000 »
+   * passaient à la ligne en `solid` et les cinq libellés ne s'alignaient plus.
    */
-  size?: 'display' | 'solid';
+  size?: 'display' | 'solid' | 'solid-compact';
   label: string;
   numeric?: number;
   prefix?: string;
@@ -40,7 +43,9 @@ const {
 <div class:list={['flex flex-col gap-2', className]}>
   <span
     class:list={[
-      size === 'solid' ? 'text-display-md tabular-nums text-navy' : 'text-stat text-brand-gradient',
+      size === 'display' && 'text-stat text-brand-gradient',
+      size === 'solid' && 'text-display-md tabular-nums text-navy',
+      size === 'solid-compact' && 'text-display-sm tabular-nums text-navy',
     ]}
     data-counter={numeric}
     data-counter-prefix={prefix}

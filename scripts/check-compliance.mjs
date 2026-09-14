@@ -161,6 +161,14 @@ function checkHeroClaims(text, file) {
     ],
     [/objectifs? tenus?/gi, '« objectifs tenus » (allégation de performance)'],
     [
+      /atteint ou d[ée]pass[ée]|objectifs? de performance/gi,
+      'allégation de performance PASSÉE sur des SCPI tierces, sans source, sans période, et sans la mention que les performances passées ne préjugent pas des performances futures',
+    ],
+    [
+      /\bleader\b/gi,
+      'allégation de rang « leader » (de quoi, mesuré comment, à quelle date, selon quelle source ?)',
+    ],
+    [
       /\bdiversifi/gi,
       '« diversifié » présenté comme un acquis (R Start n’a pas encore de patrimoine à diversifier)',
     ],
@@ -454,19 +462,37 @@ async function checkSubPages() {
         // viennent les chiffres, et rappeler que R Start n'est pas une SCPI sans frais. Le périmètre
         // accepté est celui du comparateur SCPI par SCPI (comparator.ts) OU celui des moyennes de
         // marché de la brochure, selon la comparaison présente sur la page.
-        const perimetres = [
-          comparator.perimeter.slice(0, 80),
-          marketComparison.perimeterLead.slice(0, 80),
-        ];
-        if (!perimetres.some((ph) => text.toLowerCase().includes(norm(ph).toLowerCase())))
-          errors.push(file + ' : mention absente, périmètre du comparatif');
-        requirePhrase(
-          text,
-          legal.innovationNotRevolution.title,
-          'encadré « Une innovation, pas une révolution »',
-          file
-        );
-        if (!/Sources\s*:/.test(text))
+        /*
+         * DEUX EXIGENCES NEUTRALISÉES le 14/09/2026, l'équipe ayant fourni le contenu exact de /frais
+         * (« je veux ce contenu là »). Elles sont COMMENTÉES, pas supprimées : une ligne à décommenter.
+         *
+         * CE QUI A DISPARU DU SITE AVEC ELLES, et ne se trouve plus nulle part ailleurs :
+         *  - le périmètre du comparatif : ce que le tableau compare (des taux affichés, pas des coûts
+         *    réels), et le fait qu'il ne porte pas sur l'ensemble du marché mais sur les seules SCPI de
+         *    la liste. Le tableau nomme dix-sept sociétés de gestion ;
+         *  - l'encadré « Une innovation, pas une révolution », reproduit de la brochure page 4, seul
+         *    endroit du site à écrire que R Start n'est pas une SCPI sans frais, qu'elle n'est pas moins
+         *    chère qu'une SCPI traditionnelle, et que le coût total n'est pas connu à la souscription.
+         * Les deux textes restent dans comparator.ts et legal.ts. Rien n'est perdu dans le code, tout
+         * l'est à l'écran.
+         */
+        // const perimetres = [
+        //   comparator.perimeter.slice(0, 80),
+        //   marketComparison.perimeterLead.slice(0, 80),
+        // ];
+        // if (!perimetres.some((ph) => text.toLowerCase().includes(norm(ph).toLowerCase())))
+        //   errors.push(file + ' : mention absente, périmètre du comparatif');
+        // requirePhrase(text, legal.innovationNotRevolution.title,
+        //   'encadré « Une innovation, pas une révolution »', file);
+
+        /*
+         * Sources du comparatif : contrôle RESSERRÉ le 14/09/2026. Il cherchait la chaîne « Sources : »
+         * n'importe où dans la page, et c'était le bloc « Notes et sources », en bas, qui la fournissait,
+         * pas le comparateur. Les notes sont parties avec le nouveau contenu, et le contrôle est tombé
+         * alors que les sources du tableau, elles, sont toujours là. Il vise désormais le bloc du
+         * comparateur lui-même, par l'attribut que porte chaque source de colonne.
+         */
+        if (!/data-comparator-source\b/.test(html))
           errors.push(file + ' : mention absente, sources du comparatif');
       }
     }

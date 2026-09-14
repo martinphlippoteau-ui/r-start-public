@@ -227,6 +227,10 @@ export interface StrategyChapter {
   items: { lead: string; rest?: string }[];
   /** Phrase qui referme le chapitre, sous la liste. */
   outro: string;
+  /** Mention placée par la Conformité sous le chapitre (ui/NoteConformite.astro). */
+  disclaimer?: string;
+  /** Légende de la carte de la zone d'investissement (zone « Où »), rendue hors du SVG. */
+  map?: { legend: string };
 }
 
 /**
@@ -241,6 +245,7 @@ export interface StrategyContent {
   engines: StrategyChapter;
   what: StrategyChapter;
   where: StrategyChapter;
+  how: StrategyChapter;
 }
 
 /** Frise « mois 1 → mois N » de l'entrée en jouissance (micro-textes de la section Revenus). */

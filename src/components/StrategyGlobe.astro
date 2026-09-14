@@ -1,0 +1,338 @@
+---
+/**
+ * Globe en rotation (section « Où », /strategie). Demande de l'équipe du 14/09/2026, après la carte
+ * du monde à plat : « tu peux animer un globe qui tourne sur lui-même ».
+ *
+ * POURQUOI UN CANVAS ET PAS UN SVG. Un globe qui tourne change de projection à chaque image : aucun
+ * tracé ne peut être pré-calculé, contrairement aux deux cartes plates que produit scripts/make-map.mjs.
+ * Ce qui est livré, ce sont les FRONTIÈRES elles-mêmes, en degrés (src/content/fr/globe.json, 48 Ko,
+ * 255 anneaux, 3 407 points, simplifiées une fois pour toutes par le script), et c'est le client qui
+ * projette. C'est plus léger que le SVG du planisphère qu'il remplace, qui pesait 113 Ko.
+ *
+ * PROJECTION orthographique : on voit la Terre comme depuis l'espace, une face à la fois, les bords
+ * écrasés par la courbure. Les points de la face cachée sont écartés à chaque image ; un anneau qui
+ * traverse le limbe est coupé en tronçons visibles, refermés à la corde. L'écart avec l'arc exact ne
+ * se voit qu'au ras du bord, là où tout est déjà écrasé, et le tracé est de toute façon détouré par
+ * le disque.
+ *
+ * MENÉ PAR LE DÉFILEMENT (14/09/2026, demande de l'équipe), et non par une horloge : la Terre est
+ * centrée sur l'EUROPE quand le globe entre à l'écran, puis part VERS L'OUEST au fil de la descente,
+ * Atlantique, Amériques, Pacifique. Elle s'arrête quand on s'arrête. C'est le vocabulaire du reste du
+ * site, où les scènes sont attachées au défilement (`data-scrub`), et non une animation qui tourne
+ * dans son coin. Aucune boucle d'animation permanente : on redessine sur défilement, rien d'autre.
+ *
+ * CE QUI L'ARRÊTE :
+ *  - `prefers-reduced-motion: reduce` : une seule image, centrée sur l'Europe, jamais de rotation ;
+ *  - hors écran (IntersectionObserver) : aucun calcul ;
+ *  - onglet en arrière-plan : il n'y a pas de défilement, donc rien à faire.
+ * Sans JavaScript, la figure entière disparaît (`@media (scripting: none)`) : un globe est une
+ * illustration, pas une information, et un cadre vide vaudrait moins que rien. La légende part avec.
+ *
+ * Purement décoratif : `aria-hidden`, aucun rôle, aucun texte. La légende est rendue par la section.
+ */
+import rings from '@/content/fr/globe.json';
+import { jsonScript } from '@/lib/jsonScript';
+---
+
+<figure class="globe-figure">
+  <div class="globe-scene">
+    <canvas data-globe class="globe-canvas" aria-hidden="true"></canvas>
+  </div>
+  <slot />
+</figure>
+
+{
+  /* Frontières dans un bloc de DONNÉES, non exécutable : la politique de sécurité du contenu ne le
+    soumet pas à `script-src`, il voyage donc sans nonce. Le script qui suit n'est pas « en ligne » :
+    Astro le sort dans un fichier, que `script-src 'self'` autorise. */
+}
+<script type="application/json" data-globe-data is:inline set:html={jsonScript(rings)} />
+
+<style>
+  .globe-scene {
+    position: relative;
+    margin-inline: auto;
+    width: min(100%, 34rem);
+    aspect-ratio: 1;
+  }
+  .globe-canvas {
+    display: block;
+    height: 100%;
+    width: 100%;
+  }
+  /* Sans script, le canvas resterait un carré vide : la figure entière s'efface, légende comprise. */
+  @media (scripting: none) {
+    .globe-figure {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  /**
+   * Projection orthographique et rotation. Tout est en radians à l'intérieur, en degrés aux entrées.
+   *
+   * L'INCLINAISON est fixe (23°, celle de l'axe terrestre) : le pôle nord reste en haut et légèrement
+   * vers nous, ce qui donne un volume immédiat. Seule la longitude du centre avance, c'est la rotation.
+   */
+  /** Longitude au centre à l'arrivée du globe : 12° est, l'Europe de plein fouet. */
+  const DEPART_DEG = 12;
+  /**
+   * Balayage sur toute la traversée de l'écran : 200° vers l'ouest. De l'Europe on passe l'Atlantique,
+   * les Amériques, et on finit sur le Pacifique. Un tour complet ferait revenir l'Europe au centre à
+   * la sortie, ce qui donnerait l'impression que rien ne s'est passé.
+   */
+  const BALAYAGE_DEG = -200;
+  const INCLINAISON = (23 * Math.PI) / 180;
+  /*
+   * QUAND LE BALAYAGE COMMENCE ET QUAND IL FINIT, en fractions de hauteur d'écran.
+   *
+   * Il PART AVANT que le globe soit à l'écran (14/09/2026, demande de l'équipe) : quand son haut est
+   * encore un dixième d'écran sous la ligne de flottaison. La Terre a donc déjà commencé à tourner
+   * quand elle apparaît, au lieu de rester plantée puis de démarrer d'un coup. L'Europe de face est le
+   * premier état du balayage, sous le pli ; on la voit encore pendant que le globe monte.
+   *
+   * Il FINIT avant la sortie par le haut, quand le bas du globe atteint le cinquième inférieur de
+   * l'écran : la course doit s'achever pendant qu'on le voit encore, sinon les derniers degrés se
+   * jouent hors champ et le mouvement semble s'arrêter net.
+   */
+  const DEBUT = 1.1; // `top` = 110 % de la hauteur d'écran : encore sous le pli
+  const FIN = 0.2; // `bottom` = 20 % de la hauteur d'écran : le globe est encore bien visible
+
+  type Anneau = [number, number][];
+
+  const init = (): void => {
+    const canvas = document.querySelector<HTMLCanvasElement>('[data-globe]');
+    const bloc = document.querySelector('[data-globe-data]');
+    if (!canvas || !bloc?.textContent) return;
+
+    let anneaux: Anneau[];
+    try {
+      anneaux = JSON.parse(bloc.textContent) as Anneau[];
+    } catch {
+      return; // données illisibles : pas de globe, le reste de la page ne dépend pas de lui
+    }
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    /* Coordonnées pré-converties en radians ET en sinus / cosinus : ce sont les seules valeurs dont la
+       projection a besoin, et elles ne changent jamais. Les recalculer soixante fois par seconde pour
+       trois mille points serait le seul vrai coût de la boucle. */
+    const prepares = anneaux.map((anneau) =>
+      anneau.map(([lon, lat]) => {
+        const l = (lon * Math.PI) / 180;
+        const p = (lat * Math.PI) / 180;
+        return { l, sinP: Math.sin(p), cosP: Math.cos(p) };
+      })
+    );
+
+    const sinI = Math.sin(INCLINAISON);
+    const cosI = Math.cos(INCLINAISON);
+
+    let cote = 0;
+    let rayon = 0;
+    let centre = 0;
+
+    const mesurer = (): void => {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const rect = canvas.getBoundingClientRect();
+      cote = Math.max(1, Math.round(rect.width));
+      canvas.width = Math.round(cote * dpr);
+      canvas.height = Math.round(cote * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      /* Marge d'un pour cent : le trait du limbe ne doit pas être rogné par le bord du canvas. */
+      rayon = (cote / 2) * 0.99;
+      centre = cote / 2;
+    };
+
+    /** Teintes reprises du thème (teal-400, teal-200, ink) : lues une fois, jamais recalculées. */
+    const TERRE = 'rgba(20, 164, 186, 0.9)';
+    const TERRE_FOND = 'rgba(20, 164, 186, 0.16)';
+    const GRILLE = 'rgba(169, 221, 230, 0.16)';
+
+    const dessiner = (lambda: number): void => {
+      ctx.clearRect(0, 0, cote, cote);
+
+      /* Le globe : un dégradé qui éclaire le haut gauche et s'éteint vers le bas droit. C'est lui qui
+         donne la sphère ; sans lui, les côtes flottent dans le vide. */
+      const fond = ctx.createRadialGradient(
+        centre - rayon * 0.35,
+        centre - rayon * 0.4,
+        rayon * 0.1,
+        centre,
+        centre,
+        rayon
+      );
+      fond.addColorStop(0, 'rgba(17, 152, 175, 0.28)');
+      fond.addColorStop(0.65, 'rgba(13, 46, 61, 0.35)');
+      fond.addColorStop(1, 'rgba(13, 46, 61, 0.65)');
+      ctx.beginPath();
+      ctx.arc(centre, centre, rayon, 0, Math.PI * 2);
+      ctx.fillStyle = fond;
+      ctx.fill();
+
+      ctx.save();
+      ctx.clip(); // tout ce qui suit reste dans le disque
+
+      /* Méridiens et parallèles, tous les 30° : ils disent que ça tourne, même quand une face vide
+         passe devant. Tracés avant les terres, ils ne les traversent jamais. */
+      ctx.strokeStyle = GRILLE;
+      ctx.lineWidth = 1;
+      for (let m = -180; m < 180; m += 30) {
+        const l = (m * Math.PI) / 180;
+        ctx.beginPath();
+        let leve = true;
+        for (let d = -90; d <= 90; d += 3) {
+          const p = (d * Math.PI) / 180;
+          const cosP = Math.cos(p);
+          const sinP = Math.sin(p);
+          const dl = l - lambda;
+          const cosDl = Math.cos(dl);
+          if (sinI * sinP + cosI * cosP * cosDl <= 0) {
+            leve = true;
+            continue;
+          }
+          const x = centre + rayon * (cosP * Math.sin(dl));
+          const y = centre - rayon * (cosI * sinP - sinI * cosP * cosDl);
+          if (leve) {
+            ctx.moveTo(x, y);
+            leve = false;
+          } else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+      }
+      for (let par = -60; par <= 60; par += 30) {
+        const p = (par * Math.PI) / 180;
+        const cosP = Math.cos(p);
+        const sinP = Math.sin(p);
+        ctx.beginPath();
+        let leve = true;
+        for (let d = -180; d <= 180; d += 3) {
+          const l = (d * Math.PI) / 180 - lambda;
+          const cosL = Math.cos(l);
+          if (sinI * sinP + cosI * cosP * cosL <= 0) {
+            leve = true;
+            continue;
+          }
+          const x = centre + rayon * (cosP * Math.sin(l));
+          const y = centre - rayon * (cosI * sinP - sinI * cosP * cosL);
+          if (leve) {
+            ctx.moveTo(x, y);
+            leve = false;
+          } else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+      }
+
+      /* Les terres. Chaque anneau est découpé en tronçons visibles ; un tronçon de moins de trois
+         points ne dessine rien d'utile et n'est pas ouvert. */
+      ctx.lineWidth = 1.2;
+      ctx.lineJoin = 'round';
+      ctx.strokeStyle = TERRE;
+      ctx.fillStyle = TERRE_FOND;
+      for (const anneau of prepares) {
+        let tronçon: number[] = [];
+        const vider = (): void => {
+          if (tronçon.length >= 6) {
+            ctx.beginPath();
+            ctx.moveTo(tronçon[0], tronçon[1]);
+            for (let i = 2; i < tronçon.length; i += 2) ctx.lineTo(tronçon[i], tronçon[i + 1]);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+          }
+          tronçon = [];
+        };
+        for (const { l, sinP, cosP } of anneau) {
+          const dl = l - lambda;
+          const cosDl = Math.cos(dl);
+          if (sinI * sinP + cosI * cosP * cosDl <= 0) {
+            vider();
+            continue;
+          }
+          tronçon.push(
+            centre + rayon * (cosP * Math.sin(dl)),
+            centre - rayon * (cosI * sinP - sinI * cosP * cosDl)
+          );
+        }
+        vider();
+      }
+
+      ctx.restore();
+
+      /* Le limbe, tracé en dernier : il referme la sphère sur le fond sombre de la section. */
+      ctx.beginPath();
+      ctx.arc(centre, centre, rayon, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(169, 221, 230, 0.35)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    };
+
+    const reduit = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let visible = false;
+    let enAttente = false;
+    let angle = (DEPART_DEG * Math.PI) / 180;
+
+    /**
+     * Avancement, de 0 (le globe approche, encore sous le pli, Europe de face) à 1 (course finie, le
+     * globe est encore visible en haut d'écran). Relevé sur le canvas lui-même et non sur la section :
+     * c'est lui qu'on regarde, et sa position est la seule qui compte.
+     */
+    const avancement = (): number => {
+      const r = canvas.getBoundingClientRect();
+      const vh = window.innerHeight || 1;
+      const depart = DEBUT * vh; // `top` au début de la course
+      const course = (DEBUT - FIN) * vh + r.height; // jusqu'à `bottom === FIN * vh`
+      if (course <= 0) return 0;
+      const p = (depart - r.top) / course;
+      return p < 0 ? 0 : p > 1 ? 1 : p;
+    };
+
+    const rendre = (): void => {
+      enAttente = false;
+      const p = reduit.matches ? 0 : avancement();
+      angle = ((DEPART_DEG + p * BALAYAGE_DEG) * Math.PI) / 180;
+      dessiner(angle);
+    };
+
+    const planifier = (): void => {
+      if (enAttente || !visible) return;
+      enAttente = true;
+      requestAnimationFrame(rendre);
+    };
+
+    mesurer();
+    rendre();
+
+    if ('ResizeObserver' in window) {
+      let attente = 0;
+      new ResizeObserver(() => {
+        window.clearTimeout(attente);
+        attente = window.setTimeout(() => {
+          mesurer();
+          rendre();
+        }, 120);
+      }).observe(canvas);
+    }
+
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(
+        (entrees) => {
+          visible = entrees.some((e) => e.isIntersecting);
+          if (visible) planifier();
+        },
+        { rootMargin: '15% 0px' }
+      ).observe(canvas);
+    } else {
+      visible = true;
+    }
+
+    window.addEventListener('scroll', planifier, { passive: true });
+    window.addEventListener('resize', planifier, { passive: true });
+    reduit.addEventListener('change', rendre);
+  };
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+</script>

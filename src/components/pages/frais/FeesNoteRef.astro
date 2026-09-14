@@ -24,10 +24,23 @@ const colors = {
   light: 'text-teal-700',
   dark: 'text-teal-200',
 };
+/*
+ * NE REND PLUS RIEN depuis le 14/09/2026, demande de l'équipe : « enlève les notes et les sources de
+ * tout le site sauf du tableau de la page frais ».
+ *
+ * La coupe est ici, et non dans les fichiers de contenu : les seize registres de notes restent intacts,
+ * avec leurs sources, leurs dates et leurs renvois aux documents réglementaires. Rien n'est réécrit,
+ * rien n'est perdu. Remettre `AFFICHER` à `true` rétablit tout, appels de note compris.
+ *
+ * SEULE EXCEPTION CONSERVÉE sur le site : le bloc « Sources des données » sous le comparateur de
+ * /frais (FeeComparator.astro). Il dit d'où viennent les taux des dix-sept SCPI nommées et à quelle
+ * date ils ont été relevés ; sans lui, la comparaison serait invérifiable.
+ */
+const AFFICHER = false;
 ---
 
 {
-  n !== null && (
+  AFFICHER && n !== null && (
     <a
       href={'#' + sections.notes.id + '-' + n}
       class:list={[

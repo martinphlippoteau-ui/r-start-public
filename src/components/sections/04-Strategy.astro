@@ -7,7 +7,10 @@
  * elle en compte trois, ceux du document :
  *  1. #strategie (paper) les deux moteurs de performance, numérotés, puis la phrase de méthode ;
  *  2. #quoi      (white) le double potentiel visé, puis la bande de trois photos d'immeubles ;
- *  3. #ou        (ink)   la zone d'investissement, en très grand, et le mot de la fin.
+ *  3. #ou        (ink)   la zone d'investissement à gauche, le globe en rotation à droite ;
+ *  4. #comment   (paper) la méthode d'achat en trois temps, et le mot de la fin.
+ * La zone « Comment » est arrivée le 14/09/2026, après les trois autres : les images du document
+ * fourni étaient coupées, elle n'y figurait pas.
  * Ce qui a disparu avec elles : le mot d'ordre en scène épinglée, les piliers et leurs pictos, la
  * CARTE (elle montrait le Conseil de l'Europe et le Canada, la page dit désormais « partout dans le
  * monde » : elle disait le contraire du texte), les pastilles de types d'actifs, l'effet de levier et
@@ -17,9 +20,9 @@
  * ink enchaînerait deux pavés sombres sans coupure, et un test l'interdit sur toutes les sous-pages.
  * Le ton ink ferme ici la page au lieu de l'ouvrir, et porte la phrase la plus courte du document.
  *
- * AUCUN CONTRE-POIDS dans la page, sur demande expresse de l'équipe, et plus de ligne risques dans
- * l'en-tête non plus depuis le 14/09/2026 : /strategie ne porte AUCUNE mention de risque en propre, il
- * ne reste que celles du pied de page. D'où l'absence de [data-advantage] et de RiskNote ici.
+ * UNE SEULE MENTION DE RISQUE, en fin de zone 2 : celle que la Conformité a placée elle-même le
+ * 14/09/2026, rendue par ui/NoteConformite.astro et non par RiskNote, qui ne rend plus rien. L'en-tête
+ * n'en porte plus. D'où l'absence de [data-advantage] et de RiskNote dans le reste de la page.
  *
  * Motion (src/scripts/motion.ts, tout par attributs) : aucun rideau, la section suit directement
  * l'en-tête ; H2 du premier chapitre mot à mot (data-reveal-text), les deux autres en
@@ -32,7 +35,9 @@
 import { Picture } from 'astro:assets';
 import Card from '@/components/ui/Card.astro';
 import Container from '@/components/ui/Container.astro';
+import NoteConformite from '@/components/ui/NoteConformite.astro';
 import Section from '@/components/ui/Section.astro';
+import StrategyGlobe from '@/components/StrategyGlobe.astro';
 import { sections } from '@/config/sections';
 import { media } from '@/content/fr/media';
 import { strategy } from '@/content/fr/strategy';
@@ -40,7 +45,7 @@ import { resolveImage } from '@/lib/images';
 
 const id = sections.strategy.id;
 /** Ancres des deux autres chapitres (ids HTML, pas les textes affichés). */
-const ids = { what: 'quoi', where: 'ou' };
+const ids = { what: 'quoi', where: 'ou', how: 'comment' };
 
 const photos = await Promise.all(
   media.strategy.map(async (m) => ({ ...m, image: await resolveImage(m.src) }))
@@ -102,6 +107,16 @@ const QUIET_TITLE_Y = 12;
     >
       {strategy.engines.outro}
     </p>
+
+    {
+      /* Mention de la Conformité, jamais animée : un avertissement ne dépend pas d'un défilement pour
+        apparaître. Elle referme la zone, sous la phrase de méthode qu'elle qualifie. */
+    }
+    {
+      strategy.engines.disclaimer && (
+        <NoteConformite text={strategy.engines.disclaimer} class="mt-8 max-w-4xl" />
+      )
+    }
   </Container>
 </Section>
 
@@ -200,52 +215,131 @@ const QUIET_TITLE_Y = 12;
   </Container>
 </Section>
 
-{/* 3. Où : la zone d'investissement, et le mot de la fin */}
+{/* 3. Où : la zone d'investissement à gauche, le globe à droite */}
 <Section id={ids.where} tone="ink" class="overflow-hidden">
   <Container size="wide">
+    {
+      /* DEUX COLONNES à partir de `lg` (14/09/2026, demande de l'équipe) : le texte à gauche, le globe
+        à droite, alignés par leur milieu. Sous `lg`, le globe repasse SOUS le texte : à 390 px, deux
+        colonnes donneraient un globe de la taille d'une vignette et un titre en escalier.
+        Le texte occupe sept colonnes sur douze et le globe cinq : à parts égales, « et dans tous les
+        secteurs » passait à trois lignes. */
+    }
+    <div class="lg:grid lg:grid-cols-12 lg:items-center lg:gap-12 xl:gap-16">
+      <div class="lg:col-span-7">
+        <header>
+          <p class="text-eyebrow text-teal-200">{strategy.where.eyebrow}</p>
+          <h2
+            id={ids.where + '-title'}
+            class="text-display-md mt-3 text-white"
+            data-animate="fade-up"
+            data-animate-y={String(QUIET_TITLE_Y)}
+          >
+            {strategy.where.title}
+          </h2>
+          <p class="text-lead mt-5 text-pretty text-white sm:mt-6">{strategy.where.intro}</p>
+        </header>
+
+        {
+          /* Les deux réponses en très grand, l'une sous l'autre, chacune précédée d'un filet qui
+            s'étire à l'arrivée. */
+        }
+        <ul
+          role="list"
+          class="mt-10 grid gap-8 lg:mt-12 lg:gap-10"
+          data-animate="stagger"
+          data-animate-stagger="0.12"
+        >
+          {
+            strategy.where.items.map((item) => (
+              <li>
+                <span aria-hidden="true" data-draw="width" class="block h-px w-full bg-white/20" />
+                <p class="text-display-md pt-6 text-white">
+                  {item.lead}
+                  {item.rest && <span class="text-lead block mt-3 text-white/85">{item.rest}</span>}
+                </p>
+              </li>
+            ))
+          }
+        </ul>
+
+        <p
+          class="text-display-sm mt-12 text-teal-200 lg:mt-14"
+          data-animate="fade-up"
+          data-animate-y={String(QUIET_TITLE_Y)}
+        >
+          {strategy.where.outro}
+        </p>
+      </div>
+
+      {
+        /* Globe en rotation (StrategyGlobe.astro). Il a remplacé le planisphère le 14/09/2026,
+          lui-même arrivé le matin à la place de la carte à deux volets.
+          L'ink est la condition de son existence : le dégradé de la sphère et le tracé des côtes sont
+          réglés pour ce fond, ils disparaîtraient sur un fond clair. */
+      }
+      {
+        strategy.where.map && (
+          <div class="mt-14 lg:col-span-5 lg:mt-0">
+            <StrategyGlobe>
+              <figcaption class="text-caption mt-6 text-center text-white/85">
+                {strategy.where.map.legend}
+              </figcaption>
+            </StrategyGlobe>
+          </div>
+        )
+      }
+    </div>
+  </Container>
+</Section>
+
+{/* 4. Comment : la méthode d'achat, en trois temps */}
+<Section id={ids.how} tone="paper">
+  <Container size="wide">
     <header class="max-w-4xl">
-      <p class="text-eyebrow text-teal-200">{strategy.where.eyebrow}</p>
+      <p class="text-eyebrow text-teal-700">{strategy.how.eyebrow}</p>
       <h2
-        id={ids.where + '-title'}
-        class="text-display-md mt-3 text-white"
+        id={ids.how + '-title'}
+        class="text-display-md mt-3 text-ink"
         data-animate="fade-up"
         data-animate-y={String(QUIET_TITLE_Y)}
       >
-        {strategy.where.title}
+        {strategy.how.title}
       </h2>
-      <p class="text-lead mt-5 text-pretty text-white sm:mt-6">{strategy.where.intro}</p>
+      <p class="text-lead mt-5 text-pretty text-slate-700 sm:mt-6">{strategy.how.intro}</p>
     </header>
 
     {
-      /* Les deux réponses en très grand, l'une sous l'autre : c'est le seul endroit de la page où le
-        texte tient en trois mots, autant lui laisser toute la largeur. Chacune est précédée d'un filet
-        qui s'étire à l'arrivée. */
+      /* Les trois temps sont NUMÉROTÉS parce qu'ils se suivent vraiment : on repère et on achète, puis
+        on valorise au fil des années, puis on choisit le moment de vendre. L'ordre porte du sens, il
+        n'est pas décoratif, à la différence des deux listes des zones « Quoi » et « Où ». */
     }
-    <ul
-      role="list"
-      class="mt-10 grid gap-8 lg:mt-14 lg:gap-10"
+    <ol
+      class="mt-10 grid gap-8 lg:mt-14 lg:grid-cols-3 lg:gap-10"
       data-animate="stagger"
-      data-animate-stagger="0.12"
+      data-animate-stagger="0.1"
     >
       {
-        strategy.where.items.map((item) => (
+        strategy.how.items.map((item, i) => (
           <li>
-            <span aria-hidden="true" data-draw="width" class="block h-px w-full bg-white/20" />
-            <p class="text-display-md max-w-5xl pt-6 text-white">
-              {item.lead}
-              {item.rest && <span class="text-lead block mt-3 text-white/85">{item.rest}</span>}
-            </p>
+            <span aria-hidden="true" data-draw="width" class="block h-px w-full bg-navy/15" />
+            <div class="pt-6">
+              <p class="text-caption font-semibold tabular-nums text-teal-700" aria-hidden="true">
+                {String(i + 1).padStart(2, '0')}
+              </p>
+              <p class="text-lead mt-3 text-pretty text-ink">{item.lead}</p>
+            </div>
           </li>
         ))
       }
-    </ul>
+    </ol>
 
     <p
-      class="text-display-sm mt-12 text-teal-200 lg:mt-16"
+      class="text-display-sm mt-12 max-w-4xl text-navy lg:mt-16"
       data-animate="fade-up"
       data-animate-y={String(QUIET_TITLE_Y)}
     >
-      {strategy.where.outro}
+      {strategy.how.outro}
     </p>
   </Container>
 </Section>

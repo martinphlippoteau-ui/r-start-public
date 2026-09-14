@@ -14,6 +14,7 @@ import Breadcrumb from '@/components/ui/Breadcrumb.astro';
 import Button from '@/components/ui/Button.astro';
 import StickyCta from '@/components/StickyCta.astro';
 import PageHero from '@/components/ui/PageHero.astro';
+import CorumHistory from '@/components/pages/a-propos/CorumHistory.astro';
 import CorumRange from '@/components/pages/a-propos/CorumRange.astro';
 import { pages } from '@/config/pages';
 import { aboutPage } from '@/content/fr/aboutPage';
@@ -38,6 +39,11 @@ const jsonLd = [
         {aboutPage.cta.label}
       </Button>
     </PageHero>
+    {
+      /* Zone 2 (14/09/2026) : d'où vient CORUM, et pourquoi R Start arrive maintenant. Elle s'intercale
+        entre l'en-tête et les chiffres du groupe, qu'elle prépare. */
+    }
+    <CorumHistory tone="white" />
     <CorumRange notes={notes} />
     <LegalNotes notes={notes} />
   </main>

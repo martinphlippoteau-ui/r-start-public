@@ -97,6 +97,37 @@ if (homeNotes.length !== APPELEES_SUR_ACCUEIL.length) {
   );
 }
 
+/**
+ * ZONE 2 de /a-propos (14/09/2026) : texte fourni par l'équipe, repris mot pour mot. Elle raconte d'où
+ * vient CORUM et pourquoi R Start arrive maintenant. Aucun chiffre de performance, aucune comparaison
+ * de résultats : que des caractéristiques de modèle.
+ *
+ * DEUX PHRASES À FAIRE VALIDER PAR LA CONFORMITÉ, signalées à l'équipe le jour même :
+ *  - « Aujourd'hui, la société est leader sur le marché » est une allégation de rang SANS PÉRIMÈTRE
+ *    (leader de quoi, mesuré comment, à quelle date) et SANS SOURCE. C'est la même famille que le
+ *    « la seule SCPI » de /frais ; check-compliance.mjs la signale désormais en avertissement ;
+ *  - « d'objectifs tenus », dans les chiffres juste en dessous, est déjà signalé depuis le 14/09/2026.
+ */
+export const history = {
+  title: 'En 2011, CORUM a une conviction',
+  lead: 'L’immobilier professionnel doit être accessible à tous, et pas réservé aux initiés ou aux plus aisés.',
+  transformIntro: 'Très vite, CORUM transforme le modèle des SCPI de fond en comble :',
+  transformItems: [
+    'Un faible ticket d’entrée à partir de quelques dizaines d’euros,',
+    'Des explications sans jargon,',
+    'Des revenus potentiels qui tombent tous les mois,',
+    'Des SCPI qui se mettent à acheter des immeubles hors de France puis hors d’Europe,',
+    'La possibilité de réinvestir automatiquement ses revenus ou de mettre en place un programme d’investissement progressif…',
+  ],
+  transformOutro: 'Tout ça, c’est CORUM.',
+  today: 'Aujourd’hui, la société est leader sur le marché.',
+  /** La phrase de bascule : c'est elle qui amène R Start, le gras est dans le document fourni. */
+  chapter: {
+    lead: '14 ans et quatre SCPI plus tard,',
+    strong: 'R Start ouvre un nouveau chapitre.',
+  },
+} as const;
+
 export const corum = {
   eyebrow: 'CORUM',
   title: 'L’expérience derrière R Start',
@@ -154,9 +185,22 @@ export const corum = {
     risk: 'Chacune de ces solutions a ses propres risques et ses propres frais, décrits dans ses documents réglementaires. L’étendue de la gamme ne réduit aucun des risques de R Start : le capital investi y reste exposé à une perte.',
   },
 
+  /*
+   * ZONE 4 de /a-propos, texte fourni par l'équipe le 14/09/2026 et repris MOT POUR MOT.
+   *
+   * À FAIRE VALIDER PAR LA CONFORMITÉ, signalé à l'équipe le jour même, et c'est le point le plus lourd
+   * de la page : « les SCPI du groupe CORUM ont toujours atteint ou dépassé leurs objectifs de
+   * performance » est une ALLÉGATION DE PERFORMANCE PASSÉE, portant sur quatre SCPI tierces, sans
+   * source, sans période, sans définition de l'objectif, et sans la mention que les performances
+   * passées ne préjugent pas des performances futures.
+   * Elle remplace un texte qui disait exactement l'inverse : « R Start n'a pas encore d'historique
+   * propre ; les résultats des autres SCPI CORUM ne préjugent pas des siens ». Ce texte-là reste dans
+   * l'en-tête de la note 3 de la page, c'est désormais le seul endroit qui le dit.
+   * check-compliance.mjs la signale à chaque exécution.
+   */
   range: {
     title: `Des SCPI gérées depuis ${corumGroup.scpiSince}`,
-    description: `CORUM gère des SCPI depuis ${corumGroup.scpiSince} et en compte aujourd’hui ${corumGroup.scpiCount}, avec ${corumGroup.offices} bureaux. ${product.name} est la plus récente. Elle a ouvert ses souscriptions le ${product.openingDate.label} et n’a pas encore d’historique propre. Les résultats des autres SCPI CORUM ne préjugent pas des siens.`,
+    description: `Depuis ${corumGroup.scpiSince}, les SCPI du groupe CORUM ont toujours atteint ou dépassé leurs objectifs de performance.`,
     scpiNames: [...corumGroup.scpiNames],
     currentBadge: 'Nouveau',
   },

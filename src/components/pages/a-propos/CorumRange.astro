@@ -44,26 +44,10 @@ const stats = trust.stats;
 const range = corum.range.scpiNames.map((name) => ({ name, current: name === product.name }));
 const LOGO_STAGGER = 0.08;
 const QUIET_TITLE_Y = 12;
-const expertise = corum.expertise;
 /*
- * Une PHOTO par savoir-faire (14/09/2026) à la place du pictogramme : media.expertise donne les
- * visuels dans l'ordre de corum.expertise.items. Le champ `icon` reste dans le contenu, il ne sert
- * plus au rendu. Erreur explicite si les deux listes se désalignent, plutôt qu'une carte sans image.
+ * `corum.expertise` et `media.expertise` ne sont plus lus : la section des trois savoir-faire est
+ * partie le 14/09/2026. Contenu et visuels restent dans corum.ts et media.ts, prêts à resservir.
  */
-const savoirFaire = await Promise.all(
-  (expertise?.items ?? []).map(async (item, i) => {
-    /* Typé explicitement : sans annotation, TypeScript déduit le littéral de chaque entrée et
-      `credit`, absent de deux des trois photos, n'existerait pas sur l'union. */
-    const visuel: MediaImage | undefined = media.expertise[i];
-    if (!visuel)
-      throw new Error(
-        `media.expertise n'a pas de photo pour le savoir-faire « ${item.title} » (rang ${i}).`
-      );
-    return { ...item, visuel, image: await resolveImage(visuel.src) };
-  })
-);
-/** Trois colonnes dès `lg` : la photo ne dépasse jamais le tiers de la grille. */
-const EXPERTISE_SIZES = '(min-width: 1024px) 400px, (min-width: 640px) 50vw, 100vw';
 ---
 
 {/* 1. Le groupe CORUM en chiffres */}
@@ -74,21 +58,37 @@ const EXPERTISE_SIZES = '(min-width: 1024px) 400px, (min-width: 640px) 50vw, 100
       <NoteRef notes={notes} id="confiance-chiffres" tone="light" />
     </h2>
     <!--
-      Deux colonnes dès le téléphone (13/09/2026) : en une seule, les quatre chiffres prenaient un écran
-      pour quatre nombres. Quatre colonnes dès `lg` seulement : plus étroites, « 160 000 » en text-stat
+      Deux colonnes dès le téléphone (13/09/2026) : en une seule, les chiffres prenaient un écran pour
+      quatre nombres. Plusieurs colonnes dès `lg` seulement : plus étroites, « 160 000 » en text-stat
       déborde de sa cellule (texte dégradé tronqué).
+      LE NOMBRE DE COLONNES SUIT LE NOMBRE DE CHIFFRES (14/09/2026) : l'équipe en a ajouté un cinquième,
+      « 7 bureaux dans le monde », et sur une grille de quatre il se retrouvait seul sur une deuxième
+      ligne, à côté de trois cases vides. La grille est bornée à cinq : au-delà, on repasse à quatre et
+      c'est la deuxième ligne qui se remplit.
+      À CINQ COLONNES, les cases descendent à 215 px sur un écran de 1440 : « 9,6 Md€ » et
+      « + 160 000 » passaient à la ligne en taille `solid` et les cinq libellés ne s'alignaient plus.
+      Les chiffres passent donc en `solid-compact`, un cran plus bas, dès qu'ils sont cinq. Un chiffre
+      un peu plus petit se lit ; cinq chiffres désalignés, non.
     -->
     <ul
       role="list"
-      class="mt-10 grid grid-cols-2 gap-x-6 gap-y-10 sm:gap-x-8 lg:mt-14 lg:grid-cols-4"
+      class:list={[
+        'mt-10 grid grid-cols-2 gap-x-6 gap-y-10 sm:gap-x-8 lg:mt-14',
+        stats.items.length === 5 ? 'lg:grid-cols-5' : 'lg:grid-cols-4',
+      ]}
     >
       {
-        /* Les quatre chiffres comptent depuis 0, en place, avec une durée liée à leur ordre de grandeur. */
+        /* Les chiffres comptent depuis 0, en place, avec une durée liée à leur ordre de grandeur. */
       }
       {
         stats.items.map((s) => (
           <li>
-            <Stat size="solid" value={s.value} suffix={s.suffix} label={s.label} />
+            <Stat
+              size={stats.items.length === 5 ? 'solid-compact' : 'solid'}
+              value={s.value}
+              suffix={s.suffix}
+              label={s.label}
+            />
           </li>
         ))
       }
@@ -126,69 +126,15 @@ const EXPERTISE_SIZES = '(min-width: 1024px) 400px, (min-width: 640px) 50vw, 100
 </figure>
 
 {
-  /* 3. Les trois savoir-faire du groupe : ce que fait CORUM L'Épargne au-delà de R Start. Chaque carte
-    décrit une activité, jamais un produit (aucun chiffre, aucune performance, aucune comparaison), et
-    le contre-poids commun ferme le bloc : l'étendue de la gamme ne retire rien aux risques de R Start. */
-}
-{
-  expertise && (
-    <Section id="savoir-faire" tone="paper" labelledBy="savoir-faire-title">
-      <Container size="wide">
-        <header class="max-w-4xl">
-          <h2
-            id="savoir-faire-title"
-            class="text-display-md text-ink"
-            data-animate="fade-up"
-            data-animate-y={String(QUIET_TITLE_Y)}
-          >
-            {expertise.title}
-            <NoteRef notes={notes} id="corum-savoir-faire" tone="light" />
-          </h2>
-          <p class="text-lead mt-5 text-pretty text-slate-700 sm:mt-6">{expertise.intro}</p>
-        </header>
-
-        <ul
-          role="list"
-          class="mt-10 grid gap-5 lg:mt-14 lg:grid-cols-3 lg:gap-6"
-          data-animate="stagger"
-          data-animate-stagger="0.1"
-        >
-          {savoirFaire.map((item) => (
-            <li class="flex flex-col overflow-hidden rounded-3xl bg-white shadow-card">
-              {/* La photo occupe toute la largeur de la carte : aucun rembourrage au-dessus d'elle. */}
-              <div class="relative aspect-[16/10] w-full overflow-hidden">
-                <Picture
-                  src={item.image}
-                  alt={item.visuel.alt}
-                  widths={[480, 800, 1200]}
-                  sizes={EXPERTISE_SIZES}
-                  formats={['avif', 'webp']}
-                  loading="lazy"
-                  decoding="async"
-                  pictureAttributes={{ class: 'block h-full w-full' }}
-                  class="h-full w-full object-cover"
-                />
-              </div>
-              <div class="flex flex-1 flex-col p-6 sm:p-8">
-                <p class="text-eyebrow text-teal-700">{item.kicker}</p>
-                <h3 class="text-display-sm mt-2 text-ink">{item.title}</h3>
-                <p class="mt-4 text-base leading-relaxed text-slate-700">{item.description}</p>
-                {/* Mention obligatoire sous une photo d'immeuble : R Start n'a pas de patrimoine. */}
-                {item.visuel.credit && (
-                  <p class="text-caption mt-5 text-slate-700">{item.visuel.credit}</p>
-                )}
-              </div>
-            </li>
-          ))}
-        </ul>
-
-        <RiskNote text={expertise.risk} size="lead" class="mt-8 max-w-4xl lg:mt-10" />
-      </Container>
-    </Section>
-  )
+  /*
+   * SECTION « Les trois savoir-faire de CORUM L'Épargne » SUPPRIMÉE le 14/09/2026, demande de l'équipe.
+   * Elle décrivait les trois familles de solutions du groupe (SCPI, fonds obligataires, assurance vie
+   * et plan d'épargne retraite), chacune avec sa photo. Le contenu reste dans corum.ts (`expertise`) et
+   * les trois visuels dans media.ts (`expertise`) : rien n'est perdu, la page ne les appelle plus.
+   * La page passe ainsi de cinq blocs à quatre : l'histoire, les chiffres, la photo des bureaux, la gamme.
+   */
 }
 
-{/* 4. La gamme des cinq SCPI */}
 <Section id="gamme" tone="white" labelledBy="gamme-title">
   <Container size="wide">
     <div class="grid gap-10 lg:grid-cols-12 lg:gap-16">

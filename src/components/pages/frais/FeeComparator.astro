@@ -51,14 +51,17 @@ const data = scpis.map((s) => ({
 <Section id={id} tone="white" labelledBy={titleId} class="pt-8 sm:pt-10 lg:pt-14">
   <Container size="wide">
     {
-      /* Titre MASQUÉ VISUELLEMENT (12/09/2026, demande de l'équipe) : la page arrive directement sur le
-        tableau. Il reste dans le code parce que la section a besoin d'un nom, sans lui, elle n'est plus
-        annonçable au lecteur d'écran, et `labelledBy` pointerait dans le vide.
-        L'introduction et l'hypothèse de lecture ont été retirées à la même occasion. L'hypothèse des huit
-        ans n'est pas perdue : chaque taux de retrait porte sa condition juste en dessous, « au-delà de
-        6 ans ; avant, 6,00 % TTC du capital retiré ». L'information est au plus près du chiffre. */
+      /* Titre de nouveau VISIBLE (14/09/2026, texte fourni par l'équipe). Il était masqué depuis le
+        12/09/2026 pour que la page arrive directement sur le tableau ; la phrase fournie est une
+        promesse, pas un intitulé de rubrique, elle se lit. L'accroche qui suit invite à comparer.
+        L'hypothèse des huit ans n'est toujours pas rappelée ici : chaque taux de retrait porte sa
+        condition juste en dessous, « au-delà de 6 ans ; avant, 6,00 % TTC du capital retiré ».
+        L'information est au plus près du chiffre. */
     }
-    <h2 id={titleId} class="visually-hidden">{comparator.title}</h2>
+    <header class="max-w-5xl">
+      <h2 id={titleId} class="text-display-md text-ink">{comparator.title}</h2>
+      <p class="text-lead mt-4 text-slate-700">{comparator.intro}</p>
+    </header>
 
     {
       /* Avertissement tant que les taux des autres SCPI ne sont pas relevés. Le script le masque dès que
@@ -178,19 +181,15 @@ const data = scpis.map((s) => ({
     </div>
 
     {
-      /* Périmètre et sources : obligatoires dès qu'une autre SCPI est nommée. Ils disent ce qui est
-        comparé, des taux affichés, pas des coûts réels, et d'où viennent les chiffres. */
+      /* RETIRÉS le 14/09/2026 (texte de la page fourni par l'équipe, « je veux ce contenu là ») : le
+        paragraphe de périmètre (« Ce tableau compare les taux affichés… »), les deux avertissements
+        courts (frais non publié, base HT/TTC) et l'encadré « Une innovation, pas une révolution ».
+        Ce dernier était le seul endroit du site à écrire que R Start n'est pas une SCPI sans frais, ni
+        moins chère qu'une SCPI traditionnelle, et que le coût total n'est pas connu à la souscription.
+        Les textes restent dans comparator.ts, prêts à revenir en une ligne.
+        LES SOURCES RESTENT, juste en dessous : nommer dix-sept sociétés de gestion et afficher leurs
+        taux sans dire d'où ils sortent ni à quelle date serait une comparaison invérifiable. */
     }
-    <p class="text-lead mt-8 text-ink">{comparator.perimeter}</p>
-
-    {
-      /* Les deux avertissements côte à côte à partir de « md » : ce sont deux notes courtes et
-        indépendantes, les empiler doublait leur hauteur sans rien ajouter. */
-    }
-    <div class="text-caption mt-4 grid gap-3 text-slate-700 md:grid-cols-2 md:gap-8">
-      <p>{comparator.notPublishedNotice}</p>
-      <p>{comparator.vatNotice}</p>
-    </div>
 
     {
       /* Sources, une par colonne du tableau, côte à côte comme les colonnes qu'elles documentent. Celle
@@ -211,15 +210,6 @@ const data = scpis.map((s) => ({
           <dd data-comparator-source class="mt-0.5">{comparator.sourceOthers}</dd>
         </div>
       </dl>
-    </div>
-
-    {
-      /* Encadré de la brochure (p.4) : un comparatif de frais ne part jamais sans lui, il dit que R Start
-        n'est pas une SCPI sans frais et que son coût total n'est pas connu à la souscription. */
-    }
-    <div class="mt-8 rounded-3xl border border-navy/15 p-6 sm:p-8 lg:mt-10 lg:p-10">
-      <h3 class="text-display-sm">{comparator.innovationBox.title}</h3>
-      <p class="text-lead mt-4 text-ink">{comparator.innovationBox.body}</p>
     </div>
   </Container>
 </Section>

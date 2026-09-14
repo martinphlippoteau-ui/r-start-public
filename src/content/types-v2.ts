@@ -26,8 +26,11 @@ export interface PageHero {
   eyebrow: string;
   /** H1 unique de la page. */
   title: string;
-  /** Facultative depuis le 14/09/2026 : /strategie ouvre directement sur son premier chapitre. */
-  intro?: string;
+  /**
+   * Facultative depuis le 14/09/2026 : /strategie ouvre directement sur son premier chapitre.
+   * Un TABLEAU rend plusieurs paragraphes, quand le texte fourni en compte plusieurs (/a-propos).
+   */
+  intro?: string | string[];
   /**
    * Phrase-clé sous l'introduction, en gras (14/09/2026, /frais). Elle reste dans le MÊME corps de
    * texte que l'introduction et que la ligne risques : le gras marque l'insistance, jamais une taille
@@ -293,6 +296,8 @@ export interface FeesPageContent {
   simulationDoc: DocumentItem;
   faq: { title: string; items: FaqItem[] };
   htNote: string;
+  /** Titre de la note HT/TTC (« Bon à savoir : »), écrit en dur : il ne passe pas par RiskNote. */
+  htNoteLabel?: string;
   cta: Cta;
   notes: LegalNote[];
 }

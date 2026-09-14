@@ -1,15 +1,21 @@
-// SCRIPT EN SOMMEIL depuis le 14/09/2026 : /strategie ne montre plus de carte (elle affichait le
-// Conseil de l'Europe et le Canada, la page dit désormais « partout dans le monde »), et le composant
-// qu'il écrivait, src/components/StrategyMap.astro, a été supprimé avec elle. Le script est conservé :
-// il est la seule façon de régénérer la carte le jour où elle revient, et il ne s'exécute que sur appel.
-//
 // Génère la carte de la section Stratégie (src/components/StrategyMap.astro) à partir de vraies
-// frontières (GeoJSON Natural Earth simplifié) et de l'univers d'investissement déclaré dans
-// src/content/fr/facts.ts (États membres du Conseil de l'Europe + Canada). Deux volets, chacun en
-// projection azimutale équivalente de Lambert centrée sur sa région, contours simplifiés
-// (Douglas-Peucker) pour un SVG léger. Les pays hors univers apparaissent en contexte discret.
+// frontières (GeoJSON Natural Earth simplifié). Contours simplifiés (Douglas-Peucker) pour un SVG léger.
 //
-// Usage : node scripts/make-map.mjs <chemin/countries.geo.json>
+// TROIS MODES.
+//  - `globe` (défaut depuis le 14/09/2026) : n'écrit PAS de SVG mais les frontières simplifiées en
+//    JSON (src/content/fr/globe.json), que StrategyGlobe.astro projette au canvas et fait tourner.
+//    C'est la seule carte en service ; les deux modes SVG ci-dessous n'ont plus de consommateur et
+//    src/components/StrategyMap.astro, qu'ils écrivaient, a été supprimé. Ils se régénèrent d'un appel,
+//    et il faut alors remettre l'import dans 04-Strategy.astro.
+//  - `monde` (défaut depuis le 14/09/2026) : UNE carte du monde en projection équirectangulaire, toutes
+//    les terres émergées en teal. C'est ce que dit la page : « partout dans le monde ». L'Antarctique
+//    est écarté, il n'a pas de marché immobilier et il écraserait la projection ;
+//  - `univers` : les deux volets d'origine, Canada et États membres du Conseil de l'Europe d'après
+//    src/content/fr/facts.ts (investmentUniverse), chacun en projection azimutale équivalente de
+//    Lambert centrée sur sa région, les pays voisins en contexte discret. C'est le PÉRIMÈTRE DU DIC
+//    du 20/05/2026. À reprendre si la Conformité demande que la carte s'y tienne.
+//
+// Usage : node scripts/make-map.mjs <chemin/countries.geo.json> [monde|univers]
 //   (jeu de données : https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json)
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
@@ -20,14 +26,39 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const OUT = path.join(ROOT, 'src', 'components', 'StrategyMap.astro');
 const source = process.argv[2];
 if (!source) throw new Error('Chemin du GeoJSON attendu en argument.');
+const MODE = process.argv[3] ?? 'globe';
+if (!['globe', 'monde', 'univers'].includes(MODE)) throw new Error(`Mode inconnu : ${MODE}`);
 
 const VIEW_W = 1200;
-const VIEW_H = 520;
-const PAD = 26;
-const TOLERANCE = 1.1; // simplification, en unités du viewBox
-const MIN_RING_AREA = 14; // anneaux (îlots) plus petits ignorés
+/* La carte du monde est plus plate : 360° de longitude pour 140° de latitude utile. */
+const VIEW_H = MODE === 'monde' ? 470 : 520;
+const PAD = MODE === 'monde' ? 8 : 26;
+/*
+ * Simplification plus franche et îlots plus gros écartés en mode monde : à l'échelle du globe, mille
+ * archipels ne se voient pas et pèsent chacun leur poids dans le fichier. Le seuil est choisi pour
+ * garder les îles qui se lisent (Islande, Irlande, Sri Lanka, Japon, Nouvelle-Zélande) et laisser
+ * tomber celles qui ne feraient qu'un pixel.
+ */
+const TOLERANCE = MODE === 'monde' ? 1.6 : 1.1;
+const MIN_RING_AREA = MODE === 'monde' ? 1 : 14;
 
-const panels = [
+/*
+ * L'Antarctique est écarté : aucun marché immobilier, et sa bande polaire, étirée par la projection
+ * équirectangulaire, occuperait à elle seule le quart de la hauteur.
+ */
+const HORS_CARTE = new Set(['ATA']);
+
+const monde = [
+  {
+    key: 'monde',
+    rect: [0, 0, VIEW_W, VIEW_H],
+    /* Toutes les terres sont en avant-plan : la page dit « partout », il n'y a pas d'arrière-plan. */
+    highlight: null,
+    equirect: true,
+  },
+];
+
+const univers = [
   {
     key: 'canada',
     center: [-96, 62],
@@ -42,7 +73,12 @@ const panels = [
   },
 ];
 
+const panels = MODE === 'monde' ? monde : univers;
+
 const rad = (d) => (d * Math.PI) / 180;
+
+/** Équirectangulaire (plate carrée) : x suit la longitude, y la latitude. Rayon unitaire, comme laea. */
+const equirect = (lon, lat) => [rad(lon), rad(lat)];
 
 /** Projection azimutale équivalente de Lambert (x vers l'est, y vers le nord, rayon unitaire). */
 const laea = (lon, lat, [lon0, lat0]) => {
@@ -119,19 +155,62 @@ const bbox = (pts) => {
 const geo = JSON.parse(await fs.readFile(source, 'utf8'));
 const fmt = (n) => (Math.round(n * 10) / 10).toString();
 
+/*
+ * MODE GLOBE. Le globe tourne : impossible de pré-calculer des tracés, la projection change à chaque
+ * image. On écrit donc les FRONTIÈRES ELLES-MÊMES, en degrés, simplifiées une fois pour toutes ici
+ * plutôt qu'à chaque chargement de page, et c'est le client qui projette.
+ *
+ * La simplification est exprimée en DEGRÉS (0,45 ≈ 50 km à l'équateur) : à un globe de 520 px de
+ * diamètre, un degré vaut moins de trois pixels, un détail plus fin ne se verrait pas et pèserait.
+ * Les anneaux de moins de quatre points après simplification sont écartés : un archipel réduit à un
+ * triangle est une tache, pas une île.
+ */
+if (MODE === 'globe') {
+  const TOL_DEG = 0.45;
+  const MIN_PTS = 4;
+  const OUT_JSON = path.join(ROOT, 'src', 'content', 'fr', 'globe.json');
+  const rings = [];
+  for (const f of geo.features) {
+    if (HORS_CARTE.has(f.id)) continue;
+    for (const ring of ringsOf(f.geometry)) {
+      const pts = simplify(
+        ring.map(([lon, lat]) => [lon, lat]),
+        TOL_DEG
+      );
+      if (pts.length < MIN_PTS) continue;
+      /* Deux décimales : 1,1 km à l'équateur, bien en deçà du pixel, et trois fois plus léger. */
+      rings.push(
+        pts.map(([lon, lat]) => [Math.round(lon * 100) / 100, Math.round(lat * 100) / 100])
+      );
+    }
+  }
+  const total = rings.reduce((n, r) => n + r.length, 0);
+  await fs.writeFile(OUT_JSON, JSON.stringify(rings), 'utf8');
+  const ko = Math.round((await fs.stat(OUT_JSON)).size / 1024);
+  console.log(
+    `Frontières du globe : ${path.relative(ROOT, OUT_JSON)} (${ko} Ko, ${rings.length} anneaux, ${total} points)`
+  );
+  process.exit(0);
+}
+
 const panelSvg = (panel) => {
   const [rx, ry, rw, rh] = panel.rect;
   // 1. Projection brute (rayon unitaire) de toutes les frontières.
-  const projected = geo.features.map((f) => ({
-    id: f.id,
-    rings: ringsOf(f.geometry)
-      .map((ring) => ring.map(([lon, lat]) => laea(lon, lat, panel.center)).filter(Boolean))
-      .filter((r) => r.length > 3),
-  }));
-  // 2. Échelle : les pays de l'univers tiennent dans le volet, marges comprises.
-  const focusPts = projected
-    .filter((f) => panel.highlight.has(f.id))
-    .flatMap((f) => f.rings.flat());
+  const project = panel.equirect
+    ? ([lon, lat]) => equirect(lon, lat)
+    : ([lon, lat]) => laea(lon, lat, panel.center);
+  const enFocus = (id) =>
+    panel.highlight === null ? !HORS_CARTE.has(id) : panel.highlight.has(id);
+  const projected = geo.features
+    .filter((f) => !HORS_CARTE.has(f.id))
+    .map((f) => ({
+      id: f.id,
+      rings: ringsOf(f.geometry)
+        .map((ring) => ring.map(project).filter(Boolean))
+        .filter((r) => r.length > 3),
+    }));
+  // 2. Échelle : ce qui est en avant-plan tient dans le volet, marges comprises.
+  const focusPts = projected.filter((f) => enFocus(f.id)).flatMap((f) => f.rings.flat());
   const [bx0, by0, bx1, by1] = bbox(focusPts);
   const scale = Math.min((rw - 2 * PAD) / (bx1 - bx0), (rh - 2 * PAD) / (by1 - by0));
   const cx = rx + rw / 2;
@@ -143,13 +222,14 @@ const panelSvg = (panel) => {
   const paths = { context: [], focus: [] };
   let missing = [];
   for (const f of projected) {
-    const isFocus = panel.highlight.has(f.id);
+    const isFocus = enFocus(f.id);
     const rings = [];
     for (const ring of f.rings) {
       const pts = simplify(ring.map(toView), TOLERANCE);
       const [x0, y0, x1, y1] = bbox(pts);
-      // Les pays de l'univers sont toujours tracés (Malte, Chypre…) ; le contexte ignore les îlots.
-      if (!isFocus && (x1 - x0) * (y1 - y0) < MIN_RING_AREA) continue;
+      /* En mode univers, les pays retenus sont toujours tracés, fût-ce Malte ou Chypre : ils SONT le
+         propos. En mode monde, personne n'est le propos en particulier, le seuil vaut pour tous. */
+      if ((panel.equirect || !isFocus) && (x1 - x0) * (y1 - y0) < MIN_RING_AREA) continue;
       // Anneaux entièrement hors du volet : inutiles (le clip ferait le reste).
       if (x1 < rx - 40 || x0 > rx + rw + 40 || y1 < ry - 40 || y0 > ry + rh + 40) continue;
       rings.push(pts);
@@ -163,7 +243,9 @@ const panelSvg = (panel) => {
       .join('');
     (isFocus ? paths.focus : paths.context).push(d);
   }
-  const absent = [...panel.highlight].filter((id) => !geo.features.some((f) => f.id === id));
+  const absent = panel.highlight
+    ? [...panel.highlight].filter((id) => !geo.features.some((f) => f.id === id))
+    : [];
   return {
     rect: panel.rect,
     key: panel.key,
@@ -220,14 +302,19 @@ const clipDefs = built
   })
   .join('\n');
 
+const DESCRIPTION =
+  MODE === 'monde'
+    ? `Le monde entier en projection équirectangulaire, Antarctique écarté : la page dit\n * « partout dans le monde », la carte ne dit rien de moins.`
+    : `Deux volets en projection azimutale équivalente de Lambert, Canada et États membres du\n * Conseil de l'Europe d'après facts.investmentUniverse, soit le périmètre du DIC ; les pays voisins\n * apparaissent en contexte discret.`;
+
 const astro = `---
 /**
- * Carte de l'univers d'investissement (section Stratégie), FICHIER GÉNÉRÉ par scripts/make-map.mjs,
- * ne pas éditer à la main. Deux volets en projection azimutale équivalente de Lambert : Canada et
- * États membres du Conseil de l'Europe, d'après src/content/fr/facts.ts (investmentUniverse).
- * Les pays de l'univers sont en teal (aplat + trame) et leurs contours se tracent au fil du
- * défilement (data-draw + data-draw-scrub) ; les pays voisins apparaissent en contexte discret.
- * Purement décorative (aria-hidden) : les libellés et la légende sont rendus par la section.
+ * Carte de la zone d'investissement (section Stratégie), FICHIER GÉNÉRÉ par
+ * \`node scripts/make-map.mjs <countries.geo.json> ${MODE}\`, ne pas éditer à la main.
+ * ${DESCRIPTION}
+ * Les terres sont en teal (aplat + trame) et leurs contours se tracent au fil du défilement
+ * (data-draw + data-draw-scrub).
+ * Purement décorative (aria-hidden) : la légende est rendue par la section.
  */
 interface Props {
   /** Préfixe des identifiants SVG (motif, découpes) : unique par page. */

@@ -415,7 +415,8 @@ const raw = {
    */
   hero: {
     eyebrow: `Frais · SCPI ${product.name}`,
-    title: 'Un modèle de frais inédit',
+    /* « inédit » est descendu en zone 3, sur le barème (14/09/2026, texte fourni par l'équipe). */
+    title: 'Un modèle de frais gagnant-gagnant',
     intro:
       'R Start est la seule SCPI qui ne prélève ni frais de souscription, ni frais d’acquisition sur les achats d’immeubles.',
     punchline:
@@ -441,7 +442,8 @@ const raw = {
     steps: 'Commission de retrait selon la durée de détention des parts',
     costColumns: { period: 'Durée de détention', impact: 'Incidence annuelle des coûts' },
     eyebrows: {
-      schedule: 'Le barème complet',
+      /* Titre de la zone 3 (14/09/2026, texte fourni par l'équipe), ex-« Le barème complet ». */
+      schedule: 'Un modèle de frais inédit',
       withdrawal: 'Commission de retrait',
       lossMechanism: 'Mécanisme de réserve',
       costImpact: 'Coûts, pas performance',
@@ -670,7 +672,16 @@ export const feesPage: FeesPageContent = {
   },
   arbitrageWarning: { title: arbitrageWarningTitle, bullets: [...arbitrageWarningBullets] },
   innovationBox: innovationNotRevolution,
-  htNote: feeFacts.vatNote,
+  /*
+   * Note sous le tableau des frais, texte FOURNI PAR L'ÉQUIPE le 14/09/2026, repris mot pour mot. Elle
+   * remplace `feeFacts.vatNote`, plus longue, qui exceptait les commissions de cession et de retrait,
+   * exprimées TTC. L'exception tombe sans rien fausser : R Start est exonérée de TVA, HT et TTC sont
+   * égaux, la phrase le dit elle-même. Le libellé « Bon à savoir » est ici un titre de note, pas un
+   * contre-poids de risque : il est écrit en dur, il ne passe pas par RiskNote, qui ne rend plus rien.
+   */
+  htNote:
+    'Les frais mentionnés sont exprimés hors taxes (HT). R Start étant exonérée de TVA, le montant hors taxes est égal au montant toutes taxes comprises (TTC).',
+  htNoteLabel: 'Bon à savoir :',
   marketComparison: feeComparison,
   simulationDoc: deepNb(costDocument()),
 };

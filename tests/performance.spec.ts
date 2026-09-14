@@ -54,13 +54,24 @@ test.describe('Performance', () => {
    * On clique un appel, le bloc s'ouvre, la note visée est visible et porte le focus.
    */
   /*
-   * Sur /frais et non sur l'accueil : depuis le 14/09/2026 l'accueil ne porte plus ni appel de note ni
-   * section « Notes et sources » (registre vidé dans content/fr/notes.ts). Le mécanisme lui-même n'a pas
-   * bougé et reste rendu par toutes les sous-pages, qui passent leur propre liste à LegalNotes.
+   * Sur /documentation : ni l'accueil ni /frais ne portent plus d'appel de note, tous deux ayant reçu un
+   * contenu fourni par l'équipe qui n'en prévoit pas (14/09/2026). /documentation en compte vingt-huit,
+   * c'est la page qui exerce le plus le mécanisme. Il reste rendu par les quatre sous-pages qui passent
+   * leur propre liste à LegalNotes : /documentation, /a-propos, /presse et /salle-de-presse.
    */
   test('un appel de note ouvre le bloc des notes et y amène le focus', async ({ page }) => {
-    await page.goto('/frais/');
+    await page.goto('/documentation/');
     await page.locator('[data-consent-refuse]').click();
+    /*
+     * EN SOMMEIL depuis le 14/09/2026 : « enlève les notes et les sources de tout le site sauf du
+     * tableau de la page frais ». LegalNotes et les cinq composants d'appel de note ne rendent plus
+     * rien, il n'y a donc plus ni bloc ni exposant à ouvrir. Le test est CONSERVÉ ENTIER : il se réarme
+     * tout seul le jour où un appel de note reparaît, et vérifiera exactement ce qu'il vérifiait avant.
+     */
+    test.skip(
+      (await page.locator('a[href^="#notes-"]').count()) === 0,
+      'aucun appel de note rendu : voir src/components/ui/NoteRef.astro'
+    );
     const details = page.locator('[data-legal-notes]');
     await expect(details).toHaveJSProperty('open', false);
 

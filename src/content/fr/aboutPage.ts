@@ -15,10 +15,19 @@ export const aboutPage: { seo: PageSeo; hero: PageHero; notes: LegalNote[]; cta:
     /** 140-155 caractères, avec rappel de risque. */
     description: `CORUM gère des SCPI depuis ${corumGroup.scpiSince} et en compte ${corumGroup.scpiCount}, dont ${product.name}. Cette expérience ne préjuge pas des résultats. Risque de perte en capital.`,
   },
+  /*
+   * En-tête réécrit le 14/09/2026, texte fourni par l'équipe et repris mot pour mot. Il remplace
+   * « À propos de CORUM » et son introduction, qui rappelait que R Start n'a pas d'historique.
+   * Deux paragraphes : l'accroche, puis ce sur quoi R Start s'appuie. PageHero les rend l'un sous
+   * l'autre, dans la même taille.
+   */
   hero: {
     eyebrow: 'CORUM',
-    title: 'À propos de CORUM',
-    intro: `CORUM gère des SCPI depuis ${corumGroup.scpiSince}. ${product.name} est la plus récente de la gamme : elle a ouvert ses souscriptions le ${product.openingDate.label} et n’a pas encore d’historique propre. Les résultats des autres SCPI du groupe ne préjugent pas des siens.`,
+    title: 'L’expérience derrière R Start',
+    intro: [
+      'On ne part pas d’une feuille blanche…',
+      `R Start s’appuie sur ${corumGroup.experienceLabel} d’expertise du groupe CORUM dans l’investissement immobilier.`,
+    ],
     /* Plus de ligne risques dans l'en-tête (14/09/2026, demande de l'équipe : « supprime les bon à
        savoir de tous les hero sauf celui de la home »). Le « Bon à savoir : … » sous le H1 a disparu de
        TOUTES les sous-pages ; seul l'accueil le garde, sous ses appels à l'action. Ces pages n'ont donc

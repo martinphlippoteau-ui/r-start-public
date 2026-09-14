@@ -46,6 +46,18 @@ export const riskPrefix = 'Risque : ';
  */
 export const riskLabel = 'Bon à savoir :';
 
+/*
+ * MENTION FOURNIE PAR LA CONFORMITÉ le 14/09/2026, reproduite MOT POUR MOT, ponctuation comprise.
+ *
+ * C'est la première des mentions que la Conformité replace elle-même après le retrait de tous les
+ * « Bon à savoir » du site (voir src/components/ui/RiskNote.astro). Elle ne passe donc pas par RiskNote,
+ * qui ne rend plus rien, mais par ui/NoteConformite.astro, et elle est posée à l'endroit exact que la
+ * Conformité a indiqué, ni ailleurs ni en plus. Ne pas la reformuler, ne pas l'abréger, ne pas la
+ * déplacer sans retour de leur part.
+ */
+export const corumProductsDisclaimer =
+  'Les produits commercialisés par CORUM L’Épargne sont des investissements long terme qui n’offrent aucune garantie de rendement ou de performance et présentent un risque de perte en capital et de liquidité. Les revenus ne sont pas garantis et dépendent de l’évolution du marché immobilier et financier et du cours des devises.';
+
 /** Encadré brochure p.4 « Une innovation, pas une révolution », adapté au grand public (« Vos clients » → « Vous »). */
 export const innovationNotRevolution = {
   title: 'Une innovation, pas une révolution',

@@ -63,9 +63,14 @@ const range = (rates: readonly string[]): string => {
 const withdrawalAfterHolding = fees.withdrawal.steps[fees.withdrawal.steps.length - 1].rate;
 
 export const comparator = {
-  title: 'Comparer les frais, SCPI par SCPI',
-  intro:
-    'R Start d’un côté, une autre SCPI de l’autre. Les sept lignes ci-dessous sont les frais que prélève une société de gestion, de la souscription au retrait. Un taux bas sur une ligne ne dit rien du coût total : c’est la combinaison des sept qui compte, et elle dépend de ce que la SCPI gagne.',
+  /*
+   * Titre et accroche FOURNIS PAR L'ÉQUIPE le 14/09/2026, repris mot pour mot. Le titre redevient
+   * VISIBLE à cette occasion : il était masqué depuis le 12/09/2026, la page arrivant directement sur
+   * le tableau. La phrase fournie est coupée en deux, la promesse en titre et l'invitation en accroche :
+   * c'est une mise en page, aucun mot n'est ajouté ni retiré.
+   */
+  title: 'R Start : la seule SCPI qui ne prend des frais que si vous gagnez.',
+  intro: 'Comparez vous-même !',
   /** Colonne de gauche, toujours R Start. */
   leftLabel: product.name,
   leftManager: 'CORUM Asset Management',

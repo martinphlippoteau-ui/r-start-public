@@ -3,7 +3,8 @@
  * Page /strategie, « Stratégie d'investissement » (menu, décision du 10/09/2026 : la stratégie quitte
  * l'accueil, qui n'en garde que le chapitre court). SiteNav → main#contenu : PageHero (fil d'Ariane, H1,
  * CTA souscrire, SANS ligne risques depuis le 14/09/2026) → les trois sections de la stratégie
- * (04-Strategy.astro : #strategie, #quoi, #ou, contenu strategy.ts) → Footer. PLUS DE BLOC « Notes »
+ * (04-Strategy.astro : #strategie, #quoi, #ou, #comment, contenu strategy.ts) → #risques
+ * (08-Risks.astro, le bloc de l'accueil) → Footer. PLUS DE BLOC « Notes »
  * depuis le 14/09/2026 : le texte fourni par l'équipe ne porte aucun appel de note, et le bloc affichait
  * un « Sources et précisions (0) » à déplier sur rien. Métadonnées et
  * JSON-LD (Organization, WebPage, BreadcrumbList) depuis strategyPage.ts, config/pages.ts et src/lib/seo.ts.
@@ -16,6 +17,7 @@ import Button from '@/components/ui/Button.astro';
 import StickyCta from '@/components/StickyCta.astro';
 import PageHero from '@/components/ui/PageHero.astro';
 import Strategy from '@/components/sections/04-Strategy.astro';
+import Risks from '@/components/sections/08-Risks.astro';
 import { pages } from '@/config/pages';
 import { strategyPage } from '@/content/fr/strategyPage';
 import { breadcrumbJsonLd, organizationJsonLd, webPageJsonLd } from '@/lib/seo';
@@ -40,6 +42,15 @@ const jsonLd = [
       </Button>
     </PageHero>
     <Strategy />
+
+    {
+      /* Bloc des risques de l'accueil, rendu TEL QUEL en fin de page (14/09/2026, demande de l'équipe :
+        « ajoute le même bloc de risques à la fin que sur la homepage »). Même composant, même contenu,
+        mêmes six risques : c'est la seule façon qu'ils ne divergent jamais d'une page à l'autre.
+        Il porte son rideau de chapitre : la section qui le précède ici est « Comment », sur fond clair,
+        et le bloc sombre monte par-dessus, comme sur l'accueil. */
+    }
+    <Risks />
   </main>
 
   {

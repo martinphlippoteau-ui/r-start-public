@@ -1,0 +1,62 @@
+---
+/**
+ * Mention placée par la Conformité, ouverte par « Bon à savoir : ».
+ *
+ * À NE PAS CONFONDRE AVEC RiskNote. Depuis le 14/09/2026, RiskNote ne rend plus rien : l'équipe a
+ * retiré les soixante et un « Bon à savoir » du site, le service conformité les replaçant lui-même.
+ * Ce composant est le véhicule de ce replacement : il rend UNE mention, au texte exact fourni et à
+ * l'endroit exact demandé, ni ailleurs, ni en plus.
+ *
+ * POURQUOI IL NE PORTE PAS `data-risk`. Les garde-fous du projet, en particulier le contrôle qui exige
+ * un contre-poids dans le même bloc que chaque [data-advantage], se réarment dès qu'un [data-risk]
+ * reparaît dans le DOM. Les mentions de la Conformité sont posées une par une, là où elle le décide,
+ * pas en face de chaque avantage : réarmer ces contrôles à la première mention les ferait tomber sur
+ * toutes les autres. L'attribut est donc `data-conformite`, distinct et cherchable.
+ * Le jour où la Conformité a fini de replacer, c'est une décision à reprendre : soit ce composant passe
+ * à `data-risk`, soit RiskNote reprend du service.
+ *
+ * Le texte garde la taille du corps qui l'entoure : une mention affichée plus petite que ce qu'elle
+ * qualifie est exactement ce que l'AMF a repris sur la brochure. Jamais animée, jamais repliée.
+ *
+ * APPARENCE REPRISE le 14/09/2026 : elle était en corail, lu comme une alerte et étranger à la charte.
+ * Elle passe au vocabulaire du site, un panneau turquoise très clair aux coins arrondis, libellé en
+ * bleu de marque et texte en gris ardoise. Discret sans être effacé : c'est une précision, pas un
+ * signal d'erreur, et le corail du site est réservé aux accents éditoriaux.
+ */
+import { riskLabel } from '@/content/fr/legal';
+
+interface Props {
+  text: string;
+  /** Par défaut « Bon à savoir : » (legal.ts, riskLabel). */
+  label?: string;
+  tone?: 'light' | 'dark';
+  /** `base` (corps de texte) ou `lead` (taille des introductions). */
+  size?: 'base' | 'lead';
+  class?: string;
+}
+const {
+  text,
+  label = riskLabel,
+  tone = 'light',
+  size = 'base',
+  class: className = '',
+} = Astro.props;
+const tones = {
+  light: 'bg-teal-50 text-slate-700',
+  dark: 'bg-white/10 text-white/90 ring-1 ring-white/15',
+};
+---
+
+<p
+  data-conformite
+  class:list={[
+    'rounded-2xl px-5 py-4 sm:px-6 sm:py-5',
+    size === 'lead' ? 'text-lead' : 'text-base leading-relaxed',
+    tones[tone],
+    className,
+  ]}
+>
+  <strong class:list={['font-semibold', tone === 'dark' ? 'text-teal-200' : 'text-navy']}
+    >{label}</strong
+  >{' '}{text}
+</p>

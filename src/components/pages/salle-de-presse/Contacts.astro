@@ -85,10 +85,11 @@ const telHref = (phone: string) => 'tel:' + phone.replace(/[^\d+]/g, '');
       }
     </ul>
 
-    <p class="mt-8 max-w-4xl text-base leading-relaxed text-slate-700 lg:mt-10">
-      {contacts.source}<span class="whitespace-nowrap"
-        ><PressRoomNoteRef id="salle-presse-contacts" /></span
-      >
-    </p>
+    {
+      /* LIGNE DE SOURCE RETIRÉE le 14/09/2026 (« enlève les notes et les sources de tout le site sauf du
+        tableau de la page frais ») : elle disait d'où venaient les contacts et à quelle date ils
+        avaient été relevés. Le texte reste dans pressRoom.ts (`contacts.source`). C'était la dernière
+        mention de source du site hors comparateur de /frais. */
+    }
   </Container>
 </Section>

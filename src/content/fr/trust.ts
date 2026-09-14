@@ -88,6 +88,16 @@ export const experienceStats: StatItem[] = [
     numeric: corumGroup.scpiCount,
     label: `SCPI gérées depuis ${corumGroup.scpiSince}`,
   },
+  /*
+   * CINQUIÈME CHIFFRE ajouté le 14/09/2026, document de l'équipe pour /a-propos. Il vivait jusque-là
+   * dans le texte de la gamme (« 5 SCPI, avec 7 bureaux »), pas dans la bande. Source inchangée :
+   * brochure partenaires 2026, p. 7, comme les quatre autres.
+   */
+  {
+    value: String(corumGroup.offices),
+    numeric: corumGroup.offices,
+    label: 'bureaux dans le monde',
+  },
 ];
 
 const tp = trustFacts.trustpilot;
@@ -186,7 +196,8 @@ export const trust = {
   },
 
   stats: {
-    title: 'Le groupe CORUM en chiffres',
+    /** Libellé du document de l'équipe (14/09/2026), ex-« Le groupe CORUM en chiffres ». */
+    title: 'Le groupe CORUM en quelques chiffres',
     items: experienceStats,
     source: nb(corumGroup.statsSource),
     risk: `Ces chiffres sont ceux du groupe CORUM, pas ceux de R Start. R Start a ouvert ses souscriptions le ${product.openingDate.label} et n’a pas d’historique propre. La taille du groupe ne préjuge ni de ses résultats, ni de la liquidité de ses parts.`,
