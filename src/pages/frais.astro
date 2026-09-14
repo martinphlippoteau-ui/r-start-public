@@ -3,7 +3,9 @@
  * Page /frais (périmètre v2, plan §12) : version complète de la section « Frais » de l'accueil.
  * SiteNav collée en haut (barre unique, entrées de pages) → fil d'Ariane (slot du PageHero) → PageHero
  * (H1, intro, ligne risques visible sans scroller, jamais animée) → sections :
- *  1. les trois « 0 % » et leur contre-poids dans le même bloc (data-advantage + RiskNote, text-lead) ;
+ *  1. le comparateur SCPI par SCPI (FeeComparator), premier élément de la page ; la bande des trois
+ *     « 0 % » et de leur contre-poids qui le suivait a été RETIRÉE le 14/09/2026 (demande de l'équipe) :
+ *     le comparateur montre déjà ces taux et le barème les détaille, la page les disait trois fois ;
  *  2. le barème en quatre tableaux accessibles (caption = titre H3 + introduction, th scope="col" /
  *     scope="row", nature du frais en pastille depuis FeeRow.kind, assiette et précisions repliées sous le
  *     libellé aux largeurs étroites, taux jamais coupé : `valueShort` sous 640 px) ;
@@ -18,7 +20,9 @@
  *  7. le document de référence (carte PDF data-doc, ou lien externe vers corum.fr tant que le DIC est en
  *     attente : rel noopener noreferrer, mention « nouvelle fenêtre ») ;
  *  8. la FAQ en accordéons natifs <details data-faq> (JSON-LD FAQPage émis par la page) ;
- *  9. la précision HT = TTC et le CTA tunnel (position « frais ») ;
+ *  9. la précision HT = TTC, l'appel de note sur la rémunération du distributeur (recueilli de la bande
+ *     retirée en 1 : c'est une information réglementaire, elle ne pouvait pas disparaître avec elle) et
+ *     le CTA de souscription (position « frais ») ;
  * puis les notes de la page (feesPage.notes, appels de note locaux FeesNoteRef) et le Footer.
  * Animations déclaratives sobres uniquement (data-animate clip / stagger / fade-up) ; aucun [data-risk],
  * aucun avertissement et aucun H1 sous un data-animate.
@@ -44,20 +48,7 @@ import { feesPage, notes } from '@/content/fr/feesPage';
 import { breadcrumbJsonLd, faqJsonLd, organizationJsonLd, webPageJsonLd } from '@/lib/seo';
 
 const page = pages.fees;
-const {
-  seo,
-  hero,
-  labels,
-  zeroHighlights,
-  counterweight,
-  counterweightRates,
-  groups,
-  lossMechanism,
-  arbitrageWarning,
-  faq,
-  htNote,
-  cta,
-} = feesPage;
+const { seo, hero, labels, groups, lossMechanism, arbitrageWarning, faq, htNote, cta } = feesPage;
 
 const jsonLd = [
   organizationJsonLd(),
@@ -68,7 +59,6 @@ const jsonLd = [
 
 /** Ancres des sections de la page (ids HTML, pas des textes affichés). */
 const ids = {
-  zero: 'zero-frais',
   schedule: 'bareme',
   withdrawal: 'retrait',
   loss: 'moins-value',
@@ -106,7 +96,6 @@ const faqItems = faq.items.map((item) => {
       }
     </PageHero>
 
-    <!-- 1. Les trois 0 % et leur contre-poids, dans le même bloc -->
     {
       /* Comparateur SCPI par SCPI, PREMIER ÉLÉMENT de la page (11/09/2026, demande de l'équipe) : on
         compare d'abord des taux, on comprend ensuite ce qu'ils recouvrent. Tout ce qui suit explique les
@@ -116,67 +105,15 @@ const faqItems = faq.items.map((item) => {
     }
     <FeeComparator id="comparateur" />
 
-    <Section id={ids.zero} tone="white" labelledBy={ids.zero + '-title'}>
-      <Container size="wide">
-        <h2 id={ids.zero + '-title'} class="visually-hidden">{labels?.zeroHighlights}</h2>
-        <ul
-          role="list"
-          aria-label={labels?.zeroHighlights}
-          class="grid gap-10 sm:grid-cols-3 sm:grid-rows-[auto_auto_auto] sm:gap-8 lg:gap-12"
-        >
-          {
-            zeroHighlights.map((item, i) => (
-              <li class="grid gap-3 border-t border-navy/15 pt-6 sm:row-span-3 sm:grid-rows-subgrid sm:pt-8">
-                <span
-                  class="text-fee-stat text-navy"
-                  data-fee-value
-                  data-fee-block="apercu-frais"
-                  data-animate="clip"
-                  data-animate-delay={String(i * 0.12)}
-                >
-                  {item.value}
-                </span>
-                <span class="text-lead font-medium text-ink">{item.label}</span>
-                <span class="text-base leading-relaxed text-slate-700">{item.base}</span>
-              </li>
-            ))
-          }
-        </ul>
-
-        <!-- Frais réellement prélevés, même taille (text-stat) que les trois 0 % ci-dessus : exigence AMF -->
-        <ul
-          role="list"
-          aria-hidden="true"
-          class="mt-6 grid gap-6 border-t border-coral/40 pt-6 sm:grid-cols-3 sm:grid-rows-[auto_auto] sm:gap-8 sm:pt-8"
-        >
-          {
-            counterweightRates.map((item) => (
-              <li class="grid gap-3 sm:row-span-2 sm:grid-rows-subgrid">
-                <span
-                  class="text-fee-stat text-coral-700 tabular-nums"
-                  data-fee-value
-                  data-fee-block="apercu-frais"
-                >
-                  {item.value}
-                </span>
-                <span class="text-lead font-medium text-ink">{item.label}</span>
-              </li>
-            ))
-          }
-        </ul>
-
-        <div
-          class="mt-10 grid gap-6 border-t border-navy/15 pt-8 lg:mt-14 lg:grid-cols-2 lg:gap-12 lg:pt-10"
-        >
-          <p data-advantage class="text-lead">
-            {counterweight.advantage}<span class="whitespace-nowrap"
-              ><FeesNoteRef id="frais-page-distributeur" /></span
-            >
-          </p>
-          <RiskNote text={counterweight.risk} size="lead" />
-        </div>
-      </Container>
-    </Section>
+    {
+      /* La bande « trois 0 % + les frais réellement prélevés + leur contre-poids » (#zero-frais) a été
+        RETIRÉE le 14/09/2026 (demande de l'équipe) : le comparateur juste au-dessus montre déjà ces
+        mêmes taux, R Start et autres SCPI côte à côte, et le barème complet les détaille juste en
+        dessous. La page les annonçait donc trois fois. `zeroHighlights`, `counterweight` et
+        `counterweightRates` restent dans feesPage.ts, prêts à resservir. L'appel de la note sur la
+        rémunération du distributeur, qui vivait dans ce bloc, a suivi jusqu'au bas de page : c'est une
+        information réglementaire, elle ne pouvait pas disparaître avec la bande. */
+    }
 
     <!-- 2. Le barème complet, en quatre tableaux -->
     <Section id={ids.schedule} tone="paper" labelledBy={ids.schedule + '-title'}>
@@ -413,7 +350,9 @@ const faqItems = faq.items.map((item) => {
         <h2 id={ids.cta + '-title'} class="visually-hidden">{cta.label}</h2>
         <div class="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between lg:gap-12">
           <p class="max-w-2xl text-base leading-relaxed text-slate-700">
-            {htNote}<span class="whitespace-nowrap"><FeesNoteRef id="frais-page-ht" /></span>
+            {htNote}<span class="whitespace-nowrap"
+              ><FeesNoteRef id="frais-page-ht" /><FeesNoteRef id="frais-page-distributeur" /></span
+            >
           </p>
           <div class="flex flex-wrap items-center gap-3 sm:gap-4">
             <Button position={cta.position} size="lg">{cta.label}</Button>
@@ -429,7 +368,7 @@ const faqItems = faq.items.map((item) => {
     /* Pastille d'appel : elle arrive avec la section qui suit le comparateur, une fois la comparaison
       lue, et reste jusqu'au bas de la page. Rendue au niveau de la page, jamais dans une section. */
   }
-  <StickyCta label={cta.label} position={cta.position} from={'#' + ids.zero} />
+  <StickyCta label={cta.label} position={cta.position} from={'#' + ids.schedule} />
   <Footer />
 </Base>
 
