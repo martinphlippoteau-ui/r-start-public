@@ -28,8 +28,20 @@ export interface PageHero {
   title: string;
   /** Facultative depuis le 14/09/2026 : /strategie ouvre directement sur son premier chapitre. */
   intro?: string;
-  /** Ligne risques visible sans scroller, même taille que l'intro. Jamais animée. */
-  riskLine: string;
+  /**
+   * Phrase-clé sous l'introduction, en gras (14/09/2026, /frais). Elle reste dans le MÊME corps de
+   * texte que l'introduction et que la ligne risques : le gras marque l'insistance, jamais une taille
+   * plus grande qu'un contre-poids, ce que l'AMF a déjà reproché à la brochure.
+   */
+  punchline?: string;
+  /**
+   * Ligne risques visible sans scroller, même taille que l'intro. Jamais animée.
+   * FACULTATIVE depuis le 14/09/2026, et une seule page s'en passe, /strategie : l'équipe a fourni son
+   * texte exact et demandé qu'aucun « Bon à savoir » ne s'y ajoute. Toute page qui l'omet n'a alors
+   * plus AUCUNE mention de risque en propre, seules restent celles du pied de page. À ne pas retirer
+   * ailleurs sans arbitrage.
+   */
+  riskLine?: string;
 }
 
 /** Bloc « Confiance » : cadre réglementaire, avis Trustpilot, chiffres clés CORUM. */

@@ -2,7 +2,7 @@
 /**
  * Page /strategie, « Stratégie d'investissement » (menu, décision du 10/09/2026 : la stratégie quitte
  * l'accueil, qui n'en garde que le chapitre court). SiteNav → main#contenu : PageHero (fil d'Ariane, H1,
- * ligne risques visible sans scroller, CTA souscrire) → les trois sections de la stratégie
+ * CTA souscrire, SANS ligne risques depuis le 14/09/2026) → les trois sections de la stratégie
  * (04-Strategy.astro : #strategie, #quoi, #ou, contenu strategy.ts) → Footer. PLUS DE BLOC « Notes »
  * depuis le 14/09/2026 : le texte fourni par l'équipe ne porte aucun appel de note, et le bloc affichait
  * un « Sources et précisions (0) » à déplier sur rien. Métadonnées et
@@ -33,7 +33,7 @@ const jsonLd = [
 <Base title={seo.title} description={seo.description} path={page.path} jsonLd={jsonLd}>
   <SiteNav />
   <main id="contenu">
-    <PageHero eyebrow={hero.eyebrow} title={hero.title} intro={hero.intro} riskLine={hero.riskLine}>
+    <PageHero eyebrow={hero.eyebrow} title={hero.title}>
       <Breadcrumb slot="breadcrumb" key="strategy" tone="dark" />
       <Button slot="cta" position={strategyPage.cta.position} variant="light" size="lg">
         {strategyPage.cta.label}

@@ -1,3 +1,8 @@
+// SCRIPT EN SOMMEIL depuis le 14/09/2026 : /strategie ne montre plus de carte (elle affichait le
+// Conseil de l'Europe et le Canada, la page dit désormais « partout dans le monde »), et le composant
+// qu'il écrivait, src/components/StrategyMap.astro, a été supprimé avec elle. Le script est conservé :
+// il est la seule façon de régénérer la carte le jour où elle revient, et il ne s'exécute que sur appel.
+//
 // Génère la carte de la section Stratégie (src/components/StrategyMap.astro) à partir de vraies
 // frontières (GeoJSON Natural Earth simplifié) et de l'univers d'investissement déclaré dans
 // src/content/fr/facts.ts (États membres du Conseil de l'Europe + Canada). Deux volets, chacun en

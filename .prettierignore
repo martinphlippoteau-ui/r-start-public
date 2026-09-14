@@ -1,0 +1,13 @@
+# Fichiers verrous : ils appartiennent à l'outil qui les écrit, pas au formateur.
+# `pnpm format` reformatait pnpm-lock.yaml de fond en comble (3 194 insertions, 1 091 suppressions le
+# 14/09/2026) : un diff illisible, qui noie la vraie modification et qu'aucune relecture ne peut vérifier.
+pnpm-lock.yaml
+
+# Fichiers générés : ils sont réécrits par leur script, un formatage manuel serait perdu au premier appel.
+src/content/fr/media.manifest.json
+
+# Sorties de build et rapports.
+dist/
+playwright-report/
+test-results/
+tests/screenshots/

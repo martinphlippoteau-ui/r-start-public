@@ -69,11 +69,12 @@ export const comparator = {
   /** Colonne de gauche, toujours R Start. */
   leftLabel: product.name,
   leftManager: 'CORUM Asset Management',
-  /* Intitulé VISIBLE au-dessus de la liste déroulante (12/09/2026, demande de l'équipe) : il dit en
-     deux mots ce que la colonne de droite oppose à R Start, là où « SCPI à comparer » ne disait pas
-     laquelle ni pourquoi. Les guillemets autour de « sans frais » sont ceux de la brochure : ces SCPI
-     ne prennent pas de commission de souscription, mais prélèvent des frais d'acquisition. */
-  selectLabel: 'Autres SCPI dites « sans frais »',
+  /* Intitulé VISIBLE au-dessus de la liste déroulante (12/09/2026, demande de l'équipe) : il dit ce
+     que la colonne de droite oppose à R Start, là où « SCPI à comparer » ne disait pas laquelle.
+     RACCOURCI le 14/09/2026 à la demande de l'équipe : la mention « dites “sans frais” » tombe. Ce que
+     ces SCPI ont en commun (pas de commission de souscription, mais des frais d'acquisition) reste dit
+     juste en dessous, dans la note qui ouvre le tableau, et c'est là qu'il faut le lire. */
+  selectLabel: 'Autres SCPI',
   /** Affiché tant que la SCPI n'a pas été documentée du tout (aucune source). */
   pendingLabel: 'À compléter',
   /**

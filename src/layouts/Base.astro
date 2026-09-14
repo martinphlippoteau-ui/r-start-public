@@ -47,11 +47,9 @@ const {
 const chemin = (path ?? Astro.url.pathname).replace(/^\/+|\/+$/g, '');
 const typeDePage = !chemin
   ? 'accueil'
-  : chemin.startsWith('outil/')
-    ? 'outil'
-    : ['mentions-legales', 'politique-de-confidentialite', 'cookies'].includes(chemin)
-      ? 'legal'
-      : chemin.replace(/\//g, '-');
+  : ['mentions-legales', 'politique-de-confidentialite', 'cookies'].includes(chemin)
+    ? 'legal'
+    : chemin.replace(/\//g, '-');
 ---
 
 <!doctype html>

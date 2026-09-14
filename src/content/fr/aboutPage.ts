@@ -2,7 +2,6 @@ import type { PageHero, PageSeo } from '@/content/types-v2';
 import type { Cta, LegalNote } from '@/content/types';
 import { notes as corumNotes } from '@/content/fr/corum';
 import { corumGroup, product } from '@/content/fr/facts';
-import { shortRiskLine } from '@/content/fr/legal';
 
 /**
  * Page /a-propos, la société de gestion : métadonnées, en-tête, et les blocs qui suivaient « Le groupe
@@ -20,7 +19,11 @@ export const aboutPage: { seo: PageSeo; hero: PageHero; notes: LegalNote[]; cta:
     eyebrow: 'CORUM',
     title: 'À propos de CORUM',
     intro: `CORUM gère des SCPI depuis ${corumGroup.scpiSince}. ${product.name} est la plus récente de la gamme : elle a ouvert ses souscriptions le ${product.openingDate.label} et n’a pas encore d’historique propre. Les résultats des autres SCPI du groupe ne préjugent pas des siens.`,
-    riskLine: shortRiskLine,
+    /* Plus de ligne risques dans l'en-tête (14/09/2026, demande de l'équipe : « supprime les bon à
+       savoir de tous les hero sauf celui de la home »). Le « Bon à savoir : … » sous le H1 a disparu de
+       TOUTES les sous-pages ; seul l'accueil le garde, sous ses appels à l'action. Ces pages n'ont donc
+       plus de mention de risque dans leur en-tête : il reste celles de leur contenu quand elles en ont,
+       et le pied de page, commun à tout le site. À rétablir en remettant `riskLine: shortRiskLine`. */
   },
   /** Seules les notes appelées par les blocs de cette page. */
   notes: corumNotes.filter((note) =>

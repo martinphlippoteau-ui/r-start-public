@@ -14,13 +14,7 @@ import {
   trust,
 } from '@/content/fr/facts';
 import { faq } from '@/content/fr/faq';
-import {
-  documentsNotice,
-  managementCompany,
-  publisher,
-  shortRiskLine,
-  visaNotice,
-} from '@/content/fr/legal';
+import { documentsNotice, managementCompany, publisher, visaNotice } from '@/content/fr/legal';
 import manifest from '@/content/fr/media.manifest.json';
 
 /**
@@ -47,7 +41,7 @@ import manifest from '@/content/fr/media.manifest.json';
 /**
  * Typographie française : apostrophe typographique, espace insécable (U+00A0, en échappement) avant % € : ; ? !,
  * entre groupes de trois chiffres (ex. « 10 000 € ») et à l'intérieur des guillemets « ». Jamais appliquée aux
- * mentions de legal.ts reproduites à l'identique (documentsNotice, shortRiskLine, visaNotice).
+ * mentions de legal.ts reproduites à l'identique (documentsNotice, visaNotice).
  */
 const nb = (s: string): string =>
   s
@@ -260,7 +254,11 @@ export const documentation = {
     intro: nb(
       `Les documents de R Start, au même endroit : documents réglementaires et formulaires. Ce sont eux qui font foi. Lisez le DIC${dicPublished ? '' : ', disponible sur corum.fr,'} et la note d’information avant toute décision.`
     ),
-    riskLine: shortRiskLine,
+    /* Plus de ligne risques dans l'en-tête (14/09/2026, demande de l'équipe : « supprime les bon à
+       savoir de tous les hero sauf celui de la home »). Le « Bon à savoir : … » sous le H1 a disparu de
+       TOUTES les sous-pages ; seul l'accueil le garde, sous ses appels à l'action. Ces pages n'ont donc
+       plus de mention de risque dans leur en-tête : il reste celles de leur contenu quand elles en ont,
+       et le pied de page, commun à tout le site. À rétablir en remettant `riskLine: shortRiskLine`. */
   },
 
   groups,

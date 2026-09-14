@@ -45,13 +45,7 @@ const linkHintId = linkHint ? 'documentation-link-hint' : undefined;
 <Base title={seo.title} description={seo.description} path={path} jsonLd={jsonLd}>
   <SiteNav />
   <main id="contenu">
-    <PageHero
-      eyebrow={hero.eyebrow}
-      title={hero.title}
-      intro={hero.intro}
-      riskLine={hero.riskLine}
-      asideOnLarge
-    >
+    <PageHero eyebrow={hero.eyebrow} title={hero.title} intro={hero.intro} asideOnLarge>
       <Breadcrumb slot="breadcrumb" key="documentation" tone="dark" />
       {
         /* Sommaire des groupes publiés, avec leur décompte : sur grand écran il occupe la moitié droite

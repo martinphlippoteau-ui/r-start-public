@@ -5,11 +5,6 @@ import AxeBuilder from '@axe-core/playwright';
 const PAGES = [
   '/',
   '/frais/',
-  '/outils/',
-  '/outil/simulateur-de-frais/',
-  '/outil/date-de-jouissance/',
-  '/outil/cout-de-sortie/',
-  '/outil/versements-programmes/',
   '/strategie/',
   '/a-propos/',
   '/documentation/',
@@ -17,11 +12,6 @@ const PAGES = [
   '/salle-de-presse/',
 ];
 
-/**
- * Accusé de lecture des outils, posé AVANT le script de la page : la fenêtre d'acceptation
- * (ToolsGate.astro) ne s'ouvre pas. À utiliser dans les tests qui visent les outils eux-mêmes ; la
- * fenêtre a son propre test, plus bas.
- */
 /**
  * Défiler jusqu'à `y` PUIS attendre que la page se soit posée, au lieu d'un délai à l'aveugle.
  *
@@ -84,15 +74,6 @@ const allerEnBas = async (page: Page, empreinte: () => Promise<string>) => {
     await page.waitForTimeout(100);
   }
 };
-
-const sauterLaFenetreOutils = (page: Page) =>
-  page.addInitScript(() => {
-    try {
-      sessionStorage.setItem('rstart_outils_compris', '1');
-    } catch {
-      /* stockage indisponible : la fenêtre s'ouvrira, le test le dira */
-    }
-  });
 
 test.describe('Qualité', () => {
   test('structure de page et SEO', async ({ page }) => {
@@ -404,140 +385,6 @@ test.describe('Qualité', () => {
   });
 
   /*
-   * Fenêtre d'acceptation des outils : elle barre l'entrée tant que le visiteur n'a pas accusé lecture.
-   * Ce qui est vérifié : elle s'ouvre en MODALE (le reste de la page devient inerte, ce qu'aucun
-   * bricolage maison ne reproduit), Échap ne la referme pas, le bouton reste inerte tant que la case
-   * n'est pas cochée, et l'accusé vaut pour la session entière.
-   */
-  test('la fenêtre d’acceptation barre l’entrée des outils', async ({ page }) => {
-    await page.goto('/outils/');
-
-    const fenetre = page.locator('[data-tools-gate]');
-    const entrer = page.locator('[data-tools-gate-enter]');
-
-    expect(
-      await page.evaluate(() => document.querySelector('[data-tools-gate]')!.matches(':modal'))
-    ).toBe(true);
-    /* Le contenu déplacé depuis la page est bien là, avantage ET contre-poids. */
-    await expect(fenetre.locator('[data-advantage]')).toHaveCount(1);
-    await expect(fenetre.locator('[data-risk]')).toHaveCount(1);
-    await expect(entrer).toBeDisabled();
-
-    await page.keyboard.press('Escape');
-    expect(await fenetre.evaluate((d: HTMLDialogElement) => d.open)).toBe(true);
-
-    await page.locator('[data-tools-gate-check]').check();
-    await expect(entrer).toBeEnabled();
-    await entrer.click();
-    expect(await fenetre.evaluate((d: HTMLDialogElement) => d.open)).toBe(false);
-    expect(await page.evaluate(() => sessionStorage.getItem('rstart_outils_compris'))).toBe('1');
-
-    /* L'accusé vaut pour la session : la page d'outil suivante n'ouvre plus rien. */
-    await page.goto('/outil/simulateur-de-frais/');
-    expect(await fenetre.evaluate((d: HTMLDialogElement) => d.open)).toBe(false);
-  });
-
-  /*
-   * Niveaux d'expertise des outils. La bascule est en CSS pure (global.css) : aucun typage ne la
-   * protège, et un sélecteur déplacé la casserait en silence. Le test vérifie les trois paliers, et
-   * surtout que le RÉSULTAT ne dépend pas du niveau : un champ masqué garde sa valeur, le calcul est
-   * le même. C'est la promesse faite au visiteur sous le sélecteur.
-   */
-  test('les niveaux d’expertise révèlent les champs sans changer le calcul', async ({ page }) => {
-    await sauterLaFenetreOutils(page);
-    await page.goto('/outil/simulateur-de-frais/');
-
-    /*
-     * On compte les champs OUVERTS par le niveau, pas les champs à l'écran : depuis le passage en
-     * tunnel, une seule étape s'affiche à la fois. Un champ masqué par le niveau a `display: none` sur
-     * son enveloppe, et cette valeur reste lisible même quand son étape est repliée, là où une mesure
-     * de visibilité ne verrait que l'étape courante.
-     */
-    const champs = () =>
-      page.evaluate(
-        () =>
-          [...document.querySelectorAll('[data-tool="frais"] [data-level]')].filter(
-            (e) => e.querySelector('input') && getComputedStyle(e).display !== 'none'
-          ).length
-      );
-
-    expect(await champs()).toBe(2);
-    const totalDebutant = await page.locator('#frais-out-rstart').textContent();
-
-    await page.click('label[for="frais-niveau-intermediaire"]');
-    expect(await champs()).toBe(4);
-
-    await page.click('label[for="frais-niveau-expert"]');
-    expect(await champs()).toBe(6);
-    expect(await page.locator('#frais-out-rstart').textContent()).toBe(totalDebutant);
-
-    await page.click('label[for="frais-niveau-debutant"]');
-    expect(await champs()).toBe(2);
-  });
-
-  /*
-   * Le tunnel de simulation : une étape à la fois, un fil qui suit, et le niveau qui décide du nombre
-   * d'étapes. Sans script toutes les étapes seraient là, ce qui reste le repli ; avec script il ne doit
-   * y en avoir qu'une, et « Suivant » doit mener au résultat en enjambant les étapes fermées.
-   */
-  test('le tunnel de simulation avance étape par étape', async ({ page }) => {
-    await sauterLaFenetreOutils(page);
-    await page.goto('/outil/simulateur-de-frais/');
-    await expect(page.locator('[data-funnel][data-funnel-ready]')).toHaveCount(1);
-
-    const visibles = () =>
-      page.evaluate(
-        () =>
-          [...document.querySelectorAll('[data-funnel-step]')].filter(
-            (e) => !(e as HTMLElement).hidden
-          ).length
-      );
-    const progres = () => page.locator('[data-funnel-progress]').textContent();
-
-    /* Débutant : deux questions, puis le résultat. */
-    expect(await visibles()).toBe(1);
-    expect(await progres()).toBe('Étape 1 sur 3');
-
-    await page.click('[data-funnel-next]');
-    expect(await progres()).toBe('Étape 2 sur 3');
-    await page.click('[data-funnel-next]');
-    expect(await progres()).toBe('Étape 3 sur 3');
-    expect(await visibles()).toBe(1);
-    await expect(page.locator('[data-funnel-next]')).toBeHidden();
-    await expect(page.locator('[data-funnel-restart]')).toBeVisible();
-
-    /*
-     * Expert depuis le résultat : deux étapes s'ouvrent, et l'on RESTE sur le résultat. La position est
-     * tenue par l'étape, pas par son rang ; un rang mémorisé aurait désigné la troisième question.
-     */
-    await page.click('label[for="frais-niveau-expert"]');
-    /* Six questions au niveau expert, plus le résultat : le fil s'allonge sans qu'on quitte la réponse. */
-    expect(await progres()).toBe('Étape 7 sur 7');
-    await expect(page.locator('[data-funnel-restart]')).toBeVisible();
-
-    await page.click('[data-funnel-restart]');
-    expect(await progres()).toBe('Étape 1 sur 7');
-  });
-
-  /* Chaque carte de /outils doit mener à une page qui existe et porte son titre. */
-  test('les cartes de la page Outils mènent aux quatre outils', async ({ page }) => {
-    await sauterLaFenetreOutils(page);
-    await page.goto('/outils/');
-    const liens = await page.locator('#liste article h3 a').all();
-    expect(liens).toHaveLength(4);
-
-    for (const lien of liens) {
-      const href = await lien.getAttribute('href');
-      const titre = (await lien.textContent())?.trim();
-      const reponse = await page.goto(href!);
-      expect(reponse?.status(), href!).toBe(200);
-      await expect(page.locator('h1')).toHaveText(titre!);
-      await expect(page.locator('[data-tool-level] fieldset')).toBeVisible();
-      await page.goBack();
-    }
-  });
-
-  /*
    * Le comparateur ne compare que si ses DEUX colonnes sont à l'écran. Sur téléphone il se lit en cartes
    * (global.css, sous 48 rem) et la liste déroulante reste dans l'en-tête collant : c'est le seul moyen
    * de changer de SCPI, elle doit rester atteignable et entièrement visible.
@@ -747,8 +594,6 @@ test.describe('Qualité', () => {
   });
 
   test('les événements du plan de taggage partent bien', async ({ page }) => {
-    await sauterLaFenetreOutils(page);
-
     /* Consentement : indispensable pour interpréter tout le reste. */
     await page.goto('/frais/');
     await page.locator('[data-consent-refuse]').click();
@@ -775,41 +620,11 @@ test.describe('Qualité', () => {
     expect(paliers.length, 'quatre paliers au plus').toBeLessThanOrEqual(4);
     expect(new Set(paliers).size, 'aucun palier envoyé deux fois').toBe(paliers.length);
 
-    /* Simulateur : ouverture, niveau nommé, progression. */
-    await page.goto('/outil/cout-de-sortie/');
-    await expect
-      .poll(async () => (await evenements(page)).map((x) => x.event))
-      .toContain('outil_ouvert');
-    const ouverture = (await evenements(page)).find((x) => x.event === 'outil_ouvert');
-    expect(ouverture?.outil).toBe('sortie');
-    expect(ouverture?.souscription_ouverte, 'état du tunnel joint à chaque envoi').toBe('non');
-
-    /* Le bouton radio est `visually-hidden` : c'est l'étiquette qu'un visiteur touche, et elle seule. */
-    await page.locator('label[for="sortie-niveau-expert"]').click();
-    await expect
-      .poll(async () => (await evenements(page)).find((x) => x.event === 'outil_niveau')?.niveau)
-      .toBe('expert');
-
     /* Page introuvable : détecte les liens morts diffusés à l'extérieur. */
     await page.goto('/page-qui-nexiste-pas');
     await expect
       .poll(async () => (await evenements(page)).map((x) => x.event))
       .toContain('page_introuvable');
-  });
-
-  /*
-   * Aucune donnée personnelle ni aucun montant saisi ne doit atteindre la file : les hypothèses
-   * patrimoniales d'un visiteur n'ont rien à faire dans un outil de mesure d'audience.
-   */
-  test('aucun montant saisi ne part dans la mesure', async ({ page }) => {
-    await sauterLaFenetreOutils(page);
-    await page.goto('/outil/cout-de-sortie/');
-    /* Le premier champ seulement : les suivants ne sont révélés qu'aux étapes d'après. */
-    await page.locator('#sortie-montant').fill('123456');
-    await page.waitForTimeout(400);
-    const contenu = JSON.stringify(await evenements(page));
-    expect(contenu, 'le montant saisi ne doit jamais être poussé').not.toContain('123456');
-    expect(contenu).not.toMatch(/@|mailto|password|iban/i);
   });
 
   test('captures d’écran de la page', async ({ page }, testInfo) => {

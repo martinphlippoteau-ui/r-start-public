@@ -12,17 +12,15 @@ import type { StrategyContent } from '@/content/types';
  * (la page n'a donc plus de bloc « Notes » : il n'aurait rien à déplier). Les chiffres correspondants
  * restent dans facts.ts, d'où les autres pages les tirent.
  *
- * LE TEXTE N'EST PAS CONTREBALANCÉ dans la page, sur demande expresse de l'équipe (« ne prends pas en
- * compte les gardes fous »). La seule mention de risque de /strategie est donc celle de l'en-tête,
- * visible sans défiler (shortRiskLine). Aucun [data-advantage] n'est posé ici : le garde-fou qui exige
- * un contre-poids dans le même bloc ne s'applique qu'à ce qui en porte un.
+ * LE TEXTE N'EST PAS CONTREBALANCÉ, sur demande expresse de l'équipe (« ne prends pas en compte les
+ * gardes fous »), ET L'EN-TÊTE N'A PLUS DE LIGNE RISQUES depuis le 14/09/2026 (« ne crée pas de bon à
+ * savoir »). /strategie ne porte donc AUCUNE mention de risque en propre : seul le pied de page, commun
+ * à tout le site, en porte encore. Aucun [data-advantage] n'est posé ici, faute de quoi le garde-fou
+ * qui exige un contre-poids dans le même bloc réclamerait un texte que la page ne doit plus contenir.
+ * check-compliance.mjs n'exige plus la ligne risques sur les sous-pages, la règle y est commentée.
  */
 
 export const strategy: StrategyContent = {
-  eyebrow: 'Stratégie',
-  /** Titre de la page, répété de l'en-tête : le corps commence directement au premier chapitre. */
-  title: 'Comment R Start investit l’argent de ses clients ?',
-
   engines: {
     title: 'R Start table sur deux moteurs de performance',
     intro: '',
@@ -38,7 +36,10 @@ export const strategy: StrategyContent = {
     eyebrow: 'Quoi',
     title: 'Des immeubles offrant un double potentiel',
     intro: 'L’équipe cible des immeubles avec à la fois :',
-    items: [{ lead: 'Un fort potentiel de rendement locatif ;' }, { lead: 'Et un fort potentiel de plus-value.' }],
+    items: [
+      { lead: 'Un fort potentiel de rendement locatif ;' },
+      { lead: 'Et un fort potentiel de plus-value.' },
+    ],
     outro:
       'Il s’agit principalement d’immeubles de taille intermédiaire, un secteur où la concurrence est relativement limitée.',
   },
@@ -49,7 +50,10 @@ export const strategy: StrategyContent = {
     intro: 'Pas de limite ! R Start investit :',
     items: [
       { lead: 'partout dans le monde' },
-      { lead: 'et dans tous les secteurs', rest: '(bureaux, commerces, santé, logistique, hôtellerie…)' },
+      {
+        lead: 'et dans tous les secteurs',
+        rest: '(bureaux, commerces, santé, logistique, hôtellerie…)',
+      },
     ],
     outro: 'Seul mot d’ordre : identifier une opportunité.',
   },

@@ -6,8 +6,8 @@
  * que le conteneur n'est pas là.
  *
  * PARAMÈTRES JOINTS À CHAQUE ÉVÉNEMENT, posés une fois plutôt que répétés :
- *  - page_type             accueil · frais · outil · outils · strategie · presse · a-propos ·
- *                          documentation · salle-de-presse · legal · 404 (data-page-type sur <body>)
+ *  - page_type             accueil · frais · strategie · presse · a-propos · documentation ·
+ *                          salle-de-presse · legal · 404 (data-page-type sur <body>)
  *  - souscription_ouverte  oui · non : tant que le tunnel n'est pas ouvert, tous les appels aboutissent
  *                          à une fenêtre d'attente. Sans ce repère, les taux d'avant et d'après
  *                          l'ouverture seraient comparés sans que rien ne signale qu'ils ne mesurent
@@ -17,9 +17,11 @@
  *
  * ÉVÉNEMENTS :
  *  parcours   cta_souscrire_click · souscription_indisponible · lien_sortant · retour_haut
- *  frais      comparateur_scpi · outil_ouvert · outil_niveau · outil_etape · outil_resultat
+ *  frais      comparateur_scpi
  *  lecture    document_download · faq_open · lecture_profondeur
  *  incidents  page_introuvable
+ *  RETIRÉS le 14/09/2026 avec les simulateurs eux-mêmes, À RETIRER DE GA4 ET DE GTM : les quatre
+ *  événements outil_ouvert, outil_niveau, outil_etape et outil_resultat.
  *  Le consentement est envoyé par scripts/consent.ts, qui le connaît de première main.
  *
  * JAMAIS DANS LE DATALAYER : aucun montant saisi dans un simulateur, aucune donnée personnelle. Les
@@ -121,80 +123,10 @@ const init = () => {
     });
   });
 
-  initOutils();
   initProfondeur();
 
   if (document.body.dataset.pageType === '404') {
     push({ event: 'page_introuvable', chemin: location.pathname, referent: document.referrer });
-  }
-};
-
-/**
- * Simulateurs. Quatre mesures : l'ouverture, le niveau d'expertise choisi, la progression étape par
- * étape et l'arrivée au résultat. C'est la progression qui vaut le plus : elle donne le taux d'abandon
- * par question, la seule mesure qui dise où l'outil perd les gens.
- */
-const initOutils = () => {
-  const groupe = document.querySelector<HTMLElement>('[data-tool]');
-  if (!groupe) return;
-  const outil = groupe.dataset.tool || '';
-  /*
-   * Les boutons de niveau portent 1, 2, 3 : commode pour la CSS qui révèle les champs, illisible dans un
-   * rapport. On renvoie le nom, pas le rang, pour que « expert » se lise sans table de correspondance.
-   */
-  const NIVEAUX: Record<string, string> = { '1': 'debutant', '2': 'intermediaire', '3': 'expert' };
-  const nommerNiveau = (v: string) => NIVEAUX[v] ?? v;
-  const niveauCourant = () =>
-    nommerNiveau(
-      document.querySelector<HTMLInputElement>('[data-tool-level-input]:checked')?.value || ''
-    );
-
-  push({ event: 'outil_ouvert', outil });
-
-  document.querySelectorAll<HTMLInputElement>('[data-tool-level-input]').forEach((input) => {
-    input.addEventListener('change', () => {
-      if (input.checked) push({ event: 'outil_niveau', outil, niveau: nommerNiveau(input.value) });
-    });
-  });
-
-  /*
-   * Le tunnel ne diffuse pas d'événement propre : on observe l'attribut que son script pose sur l'étape
-   * affichée. Un observateur plutôt qu'un écouteur sur les boutons, parce que l'étape change aussi au
-   * clavier, à la reprise et au retour en arrière, et qu'un seul point d'observation les couvre tous.
-   */
-  const piste = document.querySelector<HTMLElement>('[data-funnel-track]');
-  if (piste) {
-    let dernier = -1;
-    const etapes = [...piste.querySelectorAll<HTMLElement>('[data-funnel-step]')];
-    const visible = () => etapes.findIndex((e) => !e.hidden && e.getClientRects().length > 0);
-    const regarder = () => {
-      const rang = visible();
-      if (rang < 0 || rang === dernier) return;
-      const sens = dernier < 0 ? 'reprise' : rang > dernier ? 'avant' : 'arriere';
-      dernier = rang;
-      push({ event: 'outil_etape', outil, etape: rang + 1, total: etapes.length, sens });
-    };
-    new MutationObserver(regarder).observe(piste, {
-      subtree: true,
-      attributes: true,
-      attributeFilter: ['hidden', 'class', 'style', 'aria-hidden'],
-    });
-    regarder();
-  }
-
-  const resultats = document.querySelector<HTMLElement>('[data-funnel-results]');
-  if (resultats && 'IntersectionObserver' in window) {
-    const io = new IntersectionObserver(
-      (entrees) => {
-        for (const entree of entrees) {
-          if (!entree.isIntersecting) continue;
-          push({ event: 'outil_resultat', outil, niveau: niveauCourant() });
-          io.disconnect();
-        }
-      },
-      { threshold: 0.4 }
-    );
-    io.observe(resultats);
   }
 };
 

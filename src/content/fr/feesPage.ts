@@ -17,7 +17,6 @@ import {
   innovationNotRevolution,
   managementCompany,
   publisher,
-  shortRiskLine,
 } from '@/content/fr/legal';
 import manifest from '@/content/fr/media.manifest.json';
 
@@ -62,7 +61,13 @@ import manifest from '@/content/fr/media.manifest.json';
  * comptait : il portait des moyennes de marché et un panel de SCPI concurrentes, contenu sensible que
  * personne ne relisait plus, et que `check-compliance.mjs` ne voyait pas non plus, puisqu'il ne lit
  * que le HTML publié. Le contenu lui-même (`marketComparison`, ci-dessous) reste dans ce fichier :
- * il est toujours utilisé par le simulateur de frais de /outil/simulateur-de-frais.
+ * il N'A PLUS DE CONSOMMATEUR : son dernier lecteur était FeeSwitcher.astro, retiré avec la bascule,
+ * et non les simulateurs supprimés le 14/09/2026, qui n'ont jamais importé ce fichier. Les moyennes de
+ * marché et le panel des neuf SCPI restent donc ICI sans être affichés nulle part, ce que
+ * check-compliance.mjs ne voit pas puisqu'il ne lit que le HTML publié. À supprimer avec la bascule si
+ * elle n'est pas rétablie.
+ * NE PAS TOUCHER À `facts.marketComparison` pour autant : ses champs `panel` et `perimeterLead` sont
+ * lus par scripts/check-compliance.mjs (lignes 437 et 445) pour contrôler ce que /frais nomme.
  * Pour rétablir la bascule : repasser à `true`, réécrire le composant, et le faire relire.
  */
 export const SHOW_MARKET_COMPARISON = false;
@@ -394,13 +399,32 @@ const raw = {
       'Frais de R Start, SCPI CORUM : 0 % à l’entrée, 15 % de gestion, 0, 6 ou 12 % sur les cessions, 10 à 3 % au retrait avant 8 ans. Risque de perte en capital.',
   },
 
+  /*
+   * En-tête réécrit le 14/09/2026, texte fourni par l'équipe et repris mot pour mot. Il remplace
+   * « Comparer et comprendre les frais de R Start » et son introduction, qui décrivait le barème.
+   *
+   * DEUX POINTS À FAIRE VALIDER PAR LA CONFORMITÉ, signalés à l'équipe le jour même :
+   *  - « la seule SCPI qui » est une allégation de rang SANS PÉRIMÈTRE et sur TOUT LE MARCHÉ. La
+   *    brochure, elle, écrit « la première SCPI DU GROUPE CORUM sans frais d'entrée ni frais sur les
+   *    achats d'immeubles » (facts.ts, product.definition) : le périmètre y est dans la phrase. C'est
+   *    exactement le type de formulation que l'AMF avait repris sur la brochure ;
+   *  - « gagnant-gagnant » est dans la liste « à défendre en compliance » de check-compliance.mjs
+   *    (suggère un gain alors que le capital n'est pas garanti). Le contrôle le signale, il ne le
+   *    bloque pas.
+   * Le texte est rendu tel quel : c'est la décision de l'équipe, pas un oubli.
+   */
   hero: {
     eyebrow: `Frais · SCPI ${product.name}`,
-    /* Césure voulue (12/09/2026, demande de l'équipe) : « Comparer et comprendre » tient sa ligne, le
-       complément la sienne. PageHero respecte le saut de ligne. */
-    title: `Comparer et comprendre\nles frais de ${product.name}`,
-    intro: `R Start ne prélève rien à la souscription ni à l’achat des immeubles. Sa société de gestion se rémunère sur les loyers encaissés, sur les plus-values à la vente et, avant ${zeroAfter} ans, sur les retraits.`,
-    riskLine: shortRiskLine,
+    title: 'Un modèle de frais inédit',
+    intro:
+      'R Start est la seule SCPI qui ne prélève ni frais de souscription, ni frais d’acquisition sur les achats d’immeubles.',
+    punchline:
+      'En clair : nous, on ne touche rien tant que vous n’avez pas gagné d’argent. C’est gagnant-gagnant.',
+    /* Plus de ligne risques dans l'en-tête (14/09/2026, demande de l'équipe : « supprime les bon à
+       savoir de tous les hero sauf celui de la home »). Le « Bon à savoir : … » sous le H1 a disparu de
+       TOUTES les sous-pages ; seul l'accueil le garde, sous ses appels à l'action. Ces pages n'ont donc
+       plus de mention de risque dans leur en-tête : il reste celles de leur contenu quand elles en ont,
+       et le pied de page, commun à tout le site. À rétablir en remettant `riskLine: shortRiskLine`. */
   },
 
   /** Micro-textes de la page (aria-label, en-têtes, surtitres) : rien n'est écrit en dur dans frais.astro. */
@@ -626,13 +650,15 @@ const raw = {
 const typeset = deepNb(raw);
 
 /**
- * Les textes importés de legal.ts et de facts.ts sont reproduits à l'identique, hors `deepNb` : ligne
- * risques du hero, avertissement commission d'arbitrage (bloc et paragraphe de la FAQ), encadré
+ * Les textes importés de legal.ts et de facts.ts sont reproduits à l'identique, hors `deepNb` :
+ * avertissement commission d'arbitrage (bloc et paragraphe de la FAQ), encadré
  * « Une innovation, pas une révolution », note HT/TTC.
  */
 export const feesPage: FeesPageContent = {
   ...typeset,
-  hero: { ...typeset.hero, riskLine: shortRiskLine },
+  /* `deepNb` typographie tout : l'en-tête n'a plus de mention reproduite à l'identique à protéger
+     depuis que la ligne risques en est partie (14/09/2026). */
+  hero: typeset.hero,
   faq: {
     ...typeset.faq,
     items: typeset.faq.items.map((item, i) => ({

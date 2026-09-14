@@ -131,6 +131,45 @@ function checkForbidden(text, file) {
  * du bloc légal). Petit parcours de la pile des balises ouvertes sur le HTML de la page, sans parseur.
  */
 const VOID_TAGS = /^(area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr)$/i;
+/**
+ * Formulations « à défendre en compliance » : signalées en AVERTISSEMENT, pour rester traçables jusqu'à
+ * l'arbitrage, jamais bloquantes.
+ *
+ * APPELÉE SUR TOUTES LES PAGES depuis le 14/09/2026. Elle ne l'était que sur l'accueil, et le jour où
+ * l'accroche « la seule SCPI… c'est gagnant-gagnant » est passée dans l'en-tête de /frais, le contrôle
+ * est devenu muet sur les deux formulations qu'il existait précisément pour suivre. Une règle qui ne
+ * regarde qu'une page ne protège qu'une page.
+ */
+function checkHeroClaims(text, file) {
+  // (règles historiquement écrites pour l'accroche de l'accueil du 11/09/2026, prise en connaissance du risque) : signalée en
+  // AVERTISSEMENT pour rester traçable jusqu'à l'arbitrage de la compliance. « la seule » est une allégation
+  // d'exclusivité sur tout le marché, sans périmètre ni preuve ; « gagnant-gagnant » suggère un gain, alors
+  // que le capital n'est pas garanti. À passer en erreur si la compliance la refuse.
+  for (const [re_, quoi] of [
+    [
+      /\bla seule\s+SCPI/gi,
+      'allégation d’exclusivité « la seule SCPI » (sans périmètre ni preuve)',
+    ],
+    [/gagnant\s*-\s*gagnant/gi, '« gagnant-gagnant » (suggère un gain, capital non garanti)'],
+    [
+      /ne touchons rien|ne touche rien tant que|tant que vous n['’]avez pas gagné/gi,
+      "formule d'alignement inexacte : les frais de gestion sont prélevés sur les loyers encaissés, y compris quand la valeur des parts baisse",
+    ],
+    [
+      /premi[èe]re\s+SCPI(?!\s+du groupe CORUM)/gi,
+      'allégation de rang « première SCPI » sans périmètre de marché (le périmètre est en note)',
+    ],
+    [/objectifs? tenus?/gi, '« objectifs tenus » (allégation de performance)'],
+    [
+      /\bdiversifi/gi,
+      '« diversifié » présenté comme un acquis (R Start n’a pas encore de patrimoine à diversifier)',
+    ],
+  ]) {
+    const n = (text.match(re_) || []).length;
+    if (n) warnings.push(`${file} : ${n} occurrence(s) à défendre en compliance, ${quoi}`);
+  }
+}
+
 function checkNoticeSize(html, file) {
   const start = norm(legal.commercialNotice).slice(0, 40).toLowerCase();
   const stack = [];
@@ -233,33 +272,7 @@ async function checkIndex() {
       );
   }
 
-  // Accroche du hero (décision de l'équipe du 11/09/2026, prise en connaissance du risque) : signalée en
-  // AVERTISSEMENT pour rester traçable jusqu'à l'arbitrage de la compliance. « la seule » est une allégation
-  // d'exclusivité sur tout le marché, sans périmètre ni preuve ; « gagnant-gagnant » suggère un gain, alors
-  // que le capital n'est pas garanti. À passer en erreur si la compliance la refuse.
-  for (const [re_, quoi] of [
-    [
-      /\bla seule\s+SCPI/gi,
-      'allégation d’exclusivité « la seule SCPI » (sans périmètre ni preuve)',
-    ],
-    [/gagnant\s*-\s*gagnant/gi, '« gagnant-gagnant » (suggère un gain, capital non garanti)'],
-    [
-      /ne touchons rien|ne touche rien tant que|tant que vous n['’]avez pas gagné/gi,
-      "formule d'alignement inexacte : les frais de gestion sont prélevés sur les loyers encaissés, y compris quand la valeur des parts baisse",
-    ],
-    [
-      /premi[èe]re\s+SCPI(?!\s+du groupe CORUM)/gi,
-      'allégation de rang « première SCPI » sans périmètre de marché (le périmètre est en note)',
-    ],
-    [/objectifs? tenus?/gi, '« objectifs tenus » (allégation de performance)'],
-    [
-      /\bdiversifi/gi,
-      '« diversifié » présenté comme un acquis (R Start n’a pas encore de patrimoine à diversifier)',
-    ],
-  ]) {
-    const n = (text.match(re_) || []).length;
-    if (n) warnings.push(`${file} : ${n} occurrence(s) à défendre en compliance, ${quoi}`);
-  }
+  checkHeroClaims(text, file);
 
   // « La presse en parle » : la section a quitté l'accueil le 11/09/2026 (la revue complète est sur /presse,
   // au menu). Si elle y revient un jour, elle doit satisfaire les mêmes exigences que /presse, citations de
@@ -336,11 +349,6 @@ async function checkIndex() {
 async function checkSubPages() {
   for (const p of [
     'frais',
-    'outils',
-    'outil/simulateur-de-frais',
-    'outil/date-de-jouissance',
-    'outil/cout-de-sortie',
-    'outil/versements-programmes',
     'strategie',
     'a-propos',
     'documentation',
@@ -359,7 +367,21 @@ async function checkSubPages() {
     // Sur « La presse en parle », les citations de tiers sont exclues du contrôle des formulations
     // interdites (elles portent data-press-quote) ; l'avertissement qui les couvre est exigé.
     checkForbidden(p === 'presse' ? toText(stripPressQuotes(html)) : text, p);
-    requirePhrase(text, legal.shortRiskLine, 'ligne risques (en-tête de page)', file);
+    checkHeroClaims(text, p);
+    /*
+     * LA LIGNE RISQUES N'EST PLUS EXIGÉE SUR LES SOUS-PAGES depuis le 14/09/2026, demande expresse de
+     * l'équipe : « supprime les bon à savoir de tous les hero sauf celui de la home ». Le « Bon à
+     * savoir : … » sous le H1 a disparu de toutes les sous-pages ; seul l'accueil le porte, et checkIndex
+     * continue de l'y exiger.
+     *
+     * CE QUE CELA CHANGE, ET QUI DOIT ÊTRE SU : une sous-page peut désormais être publiée sans aucune
+     * mention de risque dans son en-tête. Ce qui protège encore ces pages, c'est le contenu de leurs
+     * propres sections (contre-poids [data-risk], toujours contrôlés) et le pied de page, présent
+     * partout : mention de caractère commercial et visa AMF, tous deux exigés juste en dessous.
+     * Pour rétablir : décommenter la ligne, et remettre `riskLine: shortRiskLine` dans les en-têtes de
+     * aboutPage.ts, press.ts, pressRoom.ts, documentation.ts, feesPage.ts et strategyPage.ts.
+     */
+    // requirePhrase(text, legal.shortRiskLine, 'ligne risques (en-tête de page)', file);
     requirePhrase(text, legal.commercialNotice, 'mention 1 (caractère commercial)', file);
     requirePhrase(text, 'visa S.C.P.I. n° 26-06 en date du 4 mars 2026', 'visa AMF', file);
     const h1 = html.match(/<h1\b[^>]*>/gi) || [];

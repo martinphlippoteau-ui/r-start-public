@@ -2,7 +2,6 @@ import type { LegalNote } from '@/content/types';
 import type { PressArticle, PressContent, PressQuote } from '@/content/types-v2';
 import { pages } from '@/config/pages';
 import { fees, press as pressFacts } from '@/content/fr/facts';
-import { shortRiskLine } from '@/content/fr/legal';
 
 /**
  * Page /presse, « La presse en parle » (grand public, arbitrage du 10/09/2026).
@@ -79,7 +78,11 @@ export const press = {
     title: 'Ce qu’en dit la presse',
     intro:
       'Mai 2026. R Start débarque sur le marché. La presse économique et financière s’en empare. Voici ce qu’elle en dit.',
-    riskLine: shortRiskLine,
+    /* Plus de ligne risques dans l'en-tête (14/09/2026, demande de l'équipe : « supprime les bon à
+       savoir de tous les hero sauf celui de la home »). Le « Bon à savoir : … » sous le H1 a disparu de
+       TOUTES les sous-pages ; seul l'accueil le garde, sous ses appels à l'action. Ces pages n'ont donc
+       plus de mention de risque dans leur en-tête : il reste celles de leur contenu quand elles en ont,
+       et le pied de page, commun à tout le site. À rétablir en remettant `riskLine: shortRiskLine`. */
   },
 
   quotes: {

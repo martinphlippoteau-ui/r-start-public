@@ -1,9 +1,14 @@
 ---
 /**
- * En-tête de sous-page (/frais, /documentation, /presse, /salle-de-presse) : fond ink + halo de marque,
- * sans image. Surtitre, H1 (text-display-lg), intro (text-lead) et ligne risques dans la même taille
- * (RiskNote size 'lead', jamais animée), le tout visible sans scroller à 375×812 comme à 1440×900.
- * Le fil d'Ariane se place dans le slot « breadcrumb » (au-dessus du surtitre).
+ * En-tête de sous-page (/frais, /strategie, /a-propos, /documentation, /presse, /salle-de-presse) :
+ * fond ink + halo de marque, sans image. Surtitre, H1 (text-display-lg), puis, dans une seule et même
+ * taille (text-lead) : l'introduction, la phrase-clé en gras et la ligne risques (RiskNote size 'lead',
+ * jamais animée). Le tout visible sans scroller à 375×812 comme à 1440×900. Le fil d'Ariane se place
+ * dans le slot « breadcrumb » (au-dessus du surtitre).
+ *
+ * `intro`, `punchline` et `riskLine` sont TOUTES LES TROIS FACULTATIVES, et depuis le 14/09/2026 plus
+ * aucune sous-page ne porte de ligne risques : l'équipe a demandé de retirer le « Bon à savoir : … »
+ * de tous les en-têtes sauf celui de l'accueil (01-Hero.astro, qui a le sien). Voir types-v2.ts.
  *
  * SLOT « aside » (audit UX) : le texte est borné à 4xl pour rester lisible, ce qui laissait la moitié
  * droite de l'écran vide sur grand écran, un demi-écran de dégradé avant le premier contenu utile.
@@ -19,8 +24,11 @@
  * Rythme vertical calibré pour la navigation collée (bandeau blanc dans le flux, non superposé).
  * Sous `sm`, les marges hautes sont resserrées et l'introduction comme la ligne risques passent
  * ensemble à `text-base` : avec le bandeau cookies déplié au premier chargement, la ligne risques
- * passait dessous sur plusieurs sous-pages. Les deux changent de taille ENSEMBLE, l'égalité entre le
- * texte équilibré et son contre-poids est une exigence AMF, et le test la vérifie.
+ * passait dessous sur plusieurs sous-pages. LES TROIS PARAGRAPHES changent de taille ENSEMBLE, et
+ * portent les mêmes classes : l'égalité entre un texte qui met en avant et son contre-poids est une
+ * exigence AMF, et seule la graisse distingue la phrase-clé. Attention, AUCUN TEST ne mesure cette
+ * égalité sur un en-tête de sous-page : les deux tests de tests/conformite.spec.ts qui la vérifient
+ * ciblent `#apercu`, donc l'accueil seul. Ici, la garantie tient aux classes écrites côte à côte.
  * Contenu : props issues du fichier de contenu de la page (PageHero de types-v2.ts).
  */
 import RiskNote from '@/components/ui/RiskNote.astro';
@@ -31,7 +39,10 @@ interface Props {
   title: string;
   /** Facultative depuis le 12/09/2026 : la page Frais n'en a plus, on y va droit au comparateur. */
   intro?: string;
-  riskLine: string;
+  /** Phrase-clé sous l'introduction, en gras, MÊME TAILLE que l'introduction et la ligne risques. */
+  punchline?: string;
+  /** Facultative depuis le 14/09/2026 : voir PageHero dans types-v2.ts. Une seule page s'en passe. */
+  riskLine?: string;
   tone?: 'ink' | 'brand';
   /** Ancre de la section (par défaut « en-tete »). */
   id?: string;
@@ -54,6 +65,7 @@ const {
   eyebrow,
   title,
   intro,
+  punchline,
   riskLine,
   tone = 'ink',
   id = 'en-tete',
@@ -95,15 +107,16 @@ const hasAside = Astro.slots.has('aside');
       ]}
     >
       {
-        /* 64 rem à partir de « lg » (13/09/2026) : à 80 px, « Comparer et comprendre » réclame 942 px et
-          n'en avait que 896, la première ligne du H1 de la page Frais se coupait donc en deux et le
-          titre tenait sur trois lignes au lieu de deux. Les titres courts ne changent pas de largeur
-          pour autant, ils n'atteignaient déjà pas la borne. */
+        /* 64 rem à partir de « lg » (13/09/2026) : à 80 px, un H1 de deux lignes voyait sa première
+          ligne se couper en deux et tenait sur trois lignes. Les titres courts ne changent pas de
+          largeur pour autant, ils n'atteignaient déjà pas la borne. */
       }
       <div class:list={['max-w-4xl lg:max-w-5xl', hasAside && 'lg:col-span-7 lg:max-w-none']}>
         {
           /* Un saut de ligne dans le titre est respecté : la césure d'un H1 est une décision de mise en
-            page, elle appartient au contenu et non au hasard de la largeur disponible. Le texte reste
+            page, elle appartient au contenu et non au hasard de la largeur disponible. PLUS AUCUN titre
+            n'en pose depuis le 14/09/2026 et la réécriture de l'en-tête de /frais ; le mécanisme reste,
+            il ne coûte rien et c'est la seule façon de fixer une césure. Le texte reste
             entier pour le nom accessible, `<br>` ne fait qu'y marquer une pause. */
         }
         <h1 id={titleId} class="text-display-lg text-white">
@@ -126,12 +139,28 @@ const hasAside = Astro.slots.has('aside');
             </p>
           )
         }
-        <RiskNote
-          text={riskLine}
-          tone="dark"
-          size="lead"
-          class="mt-2 max-w-3xl max-sm:text-base max-sm:leading-snug sm:mt-5"
-        />
+        {
+          /* Phrase-clé : même taille que l'introduction et que la ligne risques qui suit, seule la
+            graisse change. Une phrase qui insiste sur l'avantage ne doit pas s'afficher plus grande
+            que son contre-poids, c'est précisément le reproche fait à la brochure. */
+        }
+        {
+          punchline && (
+            <p class="text-lead mt-3 max-w-3xl text-pretty font-semibold text-white max-sm:text-base max-sm:leading-snug sm:mt-5">
+              {punchline}
+            </p>
+          )
+        }
+        {
+          riskLine && (
+            <RiskNote
+              text={riskLine}
+              tone="dark"
+              size="lead"
+              class="mt-2 max-w-3xl max-sm:text-base max-sm:leading-snug sm:mt-5"
+            />
+          )
+        }
         {
           /* Appel à l'action de l'en-tête, APRÈS la ligne risques : on ne propose pas de souscrire
             avant d'avoir dit ce qu'on risque. */

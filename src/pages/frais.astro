@@ -82,10 +82,17 @@ const faqItems = faq.items.map((item) => {
   <SiteNav />
   <main id="contenu">
     {
-      /* Plus d'introduction dans l'en-tête (12/09/2026, demande de l'équipe) : titre, ligne risques, puis
-        le comparateur. `hero.intro` reste dans le contenu, elle n'est simplement plus rendue ici. */
+      /* L'introduction REVIENT dans l'en-tête (14/09/2026) : l'équipe a fourni le texte du hero, il tient
+        en deux phrases sous le titre. Elle en était partie le 12/09/2026 pour arriver au comparateur
+        sans défiler ; le comparateur reste juste en dessous, ces deux phrases ne le repoussent pas d'un
+        écran. La phrase-clé est en gras, dans la MÊME taille que l'introduction et la ligne risques. */
     }
-    <PageHero eyebrow={hero.eyebrow} title={hero.title} riskLine={hero.riskLine}>
+    <PageHero
+      eyebrow={hero.eyebrow}
+      title={hero.title}
+      intro={hero.intro}
+      punchline={hero.punchline}
+    >
       <Breadcrumb slot="breadcrumb" key="fees" tone="dark" />
       <Button slot="cta" position={cta.position} variant="light" size="lg">{cta.label}</Button>
       {
