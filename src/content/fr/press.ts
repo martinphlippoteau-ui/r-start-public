@@ -5,7 +5,7 @@ import { fees, press as pressFacts } from '@/content/fr/facts';
 
 /**
  * Page /presse, « La presse en parle » (grand public, arbitrage du 10/09/2026).
- * Trois citations mises en avant, la revue des neuf articles avec leur média et leur date, puis
+ * Trois citations mises en avant, la revue des articles reliés avec leur média et leur date, puis
  * l'avertissement livré par CORUM. Les communiqués, les contacts et le kit média ont quitté cette page :
  * ils vivent sur /salle-de-presse (pressRoom.ts), en pied de page seulement.
  *
@@ -14,7 +14,8 @@ import { fees, press as pressFacts } from '@/content/fr/facts';
  *    couverts par `coverage.disclaimer` ; ils ne sont ni réécrits ni neutralisés (le filtre historique
  *    sur « sans frais » est retiré, plan §5). L'introduction de la revue rappelle, dans le même bloc,
  *    les frais réellement prélevés par R Start : R Start n'est pas une SCPI sans frais ;
- *  - un article dont l'adresse n'a pas été vérifiée s'affiche sans lien, avec son média et sa date ;
+ *  - un article dont l'adresse n'a pas été vérifiée N'EST PAS REPRIS (14/09/2026) : il reste dans
+ *    facts.ts et revient de lui-même le jour où son adresse est renseignée ;
  *  - aucun logo de média (aucune licence) : les noms sont en typographie ;
  *  - aucune donnée de performance, aucun chiffre repris des articles : seuls les faits de facts.ts sont
  *    cités, et R Start n'a pas d'historique propre.
@@ -29,16 +30,26 @@ const typo = (s: string): string => nb(s.replace(/'/g, '’'));
 const coverageCheckedOn = { label: '10 septembre 2026', iso: '2026-09-10' } as const;
 
 /**
- * Revue de presse : la sélection de facts.ts, dans son ordre. Le titre est reproduit tel qu'il a été
- * publié ; `url` n'est transmise que si elle est renseignée, sinon l'article s'affiche sans lien.
+ * Revue de presse : la sélection de facts.ts, dans son ordre, RÉDUITE AUX ARTICLES QUI ONT UNE ADRESSE
+ * (14/09/2026, demande de l'équipe : « mets uniquement les parutions presse avec des liens »). Un titre
+ * de presse sans lien demande au lecteur de croire sur parole ; avec le lien, il vérifie lui-même.
+ *
+ * LE FILTRE EST ICI, PAS DANS facts.ts : les cinq articles écartés y restent entiers, avec leur média,
+ * leur titre et leur date. Ils REVIENNENT TOUT SEULS le jour où leur `url` est renseignée, sans qu'il
+ * y ait rien d'autre à faire. Deux d'entre eux sont à une vérification près, leur adresse candidate est
+ * notée sur place dans facts.ts : Les Echos et Business Immo, tous deux bloqués par un 403 anti-robot.
+ *
+ * Le titre est reproduit tel qu'il a été publié.
  */
-const articles: PressArticle[] = pressFacts.coverage.map((a) => ({
-  media: a.media,
-  title: typo(a.title),
-  date: a.date.label,
-  dateIso: a.date.iso,
-  ...(a.url.trim() !== '' ? { url: a.url } : {}),
-}));
+const articles: PressArticle[] = pressFacts.coverage
+  .filter((a) => a.url.trim() !== '')
+  .map((a) => ({
+    media: a.media,
+    title: typo(a.title),
+    date: a.date.label,
+    dateIso: a.date.iso,
+    url: a.url,
+  }));
 
 /** Citations mises en avant : propos de tiers, avec leur média et leur date. */
 const quotes: PressQuote[] = pressFacts.quotes.map((q) => ({
@@ -48,8 +59,6 @@ const quotes: PressQuote[] = pressFacts.quotes.map((q) => ({
   dateIso: q.date.iso,
 }));
 
-const linkedCount = articles.filter((a) => a.url).length;
-
 const rawNotes: LegalNote[] = [
   {
     id: 'presse-citations',
@@ -57,7 +66,7 @@ const rawNotes: LegalNote[] = [
   },
   {
     id: 'presse-revue',
-    text: `Revue de presse : ${articles.length} articles de médias tiers publiés au lancement de R Start, sélection transmise par CORUM L’Épargne le ${coverageCheckedOn.label}. ${linkedCount} article${linkedCount > 1 ? 's renvoient' : ' renvoie'} vers sa publication d’origine ; pour les autres, l’adresse n’a pas été communiquée et seuls le média et la date sont indiqués. Les titres sont ceux des articles : ils peuvent employer des formulations, des comparaisons ou des chiffres absents des documents réglementaires de R Start. Seuls le document d’informations clés et la note d’information font foi. Aucune donnée de performance de R Start n’est communiquée : la SCPI a moins de douze mois d’existence.`,
+    text: `Revue de presse : ${articles.length} articles de médias tiers publiés au lancement de R Start, sélection transmise par CORUM L’Épargne le ${coverageCheckedOn.label} et complétée depuis. Chacun renvoie vers sa publication d’origine ; les articles dont l’adresse n’a pas pu être vérifiée ne sont pas repris ici. Certains éditeurs réservent la lecture complète à leurs abonnés. Les titres sont ceux des articles : ils peuvent employer des formulations, des comparaisons ou des chiffres absents des documents réglementaires de R Start. Seuls le document d’informations clés et la note d’information font foi. Aucune donnée de performance de R Start n’est communiquée : la SCPI a moins de douze mois d’existence.`,
   },
 ];
 
