@@ -25,10 +25,14 @@ const all = Object.entries(modules)
   .sort(([a], [b]) => a.localeCompare(b))
   .map(([path, mod]) => ({ path, Component: mod.default }));
 /**
- * Trame de l'accueil (10/09/2026), par préfixe de fichier : 01 Hero → 02 Points forts (comprendre le produit)
- * → 01b Ce qui change vraiment (le modèle de frais) → 07 L'expérience derrière R Start → 03a Immeuble (photo
- * → 08 Risques → 10 FAQ. Hors accueil : 05 Revenus (repris par la FAQ), 06 Souscrire (guide sur
- * /documentation, avec MyCORUM) et 09 Documents (/documentation).
+ * Trame de l'accueil, par préfixe de fichier. HOME_ORDER ci-dessous fait foi, dans cet ordre exact :
+ * 01 Hero → 01b Ce qui change vraiment → 02 R Start en un clin d'œil → 07 L'expérience derrière R Start
+ * → 03a Immeuble (photo pleine largeur) → 06 Souscrire (chapitre court) → 08 Risques → 10 FAQ.
+ *
+ * CINQ SECTIONS EXISTENT SANS ÊTRE RENDUES, ici ni ailleurs, faute de figurer dans HOME_ORDER :
+ * 03 Frais, 05 Revenus, 08b La presse en parle et 09 Documents. Leurs fichiers et leurs contenus sont
+ * conservés (audit du 14/09/2026) : les remettre, c'est ajouter leur préfixe à la liste. 04 Stratégie,
+ * elle, est importée directement par /strategie.
  */
 const HOME_ORDER = ['01-', '01b-', '02-', '07-', '03a-', '06-', '08-', '10-'];
 const byPrefix = (prefix: string) => all.find((s) => s.path.includes('/sections/' + prefix));
@@ -36,9 +40,8 @@ const hero = byPrefix('01-');
 const rest = HOME_ORDER.slice(1)
   .map(byPrefix)
   .filter((s): s is NonNullable<typeof s> => s !== undefined);
-/** La Stratégie est rendue en chapitre court (les trois piliers) ; la section complète vit sur /strategie. */
-/** Souscrire est rendue en chapitre court (prop `compact`) : le guide complet et MyCORUM vivent sur /documentation.
- *  La Stratégie a quitté l'accueil le 11/09/2026, elle est rendue en entier sur /strategie. */
+/** Souscrire est rendue en chapitre court (prop `compact`) : le guide complet et MyCORUM vivent sur
+ *  /documentation. La Stratégie a quitté l'accueil le 11/09/2026, elle vit sur /strategie. */
 const propsFor = (path: string) => (/\/06-/.test(path) ? { compact: true } : {});
 
 const jsonLd = [

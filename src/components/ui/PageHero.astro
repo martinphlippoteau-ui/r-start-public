@@ -78,6 +78,12 @@ const titleId = id + '-title';
 const intros = intro === undefined ? [] : Array.isArray(intro) ? intro : [intro];
 const tones = { ink: 'bg-ink', brand: 'bg-brand-gradient-dark' };
 const hasAside = Astro.slots.has('aside');
+/*
+ * `eyebrow` est REÇU MAIS JAMAIS RENDU : le fil d'Ariane, juste au-dessus, tient ce rôle depuis le 13/09/2026. La prop reste acceptée pour ne pas
+ * casser les six pages qui la passent, et les valeurs `eyebrow` des fichiers de contenu ne s'affichent
+ * donc nulle part (audit du 14/09/2026). À trancher : les rendre, ou retirer la prop et les valeurs.
+ */
+void eyebrow;
 ---
 
 <section

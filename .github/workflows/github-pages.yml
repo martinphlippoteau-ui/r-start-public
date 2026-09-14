@@ -97,12 +97,17 @@ jobs:
 
       # Le rapport dit quel test a cédé et sur quel profil. `always()` et non `failure()` : l'étape
       # précédente ne rapporte plus d'échec au job, le rapport ne serait jamais téléversé sans cela.
+      # Le rapporteur `html` a été ajouté à playwright.config.ts le 14/09/2026 : sans lui, cette étape
+      # archivait un dossier que rien n'écrivait, et l'artefact était vide à chaque exécution.
+      # `test-results/` accompagne le rapport : c'est là que vivent les traces des tests en échec.
       - name: Rapport des tests
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: rapport-playwright
-          path: playwright-report/
+          path: |
+            playwright-report/
+            test-results/
           retention-days: 7
 
       # Chiffre chaque page derrière un écran de mot de passe. Sans le secret PREVIEW_PASSWORD,

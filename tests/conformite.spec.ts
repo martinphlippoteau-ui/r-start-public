@@ -150,6 +150,16 @@ test.describe('Conformité', () => {
    */
   test('aucun risque n’est masqué ou animé', async ({ page }) => {
     await page.goto('/');
+    /*
+     * EN SOMMEIL depuis le 14/09/2026, comme les trois autres contrôles de risque de ce fichier : plus
+     * aucun [data-risk] n'est rendu (RiskNote.astro). Sans ce saut, le test passait en parcourant une
+     * liste VIDE : il annonçait « aucun risque masqué » alors qu'il n'y a plus de risque du tout, ce
+     * qui est plus trompeur qu'un test absent. Il se réarme seul au retour des mentions.
+     */
+    test.skip(
+      (await page.locator('[data-risk]').count()) === 0,
+      'aucun [data-risk] rendu : voir src/components/ui/RiskNote.astro'
+    );
     // L'assertion porte sur l'état APRÈS la cascade d'ouverture : on la laisse se terminer.
     await page.waitForTimeout(3000);
     const hidden = await page.locator('[data-risk]').evaluateAll(

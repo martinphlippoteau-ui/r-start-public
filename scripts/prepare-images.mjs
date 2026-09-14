@@ -17,7 +17,14 @@ const ASSETS =
     ? path.resolve(process.argv[argIndex + 1])
     : path.resolve(ROOT, '..', 'Assets R Start');
 
-const OUT_IMAGES = path.join(ROOT, 'src', 'assets', 'images');
+/*
+ * Les photos redimensionnées vont dans le VIVIER, pas dans src/assets/images (14/09/2026).
+ * src/assets/images est scanné par un `import.meta.glob` (src/lib/images.ts) qui émet TOUT ce qu'il
+ * attrape, cité ou non : y déverser les deux cent photos de la source, c'était livrer 25,7 Mo au
+ * navigateur pour treize images affichées. Curer une photo, c'est la déplacer du vivier vers
+ * src/assets/images et l'ajouter à media.ts.
+ */
+const OUT_IMAGES = path.join(ROOT, 'src', 'assets', 'vivier');
 const OUT_LOGOS = path.join(ROOT, 'src', 'assets', 'logos');
 const OUT_PUBLIC = path.join(ROOT, 'public');
 const OUT_DOCS = path.join(OUT_PUBLIC, 'documents');
@@ -33,12 +40,12 @@ const RASTER_SETS = [
   { src: '6 - Photos ambiance', out: 'ambiance', maxWidth: 2400, format: 'jpg', quality: 84 },
 ];
 
-/** Logos vectoriels utiles (copie brute). */
+/* Logos vectoriels réellement importés par un composant (copie brute). `globe.svg` en est sorti le
+   14/09/2026 : aucun fichier ne l'importait, et le globe de /strategie est dessiné au canvas. */
 const LOGOS = [
   ['1 - Logos R Start/R_Start_couleur_CMJN.svg', 'r-start-couleur.svg'],
   ['1 - Logos R Start/R_Start_blanc_CMJN.svg', 'r-start-blanc.svg'],
   ["1 - Logos R Start/CORUM L'Epargne_couleur_CMJN.svg", 'corum-lepargne-couleur.svg'],
-  ['8 - Autres visuels/globe.svg', 'globe.svg'],
 ];
 
 /** Fichiers copiés tels quels dans public/. */

@@ -119,7 +119,13 @@ export const hosting = {
     'Microsoft Ireland Operations Ltd, One Microsoft Place, South County Business Park, Leopardstown, Dublin 18, Irlande',
 } as const;
 
-/** Mots et formulations interdits dans les textes (contrôle automatisé, voir scripts/check-compliance.mjs). */
+/*
+ * Mots et formulations interdits dans les textes. LISTE DE RÉFÉRENCE ÉDITORIALE, PAS LE CONTRÔLE :
+ * rien ne lit cet export (audit du 14/09/2026). Le contrôle réellement exécuté est la table FORBIDDEN
+ * de scripts/check-compliance.mjs, qui porte ses propres expressions ET leurs fenêtres d'exception.
+ * Les deux listes doivent donc être tenues à jour ensemble, ou celle-ci rejoindre la première.
+ * Elle reste ici parce qu'elle se lit, là où la table du script est faite d'expressions régulières.
+ */
 export const forbiddenPhrases = [
   'sans frais', // sauf dans la phrase « n'est pas une SCPI sans frais »
   'sans risque',

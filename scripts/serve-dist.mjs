@@ -40,9 +40,22 @@ const TYPES = {
   '.pdf': 'application/pdf',
 };
 
+/*
+ * Sous-chemin de publication. En CI, le site est construit avec PUBLIC_BASE_PATH=r-start-public et
+ * tous ses liens portent donc ce préfixe, alors que ce serveur sert `dist/` À LA RACINE : sans ce
+ * retrait, chaque lien interne tombait en 404 et les trente tests de bout en bout examinaient la page
+ * d'erreur au lieu de la page demandée (audit du 14/09/2026). Même règle que scripts/check-compliance.mjs.
+ */
+const SEGMENTS = (process.env.PUBLIC_BASE_PATH || '').split('/').filter(Boolean);
+const PREFIXE = SEGMENTS.length ? '/' + SEGMENTS[SEGMENTS.length - 1] : '';
+const sansPrefixe = (chemin) =>
+  PREFIXE && (chemin === PREFIXE || chemin.startsWith(PREFIXE + '/'))
+    ? chemin.slice(PREFIXE.length) || '/'
+    : chemin;
+
 /** Chemin sur le disque, ou null si la demande sort de `dist/` (traversée de répertoire). */
 const resoudre = (url) => {
-  const brut = decodeURIComponent(new URL(url, 'http://x').pathname);
+  const brut = sansPrefixe(decodeURIComponent(new URL(url, 'http://x').pathname));
   const cible = path.normalize(path.join(DIST, brut));
   return cible === DIST || cible.startsWith(DIST + path.sep) ? cible : null;
 };

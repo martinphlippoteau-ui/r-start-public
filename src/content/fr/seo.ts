@@ -67,6 +67,11 @@ export const seo = {
  * contenu. Style Apple : phrase courte terminée par un point, un chiffre au plus, aucune performance.
  * Clés = SectionKey (src/config/sections.ts), hors « notes ».
  */
+/*
+ * RÉFÉRENCE ÉDITORIALE, sans lecteur : aucun composant ne lit cet export (audit du 14/09/2026).
+ * Les H2 réellement rendus sont les `title` des fichiers de contenu. Cette table dit ce que le SEO
+ * aimerait y voir ; elle sert de repère quand on réécrit un titre, pas de source de vérité.
+ */
 export const seoH2: Record<string, string> = {
   /** Sous le H1 « R Start ». Reprend l’accroche de facts.product.tagline. */
   hero: `${product.tagline} de CORUM.`,
@@ -95,6 +100,10 @@ export const seoH2: Record<string, string> = {
  * Aucune question ne porte sur la performance (rendement, taux de distribution, TRI, scénarios).
  * Chaque réponse doit rester équilibrée : l’avantage et son risque dans le même paragraphe.
  * Sert aussi de base au JSON-LD FAQPage (strictement les Q/R visibles).
+ */
+/*
+ * RÉFÉRENCE ÉDITORIALE, sans lecteur (audit du 14/09/2026) : les questions rendues sont celles de
+ * faq.ts. Cette liste dit les intentions de recherche visées, elle ne produit rien.
  */
 export const faqQuestions: string[] = [
   'Qu’est-ce qu’une SCPI ?',

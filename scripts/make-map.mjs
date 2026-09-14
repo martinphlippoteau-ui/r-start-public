@@ -7,7 +7,7 @@
 //    C'est la seule carte en service ; les deux modes SVG ci-dessous n'ont plus de consommateur et
 //    src/components/StrategyMap.astro, qu'ils écrivaient, a été supprimé. Ils se régénèrent d'un appel,
 //    et il faut alors remettre l'import dans 04-Strategy.astro.
-//  - `monde` (défaut depuis le 14/09/2026) : UNE carte du monde en projection équirectangulaire, toutes
+//  - `monde` : UNE carte du monde en projection équirectangulaire, toutes
 //    les terres émergées en teal. C'est ce que dit la page : « partout dans le monde ». L'Antarctique
 //    est écarté, il n'a pas de marché immobilier et il écraserait la projection ;
 //  - `univers` : les deux volets d'origine, Canada et États membres du Conseil de l'Europe d'après
@@ -269,7 +269,7 @@ for (const p of built) {
 }
 
 const panelMarkup = (p) => {
-  const [x, y, w, h] = p.rect;
+  /* Le rectangle du volet ne sert plus ici : c'est la découpe (clipDefs) qui le porte. */
   return `
   <g clip-path={\`url(#\${id}-map-${p.key})\`}>
     <g fill="currentColor" fill-opacity="0.05" stroke="currentColor" stroke-opacity="0.16" stroke-width="0.7" fill-rule="evenodd">

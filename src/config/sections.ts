@@ -3,9 +3,10 @@ import type { SectionKey, SectionMeta } from '@/content/types';
 /**
  * Contrat des sections : ordre, ancres et présence dans la sous-navigation.
  * Fichier figé après la phase 0. Les composants de section lisent leur `id` ici.
- * `order` suit la trame de l'accueil du 10/09/2026 (Points forts avant « Ce qui change » : comprendre le
- * produit avant le modèle de frais ; Souscrire en chapitre court entre Stratégie et Presse depuis le
- * 11/09/2026) ; Revenus et Documents (12-13) n'y sont plus rendus (src/pages/index.astro, HOME_ORDER). La photo pleine largeur 03a-Immeuble (entre Confiance et Frais) n'a
+ * `order` est un HÉRITAGE de la trame du 10/09/2026 et ne décrit plus l'ordre rendu : c'est HOME_ORDER,
+ * dans src/pages/index.astro, qui fait foi, et il ne suit pas cet ordre-là. Six clés déclarées ici ne
+ * sont rendues nulle part sur l'accueil : frais, revenus, presse, documents, strategy (sur /strategie)
+ * et income. La photo pleine largeur 03a-Immeuble (entre Confiance et Souscrire) n'a
  * ni titre, ni note, ni entrée ici : SectionKey (src/content/types.ts) ne la prévoit pas, elle porte son id.
  * Menu (réunion du 10/09/2026) : uniquement des pages (src/config/pages.ts), jamais d'ancre de section :
  * `inNav` est donc false partout et n'est conservé que pour la page de prévisualisation des sections.
@@ -26,10 +27,9 @@ export const sections: Record<SectionKey, SectionMeta> = {
   notes: { id: 'notes', label: 'Notes', order: 8, inNav: false },
 };
 
-/** Sections dans l'ordre d'affichage. */
-export const orderedSections = (Object.keys(sections) as SectionKey[])
-  .map((key) => ({ key, ...sections[key] }))
-  .sort((a, b) => a.order - b.order);
-
-/** Entrées de la sous-navigation sticky. */
-export const navSections = orderedSections.filter((s) => s.inNav);
+/*
+ * `orderedSections` et `navSections` ont été SUPPRIMÉS le 14/09/2026 : plus aucun lecteur. Ils
+ * servaient la sous-navigation par ancres, démantelée le 10/09/2026 quand le menu est passé aux pages
+ * seules. `order` et `inNav` restent dans SectionMeta, mais plus rien ne les consomme : l'ordre rendu
+ * est HOME_ORDER (src/pages/index.astro), et `inNav` vaut false partout.
+ */

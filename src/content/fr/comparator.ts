@@ -564,10 +564,10 @@ export const comparator = {
 /** Les SCPI réellement proposées au choix : celles qu'on a pu vérifier. */
 export const comparatorScpis = comparator.scpis.filter((s) => !s.unavailable);
 
-/**
- * Vrai tant qu'une SCPI proposée n'a PAS ÉTÉ DOCUMENTÉE (aucune source). Une SCPI documentée dont un
- * frais n'est pas publié n'est pas un trou : c'est une information, affichée « non publié ».
+/*
+ * `comparatorIsIncomplete` a été SUPPRIMÉ le 14/09/2026 : personne ne le lisait. Il disait « vrai tant
+ * qu'une SCPI proposée n'a pas été documentée ». Le même calcul est refait à la main dans
+ * scripts/check-compliance.mjs, qui est le seul endroit où il servait vraiment.
  */
-export const comparatorIsIncomplete = comparatorScpis.some((s) => !s.source);
 
 export default comparator;

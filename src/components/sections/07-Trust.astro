@@ -1,45 +1,22 @@
 ---
 /**
- * Section 7, « L'expérience derrière R Start » (id « corum »). Allégée le 11/09/2026 : le cadre
- * réglementaire est passé sur /documentation et le bloc « rémunération sur les ventes » (doublon de la
- * zone 2 et de /frais) a été retiré. Trame du 10/09/2026 : 02 Points
- * forts (white) → 01b Ce qui change (paper) → 07 → 03a Immeuble (photo pleine largeur) → 03 Frais. Deux
- * bandes contrastées avec les voisines : une bande ink (en-tête + cadre réglementaire en cartes label / valeur,
- * réserve AMF et RiskNote), puis une bande white (carrousel d'avis Trustpilot officiel + lien externe
- * + périmètre en RiskNote ; chiffres du groupe CORUM en quatre compteurs 2 × 2, RiskNote puis source ;
- * gamme des cinq SCPI avec logos ; rémunération de CORUM sur les ventes). Les cinq blocs sont des H3 de
- * même niveau sous le H2.
- * Aucun logo AMF, aucune photo (droits media.corum non confirmés). Le logo Trustpilot, les étoiles et les
- * avis sont rendus par le TrustBox OFFICIEL (ui/TrustBox.astro) : ils viennent de Trustpilot, pas du site
+ * Section 7, « L'expérience derrière R Start » (id « corum »), rendue sur l'accueil seulement.
+ *
+ * CE QU'ELLE REND AUJOURD'HUI, et rien d'autre : un H2, un H3 « Les avis sur CORUM L'Épargne », le
+ * carrousel Trustpilot officiel, son lien externe et le renvoi vers /a-propos. Elle a beaucoup maigri :
+ * le cadre réglementaire est passé sur /documentation le 11/09/2026 ; les quatre chiffres du groupe,
+ * les logos de la gamme et le bloc « rémunération sur les ventes » ont suivi sur /a-propos ; les
+ * contre-poids qu'elle portait ne sont plus rendus depuis la neutralisation de RiskNote le 14/09/2026.
+ *
+ * Aucun logo AMF, aucune photo (droits media.corum non confirmés). Le logo Trustpilot, les étoiles et
+ * les avis viennent du TrustBox OFFICIEL (ui/TrustBox.astro), donc de Trustpilot, pas du site
  * (11/09/2026). Le carrousel est réglé sur toutes les notes, de une à cinq étoiles : aucun tri favorable.
- * Les chiffres viennent de trust.stats (corum.stats n'est pas rendu ici pour ne pas doubler) : les quatre
- * chiffres de la trame (zone 4) sont tous rendus, dans l'ordre du contenu ; leur contre-poids et leur source
- * ont quitté le bloc le 11/09/2026 (voir le commentaire dans le gabarit).
- * Équilibre AMF : chaque bloc avantage ([data-advantage]) partage son parent avec son contre-poids
- * ([data-risk]) rendu à la même taille de texte visible (text-lead face aux valeurs des cartes, aux libellés
- * de Stat et aux descriptions) ; ni le H2, ni les blocs risque, ni la réserve AMF ne portent data-animate.
- * Motion (src/scripts/motion.ts ; sobriété du 11/09/2026 : un seul effet d'entrée par bloc) :
- *  - en-tête : H2 mot à mot et introduction en fade-up (SectionHeading `motion`), surtitre statique ;
- *  - les titres H3 des trois blocs entrent par `fade-up` : 24 px (valeur titre) quand un compteur suit
- *    (avis, chiffres), 12 px seulement quand le paragraphe sous le titre est visible d'emblée (gamme) pour
- *    ne pas chevaucher sa première ligne ;
- *  - le bloc des avis n'a plus aucun effet d'entrée : son contenu est une iframe Trustpilot, que le site
- *    n'anime pas ;
- *  - les chiffres du groupe comptent depuis 0, en place (plus de `stagger` sur la liste : le compteur est
- *    l'entrée), avec une durée proportionnelle à l'ordre de grandeur (1,4 s pour 9,6 → 2,2 s pour
- *    160 000) : les grands nombres finissent en dernier. Chiffres non réglementaires (clients, encours,
- *    immeubles, avis), jamais un frais ni un indicateur de risque ;
- *  - les logos de la gamme cascadent (`stagger`, pas de 0,08 s).
- *  Jamais animés : la réserve AMF et sa RiskNote, le périmètre Trustpilot, le contre-poids des chiffres,
- *  la source, le disclaimer de la gamme et le paragraphe équilibré sur la rémunération.
- *  Aucun rideau ne la recouvre plus : la section suivante est la photo 03a-Immeuble (le rideau de 08-Risques
- *  recouvre désormais 08b-Presse, celui de 04-Stratégie recouvre 03-Frais).
- * Surtitre via SectionHeading (teal-200 sous l'ancêtre .text-white de la bande ink, AA). Dans la bande
- * white, NoteRef reçoit tone="light" car l'ancêtre Section porte text-white.
- * Notes (corum.notes, ordre de lecture) : cadre réglementaire (confiance-agrement), carte Société de gestion
- * (item.noteId → corum-agrement), réserve visa (confiance-visa), avis (confiance-trustpilot), chiffres
- * (confiance-chiffres), gamme (corum-gamme), rémunération (corum-compensation).
- * Contenu : src/content/fr/trust.ts et src/content/fr/corum.ts.
+ *
+ * FOND BLANC, et c'est une contrainte, pas un choix : sur fond bleu, l'iframe Trustpilot affichait son
+ * propre texte gris clair sur ses cartes blanches, à 1,85:1 (six violations axe). Le fond a été échangé
+ * avec « R Start en un clin d'œil », qui est passé en bleu.
+ *
+ * Motion : un seul effet d'entrée, sur le bloc d'avis. Aucun rideau ne la recouvre.
  */
 import Button from '@/components/ui/Button.astro';
 import Container from '@/components/ui/Container.astro';
@@ -59,10 +36,6 @@ const { trustpilot } = trust;
 /** Gamme en texte (décision du 09/09/2026 : seuls les logos R Start et CORUM L'Épargne sont utilisés sur le site). */
 
 const hint = trustpilot.externalLinkHint;
-{
-  /* Quatre chiffres fixes (11/09/2026) : plus de compteur, la largeur du nombre changeait pendant
-            l'animation et décalait toute la grille. Une seule entrée en cascade sur la liste. */
-}
 ---
 
 <Section id={id} tone="white" spacing="none">

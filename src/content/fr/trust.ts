@@ -1,34 +1,7 @@
 import type { LegalNote, StatItem } from '@/content/types';
 import type { TrustContent } from '@/content/types-v2';
-import { sections } from '@/config/sections';
 import { corumGroup, product, risk as riskFacts, trust as trustFacts } from '@/content/fr/facts';
 import { managementCompany, visaNotice } from '@/content/fr/legal';
-
-/**
- * Section « Confiance » (id : corum, sections.corum), accueil, rappelée sur /frais et /documentation.
- * Trois blocs factuels, chacun daté et sourcé : le cadre réglementaire (visa de la note d'information,
- * agrément de la société de gestion, dépositaire, autorité compétente au sens du DIC, classification SFDR),
- * l'instantané Trustpilot sur le distributeur CORUM L'Épargne et les chiffres clés du groupe CORUM. Aucun logo AMF,
- * aucun visuel Trustpilot, aucune formulation de caution : le visa n'est pas une approbation du produit.
- * La mention visa (legal.visaNotice, bulletin p.4) est reproduite à l'identique dans la note « confiance-visa ».
- * La classification SFDR figure dans une carte du cadre réglementaire, avec sa portée réelle (elle n'atteste
- * d'aucune performance ni d'aucun objectif durable), et dans la note « confiance-agrement ».
- * Chaque bloc porte son contre-poids risque, de longueur comparable au bloc rendu (items et disclaimer
- * compris pour le cadre réglementaire) : champs `risk` (amf, stats) et fin du champ `scope` (trustpilot,
- * dont le type ne prévoit pas de champ `risk`).
- * Les chiffres du groupe (`experienceStats`, exporté) sont les quatre de la zone 4 de la trame du 10/09/2026
- * (15 ans, 9,6 Md€, + 160 000 épargnants, 5 SCPI depuis 2012), construits depuis facts.corumGroup et
- * réutilisés par corum.ts ; ce fichier les définit parce que corum.ts importe déjà ses notes (pas de cycle).
- * Tout arbitrage chiffré se fait dans facts.ts, jamais ici. Leur source porte une date de consultation de
- * corum.fr, pas une date d'arrêté (aucune n'existe dans le dépôt, voir facts.corumGroup et corum.ts
- * STATS_DATED) : le bloc reste rendu, le composant n'ayant pas d'état vide, et la source le dit.
- * Notes : les quatre notes exportées ici (agrément, visa, Trustpilot, chiffres) sont agrégées par corum.ts
- * avec les siennes (mention légale de l'agrément, gamme, compensation) dans l'ordre de lecture de la section ;
- * notes.ts n'importe que corum.ts. La note « chiffres » n'existe qu'ici (corum.ts ne la double plus).
- */
-
-/** Ancre HTML de la section (sous-navigation et rappels sur /frais et /documentation), dérivée de config/sections. */
-export const trustSectionId = sections.corum.id;
 
 /** Espace insécable (U+00A0, en échappement) avant % € : ; ? ! et devant « Md€ » : les libellés de facts.ts utilisent une espace simple. */
 const nb = (s: string): string => s.replace(/ ([%€:;?!])/g, ' $1').replace(/ (Md€)/g, ' $1');

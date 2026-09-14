@@ -15,6 +15,3 @@ export const withBase = (path: string): string => {
   if (!path.startsWith('/')) return path;
   return base + path;
 };
-
-/** Chemin de base normalisé, sans barre finale (chaîne vide quand le site est à la racine). */
-export const basePath = base;

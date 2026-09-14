@@ -9,8 +9,9 @@
  *    Options : data-scrub-trigger, data-scrub-start (défaut `top bottom`), data-scrub-end (`bottom top`),
  *    data-scrub-ease (défaut `none`).
  *  - data-curtain : la section recouvre la précédente. Règle d'emploi (11/09/2026) : seulement quand la
- *    section précédente ne contient AUCUN épinglage (jamais après une scène, ex. 03-Fees) et quand le
- *    contraste le justifie (fond clair → ink) ; sur l'accueil, un seul rideau : 08-Risques sur 08b-Presse.
+ *    section précédente ne contient AUCUN épinglage et quand le contraste le justifie (fond clair → ink).
+ *    Trois rideaux au 14/09/2026 : sur l'accueil 01b-Différence sur le hero et 08-Risques sur Souscrire,
+ *    sur /strategie le même bloc Risques sur « Comment ». Plus aucune scène épinglée nulle part.
  *    La section précédente est épinglée (sans
  *    espace réservé) quand son bas touche le bas du viewport pendant que la section rideau monte
  *    par-dessus (z-index, coins arrondis et ombre posés par la CSS `[data-curtain]`). Le recul

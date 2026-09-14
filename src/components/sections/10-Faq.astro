@@ -1,14 +1,17 @@
 ---
 /**
  * Section 10, FAQ (id « faq »). Six questions depuis le 11/09/2026 (faq.items, sélection HOME_FAQ) ;
- * la FAQ complète est sur /documentation, atteinte par `faq.moreLink`. Fond paper (après Risques, ink) ; dernière section de l'accueil avant les Notes.
+ * la FAQ complète est sur /documentation, atteinte par `faq.moreLink`. Fond paper (après Risques, ink) ;
+ * DERNIÈRE SECTION de l'accueil : le bloc « Notes et sources » qui la suivait n'est plus rendu depuis le
+ * 14/09/2026.
  * Deux colonnes sur grand écran : en-tête collant (surtitre, H2 en text-display-md : la FAQ clôt la page, un
- * cran sous les chapitres) face à la liste des dix questions en accordéons natifs <details name="faq"> (un
+ * cran sous les chapitres) face à la liste des six questions en accordéons natifs <details name="faq"> (un
  * seul ouvert à la fois), chevron animé en CSS, questions en text-xl (text-display-sm dès sm : une question
  * longue tient sur deux lignes à 375 px), réponse en paragraphes text-lead. Dans chaque réponse, les paragraphes « avantage »
  * (data-advantage) sont suivis, dans le même bloc et la même taille, de leur contre-poids risque
  * (RiskNote, data-risk) : la coupure vient du contenu (item.riskFrom), l'appel de note aussi
- * (item.noteId). Le CTA tunnel ferme la colonne des questions. Le JSON-LD FAQPage est émis par la
+ * (item.noteId). ATTENTION : depuis le 14/09/2026 ni RiskNote ni NoteRef ne rendent quoi que ce soit,
+ * les contre-poids et les appels sont donc invisibles, alors que le découpage continue de les préparer. Le CTA tunnel ferme la colonne des questions. Le JSON-LD FAQPage est émis par la
  * page (src/lib/seo.ts), pas ici.
  *
  * L'en-tête est rendu ici (et non par SectionHeading) pour poser les attributs motion sur le H2 ; le

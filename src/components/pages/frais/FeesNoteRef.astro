@@ -32,6 +32,10 @@ const colors = {
  * avec leurs sources, leurs dates et leurs renvois aux documents réglementaires. Rien n'est réécrit,
  * rien n'est perdu. Remettre `AFFICHER` à `true` rétablit tout, appels de note compris.
  *
+ * CE COMPOSANT N'EST DE TOUTE FAÇON PLUS IMPORTÉ : /frais a perdu ses appels de note ET son bloc de
+ * notes le 14/09/2026. Les rétablir suppose donc DEUX gestes, pas un : remettre `AFFICHER` à `true`
+ * ET réintroduire les <FeesNoteRef> et le <LegalNotes> dans src/pages/frais.astro.
+ *
  * SEULE EXCEPTION CONSERVÉE sur le site : le bloc « Sources des données » sous le comparateur de
  * /frais (FeeComparator.astro). Il dit d'où viennent les taux des dix-sept SCPI nommées et à quelle
  * date ils ont été relevés ; sans lui, la comparaison serait invérifiable.

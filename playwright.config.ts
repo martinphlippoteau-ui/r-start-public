@@ -22,7 +22,13 @@ export default defineConfig({
    * où l'étape redeviendra bloquante.
    */
   retries: 0,
-  reporter: [['list']],
+  /*
+   * `list` pour lire la console, `html` pour le rapport que l'intégration continue téléverse.
+   * Sans le second, l'étape « Rapport des tests » du workflow archivait un dossier qu'aucun rapporteur
+   * n'écrivait : l'artefact était vide à chaque exécution, et l'étape rassurait sans rien livrer
+   * (audit du 14/09/2026). `open: 'never'` : en local, on ne veut pas qu'un navigateur s'ouvre seul.
+   */
+  reporter: [['list'], ['html', { open: 'never' }]],
   use: {
     baseURL: 'http://127.0.0.1:4321',
     trace: 'retain-on-failure',

@@ -1,12 +1,5 @@
 import type { LegalNote, SubscribeContent } from '@/content/types';
-import {
-  externalLinks,
-  fees,
-  income as incomeFacts,
-  risk,
-  share,
-  subscription,
-} from '@/content/fr/facts';
+import { externalLinks, fees, risk, share, subscription } from '@/content/fr/facts';
 import { withdrawalExemptions } from '@/content/fr/fees';
 
 /**

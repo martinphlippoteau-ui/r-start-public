@@ -10,8 +10,9 @@ import { test, expect } from '@playwright/test';
  * partout.
  */
 /**
- * /strategie n'y figure pas : depuis le 10/09/2026 cette page rend la section Stratégie complète de
- * l'accueil (scène épinglée du mot d'ordre, texte mot à mot, tracés, parallaxe), qui exige le moteur GSAP.
+ * /strategie n'y figure pas : elle déclare des effets qui exigent GSAP, tracés au défilement, parallaxe
+ * des photos, texte mot à mot et rideau du bloc Risques. La scène épinglée du mot d'ordre, elle, est
+ * partie avec son texte le 14/09/2026.
  */
 const SOUS_PAGES = ['/frais/', '/a-propos/', '/documentation/', '/presse/', '/salle-de-presse/'];
 
@@ -54,10 +55,9 @@ test.describe('Performance', () => {
    * On clique un appel, le bloc s'ouvre, la note visée est visible et porte le focus.
    */
   /*
-   * Sur /documentation : ni l'accueil ni /frais ne portent plus d'appel de note, tous deux ayant reçu un
-   * contenu fourni par l'équipe qui n'en prévoit pas (14/09/2026). /documentation en compte vingt-huit,
-   * c'est la page qui exerce le plus le mécanisme. Il reste rendu par les quatre sous-pages qui passent
-   * leur propre liste à LegalNotes : /documentation, /a-propos, /presse et /salle-de-presse.
+   * EN SOMMEIL : plus aucune page ne rend d'appel de note depuis le 14/09/2026 (voir le test.skip
+   * ci-dessous et src/components/ui/NoteRef.astro). /documentation reste la cible parce qu'elle en
+   * comptait vingt-huit, le plus du site : c'est là que le mécanisme se réarmera en premier.
    */
   test('un appel de note ouvre le bloc des notes et y amène le focus', async ({ page }) => {
     await page.goto('/documentation/');

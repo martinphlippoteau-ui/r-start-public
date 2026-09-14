@@ -1,31 +1,24 @@
 ---
 /**
- * Page /frais (périmètre v2, plan §12) : version complète de la section « Frais » de l'accueil.
- * SiteNav collée en haut (barre unique, entrées de pages) → fil d'Ariane (slot du PageHero) → PageHero
- * (H1, intro, ligne risques visible sans scroller, jamais animée) → sections :
- *  1. le comparateur SCPI par SCPI (FeeComparator), premier élément de la page ; la bande des trois
- *     « 0 % » et de leur contre-poids qui le suivait a été RETIRÉE le 14/09/2026 (demande de l'équipe) :
- *     le comparateur montre déjà ces taux et le barème les détaille, la page les disait trois fois ;
- *  2. le barème en quatre tableaux accessibles (caption = titre H3 + introduction, th scope="col" /
- *     scope="row", nature du frais en pastille depuis FeeRow.kind, assiette et précisions repliées sous le
- *     libellé aux largeurs étroites, taux jamais coupé : `valueShort` sous 640 px) ;
- *  3. la commission de retrait : frise des cinq paliers (10-7-5-3-0), cas d'exonération (avantage) et
- *     leur note (risque), même taille ;
- *  4. sur fond ink : mécanisme de réserve en cas de moins-value (avantage en paragraphes + RiskNote),
- *     puis l'avertissement commission d'arbitrage, reproduit à l'identique depuis legal.ts, jamais animé
- *     (l'encadré « Une innovation, pas une révolution » accompagne désormais la bascule, en 6) ;
- *  5. l'incidence des coûts du DIC (trois durées, méthode, risque : coûts, jamais de performance) ;
- *  6. (supprimée le 14/09/2026) la bascule pédagogique des frais : le composant FeeSwitcher n'était
- *     plus importé, il a été retiré et SHOW_MARKET_COMPARISON est repassé à false ;
- *  7. le document de référence (carte PDF data-doc, ou lien externe vers corum.fr tant que le DIC est en
- *     attente : rel noopener noreferrer, mention « nouvelle fenêtre ») ;
- *  8. la FAQ en accordéons natifs <details data-faq> (JSON-LD FAQPage émis par la page) ;
- *  9. la précision HT = TTC, l'appel de note sur la rémunération du distributeur (recueilli de la bande
- *     retirée en 1 : c'est une information réglementaire, elle ne pouvait pas disparaître avec elle) et
- *     le CTA de souscription (position « frais ») ;
- * puis les notes de la page (feesPage.notes, appels de note locaux FeesNoteRef) et le Footer.
- * Animations déclaratives sobres uniquement (data-animate clip / stagger / fade-up) ; aucun [data-risk],
- * aucun avertissement et aucun H1 sous un data-animate.
+ * Page /frais. TROIS ZONES, texte fourni par l'équipe le 14/09/2026 (« je veux ce contenu là ») :
+ *  1. l'en-tête : H1 « Un modèle de frais gagnant-gagnant », introduction et phrase-clé en gras, CTA.
+ *     Plus de ligne risques : elle a quitté tous les en-têtes de sous-page le même jour ;
+ *  2. le comparateur SCPI par SCPI (FeeComparator), titre visible, accroche, tableau et, seul rescapé
+ *     du grand ménage des sources, le bloc « Sources des données » ;
+ *  3. le barème en quatre tableaux accessibles (caption = titre H3 + introduction, th scope="col" /
+ *     scope="row", nature du frais en pastille depuis FeeRow.kind, assiette et précisions repliées sous
+ *     le libellé aux largeurs étroites, taux jamais coupé : `valueShort` sous 640 px), suivi de la note
+ *     HT rendue par ui/NoteConformite.astro.
+ * Puis le Footer. La page n'a plus de bloc de notes.
+ *
+ * CE QUI A QUITTÉ LA PAGE le 14/09/2026, et dont le contenu reste dans feesPage.ts et comparator.ts :
+ * la bande des trois « 0 % », la frise de la commission de retrait, le mécanisme de réserve en cas de
+ * moins-value, l'avertissement commission d'arbitrage (toujours reproduit sur /documentation, où le
+ * contrôle l'exige), l'incidence des coûts du DIC, la bascule pédagogique, le document de référence,
+ * la FAQ des frais, le bloc d'appel final et les huit notes.
+ *
+ * Animations déclaratives sobres uniquement (data-animate clip / stagger / fade-up) ; aucun H1 et aucun
+ * avertissement sous un data-animate.
  * Contenu : src/content/fr/feesPage.ts (aucun texte en dur ; micro-textes dans feesPage.labels).
  */
 import Base from '@/layouts/Base.astro';

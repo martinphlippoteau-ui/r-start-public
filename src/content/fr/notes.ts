@@ -1,14 +1,13 @@
 import type { LegalNote } from '@/content/types';
 
 /**
- * Registre des notes légales numérotées (façon Apple).
- * Concatène les `notes` exportées par chaque fichier de contenu, dans l'ordre d'affichage de l'accueil
- * (trame du 10/09/2026, src/pages/index.astro HOME_ORDER ; `order` dans src/config/sections.ts) : la
- * numérotation des appels reste croissante à la lecture. <NoteRef id="…" /> résout le numéro via noteNumber() ;
- * LegalNotes.astro rend la liste et pose les ancres `${sections.notes.id}-${n}`.
- * La Stratégie en chapitre court (04, `compact`) ne rend que les piliers, sans appel de note : ses notes ne
- * sont numérotées que sur /strategie (prop `pageNotes`), jamais ici. Souscrire en chapitre court (06,
- * `compact`, entre Stratégie et Presse) n'appelle que les notes de ses étapes (`homeNotes`).
+ * Registre des notes de l'accueil. PLUS AUCUNE NOTE N'EST RENDUE SUR LE SITE depuis le 14/09/2026 :
+ * LegalNotes.astro et les cinq composants d'appel de note portent un commutateur `AFFICHER = false`
+ * (demande de l'équipe : « enlève les notes et les sources de tout le site sauf du tableau de la page
+ * frais »). Les seize registres, celui-ci compris, restent intacts avec leurs sources et leurs dates :
+ * remettre `AFFICHER` à `true` les fait tous revenir, appels compris.
+ * Ce fichier garde donc son rôle : il est la source de vérité de la NUMÉROTATION, et c'est lui qui
+ * garantit que deux sections ne se disputent pas un numéro le jour du retour.
  */
 /*
  * REGISTRE VIDE depuis le 14/09/2026 (demande de l'équipe) : l'accueil ne porte plus d'appels de note

@@ -1,23 +1,22 @@
 ---
 /**
- * Page /a-propos, la société de gestion : TROIS sections et une photo pleine largeur (refonte du
- * 13/09/2026). Jusqu'ici les deux chapitres tenaient dans une seule section blanche de 1 575 px,
- * sans repère entre eux :
- *  1. #corum         (white) « Le groupe CORUM en chiffres », les quatre chiffres du groupe ;
+ * Page /a-propos, société de gestion : DEUX sections et une photo pleine largeur.
+ *  1. #corum   (white) « Le groupe CORUM en quelques chiffres », les cinq chiffres du groupe. Cinq
+ *                      colonnes et une taille de chiffre plus basse dès qu'ils sont cinq : à quatre
+ *                      colonnes le cinquième restait seul sur une ligne, et à cinq colonnes en taille
+ *                      pleine « 9,6 Md€ » passait à la ligne (14/09/2026) ;
  *  2. bande photo pleine largeur, hors section (décorative, sans titre : elle n'a donc pas d'ancre) ;
- *  3. #savoir-faire  (paper) les trois familles de solutions du groupe, une photo par carte
- *                            (media.expertise, 14/09/2026, à la place des pictogrammes), contre-poids compris ;
- *  4. #gamme         (white) la gamme des cinq SCPI, tuile R Start marquée « Nouveau », et son contre-poids.
+ *  3. #gamme   (white) la gamme des cinq SCPI, tuile R Start marquée « Nouveau ».
+ * La section #savoir-faire, qui décrivait les trois familles de solutions du groupe, a été RETIRÉE le
+ * 14/09/2026 à la demande de l'équipe ; son contenu reste dans corum.ts (`expertise`) et ses trois
+ * visuels dans media.ts (`expertise`).
  * Ces blocs étaient sur l'accueil jusqu'au 11/09/2026 ; ils ont leur place ici, où le sujet est la
- * société de gestion. Les savoir-faire sont arrivés le 13/09/2026 : la page disait qui gère R Start,
- * pas ce que fait le groupe par ailleurs. Ils DÉCRIVENT une activité, ils ne proposent rien : aucune
- * de ces solutions n'est vendue ni détaillée sur ce site, et le contre-poids le dit dans le même bloc.
- * Le bloc n'est rendu que si `corum.expertise` existe.
+ * société de gestion.
  * La photo n'a PAS de parallaxe : `data-parallax` exige le moteur GSAP, que cette page n'a aucune autre
- * raison de télécharger (tests/performance.spec.ts). Elle se révèle par `data-animate="clip"`, rendu par le
- * moteur léger.
- * Équilibre AMF : la gamme porte son contre-poids (corum.disclaimer, RiskNote de même taille, jamais animé),
- * juste sous les tuiles, dans le même bloc. La photo est décorative.
+ * raison de télécharger (tests/performance.spec.ts). Elle se révèle par `data-animate="clip"`, rendu par
+ * le moteur léger.
+ * Le contre-poids de la gamme (corum.disclaimer) est toujours passé à RiskNote, qui ne rend plus rien
+ * depuis le 14/09/2026 : il reparaîtra avec les autres mentions.
  * Contenu : src/content/fr/corum.ts et media.ts. Notes résolues dans celles de la page (about.notes).
  */
 import { Picture } from 'astro:assets';
@@ -28,7 +27,7 @@ import Section from '@/components/ui/Section.astro';
 import Stat from '@/components/ui/Stat.astro';
 import { corum } from '@/content/fr/corum';
 import { trust } from '@/content/fr/trust';
-import { media, type MediaImage } from '@/content/fr/media';
+import { media } from '@/content/fr/media';
 import { product } from '@/content/fr/facts';
 import { resolveImage } from '@/lib/images';
 import type { LegalNote } from '@/content/types';

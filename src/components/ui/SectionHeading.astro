@@ -26,6 +26,12 @@ const {
 } = Astro.props;
 /** Délai de l'introduction après le titre (s) : même valeur que dans les en-têtes rendus à la main. */
 const INTRO_DELAY = '0.1';
+/*
+ * `eyebrow` est REÇU MAIS JAMAIS RENDU : les sections rendent leur surtitre elles-mêmes. La prop reste acceptée pour ne pas
+ * casser les six pages qui la passent, et les valeurs `eyebrow` des fichiers de contenu ne s'affichent
+ * donc nulle part (audit du 14/09/2026). À trancher : les rendre, ou retirer la prop et les valeurs.
+ */
+void eyebrow;
 ---
 
 {
