@@ -2,7 +2,19 @@ import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
   testDir: './tests',
-  timeout: 60_000,
+  /*
+   * Le délai de garde est DOUBLÉ en intégration continue. Le runner tourne environ cinq fois moins
+   * vite que la machine de développement : le seul build y passe de dix à cinquante-sept secondes.
+   * La suite, qui tient en une minute en local, y demande plusieurs minutes, et les tests qui
+   * attendent la stabilisation d'un défilement épinglé dépassaient soixante secondes.
+   */
+  timeout: process.env.CI ? 120_000 : 60_000,
+  /*
+   * Deux exécutants en intégration continue : Playwright n'en prend qu'un par défaut sur un runner,
+   * alors qu'ubuntu-latest en offre quatre. Deux suffisent à diviser le temps d'attente par deux sans
+   * affamer le processeur, ce qui rallongerait les mêmes tests d'attente.
+   */
+  workers: process.env.CI ? 2 : undefined,
   /*
    * Une reprise en intégration continue, aucune en local. Le but n'est pas de masquer une
    * intermittence, qui doit rester visible là où on développe, mais d'éviter qu'un hoquet de runner
@@ -16,10 +28,11 @@ export default defineConfig({
     locale: 'fr-FR',
     /*
      * `--disable-dev-shm-usage` : sur un runner GitHub, /dev/shm est minuscule et Chromium y place ses
-     * tampons de rendu. Le 14/09/2026, la première exécution en CI a vu TOUT le profil « bureau »
-     * échouer, les profils téléphone passer, et l'étape durer douze minutes au lieu d'une : un grand
-     * viewport consomme bien plus de mémoire partagée qu'un écran de téléphone. Le drapeau renvoie ces
-     * tampons vers /tmp. Sans effet sur une machine de développement, où /dev/shm est généreux.
+     * tampons de rendu. Mesure de prudence, pas un correctif ciblé : la première exécution en CI du
+     * 14/09/2026 a vu quatre-vingt-treize tests tomber sur les trois profils, et le temps d'attente
+     * du runner est l'explication qui tient, pas la mémoire partagée. Le drapeau reste parce qu'il
+     * écarte une cause classique d'instabilité en conteneur, sans effet sur une machine de
+     * développement, où /dev/shm est généreux.
      */
     launchOptions: { args: ['--disable-dev-shm-usage'] },
   },
