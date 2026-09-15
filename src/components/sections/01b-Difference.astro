@@ -145,6 +145,7 @@ const situations = (difference.situations ?? []).map((s) => {
             widths={[480, 800, 1200]}
             sizes="(min-width: 64rem) 26rem, 100vw"
             formats={['avif', 'webp']}
+            fallbackFormat="jpeg"
             loading="lazy"
             decoding="async"
             pictureAttributes={{ class: 'block h-full w-full' }}

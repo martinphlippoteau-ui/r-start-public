@@ -1,16 +1,25 @@
 /**
  * Curation visuelle du site R Start.
  *
- * Chemins relatifs à src/assets/images (visuels préparés par `pnpm images`, jamais les originaux).
- * Sélection faite après lecture de 36 photos d'immeubles et 30 photos d'ambiance (Assets R Start,
- * dossiers 3 et 6). Règles appliquées :
- *  - photos réelles uniquement : aucun rendu 3D (atelier-arsenal, brazza, cambaceres, cartoucherie,
- *    clichy-batignolles, immeuble-05, meridien-bordeaux, palermo, pavillon-des-fleurs) ni diptyque ;
- *  - aucun texte incrusté ni logo de locataire lisible (exclus : woodwork-2, nolistra, immeuble-06,
- *    et l'ensemble des portraits de locataires du dossier ambiance) ;
- *  - aucune personne identifiable au premier plan, sauf l'ambiance des bureaux CORUM ;
- *  - hors zone d'investissement exclu (moment-studio) ; bâtiments emblématiques d'autrui évités
- *    (cheval-blanc, arbre-blanc) pour ne pas suggérer qu'ils appartiennent à R Start.
+ * Chemins relatifs à src/assets/images. TOUT CE QUI EST DANS CE DOSSIER EST LIVRÉ AU NAVIGATEUR,
+ * cité ou non (src/lib/images.ts) : ce qu'on écarte va dans src/assets/vivier, hors du glob.
+ *
+ * LES IMMEUBLES SONT DES ILLUSTRATIONS DEPUIS LE 15/09/2026, fournies par l'équipe. Les photos du
+ * dossier Assets qui les précédaient ont été retirées. Ce changement défait la règle qui ouvrait ce
+ * fichier, « photos réelles uniquement, aucun rendu 3D » : elle visait à ne pas faire passer une
+ * image de synthèse pour un actif existant. Un dessin franchement dessiné ne pose pas ce risque, il
+ * l'écarte plutôt. La mention sous l'image, elle, reste (voir `illustration` plus bas).
+ *
+ * Ce qui tient toujours, et qui a servi à trier les quinze reçues :
+ *  - aucun texte incrusté ni logo de tiers lisible ;
+ *  - aucune personne identifiable : les silhouettes dessinées ne le sont pas, les photos d'ambiance
+ *    des bureaux CORUM restent la seule exception assumée ;
+ *  - aucun bâtiment réel reconnaissable qu'on pourrait croire détenu par R Start.
+ *
+ * LES FORMATS NE SONT PAS INTERCHANGEABLES. Le lot vient en trois rapports, et chacun a son cadre :
+ * 2,36 pour la bande pleine largeur (03a-Immeuble, 2,0 à 2,7 selon l'écran), 0,80 pour les trois de
+ * la section Stratégie (`aspect-[4/5]`), 1,25 pour le bloc « Ce qui change vraiment » (`aspect-[4/3]`).
+ * Remplacer une image par une autre d'un rapport différent la fait recadrer de moitié.
  * Les alt décrivent l'architecture : aucun locataire ni adresse n'est nommé faute de certitude.
  * Les pictogrammes ne sont plus des images : ce sont des SVG au trait dessinés dans
  * src/components/ui/Picto.astro (clés du champ `icon` des contenus : type PictoKey exporté par le composant).
@@ -28,25 +37,27 @@ export interface MediaImage {
   credit?: string;
 }
 
-/** Mention sous chaque photo d'immeuble : aucun de ces bâtiments n'appartient à R Start. */
-const illustration = 'Photo d’illustration. Immeuble non détenu par R Start.';
+/**
+ * Mention sous chaque visuel d'immeuble : aucun de ces bâtiments n'appartient à R Start.
+ * LIBELLÉ CHANGÉ LE 15/09/2026, avec le lot d'illustrations. « Photo d'illustration » était devenu
+ * faux : ce sont des dessins. La mention reste, car c'est elle qui empêche de lire ces visuels comme
+ * un patrimoine détenu ; c'est sa raison d'être, pas la nature du fichier. À faire valider par la
+ * conformité avant la mise en ligne publique.
+ */
+const illustration = 'Illustration. R Start ne détient aucun des immeubles représentés.';
 
 export interface MediaContent {
   /** Application MyCORUM : photo d'un téléphone affichant l'application (bloc « Après la souscription »). */
   app: MediaImage;
-  /** Photo de second plan du hero (chargement eager, jamais animée) et solution de repli. */
-  hero: { main: MediaImage; alt: MediaImage };
+  /**
+   * Visuel de la bande pleine largeur (03a-Immeuble). `alt` a été retiré le 15/09/2026 : la solution
+   * de repli n'était plus lue depuis que le hero est passé aux aurores en dégradé.
+   */
+  hero: { main: MediaImage };
   /** Trois immeubles variés pour le défilement de la section Stratégie. */
   strategy: readonly MediaImage[];
-  income: MediaImage;
-  subscribe: MediaImage;
   /** Ambiance des bureaux CORUM (section « CORUM »). */
   corum: readonly MediaImage[];
-  /**
-   * Une photo par savoir-faire du groupe (page /a-propos), DANS L'ORDRE de corum.expertise.items :
-   * immobilier, obligations, assurance vie et plan d'épargne retraite.
-   */
-  expertise: readonly MediaImage[];
   documents?: MediaImage;
   /**
    * Pas d'image Open Graph photographique : diffusée seule sur les réseaux sociaux, une photo d'immeuble
@@ -66,54 +77,43 @@ export const media = {
     alt: 'Téléphone affichant l’écran d’accueil de l’application, logo R Start sur fond sombre',
   },
   hero: {
-    // 2400 × 1600, 647 ko. Bureaux contemporains bois/verre, ciel bleu, lumière franche : la plus
-    // « premium » du lot, avec une zone de ciel qui laisse respirer le titre et la ligne risques.
+    // 2400 × 1018, rapport 2,36. La bande de 03a-Immeuble fait entre 2,0 et 2,7 selon l'écran : ce
+    // format s'y pose sans recadrage perceptible. Rez-de-chaussée vitrés et perspective ouverte sur
+    // un ciel clair, la plus lumineuse du lot (clarté 51 %) pour une bande posée sur fond blanc.
     main: {
-      src: 'immeubles/arboretum.jpg',
-      alt: 'Immeuble de bureaux contemporain en bois et verre, escaliers extérieurs blancs et jeunes arbres sous un ciel bleu',
-      credit: illustration,
-    },
-    // 2400 × 1600, 669 ko. Verrière blanche très graphique, ton clair proche du blanc cassé du site.
-    alt: {
-      src: 'immeubles/bem.jpg',
-      alt: 'Bâtiment tertiaire tout en verre abrité par une grande verrière blanche à claire-voie, arbres au premier plan',
+      src: 'immeubles/rue-commerces-vitres.png',
+      alt: 'Illustration : rue bordée d’immeubles à commerces vitrés, perspective vers un ciel clair',
       credit: illustration,
     },
   },
+  /*
+   * Les trois portraits du lot d'illustrations, en 1856 × 2304 (rapport 0,80). Le cadre de la section
+   * est `aspect-[3/4]` puis `sm:aspect-[4/5]` : à 0,80 ils remplissent le second exactement, là où
+   * l'ancien lot en 3:2 était recadré de moitié.
+   * L'ORDRE SUIT LES TROIS ZONES : ce qu'on achète, où, et comment.
+   */
   strategy: [
-    // Bureaux : siège en gradins, terrasses végétalisées et plan d'eau (2000 × 1332).
+    // Quoi : rue piétonne, commerces en pied d'immeuble et bureaux au-dessus, la cible mixte.
     {
-      src: 'immeubles/soprema.jpg',
-      alt: 'Immeuble de bureaux aux terrasses en gradins, plan d’eau au premier plan sous un ciel bleu',
+      src: 'immeubles/rue-pietonne-coupole.png',
+      alt: 'Illustration : rue piétonne pavée bordée d’arbres et de terrasses, coupole d’un édifice ancien en fond',
       credit: illustration,
     },
-    // Activité : immeuble de taille intermédiaire en zone d'activités, exactement la cible R Start
-    // (2400 × 1602). Logo du locataire sur la porte illisible à l'écran.
+    // Où : front de mer, seule vue du lot qui ne soit pas une rue de centre-ville. Elle porte
+    // l'idée d'ailleurs sans nommer de pays, ce que la carte fait ensuite précisément.
     {
-      src: 'immeubles/toul-kimmo.jpg',
-      alt: 'Petit immeuble de bureaux de trois niveaux en zone d’activités, bardage métallique et menuiseries bois',
+      src: 'immeubles/promenade-bord-de-mer.png',
+      alt: 'Illustration : promenade en bord de mer au crépuscule, lampadaires alignés et façades d’immeubles à droite',
       credit: illustration,
     },
-    // Immeuble urbain mixte en bord de fleuve, lumière dorée (2400 × 1351). Aucune photo réelle
-    // d'actif hors de France n'est disponible dans le dossier : voir openQuestions.
+    // Comment : des locataires à l'ouvrage. Personne n'est identifiable, ce sont des silhouettes
+    // dessinées, mais le bâtiment est occupé, ce qui est le sujet même de cette zone.
     {
-      src: 'immeubles/projet-241028-1.jpg',
-      alt: 'Tour à trame en bois au bord d’un fleuve au coucher du soleil, pont et quais arborés en contrebas',
+      src: 'immeubles/terrasse-affaires.png',
+      alt: 'Illustration : salle de restaurant d’un quartier d’affaires, tables occupées et tours visibles par la verrière',
       credit: illustration,
     },
   ],
-  // 2400 × 1599. Terrasse calme, horizon dégagé sur Paris : évoque la durée sans promettre un gain.
-  income: {
-    src: 'immeubles/woodwork-3.jpg',
-    alt: 'Terrasse en bois d’un immeuble avec vue dégagée sur les toits de Paris, rayons de soleil entre les nuages',
-    credit: illustration,
-  },
-  // 1700 × 1000. Plein soleil, horizon ouvert : « un nouveau départ » sans personne ni écran.
-  subscribe: {
-    src: 'immeubles/nicolas-laisne.jpg',
-    alt: 'Terrasse en bois d’un immeuble à façade en lames métalliques, vue sur un fleuve en plein soleil',
-    credit: illustration,
-  },
   corum: [
     // 2000 × 1336. Accueil des bureaux CORUM, logo au mur, deux collaborateurs en arrière-plan.
     {
@@ -126,40 +126,11 @@ export const media = {
       alt: 'Salon des bureaux de CORUM, deux fauteuils en cuir fauve, tapis bleu canard et tables basses en verre',
     },
   ],
-  /*
-   * Les trois savoir-faire (page /a-propos, 14/09/2026) : des photos à la place des pictogrammes.
-   * Tri fait sur les 30 photos d'ambiance du dossier Assets ; les mêmes règles que le reste du fichier
-   * ont éliminé la quasi-totalité des candidates évidentes :
-   *  - assurance-vie-per-1 à 6 : personnes identifiables au premier plan (familles, portraits), et
-   *    un texte lisible sur un vêtement ;
-   *  - indigo-group, tarmac, michelin, bollore-quimper, total-qatar… : logo de tiers parfaitement
-   *    lisible, ce qui suggérerait un lien entre R Start et ces sociétés ;
-   *  - fibre-excellence, poznan : visage identifiable au premier plan.
-   * Restent trois photos qui ne nomment ni n'identifient personne.
-   */
-  expertise: [
-    // 1024 × 869. Façade d'un immeuble de bureaux à la tombée du jour, aucune personne, aucune enseigne.
-    {
-      src: 'immeubles/saint-ouen-bureaux.jpg',
-      alt: 'Façade d’un immeuble de bureaux à la tombée du jour, loggias sombres et hall vitré éclairé',
-      credit: illustration,
-    },
-    // 2048 × 1373. Atelier de production, opérateurs en combinaison intégrale : aucun visage, aucune marque.
-    {
-      src: 'ambiance/blue-solutions.jpg',
-      alt: 'Atelier de production, trois opérateurs en combinaison intégrale devant des machines',
-    },
-    // 2000 × 1336. Salon des bureaux CORUM, sans personne (même lieu que la bande, autre pièce).
-    {
-      src: 'ambiance/wttj-salon.jpg',
-      alt: 'Salon des bureaux de CORUM, deux fauteuils en cuir fauve, tapis bleu canard et tables basses en verre',
-    },
-  ],
-  // 2400 × 1359. Tombée du jour, salle de réunion éclairée : ambiance sombre qui suit la section
-  // Risques (fond ink) sans rupture. Optionnelle.
+  // 2304 × 1856, rapport 1,25, contre un cadre en `aspect-[4/3]` (1,33) : le recadrage se voit à
+  // peine. Vue prise de haut, seule du lot à montrer une ville entière plutôt qu'une rue.
   documents: {
-    src: 'immeubles/lan-agence.jpg',
-    alt: 'Terrasse d’un immeuble parisien à la tombée du jour, salle de réunion éclairée et rue animée en contrebas',
+    src: 'immeubles/toits-depuis-balcon.png',
+    alt: 'Illustration : vue depuis un balcon sur les toits d’une ville et une avenue en contrebas au lever du jour',
     credit: illustration,
   },
 } as const satisfies MediaContent;
