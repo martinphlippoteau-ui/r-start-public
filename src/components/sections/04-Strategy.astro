@@ -50,6 +50,10 @@ const ids = { what: 'quoi', where: 'ou', how: 'comment' };
 const photos = await Promise.all(
   media.strategy.map(async (m) => ({ ...m, image: await resolveImage(m.src) }))
 );
+/** Une illustration par moteur, dans l'ordre des items de `strategy.engines`. */
+const enginePhotos = await Promise.all(
+  media.engines.map(async (m) => ({ ...m, image: await resolveImage(m.src) }))
+);
 const photoSizes = '(min-width: 1024px) 400px, 33vw';
 /**
  * Les trois photos portent la même mention (« Photo d'illustration. Immeuble non détenu par R Start. ») :
@@ -81,14 +85,43 @@ const QUIET_TITLE_Y = 12;
       data-animate-stagger="0.12"
     >
       {
+        /*
+         * CARTES ILLUSTRÉES depuis le 15/09/2026 (« créer des cards différentes avec des illustrations
+         * pour illustrer »). Avant : un filet, un numéro, deux lignes de texte, à même le fond.
+         * Le bandeau garde le RAPPORT NATIF des illustrations (2,36) : posé dans un cadre 16/9 il se
+         * ferait rogner sur les côtés, or ces images se lisent dans la largeur, c'est leur perspective
+         * qui porte le sujet.
+         * Le numéro passe SUR l'image, dans une pastille : sous elle, il répétait le rôle du filet qu'il
+         * remplace, et la carte commençait par deux lignes de service avant son titre.
+         */
+      }
+      {
         strategy.engines.items.map((item, i) => (
-          <li>
-            <span aria-hidden="true" data-draw="width" class="block h-px w-full bg-navy/15" />
-            <div class="pt-6">
-              <p class="text-caption font-semibold tabular-nums text-teal-700" aria-hidden="true">
+          <li class="card-lift flex flex-col overflow-hidden rounded-3xl bg-white shadow-card ring-1 ring-navy/5">
+            <div class="relative aspect-[236/100] overflow-hidden">
+              {enginePhotos[i] && (
+                <Picture
+                  src={enginePhotos[i].image}
+                  alt={enginePhotos[i].alt}
+                  widths={[480, 800, 1200]}
+                  sizes="(min-width: 40rem) 45vw, 100vw"
+                  formats={['avif', 'webp']}
+                  fallbackFormat="jpeg"
+                  loading="lazy"
+                  decoding="async"
+                  pictureAttributes={{ class: 'block h-full w-full' }}
+                  class="h-full w-full object-cover"
+                />
+              )}
+              <p
+                class="text-caption absolute left-4 top-4 flex size-10 items-center justify-center rounded-full bg-white/95 font-semibold tabular-nums text-teal-700 shadow-card"
+                aria-hidden="true"
+              >
                 {String(i + 1).padStart(2, '0')}
               </p>
-              <p class="text-display-sm mt-3 text-navy">{item.lead}</p>
+            </div>
+            <div class="flex flex-1 flex-col p-6 sm:p-8">
+              <p class="text-display-sm text-navy">{item.lead}</p>
               {item.rest && <p class="text-lead mt-3 text-slate-700">{item.rest}</p>}
             </div>
           </li>
