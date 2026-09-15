@@ -44,8 +44,15 @@ export const pages: Record<PageKey, PageMeta> = {
   fees: {
     key: 'fees',
     path: '/frais',
-    label: 'Frais',
-    navLabel: 'Les frais',
+    /*
+     * « Comparateur de frais » depuis le 15/09/2026, ex-« Frais » et « Les frais ». La page s'ouvre sur
+     * le comparateur SCPI par SCPI, son titre le dit maintenant aussi dans le menu.
+     * SEULE ENTRÉE SANS ARTICLE : la convention du 12/09/2026 en donnait un à chaque libellé de
+     * navigation (« Les frais », « La stratégie », « La presse en parle »). « Le comparateur de frais »
+     * pesait trop dans une barre qui en compte quatre. L'URL ne change pas, elle reste /frais.
+     */
+    label: 'Comparateur de frais',
+    navLabel: 'Comparateur de frais',
     order: 2,
     inMenu: true,
   },
