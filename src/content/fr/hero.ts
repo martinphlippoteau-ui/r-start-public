@@ -34,14 +34,21 @@ export const hero = {
   eyebrow: 'CORUM invente la SCPI',
   title: product.name,
   /**
-   * Accroche de l'équipe marketing, reprise mot pour mot (décision du 11/09/2026, prise en connaissance
-   * du risque). UN POINT À DÉFENDRE, signalé en avertissement par scripts/check-compliance.mjs :
-   * « gagnant-gagnant » suggère un gain pour l'épargnant, alors que le capital n'est pas garanti et les
-   * revenus non plus. (L'allégation d'exclusivité « la seule SCPI » a été abandonnée le 11/09/2026.)
-   * Le contre-poids du hero (`riskLine`, juste sous les CTA) porte les frais réellement prélevés et la
-   * ligne risques ; l'allégation bornée, elle, reste sur la page dans « Ce qui change vraiment ».
+   * Accroche de l'équipe marketing, reprise mot pour mot. CHANGÉE LE 15/09/2026 : elle disait
+   * « L'immobilier gagnant-gagnant », dont le « gagnant-gagnant » suggérait un gain alors que le
+   * capital n'est pas garanti.
+   *
+   * CE QUI REMPLACE UN POINT À DÉFENDRE PAR UN AUTRE, et il faut que la Conformité le sache :
+   *  - la partie « sans frais de souscription ni frais d'acquisition » est EXACTE et bornée, elle
+   *    nomme les deux frais absents au lieu de laisser entendre qu'il n'y en a aucun ;
+   *  - « LA PREMIÈRE SCPI » n'a pas de périmètre. C'est l'allégation de rang que
+   *    scripts/check-compliance.mjs signale déjà ailleurs, faute de source, de date et de marché de
+   *    référence. La même page porte deux sections plus bas la version bornée, « la première SCPI DU
+   *    GROUPE CORUM sans frais d'entrée ni frais sur les achats d'immeubles » : les deux formulations
+   *    coexistent donc, l'une bornée, l'autre non.
+   * Le détail des frais réellement prélevés reste à un clic, dans la note `hero-frais`.
    */
-  tagline: 'L’immobilier gagnant-gagnant',
+  tagline: 'La première SCPI sans frais de souscription ni frais d’acquisition.',
   /**
    * Contre-poids unique du hero. La phrase qui énumérait les frais prélevés a été retirée le 11/09/2026
    * à la demande de l'équipe : le bloc ne porte plus que la ligne risques de legal.ts, reproduite mot

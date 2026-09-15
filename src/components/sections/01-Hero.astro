@@ -300,11 +300,19 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
           <div
             data-intro="6"
             data-intro-move
-            class="flex flex-col items-center gap-6 sm:flex-row sm:items-start sm:justify-center sm:gap-12"
+            class="flex flex-col items-center gap-6 sm:flex-row sm:items-center sm:justify-center sm:gap-12"
           >
             <div class="w-full max-w-md">
               <TrustBox template="horizontal" theme="dark" label={trust.trustpilot.widgetLabel!} />
-              <p class="mt-2 text-sm leading-snug text-white/80">{trust.trustpilot.heroCaption}</p>
+              {
+                /* LÉGENDE RETIRÉE LE 15/09/2026, demande de l'équipe (« Enlever disclaimer »). Elle
+                  disait « Avis sur CORUM L'Épargne, distributeur de R Start. », c'est-à-dire la portée
+                  des avis : ils concernent le distributeur, pas la SCPI. Le texte n'est pas supprimé,
+                  il reste dans trust.ts (`trustpilot.heroCaption`) et sa version longue (`scope`) est
+                  toujours rendue par le bloc de confiance plus bas dans la page.
+                  À signaler à la Conformité : c'est la seconde mention retirée de ce même widget, après
+                  la divulgation du filtre 4 et 5 étoiles (PUBLIC_TRUSTBOX_CROP). */
+              }
             </div>
             {
               /* Le logo est posé sur une PLAQUE BLANCHE, et ce n'est pas une coquetterie : il est en
@@ -312,6 +320,12 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
                 logo s'y confondrait presque entièrement avec le fond.
                 Le numéro d'agrément a été retiré de la pastille le 15/09/2026 ; il reste dans le bloc
                 de confiance plus bas, avec sa note légale. */
+            }
+            {
+              /* ALIGNEMENT CENTRÉ depuis le 15/09/2026. Les deux colonnes faisaient toutes deux 55 px
+                tant que chacune portait sa légende ; celle des avis a perdu la sienne et retombe à
+                28 px. Alignées par le haut, les étoiles flottaient au-dessus d'un bloc deux fois plus
+                haut. Centrées, les deux masses se répondent de nouveau. */
             }
             {
               /* MÊME ARCHITECTURE QUE LA COLONNE DES AVIS (15/09/2026, demande de l'équipe) : la marque
