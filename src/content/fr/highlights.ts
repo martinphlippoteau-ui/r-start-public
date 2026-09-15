@@ -1,5 +1,6 @@
 import type { HighlightsContent, LegalNote } from '@/content/types';
 import { income, product, risk, share, strategy, subscription } from '@/content/fr/facts';
+import { pages } from '@/config/pages';
 
 /**
  * Section 2, « R Start en six repères » (id « points-forts »).
@@ -83,6 +84,13 @@ export const notes: LegalNote[] = [
  */
 export const highlights: HighlightsContent = {
   eyebrow: 'Points forts',
+  /*
+   * Appel à l'action au pied de la section (15/09/2026, demande de l'équipe). Le tableau dit CE QUE
+   * R Start est ; la page Stratégie dit COMMENT elle investit. Le libellé reprend l'intitulé du menu,
+   * passé à « Notre approche » le même jour : un visiteur qui suit ce bouton retrouve le mot exact
+   * dans la barre.
+   */
+  secondaryCta: { label: 'Découvrir notre approche', href: pages.strategy.path },
   /* Le bouton « i » ne montre qu'une lettre : ce libellé est ce que les lecteurs d'écran annoncent,
      complété par celui de la carte (« Expliquer : Approche »). */
   labels: { info: 'Expliquer' },

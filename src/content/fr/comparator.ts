@@ -194,7 +194,20 @@ export const comparator = {
       key: 'withdrawal' as const,
       label: 'Frais de retrait anticipé',
       basis: 'en % de la valeur de retrait',
-      rstart: withdrawalAfterHolding,
+      /*
+       * FOURCHETTE DEPUIS LE 15/09/2026 (« mets au format de 0 % à 12 % plutôt »). La case affichait le
+       * seul dernier palier, « 0 % », et renvoyait le barème dégressif au détail en dessous : on lisait
+       * donc « 0 % » là où le taux vaut 10 % pour qui sort avant quatre ans. La fourchette dit les deux
+       * bornes, comme la ligne des cessions d'immeubles juste au-dessus.
+       */
+      rstart: range(fees.withdrawal.steps.map((s) => s.rate)),
+      /*
+       * Ce qui est COMPARÉ reste le taux au-delà de la durée retenue, soit 0 %, et non la fourchette :
+       * c'est l'hypothèse de lecture du tableau, dite en clair au-dessus de lui (`holdingNotice`, une
+       * détention d'au moins huit ans). Sans ce champ, la case ne serait plus comparable du tout, un
+       * intervalle ne se départageant pas d'un taux unique.
+       */
+      rstartCompare: withdrawalAfterHolding,
       rstartDetail: `au-delà de ${HOLDING_YEARS} ans de détention ; avant, le barème est dégressif : ${fees.withdrawal.steps
         .slice(0, -1)
         .map((s) => `${s.rate} ${s.short}`)

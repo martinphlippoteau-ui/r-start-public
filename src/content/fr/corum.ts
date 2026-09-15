@@ -130,7 +130,13 @@ export const history = {
 
 export const corum = {
   eyebrow: 'CORUM',
-  title: 'L’expérience derrière R Start',
+  /*
+   * « Le groupe CORUM en quelques chiffres » depuis le 15/09/2026, ex-« L'expérience derrière
+   * R Start ». La section ne porte plus les avis Trustpilot mais le bandeau des quatre chiffres du
+   * groupe : son titre dit maintenant ce qu'elle montre. Le libellé est celui de `trust.stats.title`,
+   * qui titrait ce bandeau jusqu'ici en sous-titre et faisait donc doublon.
+   */
+  title: 'Le groupe CORUM en quelques chiffres',
   /** Phrase d'ouverture de la zone 4, suivie de son contre-poids dans le même bloc et à la même taille. */
   intro: nb(
     `R Start s’appuie sur ${corumGroup.experienceLabel} d’expertise du groupe CORUM dans l’investissement immobilier. Cette expérience ne préjuge pas des résultats de R Start. La SCPI a ouvert ses souscriptions le ${product.openingDate.label} et n’a pas d’historique propre.`
@@ -213,7 +219,9 @@ export const corum = {
   ),
 
   /** Bouton vers /a-propos (la gamme et l'ambiance y sont depuis le 11/09/2026). */
-  aboutLink: 'En savoir plus sur CORUM',
+  /* « Découvrir le groupe CORUM » depuis le 15/09/2026, ex-« En savoir plus sur CORUM » : même
+     forme que « Découvrir notre approche », l'autre appel secondaire de l'accueil. */
+  aboutLink: 'Découvrir le groupe CORUM',
   disclaimer: corumGroup.disposalsDisclaimer,
 
   notes,

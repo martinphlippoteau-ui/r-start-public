@@ -151,7 +151,18 @@ const data = scpis.map((s) => ({
                   </span>
                 </th>
                 <td role="cell" class="px-3 py-5 text-center align-top sm:px-5">
-                  <span data-fee-value class="text-display-sm text-navy">
+                  {
+                    /* `data-fee-compare` : ce qu'il faut COMPARER quand ce n'est pas ce qui est AFFICHÉ.
+                      La ligne du retrait montre une fourchette (« de 0 % à 10 % ») mais se compare sur
+                      le taux au-delà de la durée retenue, l'hypothèse de lecture du tableau. Sans lui,
+                      la case cesserait d'être comparable : un intervalle ne se départage pas d'un taux
+                      unique. Les autres lignes n'en portent pas, affiché et comparé s'y confondent. */
+                  }
+                  <span
+                    data-fee-value
+                    data-fee-compare={row.rstartCompare}
+                    class="text-display-sm text-navy"
+                  >
                     {row.rstart}
                   </span>
                   <span data-comparator-best="left" class="visually-hidden" hidden>
@@ -250,7 +261,7 @@ const data = scpis.map((s) => ({
     const cells = [...table.querySelectorAll<HTMLElement>('[data-comparator-cell]')];
     const details = [...table.querySelectorAll('[data-comparator-detail]')];
     const lignes = [...table.querySelectorAll('tbody tr')].map((tr) => ({
-      gauche: tr.querySelector('[data-fee-value]'),
+      gauche: tr.querySelector<HTMLElement>('[data-fee-value]'),
       marqueGauche: tr.querySelector<HTMLElement>('[data-comparator-best="left"]'),
       marqueDroite: tr.querySelector<HTMLElement>('[data-comparator-best="right"]'),
     }));
@@ -274,10 +285,15 @@ const data = scpis.map((s) => ({
       if (source) source.textContent = scpi.source || sourceFallback;
 
       /*
-       * Taux le plus bas de la ligne. Marqué SEULEMENT si les deux cases portent un pourcentage unique :
-       * un barème à paliers (« 0 / 6 / 12 % ») ne se compare pas à un taux unique, et deux taux égaux ne
-       * départagent rien. Hors de ces cas, aucune marque, mieux vaut ne rien dire que suggérer un
-       * classement que les chiffres ne portent pas.
+       * Taux le plus bas de la ligne. Il faut que LES DEUX cases donnent un pourcentage unique : un
+       * barème à paliers ne se compare pas à un taux unique. Une case peut fournir ce nombre par
+       * `data-fee-compare` quand ce qu'elle affiche est une fourchette (ligne du retrait).
+       *
+       * DEUX RÈGLES AJOUTÉES LE 15/09/2026, demande de l'équipe :
+       *  - R Start à 0 % est marqué même à ÉGALITÉ. Le libellé lu par les lecteurs d'écran reste exact,
+       *    « taux le plus bas de la ligne » : à 0 %, rien n'est plus bas, y compris quand l'autre SCPI
+       *    y est aussi. Elle ne reçoit alors pas la marque, la règle de droite n'a pas changé.
+       *  - la colonne de droite, elle, ne se marque toujours QUE si elle est strictement inférieure.
        */
       const seul = (t: string | null | undefined) => {
         if (!t) return null;
@@ -290,10 +306,10 @@ const data = scpis.map((s) => ({
         return m ? parseFloat(m[1].replace(',', '.')) : null;
       };
       lignes.forEach((ligne, i) => {
-        const g = seul(ligne.gauche?.textContent);
+        const g = seul(ligne.gauche?.dataset.feeCompare || ligne.gauche?.textContent);
         const d = seul(scpi.values[i]);
-        const comparable = g !== null && d !== null && g !== d;
-        const gagneGauche = comparable && g < d;
+        const comparable = g !== null && d !== null;
+        const gagneGauche = comparable && (g < d || g === 0);
         const gagneDroite = comparable && d < g;
         if (ligne.marqueGauche) ligne.marqueGauche.hidden = !gagneGauche;
         if (ligne.marqueDroite) ligne.marqueDroite.hidden = !gagneDroite;

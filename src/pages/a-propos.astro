@@ -12,6 +12,9 @@ import Base from '@/layouts/Base.astro';
 import SiteNav from '@/components/SiteNav.astro';
 import Footer from '@/components/Footer.astro';
 import LegalNotes from '@/components/LegalNotes.astro';
+import Container from '@/components/ui/Container.astro';
+import Section from '@/components/ui/Section.astro';
+import TrustpilotReviews from '@/components/ui/TrustpilotReviews.astro';
 import Breadcrumb from '@/components/ui/Breadcrumb.astro';
 import Button from '@/components/ui/Button.astro';
 import StickyCta from '@/components/StickyCta.astro';
@@ -47,6 +50,21 @@ const jsonLd = [
     }
     <CorumHistory tone="white" />
     <CorumRange notes={notes} />
+    {
+      /* LES AVIS TRUSTPILOT FERMENT LA PAGE (15/09/2026, demande de l'équipe : « mettre les avis
+        trustpilot dans la page à propos tout en bas »). Ils occupaient la section « L'expérience
+        derrière R Start » de l'accueil, où le bandeau des chiffres du groupe les a remplacés.
+        Ils tombent bien ici : la page dit qui gère R Start, les avis disent ce qu'on pense de ce
+        gestionnaire. Leur portée est d'ailleurs celle-là, CORUM L'Épargne et non R Start.
+        `paper` après le `white` de la gamme : le carrousel pose ses propres cartes blanches, il lui
+        faut un fond clair mais distinct du leur. `niveau={2}` parce que le bloc est seul dans sa
+        section et doit donc en porter le titre. */
+    }
+    <Section id="avis" tone="paper" labelledBy="avis-title">
+      <Container size="wide">
+        <TrustpilotReviews notes={notes} niveau={2} titleId="avis-title" />
+      </Container>
+    </Section>
     <LegalNotes notes={notes} />
   </main>
 

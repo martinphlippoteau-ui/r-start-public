@@ -133,6 +133,11 @@ export interface HighlightsContent {
   subscriptionItems?: { label: string; value: string; noteId?: string }[];
   /** Contre-poids unique de la section, sous les repères. */
   risk?: string;
+  /**
+   * Appel à l'action secondaire, au pied de la section (15/09/2026). Il mène à une page du site, pas
+   * au tunnel : il ne porte donc pas de `position`, contrairement aux CTA de souscription.
+   */
+  secondaryCta?: { label: string; href: string };
   /** Micro-textes : rien n'est écrit en dur dans le composant. */
   labels?: {
     /** Nom du bouton « i » pour les lecteurs d'écran, complété par le libellé de la carte. */

@@ -1,0 +1,72 @@
+---
+/**
+ * Bloc des avis Trustpilot : titre, carrousel officiel, lien vers le profil.
+ *
+ * EXTRAIT DE 07-Trust.astro LE 15/09/2026 (demande de l'équipe : « mettre les avis trustpilot dans la
+ * page à propos tout en bas »). Il vivait en dur dans la section « L'expérience derrière R Start », que
+ * le bandeau des chiffres du groupe occupe désormais. Le sortir plutôt que le recopier : un seul
+ * endroit à corriger si Trustpilot change de gabarit ou si la Conformité revient sur la portée.
+ *
+ * `notes` est PASSÉ PAR LA PAGE, pas lu ici : l'accueil a un registre vide et NoteRef n'y rend rien,
+ * /a-propos passe le sien. Le composant n'a donc pas à savoir où il est rendu.
+ *
+ * Pas de `theme="dark"` sur le carrousel, jamais : le thème sombre de Trustpilot passe le nom et la
+ * date des avis en gris clair sur des cartes restées blanches, six violations de contraste à 1,85:1
+ * mesurées dans l'iframe le 14/09/2026. Le bloc attend donc un fond clair.
+ */
+import NoteRef from '@/components/ui/NoteRef.astro';
+import TrustBox from '@/components/ui/TrustBox.astro';
+import { trust } from '@/content/fr/trust';
+import type { LegalNote } from '@/content/types';
+
+interface Props {
+  /** Registre de notes de la page hôte. Absent sur l'accueil, dont le registre est vide. */
+  notes?: LegalNote[];
+  /** Niveau de titre : h2 quand le bloc est seul dans sa section, h3 quand il en ferme une. */
+  niveau?: 2 | 3;
+  /** Identifiant du titre, pour l'`aria-labelledby` de la section hôte. */
+  titleId?: string;
+  class?: string;
+}
+const { notes, niveau = 3, titleId, class: className = '' } = Astro.props as Props;
+const { trustpilot } = trust;
+const hint = trustpilot.externalLinkHint;
+const Titre = niveau === 2 ? 'h2' : 'h3';
+---
+
+<div class={className}>
+  <Titre id={titleId} class="text-display-sm text-ink" data-animate="fade-up">
+    {trustpilot.title}
+    <NoteRef notes={notes} id="confiance-trustpilot" tone="light" />
+  </Titre>
+
+  {
+    /* Carrousel officiel : rien n'est composé ni trié ici, le contenu arrive dans une iframe servie par
+      Trustpilot. Le gabarit est filtré aux notes 4 et 5 (facts.ts, `trustpilot.widgets`). */
+  }
+  <div class="mt-6">
+    <TrustBox template="carousel" label={trustpilot.widgetLabel!} />
+  </div>
+
+  <div>
+    <a
+      href={trustpilot.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="link-underline mt-4 inline-flex items-center gap-2 text-base font-semibold text-teal-700 no-underline hover:text-navy"
+    >
+      {trustpilot.linkLabel}
+      {hint && <span class="visually-hidden">({hint})</span>}
+      <svg
+        aria-hidden="true"
+        class="size-4"
+        viewBox="0 0 16 16"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.8"
+      >
+        <path d="M4 12 12 4M6 4h6v6" stroke-linecap="round" stroke-linejoin="round"></path>
+      </svg>
+    </a>
+  </div>
+</div>

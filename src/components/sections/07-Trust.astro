@@ -23,8 +23,8 @@ import Button from '@/components/ui/Button.astro';
 import Container from '@/components/ui/Container.astro';
 import NoteRef from '@/components/ui/NoteRef.astro';
 import Section from '@/components/ui/Section.astro';
+import Stat from '@/components/ui/Stat.astro';
 import SectionHeading from '@/components/ui/SectionHeading.astro';
-import TrustBox from '@/components/ui/TrustBox.astro';
 import { pages } from '@/config/pages';
 import { withBase } from '@/lib/href';
 import { sections } from '@/config/sections';
@@ -32,11 +32,10 @@ import { corum } from '@/content/fr/corum';
 import { trust } from '@/content/fr/trust';
 
 const id = sections.corum.id;
-const { trustpilot } = trust;
+const { stats } = trust;
 
 /** Gamme en texte (décision du 09/09/2026 : seuls les logos R Start et CORUM L'Épargne sont utilisés sur le site). */
 
-const hint = trustpilot.externalLinkHint;
 ---
 
 <Section id={id} tone="white" spacing="none">
@@ -61,60 +60,53 @@ const hint = trustpilot.externalLinkHint;
       <SectionHeading id={id} eyebrow={corum.eyebrow} title={corum.title} motion />
 
       {
-        /* LES AVIS REJOIGNENT CE BLOC (14/09/2026, demande de l'équipe) : ils occupaient une bande à
-          part, ils ferment maintenant « L'expérience derrière R Start ». La section entière est passée
-          en blanc, et le tableau « en un clin d'œil » a pris l'ink en échange : c'est ce qui règle le
-          rendu du carrousel, qui pose ses propres cartes blanches et s'accommodait mal d'un fond bleu. */
+        /*
+         * LE BANDEAU DES CHIFFRES DU GROUPE REMPLACE LES AVIS (15/09/2026, demande de l'équipe). Les
+         * avis Trustpilot sont descendus au bas de /a-propos ; ces quatre chiffres, eux, avaient quitté
+         * l'accueil le 14/09 et reviennent ici. Ils sont rendus par le même composant `Stat` et lus
+         * dans le même `trust.stats` que sur /a-propos : une seule source, deux rendus.
+         *
+         * CE QU'IL FAUT SAVOIR CÔTÉ CONFORMITÉ : `trust.stats.risk` existe (« Ces chiffres sont ceux du
+         * groupe CORUM, pas ceux de R Start… ») et n'est rendu NI ICI NI SUR /a-propos, où il avait été
+         * retiré le 11/09 sur décision de l'équipe. Sur /a-propos, l'introduction de l'en-tête porte le
+         * rappel ; sur l'accueil, il n'y a pas d'équivalent, seule la section Risques plus bas. Le
+         * bandeau n'est donc pas marqué [data-advantage], sans quoi le contrôle d'équilibre AMF
+         * réclamerait un contre-poids frère qui n'existe pas. Une ligne à ajouter si la Conformité le
+         * demande, le texte est prêt.
+         */
       }
       <div class="mt-section-sm">
-        <h3 class="text-display-sm text-ink" data-animate="fade-up">
-          {trustpilot.title}
-          <NoteRef id="confiance-trustpilot" tone="light" />
-        </h3>
         {
-          /* TrustBox officiel « carrousel » (11/09/2026) : la note figée et son compteur ont laissé la
-            place aux avis servis en direct par Trustpilot, toutes notes confondues (`stars` 1 à 5). Rien
-            n'est composé ni trié ici : le contenu arrive dans une iframe Trustpilot. */
+          /* PAS DE SOUS-TITRE : `stats.title` disait « Le groupe CORUM en quelques chiffres », ce que le
+            titre de la section dit maintenant lui-même (corum.ts, 15/09/2026). L'appel de note reste,
+            accroché au bandeau qu'il qualifie. */
         }
+        <p class="visually-hidden">{stats.title}<NoteRef id="confiance-chiffres" tone="light" /></p>
         {
-          /*
-           * Plus d'enveloppe blanche autour du carrousel depuis que la section entière est blanche
-           * (14/09/2026) : le composant embarqué pose ses propres cartes blanches sur un fond de même
-           * couleur, ce qu'il attend. Et surtout PAS de `theme="dark"` : le thème sombre de Trustpilot
-           * passe le nom et la date des avis en gris clair sur ces mêmes cartes restées blanches, six
-           * violations de contraste à 1,85:1 mesurées dans l'iframe le 14/09/2026.
-           */
+          /* Deux colonnes dès le téléphone : en une seule, quatre nombres prenaient un écran entier.
+            Le nombre de colonnes suit celui des chiffres, comme sur /a-propos, et les cases passent en
+            `solid-compact` à cinq, où « 9,6 Md€ » et « + 160 000 » passaient à la ligne. */
         }
-        <div class="mt-6">
-          <TrustBox template="carousel" label={trustpilot.widgetLabel!} />
-        </div>
-        <div>
-          <a
-            href={trustpilot.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="link-underline mt-4 inline-flex items-center gap-2 text-base font-semibold text-teal-700 no-underline hover:text-navy"
-          >
-            {trustpilot.linkLabel}
-            {hint && <span class="visually-hidden">({hint})</span>}
-            <svg
-              aria-hidden="true"
-              class="size-4"
-              viewBox="0 0 16 16"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.8"
-            >
-              <path d="M4 12 12 4M6 4h6v6" stroke-linecap="round" stroke-linejoin="round"></path>
-            </svg>
-          </a>
-        </div>
-        {
-          /* La note de périmètre Trustpilot (« avis sur CORUM L'Épargne, distributeur… ne réduisent pas les
-            risques ») a été retirée le 11/09/2026 (décision de l'équipe) ; le titre du bloc garde le périmètre
-            (« Les avis sur CORUM L'Épargne ») et la note légale confiance-trustpilot reste appelée. Le bloc n'est
-            donc plus marqué [data-advantage]. */
-        }
+        <ul
+          role="list"
+          class:list={[
+            'mt-10 grid grid-cols-2 gap-x-6 gap-y-10 sm:gap-x-8 lg:mt-14',
+            stats.items.length === 5 ? 'lg:grid-cols-5' : 'lg:grid-cols-4',
+          ]}
+        >
+          {
+            stats.items.map((s) => (
+              <li>
+                <Stat
+                  size={stats.items.length === 5 ? 'solid-compact' : 'solid'}
+                  value={s.value}
+                  suffix={s.suffix}
+                  label={s.label}
+                />
+              </li>
+            ))
+          }
+        </ul>
       </div>
 
       {

@@ -26,6 +26,7 @@
  * Contenu : src/content/fr/highlights.ts.
  */
 import Container from '@/components/ui/Container.astro';
+import Button from '@/components/ui/Button.astro';
 import NoteRef from '@/components/ui/NoteRef.astro';
 import RiskNote from '@/components/ui/RiskNote.astro';
 import Section from '@/components/ui/Section.astro';
@@ -148,6 +149,18 @@ const titleId = sections.highlights.id + '-title';
 
     {/* Contre-poids unique de la section, jamais animé. */}
     {highlights.risk && <RiskNote text={highlights.risk} size="lead" class="mt-8 lg:mt-10" />}
+    {
+      /* APPEL À L'ACTION DE LA SECTION (15/09/2026). `outline-light` et non `light` : le fond est ink,
+        et un bouton blanc plein aurait le poids d'un CTA de souscription, alors que celui-ci mène à une
+        page du site. La hiérarchie de l'accueil reste celle du hero. */
+      highlights.secondaryCta && (
+        <p class="mt-chapter">
+          <Button href={highlights.secondaryCta.href} variant="outline-light" size="md">
+            {highlights.secondaryCta.label}
+          </Button>
+        </p>
+      )
+    }
   </Container>
 </Section>
 
