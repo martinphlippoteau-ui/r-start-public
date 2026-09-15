@@ -724,6 +724,71 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
 
 /* Halo de marque (hero) : deux lueurs teal et une touche sable sur fond ink. À poser sur un parent
    `relative overflow-hidden` ; le contenu doit être `relative` pour passer devant. */
+/*
+ * AURORE DU HERO (15/09/2026, demande de l'équipe : « d'autres couleurs et du mouvement »), d'après la
+ * planche fournie : #E7CCA5 sable, #1499B0 turquoise, #03242E fond profond.
+ *
+ * QUATRE FOYERS INDÉPENDANTS plutôt qu'une seule couche qui dérive. Chacun a sa couleur, sa taille, sa
+ * position, sa durée et son sens : leurs périodes sont premières entre elles (23, 31, 37, 43 s), si
+ * bien que la composition ne se répète qu'au bout de plusieurs heures. C'est ce qui distingue une
+ * aurore d'une animation en boucle : à une seule période, l'œil reconnaît le cycle en trente secondes.
+ *
+ * LE SABLE EST TENU À L'ÉCART DU TEXTE. C'est la seule teinte claire de la planche, et le hero porte un
+ * titre, un logo et une ligne d'appel en blanc : un foyer sable qui passerait derrière eux ferait
+ * tomber le contraste. Il est donc ancré dans le coin haut droit, de petit rayon, à faible opacité, et
+ * son amplitude de dérive est la plus courte des quatre. Les contrastes ont été mesurés sur le rendu, à
+ * cinq instants de l'animation, pas estimés.
+ *
+ * COÛT. Chaque foyer est un dégradé radial sur son propre élément, animé en `transform` seul : c'est
+ * composité par le GPU, sans recalcul de mise en page ni de peinture. Rien ne tourne hors écran
+ * (`is-in-view`, posé par le moteur), ni en mouvement réduit.
+ */
+[data-aurora] {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+[data-aurora] > span {
+  position: absolute;
+  top: var(--y);
+  left: var(--x);
+  height: var(--taille);
+  width: var(--taille);
+  margin-top: calc(var(--taille) / -2);
+  margin-left: calc(var(--taille) / -2);
+  border-radius: 9999px;
+  background: radial-gradient(circle at 50% 50%, var(--teinte) 0%, transparent 70%);
+  opacity: var(--opacite);
+  filter: blur(var(--flou, 60px));
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  [data-aurora] > span {
+    animation: aurore var(--duree) ease-in-out infinite alternate;
+    animation-delay: var(--retard, 0s);
+    animation-play-state: paused;
+  }
+  .is-in-view [data-aurora] > span {
+    animation-play-state: running;
+  }
+}
+
+/* Dérive douce, amplitude donnée par foyer (`--amp`) : les quatre partagent la courbe, pas la course. */
+@keyframes aurore {
+  from {
+    transform: translate3d(calc(var(--amp) * -1), calc(var(--amp) * 0.6), 0) scale(0.92);
+  }
+  50% {
+    transform: translate3d(calc(var(--amp) * 0.8), calc(var(--amp) * -0.9), 0) scale(1.08);
+  }
+  to {
+    transform: translate3d(var(--amp), calc(var(--amp) * 0.4), 0) scale(0.96);
+  }
+}
+
 @utility brand-halo {
   &::before {
     content: '';

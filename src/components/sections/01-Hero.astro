@@ -120,8 +120,36 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
     class="brand-halo brand-halo-drift grain pointer-events-none absolute inset-0 -z-10 will-change-transform"
   >
     {
-      /* Deux lueurs qui dérivent séparément du halo, sur des durées premières entre elles : le fond
-        bouge sans qu'on voie de boucle. Purement décoratives, sous un parent aria-hidden. */
+      /*
+       * AURORE (15/09/2026), d'après la planche fournie par l'équipe : quatre foyers de couleur qui
+       * dérivent chacun à sa vitesse. Les durées sont premières entre elles (23, 31, 37, 43 s) : la
+       * composition ne se répète qu'au bout de plusieurs heures, là où une période unique se reconnaît
+       * en trente secondes.
+       *
+       * L'ORDRE COMPTE : le sable, seule teinte claire, est posé EN PREMIER et reste dans le coin haut
+       * droit, à faible opacité et avec la plus petite amplitude. Le titre, le logo et les appels sont
+       * en blanc au centre : un foyer clair qui passerait derrière eux ferait tomber le contraste.
+       * Les deux turquoises occupent la gauche et le bas, le foyer profond creuse le coin bas droit.
+       * Décoratif, sous un parent aria-hidden. Voir global.css, [data-aurora].
+       */
+    }
+    <div data-aurora>
+      <span
+        style="--x:84%; --y:4%; --taille:54rem; --teinte:#e7cca5; --opacite:0.34; --flou:100px; --duree:31s; --amp:2.5%;"
+      ></span>
+      <span
+        style="--x:12%; --y:46%; --taille:64rem; --teinte:#1499b0; --opacite:0.46; --flou:80px; --duree:23s; --amp:9%;"
+      ></span>
+      <span
+        style="--x:62%; --y:90%; --taille:56rem; --teinte:#14a4ba; --opacite:0.32; --flou:90px; --duree:37s; --amp:8%; --retard:-8s;"
+      ></span>
+      <span
+        style="--x:94%; --y:84%; --taille:52rem; --teinte:#03242e; --opacite:0.72; --flou:70px; --duree:43s; --amp:6%; --retard:-15s;"
+      ></span>
+    </div>
+
+    {
+      /* Les deux lueurs d'origine restent : elles tiennent les angles hauts, que l'aurore laisse nus. */
     }
     <span class="halo-blob halo-blob-a"></span>
     <span class="halo-blob halo-blob-b"></span>
