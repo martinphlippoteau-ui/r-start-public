@@ -16,15 +16,15 @@ import LegalNotes from '@/components/LegalNotes.astro';
 import Breadcrumb from '@/components/ui/Breadcrumb.astro';
 import Button from '@/components/ui/Button.astro';
 import StickyCta from '@/components/StickyCta.astro';
-import Container from '@/components/ui/Container.astro';
 import PageHero from '@/components/ui/PageHero.astro';
-import Section from '@/components/ui/Section.astro';
 import Coverage from '@/components/pages/presse/Coverage.astro';
 import Quotes from '@/components/pages/presse/Quotes.astro';
+/* Zone 4 : le composant vit sous salle-de-presse/ parce qu'il y est né. Sa page est désactivée,
+   lui reste, c'est /presse qui le rend maintenant. */
+import Contacts from '@/components/pages/salle-de-presse/Contacts.astro';
 import { pages } from '@/config/pages';
 import { press } from '@/content/fr/press';
 import { breadcrumbJsonLd, organizationJsonLd, webPageJsonLd } from '@/lib/seo';
-import { withBase } from '@/lib/href';
 
 const path = pages.press.path;
 const jsonLd = [
@@ -32,7 +32,6 @@ const jsonLd = [
   webPageJsonLd({ path, title: press.seo.title, description: press.seo.description }),
   breadcrumbJsonLd('press'),
 ];
-const { pressRoomLink } = press;
 ---
 
 <Base title={press.seo.title} description={press.seo.description} path={path} jsonLd={jsonLd}>
@@ -69,32 +68,12 @@ const { pressRoomLink } = press;
     <Quotes />
     <Coverage />
 
-    <!-- Renvoi vers la salle de presse, absente du menu principal -->
-    <Section
-      id="salle-de-presse-renvoi"
-      tone="paper"
-      spacing="compact"
-      labelledBy="salle-de-presse-renvoi-title"
-    >
-      <Container size="wide">
-        <div
-          class="flex flex-col gap-5 rounded-3xl bg-white p-6 shadow-card sm:p-8 lg:flex-row lg:items-center lg:justify-between lg:gap-10 lg:p-10"
-        >
-          <div class="max-w-2xl">
-            <h2 id="salle-de-presse-renvoi-title" class="text-display-sm text-ink">
-              {pressRoomLink.title}
-            </h2>
-            <p class="text-lead mt-3 text-slate-700">{pressRoomLink.body}</p>
-          </div>
-          <a
-            href={withBase(pressRoomLink.href)}
-            class="text-lead shrink-0 font-semibold text-navy underline-offset-4 hover:text-teal-700 link-underline"
-          >
-            {pressRoomLink.label}
-          </a>
-        </div>
-      </Container>
-    </Section>
+    {
+      /* ZONE 4 (15/09/2026). Cette place portait un renvoi vers /salle-de-presse. L'équipe a demandé de
+        ne pas encore ouvrir cette page aux journalistes, faute de communiqués à y mettre : la route est
+        désactivée et les contacts sont servis ici, par le composant déjà écrit pour eux. */
+    }
+    <Contacts tone="paper" />
 
     <LegalNotes notes={press.notes} />
   </main>

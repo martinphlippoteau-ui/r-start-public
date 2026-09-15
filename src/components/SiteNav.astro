@@ -176,7 +176,10 @@ const linkClass =
         /* Sous « lg », la liste est masquée : un seul menu (le panneau), le CTA reste visible et pousse à droite. */
       }
       <div class="ml-auto shrink-0 lg:ml-0 lg:justify-self-end">
-        <Button position="nav" variant="primary" size="sm" class="subnav-cta">{ctaLabel}</Button>
+        {/* AGRANDI LE 15/09/2026 : `sm` (40 px de haut) devient `md` (48 px). La barre en fait 56,
+          il reste donc 4 px de part et d'autre, et la contraction au défilement (scale 0.92,
+          utilitaire `subnav-cta`) le ramène à 44 px, toujours au-dessus des 44 px de cible tactile. */}
+        <Button position="nav" variant="primary" size="md" class="subnav-cta">{ctaLabel}</Button>
       </div>
 
       <button

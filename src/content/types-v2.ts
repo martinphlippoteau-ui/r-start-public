@@ -457,7 +457,7 @@ export interface PressContent {
     disclaimerTitle?: string;
   };
   /** Renvoi vers /salle-de-presse, absente du menu principal. */
-  pressRoomLink: { title: string; body: string; label: string; href: string };
+  /* `pressRoomLink` retiré le 15/09/2026 avec la désactivation de /salle-de-presse. */
   /** Appel à l'action de la page : en-tête et pastille flottante. */
   cta: Cta;
   labels?: PressLabels;

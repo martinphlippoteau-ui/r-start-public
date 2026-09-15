@@ -34,7 +34,8 @@ export const footer = {
       links: [
         ...menuPages.map((p): FooterLink => ({ label: p.navLabel ?? p.label, href: p.path })),
         { label: pages.documentation.label, href: pages.documentation.path } satisfies FooterLink,
-        { label: pages.pressRoom.label, href: pages.pressRoom.path } satisfies FooterLink,
+        /* La salle de presse est sortie du pied de page le 15/09/2026 : sa route est désactivée
+           (src/pages/_salle-de-presse.astro), le lien pointerait dans le vide. */
       ],
     },
     {

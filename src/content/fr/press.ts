@@ -84,9 +84,9 @@ export const press = {
 
   hero: {
     eyebrow: 'La presse en parle',
-    title: 'Ce qu’en dit la presse',
-    intro:
-      'Mai 2026. R Start débarque sur le marché. La presse économique et financière s’en empare. Voici ce qu’elle en dit.',
+    /* Zones réécrites le 15/09/2026, texte fourni par l'équipe. */
+    title: 'R Start dans vos médias',
+    intro: 'Découvrez les derniers articles parus',
     /* Plus de ligne risques dans l'en-tête (14/09/2026, demande de l'équipe : « supprime les bon à
        savoir de tous les hero sauf celui de la home »). Le « Bon à savoir : … » sous le H1 a disparu de
        TOUTES les sous-pages ; seul l'accueil le garde, sous ses appels à l'action. Ces pages n'ont donc
@@ -95,14 +95,16 @@ export const press = {
   },
 
   quotes: {
-    title: 'Ce qu’en a écrit la presse spécialisée',
+    /* Zone 2, titre du 15/09/2026. Les trois citations ne bougent pas : « Garder les 3 exemples ». */
+    title: 'Le verdict des journalistes',
     intro:
       'Ces citations sont des extraits d’articles de tiers. Elles n’engagent que leurs auteurs et ne portent sur aucun résultat de R Start.',
     items: quotes,
   },
 
   coverage: {
-    title: 'La revue de presse',
+    /* Zone 3, titre du 15/09/2026, ex-« La revue de presse ». */
+    title: 'Revue de presse',
     intro: nb(
       `Au lancement de R Start, ${articles.length} articles de la presse économique et financière, avec leur média et leur date. Les titres sont ceux des articles, reproduits tels quels. R Start n’est pas une SCPI sans frais : ${nb(fees.management.label)} de frais de gestion sur les loyers HT, commissions sur les cessions d’immeubles et commission de retrait avant ${fees.withdrawal.zeroAfterYears} ans s’appliquent.`
     ),
@@ -113,12 +115,16 @@ export const press = {
   },
 
   /** Renvoi vers /salle-de-presse, absente du menu principal (arbitrage du 10/09/2026). */
-  pressRoomLink: {
-    title: 'Vous êtes journaliste ?',
-    body: 'La salle de presse réunit les communiqués, les contacts presse, le kit média et le texte de présentation de CORUM L’Épargne.',
-    label: 'Aller à la salle de presse',
-    href: pages.pressRoom.path,
-  },
+  /*
+   * ZONE 4 : LE RENVOI VERS LA SALLE DE PRESSE EST RETIRÉ (15/09/2026). Il disait « Vous êtes
+   * journaliste ? » et envoyait sur /salle-de-presse. L'équipe a tranché : « Ne pas activer encore la
+   * page presse pour les journalistes : pas assez d'infos, pas de CP, ça va plus nous desservir
+   * qu'autre chose. » De fait, la salle de presse annonçait des communiqués dont aucun fichier n'a
+   * jamais été livré. La route est donc désactivée (src/pages/_salle-de-presse.astro), et la zone 4
+   * porte maintenant les contacts presse eux-mêmes, par le composant Contacts déjà écrit pour elle.
+   * Pour rétablir : renommer la page sans le tiret bas, remettre ce bloc et son lien en pied de page,
+   * et les entrées retirées des listes de tests et de scripts.
+   */
 
   /** Micro-textes du composant (libellés d'accessibilité). */
   /* Appel à l'action de la page (13/09/2026) : elle n'en portait aucun, on lisait la revue de presse et

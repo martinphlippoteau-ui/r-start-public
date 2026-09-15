@@ -22,7 +22,6 @@ const PAGES = [
   '/frais/',
   '/documentation/',
   '/presse/',
-  '/salle-de-presse/',
   '/mentions-legales/',
   '/cookies/',
 ];

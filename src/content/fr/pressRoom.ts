@@ -111,7 +111,12 @@ export const pressRoom = {
   },
 
   contacts: {
-    title: 'Contacts presse',
+    /*
+     * « Vous êtes journalistes ? » depuis le 15/09/2026, texte de l'équipe. Ce bloc n'est plus rendu
+     * par la salle de presse, dont la route est désactivée, mais par la ZONE 4 de /presse : c'est
+     * désormais le seul endroit du site où un journaliste trouve un contact.
+     */
+    title: 'Vous êtes journalistes ?',
     items: contacts,
     source: nb(`Source : ${pressFacts.contactsSource}.`),
   },

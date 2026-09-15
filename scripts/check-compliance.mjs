@@ -371,7 +371,6 @@ async function checkSubPages() {
     'a-propos',
     'documentation',
     'presse',
-    'salle-de-presse',
   ]) {
     const file = p + '/index.html';
     let html;
