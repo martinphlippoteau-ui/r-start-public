@@ -202,42 +202,63 @@
    cas sur grand écran et jamais sur téléphone, où les jambages de la ligne du dessus touchaient les
    capitales de la suivante. */
 /*
- * ÉCHELLE ABAISSÉE le 15/09/2026 (« tout est un peu trop gros »). Les quatre paliers perdent de 17 à
- * 20 % sur grand écran et un à deux pixels sur téléphone, où ils étaient déjà justes :
- *   display-xl  44 → 120 px  devient  40 → 96 px
- *   display-lg  30 →  80 px  devient  28 → 64 px   (les H1 et les H2 de chapitre)
- *   display-md  26 →  56 px  devient  24 → 46 px   (les H2 de section)
- *   display-sm  21 →  36 px  devient  20 → 30 px   (les H3)
+ * ÉCHELLE CALÉE SUR REVOLUT le 15/09/2026, à la demande de l'équipe. Les valeurs ci-dessous ne sont
+ * pas estimées : la page d'accueil revolut.com/fr-FR refuse les robots (Cloudflare, 403), elle a donc
+ * été relevée depuis la capture archivée du 04/08/2026, rendue dans un vrai navigateur, et les tailles
+ * calculées lues à huit largeurs. Ce qu'on y mesure, de 390 à 1440 px :
+ *   H1     48 → 88 px      interligne 1      interlettrage -2 %
+ *   H2     36 → 52 px      interligne 1      interlettrage -1 %
+ *   H3     18 px fixe      interligne 1,33   interlettrage normal
+ *   corps  18 px fixe
+ *
+ * DEUX ENSEIGNEMENTS, et le second est le vrai. Leur échelle est plus PLATE que la nôtre : un H2 y
+ * gagne 44 % du téléphone au grand écran quand le nôtre en gagnait 129 %. Et leur H3 ne se distingue
+ * pas du corps par la taille mais par la graisse. C'est ce qui fait tenir leurs pages : deux niveaux
+ * qui crient, le reste qui parle normalement.
+ *
+ * CE QU'ON REPREND, et ce qu'on adapte :
+ *   display-xl  40 →  96 px  devient  48 → 88 px   (l'accroche d'accueil)
+ *   display-lg  28 →  64 px  devient  36 → 52 px   (les H1 et les H2 de chapitre)
+ *   display-md  24 →  46 px  devient  28 → 36 px   (les H2 de section)
+ *   display-sm  20 →  30 px  devient  20 → 24 px   (les H3)
+ * Grand écran : tout descend encore, de 8 à 22 %. Téléphone : les deux premiers paliers REMONTENT,
+ * parce que c'est là que Revolut est plus gros que nous et que c'est ce qui donne la tenue.
+ *
+ * L'INTERLIGNE DE 1 N'EST PAS REPRIS TEL QUEL. Il tient chez eux parce que leurs accroches font trois
+ * mots (« Bien plus qu'une banque »). Les nôtres sont des phrases qui passent à la ligne, et le français
+ * y ajoute des accents sur capitales : à 1, le É de la seconde ligne touche les jambages de la première.
+ * On garde donc 1,05 et 1,1, le minimum qui laisse passer un É.
+ *
  * Les bornes restent calées sur 390 et 1440 px, et la pente est recalculée pour les atteindre
  * exactement là : c'est ce qui garde la progression régulière entre les deux.
- * Les interlettrages et les interlignes ne bougent pas, eux sont proportionnels à la taille.
  */
 @utility text-display-xl {
-  /* 40 px à 390, 96 px à 1440. Reste bien au-dessus de l'accroche, façon iPhone. */
-  font-size: clamp(2.5rem, 1.2rem + 5.33vw, 6rem);
-  line-height: 1;
-  letter-spacing: -0.035em;
+  /* 48 px à 390, 88 px à 1440. */
+  font-size: clamp(3rem, 2.071rem + 3.81vw, 5.5rem);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
   font-weight: 700;
 }
 @utility text-display-lg {
-  /* 28 px à 390, 64 px à 1440. */
-  font-size: clamp(1.75rem, 0.914rem + 3.43vw, 4rem);
+  /* 36 px à 390, 52 px à 1440. */
+  font-size: clamp(2.25rem, 1.879rem + 1.52vw, 3.25rem);
   line-height: 1.08;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.015em;
   font-weight: 700;
 }
 @utility text-display-md {
-  /* 24 px à 390, 46 px à 1440. */
-  font-size: clamp(1.5rem, 0.989rem + 2.1vw, 2.875rem);
-  line-height: 1.1;
-  letter-spacing: -0.025em;
+  /* 28 px à 390, 36 px à 1440. */
+  font-size: clamp(1.75rem, 1.564rem + 0.76vw, 2.25rem);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
   font-weight: 700;
 }
 @utility text-display-sm {
-  /* 20 px à 390, 30 px à 1440. */
-  font-size: clamp(1.25rem, 1.018rem + 0.95vw, 1.875rem);
-  line-height: 1.2;
-  letter-spacing: -0.02em;
+  /* 20 px à 390, 24 px à 1440. Comme chez eux, ce palier se distingue du corps par la graisse
+     plus que par la taille. */
+  font-size: clamp(1.25rem, 1.157rem + 0.38vw, 1.5rem);
+  line-height: 1.25;
+  letter-spacing: -0.005em;
   font-weight: 600;
 }
 @utility text-lead {
