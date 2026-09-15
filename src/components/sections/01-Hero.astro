@@ -44,9 +44,6 @@
  */
 import { Image } from 'astro:assets';
 import brandLogo from '@/assets/logos/r-start-blanc.svg';
-/* Logo de l'AMF pour la pastille de réassurance. Le fichier vient de Wikipédia France, où il est
-   hébergé au titre d'un usage non libre : voir la mise en garde dans trust.ts (`amf.heroBadge`). */
-import amfLogo from '@/assets/logos/amf.svg';
 import Button from '@/components/ui/Button.astro';
 import Container from '@/components/ui/Container.astro';
 import RiskNote from '@/components/ui/RiskNote.astro';
@@ -349,17 +346,16 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
                   `flex` et non `inline-flex` : un élément en ligne ajoute la descente de sa ligne de
                   base sous la plaque, six pixels qui suffisaient à décaler les deux colonnes. */
               }
-              <span class="mx-auto flex h-7 w-fit items-center rounded-lg bg-white px-2 shadow-card">
-                <Image
-                  src={amfLogo}
-                  alt={trust.amf.heroBadge.logoAlt}
-                  width={142}
-                  height={57}
-                  loading="eager"
-                  class="h-5 w-auto"
-                />
-              </span>
-              <p class="mt-2 text-sm leading-snug text-white/80">
+              {
+                /* LOGO RETIRÉ LE 15/09/2026, demande de l'équipe : retour à la mention seule. Il avait
+                  été posé le matin même, sur une plaque blanche, après une mise en garde rappelée dans
+                  trust.ts : l'AMF ne concède pas son logo aux communications commerciales, et le fichier
+                  venait de Wikipédia France au titre d'un usage non libre. Son retrait règle les deux
+                  points d'un coup. Le fichier reste dans src/assets/logos/amf.svg, inutilisé.
+                  La mention, elle, ne change pas : « société de gestion agréée », jamais « R Start
+                  agréé », R Start étant visé et non agréé. */
+              }
+              <p class="text-sm leading-snug text-white/80">
                 {trust.amf.heroBadge.label}
               </p>
             </div>

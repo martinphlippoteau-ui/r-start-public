@@ -44,6 +44,7 @@ import AppMyCorum from '@/components/AppMyCorum.astro';
 import StoreBadge from '@/components/ui/StoreBadge.astro';
 import Card from '@/components/ui/Card.astro';
 import Container from '@/components/ui/Container.astro';
+import Button from '@/components/ui/Button.astro';
 import NoteRef from '@/components/ui/NoteRef.astro';
 import Pill from '@/components/ui/Pill.astro';
 import RiskNote from '@/components/ui/RiskNote.astro';
@@ -186,6 +187,21 @@ const OPTION_Y = 12;
             </li>
           ))
         }
+        {
+          /* APPEL À L'ACTION APRÈS LES ÉTAPES (15/09/2026, demande de l'équipe). `primary` : celui-ci
+            mène au tunnel de souscription, contrairement aux appels secondaires des sections
+            précédentes, et il arrive au terme du parcours qu'il conclut.
+            Il porte `position` : c'est ce qui le rattache au plan de taggage, comme les autres CTA de
+            souscription, et ce qui lui fait ouvrir la fenêtre d'attente tant que le tunnel n'est pas
+            ouvert (tests/qualite.spec.ts le vérifie sur tous les CTA de souscription).
+            DANS la liste plutôt qu'après elle : la colonne de droite porte la photo en `lg:sticky`, un
+            frère de la liste se placerait sous elle et non sous les étapes. */
+        }
+        <li class="mt-12 list-none">
+          <Button position={subscribe.cta.position} variant="primary" size="lg">
+            {subscribe.cta.label}
+          </Button>
+        </li>
       </ol>
 
       {

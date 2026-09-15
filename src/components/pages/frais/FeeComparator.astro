@@ -168,8 +168,13 @@ const data = scpis.map((s) => ({
                   <span data-comparator-best="left" class="visually-hidden" hidden>
                     {comparator.bestLabel}
                   </span>
+                  {
+                    /* `mt-3` et non `mt-1` : la pastille du gagnant déborde de 0,3 em SOUS la ligne de
+                      base du chiffre, et le détail venait s'y coller. Les quatre pixels d'origine
+                      suffisaient sous un halo diffus, plus sous un fond plein. */
+                  }
                   {row.rstartDetail && (
-                    <span class="text-caption mt-1 block text-slate-700">{row.rstartDetail}</span>
+                    <span class="text-caption mt-3 block text-slate-700">{row.rstartDetail}</span>
                   )}
                 </td>
                 <td role="cell" class="px-3 py-5 text-center align-top sm:px-5">
@@ -179,9 +184,10 @@ const data = scpis.map((s) => ({
                   <span data-comparator-best="right" class="visually-hidden" hidden>
                     {comparator.bestLabel}
                   </span>
+                  {/* Même écart qu'à gauche, pour la même raison : la pastille peut être de ce côté. */}
                   <span
                     data-comparator-detail={String(i)}
-                    class="text-caption mt-1 block text-slate-700"
+                    class="text-caption mt-3 block text-slate-700"
                   />
                 </td>
               </tr>
@@ -317,12 +323,16 @@ const data = scpis.map((s) => ({
          * Mise en avant par la COULEUR et la GRAISSE seulement : la taille reste identique d'une case à
          * l'autre, sans quoi un frais serait affiché plus petit que son voisin, ce que l'AMF refuse.
          * Le perdant est atténué, jamais effacé : il reste parfaitement lisible.
+         * Depuis le 15/09/2026 le gagnant porte une PASTILLE PLEINE (`fee-gagnant`), et non plus un
+         * halo à 18 % d'opacité qui se voyait à peine sur le blanc du tableau. Texte BLANC sur le navy,
+         * relevé à 9,52:1, après un essai en sable qui tenait déjà largement (7,72:1) mais rendait le
+         * chiffre moins net que son voisin en navy plein.
          */
         const peindre = (cell: Element | null | undefined, gagne: boolean, perd: boolean) => {
           if (!cell) return;
           cell.classList.toggle('font-bold', gagne);
-          cell.classList.toggle('text-teal-700', gagne);
-          cell.classList.toggle('fee-halo', gagne);
+          cell.classList.toggle('text-white', gagne);
+          cell.classList.toggle('fee-gagnant', gagne);
           cell.classList.toggle('text-slate-600', perd);
           cell.classList.toggle('text-navy', !gagne && !perd);
         };
