@@ -5,10 +5,12 @@
  * ni composé ni sélectionné par CORUM, et il n'entre donc pas dans le périmètre du contrôle des
  * formulations du site (scripts/check-compliance.mjs ne voit que le lien de repli).
  *
- * C'est précisément ce qui rend l'intégration défendable : le carrousel est réglé sur `data-stars`
- * « 1,2,3,4,5 », donc il diffuse TOUTES les notes, y compris les avis négatifs. Aucun tri favorable n'est
- * opéré, l'obligation d'information sur les avis en ligne (art. L111-7-2 du code de la consommation) est
- * tenue par ce réglage et par la note légale `confiance-trustpilot`.
+ * CARROUSEL FILTRÉ depuis le 15/09/2026 : `data-stars` vaut « 4,5 », le widget ne présente donc que les
+ * avis favorables. C'est un réglage de l'équipe, et il change la nature de l'intégration : ce n'est plus
+ * un flux non trié. L'obligation d'information sur les avis en ligne (art. L111-7-2 du code de la
+ * consommation) repose désormais entièrement sur le texte qui accompagne le widget (trust.ts, `scope`)
+ * et sur la note `confiance-trustpilot`, tous deux réécrits le même jour pour dire que le carrousel est
+ * filtré et renvoyer au profil Trustpilot pour l'ensemble des avis. Voir facts.ts, `trustpilot.widgets`.
  *
  * Le script d'amorçage doit être chargé UNE SEULE FOIS par page, dans le <head> :
  * components/TrustpilotScript.astro, passé à Base.astro par le slot « head ». Sans lui, le contenu du

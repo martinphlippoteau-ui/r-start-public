@@ -95,7 +95,7 @@ export const notes: LegalNote[] = [
   {
     id: 'confiance-trustpilot',
     text: nb(
-      `Note et avis affichés en direct par Trustpilot depuis le profil ${tp.url}, revendiqué par ${company}. Trustpilot est une plateforme d’avis indépendante de CORUM : elle publie et modère ces avis, CORUM ne les sélectionne pas et ne les modifie pas. Le carrousel diffuse toutes les notes, de une à cinq étoiles, avis négatifs compris. Les avis portent sur les services du distributeur ${company}, non sur R Start. Ils évoluent en permanence : seule la page Trustpilot fait foi à la date de consultation. Ils ne constituent ni une recommandation ni une indication sur les résultats futurs de R Start, et ne réduisent aucun de ses risques : perte en capital, revenus non garantis, liquidité limitée.`
+      `Note et avis affichés en direct par Trustpilot depuis le profil ${tp.url}, revendiqué par ${company}. Trustpilot est une plateforme d’avis indépendante de CORUM : elle publie et modère ces avis, et CORUM ne les modifie pas. Le carrousel affiché ici est paramétré pour ne présenter que les avis notés 4 et 5 étoiles : il ne reflète donc pas l’ensemble des avis publiés. La note globale et la totalité des avis, toutes notes confondues, sont consultables sur le profil Trustpilot. Les avis portent sur les services du distributeur ${company}, non sur R Start. Ils évoluent en permanence : seule la page Trustpilot fait foi à la date de consultation. Ils ne constituent ni une recommandation ni une indication sur les résultats futurs de R Start, et ne réduisent aucun de ses risques : perte en capital, revenus non garantis, liquidité limitée.`
     ),
   },
   {

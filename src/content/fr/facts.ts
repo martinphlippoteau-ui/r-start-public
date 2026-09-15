@@ -414,9 +414,20 @@ export const trust = {
     claimed: true,
     url: 'https://fr.trustpilot.com/review/www.corum.fr', // profil visé par les codes d'intégration Trustpilot
     /**
-     * Identifiants des TrustBox officiels, remis par l'équipe le 11/09/2026 depuis le back-office
-     * Trustpilot de CORUM. Ils ne se devinent pas : toute modification vient de ce back-office.
-     * Le carrousel diffuse TOUTES les notes (`stars` : 1 à 5) : aucun tri favorable des avis.
+     * Identifiants des TrustBox officiels, remis par l'équipe depuis le back-office Trustpilot de CORUM.
+     * Ils ne se devinent pas : toute modification vient de ce back-office.
+     *
+     * CARROUSEL FILTRÉ SUR 4 ET 5 ÉTOILES depuis le 15/09/2026, avec un nouveau token, code
+     * d'intégration fourni par l'équipe. Il diffusait jusque-là TOUTES les notes, de une à cinq.
+     *
+     * CE QUE CE RÉGLAGE CHANGE, ET QUI DOIT ÊTRE SU. Le site n'affiche plus que des avis favorables :
+     * c'est une SÉLECTION, faite par le paramétrage du widget, et non plus un flux non trié. Les textes
+     * qui l'accompagnaient ont donc été réécrits le même jour (trust.ts, `scope` et la note
+     * `confiance-trustpilot`) : ils affirmaient « toutes les notes, de une à cinq étoiles, avis négatifs
+     * compris », ce qui serait devenu faux. L'article L111-7-2 du code de la consommation impose
+     * d'informer sur les modalités de publication et de traitement des avis ; dire que le carrousel est
+     * filtré est le minimum, et l'opportunité du filtre lui-même est une décision de l'équipe, à faire
+     * valider par la Conformité.
      */
     widgets: {
       locale: 'fr-FR',
@@ -431,9 +442,9 @@ export const trust = {
         },
         carousel: {
           templateId: '53aa8912dec7e10d38f59f36',
-          token: '57f52181-f64a-4a4f-b409-edb45c746c8d',
+          token: 'c7d01bac-c778-4cec-9929-cd93e1283460',
           height: '140px',
-          stars: '1,2,3,4,5',
+          stars: '4,5',
           reviewLanguages: 'fr',
         },
       },
