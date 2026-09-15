@@ -37,7 +37,12 @@ export default defineConfig({
   integrations: [
     sitemap({
       filter: (page) =>
-        !page.includes('/404') && !page.includes('/cookies') && !page.includes('/sections-preview'),
+        !page.includes('/404') &&
+        !page.includes('/cookies') &&
+        !page.includes('/sections-preview') &&
+        /* Page d'essai typographique, hors menu et provisoire (15/09/2026) : elle n'a rien à faire
+           dans le plan du site, et elle sera supprimée une fois la fonte choisie. */
+        !page.includes('/test'),
       changefreq: 'weekly',
       priority: 0.8,
     }),
