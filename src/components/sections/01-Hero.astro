@@ -294,7 +294,7 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
           <div
             data-intro="6"
             data-intro-move
-            class="flex flex-col items-center gap-6 sm:flex-row sm:items-start sm:justify-center sm:gap-10"
+            class="flex flex-col items-center gap-6 sm:flex-row sm:items-start sm:justify-center sm:gap-12"
           >
             <div class="w-full max-w-md">
               <TrustBox template="horizontal" theme="dark" label={trust.trustpilot.widgetLabel!} />
@@ -307,23 +307,29 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
                 Le numéro d'agrément a été retiré de la pastille le 15/09/2026 ; il reste dans le bloc
                 de confiance plus bas, avec sa note légale. */
             }
-            {/* `shrink-0` : la colonne des avis est en `w-full`, elle réclame donc toute la rangée et
-                comprimait la pastille jusqu'à casser son texte en cinq lignes. */}
-            <p class="flex shrink-0 items-center gap-3 text-left">
-              <span class="shrink-0 rounded-xl bg-white px-2.5 py-2 shadow-card">
+            {
+              /* MÊME ARCHITECTURE QUE LA COLONNE DES AVIS (15/09/2026, demande de l'équipe) : la marque
+                en haut, sa portée juste dessous, dans le même corps et la même teinte que
+                « Avis sur CORUM L'Épargne, distributeur de R Start. » Les deux réassurances se lisent
+                ainsi de la même façon, au lieu d'une en colonne et l'autre en rangée.
+                `shrink-0` : la colonne des avis est en `w-full`, elle réclame toute la rangée et
+                comprimait la pastille jusqu'à casser son libellé en cinq lignes. */
+            }
+            <div class="shrink-0">
+              <span class="inline-block rounded-xl bg-white px-3 py-2.5 shadow-card">
                 <Image
                   src={amfLogo}
                   alt={trust.amf.heroBadge.logoAlt}
                   width={142}
                   height={57}
                   loading="eager"
-                  class="h-9 w-auto"
+                  class="h-10 w-auto"
                 />
               </span>
-              <span class="max-w-[11rem] text-sm font-semibold leading-snug text-white">
+              <p class="mt-2 max-w-[13rem] text-sm leading-snug text-white/80">
                 {trust.amf.heroBadge.label}
-              </span>
-            </p>
+              </p>
+            </div>
           </div>
         </div>
       </div>
