@@ -117,7 +117,7 @@ const linkClass =
     <div
       data-sitenav-bar
       style="view-transition-name: barre-nav"
-      class="nav-glass flex h-subnav items-center gap-2 px-3 sm:gap-4 sm:px-4 lg:grid lg:grid-cols-[1fr_auto_1fr]"
+      class="nav-glass flex h-subnav items-center gap-2 px-3 sm:gap-4 sm:px-4 lg:grid lg:grid-cols-[1fr_auto_1fr] lg:pr-[3px]"
     >
       <a
         href={logoHref}
@@ -178,7 +178,13 @@ const linkClass =
       <div class="ml-auto shrink-0 lg:ml-0 lg:justify-self-end">
         {/* AGRANDI LE 15/09/2026 : `sm` (40 px de haut) devient `md` (48 px). La barre en fait 56,
           il reste donc 4 px de part et d'autre, et la contraction au défilement (scale 0.92,
-          utilitaire `subnav-cta`) le ramène à 44 px, toujours au-dessus des 44 px de cible tactile. */}
+          utilitaire `subnav-cta`) le ramène à 44 px, toujours au-dessus des 44 px de cible tactile.
+          RETRAIT DROIT ÉGALISÉ (15/09/2026) : la barre porte `lg:pr-[3px]`, soit exactement les 3 px
+          qu'on relève en haut et en bas. Trois et non quatre : le bouton mesure 50 px et non 48, il
+          porte un filet d'un pixel, et (56 - 50) / 2 fait 3. et le bouton se pose dans la barre comme une pastille dans une pastille,
+          les deux étant à rayon plein. Le resserrement ne vaut QU'À PARTIR DE `lg` : en dessous, ce
+          n'est pas le CTA qui borde la barre à droite mais le bouton du menu, plus petit (40 px), qui
+          demande son propre retrait. */}
         <Button position="nav" variant="primary" size="md" class="subnav-cta">{ctaLabel}</Button>
       </div>
 
