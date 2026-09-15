@@ -38,14 +38,15 @@ interface Props {
   notes?: LegalNote[];
 }
 const { tone = 'white', notes } = Astro.props as Props;
-const officePhoto = await resolveImage(media.corum[0].src);
+const officePhoto = await resolveImage(media.corum.src);
 const stats = trust.stats;
 const range = corum.range.scpiNames.map((name) => ({ name, current: name === product.name }));
 const LOGO_STAGGER = 0.08;
 const QUIET_TITLE_Y = 12;
 /*
- * `corum.expertise` et `media.expertise` ne sont plus lus : la section des trois savoir-faire est
- * partie le 14/09/2026. Contenu et visuels restent dans corum.ts et media.ts, prêts à resservir.
+ * `corum.expertise` n'est plus lu : la section des trois savoir-faire est partie le 14/09/2026.
+ * Le contenu reste dans corum.ts, prêt à resservir ; les trois visuels, eux, ont été retirés de
+ * media.ts le 15/09/2026 avec les dernières photographies du site.
  */
 ---
 
@@ -102,9 +103,12 @@ const QUIET_TITLE_Y = 12;
 </Section>
 
 {
-  /* 2. Photo d'ambiance des bureaux, PLEINE LARGEUR (13/09/2026) : elle sépare les deux chapitres et
-    donne à la page sa seule respiration visuelle. Décorative, aucun avantage, donc aucun contre-poids
-    attendu. Hors <Section> : sans titre, elle n'aurait aucune ancre à désigner en aria-labelledby. */
+  /* 2. Bande PLEINE LARGEUR (13/09/2026) : elle sépare les deux chapitres et donne à la page sa seule
+    respiration visuelle. Décorative, aucun avantage, donc aucun contre-poids attendu. Hors <Section> :
+    sans titre, elle n'aurait aucune ancre à désigner en aria-labelledby.
+    LA MENTION EST APPARUE LE 15/09/2026 avec le passage aux illustrations. Tant que la bande montrait
+    les bureaux de CORUM, il n'y avait rien à écarter ; elle montre désormais un immeuble, et doit donc
+    la même mention que les deux autres bandes du site (03a-Immeuble, 01b-Difference). */
 }
 <figure class="relative" data-animate="clip">
   <div
@@ -112,16 +116,24 @@ const QUIET_TITLE_Y = 12;
   >
     <Picture
       src={officePhoto}
-      alt={media.corum[0].alt}
+      alt={media.corum.alt}
       widths={[640, 1024, 1600, 2400]}
       sizes="100vw"
       formats={['avif', 'webp']}
+      fallbackFormat="jpeg"
       loading="lazy"
       decoding="async"
       pictureAttributes={{ class: 'block h-full w-full' }}
       class="h-full w-full object-cover"
     />
   </div>
+  {
+    media.corum.credit && (
+      <figcaption class="text-caption py-4 text-slate-700">
+        <Container size="wide">{media.corum.credit}</Container>
+      </figcaption>
+    )
+  }
 </figure>
 
 {

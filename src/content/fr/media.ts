@@ -56,8 +56,8 @@ export interface MediaContent {
   hero: { main: MediaImage };
   /** Trois immeubles variés pour le défilement de la section Stratégie. */
   strategy: readonly MediaImage[];
-  /** Ambiance des bureaux CORUM (section « CORUM »). */
-  corum: readonly MediaImage[];
+  /** Bande pleine largeur de la page /a-propos, entre les deux chapitres. */
+  corum: MediaImage;
   documents?: MediaImage;
   /**
    * Pas d'image Open Graph photographique : diffusée seule sur les réseaux sociaux, une photo d'immeuble
@@ -114,18 +114,20 @@ export const media = {
       credit: illustration,
     },
   ],
-  corum: [
-    // 2000 × 1336. Accueil des bureaux CORUM, logo au mur, deux collaborateurs en arrière-plan.
-    {
-      src: 'ambiance/hero-a-propos.jpg',
-      alt: 'Espace d’accueil des bureaux de CORUM, logo au mur, deux collaborateurs en discussion à l’arrière-plan',
-    },
-    // 2000 × 1336. Salon des bureaux CORUM, sans personne, teintes fauve et bleu canard.
-    {
-      src: 'ambiance/wttj-salon.jpg',
-      alt: 'Salon des bureaux de CORUM, deux fauteuils en cuir fauve, tapis bleu canard et tables basses en verre',
-    },
-  ],
+  /*
+   * LES PHOTOS D'AMBIANCE SONT PARTIES LE 15/09/2026 : plus aucune photographie sur le site, tout
+   * l'imagier est dessiné. Les deux vues des bureaux CORUM ont été supprimées, ainsi que l'atelier
+   * de production que la section des savoir-faire lisait avant sa dépose. Le dossier src/assets/
+   * images/ambiance n'existe plus.
+   * Le rapport visé ici est le même que la bande d'accueil : 2,0 à 2,7 selon l'écran, pour un cadre
+   * en 42vh à 60vh sur toute la largeur. Seule du lot à montrer des plateaux de bureaux éclairés,
+   * ce qui est le sujet de la page.
+   */
+  corum: {
+    src: 'immeubles/rue-bureaux-eclaires.png',
+    alt: 'Illustration : rue vue de haut, immeuble de bureaux vitré aux plateaux éclairés sur la gauche',
+    credit: illustration,
+  },
   // 2304 × 1856, rapport 1,25, contre un cadre en `aspect-[4/3]` (1,33) : le recadrage se voit à
   // peine. Vue prise de haut, seule du lot à montrer une ville entière plutôt qu'une rue.
   documents: {
