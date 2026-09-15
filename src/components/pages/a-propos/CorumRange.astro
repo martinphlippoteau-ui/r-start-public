@@ -27,7 +27,7 @@ import Section from '@/components/ui/Section.astro';
 import Stat from '@/components/ui/Stat.astro';
 import { corum } from '@/content/fr/corum';
 import { trust } from '@/content/fr/trust';
-import { media } from '@/content/fr/media';
+import { media, AFFICHER_LEGENDES } from '@/content/fr/media';
 import { product } from '@/content/fr/facts';
 import { resolveImage } from '@/lib/images';
 import type { LegalNote } from '@/content/types';
@@ -128,7 +128,7 @@ const QUIET_TITLE_Y = 12;
     />
   </div>
   {
-    media.corum.credit && (
+    AFFICHER_LEGENDES && media.corum.credit && (
       <figcaption class="text-caption py-4 text-slate-700">
         <Container size="wide">{media.corum.credit}</Container>
       </figcaption>

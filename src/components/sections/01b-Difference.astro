@@ -22,7 +22,7 @@ import NoteRef from '@/components/ui/NoteRef.astro';
 import Section from '@/components/ui/Section.astro';
 import { sections } from '@/config/sections';
 import { difference } from '@/content/fr/difference';
-import { media } from '@/content/fr/media';
+import { media, AFFICHER_LEGENDES } from '@/content/fr/media';
 import { resolveImage } from '@/lib/images';
 
 const id = sections.difference.id;
@@ -153,7 +153,7 @@ const situations = (difference.situations ?? []).map((s) => {
           />
         </div>
         {
-          media.documents.credit && (
+          AFFICHER_LEGENDES && media.documents.credit && (
             <figcaption class="text-caption mt-3 text-slate-700">
               {media.documents.credit}
             </figcaption>

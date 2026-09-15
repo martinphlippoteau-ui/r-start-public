@@ -278,10 +278,44 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
             ferme la séquence d'ouverture (rang 5). Sa portée est dite juste dessous : les avis parlent de
             CORUM L'Épargne, pas de R Start. */
         }
-        <div {...copyScrubDown} class="mx-auto mt-6 w-full max-w-md sm:mt-10">
-          <div data-intro="6" data-intro-move>
-            <TrustBox template="horizontal" theme="dark" label={trust.trustpilot.widgetLabel!} />
-            <p class="mt-2 text-sm leading-snug text-white/80">{trust.trustpilot.heroCaption}</p>
+        {
+          /* La PASTILLE AMF rejoint les avis le 15/09/2026. Les deux réassurances sont mises côte à côte
+            à partir de `sm`, empilées en dessous : à 390 px, une rangée de deux les rendrait illisibles
+            toutes les deux. L'enveloppe passe de max-w-md à max-w-3xl pour loger la paire, et la colonne
+            des avis garde sa largeur propre (max-w-md) pour que le widget ne s'étire pas.
+            Ce qu'elle dit et ce qu'elle ne dit pas est argumenté dans trust.ts (`amf.heroBadge`) :
+            l'agrément est celui de la société de gestion, pas de R Start, et l'écusson est dessiné, ce
+            n'est pas le logo de l'AMF. */
+        }
+        <div {...copyScrubDown} class="mx-auto mt-6 w-full max-w-3xl sm:mt-10">
+          <div
+            data-intro="6"
+            data-intro-move
+            class="flex flex-col items-center gap-6 sm:flex-row sm:items-start sm:justify-center sm:gap-10"
+          >
+            <div class="w-full max-w-md">
+              <TrustBox template="horizontal" theme="dark" label={trust.trustpilot.widgetLabel!} />
+              <p class="mt-2 text-sm leading-snug text-white/80">{trust.trustpilot.heroCaption}</p>
+            </div>
+            <p class="flex items-center gap-3 text-left sm:max-w-[15rem]">
+              <svg
+                class="size-9 shrink-0 text-teal-200"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M12 2.75 4.75 5.5v6c0 4.2 2.9 7.6 7.25 9.75 4.35-2.15 7.25-5.55 7.25-9.75v-6L12 2.75Z" />
+                <path d="m8.75 11.75 2.25 2.25 4.25-4.5" />
+              </svg>
+              <span class="text-sm leading-snug text-white/80">
+                <span class="block font-semibold text-white">{trust.amf.heroBadge.label}</span>
+                {trust.amf.heroBadge.detail && <span class="block">{trust.amf.heroBadge.detail}</span>}
+              </span>
+            </p>
           </div>
         </div>
       </div>

@@ -39,7 +39,7 @@ import NoteConformite from '@/components/ui/NoteConformite.astro';
 import Section from '@/components/ui/Section.astro';
 import StrategyGlobe from '@/components/StrategyGlobe.astro';
 import { sections } from '@/config/sections';
-import { media } from '@/content/fr/media';
+import { media, AFFICHER_LEGENDES } from '@/content/fr/media';
 import { strategy } from '@/content/fr/strategy';
 import { resolveImage } from '@/lib/images';
 
@@ -200,7 +200,7 @@ const QUIET_TITLE_Y = 12;
                   />
                 </div>
               </div>
-              {!sharedCredit && photo.credit && (
+              {AFFICHER_LEGENDES && !sharedCredit && photo.credit && (
                 <p class="text-caption mt-3 text-slate-700">{photo.credit}</p>
               )}
             </li>
@@ -208,7 +208,7 @@ const QUIET_TITLE_Y = 12;
         }
       </ul>
       {
-        sharedCredit && (
+        AFFICHER_LEGENDES && sharedCredit && (
           <figcaption class="text-caption mt-3 text-slate-700">{sharedCredit}</figcaption>
         )
       }
@@ -283,9 +283,11 @@ const QUIET_TITLE_Y = 12;
         strategy.where.map && (
           <div class="mt-14 lg:col-span-5 lg:mt-0">
             <StrategyGlobe>
-              <figcaption class="text-caption mt-6 text-center text-white/85">
-                {strategy.where.map.legend}
-              </figcaption>
+              {AFFICHER_LEGENDES && (
+                <figcaption class="text-caption mt-6 text-center text-white/85">
+                  {strategy.where.map.legend}
+                </figcaption>
+              )}
             </StrategyGlobe>
           </div>
         )

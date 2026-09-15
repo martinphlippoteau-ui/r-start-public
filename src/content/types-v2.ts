@@ -63,6 +63,19 @@ export interface TrustContent {
     /** Phrase standard : le visa n'implique ni approbation ni authentification. */
     disclaimer: string;
     risk: string;
+    /**
+     * Pastille de réassurance du hero, à côté des avis Trustpilot (15/09/2026). Elle porte l'agrément
+     * de la SOCIÉTÉ DE GESTION, jamais celui de R Start, qui n'est pas agréé mais visé : le détail de
+     * cette distinction, et la raison pour laquelle l'écusson n'est pas le logo de l'AMF, sont dans
+     * trust.ts au-dessus du champ.
+     */
+    heroBadge: {
+      label: string;
+      /** Numéro d'agrément, vide si la source ne le donne pas. */
+      detail: string;
+      /** Ce que les lecteurs d'écran entendent à la place de l'écusson. */
+      srLabel: string;
+    };
   };
   trustpilot: {
     title: string;

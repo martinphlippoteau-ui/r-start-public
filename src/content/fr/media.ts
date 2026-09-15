@@ -38,6 +38,17 @@ export interface MediaImage {
 }
 
 /**
+ * INTERRUPTEUR DES LÉGENDES, posé le 15/09/2026 : « supprime toutes les légendes sous les images ».
+ * Même geste que pour les notes légales (src/components/LegalNotes.astro) et les « Bon à savoir » :
+ * RIEN N'EST EFFACÉ, seul l'affichage est coupé. Les textes restent dans ce fichier et dans
+ * strategy.ts, le service conformité les replacera où il l'entend.
+ * Les cinq rendus concernés : 03a-Immeuble, 01b-Difference, 04-Strategy (deux, la légende commune et
+ * celle par photo), CorumRange, et la légende du globe dans 04-Strategy.
+ * Pour les rétablir : passer cette constante à `true`, et rien d'autre.
+ */
+export const AFFICHER_LEGENDES = false;
+
+/**
  * Mention sous chaque visuel d'immeuble : aucun de ces bâtiments n'appartient à R Start.
  * LIBELLÉ CHANGÉ LE 15/09/2026, avec le lot d'illustrations. « Photo d'illustration » était devenu
  * faux : ce sont des dessins. La mention reste, car c'est elle qui empêche de lire ces visuels comme

@@ -141,6 +141,29 @@ export const trust = {
       },
     ],
     disclaimer: trustFacts.amf.disclaimer,
+    /*
+     * PASTILLE DU HERO (15/09/2026), posée à côté des avis Trustpilot.
+     *
+     * LA DEMANDE DISAIT « Agréé par l'AMF avec le logo de l'AMF ». Ni l'un ni l'autre n'est possible
+     * tel quel, et ce n'est pas une prudence de forme :
+     *  - R Start n'est pas AGRÉÉ, il est VISÉ (visa SCPI n° 26-06 du 4 mars 2026). L'AMF impose
+     *    elle-même la phrase qui le dit, déjà présente dans le pied de page : « Le visa de l'AMF
+     *    n'implique ni approbation de l'opportunité de l'opération ». Écrire « Agréé par l'AMF » au
+     *    premier écran affirme exactement ce que cette mention nie.
+     *  - Ce qui EST agréé, c'est la société de gestion, depuis le 14 avril 2011 sous le n° GP-11000012.
+     *    C'est la formulation que l'AMF a demandée dans ses retours sur la brochure (09/2026), reprise
+     *    ici mot pour mot.
+     *  - Le logo de l'AMF n'est pas concédé aux communications commerciales : posé en pastille près
+     *    d'une note Trustpilot, il se lit comme une caution. Le site a déjà tranché à trois endroits
+     *    (Footer.astro, 07-Trust.astro, et l'en-tête de `trust` ici même) : aucun logo AMF. La pastille
+     *    porte donc un écusson dessiné, dans la palette du site, qui ne se confond avec aucune marque.
+     */
+    heroBadge: {
+      label: 'Société de gestion agréée par l’AMF',
+      detail: amfApprovalNumber ? `n° ${amfApprovalNumber}` : '',
+      /** Lu par les lecteurs d'écran à la place de l'écusson, purement décoratif. */
+      srLabel: `${managementCompany.name}, agréée et réglementée par l’AMF depuis le ${corumGroup.amfSince}.`,
+    },
     /** Contre-poids du bloc de réassurance : longueur comparable aux items et au disclaimer réunis, sans nouveau chiffre. */
     risk: nb(
       `Le visa et l’agrément n’écartent aucun risque. Le visa porte sur la note d’information, pas sur l’opportunité d’investir. Vous pouvez perdre tout ou partie du capital investi. Les revenus ne sont pas garantis, le rachat de vos parts non plus : la liquidité est limitée. R Start peut investir hors zone euro : sa valeur et ses revenus dépendent aussi du cours des devises. La durée de placement recommandée est de ${riskFacts.recommendedHoldingLabel}.`
