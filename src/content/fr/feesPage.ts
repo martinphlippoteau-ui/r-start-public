@@ -419,8 +419,16 @@ const raw = {
     title: 'Un modèle de frais gagnant-gagnant',
     intro:
       'R Start est la seule SCPI qui ne prélève ni frais de souscription, ni frais d’acquisition sur les achats d’immeubles.',
+    /*
+     * CHUTE REMPLACÉE LE 15/09/2026, texte fourni par l'équipe. L'ancienne disait « En clair : nous, on
+     * ne touche rien tant que vous n'avez pas gagné d'argent. C'est gagnant-gagnant. » La nouvelle ne
+     * promet plus rien et envoie au comparateur, qui est l'outil de la page.
+     * Au passage, elle retire l'une des deux occurrences de « gagnant-gagnant » que le contrôle de
+     * conformité signalait sur cette page (« suggère un gain, capital non garanti »). L'autre est encore
+     * dans le titre juste au-dessus.
+     */
     punchline:
-      'En clair : nous, on ne touche rien tant que vous n’avez pas gagné d’argent. C’est gagnant-gagnant.',
+      'Ce qui compte pour vous ? Savoir où va votre argent. Comparez chaque ligne de frais avec d’autres SCPI du marché grâce à notre comparateur.',
     /* Plus de ligne risques dans l'en-tête (14/09/2026, demande de l'équipe : « supprime les bon à
        savoir de tous les hero sauf celui de la home »). Le « Bon à savoir : … » sous le H1 a disparu de
        TOUTES les sous-pages ; seul l'accueil le garde, sous ses appels à l'action. Ces pages n'ont donc
