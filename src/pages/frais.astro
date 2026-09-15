@@ -103,7 +103,13 @@ const ids = { schedule: 'bareme' };
     <Section id={ids.schedule} tone="paper" labelledBy={ids.schedule + '-title'}>
       <Container size="wide">
         <h2 id={ids.schedule + '-title'} class="text-display-lg max-w-4xl">
-          {labels?.eyebrows.schedule}<span aria-hidden="true" class="text-coral-700">*</span>
+          {
+            /* Astérisque en TURQUOISE, l'accent de la charte sur fond clair, et non en corail
+              (15/09/2026) : le corail se lit comme une alerte et n'appartient pas à la palette des
+              marqueurs. C'est la même correction que sur le libellé « Bon à savoir », passé la veille
+              au bleu de marque sur panneau turquoise clair (ui/NoteConformite.astro). */
+          }
+          {labels?.eyebrows.schedule}<span aria-hidden="true" class="text-teal-700">*</span>
         </h2>
 
         <div class="mt-14 space-y-16 lg:mt-20 lg:space-y-24">
