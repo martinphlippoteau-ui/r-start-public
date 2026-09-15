@@ -144,25 +144,24 @@ export const trust = {
     /*
      * PASTILLE DU HERO (15/09/2026), posée à côté des avis Trustpilot.
      *
-     * LA DEMANDE DISAIT « Agréé par l'AMF avec le logo de l'AMF ». Ni l'un ni l'autre n'est possible
-     * tel quel, et ce n'est pas une prudence de forme :
-     *  - R Start n'est pas AGRÉÉ, il est VISÉ (visa SCPI n° 26-06 du 4 mars 2026). L'AMF impose
-     *    elle-même la phrase qui le dit, déjà présente dans le pied de page : « Le visa de l'AMF
-     *    n'implique ni approbation de l'opportunité de l'opération ». Écrire « Agréé par l'AMF » au
-     *    premier écran affirme exactement ce que cette mention nie.
-     *  - Ce qui EST agréé, c'est la société de gestion, depuis le 14 avril 2011 sous le n° GP-11000012.
-     *    C'est la formulation que l'AMF a demandée dans ses retours sur la brochure (09/2026), reprise
-     *    ici mot pour mot.
-     *  - Le logo de l'AMF n'est pas concédé aux communications commerciales : posé en pastille près
-     *    d'une note Trustpilot, il se lit comme une caution. Le site a déjà tranché à trois endroits
-     *    (Footer.astro, 07-Trust.astro, et l'en-tête de `trust` ici même) : aucun logo AMF. La pastille
-     *    porte donc un écusson dessiné, dans la palette du site, qui ne se confond avec aucune marque.
+     * LOGO AMF ET SUPPRESSION DU NUMÉRO : demande de l'équipe, réitérée après mise en garde. Ce qui
+     * avait été signalé, et qui reste vrai, pour que la conformité l'ait sous les yeux :
+     *  - le logo de l'AMF n'est pas concédé aux communications commerciales ; le fichier vient de
+     *    Wikipédia France, où il est hébergé au titre d'un usage non libre, pas de Wikimedia Commons ;
+     *  - posé près d'une note Trustpilot, un logo d'autorité se lit comme une caution, ce que la
+     *    mention standard du pied de page dit explicitement ne pas être le cas.
+     * Ce qui a été tenu malgré tout : le TEXTE. Il dit « société de gestion agréée », pas « R Start
+     * agréé ». R Start n'est pas agréé, il est VISÉ (visa SCPI n° 26-06 du 4 mars 2026). La formulation
+     * est celle que l'AMF a demandée dans ses retours sur la brochure (09/2026), mot pour mot.
+     *
+     * LE NUMÉRO D'AGRÉMENT EST RETIRÉ de la pastille (« supprime le code technique »). Il n'est pas
+     * perdu : `amf.items` le porte toujours dans le bloc de confiance, avec sa note légale, et le
+     * contrôle de conformité continue d'exiger « GP-11000012 » sur l'accueil (check-compliance.mjs).
      */
     heroBadge: {
       label: 'Société de gestion agréée par l’AMF',
-      detail: amfApprovalNumber ? `n° ${amfApprovalNumber}` : '',
-      /** Lu par les lecteurs d'écran à la place de l'écusson, purement décoratif. */
-      srLabel: `${managementCompany.name}, agréée et réglementée par l’AMF depuis le ${corumGroup.amfSince}.`,
+      /** Ce que les lecteurs d'écran entendent à la place du logo. */
+      logoAlt: 'Autorité des marchés financiers',
     },
     /** Contre-poids du bloc de réassurance : longueur comparable aux items et au disclaimer réunis, sans nouveau chiffre. */
     risk: nb(

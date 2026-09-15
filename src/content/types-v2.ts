@@ -71,10 +71,8 @@ export interface TrustContent {
      */
     heroBadge: {
       label: string;
-      /** Numéro d'agrément, vide si la source ne le donne pas. */
-      detail: string;
-      /** Ce que les lecteurs d'écran entendent à la place de l'écusson. */
-      srLabel: string;
+      /** Ce que les lecteurs d'écran entendent à la place du logo. */
+      logoAlt: string;
     };
   };
   trustpilot: {

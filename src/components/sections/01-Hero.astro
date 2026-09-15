@@ -44,6 +44,9 @@
  */
 import { Image } from 'astro:assets';
 import brandLogo from '@/assets/logos/r-start-blanc.svg';
+/* Logo de l'AMF pour la pastille de réassurance. Le fichier vient de Wikipédia France, où il est
+   hébergé au titre d'un usage non libre : voir la mise en garde dans trust.ts (`amf.heroBadge`). */
+import amfLogo from '@/assets/logos/amf.svg';
 import Button from '@/components/ui/Button.astro';
 import Container from '@/components/ui/Container.astro';
 import RiskNote from '@/components/ui/RiskNote.astro';
@@ -287,7 +290,7 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
             l'agrément est celui de la société de gestion, pas de R Start, et l'écusson est dessiné, ce
             n'est pas le logo de l'AMF. */
         }
-        <div {...copyScrubDown} class="mx-auto mt-6 w-full max-w-3xl sm:mt-10">
+        <div {...copyScrubDown} class="mx-auto mt-6 w-full max-w-4xl sm:mt-10">
           <div
             data-intro="6"
             data-intro-move
@@ -297,23 +300,28 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
               <TrustBox template="horizontal" theme="dark" label={trust.trustpilot.widgetLabel!} />
               <p class="mt-2 text-sm leading-snug text-white/80">{trust.trustpilot.heroCaption}</p>
             </div>
-            <p class="flex items-center gap-3 text-left sm:max-w-[15rem]">
-              <svg
-                class="size-9 shrink-0 text-teal-200"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.5"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M12 2.75 4.75 5.5v6c0 4.2 2.9 7.6 7.25 9.75 4.35-2.15 7.25-5.55 7.25-9.75v-6L12 2.75Z" />
-                <path d="m8.75 11.75 2.25 2.25 4.25-4.5" />
-              </svg>
-              <span class="text-sm leading-snug text-white/80">
-                <span class="block font-semibold text-white">{trust.amf.heroBadge.label}</span>
-                {trust.amf.heroBadge.detail && <span class="block">{trust.amf.heroBadge.detail}</span>}
+            {
+              /* Le logo est posé sur une PLAQUE BLANCHE, et ce n'est pas une coquetterie : il est en
+                #003867 et #DB002E sur fond transparent, or le hero est en #03242e. Le bleu marine du
+                logo s'y confondrait presque entièrement avec le fond.
+                Le numéro d'agrément a été retiré de la pastille le 15/09/2026 ; il reste dans le bloc
+                de confiance plus bas, avec sa note légale. */
+            }
+            {/* `shrink-0` : la colonne des avis est en `w-full`, elle réclame donc toute la rangée et
+                comprimait la pastille jusqu'à casser son texte en cinq lignes. */}
+            <p class="flex shrink-0 items-center gap-3 text-left">
+              <span class="shrink-0 rounded-xl bg-white px-2.5 py-2 shadow-card">
+                <Image
+                  src={amfLogo}
+                  alt={trust.amf.heroBadge.logoAlt}
+                  width={142}
+                  height={57}
+                  loading="eager"
+                  class="h-9 w-auto"
+                />
+              </span>
+              <span class="max-w-[11rem] text-sm font-semibold leading-snug text-white">
+                {trust.amf.heroBadge.label}
               </span>
             </p>
           </div>
