@@ -35,6 +35,30 @@ interface Props {
 const { template, theme, label, class: className = '' } = Astro.props as Props;
 const tp = trustFacts.trustpilot;
 const widget = tp.widgets.templates[template];
+/*
+ * ROGNAGE DE LA MENTION DE FILTRE, ÉTEINT PAR DÉFAUT ET RÉSERVÉ AU LOCAL (15/09/2026).
+ *
+ * Quand `data-stars` filtre les avis, Trustpilot écrit « Nos avis 4 et 5 étoiles » en bas de son
+ * iframe, sur les dix-sept derniers pixels. Ce drapeau masque cette bande. L'équipe l'a demandé pour
+ * voir le rendu sans elle.
+ *
+ * SEULEMENT SUR UN GABARIT FILTRÉ (`widget.stars` renseigné), et c'est la condition qui manquait au
+ * premier essai : le bandeau du hero ne filtre rien, il n'a donc aucune mention à masquer, et il ne
+ * fait que 28 px de haut. Les dix-huit pixels de marge négative lui en retiraient les deux tiers.
+ *
+ * IL EST ÉTEINT SAUF SI `PUBLIC_TRUSTBOX_CROP=true` EST POSÉ DANS L'ENVIRONNEMENT. La variable est
+ * déclarée dans .github/workflows/github-pages.yml, ATTACHÉE AU RÉGIME DE PRÉVISUALISATION : ce
+ * déploiement est chiffré par mot de passe et en noindex, aucun épargnant ne le voit.
+ *
+ * CE QUE CE RÉGLAGE FAIT, EN CLAIR. Il masque, sans la supprimer, la seule mention qui dit au visiteur
+ * que le carrousel ne présente que les avis favorables. Devant de vrais visiteurs, il présenterait une
+ * sélection d'avis comme si elle n'en était pas une : c'est ce que l'article L111-7-2 du code de la
+ * consommation et les conditions d'utilisation du widget Trustpilot interdisent l'un et l'autre.
+ * À RETIRER LE JOUR DE L'OUVERTURE AU PUBLIC, avec PUBLIC_NOINDEX et l'écran de mot de passe. Les deux
+ * sorties propres sont alors de retirer le filtre (`stars` à « 1,2,3,4,5 » dans facts.ts) ou de changer
+ * de gabarit Trustpilot. Voir facts.ts, `trustpilot.widgets`.
+ */
+const ROGNER = import.meta.env.PUBLIC_TRUSTBOX_CROP === 'true' && widget.stars !== undefined;
 ---
 
 {
@@ -44,7 +68,7 @@ const widget = tp.widgets.templates[template];
   /* L'enveloppe ne porte PAS la classe `trustpilot-widget` : le script d'amorçage initialise tout élément
     qui la porte, et un conteneur sans identifiants le fait échouer (erreur remontée à Trustpilot). */
 }
-<div class:list={[className]} role="group" aria-label={label}>
+<div class:list={[className, ROGNER && 'tb-rogne']} role="group" aria-label={label}>
   <div
     class="trustpilot-widget"
     data-locale={tp.widgets.locale}
@@ -60,3 +84,15 @@ const widget = tp.widgets.templates[template];
     <a href={tp.url} target="_blank" rel="noopener noreferrer">Trustpilot</a>
   </div>
 </div>
+
+<style>
+  /* Voir le bandeau du frontmatter : rognage local seulement, jamais en production.
+     La marge négative remonte ce qui suit et le débordement masqué coupe la bande du bas ; l'iframe
+     n'est ni redimensionnée ni modifiée, on ne fait que la cadrer. */
+  .tb-rogne {
+    overflow: hidden;
+  }
+  .tb-rogne > .trustpilot-widget {
+    margin-bottom: -18px;
+  }
+</style>

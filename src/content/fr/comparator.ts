@@ -9,15 +9,16 @@ import { innovationNotRevolution } from './legal.ts';
  * Comparateur de frais, page /frais (11/09/2026, demande de l'équipe, inspiré des comparateurs
  * e-commerce) : R Start à gauche, une SCPI choisie dans une liste à droite, sept lignes de frais.
  *
- * ⚠ NON PUBLIABLE EN L'ÉTAT. Les valeurs des autres SCPI sont vides : le comparateur afficherait les
- * zéros de R Start face à des cases blanches, ce qui est une comparaison trompeuse. Le composant
- * l'annonce à l'écran et scripts/check-compliance.mjs le signale à chaque exécution.
+ * ÉTAT AU 15/09/2026 : les dix-neuf SCPI ont leurs sept taux, relevé de l'équipe, tous en HT. Les
+ * cases vides ont disparu, le comparateur ne montre plus les zéros de R Start face à du blanc.
  *
- * Ce qu'il faut pour publier, SCPI par SCPI :
- *  1. les sept taux, relevés dans le document d'informations clés et la note d'information de la SCPI ;
- *  2. la date d'arrêté de ces documents, car un taux change ;
- *  3. la source exacte (document, page), qui doit apparaître sous le tableau.
- * Sans ces trois éléments, la ligne reste « à compléter » et la SCPI ne doit pas être proposée au choix.
+ * IL MANQUE ENCORE LA TROISIÈME CONDITION POUR PUBLIER. Il en fallait trois, SCPI par SCPI :
+ *  1. les sept taux — obtenus ;
+ *  2. la même base de calcul pour tous — obtenue, tout est HT ;
+ *  3. le document et la date d'arrêté d'où vient chaque taux — MANQUANTS. Le relevé est global, sans
+ *     référence par société de gestion, alors que le tableau en nomme dix-neuf. Un taux change, et une
+ *     comparaison qu'on ne peut pas remonter à sa source n'est pas vérifiable.
+ * Voir SOURCE_EQUIPE plus bas.
  *
  * Les valeurs de R Start ne sont JAMAIS saisies ici : elles viennent de facts.fees, comme partout.
  */
@@ -61,6 +62,23 @@ const range = (rates: readonly string[]): string => {
 
 /** Taux de retrait de R Start au-delà de la durée retenue : le dernier palier du barème. */
 const withdrawalAfterHolding = fees.withdrawal.steps[fees.withdrawal.steps.length - 1].rate;
+
+/*
+ * SOURCE COMMUNE des taux des autres SCPI, relevé transmis par l'équipe le 15/09/2026. Il remplace les
+ * relevés faits un à un entre le 11 et le 12/09/2026, qui mêlaient pages marketing et documents
+ * réglementaires, et exprimaient les taux tantôt HT tantôt TTC.
+ *
+ * TOUT EST EN HT dans ce relevé, ce qui est enfin la même base pour les dix-neuf SCPI et pour R Start.
+ * C'est le principal gain : jusqu'ici la comparaison portait sur des bases différentes selon la ligne.
+ *
+ * CE QUI MANQUE ENCORE, et qui doit être obtenu avant publication : pour chaque SCPI, le DOCUMENT et
+ * la DATE D'ARRÊTÉ d'où vient le taux (document d'informations clés, note d'information, et leur page).
+ * Un comparatif qui nomme dix-neuf sociétés de gestion doit pouvoir dire d'où vient chaque chiffre :
+ * c'est ce que dit déjà le bloc « Sources des données » sous le tableau, et il ne peut pas se contenter
+ * d'un renvoi global. Tant que ces références ne sont pas là, la ligne reste vraie mais invérifiable.
+ */
+const SOURCE_EQUIPE =
+  'relevé comparatif transmis par l’équipe le 15 septembre 2026, taux exprimés hors taxes. Document et date d’arrêté de chaque société de gestion à obtenir avant publication.';
 
 export const comparator = {
   /*
@@ -185,378 +203,338 @@ export const comparator = {
   ],
 
   /**
-   * Les SCPI proposées au choix. Iroko Zen en tête : c'est celle que l'équipe veut voir d'abord.
-   * Orthographes et sociétés de gestion À VÉRIFIER sur les documents au moment de relever les taux.
+   * Les SCPI proposées au choix, DIX-NEUF depuis le 15/09/2026. Iroko Zen en tête : c'est celle que
+   * l'équipe veut voir d'abord. Immo France Territoires et Atream Atwin, jusque-là écartées faute de
+   * documents publiés, entrent dans la liste avec le relevé de l'équipe.
    */
   scpis: [
     {
       name: 'Iroko Zen',
       manager: 'Iroko',
-      /**
-       * Taux repris MOT POUR MOT de la page « Nos frais » d'Iroko, consultée le 11/09/2026. Ils y sont
-       * exprimés TTC, là où ceux de R Start sont HT sauf cession et retrait, la comparaison tient parce
-       * que R Start est exonérée de TVA (son HT égale son TTC), et le tableau le dit sous les sources.
-       * À CONFIRMER SUR LA NOTE D'INFORMATION D'IROKO ZEN avant publication : une page marketing n'est pas
-       * un document réglementaire, et un taux change.
-       */
       values: {
         subscription: '0 %',
-        acquisition: '3,60 % TTC',
-        broker: '0,20 % TTC',
-        management: '14,40 % TTC',
-        works: '6,00 % TTC',
-        disposal: '5 % TTC',
-        withdrawal: '0 %',
+        acquisition: '3 %',
+        broker: '5 %',
+        management: '12 %',
+        works: '5 %',
+        disposal: '4,16 %',
+        withdrawal: '5 %',
       },
       details: {
-        broker: 'taux 2025 des acquisitions de gré à gré, plafonné à 6,00 % TTC',
-        management: 'sur les loyers perçus',
-        disposal: 'sur le prix de vente, en cas de plus-value',
-        withdrawal: 'au-delà de 6 ans ; avant, 6,00 % TTC du capital retiré',
+        disposal: 'si la plus-value dépasse 5 %',
+        withdrawal: 'avant 6 ans de détention ; 0 % au-delà',
       },
-      /** Le nom de la SCPI est déjà l'intitulé de la ligne de sources : il ne se répète pas ici. */
-      source:
-        'taux publiés sur iroko.eu/nos-frais, consultés le 11 septembre 2026. À confirmer sur la note d’information avant publication.',
+      source: SOURCE_EQUIPE,
     },
     {
       name: 'Transitions Europe',
       manager: 'Arkéa REIM',
       values: {
-        subscription: '12 % TTC',
+        subscription: '10 %',
         acquisition: '0 %',
-        management: '12 % TTC',
-        works: '6 % TTC',
-        disposal: '2,40 % TTC',
+        broker: '0 %',
+        management: '10 %',
+        works: '5 %',
+        disposal: '2 %',
         withdrawal: '0 %',
       },
-      details: {
-        subscription: '10 % HT maximum du prix de souscription, incluse dans la prime d’émission',
-        acquisition:
-          'la société de gestion ne perçoit pas de commission sur l’acquisition des actifs',
-        management: '10 % HT maximum des produits locatifs et financiers encaissés',
-        works: '5 % HT du montant des travaux réalisés',
-        disposal: 'commission sur arbitrages, 2 % HT du prix de vente net vendeur',
-        withdrawal: 'aucun coût de sortie, selon le document d’informations clés',
-      },
-      source:
-        'note d’information, chapitre 3, et document d’informations clés du 31 décembre 2025, consultés le 12 septembre 2026 sur arkea-reim.com. Les 0 % viennent d’une mention explicite d’absence de commission, non d’un silence.',
+      source: SOURCE_EQUIPE,
     },
     {
       name: 'Comète',
       manager: 'Alderan',
       values: {
-        subscription: '12 % TTC',
-        acquisition: '1,20 % TTC',
-        management: '13,20 % TTC',
-        works: '3,60 % TTC',
-        disposal: '1,20 % TTC',
+        subscription: '10 %',
+        acquisition: '0 %',
+        broker: '0 %',
+        management: '11 %',
+        works: '3 %',
+        disposal: '1 %',
+        withdrawal: '0 %',
       },
       details: {
-        subscription: '10 % HT maximum du prix de souscription des parts',
         acquisition:
-          '1 % HT, assise sur le prix d’acquisition de l’actif et les droits immobiliers',
-        management: '11 % HT des recettes de toute nature encaissées par la SCPI',
-        works: '3 % HT du montant des travaux réalisés',
-        disposal: '1 % HT, assise sur le prix de cession de l’actif hors droits',
+          '0 % sur les acquisitions financées par la collecte, 1 % en cas de réemploi du produit de cessions',
       },
-      source:
-        'page « Carte d’identité » d’Alderan (visa SCPI 26-16 du 7 juillet 2026), consultée le 12 septembre 2026 sur alderan.fr. Aucune commission de retrait n’y figure.',
+      source: SOURCE_EQUIPE,
     },
     {
       name: 'Épargne Pierre Europe',
       manager: 'Atland Voisin',
       values: {
-        subscription: '12 % TTC',
-        management: '12 % TTC',
-        works: '3 % TTC',
-        disposal: '1,20 % TTC',
+        subscription: '10 %',
+        acquisition: '0 %',
+        broker: '0 %',
+        management: '10 %',
+        works: '2,50 %',
+        disposal: '1 %',
+        withdrawal: '0 %',
       },
       details: {
-        subscription: '10 % HT du prix de souscription, prime d’émission incluse',
-        management: '10 % HT du montant total des recettes brutes encaissées',
-        works: '2,5 % HT du montant des travaux immobilisés',
+        acquisition:
+          '0 % sur les acquisitions financées par la collecte, 1 % en cas de réemploi du produit de cessions',
         disposal:
-          '1 % HT du prix net vendeur si la plus-value nette fiscale est de 5 à 10 %, 1,25 % HT au-delà',
+          '1 % si la plus-value nette fiscale est comprise entre 5 % et 10 %, 1,25 % au-delà de 10 %',
       },
-      source:
-        'fiche produit d’Atland Voisin, consultée le 12 septembre 2026 sur atland-voisin.com. Aucun taux n’y est exprimé sur un prix d’achat : la ligne acquisition reste vide plutôt que d’être déduite.',
+      source: SOURCE_EQUIPE,
     },
     {
-      /** Attention : les taux d'Atlas diffèrent de ceux de Zen sur la même page d'Iroko. */
       name: 'Iroko Atlas',
       manager: 'Iroko',
       values: {
         subscription: '0 %',
-        acquisition: '4,80 % TTC',
-        management: '15,36 % TTC',
-        works: '6,00 % TTC',
-        disposal: '5 % TTC',
-        withdrawal: '0 %',
+        acquisition: '4 %',
+        broker: '0 %',
+        management: '12 %',
+        works: '5 %',
+        disposal: '4,16 %',
+        withdrawal: '5 %',
       },
       details: {
-        management: 'des loyers perçus',
-        disposal: 'sur le prix de vente d’un actif, en cas de plus-value seulement',
-        withdrawal: 'au-delà de 6 ans ; avant, 6,00 % TTC du capital retiré',
+        management: '12 % pour les actifs situés en zone euro, 14 % hors zone euro',
+        disposal: 'si la plus-value dépasse 5 %',
+        withdrawal: 'sur les parts détenues moins de 6 ans',
       },
-      source:
-        'page « Nos frais » d’Iroko, colonne Iroko Atlas, consultée le 12 septembre 2026 sur iroko.eu. Les frais de brokerage n’y figurent que pour Iroko Zen : la ligne reste vide pour Atlas.',
+      source: SOURCE_EQUIPE,
     },
     {
       name: 'EDR Europa',
       manager: 'Edmond de Rothschild REIM',
       values: {
-        subscription: '12 % TTC',
-        acquisition: '1,50 % TTC',
-        management: '12,60 % TTC',
-        works: '3 % TTC',
-        disposal: '1,50 % TTC',
+        subscription: '10 %',
+        acquisition: '1,25 %',
+        broker: '0 %',
+        management: '10,50 %',
+        works: '2,50 %',
+        disposal: '1,25 %',
+        withdrawal: '0 %',
       },
       details: {
-        acquisition: 'du prix d’acquisition net vendeur des actifs immobiliers',
-        management: 'des produits locatifs hors taxes et des produits financiers nets encaissés',
-        works: 'du montant des travaux hors taxes réalisés',
-        disposal: 'en cas de plus-value nette fiscale seulement',
+        disposal: 'dès que la vente dégage une plus-value',
       },
-      source:
-        'tableau « Frais et commissions » du site de la SCPI, consulté le 12 septembre 2026 sur edr-europa.com. L’assiette de la commission de cession y est libellée « prix d’acquisition », ce qui semble une coquille : à lever sur la note d’information de juin 2026 avant publication.',
+      source: SOURCE_EQUIPE,
     },
     {
       name: 'Cristal Life',
       manager: 'Inter Gestion',
       values: {
-        subscription: '12,00 % TTI',
-        acquisition: '1,50 % TTI',
+        subscription: '12 %',
+        acquisition: '1,50 %',
         broker: '3,50 %',
-        management: '13,20 % TTC',
-        works: '3 % TTC',
-        disposal: '2,50 % TTI',
+        management: '12,40 %',
+        works: '2,50 %',
+        disposal: '2,50 %',
+        withdrawal: '0 %',
       },
       details: {
-        subscription: 'du prix de souscription, dont 10 % de frais de collecte et 2 % de recherche',
-        acquisition: 'du prix d’acquisition tous frais inclus',
         broker:
-          'commission d’intermédiation HT, dégressive : 3,50 % sous 5 M€, puis 1,75 %, 1,50 % et 1,25 %',
-        management: 'des produits locatifs hors taxes et des produits financiers nets encaissés',
-        works: '2,50 % HT du montant global des travaux réalisés',
-        disposal: 'du prix de vente net',
+          '3,5 % sous 5 M€ hors droits, 1,75 % de 5 à 10 M€, 1,5 % de 10 à 15 M€, 1,25 % au-delà',
       },
-      source:
-        'note d’information et statuts, version du 15 janvier 2026, consultés le 12 septembre 2026 depuis inter-gestion.com. Aucune commission de retrait n’y figure : la ligne reste vide.',
+      source: SOURCE_EQUIPE,
     },
     {
       name: 'Sofidynamic',
       manager: 'Tikehau IM',
       values: {
-        subscription: '2,40 % TTC',
-        acquisition: '3,00 % TTC',
-        management: '14,40 % TTC',
-        works: '1,80 % TTC',
-        disposal: '3,00 % TTC',
-        withdrawal: '0 %',
+        subscription: '2 %',
+        acquisition: '2,50 %',
+        broker: '0 %',
+        management: '12 %',
+        works: '1,50 %',
+        disposal: '2,50 %',
+        withdrawal: '4,17 %',
       },
       details: {
-        subscription: '2,00 % HT du prix de souscription, primes d’émission incluses',
-        acquisition: '2,50 % HT du prix d’acquisition net vendeur',
-        management: '12,00 % HT des produits locatifs et financiers encaissés',
-        works: '1,50 % HT, pour tout programme supérieur à 100 000 € HT',
-        disposal: '2,50 % HT du prix de vente du bien cédé',
-        withdrawal: 'au-delà de 8 ans ; avant, 4,17 % HT (5,00 % TTC) du montant remboursé',
+        works: 'sur les travaux dépassant 100 000 € HT',
+        withdrawal: 'sur les parts détenues moins de 8 ans',
       },
-      source:
-        'note d’information, version de juillet 2026, chapitre III, consultée le 12 septembre 2026 sur sofidy.com.',
+      source: SOURCE_EQUIPE,
     },
     {
       name: 'Wemo One',
       manager: 'Wemo REIM',
       values: {
-        subscription: '12 % TTC',
-        acquisition: '2,40 % TTC',
-        management: '13,20 % TTC',
-        works: 'Néant',
-        disposal: '2,40 % TTC',
+        subscription: '10 %',
+        acquisition: '2 %',
+        broker: '0 %',
+        management: '11 %',
+        works: '0 %',
+        disposal: '2 %',
+        withdrawal: '0 %',
       },
       details: {
-        subscription: '10 % HT maximum du montant de la souscription',
-        acquisition: '2 % HT maximum du prix d’acquisition hors taxes, hors droits et hors frais',
-        management: '11 % HT maximum des produits locatifs et autres produits encaissés',
-        disposal: '2 % HT maximum du prix de cession net vendeur, en cas de plus-value seulement',
+        disposal: 'dès que la vente dégage une plus-value',
       },
-      source:
-        'note d’information du 24 juin 2026, consultée le 12 septembre 2026 sur wemo-reim.fr. Les commissions d’acquisition et de cession ont été introduites dans cette version : la précédente indiquait « Néant ». Aucune commission de retrait n’y figure.',
+      source: SOURCE_EQUIPE,
     },
     {
       name: 'Remake Live',
       manager: 'Remake AM',
       values: {
         subscription: '0 %',
-        acquisition: '5 % TTC',
-        management: '18 % TTC',
-        works: '5 % TTC',
-        withdrawal: '0 %',
+        acquisition: '4,17 %',
+        broker: '0 %',
+        management: '15 %',
+        works: '4,17 %',
+        disposal: '0 %',
+        withdrawal: '4,17 %',
       },
       details: {
-        acquisition: '4,17 % HT du prix d’acquisition net vendeur',
-        management: '15 % HT des produits locatifs et autres produits encaissés',
-        works: '4,17 % HT du montant des travaux de gros entretien et d’investissement',
-        withdrawal:
-          'au-delà de 5 ans ; avant, 4,17 % HT (5 % TTC) du montant remboursé, avec exonérations prévues',
+        withdrawal: 'sur les parts détenues moins de 5 ans',
       },
-      source:
-        'note d’information du 30 juin 2026, consultée le 12 septembre 2026 sur remake.fr. Aucune commission de cession d’immeubles ni d’intermédiation n’y figure : ces lignes restent vides.',
+      source: SOURCE_EQUIPE,
     },
     {
       name: 'Cœur d’Europe',
       manager: 'Sogenial Immobilier',
       values: {
-        subscription: '12 % TTC',
-        management: '12 % TTC',
-        works: '6 % TTC',
-        disposal: '6 % TTC',
+        subscription: '10 %',
+        acquisition: '0 %',
+        broker: '0 %',
+        management: '10 %',
+        works: '5 %',
+        disposal: '5 %',
+        withdrawal: '0 %',
       },
-      details: {
-        subscription: '10 % HT du prix de souscription, prélevée sur la prime d’émission',
-        management: '10 % HT des produits locatifs et financiers encaissés',
-        works: 'au maximum, du montant des travaux hors taxes réalisés',
-        disposal: 'commission d’arbitrage, au maximum, du prix de vente net',
-      },
-      source:
-        'note d’information d’août 2026, chapitre 3, consultée le 12 septembre 2026 sur sogenial.fr. Aucune commission d’acquisition, d’intermédiation ni de retrait n’y figure.',
+      source: SOURCE_EQUIPE,
     },
     {
       name: 'Osmo Énergie',
       manager: 'Mata Capital IM',
       values: {
-        subscription: '12 % TTC',
-        acquisition: '1,20 % TTC',
-        management: '10,80 % TTC',
+        subscription: '10 %',
+        acquisition: '1 %',
+        broker: '0 %',
+        management: '9 %',
         works: '0 %',
-        disposal: '1,20 % TTC',
+        disposal: '1 %',
         withdrawal: '0 %',
       },
       details: {
-        acquisition: '1,00 % HT maximum du prix d’acquisition hors taxes et hors droits',
-        management: '9,00 % HT maximum des produits locatifs encaissés',
-        works: 'la société de gestion ne perçoit pas de commission de travaux',
-        disposal: '1,00 % HT maximum, en cas de plus-value seulement',
-        withdrawal: 'la société de gestion ne perçoit pas de commission de retrait',
+        disposal: 'dès que la vente dégage une plus-value',
       },
-      source:
-        'note d’information du 1er août 2026, chapitre III, consultée le 12 septembre 2026 sur osmo-energie.com.',
+      source: SOURCE_EQUIPE,
     },
     {
       name: 'Allianz Diverscity',
       manager: 'Allianz Immovalor',
       values: {
-        subscription: '9,60 % TTC',
-        management: '9,60 % TTC',
-        disposal: '2,40 % TTC',
+        subscription: '8 %',
+        acquisition: '0 %',
+        broker: '0 %',
+        management: '8 %',
+        works: '0 %',
+        disposal: '2 %',
+        withdrawal: '0 %',
       },
-      details: {
-        subscription: '8 % HT maximum du produit de chaque souscription, prime d’émission incluse',
-        management: '8 % HT maximum des produits locatifs et financiers encaissés',
-        disposal: '2 % HT maximum du produit des ventes constatées par acte notarié',
-      },
-      source:
-        'note d’information du 30 avril 2026, chapitre 3, consultée le 12 septembre 2026 sur immovalor.fr. Ce chapitre ne prévoit ni commission d’acquisition, ni frais d’agent immobilier, ni commission de travaux ou de retrait : ces lignes restent vides plutôt que d’être supposées nulles.',
+      source: SOURCE_EQUIPE,
     },
     {
       name: 'Epsicap Nano',
       manager: 'Epsicap REIM',
       values: {
-        subscription: '5 % HT',
-        acquisition: '5 % HT',
-        management: '10 % HT',
+        subscription: '5 %',
+        acquisition: '5 %',
+        broker: '0 %',
+        management: '10 %',
         works: '0 %',
         disposal: '0 %',
         withdrawal: '0 %',
       },
       details: {
-        management: 'des loyers perçus par la SCPI',
-        works: 'pas de commission de suivi de travaux',
-        disposal: 'pas de commission de cession',
-        withdrawal: 'pas de frais de sortie',
+        acquisition:
+          '5 % sur les acquisitions financées par la collecte, 2 % en cas de réemploi du produit de cessions',
       },
-      source:
-        'page « Nos frais » d’Epsicap REIM, consultée le 12 septembre 2026 sur epsicap.fr. Les trois 0 % y sont affirmés, non déduits.',
+      source: SOURCE_EQUIPE,
     },
     {
       name: 'Alta Convictions',
       manager: 'Altarea IM',
       values: {
-        subscription: '10,14 % TTC',
-        acquisition: '1,50 % TTC',
-        management: '13,74 % TTC',
-        works: '3,60 % TTC',
-        disposal: '3 % TTC',
+        subscription: '8,45 %',
+        acquisition: '1,25 %',
+        broker: '0 %',
+        management: '11,45 %',
+        works: '3 %',
+        disposal: '2,50 %',
+        withdrawal: '0 %',
       },
-      details: {
-        subscription: '8,45 % HT maximum du montant de la souscription, prime d’émission incluse',
-        acquisition:
-          '1,25 % HT du prix d’acquisition hors droits, sauf acquisitions consécutives à de nouvelles souscriptions',
-        management: '11,45 % HT maximum des produits locatifs et autres produits encaissés',
-        works: '3 % HT maximum du montant des travaux réalisés',
-        disposal: '2,50 % HT du prix de cession net vendeur',
-      },
-      source:
-        'note d’information de juin 2026, chapitre 3, consultée le 12 septembre 2026 sur altarea-im.com. Aucune commission de retrait n’y figure : la ligne reste vide.',
+      source: SOURCE_EQUIPE,
     },
     {
       name: 'Volt Europe',
       manager: 'Volt AM',
       values: {
-        subscription: '12 % TTC',
+        subscription: '10 %',
         acquisition: '0 %',
-        management: '12 % TTC',
-        works: '6 % TTC',
-        disposal: 'de 1 % à 5 %',
+        broker: '0 %',
+        management: '10 %',
+        works: '5 %',
+        disposal: '1 %',
+        withdrawal: '0 %',
       },
       details: {
-        subscription: '10 % HT maximum du prix de souscription, inclus dans la prime d’émission',
-        acquisition:
-          'la société de gestion ne perçoit pas de commission sur l’acquisition des actifs',
-        management: '10 % HT maximum des produits locatifs et financiers',
-        works: '5 % HT maximum du montant des travaux réalisés',
         disposal:
-          'en cas de plus-value seulement : 1 % de 1 à 5 %, 3 % de 5 à 10 %, 5 % au-delà de 10 %',
+          '1 % si la plus-value est comprise entre 1 % et 5 %, 3 % de 5 à 10 %, 5 % au-delà',
       },
-      source:
-        'note d’information visée par l’AMF le 29 mai 2026 (visa 26-14), chapitre 3, consultée le 12 septembre 2026 sur volt-am.com.',
+      source: SOURCE_EQUIPE,
     },
     {
       name: 'Immo France Territoires',
       manager: 'Amundi Immobilier',
-      unavailable:
-        'Aucune SCPI de ce nom chez Amundi Immobilier au 12 septembre 2026 : leur site ne liste ni ce fonds, ni un nom approchant. Nom à vérifier auprès de l’équipe avant de la proposer au choix.',
+      values: {
+        subscription: '4 %',
+        acquisition: '1 %',
+        broker: '0 %',
+        management: '13 %',
+        works: '3 %',
+        disposal: '1 %',
+        withdrawal: '1 %',
+      },
+      details: {
+        acquisition:
+          '1 %, ramené à 0,5 % pour une transaction entre deux fonds gérés par Amundi Immobilier',
+        disposal:
+          '1 %, ramené à 0,5 % pour une transaction entre deux fonds gérés par Amundi Immobilier',
+      },
+      source: SOURCE_EQUIPE,
     },
     {
-      /** Nom officiel : « PPG PremEurope », société de gestion « Pierre 1er Gestion ». */
       name: 'PPG PremEurope',
       manager: 'Pierre 1er Gestion',
       values: {
-        subscription: '9,60 % TTC',
-        acquisition: '3,60 % TTC',
-        management: '12 % TTC',
-        works: '1,20 % TTC',
-        disposal: '1,20 % TTC',
+        subscription: '8 %',
+        acquisition: '3 %',
+        broker: '0 %',
+        management: '10 %',
+        works: '1 %',
+        disposal: '1 %',
         withdrawal: '0 %',
       },
       details: {
-        subscription: '8 % HT du montant de la souscription',
-        acquisition:
-          '3 % HT jusqu’à 10 M€, 2 % HT de 10 à 25 M€, 1,5 % HT au-delà, sur le prix d’acquisition',
-        management: '10 % HT maximum des produits locatifs et autres produits encaissés',
-        works: '1 % HT maximum du montant des travaux réalisés',
-        disposal: '1 % HT maximum du prix de vente hors droits, en cas de plus-value seulement',
-        withdrawal: 'la note d’information ne prévoit aucune commission de retrait',
+        acquisition: '3 % sous 10 M€ hors droits, 2 % de 10 à 25 M€, 1,5 % au-delà',
+        disposal: 'dès que la vente dégage une plus-value',
       },
-      source:
-        'page produit de Pierre 1er Gestion, consultée le 12 septembre 2026 sur pierrepremiergestion.fr, qui renvoie au document d’informations clés et à la note d’information.',
+      source: SOURCE_EQUIPE,
     },
     {
       name: 'Atream Atwin',
       manager: 'Atream',
-      unavailable:
-        'Société constituée le 29 avril 2026 mais absente du site d’Atream au 12 septembre 2026, sans document d’informations clés ni note d’information publiés : elle ne semble pas ouverte à la souscription. Rien à comparer tant qu’elle ne publie pas ses frais.',
+      values: {
+        subscription: '10 %',
+        acquisition: '0 %',
+        broker: '0 %',
+        management: '10 %',
+        works: '0 %',
+        disposal: '0 %',
+        withdrawal: '0 %',
+      },
+      details: {
+        acquisition:
+          '0 % sur les acquisitions financées par la collecte, 1,5 % en cas de réemploi du produit de cessions',
+        disposal: '0 % sous 5 % de plus-value, 2,5 % de 5 à 10 %, 5 % au-delà',
+      },
+      source: SOURCE_EQUIPE,
     },
   ] as ComparedScpi[],
 };

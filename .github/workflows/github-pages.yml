@@ -27,6 +27,16 @@ env:
   PUBLIC_BASE_PATH: r-start-public
   # Prévisualisation interne : aucune indexation par les moteurs de recherche.
   PUBLIC_NOINDEX: 'true'
+  # Rogne la mention « Nos avis 4 et 5 étoiles » que Trustpilot écrit sous son carrousel filtré
+  # (15/09/2026, demande de l'équipe). Cette variable est ATTACHÉE AU RÉGIME DE PRÉVISUALISATION :
+  # elle ne tient que parce que ce déploiement est chiffré par mot de passe (étape « Protection par
+  # mot de passe », secret PREVIEW_PASSWORD) et en noindex ci-dessus. Aucun épargnant ne le voit.
+  #
+  # À RETIRER LE JOUR OÙ LE SITE S'OUVRE AU PUBLIC, en même temps que PUBLIC_NOINDEX et que l'écran de
+  # mot de passe : masquer cette mention devant de vrais visiteurs présenterait une sélection d'avis
+  # favorables comme si elle n'en était pas une. Les deux sorties propres sont alors de retirer le
+  # filtre (`stars` dans src/content/fr/facts.ts) ou de changer de gabarit Trustpilot.
+  PUBLIC_TRUSTBOX_CROP: 'true'
   # Vide tant que le tunnel de souscription n'a pas ouvert : les CTA ouvrent la fenêtre d'attente.
   # Le jour de l'ouverture, passer à 'true' ET renseigner PUBLIC_SUBSCRIBE_URL.
   PUBLIC_SUBSCRIBE_OPEN: ''
