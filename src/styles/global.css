@@ -201,30 +201,41 @@
    Les INTERLIGNES suivent. Un interligne de 1 ne tient que sur un titre d'une seule ligne, ce qui est le
    cas sur grand écran et jamais sur téléphone, où les jambages de la ligne du dessus touchaient les
    capitales de la suivante. */
+/*
+ * ÉCHELLE ABAISSÉE le 15/09/2026 (« tout est un peu trop gros »). Les quatre paliers perdent de 17 à
+ * 20 % sur grand écran et un à deux pixels sur téléphone, où ils étaient déjà justes :
+ *   display-xl  44 → 120 px  devient  40 → 96 px
+ *   display-lg  30 →  80 px  devient  28 → 64 px   (les H1 et les H2 de chapitre)
+ *   display-md  26 →  56 px  devient  24 → 46 px   (les H2 de section)
+ *   display-sm  21 →  36 px  devient  20 → 30 px   (les H3)
+ * Les bornes restent calées sur 390 et 1440 px, et la pente est recalculée pour les atteindre
+ * exactement là : c'est ce qui garde la progression régulière entre les deux.
+ * Les interlettrages et les interlignes ne bougent pas, eux sont proportionnels à la taille.
+ */
 @utility text-display-xl {
-  /* 44 px à 390, 115 px à 1440 (inchangé). Reste bien au-dessus de l'accroche, façon iPhone. */
-  font-size: clamp(2.75rem, 1.1rem + 6.76vw, 7.5rem);
+  /* 40 px à 390, 96 px à 1440. Reste bien au-dessus de l'accroche, façon iPhone. */
+  font-size: clamp(2.5rem, 1.2rem + 5.33vw, 6rem);
   line-height: 1;
   letter-spacing: -0.035em;
   font-weight: 700;
 }
 @utility text-display-lg {
-  /* 30 px à 390, 80 px à 1440 (inchangé). */
-  font-size: clamp(1.875rem, 0.7rem + 4.76vw, 5rem);
+  /* 28 px à 390, 64 px à 1440. */
+  font-size: clamp(1.75rem, 0.914rem + 3.43vw, 4rem);
   line-height: 1.08;
   letter-spacing: -0.03em;
   font-weight: 700;
 }
 @utility text-display-md {
-  /* 26 px à 390, 56 px à 1440 (inchangé). */
-  font-size: clamp(1.625rem, 0.93rem + 2.86vw, 3.5rem);
+  /* 24 px à 390, 46 px à 1440. */
+  font-size: clamp(1.5rem, 0.989rem + 2.1vw, 2.875rem);
   line-height: 1.1;
   letter-spacing: -0.025em;
   font-weight: 700;
 }
 @utility text-display-sm {
-  /* 21 px à 390, 36 px à 1440 (inchangé). */
-  font-size: clamp(1.3125rem, 0.965rem + 1.43vw, 2.25rem);
+  /* 20 px à 390, 30 px à 1440. */
+  font-size: clamp(1.25rem, 1.018rem + 0.95vw, 1.875rem);
   line-height: 1.2;
   letter-spacing: -0.02em;
   font-weight: 600;
