@@ -315,7 +315,10 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
                 `shrink-0` : la colonne des avis est en `w-full`, elle réclame toute la rangée et
                 comprimait la pastille jusqu'à casser son libellé en cinq lignes. */
             }
-            <div class="shrink-0">
+            {/* `text-center` sur la colonne, `mx-auto` sur la plaque : la plaque fait 76 px de large
+              et sa légende 240, l'une doit donc être posée au milieu de l'autre, pas alignée à
+              gauche comme elle l'était (demande de l'équipe, 15/09/2026). */}
+            <div class="shrink-0 text-center">
               {
                 /* HAUTEURS ACCORDÉES (15/09/2026). La colonne des avis fait 55 px : 28 de widget, 8 de
                   gouttière, 19 d'une légende sur une ligne. La pastille en faisait 113, soit le double,
@@ -326,7 +329,7 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
                   `flex` et non `inline-flex` : un élément en ligne ajoute la descente de sa ligne de
                   base sous la plaque, six pixels qui suffisaient à décaler les deux colonnes. */
               }
-              <span class="flex h-7 w-fit items-center rounded-lg bg-white px-2 shadow-card">
+              <span class="mx-auto flex h-7 w-fit items-center rounded-lg bg-white px-2 shadow-card">
                 <Image
                   src={amfLogo}
                   alt={trust.amf.heroBadge.logoAlt}
