@@ -170,17 +170,22 @@ export const comparator = {
       basis: 'en % du prix d’acquisition',
       rstart: fees.broker.label,
     },
-    {
-      key: 'management' as const,
-      label: 'Frais de gestion',
-      basis: 'en % des loyers encaissés',
-      rstart: fees.management.label,
-    },
+    /*
+     * TRAVAUX AVANT GESTION depuis le 15/09/2026 (demande de l'équipe). Les valeurs suivent seules :
+     * chaque SCPI donne les siennes dans un objet indexé par `key`, l'ordre des colonnes n'a donc
+     * qu'une source, cette liste.
+     */
     {
       key: 'works' as const,
       label: 'Frais de travaux',
       basis: 'en % du montant des travaux',
       rstart: fees.works.label,
+    },
+    {
+      key: 'management' as const,
+      label: 'Frais de gestion',
+      basis: 'en % des loyers encaissés',
+      rstart: fees.management.label,
     },
     {
       key: 'disposal' as const,
