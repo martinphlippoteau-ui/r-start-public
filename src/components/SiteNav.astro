@@ -98,7 +98,10 @@ const menuAriaLabel = nav.menuAriaLabel ?? nav.brand;
 const homeLinkLabel = nav.homeLinkLabel ?? nav.brand;
 const ctaLabel = nav.subnavCtaLabel ?? nav.cta.label;
 /* 16 px depuis le 15/09/2026, ex-`text-lg` (18 px) : quatre entrées plus le bouton tenaient à l'étroit
-   dans la barre, et les liens pesaient autant que le corps de texte des pages. */
+   dans la barre, et les liens pesaient autant que le corps de texte des pages. Les liens du TIROIR
+   suivent, eux qui étaient en `text-display-sm` (20 à 24 px) : un seul corps pour le même menu.
+   Leur cible tactile ne bouge pas, `py-2.5` plus une interligne de 24 px font exactement les 44 px
+   exigés. */
 const linkClass =
   'block rounded-full px-2.5 py-1.5 text-base font-medium whitespace-nowrap text-slate-700 no-underline transition-colors hover:text-navy aria-[current]:font-semibold aria-[current]:text-navy sm:px-3.5';
 ---
@@ -275,7 +278,7 @@ const linkClass =
                   data-menu-close
                   data-astro-prefetch="hover"
                   aria-current={e.current ? 'page' : undefined}
-                  class="text-display-sm block rounded-2xl px-3 py-2.5 text-white/85 no-underline transition-colors hover:text-white aria-[current]:text-white aria-[current]:underline aria-[current]:decoration-2 aria-[current]:underline-offset-8"
+                  class="block rounded-2xl px-3 py-2.5 text-base font-medium text-white/85 no-underline transition-colors hover:text-white aria-[current]:text-white aria-[current]:underline aria-[current]:decoration-2 aria-[current]:underline-offset-8"
                 >
                   {e.label}
                 </a>

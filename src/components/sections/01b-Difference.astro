@@ -60,17 +60,6 @@ const situations = (difference.situations ?? []).map((s) => {
   <Container size="wide">
     <header>
       <h2 id={titleId} class="text-display-lg text-balance" data-reveal-text>{difference.title}</h2>
-      {
-        /* La question d'accroche est un H3 (11/09/2026) : mise en valeur et nettement détachée du H2,
-          elle ouvre la démonstration au lieu de la commenter. */
-      }
-      <h3
-        data-animate="fade-up"
-        data-animate-delay="0.1"
-        class="text-display-sm mt-6 max-w-3xl text-ink sm:mt-8"
-      >
-        {difference.intro}
-      </h3>
     </header>
 
     {
@@ -86,9 +75,29 @@ const situations = (difference.situations ?? []).map((s) => {
         démonstration était rendue au corps d'une introduction, alors qu'elle se lit comme du
         texte courant. `text-lg` la fixe à 18 px partout. */
     }
+    {
+      /* LE H3 EST DANS LA GRILLE depuis le 15/09/2026, et non plus dans l'en-tête au-dessus d'elle
+        (« remonte la photo du bloc 2 pour qu'elle s'aligne avec R Start, un modèle de frais
+        gagnant-gagnant »). C'est la seule façon propre d'aligner la photo sur lui : tant qu'il vivait
+        au-dessus, la colonne de droite ne pouvait commencer qu'après. Une marge négative sur la figure
+        aurait donné le même résultat à une largeur donnée et se serait décalée à toutes les autres.
+        Rien ne change sous `lg`, où la grille est en une colonne : le H3 reste au même endroit, suivi
+        du corps puis de la photo, dans cet ordre. */
+    }
     <div class="mt-6 grid items-start gap-8 sm:mt-8 lg:grid-cols-12 lg:gap-14">
       <div class="text-lg text-ink lg:col-span-7">
-        {difference.lead && <p>{difference.lead}</p>}
+        {
+          /* La question d'accroche est un H3 (11/09/2026) : mise en valeur et nettement détachée du H2,
+            elle ouvre la démonstration au lieu de la commenter. */
+        }
+        <h3
+          data-animate="fade-up"
+          data-animate-delay="0.1"
+          class="text-display-sm max-w-3xl text-ink"
+        >
+          {difference.intro}
+        </h3>
+        {difference.lead && <p class="mt-6">{difference.lead}</p>}
 
         <ul role="list" class="mt-4 space-y-2">
           {

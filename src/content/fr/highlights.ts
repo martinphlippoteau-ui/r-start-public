@@ -109,7 +109,16 @@ export const highlights: HighlightsContent = {
     { label: 'Zone d’investissement', value: 'Monde', noteId: 'points-forts-zone' },
     {
       label: 'Délai de jouissance',
-      value: nb(income.enjoymentDelayLabel),
+      /*
+       * « 1er jour du 6e mois » depuis le 15/09/2026, demande de l'équipe. La carte disait « 6 mois »,
+       * repris de la brochure p. 3 ; elle dit maintenant la RÈGLE, celle du bulletin de souscription,
+       * qui est plus précise et ne se contredit pas : le délai court jusqu'au premier jour du sixième
+       * mois suivant la souscription et son règlement, il n'est donc pas de six mois pleins pour tout
+       * le monde. Les deux formulations existaient déjà dans facts.ts, `enjoymentDelayLabel` et
+       * `enjoymentShort` ; c'est la seconde qui est affichée.
+       * « 6e » et non « 6ème » : abréviation correcte de l'ordinal, déjà employée partout ailleurs.
+       */
+      value: nb(income.enjoymentShort),
       noteId: 'points-forts-jouissance',
     },
     /*
