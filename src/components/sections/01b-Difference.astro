@@ -22,6 +22,7 @@ import NoteRef from '@/components/ui/NoteRef.astro';
 import Section from '@/components/ui/Section.astro';
 import { sections } from '@/config/sections';
 import { difference } from '@/content/fr/difference';
+import Button from '@/components/ui/Button.astro';
 import { media, AFFICHER_LEGENDES } from '@/content/fr/media';
 import { resolveImage } from '@/lib/images';
 
@@ -66,7 +67,7 @@ const situations = (difference.situations ?? []).map((s) => {
       <h3
         data-animate="fade-up"
         data-animate-delay="0.1"
-        class="text-display-sm mt-10 max-w-3xl text-ink sm:mt-14"
+        class="text-display-sm mt-6 max-w-3xl text-ink sm:mt-8"
       >
         {difference.intro}
       </h3>
@@ -79,11 +80,17 @@ const situations = (difference.situations ?? []).map((s) => {
         d'équilibre AMF le refuserait. Les risques de l'accueil reposent désormais sur la ligne du hero et
         sur la section Risques ; le détail des frais reste sur /frais, atteinte par le lien ci-dessous. */
     }
-    <div class="mt-8 grid items-start gap-10 sm:mt-12 lg:grid-cols-12 lg:gap-16">
-      <div class="text-lead text-ink lg:col-span-7">
+    {
+      /* CORPS À 18 PX FIXES depuis le 15/09/2026, et espacements resserrés d'un cran.
+        `text-lead` montait de 18 à 24 px avec la largeur d'écran : sur grand écran, la
+        démonstration était rendue au corps d'une introduction, alors qu'elle se lit comme du
+        texte courant. `text-lg` la fixe à 18 px partout. */
+    }
+    <div class="mt-6 grid items-start gap-8 sm:mt-8 lg:grid-cols-12 lg:gap-14">
+      <div class="text-lg text-ink lg:col-span-7">
         {difference.lead && <p>{difference.lead}</p>}
 
-        <ul role="list" class="mt-5 space-y-3">
+        <ul role="list" class="mt-4 space-y-2">
           {
             situations.map((s) => (
               <li class="flex gap-3">
@@ -104,7 +111,7 @@ const situations = (difference.situations ?? []).map((s) => {
         {
           /* Conclusion de l'équipe. La note détaille la rémunération réellement perçue. */
           difference.counterweight.pedagogy?.map((phrase) => (
-            <p class="mt-6 font-semibold">
+            <p class="mt-5 font-semibold">
               {phrase}
               {difference.counterweight.noteId && (
                 <span class="whitespace-nowrap">
@@ -116,14 +123,14 @@ const situations = (difference.situations ?? []).map((s) => {
         }
 
         {
-          /* Allégation de rang de l'équipe : elle n'est PAS bornée au périmètre du groupe CORUM, c'est
-            l'appel de note qui le porte. Jamais affichée sans lui. */
+          /* Allégation de rang de l'équipe, retirée du contenu le 15/09/2026 : le rendu reste, il ne
+            trouve simplement plus rien à afficher. Voir difference.ts pour ce que son retrait emporte
+            du côté de la Conformité. */
           difference.counterweight.claim && (
             <p class="mt-6 flex gap-3 font-medium">
               <span aria-hidden="true" class="text-teal-700">
                 →
               </span>
-              {/* L'appel de note n'existe plus que si la phrase ne porte pas son périmètre en elle. */}
               <span>
                 {difference.counterweight.claim.text}
                 {difference.counterweight.claim.noteId && (
@@ -132,6 +139,19 @@ const situations = (difference.situations ?? []).map((s) => {
                   </span>
                 )}
               </span>
+            </p>
+          )
+        }
+
+        {
+          /* Appel à l'action du bloc (15/09/2026). `ghost` et non `primary` : la page porte déjà deux
+            boutons de souscription au premier écran et une pastille flottante ; celui-ci mène à une
+            page du site, pas au tunnel, et ne doit pas leur disputer l'attention. */
+          difference.secondaryCta && (
+            <p class="mt-6">
+              <Button href={difference.secondaryCta.href} variant="ghost" size="md">
+                {difference.secondaryCta.label}
+              </Button>
             </p>
           )
         }

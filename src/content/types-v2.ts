@@ -161,6 +161,11 @@ export interface DifferenceContent {
   lossMechanism?: { title: string; body: string[]; risk: string; noteId?: string };
   /** Lien interne vers la page Frais : ce n'est pas un CTA de souscription, il ne porte pas de `position`. */
   cta: { label: string; href: string };
+  /**
+   * Appel à l'action rendu DANS le bloc, sous la démonstration (15/09/2026). Distinct de `cta`
+   * ci-dessus, qui alimente la pastille flottante de la page.
+   */
+  secondaryCta?: { label: string; href: string };
   notes: LegalNote[];
 }
 

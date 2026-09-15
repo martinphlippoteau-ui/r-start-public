@@ -29,12 +29,15 @@ const all = Object.entries(modules)
  * 01 Hero → 01b Ce qui change vraiment → 02 R Start en un clin d'œil → 07 L'expérience derrière R Start
  * → 03a Immeuble (photo pleine largeur) → 06 Souscrire (chapitre court) → 08 Risques → 10 FAQ.
  *
- * CINQ SECTIONS EXISTENT SANS ÊTRE RENDUES, ici ni ailleurs, faute de figurer dans HOME_ORDER :
- * 03 Frais, 05 Revenus, 08b La presse en parle et 09 Documents. Leurs fichiers et leurs contenus sont
+ * DES SECTIONS EXISTENT SANS ÊTRE RENDUES, ici ni ailleurs, faute de figurer dans HOME_ORDER :
+ * 05 Revenus, 08b La presse en parle et 09 Documents. (03 Frais est revenue le 15/09/2026.) Leurs fichiers et leurs contenus sont
  * conservés (audit du 14/09/2026) : les remettre, c'est ajouter leur préfixe à la liste. 04 Stratégie,
  * elle, est importée directement par /strategie.
  */
-const HOME_ORDER = ['01-', '01b-', '02-', '07-', '03a-', '06-', '08-', '10-'];
+/* « 03- » réinséré le 15/09/2026, JUSTE APRÈS « 02- » (« R Start en un clin d'œil ») : le
+   comparateur de frais revient sur l'accueil. Les tons s'enchaînent ink puis white puis white,
+   aucune rupture. */
+const HOME_ORDER = ['01-', '01b-', '02-', '03-', '07-', '03a-', '06-', '08-', '10-'];
 const byPrefix = (prefix: string) => all.find((s) => s.path.includes('/sections/' + prefix));
 const hero = byPrefix('01-');
 const rest = HOME_ORDER.slice(1)

@@ -1,0 +1,26 @@
+---
+/**
+ * Accueil, zone 3 : LE COMPARATEUR DE FRAIS (15/09/2026, demande de l'équipe : « Remets le
+ * Comparateur après R Start en un clin d'œil »).
+ *
+ * Cette section avait existé puis disparu au nettoyage du 14/09/2026, faute de figurer dans HOME_ORDER.
+ * Elle revient en enveloppe MINCE : tout le travail est dans components/pages/frais/FeeComparator.astro,
+ * qui rend son propre <Section>, son titre et ses sources. Deux rendus du même composant, aucun contenu
+ * dupliqué, donc aucun risque de voir les deux pages diverger.
+ *
+ * L'IDENTIFIANT VIENT DU REGISTRE (config/sections.ts, clé `fees`, ancre « frais ») et non d'une chaîne
+ * écrite ici : c'est le contrat des sections de l'accueil.
+ *
+ * Ce qu'il faut savoir côté Conformité : les exigences attachées au comparatif (périmètre de l'analyse,
+ * encadré « Une innovation, pas une révolution », source des chiffres) sont contrôlées par
+ * scripts/check-compliance.mjs sur la seule page /frais, où deux d'entre elles sont déjà neutralisées
+ * depuis que l'équipe a fourni son contenu. Le tableau nomme des sociétés de gestion tierces : s'il faut
+ * un jour rétablir ces mentions, elles devront l'être sur les DEUX pages.
+ */
+import FeeComparator from '@/components/pages/frais/FeeComparator.astro';
+import { sections } from '@/config/sections';
+
+const { id } = sections.fees;
+---
+
+<FeeComparator id={id} />

@@ -1,6 +1,5 @@
 import type { LegalNote } from '@/content/types';
 import type { PressArticle, PressContent, PressQuote } from '@/content/types-v2';
-import { pages } from '@/config/pages';
 import { fees, press as pressFacts } from '@/content/fr/facts';
 
 /**

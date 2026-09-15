@@ -64,8 +64,13 @@ export const difference: DifferenceContent = {
   eyebrow: 'Le modèle',
   /** Titre et copie fournis par l'équipe le 11/09/2026, repris tels quels (deux points à défendre en
    *  compliance, signalés en avertissement par scripts/check-compliance.mjs, voir l'en-tête du fichier). */
-  title: 'Pourquoi gagnant-gagnant ?',
-  intro: 'Qui a envie de payer avant de gagner ?',
+  /*
+   * TITRE ET SOUS-TITRE PERMUTÉS ET RÉÉCRITS le 15/09/2026, texte de l'équipe. C'était
+   * « Pourquoi gagnant-gagnant ? » en titre et « Qui a envie de payer avant de gagner ? » dessous ;
+   * la question passe en titre, et le sous-titre nomme le modèle.
+   */
+  title: 'Qui a envie de payer avant de gagner ?',
+  intro: 'R Start, un modèle de frais gagnant-gagnant',
   lead: 'Quand vous détenez des parts de R Start, on ne vous prélève des frais que dans deux situations :',
   /** Les deux situations, en liste. `strong` est le mot mis en valeur par le gabarit. */
   situations: [
@@ -77,21 +82,18 @@ export const difference: DifferenceContent = {
   ],
   counterweight: {
     title: undefined,
-    /**
-     * ALLÉGATION BORNÉE DANS SA PROPRE PHRASE depuis le 14/09/2026, et c'est une conséquence directe du
-     * retrait des notes de l'accueil. Jusque-là, la formule de l'équipe était affichée non bornée (« La
-     * première SCPI sans frais d'entrée ni frais d'acquisition ») et son périmètre tenait dans l'appel
-     * de note `difference-definition`, qui disait « du groupe CORUM » et précisait que la comparaison
-     * ne porte pas sur l'ensemble du marché. Le commentaire d'alors le disait : jamais affichée sans
-     * cet appel. Les notes parties, la page ne portait plus qu'une allégation de rang sur tout le
-     * marché, sans périmètre ni preuve.
-     * La phrase affichée est donc désormais celle de la brochure (facts.product.definition, p. 4 et
-     * p. 6), qui porte son périmètre en elle : quatre mots de plus, aucun bloc de plus, et le contrôle
-     * de conformité retrouve la mention qu'il exige.
+    /*
+     * ALLÉGATION DE RANG RETIRÉE le 15/09/2026 (« Supprimer dernière phrase : la première SCPI… »).
+     * Elle disait `facts.product.definition` : « La première SCPI DU GROUPE CORUM sans frais d'entrée
+     * ni frais sur les achats d'immeubles. »
+     *
+     * CE QUI PART AVEC ELLE, et la Conformité doit le savoir : c'était la SEULE occurrence du périmètre
+     * « du groupe CORUM » sur l'accueil. La page ne porte donc plus que l'allégation non bornée de
+     * l'accroche, « La première SCPI sans frais de souscription ni frais d'acquisition. »
+     * scripts/check-compliance.mjs exigeait cette phrase sur index.html : la règle est COMMENTÉE, pas
+     * supprimée, comme celles des mentions de risque, et reprend effet dès qu'on remet le périmètre.
+     * `claim` reste facultatif dans le type et le gabarit le teste : rien d'autre à défaire.
      */
-    claim: {
-      text: `${product.definition}.`,
-    },
     /**
      * Conclusion de l'équipe, reprise mot pour mot (11/09/2026). À DÉFENDRE EN COMPLIANCE : en lecture
      * stricte elle est inexacte, les frais de gestion sont prélevés sur les loyers encaissés, y compris
@@ -114,5 +116,11 @@ export const difference: DifferenceContent = {
    * destination en entier, « le comparateur » tout court ne disait pas de quoi.
    */
   cta: { label: 'Voir le comparateur de frais', href: pages.fees.path },
+  /*
+   * Appel à l'action DANS le bloc (15/09/2026), à ne pas confondre avec `cta` juste au-dessus, qui
+   * alimente la pastille flottante de la page. Deux libellés voisins mais distincts : celui-ci est lu
+   * au fil du texte, d'où le possessif.
+   */
+  secondaryCta: { label: 'Voir notre comparateur de frais', href: pages.fees.path },
   notes,
 };
