@@ -60,9 +60,15 @@ export const pages: Record<PageKey, PageMeta> = {
     key: 'strategy',
     path: '/strategie',
     label: 'Stratégie d’investissement',
-    /* Les libellés de navigation portent tous un article (12/09/2026) : « Les frais », « La stratégie »,
-       « La presse en parle ». `label` reste le nom complet de la page. */
-    navLabel: 'La stratégie',
+    /*
+     * « Notre approche » depuis le 15/09/2026, ex-« La stratégie ». La convention du 12/09/2026 voulait
+     * un article devant chaque libellé de navigation (« Les frais », « La stratégie », « La presse en
+     * parle ») ; celui-ci porte un possessif à la place, ce qui remplit le même rôle : il empêche le
+     * libellé de se lire comme une étiquette de rubrique.
+     * `label` reste le nom complet de la page, lu par la page 404 et le pied de page ; seul l'intitulé
+     * de la barre change, et le fil d'Ariane le suit puisqu'il reprend l'intitulé du menu.
+     */
+    navLabel: 'Notre approche',
     order: 3,
     inMenu: true,
   },

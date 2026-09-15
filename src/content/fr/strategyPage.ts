@@ -33,6 +33,12 @@ export const strategyPage: { seo: PageSeo; hero: PageHero; cta: Cta } = {
   hero: {
     eyebrow: `Stratégie · SCPI ${product.name}`,
     title: 'Comment R Start investit l’argent de ses clients ?',
+    /*
+     * CHUTE AJOUTÉE LE 15/09/2026, texte fourni par l'équipe. L'en-tête n'avait qu'un titre.
+     * L'espace avant le deux-points est une INSÉCABLE (U+00A0) écrite à la main : ce fichier ne passe
+     * pas par le `nb()` de feesPage.ts, et sans elle « : nos choix » peut partir seul à la ligne.
+     */
+    punchline: 'On ouvre le capot\u00A0: nos choix qui font la différence',
   },
   /* Appel à l'action de la page (13/09/2026) : ni l'en-tête ni le corps n'en portaient, la page se
      lisait et s'arrêtait là. Même libellé que partout ailleurs. */
