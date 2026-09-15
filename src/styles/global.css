@@ -1282,6 +1282,31 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   }
 }
 
+/* Explication dépliable des repères de l'accueil (15/09/2026, « R Start en un clin d'œil »).
+   LA HAUTEUR S'ANIME PAR `grid-template-rows`, de 0fr à 1fr : c'est la seule façon d'ouvrir sur une
+   hauteur INCONNUE sans la mesurer en JavaScript ni la figer en dur. `min-height: 0` sur l'enfant est
+   obligatoire, sans quoi la grille refuse de le comprimer sous sa hauteur de contenu.
+   ÉTAT PAR DÉFAUT : OUVERT. Le panneau est écrit ouvert dans le HTML et c'est le script qui le referme
+   au chargement, en même temps qu'il révèle le bouton. Sans JavaScript, on lit donc les explications,
+   et aucun bouton mort ne traîne. */
+@utility info-panneau {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition: grid-template-rows 260ms ease, margin-top 260ms ease;
+  margin-top: 0.75rem;
+  & > * {
+    min-height: 0;
+    overflow: hidden;
+  }
+  &[data-ferme] {
+    grid-template-rows: 0fr;
+    margin-top: 0;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+}
+
 /* --- Hero (fond ink + halo de marque + grain ; plus d'image de fond depuis le 11/09/2026) --- */
 
 /* Halo de marque animé : dérive lente (20 s, transform uniquement) des lueurs, coupée en reduced-motion.

@@ -83,6 +83,9 @@ export const notes: LegalNote[] = [
  */
 export const highlights: HighlightsContent = {
   eyebrow: 'Points forts',
+  /* Le bouton « i » ne montre qu'une lettre : ce libellé est ce que les lecteurs d'écran annoncent,
+     complété par celui de la carte (« Expliquer : Approche »). */
+  labels: { info: 'Expliquer' },
   /**
    * TABLEAU DU DOCUMENT DE L'ÉQUIPE, repris au plus près (14/09/2026) : son titre, ses sept lignes,
    * son ordre, « 100 % Digital » remonté du second bloc dans le tableau, et le second bloc réduit aux
@@ -105,8 +108,25 @@ export const highlights: HighlightsContent = {
     { label: 'Niveau de risque', value: risk.sriLabel, noteId: 'points-forts-risque' },
     /** income.frequency vaut « Mensuelle » ; accordé ici au libellé (« revenus »). */
     { label: 'Revenus potentiels', value: 'Mensuels', noteId: 'points-forts-distribution' },
-    { label: 'Approche', value: 'Diversifiée', noteId: 'points-forts-approche' },
-    { label: 'Zone d’investissement', value: 'Monde', noteId: 'points-forts-zone' },
+    /*
+     * DEUX EXPLICATIONS DÉPLIABLES (15/09/2026, textes de l'équipe). « Diversifiée » et « Monde » sont
+     * les deux valeurs du tableau qu'un mot ne suffit pas à rendre : elles nomment un mandat, pas une
+     * caractéristique observable. Le bouton « i » les développe sans allonger la carte.
+     * Elles ne remplacent pas les notes légales, qui restent en `noteId` : celle de l'approche rappelle
+     * notamment que le patrimoine n'existe pas encore et peut rester concentré.
+     */
+    {
+      label: 'Approche',
+      value: 'Diversifiée',
+      info: 'R Start investit dans tous secteurs, toutes zones géographiques et tous types d’immeubles pour ne pas dépendre d’une seule source de performance.',
+      noteId: 'points-forts-approche',
+    },
+    {
+      label: 'Zone d’investissement',
+      value: 'Monde',
+      info: 'R Start investit là où les équipes de gestion identifient les meilleures opportunités, en Europe et au-delà, tous secteurs confondus.',
+      noteId: 'points-forts-zone',
+    },
     {
       label: 'Délai de jouissance',
       /*

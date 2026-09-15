@@ -103,6 +103,12 @@ export interface HighlightCard {
   value: string;
   /** Appel de note : source et portée de la valeur. */
   noteId?: string;
+  /**
+   * Explication dépliable, derrière un bouton « i » posé après le libellé (15/09/2026). Elle dit ce que
+   * la valeur RECOUVRE, quand le mot seul ne suffit pas : « Diversifiée », « Monde ». Ce n'est pas une
+   * note légale, qui porte source et portée et vit dans `noteId` ; c'est de la pédagogie.
+   */
+  info?: string;
   /** Champs de l'ancienne carte détaillée, plus rendus depuis le 11/09/2026 (blocs simples). */
   icon?: string;
   description?: string;
@@ -127,6 +133,11 @@ export interface HighlightsContent {
   subscriptionItems?: { label: string; value: string; noteId?: string }[];
   /** Contre-poids unique de la section, sous les repères. */
   risk?: string;
+  /** Micro-textes : rien n'est écrit en dur dans le composant. */
+  labels?: {
+    /** Nom du bouton « i » pour les lecteurs d'écran, complété par le libellé de la carte. */
+    info: string;
+  };
   notes: LegalNote[];
 }
 
