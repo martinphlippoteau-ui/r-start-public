@@ -1341,47 +1341,30 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
 }
 
 /*
- * OUVERTURE ET FERMETURE EN BULLE (16/09/2026, demande de l'équipe).
+ * OUVERTURE EN TROIS TEMPS (16/09/2026, demande de l'équipe) : « clic tourne la card, contenu tout
+ * petit au dos ; zoom sur ce contenu en affichage final ; fermeture en faisant le flow inverse ».
  *
- * TROIS PROPRIÉTÉS SONT NÉCESSAIRES, et c'est ce qui rend l'exercice délicat : `display` et `overlay`
- * sont des propriétés DISCRÈTES, elles sautent d'un état à l'autre sans valeur intermédiaire. Sans
- * `transition-behavior: allow-discrete`, la fenêtre disparaît à l'instant où on la ferme et l'animation
- * de sortie n'a pas lieu. `overlay` doit y figurer aussi, sans quoi la fenêtre quitte la couche
- * supérieure avant d'avoir fini de se réduire et se retrouve masquée par le reste de la page.
+ * LA SÉQUENCE EST PILOTÉE EN JAVASCRIPT (src/scripts/carteDialog.ts), et c'est une décision, pas une
+ * facilité : le zoom doit partir DE LA CARTE CLIQUÉE, dont la position et la taille ne sont connues
+ * qu'à l'exécution et changent avec la largeur de l'écran, la colonne et le défilement. Aucune règle
+ * CSS ne peut les écrire. Le script mesure la carte, puis joue une seule animation en trois clés :
+ * la fenêtre arrive de dos, à la taille de la carte, se retourne, puis s'agrandit.
  *
- * `@starting-style` donne l'état AVANT l'ouverture : c'est le seul moyen d'animer l'entrée d'un
- * élément qui vient d'apparaître, une transition ordinaire n'ayant pas d'état de départ à quitter.
- *
- * LE REBOND EST DANS LA COURBE, pas dans une image-clé : cubic-bezier(0.34, 1.56, 0.64, 1) dépasse 1
- * avant de revenir, la bulle enfle donc légèrement au-delà de sa taille puis se pose. À la fermeture,
- * une courbe sans dépassement et plus courte : on ne fait pas rebondir ce qui s'en va.
- *
- * Les navigateurs qui ignorent `@starting-style` affichent la fenêtre d'un coup, sans animation : rien
- * ne casse, le style final est le même.
+ * CE QUI RESTE ICI est ce que le script ne doit pas avoir à poser :
+ *  - `backface-visibility: hidden`, qui rend la fenêtre invisible tant qu'elle est vue de dos ; c'est
+ *    lui qui fait que la carte et la fenêtre se relaient exactement au quart de tour, sans que rien ne
+ *    se superpose ;
+ *  - le voile, qui n'est pas atteignable par l'API d'animation (aucun sélecteur ne vise ::backdrop) :
+ *    il garde donc sa transition CSS, RETARDÉE du temps du retournement pour arriver avec le zoom et
+ *    non avec le clic ;
+ *  - `allow-discrete` sur `display` et `overlay`, sans quoi la fenêtre disparaîtrait à l'instant de la
+ *    fermeture et le retour en arrière n'aurait pas lieu ;
+ *  - la solution de repli : sans JavaScript la fenêtre n'existe pas, et en `prefers-reduced-motion` le
+ *    script n'anime rien. Les règles ci-dessous laissent alors la fenêtre pleine et nette.
  */
 .carte-dialog {
-  transform: scale(0.88);
-  opacity: 0;
-  transition:
-    transform 260ms cubic-bezier(0.32, 0.72, 0.35, 1),
-    opacity 180ms ease,
-    display 260ms allow-discrete,
-    overlay 260ms allow-discrete;
-}
-.carte-dialog[open] {
-  transform: scale(1);
-  opacity: 1;
-  transition:
-    transform 360ms cubic-bezier(0.34, 1.56, 0.64, 1),
-    opacity 200ms ease,
-    display 360ms allow-discrete,
-    overlay 360ms allow-discrete;
-}
-@starting-style {
-  .carte-dialog[open] {
-    transform: scale(0.88);
-    opacity: 0;
-  }
+  backface-visibility: hidden;
+  transform-origin: center;
 }
 
 .carte-dialog::backdrop {
@@ -1393,6 +1376,8 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
 }
 .carte-dialog[open]::backdrop {
   opacity: 1;
+  /* Le voile attend la fin du retournement : pendant que la carte tourne, la page reste claire. */
+  transition-delay: 260ms;
 }
 @starting-style {
   .carte-dialog[open]::backdrop {
@@ -1400,15 +1385,22 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   }
 }
 
+/* Posée par le script au premier instant de la fermeture : le voile s'en va avec le mouvement et
+   non 600 ms après lui, une fois la fenêtre refermée. */
+.carte-dialog--sort::backdrop {
+  opacity: 0;
+  transition-delay: 0ms;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .carte-dialog,
-  .carte-dialog[open],
   .carte-dialog::backdrop {
     transition: none;
-    transform: none;
-    opacity: 1;
+  }
+  .carte-dialog[open]::backdrop {
+    transition-delay: 0ms;
   }
 }
+
 .carte-dialog > [data-carte-detail] {
   max-height: 85svh;
   overflow-y: auto;
@@ -1489,32 +1481,23 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
 }
 
 /*
- * LA CARTE SE RETOURNE POUR OUVRIR LA FENÊTRE (16/09/2026, demande de l'équipe). Le bouton ne fait
- * plus apparaître la fenêtre d'un coup : la tuile pivote sur son axe vertical jusqu'à se présenter de
- * profil, et c'est à ce moment-là que la fenêtre s'ouvre. À la fermeture, elle repivote et revient.
+ * LA CARTE SE RETOURNE POUR OUVRIR LA FENÊTRE (16/09/2026, demande de l'équipe). Le retournement
+ * lui-même est joué par src/scripts/carteDialog.ts, en même temps que celui de la fenêtre : les deux
+ * doivent partager une seule horloge, et deux animations CSS indépendantes dériveraient.
  *
- * -90deg ET NON 180 : à 180 on verrait le dos de la carte, c'est-à-dire son contenu en miroir, qu'il
- * faudrait alors masquer et remplacer par une seconde face. À 90 la carte est de profil, donc
- * invisible, et la fenêtre prend le relais : un seul élément, aucune face arrière à entretenir.
- *
- * La classe est posée par src/scripts/carteDialog.ts, qui attend la fin de la transition avant
- * d'ouvrir. En `prefers-reduced-motion`, le script n'ajoute rien et la fenêtre s'ouvre directement.
+ * `backface-visibility: hidden` EST LA PIÈCE MAÎTRESSE : la carte devient invisible dès qu'elle
+ * dépasse le quart de tour, et la fenêtre, qui arrive de dos, devient visible au même instant. Le
+ * relais est exact, rien ne se superpose, et il n'y a aucune face arrière à entretenir.
  */
 @utility carte-face {
-  transition: transform 300ms cubic-bezier(0.45, 0, 0.3, 1);
-  transform-origin: center;
   backface-visibility: hidden;
+  transform-origin: center;
 }
-.carte-face--profil {
-  transform: rotateY(-90deg);
-}
-@media (prefers-reduced-motion: reduce) {
-  .carte-face {
-    transition: none;
-  }
-  .carte-face--profil {
-    transform: none;
-  }
+
+/* La main n'apparaît que si le script a tourné : sans lui, la carte n'ouvre rien et promettre un clic
+   serait un mensonge. Le bouton, lui, garde son propre curseur. */
+[data-carte-cliquable] {
+  cursor: pointer;
 }
 
 @utility carte-plus {
