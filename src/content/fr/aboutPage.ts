@@ -23,7 +23,10 @@ export const aboutPage: { seo: PageSeo; hero: PageHero; notes: LegalNote[]; cta:
    */
   hero: {
     eyebrow: 'CORUM',
-    title: 'L’expérience derrière R Start',
+    /* « R Start, une innovation signée CORUM » depuis le 16/09/2026, texte de l'équipe.
+       L'ancien titre, « L'expérience derrière R Start », a servi jusqu'à la veille au bloc CORUM de
+       l'accueil, qui porte désormais « Le groupe CORUM en quelques chiffres » : plus de doublon. */
+    title: 'R Start, une innovation signée CORUM',
     intro: [
       'On ne part pas d’une feuille blanche…',
       `R Start s’appuie sur ${corumGroup.experienceLabel} d’expertise du groupe CORUM dans l’investissement immobilier.`,

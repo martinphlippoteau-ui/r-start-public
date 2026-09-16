@@ -19,7 +19,8 @@
  * depuis le 14/09/2026 : il reparaîtra avec les autres mentions.
  * Contenu : src/content/fr/corum.ts et media.ts. Notes résolues dans celles de la page (about.notes).
  */
-import { Picture } from 'astro:assets';
+import { Image, Picture } from 'astro:assets';
+import brandLogo from '@/assets/logos/r-start-couleur.svg';
 import Container from '@/components/ui/Container.astro';
 import NoteRef from '@/components/ui/NoteRef.astro';
 import RiskNote from '@/components/ui/RiskNote.astro';
@@ -186,7 +187,24 @@ const QUIET_TITLE_Y = 12;
                       {corum.range.currentBadge}
                     </span>
                   )}
-                  <span>{name}</span>
+                  {
+                    /*
+                     * LE LOGO REMPLACE LE NOM sur la carte de R Start (16/09/2026, demande de l'équipe) :
+                     * c'est la seule des cinq dont on possède la marque, les quatre autres sont écrites en
+                     * typographie faute de licence sur leurs logos (décision du 09/09/2026).
+                     * `alt` vide et `aria-hidden` : le nom reste dans le HTML, hors écran, sinon la carte
+                     * ne serait plus annoncée que par son badge. Un lecteur d'écran lit donc « R Start »,
+                     * comme pour les quatre autres.
+                     */
+                  }
+                  {current ? (
+                    <>
+                      <Image src={brandLogo} alt="" aria-hidden="true" width={290} height={89} class="h-7 w-auto" />
+                      <span class="visually-hidden">{name}</span>
+                    </>
+                  ) : (
+                    <span>{name}</span>
+                  )}
                 </span>
               </li>
             ))

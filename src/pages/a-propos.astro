@@ -19,7 +19,6 @@ import Breadcrumb from '@/components/ui/Breadcrumb.astro';
 import Button from '@/components/ui/Button.astro';
 import StickyCta from '@/components/StickyCta.astro';
 import PageHero from '@/components/ui/PageHero.astro';
-import CorumHistory from '@/components/pages/a-propos/CorumHistory.astro';
 import CorumRange from '@/components/pages/a-propos/CorumRange.astro';
 import { pages } from '@/config/pages';
 import { aboutPage } from '@/content/fr/aboutPage';
@@ -45,10 +44,14 @@ const jsonLd = [
       </Button>
     </PageHero>
     {
-      /* Zone 2 (14/09/2026) : d'où vient CORUM, et pourquoi R Start arrive maintenant. Elle s'intercale
-        entre l'en-tête et les chiffres du groupe, qu'elle prépare. */
+      /*
+       * BLOC « En 2011, CORUM a une conviction » RETIRÉ le 16/09/2026, demande de l'équipe. Il racontait
+       * d'où vient CORUM et pourquoi R Start arrive maintenant, entre l'en-tête et les chiffres du
+       * groupe. Le composant et son contenu restent en place (components/pages/a-propos/CorumHistory.astro
+       * et corum.ts) : une ligne suffit à le remettre.
+       * La page enchaîne donc l'en-tête sur les chiffres, qui portent le même propos en plus court.
+       */
     }
-    <CorumHistory tone="white" />
     <CorumRange notes={notes} />
     {
       /* LES AVIS TRUSTPILOT FERMENT LA PAGE (15/09/2026, demande de l'équipe : « mettre les avis

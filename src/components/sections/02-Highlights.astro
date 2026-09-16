@@ -57,7 +57,11 @@ const titleId = sections.highlights.id + '-title';
         en-tête centré de la page. */
     }
     <header>
-      <h2 id={titleId} class="text-display-lg text-balance" data-reveal-text>{highlights.title}</h2>
+      {/* Titre en sable depuis le 16/09/2026, comme celui de la section Risques : les deux blocs
+        sur fond ink partagent la même couleur de titre. */}
+      <h2 id={titleId} class="text-display-lg text-balance text-sand" data-reveal-text>
+        {highlights.title}
+      </h2>
       {
         highlights.intro && (
           <p
