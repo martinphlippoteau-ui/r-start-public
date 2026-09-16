@@ -40,12 +40,22 @@ const {
 } = Astro.props;
 ---
 
-<div class:list={['flex flex-col gap-2', className]}>
+{
+  /*
+   * HIÉRARCHIE RÉTABLIE LE 16/09/2026. Le chiffre était en `text-display-sm` (20 à 24 px) et son
+   * libellé en `text-lead` (18 à 24 px) : sur grand écran ils faisaient la MÊME TAILLE, et rien ne
+   * disait lequel des deux était le chiffre. Un bloc de chiffres clés dont les chiffres ne dominent
+   * pas manque sa raison d'être.
+   * Le chiffre monte donc d'un cran et le libellé descend, dans les deux tailles pleines. L'écart
+   * passe de 1 à 1,5 environ, ce qui suffit à ce que l'œil attrape le nombre d'abord.
+   */
+}
+<div class:list={['flex flex-col gap-1.5', className]}>
   <span
     class:list={[
       size === 'display' && 'text-stat text-brand-gradient',
-      size === 'solid' && 'text-display-md tabular-nums text-navy',
-      size === 'solid-compact' && 'text-display-sm tabular-nums text-navy',
+      size === 'solid' && 'text-display-lg tabular-nums text-navy',
+      size === 'solid-compact' && 'text-display-md tabular-nums text-navy',
     ]}
     data-counter={numeric}
     data-counter-prefix={prefix}
@@ -56,5 +66,7 @@ const {
   >
     {value}
   </span>
-  <span class="text-lead font-medium">{label}</span>
+  <span class:list={[size === 'display' ? 'text-lead font-medium' : 'text-base leading-snug text-slate-700']}>
+    {label}
+  </span>
 </div>

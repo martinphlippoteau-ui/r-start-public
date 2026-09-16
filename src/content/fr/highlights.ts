@@ -133,22 +133,26 @@ export const highlights: HighlightsContent = {
      * « HORIZON D'INVESTISSEMENT » REMPLACE « ZONE D'INVESTISSEMENT » le 16/09/2026, demande de
      * l'équipe. La carte disait « Monde », elle dit maintenant la durée.
      *
-     * LE CHIFFRE N'EST PAS CELUI DEMANDÉ, et il faut que l'équipe le sache. La demande disait « 8 ans
-     * minimum ». Le DIC donne une durée de placement recommandée de DIX ans (facts.ts,
-     * `risk.recommendedHoldingLabel`, sourcé « DIC, bulletin »), et c'est ce que le site affiche
-     * partout ailleurs : dans la FAQ de cette même page, dans celle de /faq, et dans les mentions
-     * légales. Les huit ans sont autre chose : le seuil au-delà duquel R Start ne prélève plus de
-     * commission de retrait (`fees.withdrawal.zeroAfterYears`).
-     * Une communication commerciale ne peut pas contredire le DIC, et l'AMF l'a déjà relevé sur ce
-     * projet à propos de l'indicateur de risque. La carte reprend donc le chiffre du DIC, et il suffit
-     * d'écrire `8 ans minimum` ici pour revenir à la demande si l'équipe l'assume.
+     * HUIT ANS, CHOIX DE L'ÉQUIPE RÉITÉRÉ APRÈS MISE EN GARDE, et la Conformité doit l'avoir sous les
+     * yeux. Ce qui a été signalé et qui reste vrai :
+     *  - le DIC donne une durée de placement recommandée de DIX ans (facts.ts,
+     *    `risk.recommendedHoldingLabel`, sourcé « DIC, bulletin ») ;
+     *  - le site affiche ces dix ans PARTOUT AILLEURS : dans la FAQ de cette même page, dans celle de
+     *    /faq, et dans les mentions légales. La carte les contredit donc à quelques écrans d'écart ;
+     *  - les huit ans sont autre chose dans les documents : le seuil au-delà duquel R Start ne prélève
+     *    plus de commission de retrait (`fees.withdrawal.zeroAfterYears`) ;
+     *  - une communication commerciale ne peut pas contredire le DIC, et l'AMF l'a déjà relevé sur ce
+     *    projet à propos de l'indicateur de risque.
+     * LA VALEUR EST ÉCRITE EN DUR, et pas tirée de `zeroAfterYears` : ce serait accréditer l'idée que
+     * l'horizon se déduit du barème de retrait, et un ajustement du barème changerait l'horizon en
+     * silence. `risk.recommendedHoldingLabel` reste la source à reprendre pour rétablir le DIC.
      *
      * L'explication de la zone est partie avec elle : elle parlait de géographie.
      */
     {
       label: 'Horizon d’investissement',
-      value: nb(`${risk.recommendedHoldingLabel} minimum`),
-      info: 'Une SCPI est un placement de long terme. Cette durée est celle que recommande le document d’informations clés ; sortir plus tôt coûte une commission de retrait et la revente des parts n’est pas garantie.',
+      value: nb('8 ans minimum'),
+      info: 'Une SCPI est un placement de long terme. Sortir plus tôt coûte une commission de retrait, et la revente des parts n’est pas garantie. Le document d’informations clés recommande une durée de placement de 10 ans.',
       noteId: 'points-forts-zone',
     },
     {

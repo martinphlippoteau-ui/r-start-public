@@ -364,8 +364,10 @@ export const faq = {
   searchEmpty: 'Aucune question ne correspond. Essayez un autre mot.',
   /** En-tête de la page /faq, distinct de celui de la section courte. */
   pageTitle: 'Toutes vos questions sur la SCPI R Start.',
-  pageIntro:
-    'Les réponses sont courtes et factuelles, issues des documents officiels de R Start. Elles ne remplacent pas la lecture du DIC et de la note d’information.',
+  /* Introduction retirée le 16/09/2026, demande de l'équipe. Elle disait : « Les réponses sont courtes
+     et factuelles, issues des documents officiels de R Start. Elles ne remplacent pas la lecture du DIC
+     et de la note d'information. » Le renvoi vers les documents reste dans le pied de page. */
+  pageIntro: '',
   cta: { label: 'Souscrire en ligne', position: 'faq' },
   notes,
 } satisfies FaqContent;

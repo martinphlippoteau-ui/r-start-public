@@ -91,16 +91,27 @@ const { stats } = trust;
             Le nombre de colonnes suit celui des chiffres, comme sur /a-propos, et les cases passent en
             `solid-compact` à cinq, où « 9,6 Md€ » et « + 160 000 » passaient à la ligne. */
         }
+        {
+          /*
+           * UN FILET AU-DESSUS DE CHAQUE CHIFFRE (16/09/2026). Les cinq paires flottaient dans une
+           * rangée sans rien qui les groupe ni les sépare : l'œil devait deviner quel libellé allait
+           * avec quel nombre, d'autant que les libellés ne font pas tous le même nombre de lignes.
+           * Le filet fait les deux à la fois, sans ajouter de carte ni d'encadré : c'est le même
+           * procédé que la section Risques, déjà en place sur la page.
+           * `items-start` et non l'étirement par défaut : sans lui, les cases prennent la hauteur de
+           * la plus haute et les filets restent seuls en l'air au-dessus des libellés courts.
+           */
+        }
         <ul
           role="list"
           class:list={[
-            'mt-10 grid grid-cols-2 gap-x-6 gap-y-10 sm:gap-x-8 lg:mt-14',
+            'mt-10 grid grid-cols-2 items-start gap-x-6 gap-y-8 sm:gap-x-8 lg:mt-14',
             stats.items.length === 5 ? 'lg:grid-cols-5' : 'lg:grid-cols-4',
           ]}
         >
           {
             stats.items.map((s) => (
-              <li>
+              <li class="border-t border-navy/15 pt-5">
                 <Stat
                   size={stats.items.length === 5 ? 'solid-compact' : 'solid'}
                   value={s.value}

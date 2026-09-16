@@ -77,8 +77,20 @@ const withdrawalAfterHolding = fees.withdrawal.steps[fees.withdrawal.steps.lengt
  * c'est ce que dit déjà le bloc « Sources des données » sous le tableau, et il ne peut pas se contenter
  * d'un renvoi global. Tant que ces références ne sont pas là, la ligne reste vraie mais invérifiable.
  */
+/*
+ * SOURCE NOMMÉE LE 16/09/2026 : « étude comparative réalisée par CORUM le 15 septembre 2026 ».
+ * Elle disait jusque-là « relevé comparatif transmis par l'équipe », sans auteur ni nature, et ajoutait
+ * que le document et la date d'arrêté de chaque société de gestion restaient à obtenir.
+ *
+ * CE QUI EST RÉGLÉ : le tableau peut désormais nommer d'où viennent ses chiffres, ce qu'un comparatif
+ * qui cite dix-neuf sociétés de gestion doit pouvoir faire.
+ * CE QUI NE L'EST PAS, et qu'il faut garder en tête : l'étude est une source UNIQUE et globale. Elle ne
+ * donne toujours pas, SCPI par SCPI, le document réglementaire et sa date d'arrêté. Un lecteur ne peut
+ * donc pas remonter un taux jusqu'à la note d'information ou au DIC dont il sort. La mention reste donc
+ * honnête sur ce point plutôt que de laisser croire à une référence par SCPI.
+ */
 const SOURCE_EQUIPE =
-  'relevé comparatif transmis par l’équipe le 15 septembre 2026, taux exprimés hors taxes. Document et date d’arrêté de chaque société de gestion à obtenir avant publication.';
+  'étude comparative réalisée par CORUM le 15 septembre 2026, taux exprimés hors taxes. La référence documentaire de chaque société de gestion n’est pas publiée.';
 
 export const comparator = {
   /*
