@@ -297,6 +297,11 @@ export interface CorumContent {
   alignmentBody?: string;
   /** Libellé du bouton vers la page À propos. */
   aboutLink?: string;
+  /**
+   * Appel sous les chiffres du groupe, sur /a-propos (16/09/2026). Il SORT DU SITE, vers corum.fr :
+   * `newTabHint` est ce que les lecteurs d'écran annoncent, il n'est pas affiché.
+   */
+  siteLink?: { label: string; href: string; newTabHint: string };
   disclaimer: string;
   notes: LegalNote[];
 }

@@ -21,6 +21,7 @@
  * text-caption (14 px, contrôlé par scripts/check-compliance.mjs : jamais text-xs) ; les blocs
  * d'identité repliés et le copyright peuvent être en text-xs.
  */
+import IconExterne from '@/components/ui/IconExterne.astro';
 import { Image } from 'astro:assets';
 import brandLogo from '@/assets/logos/r-start-couleur.svg';
 import publisherLogo from '@/assets/logos/corum-lepargne-couleur.svg';
@@ -138,20 +139,7 @@ const topLabel = footer.backToTopLabel;
                       {link.label}
                       {link.external && (
                         <>
-                          <svg
-                            aria-hidden="true"
-                            class="size-3.5 shrink-0 text-slate"
-                            viewBox="0 0 16 16"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="1.5"
-                          >
-                            <path
-                              d="M6 3h7v7M13 3 4 12"
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                            />
-                          </svg>
+                          <IconExterne class="size-3.5 shrink-0 text-slate" strokeWidth={1.5} />
                           {hint && <span class="visually-hidden">({hint})</span>}
                         </>
                       )}

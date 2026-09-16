@@ -1,5 +1,5 @@
 import type { CorumContent, LegalNote } from '@/content/types';
-import { corumGroup, product } from '@/content/fr/facts';
+import { corumGroup, product, externalLinks } from '@/content/fr/facts';
 import { managementCompany } from '@/content/fr/legal';
 import { experienceStats, notes as trustNotes } from '@/content/fr/trust';
 
@@ -222,6 +222,17 @@ export const corum = {
   /* « Découvrir le groupe CORUM » depuis le 15/09/2026, ex-« En savoir plus sur CORUM » : même
      forme que « Découvrir notre approche », l'autre appel secondaire de l'accueil. */
   aboutLink: 'Découvrir le groupe CORUM',
+  /*
+   * Appel SOUS LES CHIFFRES DU GROUPE, sur /a-propos (16/09/2026). Il sort du site, vers corum.fr :
+   * c'est le seul appel du site à le faire depuis le corps d'une page, d'où la mention de nouvelle
+   * fenêtre lue par les lecteurs d'écran. Le libellé est plus court que celui de l'accueil, qui reste
+   * interne et mène ici même.
+   */
+  siteLink: {
+    label: 'Découvrir CORUM',
+    href: externalLinks.corum,
+    newTabHint: 'nouvelle fenêtre',
+  },
   disclaimer: corumGroup.disposalsDisclaimer,
 
   notes,

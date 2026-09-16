@@ -14,6 +14,7 @@
  * date des avis en gris clair sur des cartes restées blanches, six violations de contraste à 1,85:1
  * mesurées dans l'iframe le 14/09/2026. Le bloc attend donc un fond clair.
  */
+import IconExterne from '@/components/ui/IconExterne.astro';
 import NoteRef from '@/components/ui/NoteRef.astro';
 import TrustBox from '@/components/ui/TrustBox.astro';
 import { trust } from '@/content/fr/trust';
@@ -57,16 +58,7 @@ const Titre = niveau === 2 ? 'h2' : 'h3';
     >
       {trustpilot.linkLabel}
       {hint && <span class="visually-hidden">({hint})</span>}
-      <svg
-        aria-hidden="true"
-        class="size-4"
-        viewBox="0 0 16 16"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="1.8"
-      >
-        <path d="M4 12 12 4M6 4h6v6" stroke-linecap="round" stroke-linejoin="round"></path>
-      </svg>
+      <IconExterne class="size-4 shrink-0" />
     </a>
   </div>
 </div>

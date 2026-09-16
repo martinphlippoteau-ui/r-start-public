@@ -20,13 +20,16 @@
  * Contenu : src/content/fr/corum.ts et media.ts. Notes résolues dans celles de la page (about.notes).
  */
 import { Image, Picture } from 'astro:assets';
+import amfLogo from '@/assets/logos/amf.svg';
 import brandLogo from '@/assets/logos/r-start-couleur.svg';
+import Button from '@/components/ui/Button.astro';
 import Container from '@/components/ui/Container.astro';
 import NoteRef from '@/components/ui/NoteRef.astro';
 import RiskNote from '@/components/ui/RiskNote.astro';
 import Section from '@/components/ui/Section.astro';
 import Stat from '@/components/ui/Stat.astro';
 import { corum } from '@/content/fr/corum';
+import { trust as trustFacts } from '@/content/fr/facts';
 import { trust } from '@/content/fr/trust';
 import { media, AFFICHER_LEGENDES } from '@/content/fr/media';
 import { product } from '@/content/fr/facts';
@@ -94,6 +97,74 @@ const QUIET_TITLE_Y = 12;
         ))
       }
     </ul>
+    {
+      /*
+       * CADRE RÉGLEMENTAIRE (16/09/2026, demande de l'équipe : « mettre le logo AMF en disant que
+       * R Start est agréé par l'AMF »).
+       *
+       * LE TEXTE NE DIT PAS CELA, ET C'EST VOULU. R Start n'est pas agréé, il est VISÉ : la note
+       * d'information a obtenu le visa SCPI n° 26-06 du 4 mars 2026. Ce qui est AGRÉÉ, c'est la société
+       * de gestion. Écrire « R Start est agréé par l'AMF » affirmerait exactement ce que la mention
+       * standard du pied de page nie (« le visa n'implique ni approbation de l'opportunité de
+       * l'opération »). L'équipe a arbitré entre trois formulations exactes et retenu celle-ci, qui
+       * porte les DEUX faits.
+       *
+       * LES DEUX PHRASES SONT REPRISES DE trust.ts, mot pour mot : elles viennent du bulletin de
+       * souscription, et celle de l'agrément est la formulation que l'AMF a demandée dans ses retours
+       * sur la brochure (09/2026). Rien n'est reparaphrasé ici.
+       *
+       * LE LOGO reste ce qu'il était sur le hero avant son retrait : un fichier hébergé sur Wikipédia
+       * France au titre d'un usage non libre, et l'AMF ne concède pas son logo aux communications
+       * commerciales. La réserve vaut toujours, l'équipe l'a levée en connaissance de cause.
+       */
+    }
+    {/* `sm:items-stretch` : la plaque prend la hauteur de la rangée, donc celle du texte à sa
+      droite, et le logo la remplit. Une hauteur écrite en dur se serait décalée dès qu'une phrase
+      passe d'une ligne à l'autre, ce qui arrive entre 640 et 1024 px. */}
+    <div class="mt-section-sm flex flex-col gap-5 sm:flex-row sm:items-stretch sm:gap-7">
+      {/* Logo agrandi deux fois le 16/09/2026 : à 40 px sa ligne de tête (« AUTORITÉ DES MARCHÉS
+      FINANCIERS ») se refermait, à 56 px elle redevenait lisible, et il prend maintenant toute la
+      hauteur du texte à sa droite. Sous `sm`, où la plaque passe au-dessus du texte, il garde ses
+      56 px : rien à épouser dans ce sens-là. */}
+      <span class="flex shrink-0 items-center justify-center rounded-xl bg-white px-5 py-4 ring-1 ring-navy/10">
+        <Image
+          src={amfLogo}
+          alt="Autorité des marchés financiers"
+          width={142}
+          height={57}
+          class="w-auto max-sm:h-14 sm:h-full"
+        />
+      </span>
+      <div class="max-w-3xl space-y-2">
+        <p class="text-base leading-snug text-slate-700">{trustFacts.amf.managementCompanyApproval}</p>
+        <p class="text-base leading-snug text-slate-700">{trustFacts.amf.visaSentence}</p>
+      </div>
+    </div>
+
+    {
+      /*
+       * APPEL SOUS LES CHIFFRES (16/09/2026, demande de l'équipe). Il SORT DU SITE, vers corum.fr, ce
+       * qu'aucun autre appel ne fait depuis le corps d'une page : d'où `target="_blank"`, le
+       * `rel="noopener noreferrer"` qui va avec, et la mention de nouvelle fenêtre lue par les lecteurs
+       * d'écran mais pas affichée.
+       * `secondary` et non `primary` : il ne mène pas au tunnel de souscription, et la page en porte
+       * déjà un dans son en-tête.
+       */
+    }
+    {corum.siteLink && (
+      <p class="mt-section-sm">
+        <Button
+          href={corum.siteLink.href}
+          variant="secondary"
+          size="lg"
+          target="_blank"
+        >
+          {corum.siteLink.label}
+          <span class="visually-hidden">({corum.siteLink.newTabHint})</span>
+        </Button>
+      </p>
+    )}
+
     {
       /* Le contre-poids « Ces chiffres sont ceux du groupe CORUM… » et la ligne de source ont été retirés
         d'ici le 11/09/2026 (décision de l'équipe). Le rappel « cette expérience ne préjuge pas des résultats

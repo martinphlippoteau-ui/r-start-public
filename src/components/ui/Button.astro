@@ -1,4 +1,5 @@
 ---
+import IconExterne from '@/components/ui/IconExterne.astro';
 import { ctaHref, site } from '@/config/site';
 import { withBase } from '@/lib/href';
 import type { CtaPosition } from '@/content/types';
@@ -24,6 +25,18 @@ interface Props {
   size?: 'sm' | 'md' | 'lg';
   class?: string;
   ariaLabel?: string;
+  /**
+   * Ouverture dans un nouvel onglet, pour les liens qui SORTENT DU SITE (16/09/2026). `rel` suit
+   * automatiquement : `noopener noreferrer` est obligatoire avec `_blank`, la page ouverte pouvant
+   * sinon manipuler celle qui l'a ouverte via `window.opener`.
+   * Ce n'est jamais posé sur un CTA de souscription : celui-ci gère déjà sa propre cible.
+   *
+   * UNE FLÈCHE EN DIAGONALE est ajoutée automatiquement au libellé (16/09/2026) : elle prévient qu'on
+   * quitte le site. Le même dessin que sur les liens Trustpilot et ceux du pied de page, pour qu'il
+   * veuille dire la même chose partout. Décorative (aria-hidden), l'information étant déjà portée par
+   * la mention de nouvelle fenêtre que l'appelant place en `visually-hidden`.
+   */
+  target?: '_blank';
 }
 const {
   href,
@@ -32,6 +45,7 @@ const {
   size = 'md',
   class: className = '',
   ariaLabel,
+  target,
 } = Astro.props;
 const isSubscribe = !href;
 // Un lien interne est préfixé par le chemin de base ; les ancres et les URL absolues passent telles
@@ -66,8 +80,16 @@ const sizes = { sm: 'px-4 py-2.5 text-sm', md: 'px-6 py-3 text-base', lg: 'px-8 
   ]}
   data-cta={isSubscribe ? 'souscrire' : undefined}
   data-cta-position={isSubscribe ? position : undefined}
-  rel={isSubscribe && site.subscribeOpen ? 'noopener' : undefined}
+  target={target}
+  rel={target === '_blank'
+    ? 'noopener noreferrer'
+    : isSubscribe && site.subscribeOpen
+      ? 'noopener'
+      : undefined}
   aria-label={ariaLabel}
 >
   <slot />
+  {target === '_blank' && (
+    <IconExterne class="size-4 shrink-0" />
+  )}
 </a>
