@@ -27,20 +27,21 @@ import Footer from '@/components/Footer.astro';
 import Breadcrumb from '@/components/ui/Breadcrumb.astro';
 import Button from '@/components/ui/Button.astro';
 import StickyCta from '@/components/StickyCta.astro';
-import Container from '@/components/ui/Container.astro';
-import NoteConformite from '@/components/ui/NoteConformite.astro';
 import PageHero from '@/components/ui/PageHero.astro';
-import Pill from '@/components/ui/Pill.astro';
-import Section from '@/components/ui/Section.astro';
 import FeeComparator from '@/components/pages/frais/FeeComparator.astro';
 import { pages } from '@/config/pages';
 import { feesPage } from '@/content/fr/feesPage';
 import { breadcrumbJsonLd, faqJsonLd, organizationJsonLd, webPageJsonLd } from '@/lib/seo';
 
 const page = pages.fees;
-const { seo, hero, labels, groups, faq, htNote, htNoteLabel, cta } = feesPage;
-/* `faq` n'est plus rendu : la page a perdu sa section Questions le 14/09/2026. Il reste lu pour la
-   donnée structurée FAQPage, que les moteurs exploitent même sans bloc visible. */
+const { seo, hero, faq, cta } = feesPage;
+/*
+ * `faq` n'est plus rendu : la page a perdu sa section Questions le 14/09/2026. Il reste lu pour la
+ * donnée structurée FAQPage, que les moteurs exploitent même sans bloc visible.
+ * `labels`, `groups`, `htNote` et `htNoteLabel` ont quitté ce tri le 16/09/2026 avec le barème :
+ * les quatre tableaux, leurs intitulés et la mention HT restent dans feesPage.ts, la page ne les
+ * appelle plus.
+ */
 
 const jsonLd = [
   organizationJsonLd(),
@@ -49,10 +50,6 @@ const jsonLd = [
   faqJsonLd(faq.items),
 ];
 
-/** Ancres des sections de la page (ids HTML, pas des textes affichés). */
-const ids = { schedule: 'bareme' };
-
-/** Frise de retrait : le dernier palier (0 %) est mis en avant. */
 ---
 
 <Base title={seo.title} description={seo.description} path={page.path} jsonLd={jsonLd}>
@@ -99,109 +96,23 @@ const ids = { schedule: 'bareme' };
         information réglementaire, elle ne pouvait pas disparaître avec la bande. */
     }
 
-    <!-- 2. Le barème complet, en quatre tableaux -->
-    <Section id={ids.schedule} tone="paper" labelledBy={ids.schedule + '-title'}>
-      <Container size="wide">
-        <h2 id={ids.schedule + '-title'} class="text-display-lg max-w-4xl">
-          {
-            /* Astérisque en TURQUOISE, l'accent de la charte sur fond clair, et non en corail
-              (15/09/2026) : le corail se lit comme une alerte et n'appartient pas à la palette des
-              marqueurs. C'est la même correction que sur le libellé « Bon à savoir », passé la veille
-              au bleu de marque sur panneau turquoise clair (ui/NoteConformite.astro). */
-          }
-          {labels?.eyebrows.schedule}<span aria-hidden="true" class="text-teal-700">*</span>
-        </h2>
-
-        <div class="mt-14 space-y-16 lg:mt-20 lg:space-y-24">
-          {
-            groups.map((group) => (
-              <div
-                class="overflow-x-auto focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-navy"
-                tabindex="0"
-                role="region"
-                aria-label={group.title}
-              >
-                <table class="w-full border-collapse text-left">
-                  <caption class="mb-6 text-left sm:mb-8">
-                    <h3 class="text-display-sm text-ink">{group.title}</h3>
-                    {group.intro && <p class="text-lead mt-3 max-w-3xl text-ink">{group.intro}</p>}
-                  </caption>
-                  {labels && (
-                    <thead>
-                      <tr class="border-b border-navy/20 text-caption font-semibold uppercase tracking-[0.12em] text-slate-700">
-                        <th scope="col" class="py-3 pr-4">
-                          {labels.columns.fee}
-                        </th>
-                        <th scope="col" class="hidden py-3 pr-4 sm:table-cell">
-                          {labels.columns.base}
-                        </th>
-                        <th scope="col" class="py-3 text-right">
-                          {labels.columns.value}
-                        </th>
-                        <th scope="col" class="hidden py-3 pl-6 lg:table-cell">
-                          {labels.columns.detail}
-                        </th>
-                      </tr>
-                    </thead>
-                  )}
-                  <tbody>
-                    {group.rows.map((row) => (
-                      <tr class="border-b border-navy/10 align-top" data-kind={row.kind}>
-                        <th scope="row" class="py-4 pr-4 font-normal sm:py-5 lg:w-72">
-                          <span class="block text-base font-semibold text-ink sm:text-xl">
-                            {row.label}
-                          </span>
-                          {labels && (
-                            <Pill tone="outline" class="mt-2 text-teal-700">
-                              {labels.kinds[row.kind]}
-                            </Pill>
-                          )}
-                          <span class="mt-2 block text-base leading-relaxed text-slate-700 sm:hidden">
-                            {row.base}
-                          </span>
-                          {row.detail && (
-                            <span class="mt-2 block text-base leading-relaxed text-slate-700 lg:hidden">
-                              {row.detail}
-                            </span>
-                          )}
-                        </th>
-                        <td class="hidden py-4 pr-4 text-base leading-relaxed text-slate-700 sm:table-cell sm:py-5 lg:w-64">
-                          {row.base}
-                        </td>
-                        <td
-                          class="py-4 pl-3 text-right text-lg leading-tight font-bold tracking-tight whitespace-nowrap text-navy tabular-nums max-sm:w-[7.25rem] sm:py-5 sm:text-3xl"
-                          data-fee-value
-                          data-fee-block="bareme-frais"
-                        >
-                          {row.valueShort ? (
-                            <>
-                              <span class="sm:hidden">{row.valueShort}</span>
-                              <span class="hidden sm:inline">{row.value}</span>
-                            </>
-                          ) : (
-                            row.value
-                          )}
-                        </td>
-                        <td class="hidden py-4 pl-6 text-base leading-relaxed text-slate-700 lg:table-cell lg:py-5">
-                          {row.detail}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            ))
-          }
-        </div>
-
-        {
-          /* Note de la zone 3, fournie par l'équipe le 14/09/2026 : elle suit immédiatement le tableau
-            qu'elle qualifie, appelée par l'astérisque posée sur le titre du bloc. « Bon à savoir » est
-            ici un titre de note, écrit en dur : RiskNote ne rend plus rien depuis ce jour. */
-        }
-        <NoteConformite text={htNote} label={htNoteLabel} class="mt-10 max-w-4xl lg:mt-14" />
-      </Container>
-    </Section>
+    {
+      /*
+       * BARÈME COMPLET RETIRÉ LE 16/09/2026, demande de l'équipe (« supprimer tout ce qu'il y a après
+       * Un modèle de frais inédit* »). La zone portait ce titre, les quatre tableaux de frais groupés
+       * par moment de prélèvement, la commission de retrait à paliers, et la mention HT de la
+       * Conformité. La page tient désormais en DEUX zones : l'en-tête et le comparateur.
+       *
+       * LE TITRE EST PARTI AVEC LE RESTE, et c'est un écart à la lettre de la demande : un titre seul
+       * sur un fond vide n'est pas un état livrable. À remettre en une ligne si l'équipe voulait le
+       * garder pour y poser autre chose.
+       *
+       * CE QUI NE DISPARAÎT PAS DU SITE : les taux eux-mêmes restent dans le comparateur juste
+       * au-dessus, ligne par ligne, et c'est lui qui porte maintenant le « 15 % » que
+       * scripts/check-compliance.mjs exige sur cette page. La mention HT et les quatre tableaux vivent
+       * toujours dans feesPage.ts, la page ne les appelle plus.
+       */
+    }
 
     {
       /*
@@ -224,10 +135,11 @@ const ids = { schedule: 'bareme' };
   </main>
 
   {
-    /* Pastille d'appel : elle arrive avec la section qui suit le comparateur, une fois la comparaison
-      lue, et reste jusqu'au bas de la page. Rendue au niveau de la page, jamais dans une section. */
+    /* Pastille d'appel : elle arrive AVEC LE COMPARATEUR depuis le 16/09/2026, et non plus avec le
+      barème qui le suivait, celui-ci ayant été retiré. Sans ce changement elle visait une ancre
+      absente et ne serait jamais apparue. Rendue au niveau de la page, jamais dans une section. */
   }
-  <StickyCta label={cta.label} position={cta.position} from={'#' + ids.schedule} />
+  <StickyCta label={cta.label} position={cta.position} from="#comparateur" />
   <Footer />
 </Base>
 

@@ -31,7 +31,8 @@ export const hero = {
    * logo. La nature juridique du produit (facts.product.type) reste dans les données structurées et les
    * mentions légales.
    */
-  eyebrow: 'CORUM invente la SCPI',
+  /* « CORUM invente » depuis le 16/09/2026, ex-« CORUM invente la SCPI ». */
+  eyebrow: 'CORUM invente',
   title: product.name,
   /**
    * Accroche de l'équipe marketing, reprise mot pour mot. CHANGÉE LE 15/09/2026 : elle disait
