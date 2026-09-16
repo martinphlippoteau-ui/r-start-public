@@ -22,7 +22,9 @@
  * DATE D'ARRÊTÉ NON COMMUNIQUÉE : comme pour les chiffres du groupe, elle reste à demander à CORUM.
  */
 
-/** Une mesure affichée sur une carte : le nombre, son unité, et ce qu'il mesure. */
+import { scpiCreated } from '@/content/fr/facts';
+
+/** Une mesure affichée sur une carte : le nombre, son unité, et ce qu'elle mesure. */
 export interface MesureScpi {
   value: string;
   unit: string;
@@ -30,6 +32,12 @@ export interface MesureScpi {
 }
 
 export interface ScpiGamme {
+  /**
+   * Année de création, rendue sous le nom. Absente : la carte se referme sur son seul nom.
+   * La valeur n'est pas saisie ici : elle vient de `scpiCreated` (facts.ts), qui est déjà la source de
+   * ces dates et qui porte la réserve sur leur vérification.
+   */
+  created?: string;
   /*
    * PAS DE SURTITRE. Chaque carte en portait un, « SCPI », retiré le 16/09/2026 à la demande de
    * l'équipe : le titre du bloc dit déjà « Nos autres SCPI », et le mot se répétait quatre fois sous
@@ -48,6 +56,18 @@ export interface ScpiGamme {
   autres: MesureScpi[];
 }
 
+/*
+ * DATES DE CRÉATION SOUS LE NOM (16/09/2026, demande de l'équipe). Elles figuraient sur les tuiles que
+ * ce carrousel a remplacées, elles y reviennent.
+ * ELLES NE SONT PAS RETAPÉES ICI : `scpiCreated` (facts.ts) est leur unique source, et c'est là qu'est
+ * écrite la réserve qui compte — seule celle de R Start s'appuie sur une pièce du dossier, les quatre
+ * autres restent à faire confirmer par CORUM. Deux listes de dates finiraient par diverger.
+ */
+const creee = (nom: string): string | undefined => {
+  const annee = scpiCreated[nom];
+  return annee ? `Créée en ${annee}` : undefined;
+};
+
 const RISQUE = 'Indicateur de risque';
 const MINIMUM = 'Minimum d’investissement';
 const RENDEMENT = 'Rendement 2025';
@@ -62,6 +82,7 @@ const TRI = 'Taux de rendement interne (TRI) depuis la création';
 const ITEMS: ScpiGamme[] = [
     {
       name: 'CORUM Origin',
+    created: creee('CORUM Origin'),
       principale: { value: '6,94', unit: '%', label: TRI },
       autres: [
         { value: '3', unit: '/7', label: RISQUE },
@@ -71,6 +92,7 @@ const ITEMS: ScpiGamme[] = [
     },
     {
       name: 'CORUM XL',
+    created: creee('CORUM XL'),
       principale: { value: '5,77', unit: '%', label: TRI },
       autres: [
         { value: '4', unit: '/7', label: RISQUE },
@@ -80,6 +102,7 @@ const ITEMS: ScpiGamme[] = [
     },
     {
       name: 'CORUM Eurion',
+    created: creee('CORUM Eurion'),
       principale: { value: '6,50', unit: '%', label: TRI },
       autres: [
         { value: '3', unit: '/7', label: RISQUE },
@@ -89,6 +112,7 @@ const ITEMS: ScpiGamme[] = [
     },
     {
       name: 'CORUM USA',
+    created: creee('CORUM USA'),
       /* Pastille « nouveauté » retirée le 16/09/2026, demande de l'équipe. Le champ `badge` reste
          dans le type : R Start le reprendra le jour où elle entrera dans cette liste. */
       /* OBJECTIF et non historique : la SCPI est trop jeune pour un TRI réalisé, et l'intitulé fourni
