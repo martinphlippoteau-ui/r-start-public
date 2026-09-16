@@ -133,6 +133,13 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
        * premiers distincts, donc un cycle commun de 13 × 17 × 19 × 23 secondes. Les retards de phase
        * suivent la même réduction, pour que les foyers restent décalés dans les mêmes proportions.
        *
+       * AMPLIFIÉES LE 16/09/2026 (« le mouvement du hero n'est pas assez visible ») : un foyer flouté à
+       * 80 px qui glisse de 90 px en six secondes ne se voit pas. Les amplitudes sont DOUBLÉES (4, 18,
+       * 16 et 12 %), les périodes raccourcies d'un quart (11, 13, 17, 19 s, toujours quatre nombres
+       * premiers distincts), les deux turquoises un peu plus denses (0,55 et 0,42), et la respiration
+       * d'échelle élargie dans global.css (0,86 à 1,16 au lieu de 0,92 à 1,08). Le sable garde la plus
+       * petite amplitude et son opacité : il ne doit jamais passer sous le texte.
+       *
        * L'ORDRE COMPTE : le sable, seule teinte claire, est posé EN PREMIER et reste dans le coin haut
        * droit, à faible opacité et avec la plus petite amplitude. Le titre, le logo et les appels sont
        * en blanc au centre : un foyer clair qui passerait derrière eux ferait tomber le contraste.
@@ -142,16 +149,16 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
     }
     <div data-aurora>
       <span
-        style="--x:84%; --y:4%; --taille:54rem; --teinte:#e7cca5; --opacite:0.34; --flou:100px; --duree:17s; --amp:2.5%;"
+        style="--x:84%; --y:4%; --taille:54rem; --teinte:#e7cca5; --opacite:0.34; --flou:100px; --duree:13s; --amp:4%;"
       ></span>
       <span
-        style="--x:12%; --y:46%; --taille:64rem; --teinte:#1499b0; --opacite:0.46; --flou:80px; --duree:13s; --amp:9%;"
+        style="--x:12%; --y:46%; --taille:64rem; --teinte:#1499b0; --opacite:0.55; --flou:80px; --duree:11s; --amp:18%;"
       ></span>
       <span
-        style="--x:62%; --y:90%; --taille:56rem; --teinte:#14a4ba; --opacite:0.32; --flou:90px; --duree:19s; --amp:8%; --retard:-4s;"
+        style="--x:62%; --y:90%; --taille:56rem; --teinte:#14a4ba; --opacite:0.42; --flou:90px; --duree:17s; --amp:16%; --retard:-4s;"
       ></span>
       <span
-        style="--x:94%; --y:84%; --taille:52rem; --teinte:#03242e; --opacite:0.72; --flou:70px; --duree:23s; --amp:6%; --retard:-8s;"
+        style="--x:94%; --y:84%; --taille:52rem; --teinte:#03242e; --opacite:0.72; --flou:70px; --duree:19s; --amp:12%; --retard:-8s;"
       ></span>
     </div>
 

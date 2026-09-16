@@ -864,21 +864,23 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   }
 }
 
-/* Dérive douce, amplitude donnée par foyer (`--amp`) : les quatre partagent la courbe, pas la course.
+/* Dérive, amplitude donnée par foyer (`--amp`) : les quatre partagent la courbe, pas la course.
    `--amp` est un pour-cent de la boîte de l'élément, trois fois plus petite que le foyer visible : il est
-   multiplié par `--zoom` pour que la dérive garde sa course en pixels, et chaque échelle l'est aussi. */
+   multiplié par `--zoom` pour que la dérive garde sa course en pixels, et chaque échelle l'est aussi.
+   RESPIRATION ÉLARGIE le 16/09/2026 (« pas assez visible ») : de 0,86 à 1,16 au lieu de 0,92 à 1,08, un
+   foyer grossit et rétrécit d'un tiers sur sa course, ce qui se lit même sans suivre sa dérive. */
 @keyframes aurore {
   from {
     transform: translate3d(calc(var(--amp) * var(--zoom) * -1), calc(var(--amp) * var(--zoom) * 0.6), 0)
-      scale(calc(var(--zoom) * 0.92));
+      scale(calc(var(--zoom) * 0.86));
   }
   50% {
     transform: translate3d(calc(var(--amp) * var(--zoom) * 0.8), calc(var(--amp) * var(--zoom) * -0.9), 0)
-      scale(calc(var(--zoom) * 1.08));
+      scale(calc(var(--zoom) * 1.16));
   }
   to {
     transform: translate3d(calc(var(--amp) * var(--zoom)), calc(var(--amp) * var(--zoom) * 0.4), 0)
-      scale(calc(var(--zoom) * 0.96));
+      scale(calc(var(--zoom) * 0.94));
   }
 }
 
