@@ -227,8 +227,22 @@ const data = scpis.map((s) => ({
                       base du chiffre, et le détail venait s'y coller. Les quatre pixels d'origine
                       suffisaient sous un halo diffus, plus sous un fond plein. */
                   }
-                  {row.rstartDetail && (
-                    <span class="text-caption mt-3 block text-slate-700">{row.rstartDetail}</span>
+                  {
+                    /* Un barème se lit UNE LIGNE PAR PALIER (16/09/2026) : une vraie liste, et non des
+                      retours forcés dans un texte, pour qu'un lecteur d'écran annonce « cinq éléments »
+                      et les énumère un par un. `role="list"` rétablit la sémantique que la remise à
+                      zéro des puces efface. */
+                  }
+                  {Array.isArray(row.rstartDetail) ? (
+                    <ul role="list" class="text-caption mt-3 space-y-1 text-slate-700">
+                      {row.rstartDetail.map((ligne) => (
+                        <li>{ligne}</li>
+                      ))}
+                    </ul>
+                  ) : (
+                    row.rstartDetail && (
+                      <span class="text-caption mt-3 block text-slate-700">{row.rstartDetail}</span>
+                    )
                   )}
                 </td>
                 <td role="cell" class="px-3 py-5 text-center align-top sm:px-5">

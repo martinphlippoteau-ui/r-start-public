@@ -59,8 +59,12 @@ export interface ComparatorRow {
   rstart: string;
   /** Taux réellement comparé quand la case affiche une fourchette. */
   rstartCompare?: string;
-  /** Précision sous le taux de R Start. Absente : la case n'affiche que le taux. */
-  rstartDetail?: string;
+  /**
+   * Précision sous le taux de R Start. Absente : la case n'affiche que le taux. Une LISTE depuis le
+   * 16/09/2026 : les deux barèmes à paliers (cessions, retrait) se lisent une ligne par palier, taux
+   * en tête, et non en une phrase où les taux se noient.
+   */
+  rstartDetail?: string | readonly string[];
 }
 
 export type ComparatorRowKey =
@@ -83,6 +87,29 @@ const range = (rates: readonly string[]): string => {
 
 /** Taux de retrait de R Start au-delà de la durée retenue : le dernier palier du barème. */
 const withdrawalAfterHolding = fees.withdrawal.steps[fees.withdrawal.steps.length - 1].rate;
+
+/*
+ * BARÈME DU RETRAIT, tel que l'équipe l'a formulé le 16/09/2026 pour le comparateur, un palier par
+ * ligne. LES TAUX VIENNENT DE facts.fees.withdrawal.steps, jamais d'ici ; seules les conditions sont
+ * écrites, dans l'ordre des paliers. Le garde-fou vérifie que le barème compte bien autant de
+ * conditions que de paliers : un palier ajouté dans facts.ts sans sa condition arrêterait la
+ * compilation au lieu de laisser un taux sans phrase.
+ */
+const WITHDRAWAL_CONDITIONS = [
+  'en cas de sortie avant 4 ans de détention',
+  'en cas de sortie la 5e ou la 6e année',
+  'en cas de sortie la 7e année',
+  'en cas de sortie la 8e année',
+  'au-delà de 8 ans de détention',
+] as const;
+if (WITHDRAWAL_CONDITIONS.length !== fees.withdrawal.steps.length) {
+  throw new Error(
+    `comparator.ts : ${WITHDRAWAL_CONDITIONS.length} conditions de retrait pour ${fees.withdrawal.steps.length} paliers dans facts.fees.withdrawal.steps`
+  );
+}
+const withdrawalSchedule = fees.withdrawal.steps.map(
+  (step, i) => `${step.rate} ${WITHDRAWAL_CONDITIONS[i]}`
+);
 
 /*
  * SOURCE COMMUNE des taux des autres SCPI, relevé transmis par l'équipe le 15/09/2026. Il remplace les
@@ -170,13 +197,13 @@ const ROWS: ComparatorRow[] = [
       basis: 'en % du prix de vente',
       rstart: range(fees.disposal.tiers.map((t) => t.rate)),
       /*
-       * DÉTAIL RETIRÉ DE L'ÉCRAN le 16/09/2026, demande de l'équipe (« on changera et on ajoutera plus
-       * tard »). Il déroulait les trois paliers de la commission sur les cessions, « 0 % si la
-       * plus-value est inférieure à 7 %, 6 % entre 7 et 13 %, 12 % au-delà ».
-       * La case garde la FOURCHETTE, de 0 à 12 % : le lecteur voit donc toujours les deux bornes, il
-       * n'a plus la règle qui les sépare. Le détail complet reste sur /frais et dans la FAQ.
-       * Pour rétablir : `rstartDetail: fees.disposal.tiers.map((t) => `${t.rate} ${t.condition}`).join(', ')`.
+       * LE BARÈME SOUS LA FOURCHETTE, un palier par ligne (16/09/2026, texte de l'équipe : « 0 % si la
+       * plus-value est inférieure à 7 % », « 6 % si la plus-value est comprise entre 7 % et 13 % »,
+       * « 12 % si la plus-value est supérieure à 13 % »). Il avait été retiré le matin même (« on
+       * changera et on ajoutera plus tard ») ; il revient dans ce format, et non plus en une phrase.
+       * Taux ET conditions viennent de facts.fees.disposal.tiers, dont les libellés sont ceux fournis.
        */
+      rstartDetail: fees.disposal.tiers.map((t) => `${t.rate} ${t.condition}`),
     },
     {
       key: 'withdrawal' as const,
@@ -198,14 +225,14 @@ const ROWS: ComparatorRow[] = [
        */
       rstartCompare: withdrawalAfterHolding,
       /*
-       * DÉTAIL RETIRÉ DE L'ÉCRAN le 16/09/2026, demande de l'équipe. Il disait « au-delà de 8 ans de
-       * détention ; avant, le barème est dégressif : 10 % < 4 ans, 7 % 5e-6e année, 5 % 7e année,
-       * 3 % 8e année ».
-       * ATTENTION, CE QUI RESTE : la case affiche la fourchette « de 0 % à 10 % » et la comparaison se
-       * fait toujours sur le taux au-delà de huit ans, hypothèse dite au-dessus du tableau
-       * (`holdingNotice`). Sans le détail, c'est cette note d'en-tête qui porte seule la condition.
-       * Le barème complet reste sur /frais et dans la FAQ.
+       * LE BARÈME SOUS LA FOURCHETTE, un palier par ligne (16/09/2026, texte de l'équipe). Il avait été
+       * retiré le matin même, en une phrase (« au-delà de 8 ans de détention ; avant, le barème est
+       * dégressif : 10 % < 4 ans, 7 % 5e-6e année… ») ; il revient ligne à ligne, taux en tête.
+       * La comparaison, elle, se fait toujours sur le taux au-delà de huit ans (`rstartCompare`),
+       * hypothèse dite au-dessus du tableau (`holdingNotice`) : le barème la rend lisible, il ne la
+       * change pas.
        */
+      rstartDetail: withdrawalSchedule,
     },
 ];
 
