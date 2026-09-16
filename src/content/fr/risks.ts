@@ -55,27 +55,43 @@ export const risks: RisksContent = {
    * Pour la rétablir : remettre le champ `intro` ici, il reste facultatif dans le type.
    */
 
+  /*
+   * LES QUATRE PREMIERS RISQUES SONT REPRIS DE corum.fr (16/09/2026, demande de l'équipe). La source est
+   * la page de CORUM XL, et non celle de CORUM USA que l'équipe avait d'abord transmise : XL est la
+   * seule SCPI du groupe dont le profil correspond à celui de R Start, un patrimoine européen qui sort
+   * de la zone euro, donc les quatre mêmes rubriques dont le risque de devise. La page de CORUM USA
+   * parle d'« exposition majoritaire au marché américain » et du « cours du dollar », que R Start n'a
+   * ni l'un ni l'autre : son DIC la situe dans les pays du Conseil de l'Europe et au Canada.
+   *
+   * CE QUI EST REPRIS : les intitulés et la construction des phrases, mot pour mot quand le sens le
+   * permet. CE QUI EST ADAPTÉ : le nom de la SCPI, et la géographie, qui est celle du DIC de R Start.
+   *
+   * LES DEUX DERNIERS RISQUES NE VIENNENT PAS DE corum.fr et sont PROPRES À R START : l'effet de levier
+   * et l'absence d'historique (souscriptions ouvertes le 20 mai 2026). Les SCPI de corum.fr sont
+   * établies depuis des années, elles n'ont pas le second, et c'est précisément ce qui distingue
+   * R Start d'elles. Ils sont donc gardés. À dire si l'équipe veut s'en tenir aux quatre de corum.fr.
+   */
   items: [
     {
-      title: 'Perte en capital',
+      title: 'Risque de perte en capital',
       description:
-        'Le capital investi n’est pas garanti. La valeur de vos parts suit celle des immeubles détenus et peut baisser. Vous pourriez perdre tout ou partie de votre investissement.',
+        'La valeur des parts de R Start évolue avec la valeur de son patrimoine dans le temps. Elle peut donc varier à la hausse comme à la baisse en fonction de l’évolution des marchés immobiliers et des devises.',
       noteId: 'risques-sources',
     },
     {
       title: 'Revenus non garantis',
       description:
-        'Les dividendes potentiels dépendent des loyers encaissés et des résultats de la SCPI. Ils varient à la hausse comme à la baisse, selon le marché immobilier et le cours des devises.',
+        'Les revenus potentiels distribués par R Start ne sont pas garantis et peuvent varier à la hausse comme à la baisse en fonction des loyers encaissés ainsi que des charges afférentes aux immeubles et au fonctionnement de la SCPI.',
     },
     {
-      title: 'Liquidité limitée',
-      description: `R Start ne garantit pas le rachat de vos parts : vous ne récupérez votre argent que si un autre épargnant les achète. Si personne ne se présente, votre argent reste investi. Avant ${fees.withdrawal.zeroAfterYears} ans de détention, une commission de retrait dégressive s’applique.`,
+      title: 'Risque de liquidité',
+      description: `Comme tout placement immobilier, la SCPI est un placement peu liquide. Aussi, nous attirons votre attention sur la revente de vos parts, qui n’est pas garantie et peut être plus ou moins rapide en fonction de l’évolution du marché immobilier. Avant ${fees.withdrawal.zeroAfterYears} ans de détention, une commission de retrait dégressive s’applique.`,
       noteId: 'risques-sortie',
     },
     {
-      title: 'Risque de change',
+      title: 'Risque de devise',
       description:
-        'R Start peut investir hors zone euro, notamment au Canada. La couverture du risque de devise n’est pas systématique. L’évolution des cours peut réduire la valeur de vos parts et vos revenus.',
+        'La variation du cours des devises implique un risque de perte en capital et des fluctuations potentielles dans les revenus distribués. R Start peut investir hors zone euro, notamment au Canada, et n’aura pas recours à une couverture systématique du risque de change.',
     },
     {
       title: 'Effet de levier',

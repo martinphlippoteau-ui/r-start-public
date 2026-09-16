@@ -24,6 +24,59 @@ import Base from '@/layouts/Base.astro';
 import Container from '@/components/ui/Container.astro';
 import Section from '@/components/ui/Section.astro';
 
+/**
+ * PICTOGRAMMES CANDIDATS pour la mention « Société de gestion agréée par l'AMF » du hero (16/09/2026).
+ * Le logo de l'AMF a été retiré la veille : l'AMF ne le concède pas aux communications commerciales, et
+ * un signe qui figure l'autorité, près d'une note Trustpilot, se lit comme une caution de cette
+ * autorité. Ces six-là sont les nôtres, dessinés au trait, ils ne se confondent avec aucune marque.
+ * Grille 24 × 24, trait 1,5, `currentColor` : la convention de ui/Picto.astro.
+ * DEUX SONT SIGNALÉS COMME À ÉVITER, et ce n'est pas un avis de goût : le fronton et la balance
+ * représentent l'institution et sa fonction, donc l'AMF, ce qui ramène la lecture qu'on vient d'écarter.
+ */
+const PICTOS: { id: string; nom: string; note: string; eviter?: true; d: string }[] = [
+  {
+    id: 'document',
+    nom: 'Document validé',
+    note: 'celui en place : un document et sa coche',
+    d: '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z"/><path d="M14 3v5h5"/><path d="m9 14 2 2 3.5-3.5"/>',
+  },
+  {
+    id: 'ecusson',
+    nom: 'Écusson à coche',
+    note: 'le plus lu comme « protégé », sans réfléchir',
+    d: '<path d="M12 2.8 4.8 5.4v6c0 4.2 2.9 7.6 7.2 9.8 4.3-2.2 7.2-5.6 7.2-9.8v-6L12 2.8Z"/><path d="m8.8 11.8 2.2 2.2 4.2-4.4"/>',
+  },
+  {
+    id: 'sceau',
+    nom: 'Sceau officiel',
+    note: 'une rosette : agrément, contrôle. Se referme sous 20 px',
+    d: '<path d="M12 2.6l2.2 1.5 2.6-.4 1 2.5 2.3 1.3-.6 2.6.6 2.6-2.3 1.3-1 2.5-2.6-.4L12 21.6l-2.2-1.5-2.6.4-1-2.5-2.3-1.3.6-2.6-.6-2.6 2.3-1.3 1-2.5 2.6.4L12 2.6Z"/><path d="m8.9 12.1 2.1 2.1 4.1-4.3"/>',
+  },
+  {
+    id: 'coche',
+    nom: 'Coche cerclée',
+    note: 'irréprochable mais banal : le picto de validation de tout formulaire',
+    d: '<circle cx="12" cy="12" r="9"/><path d="m8.2 12.2 2.6 2.6 5-5.2"/>',
+  },
+  {
+    id: 'fronton',
+    nom: 'Fronton',
+    note: 'représente l’AMF elle-même : ramène la lecture « caution de l’autorité »',
+    eviter: true,
+    d: '<path d="M3.6 9.4 12 4.2l8.4 5.2"/><path d="M5.6 9.8v8M9.8 9.8v8M14.2 9.8v8M18.4 9.8v8"/><path d="M3.4 20.4h17.2"/>',
+  },
+  {
+    id: 'balance',
+    nom: 'Balance',
+    note: 'même écueil que le fronton, en plus discret',
+    eviter: true,
+    d: '<path d="M12 4.2v15.6M7.4 19.8h9.2M4.6 7.2h14.8M12 4.2 6 7"/><path d="M6.2 7.4 3.4 13.6h5.6L6.2 7.4Z"/><path d="M17.8 7.4 15 13.6h5.6l-2.8-6.2Z"/>',
+  },
+];
+
+/** Le libellé exact du hero, pour juger sur pièce et non sur une phrase d'exemple. */
+const MENTION_AMF = 'Société de gestion agréée par l’AMF';
+
 /** Les neuf titres du site qui nomment R Start, relevés dans dist/ le 15/09/2026. */
 const TITRES: { niveau: 1 | 2; avant: string; apres: string }[] = [
   { niveau: 2, avant: '', apres: ' table sur deux moteurs de performance' },
@@ -169,6 +222,99 @@ const TITRES: { niveau: 1 | 2; avant: string; apres: string }[] = [
         </div>
       </Container>
     </Section>
+
+    <Section id="pictos" tone="ink">
+      <Container size="wide">
+        <h2 id="pictos-title" class="text-eyebrow text-teal-200">Pictogramme de la mention AMF</h2>
+        <p class="text-lead mt-4 max-w-3xl text-white/80">
+          Les six candidats, au libellé et à la taille du hero, sur son fond. Les réglages agissent sur
+          tous en même temps.
+        </p>
+
+        <div
+          class="mt-8 flex flex-wrap items-end gap-x-10 gap-y-5 rounded-3xl bg-white/5 p-6 ring-1 ring-white/15"
+          data-reglages-picto
+        >
+          <fieldset>
+            <legend class="text-caption font-semibold text-teal-200">Taille</legend>
+            <div class="mt-3 flex gap-4">
+              {
+                ['16', '20', '24'].map((v, i) => (
+                  <label class="flex items-center gap-2 text-base text-white/85">
+                    <input type="radio" name="taille" value={v} checked={i === 1} /> {v} px
+                  </label>
+                ))
+              }
+            </div>
+          </fieldset>
+          <fieldset>
+            <legend class="text-caption font-semibold text-teal-200">Opacité</legend>
+            <div class="mt-3 flex gap-4">
+              {
+                ['0.45', '0.65', '1'].map((v, i) => (
+                  <label class="flex items-center gap-2 text-base text-white/85">
+                    <input type="radio" name="opacite" value={v} checked={i === 0} />
+                    {Math.round(Number(v) * 100)} %
+                  </label>
+                ))
+              }
+            </div>
+          </fieldset>
+          <fieldset>
+            <legend class="text-caption font-semibold text-teal-200">Teinte</legend>
+            <div class="mt-3 flex gap-4">
+              {
+                [
+                  ['currentColor', 'Comme le texte'],
+                  ['var(--color-teal-200)', 'Turquoise clair'],
+                  ['var(--color-sand)', 'Sable'],
+                ].map(([v, l], i) => (
+                  <label class="flex items-center gap-2 text-base text-white/85">
+                    <input type="radio" name="teinte" value={v} checked={i === 0} /> {l}
+                  </label>
+                ))
+              }
+            </div>
+          </fieldset>
+        </div>
+
+        <ul role="list" class="mt-10 grid gap-4 lg:grid-cols-2 lg:gap-x-10">
+          {
+            PICTOS.map((p, i) => (
+              <li class="flex items-center gap-4 rounded-2xl bg-white/5 px-5 py-4">
+                <span class="text-caption w-6 shrink-0 tabular-nums text-white/40">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <span class="flex items-center gap-2 text-sm leading-snug text-white/80">
+                  <svg
+                    class="shrink-0"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                    data-picto
+                    set:html={p.d}
+                  />
+                  {MENTION_AMF}
+                </span>
+                <span class="text-caption ml-auto max-w-[15rem] text-right text-white/45">
+                  <b class="block font-semibold text-white/75">
+                    {p.nom}
+                    {p.eviter && <span class="ml-1 font-normal text-teal-200">(à éviter)</span>}
+                  </b>
+                  {p.note}
+                </span>
+              </li>
+            ))
+          }
+        </ul>
+      </Container>
+    </Section>
   </main>
 </Base>
 
@@ -248,4 +394,35 @@ const TITRES: { niveau: 1 | 2; avant: string; apres: string }[] = [
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();
+</script>
+
+<script>
+  /**
+   * Réglages des pictogrammes candidats (16/09/2026) : taille, opacité et teinte, appliqués aux six en
+   * même temps pour qu'ils se comparent à conditions égales. Rien n'est écrit dans le HTML des SVG, on
+   * ne touche qu'à trois propriétés d'un style en ligne.
+   */
+  const initPicto = (): void => {
+    const form = document.querySelector<HTMLElement>('[data-reglages-picto]');
+    if (!form) return;
+    const pictos = [...document.querySelectorAll<SVGElement>('[data-picto]')];
+
+    const appliquer = (): void => {
+      const coches = [...form.querySelectorAll<HTMLInputElement>('input')].filter((i) => i.checked);
+      const d = new Map(coches.map((i) => [i.name, i.value]));
+      const taille = d.get('taille') ?? '20';
+      for (const p of pictos) {
+        p.setAttribute('width', taille);
+        p.setAttribute('height', taille);
+        p.style.opacity = d.get('opacite') ?? '0.45';
+        p.style.color = d.get('teinte') ?? 'currentColor';
+      }
+    };
+
+    form.addEventListener('change', appliquer);
+    appliquer();
+  };
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initPicto);
+  else initPicto();
 </script>
