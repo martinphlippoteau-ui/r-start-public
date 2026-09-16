@@ -1326,6 +1326,76 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   background: rgb(13 46 61 / 0.55);
   backdrop-filter: blur(2px);
 }
+
+/*
+ * OUVERTURE ET FERMETURE EN BULLE (16/09/2026, demande de l'équipe).
+ *
+ * TROIS PROPRIÉTÉS SONT NÉCESSAIRES, et c'est ce qui rend l'exercice délicat : `display` et `overlay`
+ * sont des propriétés DISCRÈTES, elles sautent d'un état à l'autre sans valeur intermédiaire. Sans
+ * `transition-behavior: allow-discrete`, la fenêtre disparaît à l'instant où on la ferme et l'animation
+ * de sortie n'a pas lieu. `overlay` doit y figurer aussi, sans quoi la fenêtre quitte la couche
+ * supérieure avant d'avoir fini de se réduire et se retrouve masquée par le reste de la page.
+ *
+ * `@starting-style` donne l'état AVANT l'ouverture : c'est le seul moyen d'animer l'entrée d'un
+ * élément qui vient d'apparaître, une transition ordinaire n'ayant pas d'état de départ à quitter.
+ *
+ * LE REBOND EST DANS LA COURBE, pas dans une image-clé : cubic-bezier(0.34, 1.56, 0.64, 1) dépasse 1
+ * avant de revenir, la bulle enfle donc légèrement au-delà de sa taille puis se pose. À la fermeture,
+ * une courbe sans dépassement et plus courte : on ne fait pas rebondir ce qui s'en va.
+ *
+ * Les navigateurs qui ignorent `@starting-style` affichent la fenêtre d'un coup, sans animation : rien
+ * ne casse, le style final est le même.
+ */
+.carte-dialog {
+  transform: scale(0.88);
+  opacity: 0;
+  transition:
+    transform 260ms cubic-bezier(0.32, 0.72, 0.35, 1),
+    opacity 180ms ease,
+    display 260ms allow-discrete,
+    overlay 260ms allow-discrete;
+}
+.carte-dialog[open] {
+  transform: scale(1);
+  opacity: 1;
+  transition:
+    transform 360ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    opacity 200ms ease,
+    display 360ms allow-discrete,
+    overlay 360ms allow-discrete;
+}
+@starting-style {
+  .carte-dialog[open] {
+    transform: scale(0.88);
+    opacity: 0;
+  }
+}
+
+.carte-dialog::backdrop {
+  opacity: 0;
+  transition:
+    opacity 260ms ease,
+    display 260ms allow-discrete,
+    overlay 260ms allow-discrete;
+}
+.carte-dialog[open]::backdrop {
+  opacity: 1;
+}
+@starting-style {
+  .carte-dialog[open]::backdrop {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .carte-dialog,
+  .carte-dialog[open],
+  .carte-dialog::backdrop {
+    transition: none;
+    transform: none;
+    opacity: 1;
+  }
+}
 .carte-dialog > [data-carte-detail] {
   max-height: 85svh;
   overflow-y: auto;

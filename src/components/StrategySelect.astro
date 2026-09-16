@@ -1,0 +1,120 @@
+---
+/**
+ * Illustration de la tuile « Sélective » (16/09/2026) : neuf immeubles, un seul retenu.
+ *
+ * PENDANT DU GLOBE, dans la même grammaire : dessin au trait clair sur fond ink, carré, calé sur la
+ * largeur de sa tuile. Le globe est un canvas parce qu'il projette une sphère ; ici un SVG suffit et
+ * coûte cent fois moins.
+ *
+ * CE QU'ELLE DIT : on regarde beaucoup d'immeubles, on en garde un. C'est le propos de la zone, pas
+ * une décoration. Le balayage passe sur les neuf et s'arrête sur celui du centre, qui reste allumé.
+ *
+ * Décorative (aria-hidden) : le texte de la tuile porte le sens, l'image ne l'ajoute pas.
+ * Animation coupée en `prefers-reduced-motion` : l'immeuble retenu est alors simplement allumé.
+ */
+---
+
+<figure class="select-figure" aria-hidden="true">
+  <svg viewBox="0 0 120 120" fill="none" class="select-svg">
+    {
+      /* Trois rangées de trois. L'ordre des index suit la lecture, le balayage aussi. */
+      [0, 1, 2].map((ligne) =>
+        [0, 1, 2].map((colonne) => {
+          const i = ligne * 3 + colonne;
+          const x = 14 + colonne * 38;
+          const y = 14 + ligne * 38;
+          const retenu = i === 4;
+          return (
+            <g class={retenu ? 'select-bloc select-bloc--retenu' : 'select-bloc'} style={`--rang:${i}`}>
+              <rect x={x} y={y} width="26" height="26" rx="4" class="select-cadre" />
+              <path d={`M${x + 6} ${y + 20}v-8M${x + 13} ${y + 20}v-12M${x + 20} ${y + 20}v-6`} class="select-trait" />
+            </g>
+          );
+        })
+      )
+    }
+    {/* Le repère qui se pose sur l'immeuble retenu, une fois le balayage terminé. */}
+    <circle cx="60" cy="60" r="22" class="select-repere" />
+  </svg>
+</figure>
+
+<style>
+  .select-figure {
+    margin: 0;
+  }
+  .select-svg {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1;
+  }
+  .select-cadre {
+    stroke: rgb(169 221 230 / 0.35);
+    stroke-width: 1.4;
+  }
+  .select-trait {
+    stroke: rgb(169 221 230 / 0.28);
+    stroke-width: 1.1;
+    stroke-linecap: round;
+  }
+
+  /* Le balayage : chaque bloc s'allume à son tour, décalé par son rang. Neuf blocs, 0,18 s d'écart,
+     et un cycle de 6 s pour que l'ensemble respire sans jamais réclamer l'attention. */
+  .select-bloc {
+    animation: select-passage 6s ease-in-out infinite;
+    animation-delay: calc(var(--rang) * 0.18s);
+  }
+  .select-bloc--retenu .select-cadre {
+    stroke: var(--color-teal-200);
+    stroke-width: 1.8;
+  }
+  .select-bloc--retenu .select-trait {
+    stroke: var(--color-teal-200);
+  }
+  .select-bloc--retenu {
+    animation: none;
+  }
+  .select-repere {
+    stroke: var(--color-teal-400);
+    stroke-width: 1.4;
+    stroke-dasharray: 4 6;
+    transform-origin: 60px 60px;
+    animation: select-repere 6s ease-in-out infinite;
+  }
+
+  @keyframes select-passage {
+    0%,
+    24%,
+    100% {
+      opacity: 0.55;
+    }
+    12% {
+      opacity: 1;
+    }
+  }
+  @keyframes select-repere {
+    0%,
+    30% {
+      opacity: 0;
+      transform: scale(0.7) rotate(0deg);
+    }
+    45%,
+    88% {
+      opacity: 1;
+      transform: scale(1) rotate(0deg);
+    }
+    100% {
+      opacity: 0;
+      transform: scale(1.06) rotate(40deg);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .select-bloc,
+    .select-repere {
+      animation: none;
+    }
+    .select-repere {
+      opacity: 1;
+    }
+  }
+</style>

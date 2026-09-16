@@ -77,35 +77,40 @@ export const pages: Record<PageKey, PageMeta> = {
     key: 'about',
     path: '/a-propos',
     label: 'À propos',
-    order: 6,
+    order: 7,
     inMenu: true,
   },
   documentation: {
     key: 'documentation',
     path: '/documentation',
     label: 'Documentation',
-    order: 5,
+    order: 6,
     // Hors menu depuis le 11/09/2026 : accessible par le pied de page, comme la salle de presse.
     inMenu: false,
   },
   /*
    * FAQ COMPLÈTE, page créée le 16/09/2026. Les autres pages n'en rendent plus que quatre questions et
-   * renvoient ici pour le reste. HORS MENU, comme la documentation : la barre ne porte que les quatre
-   * pages du parcours (réunion du 10/09/2026), la FAQ s'atteint par les renvois et le pied de page.
+   * renvoient ici pour le reste.
+   * AU MENU depuis le 16/09/2026, en quatrième position, juste après « Notre approche » : la barre en
+   * portait quatre depuis la réunion du 10/09/2026, elle en porte cinq. Les renvois posés sous chaque
+   * FAQ courte restent, ils mènent au même endroit.
+   * `navLabel` « Vos questions » et non le nom complet de la page : cinq entrées dans une barre, à
+   * 375 px, ne tiennent qu'à des libellés courts. Le fil d'Ariane suit l'intitulé du menu.
    */
   faq: {
     key: 'faq',
     path: '/faq',
     label: 'Questions fréquentes',
-    order: 8,
-    inMenu: false,
+    navLabel: 'Vos questions',
+    order: 4,
+    inMenu: true,
   },
   press: {
     key: 'press',
     path: '/presse',
     label: 'Presse',
     navLabel: 'La presse en parle',
-    order: 4,
+    order: 5,
     inMenu: true,
   },
   // Salle de presse : réservée aux journalistes, accessible depuis le pied de page seulement
@@ -114,7 +119,7 @@ export const pages: Record<PageKey, PageMeta> = {
     key: 'pressRoom',
     path: '/salle-de-presse',
     label: 'Salle de presse',
-    order: 7,
+    order: 8,
     inMenu: false,
   },
   legal: {

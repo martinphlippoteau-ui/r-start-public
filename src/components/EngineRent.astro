@@ -1,0 +1,154 @@
+---
+/**
+ * Illustration du moteur 01, « Les loyers versés par les entreprises locataires » (16/09/2026).
+ *
+ * MÊME GRAMMAIRE QUE LES TROIS TUILES de la sélection (StrategySelect, StrategyGlobe,
+ * StrategyTiming) : dessin au trait clair sur fond ink, animé en boucle lente, coupé en
+ * `prefers-reduced-motion`. Elle remplace la photo d'illustration qui occupait ce bandeau.
+ * Format 236 × 100, le rapport natif du bandeau de la carte : le cadre ne change pas.
+ *
+ * CE QU'ELLE DIT : des entreprises occupent l'immeuble, et il en sort un flux RÉGULIER. C'est le
+ * pendant exact du moteur 02, qui montre lui un échange ponctuel. Les fenêtres s'allument l'une
+ * après l'autre (les locataires), et les versements partent à intervalles égaux vers la droite.
+ *
+ * AUCUN CHIFFRE, aucune échelle, rien qui monte : le flux est régulier, pas croissant. L'image ne
+ * dit rien du montant ni de la régularité future des loyers, elle nomme le mécanisme.
+ *
+ * Décorative (aria-hidden) : le texte de la carte porte le sens.
+ */
+
+/* Les quatre versements en vol. Retards NÉGATIFS : au chargement, le flux est déjà installé, la
+   carte ne s'ouvre pas sur une ligne vide qui attendrait son premier point. */
+const versements = [0, 1, 2, 3];
+/* Trois colonnes de quatre fenêtres. L'ordre sert le décalage d'allumage. */
+const fenetres = [0, 1, 2].flatMap((colonne) => [0, 1, 2, 3].map((ligne) => ({ colonne, ligne })));
+---
+
+<figure class="rent-figure" aria-hidden="true">
+  <svg viewBox="0 0 236 100" fill="none" class="rent-svg">
+    {/* L'immeuble : les entreprises locataires que la ligne nomme. */}
+    <rect x="24" y="22" width="60" height="62" rx="5" class="rent-cadre" />
+    {
+      fenetres.map(({ colonne, ligne }) => (
+        <rect
+          x={35 + colonne * 15}
+          y={32 + ligne * 13}
+          width="9"
+          height="8"
+          rx="1.5"
+          class="rent-fenetre"
+          style={`--rang:${colonne * 4 + ligne}`}
+        />
+      ))
+    }
+
+    {/* Le chemin des versements, de l'immeuble vers la droite. */}
+    <path d="M96 56h104" class="rent-ligne" />
+    {
+      versements.map((i) => (
+        <circle cx="98" cy="56" r="3.2" class="rent-versement" style={`--rang:${i}`} />
+      ))
+    }
+
+    {/* Ce qui reçoit : le point d'arrivée s'allume au passage de chaque versement. */}
+    <circle cx="208" cy="56" r="9" class="rent-collecte" />
+  </svg>
+</figure>
+
+<style>
+  .rent-figure {
+    margin: 0;
+  }
+  .rent-svg {
+    display: block;
+    width: 100%;
+    aspect-ratio: 236 / 100;
+  }
+  .rent-cadre {
+    stroke: rgb(169 221 230 / 0.38);
+    stroke-width: 1.6;
+  }
+  .rent-ligne {
+    stroke: rgb(169 221 230 / 0.22);
+    stroke-width: 1.2;
+    stroke-dasharray: 3 7;
+    stroke-linecap: round;
+  }
+
+  /* Les fenêtres s'allument par vagues : douze, 0,22 s d'écart, cycle de 4,8 s, le même que celui
+     des versements pour que les deux mouvements restent en phase. */
+  .rent-fenetre {
+    fill: rgb(169 221 230 / 0.16);
+    animation: rent-occupation 4.8s ease-in-out infinite;
+    animation-delay: calc(var(--rang) * 0.22s);
+  }
+
+  /* Quatre versements pour un cycle de 4,8 s : un départ toutes les 1,2 s, à intervalles égaux.
+     C'est la régularité qui est le sujet, d'où un `linear` et non une courbe qui accélérerait. */
+  .rent-versement {
+    fill: var(--color-teal-200);
+    animation: rent-flux 4.8s linear infinite;
+    animation-delay: calc(var(--rang) * -1.2s);
+  }
+  .rent-collecte {
+    stroke: var(--color-teal-400);
+    stroke-width: 1.6;
+    transform-origin: 208px 56px;
+    animation: rent-collecte 1.2s ease-out infinite;
+  }
+
+  @keyframes rent-occupation {
+    0%,
+    70%,
+    100% {
+      fill: rgb(169 221 230 / 0.16);
+    }
+    20%,
+    50% {
+      fill: rgb(169 221 230 / 0.62);
+    }
+  }
+  @keyframes rent-flux {
+    0% {
+      transform: translateX(0);
+      opacity: 0;
+    }
+    12% {
+      opacity: 1;
+    }
+    88% {
+      opacity: 1;
+    }
+    100% {
+      transform: translateX(101px);
+      opacity: 0;
+    }
+  }
+  @keyframes rent-collecte {
+    0%,
+    100% {
+      stroke-opacity: 0.45;
+      transform: scale(1);
+    }
+    12% {
+      stroke-opacity: 1;
+      transform: scale(1.12);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .rent-fenetre,
+    .rent-versement,
+    .rent-collecte {
+      animation: none;
+    }
+    /* À l'arrêt : l'immeuble est occupé et les versements sont posés le long du chemin, à intervalles
+       égaux. L'image dit la même chose, sans mouvement. */
+    .rent-fenetre {
+      fill: rgb(169 221 230 / 0.5);
+    }
+    .rent-versement {
+      transform: translateX(calc(var(--rang) * 25px));
+    }
+  }
+</style>

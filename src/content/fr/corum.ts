@@ -1,5 +1,5 @@
 import type { CorumContent, LegalNote } from '@/content/types';
-import { corumGroup, product, externalLinks } from '@/content/fr/facts';
+import { corumGroup, product, externalLinks, scpiCreated } from '@/content/fr/facts';
 import { managementCompany } from '@/content/fr/legal';
 import { experienceStats, notes as trustNotes } from '@/content/fr/trust';
 
@@ -208,6 +208,9 @@ export const corum = {
     title: `Des SCPI gérées depuis ${corumGroup.scpiSince}`,
     description: `Depuis ${corumGroup.scpiSince}, les SCPI du groupe CORUM ont toujours atteint ou dépassé leurs objectifs de performance.`,
     scpiNames: [...corumGroup.scpiNames],
+    /* Dates de création sous chaque tuile (16/09/2026). Voir la réserve de source dans facts.ts. */
+    scpiCreated,
+    scpiCreatedLabel: 'Créée en {year}',
     currentBadge: 'Nouveau',
   },
 

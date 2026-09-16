@@ -295,6 +295,13 @@ export interface CorumContent {
     title: string;
     description: string;
     scpiNames: string[];
+    /**
+     * Année de création par nom de SCPI, rendue sous chaque tuile. Une SCPI absente de l'objet n'a
+     * pas de ligne de date : la tuile se referme sur son seul nom, sans trou.
+     */
+    scpiCreated?: Record<string, string>;
+    /** Gabarit de la ligne de date, `{year}` remplacé par l'année (« Créée en 2012 »). */
+    scpiCreatedLabel?: string;
     /** Pastille sur la tuile de R Start dans la gamme (« Nouveau ») ; absente : rien. */
     currentBadge?: string;
   };

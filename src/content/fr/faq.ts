@@ -360,8 +360,11 @@ export const homeNotes: LegalNote[] = notes.filter((n) => idsAppeles.includes(n.
 export const faq = {
   eyebrow: 'FAQ',
   title: 'Vos questions sur la SCPI R Start.',
-  intro:
-    'Des réponses courtes et factuelles, issues des documents officiels de R Start. Elles ne remplacent pas la lecture du DIC et de la note d’information.',
+  /* Supprimée le 16/09/2026 à la demande de l'équipe, sur toutes les pages : la phrase annonçait ce
+     que les questions montrent d'elles-mêmes, et le renvoi au DIC et à la note d'information est déjà
+     porté par la section Documents et par le pied de page. Vide et non retirée : `FaqContent.intro`
+     reste exigé par le type, et la section n'affiche plus son paragraphe quand il est vide. */
+  intro: '',
   items: homeItems.map(({ question, answer, ...rest }) => ({
     ...rest,
     question: nb(question),

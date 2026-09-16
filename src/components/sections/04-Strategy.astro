@@ -29,28 +29,27 @@
  * fade-up court ; filets qui s'étirent (data-draw="width") ; listes en cascade ; photos en cascade
  * avec parallaxe de sens alterné dans chaque cadre (élément surdimensionné de ±12 % pour ne jamais
  * découvrir le bord).
- * Contenu : src/content/fr/strategy.ts ; photos : src/content/fr/media.ts.
+ * Contenu : src/content/fr/strategy.ts. Plus aucune photo depuis le 16/09/2026 : les deux moteurs et
+ * les trois tuiles sont illustrés par des dessins animés, chacun dans son propre composant.
  * Aucune prop : la section n'appelle plus de note, elle n'a plus besoin du registre de la page.
  */
-import { Picture } from 'astro:assets';
 import Container from '@/components/ui/Container.astro';
 import NoteConformite from '@/components/ui/NoteConformite.astro';
 import Picto from '@/components/ui/Picto.astro';
 import Section from '@/components/ui/Section.astro';
+import EngineGain from '@/components/EngineGain.astro';
+import EngineRent from '@/components/EngineRent.astro';
 import StrategyGlobe from '@/components/StrategyGlobe.astro';
+import StrategySelect from '@/components/StrategySelect.astro';
+import StrategyTiming from '@/components/StrategyTiming.astro';
 import { sections } from '@/config/sections';
-import { media, AFFICHER_LEGENDES } from '@/content/fr/media';
 import { strategy } from '@/content/fr/strategy';
-import { resolveImage } from '@/lib/images';
 
 const id = sections.strategy.id;
 /** Ancres des deux autres chapitres (ids HTML, pas les textes affichés). */
 const ids = { what: 'quoi', where: 'ou', how: 'comment' };
 
 /** Une illustration par moteur, dans l'ordre des items de `strategy.engines`. */
-const enginePhotos = await Promise.all(
-  media.engines.map(async (m) => ({ ...m, image: await resolveImage(m.src) }))
-);
 /**
  * Les trois photos portent la même mention (« Photo d'illustration. Immeuble non détenu par R Start. ») :
  * une seule légende sous la bande suffit. Répétée trois fois côte à côte, elle occupait trois colonnes
@@ -80,31 +79,23 @@ const QUIET_TITLE_Y = 12;
         /*
          * CARTES ILLUSTRÉES depuis le 15/09/2026 (« créer des cards différentes avec des illustrations
          * pour illustrer »). Avant : un filet, un numéro, deux lignes de texte, à même le fond.
-         * Le bandeau garde le RAPPORT NATIF des illustrations (2,36) : posé dans un cadre 16/9 il se
-         * ferait rogner sur les côtés, or ces images se lisent dans la largeur, c'est leur perspective
-         * qui porte le sujet.
-         * Le numéro passe SUR l'image, dans une pastille : sous elle, il répétait le rôle du filet qu'il
-         * remplace, et la carte commençait par deux lignes de service avant son titre.
+         * DESSINS ANIMÉS depuis le 16/09/2026, à la place des deux photos d'illustration : les deux
+         * moteurs rejoignent la grammaire des trois tuiles de la sélection, trait clair sur fond ink.
+         * Une photo de rue commerçante montrait un décor ; le dessin montre le MÉCANISME, et la
+         * différence entre les deux moteurs se lit alors sans passer par les textes : flux régulier
+         * d'un côté, échange ponctuel de l'autre.
+         * Le bandeau garde le rapport 2,36, celui des illustrations qu'il remplace : les deux dessins
+         * sont tracés dans un viewBox 236 × 100, le cadre de la carte ne bouge pas.
+         * Le numéro reste SUR le bandeau, dans une pastille : sous lui, il répétait le rôle du filet
+         * qu'il remplace, et la carte commençait par deux lignes de service avant son titre.
          */
       }
       {
         strategy.engines.items.map((item, i) => (
           <li class="card-lift flex flex-col overflow-hidden rounded-3xl bg-white shadow-card ring-1 ring-navy/5">
-            <div class="relative aspect-[236/100] overflow-hidden">
-              {enginePhotos[i] && (
-                <Picture
-                  src={enginePhotos[i].image}
-                  alt={enginePhotos[i].alt}
-                  widths={[480, 800, 1200]}
-                  sizes="(min-width: 40rem) 45vw, 100vw"
-                  formats={['avif', 'webp']}
-                  fallbackFormat="jpeg"
-                  loading="lazy"
-                  decoding="async"
-                  pictureAttributes={{ class: 'block h-full w-full' }}
-                  class="h-full w-full object-cover"
-                />
-              )}
+            <div class="relative aspect-[236/100] overflow-hidden bg-ink">
+              {i === 0 && <EngineRent />}
+              {i === 1 && <EngineGain />}
               <p
                 class="text-caption absolute left-4 top-4 flex size-10 items-center justify-center rounded-full bg-white/95 font-semibold tabular-nums text-teal-700 shadow-card"
                 aria-hidden="true"
@@ -195,14 +186,20 @@ const QUIET_TITLE_Y = 12;
                 </h2>
 
                 {
-                  /* Le globe reste dans sa zone et retrouve son fond sombre. Il est en
-                    `aspect-ratio: 1`, donc borné pour ne pas pousser la tuile hors de sa rangée. */
+                  /* UNE ILLUSTRATION PAR TUILE (16/09/2026). Le globe n'en avait plus qu'une sur trois,
+                    les deux autres restaient nues. Les trois sont maintenant dans la même grammaire :
+                    dessin au trait clair sur fond ink, carré, calé sur la largeur de la tuile, animé
+                    en boucle lente et coupé en `prefers-reduced-motion`.
+                    Le globe est un CANVAS parce qu'il projette une sphère ; les deux autres sont des
+                    SVG, qui suffisent et coûtent cent fois moins.
+                    Bornées à 11rem : en `aspect-ratio: 1`, elles pousseraient sinon la tuile hors de
+                    sa rangée. */
                 }
-                {zone.map && (
-                  <div class="mx-auto mt-4 w-full max-w-[11rem]">
-                    <StrategyGlobe />
-                  </div>
-                )}
+                <div class="mx-auto mt-4 w-full max-w-[11rem]">
+                  {z === 0 && <StrategySelect />}
+                  {z === 1 && <StrategyGlobe />}
+                  {z === 2 && <StrategyTiming />}
+                </div>
 
                 <button
                   type="button"

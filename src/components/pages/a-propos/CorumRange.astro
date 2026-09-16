@@ -44,7 +44,19 @@ interface Props {
 const { tone = 'white', notes } = Astro.props as Props;
 const officePhoto = await resolveImage(media.corum.src);
 const stats = trust.stats;
-const range = corum.range.scpiNames.map((name) => ({ name, current: name === product.name }));
+/*
+ * DATE DE CRÉATION SOUS CHAQUE TUILE (16/09/2026, demande de l'équipe). Le gabarit vient du contenu,
+ * l'année aussi : le composant ne fabrique aucun texte. Une SCPI sans année rend une tuile inchangée.
+ */
+const range = corum.range.scpiNames.map((name) => {
+  const annee = corum.range.scpiCreated?.[name];
+  const gabarit = corum.range.scpiCreatedLabel;
+  return {
+    name,
+    current: name === product.name,
+    created: annee && gabarit ? gabarit.replace('{year}', annee) : undefined,
+  };
+});
 const LOGO_STAGGER = 0.08;
 const QUIET_TITLE_Y = 12;
 /*
@@ -242,7 +254,7 @@ const QUIET_TITLE_Y = 12;
           data-animate-stagger={String(LOGO_STAGGER)}
         >
           {
-            range.map(({ name, current }) => (
+            range.map(({ name, current, created }) => (
               <li
                 class:list={[
                   'flex min-h-24 items-center justify-center rounded-2xl border p-5 text-center text-lg font-semibold sm:p-6',
@@ -275,6 +287,25 @@ const QUIET_TITLE_Y = 12;
                     </>
                   ) : (
                     <span>{name}</span>
+                  )}
+                  {
+                    /*
+                     * La date est en poids normal sous un nom en gras, et d'un cran plus petite : deux
+                     * lignes de même graisse se seraient lues comme deux noms.
+                     * Teintes calculées, pas choisies à l'œil : `slate-700` sur `paper` donne 9,21:1, et
+                     * `navy/80` sur le `teal-100` de la tuile courante 5,00:1. `navy/75`, essayé d'abord,
+                     * tombait à 4,45:1, sous le seuil de 4,5:1 exigé pour ce corps de texte.
+                     */
+                  }
+                  {created && (
+                    <span
+                      class:list={[
+                        'text-caption font-normal',
+                        current ? 'text-navy/80' : 'text-slate-700',
+                      ]}
+                    >
+                      {created}
+                    </span>
                   )}
                 </span>
               </li>

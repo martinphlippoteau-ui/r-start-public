@@ -346,6 +346,32 @@ export const corumGroup = {
     'Les cessions réalisées par les SCPI CORUM ne préjugent pas de leurs performances futures.', // brochure p.7
 } as const;
 
+/**
+ * ANNÉE DE CRÉATION DE CHAQUE SCPI de la gamme (16/09/2026, demande de l'équipe : « la date de
+ * création de chaque SCPI sous les SCPI », page /a-propos).
+ *
+ * SOURCE À FAIRE CONFIRMER PAR CORUM. Une seule de ces cinq dates est adossée à une pièce du dossier :
+ * celle de R Start, dont la note d'information porte le visa SCPI n° 26-06 du 4 mars 2026. Les quatre
+ * autres sont les années d'ouverture publiquement connues de chaque SCPI ; aucun document fourni pour
+ * ce site ne les porte. À vérifier auprès de la société de gestion avant la mise en ligne publique,
+ * comme la date d'arrêté des chiffres du groupe.
+ *
+ * CORUM Origin a été créée sous le nom CORUM Convictions et renommée en 2019 : l'année retenue est
+ * celle de la CRÉATION, que la demande vise, et non celle du changement de nom.
+ *
+ * Cohérent avec `corumGroup.scpiSince` (2012) et avec les « 15 ans d'expertise » de la brochure p. 7.
+ *
+ * Objet indexé par le nom plutôt que tableau parallèle à `scpiNames` : deux listes alignées par
+ * position se désalignent au premier ajout, et la gamme en attend d'autres.
+ */
+export const scpiCreated: Record<string, string> = {
+  'CORUM Origin': '2012',
+  'CORUM XL': '2017',
+  'CORUM Eurion': '2020',
+  'CORUM USA': '2023',
+  'R Start': '2026',
+};
+
 export const documents = [
   {
     key: 'dic',

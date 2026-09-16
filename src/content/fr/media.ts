@@ -65,11 +65,6 @@ export interface MediaContent {
    * de repli n'était plus lue depuis que le hero est passé aux aurores en dégradé.
    */
   hero: { main: MediaImage };
-  /**
-   * Une illustration par moteur de performance (zone 1 de /strategie), DANS L'ORDRE des items de
-   * `strategy.engines` : les loyers, puis les plus-values.
-   */
-  engines: readonly MediaImage[];
   /** Trois immeubles variés pour le défilement de la section Stratégie. */
   strategy: readonly MediaImage[];
   /** Bande pleine largeur de la page /a-propos, entre les deux chapitres. */
@@ -103,28 +98,12 @@ export const media = {
     },
   },
   /*
-   * LES DEUX MOTEURS DE PERFORMANCE (15/09/2026, demande de l'équipe : « créer des cards différentes
-   * avec des illustrations pour illustrer »). La zone n'avait que du texte sous un filet.
-   * Chacune montre ce que son moteur désigne, et pas un décor interchangeable : des commerces occupés
-   * pour les loyers, un immeuble de caractère pour la plus-value réalisée à la revente. Toutes deux en
-   * 2,36, posées en bandeau au-dessus du texte de la carte, à leur rapport natif donc sans recadrage.
+   * LES DEUX MOTEURS DE PERFORMANCE n'ont plus d'images depuis le 16/09/2026 : leurs bandeaux sont
+   * devenus des dessins animés (src/components/EngineRent.astro et EngineGain.astro), dans la même
+   * grammaire que les trois tuiles de la sélection. Les deux illustrations qui occupaient la place
+   * (rue-vitrines, rue-hotel-marquise) montraient un décor ; les dessins montrent le mécanisme.
+   * L'entrée est retirée d'ici et de MediaContent : une donnée que personne ne lit induit en erreur.
    */
-  engines: [
-    // 01, les loyers : une rue de commerces en activité, vitrines éclairées et passants. Ce sont les
-    // entreprises locataires que la ligne nomme, montrées à l'ouvrage plutôt qu'en façade vide.
-    {
-      src: 'immeubles/rue-vitrines.png',
-      alt: 'Illustration : rue commerçante aux vitrines éclairées, passants devant les devantures',
-      credit: illustration,
-    },
-    // 02, les plus-values : un immeuble de caractère à l'angle d'une rue, marquise et ferronneries.
-    // C'est l'actif lui-même, celui qu'on revend, et non un panorama de ville.
-    {
-      src: 'immeubles/rue-hotel-marquise.png',
-      alt: 'Illustration : immeuble ancien à l’angle d’une rue, marquise vitrée et ferronneries au balcon',
-      credit: illustration,
-    },
-  ],
   /*
    * Les trois portraits du lot d'illustrations, en 1856 × 2304 (rapport 0,80). Le cadre de la section
    * est `aspect-[3/4]` puis `sm:aspect-[4/5]` : à 0,80 ils remplissent le second exactement, là où

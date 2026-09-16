@@ -1,0 +1,126 @@
+---
+/**
+ * Illustration de la tuile « Opportuniste » (16/09/2026) : acheter bas, valoriser, vendre haut.
+ *
+ * PENDANT DU GLOBE, dans la même grammaire : dessin au trait clair sur fond ink, carré, calé sur la
+ * largeur de sa tuile. Un SVG suffit, le globe n'est un canvas que parce qu'il projette une sphère.
+ *
+ * CE QU'ELLE DIT, et c'est le propos de la zone en trois points : on repère un immeuble sous sa
+ * valeur (le creux), on travaille à la faire monter (la pente), on choisit le moment de vendre (le
+ * sommet). La courbe se trace, les deux repères se posent l'un après l'autre.
+ *
+ * LA COURBE N'EST PAS UNE PERFORMANCE et ne doit pas se lire comme telle : aucune échelle, aucun
+ * chiffre, aucune date. C'est un geste, pas un graphique. La tuile ne porte d'ailleurs aucune donnée.
+ *
+ * Décorative (aria-hidden). Animation coupée en `prefers-reduced-motion` : tout est alors déjà tracé.
+ */
+---
+
+<figure class="timing-figure" aria-hidden="true">
+  <svg viewBox="0 0 120 120" fill="none" class="timing-svg">
+    {/* Grille de fond, très retenue : elle donne un plan sans faire graphique. */}
+    <path d="M14 30h92M14 60h92M14 90h92" class="timing-grille" />
+
+    {/* Le geste : descente vers le creux, longue montée, sommet. */}
+    <path d="M16 74c14 10 22 16 30 14s14-26 26-36 20-12 32-20" class="timing-courbe" />
+
+    {/* Achat, au creux. */}
+    <g class="timing-repere timing-repere--achat">
+      <circle cx="46" cy="88" r="6" class="timing-point" />
+      <path d="M46 82v12M40 88h12" class="timing-croix" />
+    </g>
+    {/* Vente, au sommet. */}
+    <g class="timing-repere timing-repere--vente">
+      <circle cx="104" cy="32" r="6" class="timing-point" />
+      <path d="m100 32 3 3 5-6" class="timing-coche" />
+    </g>
+  </svg>
+</figure>
+
+<style>
+  .timing-figure {
+    margin: 0;
+  }
+  .timing-svg {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1;
+  }
+  .timing-grille {
+    stroke: rgb(169 221 230 / 0.18);
+    stroke-width: 1;
+  }
+  .timing-courbe {
+    stroke: var(--color-teal-200);
+    stroke-width: 2;
+    stroke-linecap: round;
+    /* Longueur mesurée sur le tracé : une valeur plus grande que le chemin suffit, le reste est du
+       dash invisible. 260 couvre largement les ~190 unités du `d`. */
+    stroke-dasharray: 260;
+    stroke-dashoffset: 260;
+    animation: timing-trace 7s ease-in-out infinite;
+  }
+  .timing-point {
+    stroke: var(--color-teal-400);
+    stroke-width: 1.6;
+    fill: var(--color-ink);
+  }
+  .timing-croix,
+  .timing-coche {
+    stroke: var(--color-teal-400);
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .timing-repere {
+    opacity: 0;
+    animation: timing-pose 7s ease-in-out infinite;
+  }
+  .timing-repere--achat {
+    animation-delay: 1.4s;
+  }
+  .timing-repere--vente {
+    animation-delay: 3.2s;
+  }
+
+  @keyframes timing-trace {
+    0% {
+      stroke-dashoffset: 260;
+    }
+    55%,
+    88% {
+      stroke-dashoffset: 0;
+    }
+    100% {
+      stroke-dashoffset: 0;
+      opacity: 0;
+    }
+  }
+  @keyframes timing-pose {
+    0% {
+      opacity: 0;
+      transform: scale(0.6);
+    }
+    12%,
+    70% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    85%,
+    100% {
+      opacity: 0;
+      transform: scale(1);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .timing-courbe {
+      stroke-dashoffset: 0;
+      animation: none;
+    }
+    .timing-repere {
+      opacity: 1;
+      animation: none;
+    }
+  }
+</style>

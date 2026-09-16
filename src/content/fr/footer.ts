@@ -34,9 +34,8 @@ export const footer = {
       links: [
         ...menuPages.map((p): FooterLink => ({ label: p.navLabel ?? p.label, href: p.path })),
         { label: pages.documentation.label, href: pages.documentation.path } satisfies FooterLink,
-        /* /faq est hors menu comme la documentation : le pied de page est son seul accès direct,
-           en plus des renvois posés sous chaque FAQ courte (16/09/2026). */
-        { label: pages.faq.label, href: pages.faq.path } satisfies FooterLink,
+        /* /faq n'est plus listée ici : entrée au menu le 16/09/2026, elle arrive par `menuPages`
+           juste au-dessus. La répéter la ferait figurer deux fois dans la même colonne. */
         /* La salle de presse est sortie du pied de page le 15/09/2026 : sa route est désactivée
            (src/pages/_salle-de-presse.astro), le lien pointerait dans le vide. */
       ],

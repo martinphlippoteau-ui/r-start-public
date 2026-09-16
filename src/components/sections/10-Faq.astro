@@ -123,13 +123,20 @@ const items = rendus.map((item) => {
       <h2 id={titleId} class="text-display-lg text-balance" data-reveal-text={revealTitle || undefined}>
         {title}
       </h2>
-      <p
-        class="mt-6 max-w-3xl text-lead opacity-90"
-        data-animate="fade-up"
-        data-animate-delay="0.1"
-      >
-        {intro}
-      </p>
+      {
+        /* Paragraphe rendu SEULEMENT s'il y a un texte (16/09/2026) : l'introduction commune a été
+          supprimée, et /faq passait déjà une chaîne vide. Un <p> vide laissait sa marge haute sous le
+          titre, et les lecteurs d'écran annonçaient un paragraphe sans contenu. */
+      }
+      {intro && (
+        <p
+          class="mt-6 max-w-3xl text-lead opacity-90"
+          data-animate="fade-up"
+          data-animate-delay="0.1"
+        >
+          {intro}
+        </p>
+      )}
     </header>
 
     <div class="mt-chapter grid gap-12 lg:grid-cols-12 lg:gap-16">
