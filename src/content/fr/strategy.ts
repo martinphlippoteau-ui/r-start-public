@@ -31,9 +31,30 @@ export const strategy: StrategyContent = {
        chiffre s'y repère plus vite. */
     title: 'R Start : 2 moteurs au service de la performance',
     intro: '',
+    /*
+     * TEXTES DE L'ÉQUIPE, 16/09/2026. Les deux cartes portaient une ligne chacune (« versés par les
+     * entreprises locataires », « réalisées sur les ventes d'immeuble ») ; elles portent maintenant
+     * le paragraphe qui explique le moteur.
+     *
+     * DEUX RETOUCHES SUR LE TEXTE FOURNI, et rien d'autre : « la cherche » corrigé en « la
+     * recherche », et un point final ajouté à la carte des loyers, qui n'en avait pas.
+     *
+     * « de façon plus systématique que d'autres SCPI » est une COMPARAISON avec le reste du marché,
+     * sans périmètre et sans source. check-compliance.mjs la signale comme allégation à défendre :
+     * c'est voulu, la mention reste visible dans le rapport tant que CORUM n'a pas fourni la base de
+     * la comparaison. Les autres comparaisons du site (« la première SCPI », « la seule SCPI »)
+     * portent une note de périmètre ; celle-ci n'en a pas encore.
+     */
     items: [
-      { lead: 'Les loyers', rest: 'versés par les entreprises locataires' },
-      { lead: 'Les plus-values', rest: 'réalisées sur les ventes d’immeuble' },
+      {
+        lead: 'Les loyers',
+        rest: 'Comme toute SCPI de rendement, R Start distribue à ses épargnants des revenus potentiels (appelés « dividendes ») issus des loyers facturés aux entreprises locataires de ses immeubles.',
+      },
+      {
+        lead: 'Les plus-values',
+        rest:
+          'R Start met au cœur de sa démarche la recherche de plus-values sur les ventes d’immeubles. C’est une particularité de cette SCPI. En clair, R Start vise à dégager des plus-values sur vente d’immeubles de façon plus systématique que d’autres SCPI. Les plus-values réalisées sont redistribuées aux épargnants sous forme de dividendes. C’est la deuxième source de revenus potentiels pour les clients de la SCPI R Start.',
+      },
     ],
     /* La phrase de méthode (« Les opportunités ne tombent pas du ciel… ») est descendue sous « Tout
        commence par le choix des immeubles » le 16/09/2026 : elle y annonce ce qui suit au lieu de
@@ -48,6 +69,14 @@ export const strategy: StrategyContent = {
      * Pour la rétablir : `disclaimer: corumProductsDisclaimer`.
      */
   },
+
+  /*
+   * EN-TÊTE DES TROIS VOLETS (16/09/2026, texte de l'équipe). « pour les alimenter » renvoie aux deux
+   * moteurs du bloc précédent : le titre fait donc la jointure entre les deux blocs, et doit rester
+   * juste après eux.
+   * Chiffre et non lettre (« 3 volets »), comme « 2 moteurs » et « 4 étapes pour souscrire ».
+   */
+  tilesTitle: 'Une approche en 3 volets pour les alimenter',
 
   what: {
     /*

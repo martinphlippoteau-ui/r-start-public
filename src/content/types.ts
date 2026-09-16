@@ -212,6 +212,11 @@ export interface StrategyChapter {
  * l'effet de levier. Plus de `notes` non plus : la page n'appelle aucune source.
  */
 export interface StrategyContent {
+  /**
+   * Titre commun aux trois volets (Sélective, Diversifiée, Opportuniste) de /strategie. Absent : le
+   * bloc n'a pas d'en-tête et c'est le premier volet qui nomme la section, comme avant le 16/09/2026.
+   */
+  tilesTitle?: string;
   /** Libellés des tuiles à fenêtre : lus par les lecteurs d'écran, jamais affichés (16/09/2026). */
   dialogOpen?: string;
   dialogClose?: string;

@@ -151,9 +151,11 @@ const QUIET_TITLE_Y = 12;
    * leur contenu : la page s'ouvre maintenant sur trois tuiles qui se lisent d'un coup d'œil, et le
    * détail vient à la demande.
    *
-   * AUCUN TEXTE N'EST AJOUTÉ NI RETIRÉ, la répartition change seulement : la tuile porte le surtitre
-   * et le titre, la fenêtre porte l'introduction, la phrase d'annonce, la liste et la chute. Les trois
-   * titres restent des H2, le plan du document ne bouge pas.
+   * AUCUN TEXTE N'EST AJOUTÉ NI RETIRÉ par la fusion, la répartition change seulement : la tuile porte
+   * le surtitre et le titre, la fenêtre porte l'introduction, la phrase d'annonce, la liste et la chute.
+   * Les trois titres étaient des H2 ; ils sont passés en H3 le 16/09/2026, quand l'équipe a demandé un
+   * titre commun au-dessus des trois volets (« Une approche en 3 volets pour les alimenter »), qui
+   * prend le rang H2. C'est le seul texte ajouté à ce bloc depuis la fusion.
    *
    * SANS JAVASCRIPT, TOUT RESTE LISIBLE : le détail est écrit dans le flux, sous sa tuile, et le
    * bouton d'ouverture arrive `hidden`. Le script inverse les deux (src/scripts/carteDialog.ts). C'est
@@ -166,11 +168,32 @@ const QUIET_TITLE_Y = 12;
    * pas.
    */
 }
-<Section id={ids.what} tone="paper">
+<Section id={ids.what} tone="paper" labelledBy="volets-title">
   <Container size="wide">
+    {
+      /*
+       * EN-TÊTE DU BLOC (16/09/2026, demande de l'équipe). Les trois tuiles n'en avaient pas : la
+       * section empruntait son nom au premier volet, dont le H2 portait l'identifiant attendu par
+       * <Section>. Elle a maintenant son titre, et `labelledBy` le désigne explicitement.
+       * LES TROIS TITRES DE VOLET PASSENT DONC EN H3 : sous un H2 qui les annonce, trois H2 de même
+       * rang auraient fait quatre sections de même niveau dans le plan du document. Leurs
+       * identifiants ne bougent pas, ce sont eux qui servent d'ancres.
+       */
+    }
+    <header class="max-w-5xl">
+      <h2
+        id="volets-title"
+        class="text-display-lg text-ink"
+        data-animate="fade-up"
+        data-animate-y={String(QUIET_TITLE_Y)}
+      >
+        {strategy.tilesTitle}
+      </h2>
+    </header>
+
     <ul
       role="list"
-      class="grid gap-4 sm:gap-5 lg:grid-cols-3"
+      class="mt-chapter grid gap-4 sm:gap-5 lg:grid-cols-3"
       data-animate="stagger"
       data-animate-stagger="0.1"
     >
@@ -181,9 +204,9 @@ const QUIET_TITLE_Y = 12;
             <li>
               <article class="relative flex min-h-[20rem] flex-col overflow-hidden rounded-3xl bg-ink p-6 text-white sm:min-h-[24rem] sm:p-8">
                 {zone.eyebrow && <p class="text-eyebrow text-teal-200">{zone.eyebrow}</p>}
-                <h2 id={ancre + '-title'} class="text-display-sm mt-3 max-w-[16rem] text-sand">
+                <h3 id={ancre + '-title'} class="text-display-sm mt-3 max-w-[16rem] text-sand">
                   {zone.title}
-                </h2>
+                </h3>
 
                 {
                   /* UNE ILLUSTRATION PAR TUILE (16/09/2026). Le globe n'en avait plus qu'une sur trois,

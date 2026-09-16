@@ -194,6 +194,18 @@ function checkHeroClaims(text, file) {
       'allégation de rang « première SCPI » sans périmètre de marché (le périmètre est en note)',
     ],
     [/objectifs? tenus?/gi, '« objectifs tenus » (allégation de performance)'],
+    /*
+     * Ajoutée le 16/09/2026 avec le texte du moteur « Les plus-values » de /strategie : « R Start vise
+     * à dégager des plus-values sur vente d'immeubles de façon plus systématique que d'autres SCPI ».
+     * C'est une comparaison avec le reste du marché, comme « la seule SCPI » et « première SCPI », et
+     * elle n'a ni périmètre ni source : elle est donc suivie ici comme les deux autres, en
+     * avertissement, jusqu'à ce que CORUM fournisse la base de la comparaison ou que la compliance
+     * tranche. Le motif vise la COMPARAISON, pas le mot « systématique » seul.
+     */
+    [
+      /(plus|davantage|moins)\s+(syst[ée]matique|souvent|fr[ée]quemment)[^.]{0,40}\bque\s+d['’]autres\s+SCPI/gi,
+      'comparaison avec les autres SCPI (« plus systématique que d’autres SCPI ») sans périmètre ni source',
+    ],
     [
       /atteint ou d[ée]pass[ée]|objectifs? de performance/gi,
       'allégation de performance PASSÉE sur des SCPI tierces, sans source, sans période, et sans la mention que les performances passées ne préjugent pas des performances futures',
