@@ -40,7 +40,11 @@ const { stats } = trust;
 
 <Section id={id} tone="white" spacing="none">
   <!-- Bande blanche : en-tête, avis Trustpilot, renvoi vers /a-propos -->
-  <div class="py-section">
+  {/* `pt-section-sm` et non `py-section` (15/09/2026) : la marge haute valait 10vw, soit 138 px sur
+    un écran de 1380, et elle s'ajoutait à la marge basse du comparateur juste au-dessus. Le palier
+    court la ramène à 6vw, environ 83 px. La marge basse, elle, ne bouge pas : c'est elle qui sépare
+    la section de la bande pleine largeur qui suit. */}
+  <div class="pt-section-sm pb-section">
     <Container size="wide">
       {
         /* Zone 4 de la trame : en-tête de corum.ts (« L'expérience derrière R Start »), dont l'introduction porte

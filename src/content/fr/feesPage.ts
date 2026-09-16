@@ -415,8 +415,16 @@ const raw = {
    */
   hero: {
     eyebrow: `Frais · SCPI ${product.name}`,
-    /* « inédit » est descendu en zone 3, sur le barème (14/09/2026, texte fourni par l'équipe). */
-    title: 'Un modèle de frais gagnant-gagnant',
+    /*
+     * « Comparateur de frais SCPI » depuis le 16/09/2026, texte de l'équipe. Le titre disait « Un modèle
+     * de frais gagnant-gagnant » ; il dit maintenant ce que la page EST, et reprend l'intitulé du menu,
+     * passé à « Comparateur de frais » le 15/09.
+     * Il emporte au passage la DERNIÈRE occurrence de « gagnant-gagnant » sur cette page, que
+     * scripts/check-compliance.mjs signalait (« suggère un gain, capital non garanti ») : l'autre était
+     * partie avec la chute du hero le 15/09.
+     * (« inédit » reste descendu en zone 3, sur le barème.)
+     */
+    title: 'Comparateur de frais SCPI',
     intro:
       'R Start est la seule SCPI qui ne prélève ni frais de souscription, ni frais d’acquisition sur les achats d’immeubles.',
     /*
@@ -428,7 +436,7 @@ const raw = {
      * dans le titre juste au-dessus.
      */
     punchline:
-      'Ce qui compte pour vous ? Savoir où va votre argent. Comparez chaque ligne de frais avec d’autres SCPI du marché grâce à notre comparateur.',
+      'Comparez chaque ligne de frais de R Start avec les autres SCPI du marché grâce à notre comparateur.',
     /* Plus de ligne risques dans l'en-tête (14/09/2026, demande de l'équipe : « supprime les bon à
        savoir de tous les hero sauf celui de la home »). Le « Bon à savoir : … » sous le H1 a disparu de
        TOUTES les sous-pages ; seul l'accueil le garde, sous ses appels à l'action. Ces pages n'ont donc

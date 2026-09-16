@@ -35,11 +35,25 @@ export const notes: LegalNote[] = [
   },
 ];
 
-export const risks = {
+/*
+ * Type DÉCLARÉ et non `satisfies` depuis le 15/09/2026 : `intro` est devenue facultative et absente
+ * de ce contenu. Avec `satisfies`, le type déduit est celui du littéral, et le composant qui lit
+ * `risks.intro` ne compilait plus. L'annotation garde le contrôle du littéral et expose le champ.
+ */
+export const risks: RisksContent = {
   eyebrow: 'Risques',
   /** « R Start » en espace insécable : le nom de marque ne se coupe jamais dans le H2 (mobile 375 px). */
   title: 'Investir dans R Start comporte des risques.',
-  intro: `Ces risques ont le même poids que les avantages présentés sur cette page. Ils s’appliquent à tout investissement dans R Start, quel que soit le montant. Prenez le temps de les lire avant de souscrire.`,
+  /*
+   * INTRODUCTION RETIRÉE LE 15/09/2026, demande de l'équipe. Elle disait :
+   * « Ces risques ont le même poids que les avantages présentés sur cette page. Ils s'appliquent à tout
+   * investissement dans R Start, quel que soit le montant. Prenez le temps de les lire avant de
+   * souscrire. »
+   * Aucun contrôle ne l'exigeait, ni check-compliance.mjs ni conformite.spec.ts : elle disait en mots ce
+   * que la page fait déjà en structure, les six risques étant rendus au même poids typographique que les
+   * avantages. Ce qui est contrôlé, c'est cette égalité-là, et elle ne bouge pas.
+   * Pour la rétablir : remettre le champ `intro` ici, il reste facultatif dans le type.
+   */
 
   items: [
     {
@@ -83,6 +97,6 @@ export const risks = {
   arbitrageBullets: [...arbitrageWarningBullets],
 
   notes,
-} satisfies RisksContent;
+};
 
 export default risks;

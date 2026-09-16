@@ -311,7 +311,11 @@ export interface RiskItem {
 export interface RisksContent {
   eyebrow: string;
   title: string;
-  intro: string;
+  /**
+   * Facultative depuis le 15/09/2026 : l'équipe a demandé de retirer celle de l'accueil. Le texte reste
+   * dans risks.ts, en commentaire, prêt à revenir.
+   */
+  intro?: string;
   items: RiskItem[];
   /** Titre (H2) de la section qui regroupe les avertissements reproduits in extenso (/documentation). */
   warningsTitle?: string;

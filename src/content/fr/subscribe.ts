@@ -59,8 +59,7 @@ export const subscribe: SubscribeContent = {
      chiffre s'y repère plus vite. L'introduction, elle, garde « quatre », la lettre étant la règle dans
      une phrase suivie. */
   /** Au mot du document de l'équipe (14/09/2026) : « 4 étapes pour souscrire, 100 % en ligne ». */
-  /* TROIS ÉTAPES depuis le 15/09/2026, texte de l'équipe, ex-« 4 étapes ». */
-  homeTitle: `3 étapes pour souscrire, ${nb(subscription.onlineLabel)}.`,
+  homeTitle: `4 étapes pour souscrire, ${nb(subscription.onlineLabel)}.`,
   /*
    * PAS D'INTRODUCTION SUR L'ACCUEIL depuis le 14/09/2026 (demande de l'équipe) : le titre enchaîne
    * directement sur les quatre étapes, qui se lisent d'elles-mêmes. Le champ reste optionnel dans le
@@ -68,7 +67,7 @@ export const subscribe: SubscribeContent = {
    * ligne, à partir de 200 € la part : profil investisseur, signature électronique, règlement par
    * virement ou prélèvement, suivi de vos parts sur votre espace privé et l'application MyCORUM. »
    */
-  intro: `La souscription se fait entièrement en ligne, en trois étapes, à partir d’une part de ${nb(share.priceLabel)}. Aucune souscription papier n’est possible. R Start vise une stratégie patrimoniale plus dynamique, en contrepartie d’un risque plus élevé. Avant de vous engager, lisez le DIC et la note d’information. R Start comporte un risque de perte en capital.`,
+  intro: `La souscription se fait entièrement en ligne, en quatre étapes, à partir d’une part de ${nb(share.priceLabel)}. Aucune souscription papier n’est possible. R Start vise une stratégie patrimoniale plus dynamique, en contrepartie d’un risque plus élevé. Avant de vous engager, lisez le DIC et la note d’information. R Start comporte un risque de perte en capital.`,
 
   /**
    * Quatre intitulés, sans description (11/09/2026, trame de l'équipe) : le parcours se lit d'un coup
@@ -77,9 +76,9 @@ export const subscribe: SubscribeContent = {
    * appelées ici, et le suivi de l'épargne a sa place sur /documentation, avec MyCORUM.
    */
   /*
-   * TROIS ÉTAPES DEPUIS LE 15/09/2026, intitulés fournis par l'équipe. C'étaient les quatre suivantes :
-   * renseigner sa situation et ses objectifs ; choisir le nombre de parts ; signer le bulletin par
-   * signature électronique ; effectuer le versement par virement ou prélèvement.
+   * QUATRE ÉTAPES RÉÉCRITES LE 15/09/2026, intitulés fournis par l'équipe. C'étaient : renseigner sa
+   * situation et ses objectifs ; choisir le nombre de parts ; signer le bulletin par signature
+   * électronique ; effectuer le versement par virement ou prélèvement.
    *
    * LA DEUXIÈME ÉTAPE CHANGE DE NATURE, et c'est le vrai écart : elle disait ce que FAIT le
    * souscripteur (choisir ses parts), elle dit maintenant ce que fait CORUM (vérifier l'adéquation).
@@ -94,9 +93,16 @@ export const subscribe: SubscribeContent = {
     { title: 'Définissez votre profil et vos objectifs' },
     { title: 'CORUM vérifie que R Start est bien fait pour vous' },
     { title: 'Signez électroniquement votre souscription' },
+    /*
+     * QUATRIÈME ÉTAPE AJOUTÉE le 15/09/2026, après le passage à trois le même jour. Elle ne décrit pas
+     * la souscription mais ce qui vient APRÈS elle : le parcours ne s'arrête plus à la signature.
+     * C'est aussi le seul endroit de l'accueil qui nomme MyCORUM, dont le bloc complet vit sur
+     * /documentation, avec les liens vers les deux magasins d'applications.
+     */
+    { title: 'Suivez votre investissement sur l’application MyCORUM' },
   ],
 
-  stepsLabel: 'Les trois étapes de la souscription',
+  stepsLabel: 'Les quatre étapes de la souscription',
   stepPrefix: 'Étape',
 
   optionsTitle: 'Deux options facultatives',
