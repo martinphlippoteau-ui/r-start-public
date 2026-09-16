@@ -84,7 +84,13 @@ const situations = (difference.situations ?? []).map((s) => {
         Rien ne change sous `lg`, où la grille est en une colonne : le H3 reste au même endroit, suivi
         du corps puis de la photo, dans cet ordre. */
     }
-    <div class="mt-6 grid items-start gap-8 sm:mt-8 lg:grid-cols-12 lg:gap-14">
+    {
+      /* LE TITRE SE DÉTACHE DU BLOC (16/09/2026 au soir, « remonte un peu "Qui a envie de payer avant de
+        gagner" pour le détacher un peu du bloc ») : la grille descend d'un cran, `mt-10` et `sm:mt-14`
+        au lieu de `mt-6` et `sm:mt-8`. Le titre garde sa place en tête de section, c'est l'air sous lui
+        qui grandit. */
+    }
+    <div class="mt-10 grid items-start gap-8 sm:mt-14 lg:grid-cols-12 lg:gap-14">
       <div class="text-lg text-ink lg:col-span-7">
         {
           /* La question d'accroche est un H3 (11/09/2026) : mise en valeur et nettement détachée du H2,

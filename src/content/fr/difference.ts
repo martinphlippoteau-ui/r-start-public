@@ -117,10 +117,12 @@ export const difference: DifferenceContent = {
    */
   cta: { label: 'Voir le comparateur de frais', href: pages.fees.path },
   /*
-   * Appel à l'action DANS le bloc (15/09/2026), à ne pas confondre avec `cta` juste au-dessus, qui
-   * alimente la pastille flottante de la page. Deux libellés voisins mais distincts : celui-ci est lu
-   * au fil du texte, d'où le possessif.
+   * APPEL À L'ACTION DANS LE BLOC RETIRÉ le 16/09/2026 au soir, demande de l'équipe (« supprime le
+   * "Voir notre comparateur de frais" du premier bloc de la home »). Il vivait ici depuis le 15/09 en
+   * bouton discret sous la démonstration ; la pastille flottante (`cta` ci-dessus) mène déjà au
+   * comparateur, et la section suivante l'affiche en entier. Le gabarit teste la propriété : rien
+   * d'autre à défaire. Pour rétablir :
+   * `secondaryCta: { label: 'Voir notre comparateur de frais', href: pages.fees.path }`.
    */
-  secondaryCta: { label: 'Voir notre comparateur de frais', href: pages.fees.path },
   notes,
 };
