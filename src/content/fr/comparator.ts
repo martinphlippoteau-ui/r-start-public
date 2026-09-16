@@ -181,7 +181,7 @@ export const comparator = {
     },
     {
       key: 'broker' as const,
-      info: 'Ces frais sont payés par l’épargnant lorsque la SCPI achète un immeuble sans avoir recours à un agent immobilier pour ce faire. Ce sont en fait des frais d’acquisition majorés. Ils ne s’additionnent pas aux frais d’acquisition.',
+      info: 'L’épargnant paie ces frais lorsque la SCPI achète un immeuble sans passer par un agent immobilier. Il s’agit de frais d’acquisition majorés. Ces frais sont prélevés même si la SCPI ne verse aucun revenu à l’épargnant.',
       label: 'Frais d’agent immobilier',
       basis: 'en % du prix d’acquisition',
       rstart: fees.broker.label,

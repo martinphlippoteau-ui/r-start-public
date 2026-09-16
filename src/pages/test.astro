@@ -241,7 +241,7 @@ const TITRES: { niveau: 1 | 2; avant: string; apres: string }[] = [
               {
                 ['16', '20', '24'].map((v, i) => (
                   <label class="flex items-center gap-2 text-base text-white/85">
-                    <input type="radio" name="taille" value={v} checked={i === 1} /> {v} px
+                    <input type="radio" name="picto-taille" value={v} checked={i === 1} /> {v} px
                   </label>
                 ))
               }
@@ -253,7 +253,7 @@ const TITRES: { niveau: 1 | 2; avant: string; apres: string }[] = [
               {
                 ['0.45', '0.65', '1'].map((v, i) => (
                   <label class="flex items-center gap-2 text-base text-white/85">
-                    <input type="radio" name="opacite" value={v} checked={i === 0} />
+                    <input type="radio" name="picto-opacite" value={v} checked={i === 0} />
                     {Math.round(Number(v) * 100)} %
                   </label>
                 ))
@@ -270,7 +270,7 @@ const TITRES: { niveau: 1 | 2; avant: string; apres: string }[] = [
                   ['var(--color-sand)', 'Sable'],
                 ].map(([v, l], i) => (
                   <label class="flex items-center gap-2 text-base text-white/85">
-                    <input type="radio" name="teinte" value={v} checked={i === 0} /> {l}
+                    <input type="radio" name="picto-teinte" value={v} checked={i === 0} /> {l}
                   </label>
                 ))
               }
@@ -399,6 +399,9 @@ const TITRES: { niveau: 1 | 2; avant: string; apres: string }[] = [
 <script>
   /**
    * Réglages des pictogrammes candidats (16/09/2026) : taille, opacité et teinte, appliqués aux six en
+ * même temps. LES NOMS SONT PRÉFIXÉS `picto-` : l'essai typographique, plus haut dans la MÊME page,
+ * a déjà une commande nommée « teinte », et deux groupes de même nom dans un document sont une
+ * erreur html-validate (form-dup-name), en plus d'être ambigus pour les technologies d'assistance.
    * même temps pour qu'ils se comparent à conditions égales. Rien n'est écrit dans le HTML des SVG, on
    * ne touche qu'à trois propriétés d'un style en ligne.
    */
@@ -410,12 +413,12 @@ const TITRES: { niveau: 1 | 2; avant: string; apres: string }[] = [
     const appliquer = (): void => {
       const coches = [...form.querySelectorAll<HTMLInputElement>('input')].filter((i) => i.checked);
       const d = new Map(coches.map((i) => [i.name, i.value]));
-      const taille = d.get('taille') ?? '20';
+      const taille = d.get('picto-taille') ?? '20';
       for (const p of pictos) {
         p.setAttribute('width', taille);
         p.setAttribute('height', taille);
-        p.style.opacity = d.get('opacite') ?? '0.45';
-        p.style.color = d.get('teinte') ?? 'currentColor';
+        p.style.opacity = d.get('picto-opacite') ?? '0.45';
+        p.style.color = d.get('picto-teinte') ?? 'currentColor';
       }
     };
 
