@@ -1,38 +1,79 @@
 ---
 /**
- * Illustration de la tuile « Opportuniste » (16/09/2026) : acheter bas, valoriser, vendre haut.
+ * Illustration de la tuile « Opportuniste » (16/09/2026) : un immeuble bâti jusqu'à sa vraie valeur.
  *
- * PENDANT DU GLOBE, dans la même grammaire : dessin au trait clair sur fond ink, carré, calé sur la
- * largeur de sa tuile. Un SVG suffit, le globe n'est un canvas que parce qu'il projette une sphère.
+ * MÊME GRAMMAIRE QUE LES QUATRE AUTRES DESSINS DES CARTES (StrategySelect.astro la décrit en tête).
  *
- * CE QU'ELLE DIT, et c'est le propos de la zone en trois points : on repère un immeuble sous sa
- * valeur (le creux), on travaille à la faire monter (la pente), on choisit le moment de vendre (le
- * sommet). La courbe se trace, les deux repères se posent l'un après l'autre.
+ * TROISIÈME FORME. La courbe creux-sommet avec ses deux repères (achat, vente) se lisait comme un
+ * graphique de cours, ce qu'elle n'avait pas le droit d'être, et l'équipe n'en était pas convaincue
+ * (16/09/2026 au soir). CELLE-CI RACONTE LES TROIS POINTS DU TEXTE avec un immeuble, pas une courbe :
+ *  1. « Repérer des immeubles moins chers que leur vraie valeur » : un immeuble d'un seul étage, et,
+ *     au-dessus de lui, une SILHOUETTE EN POINTILLÉ bien plus haute qui se dresse : ce qu'il vaut
+ *     vraiment, ce qu'il peut devenir ;
+ *  2. « Travailler à leur donner plus de valeur au fil des années » : les étages se construisent un
+ *     à un jusqu'à remplir la silhouette, pendant qu'un CADRAN se remplit à droite, le temps qui
+ *     passe ;
+ *  3. « Choisir le bon moment pour vendre » : la silhouette est atteinte, le cadran est plein, une
+ *     COCHE se pose. Puis tout s'efface, et un autre immeuble.
  *
- * LA COURBE N'EST PAS UNE PERFORMANCE et ne doit pas se lire comme telle : aucune échelle, aucun
- * chiffre, aucune date. C'est un geste, pas un graphique. La tuile ne porte d'ailleurs aucune donnée.
+ * L'IMMEUBLE QUI GRANDIT N'EST PAS UNE PERFORMANCE et ne doit pas se lire comme telle : aucune échelle,
+ * aucun chiffre, aucune date, aucune durée. C'est un geste, l'image d'un travail, pas un résultat
+ * promis. La tuile ne porte d'ailleurs aucune donnée.
  *
- * Décorative (aria-hidden). Animation coupée en `prefers-reduced-motion` : tout est alors déjà tracé.
+ * Décorative (aria-hidden). En `prefers-reduced-motion`, l'immeuble est bâti et la coche posée.
  */
+import { fenetres } from '@/lib/immeuble';
+
+/** Le sol, et l'immeuble : quatre étages de 16 sur une base de 60, du sol (y = 104) au faîte (y = 40). */
+const SOL = 104;
+const X = 36;
+const LARGEUR = 60;
+const ETAGE = 16;
+const ETAGES = [0, 1, 2, 3].map((k) => {
+  const cadre = { x: X, y: SOL - ETAGE * (k + 1), w: LARGEUR, h: ETAGE };
+  return { k, cadre, fenetres: fenetres(cadre, { colonnes: 3, rangees: 1, taille: 8, ecart: 7 }) };
+});
+const FAITE = SOL - ETAGE * ETAGES.length;
+
+/** Le cadran, à droite de l'immeuble : un anneau qui se remplit dans le sens des aiguilles. */
+const CADRAN = { cx: 130, cy: 60, r: 15 };
 ---
 
-<figure class="timing-figure" aria-hidden="true">
-  <svg viewBox="0 0 120 120" fill="none" class="timing-svg">
-    {/* Grille de fond, très retenue : elle donne un plan sans faire graphique. */}
-    <path d="M14 30h92M14 60h92M14 90h92" class="timing-grille" />
+<figure class="timing-figure" aria-hidden="true" data-in-view="illus-en-vue">
+  <svg viewBox="0 0 160 120" fill="none" class="timing-svg">
+    {/* Le sol. */}
+    <path d={`M12 ${SOL + 0.5}h136`} class="timing-sol" />
 
-    {/* Le geste : descente vers le creux, longue montée, sommet. */}
-    <path d="M16 74c14 10 22 16 30 14s14-26 26-36 20-12 32-20" class="timing-courbe" />
+    {
+      /* LA SILHOUETTE : ce que l'immeuble vaut vraiment. Elle se dresse depuis le sol (échelle
+        verticale, origine en bas) et s'efface quand les étages l'ont remplie. */
+    }
+    <rect x={X} y={FAITE} width={LARGEUR} height={SOL - FAITE} rx="2" class="timing-silhouette" />
 
-    {/* Achat, au creux. */}
-    <g class="timing-repere timing-repere--achat">
-      <circle cx="46" cy="88" r="6" class="timing-point" />
-      <path d="M46 82v12M40 88h12" class="timing-croix" />
-    </g>
-    {/* Vente, au sommet. */}
-    <g class="timing-repere timing-repere--vente">
-      <circle cx="104" cy="32" r="6" class="timing-point" />
-      <path d="m100 32 3 3 5-6" class="timing-coche" />
+    {
+      /* LES ÉTAGES, du sol au faîte. Le premier est là dès le départ : c'est l'immeuble qu'on achète.
+        Les trois autres se construisent. Chaque étage est un cadre et ses trois fenêtres : les dalles
+        se lisent entre les cadres, c'est ce qui fait l'immeuble. */
+    }
+    {
+      ETAGES.map(({ k, cadre, fenetres: f }) => (
+        <g class={`timing-etage timing-etage--${k}`}>
+          <rect x={cadre.x} y={cadre.y} width={cadre.w} height={cadre.h} class="timing-cadre" />
+          {f.map((w) => <rect x={w.x} y={w.y} width={w.w} height={w.h} rx="1" class="timing-fenetre" />)}
+        </g>
+      ))
+    }
+
+    {/* Le cadran : l'anneau de fond, et l'arc qui le remplit. */}
+    <circle cx={CADRAN.cx} cy={CADRAN.cy} r={CADRAN.r} class="timing-cadran-fond" />
+    <circle cx={CADRAN.cx} cy={CADRAN.cy} r={CADRAN.r} pathLength="100" class="timing-cadran-arc" />
+    <circle cx={CADRAN.cx} cy={CADRAN.cy} r="1.6" class="timing-cadran-axe" />
+
+    {/* La coche du bon moment, sur l'angle haut droit de l'immeuble bâti, et son onde. */}
+    <circle cx={X + LARGEUR} cy={FAITE} r="11" class="timing-onde" />
+    <g class="timing-coche">
+      <circle cx={X + LARGEUR} cy={FAITE} r="7" class="timing-coche-fond" />
+      <path d={`m${X + LARGEUR - 3.5} ${FAITE} 2.5 2.5 4.5-5`} class="timing-coche-trait" />
     </g>
   </svg>
 </figure>
@@ -40,87 +81,288 @@
 <style>
   .timing-figure {
     margin: 0;
+    /* Pleine largeur de la carte : enfant d\'une boîte flex, la figure retomberait sinon à la largeur
+       intrinsèque du SVG, 300 px. */
+    width: 100%;
+    --cycle: 8s;
+    --decal: var(--illus-decalage, 0s);
   }
   .timing-svg {
     display: block;
     width: 100%;
-    aspect-ratio: 1;
+    aspect-ratio: 160 / 120;
   }
-  .timing-grille {
-    stroke: rgb(169 221 230 / 0.18);
+  .timing-sol {
+    stroke: rgb(169 221 230 / 0.22);
     stroke-width: 1;
   }
-  .timing-courbe {
-    stroke: var(--color-teal-200);
-    stroke-width: 2;
-    stroke-linecap: round;
-    /* Longueur mesurée sur le tracé : une valeur plus grande que le chemin suffit, le reste est du
-       dash invisible. 260 couvre largement les ~190 unités du `d`. */
-    stroke-dasharray: 260;
-    stroke-dashoffset: 260;
-    animation: timing-trace 7s ease-in-out infinite;
-  }
-  .timing-point {
-    stroke: var(--color-teal-400);
-    stroke-width: 1.6;
+  .timing-cadre {
+    stroke: rgb(169 221 230 / 0.6);
+    stroke-width: 1.4;
     fill: var(--color-ink);
   }
-  .timing-croix,
-  .timing-coche {
+  .timing-fenetre {
+    fill: rgb(169 221 230 / 0.5);
+  }
+  .timing-cadran-fond {
+    stroke: rgb(169 221 230 / 0.18);
+    stroke-width: 2;
+  }
+  .timing-cadran-axe {
+    fill: rgb(169 221 230 / 0.5);
+  }
+
+  /*
+   * ÉTAT DE REPOS = IMAGE COMPLÈTE (`prefers-reduced-motion`, navigateurs sans animation) : les
+   * quatre étages bâtis, la silhouette effacée, le cadran plein, la coche posée.
+   */
+  .timing-silhouette {
     stroke: var(--color-teal-400);
+    stroke-width: 1.2;
+    stroke-dasharray: 3 3;
+    opacity: 0;
+    transform-box: fill-box;
+    transform-origin: center bottom;
+  }
+  .timing-etage {
+    opacity: 1;
+  }
+  .timing-cadran-arc {
+    stroke: var(--color-teal-400);
+    stroke-width: 2;
+    stroke-linecap: butt;
+    /* `pathLength="100"` : le tiret se compte en pour-cent du tour. L'écart de 120 dépasse le tour :
+       aucun second tiret. L'arc part de midi : le cercle SVG commence à trois heures, on le tourne
+       d'un quart. Au repos, il est plein. */
+    stroke-dasharray: 100 120;
+    stroke-dashoffset: 0;
+    transform-box: fill-box;
+    transform-origin: center;
+    transform: rotate(-90deg);
+    opacity: 1;
+  }
+  .timing-onde {
+    stroke: var(--color-teal-400);
+    stroke-width: 1.2;
+    opacity: 0;
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+  .timing-coche {
+    opacity: 1;
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+  .timing-coche-fond {
+    fill: var(--color-ink);
+    stroke: var(--color-teal-400);
+    stroke-width: 1.6;
+  }
+  .timing-coche-trait {
+    stroke: var(--color-teal-200);
     stroke-width: 1.6;
     stroke-linecap: round;
     stroke-linejoin: round;
   }
-  .timing-repere {
-    opacity: 0;
-    animation: timing-pose 7s ease-in-out infinite;
-  }
-  .timing-repere--achat {
-    animation-delay: 1.4s;
-  }
-  .timing-repere--vente {
-    animation-delay: 3.2s;
+
+  /*
+   * LE CYCLE, 8 s :
+   *    0 –  5 %  silence : un étage, rien d'autre ;
+   *    5 – 18 %  ACTE 1, repérer : la silhouette se dresse depuis le sol, en pointillé ;
+   *   26 – 58 %  ACTE 2, valoriser : les étages 2, 3 et 4 se construisent (28, 38, 48 %), le cadran
+   *              se remplit d'un mouvement régulier, le temps qui passe ;
+   *   56 – 66 %  ACTE 3, vendre : la silhouette s'efface, atteinte ; la coche se pose, son onde ;
+   *   66 – 80 %  on lit ;
+   *   80 – 90 %  les trois étages construits, la coche et le cadran s'effacent ;
+   *   90 – 100 % silence, l'arc se rembobine invisible.
+   */
+  @media (prefers-reduced-motion: no-preference) {
+    .timing-silhouette,
+    .timing-etage--1,
+    .timing-etage--2,
+    .timing-etage--3,
+    .timing-cadran-arc,
+    .timing-onde,
+    .timing-coche {
+      animation-duration: var(--cycle);
+      animation-iteration-count: infinite;
+      animation-fill-mode: both;
+      animation-delay: var(--decal);
+    }
+    .timing-silhouette {
+      animation-name: timing-silhouette;
+    }
+    .timing-etage--1 {
+      animation-name: timing-etage-1;
+    }
+    .timing-etage--2 {
+      animation-name: timing-etage-2;
+    }
+    .timing-etage--3 {
+      animation-name: timing-etage-3;
+    }
+    .timing-cadran-arc {
+      animation-name: timing-cadran;
+    }
+    .timing-onde {
+      animation-name: timing-onde;
+    }
+    .timing-coche {
+      animation-name: timing-coche;
+    }
+    /* Les étages qui se construisent montent d'un cran : l'origine est sans importance pour une
+       translation, mais chacun part de sa propre image-clé. */
+    .timing-etage--1,
+    .timing-etage--2,
+    .timing-etage--3 {
+      transform-box: fill-box;
+      transform-origin: center;
+    }
   }
 
-  @keyframes timing-trace {
-    0% {
-      stroke-dashoffset: 260;
+  @keyframes timing-silhouette {
+    0%,
+    5% {
+      opacity: 0;
+      transform: scaleY(0.4);
+      animation-timing-function: var(--ease-out-expo);
     }
-    55%,
-    88% {
+    18% {
+      opacity: 0.7;
+      transform: scaleY(1);
+      animation-timing-function: linear;
+    }
+    56% {
+      opacity: 0.7;
+      transform: scaleY(1);
+      animation-timing-function: cubic-bezier(0.7, 0, 0.84, 0);
+    }
+    62%,
+    100% {
+      opacity: 0;
+      transform: scaleY(1);
+    }
+  }
+  /* Trois étages, trois images-clés : même extinction, construction décalée. */
+  @keyframes timing-etage-1 {
+    0%,
+    28% {
+      opacity: 0;
+      transform: translateY(8px);
+      animation-timing-function: var(--ease-out-expo);
+    }
+    36%,
+    80% {
+      opacity: 1;
+      transform: translateY(0);
+      animation-timing-function: cubic-bezier(0.7, 0, 0.84, 0);
+    }
+    90%,
+    100% {
+      opacity: 0;
+      transform: translateY(0);
+    }
+  }
+  @keyframes timing-etage-2 {
+    0%,
+    38% {
+      opacity: 0;
+      transform: translateY(8px);
+      animation-timing-function: var(--ease-out-expo);
+    }
+    46%,
+    80% {
+      opacity: 1;
+      transform: translateY(0);
+      animation-timing-function: cubic-bezier(0.7, 0, 0.84, 0);
+    }
+    90%,
+    100% {
+      opacity: 0;
+      transform: translateY(0);
+    }
+  }
+  @keyframes timing-etage-3 {
+    0%,
+    48% {
+      opacity: 0;
+      transform: translateY(8px);
+      animation-timing-function: var(--ease-out-expo);
+    }
+    56%,
+    80% {
+      opacity: 1;
+      transform: translateY(0);
+      animation-timing-function: cubic-bezier(0.7, 0, 0.84, 0);
+    }
+    90%,
+    100% {
+      opacity: 0;
+      transform: translateY(0);
+    }
+  }
+  /* Le cadran se remplit à vitesse constante : c'est le temps, il ne s'accélère pas. Décalage de
+     repos à 102, pas 100 : deux unités de marge, aucun point ne dépasse sur le départ. */
+  @keyframes timing-cadran {
+    0%,
+    26% {
+      stroke-dashoffset: 102;
+      opacity: 1;
+      animation-timing-function: linear;
+    }
+    58% {
       stroke-dashoffset: 0;
+      animation-timing-function: linear;
     }
+    80% {
+      stroke-dashoffset: 0;
+      opacity: 1;
+      animation-timing-function: cubic-bezier(0.7, 0, 0.84, 0);
+    }
+    90%,
     100% {
       stroke-dashoffset: 0;
       opacity: 0;
     }
   }
-  @keyframes timing-pose {
-    0% {
+  @keyframes timing-coche {
+    0%,
+    60% {
+      opacity: 0;
+      transform: scale(0.5);
+      animation-timing-function: cubic-bezier(0.34, 1.3, 0.64, 1);
+    }
+    66% {
+      opacity: 1;
+      transform: scale(1);
+      animation-timing-function: linear;
+    }
+    80% {
+      opacity: 1;
+      transform: scale(1);
+      animation-timing-function: cubic-bezier(0.7, 0, 0.84, 0);
+    }
+    90%,
+    100% {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+  }
+  @keyframes timing-onde {
+    0%,
+    60% {
       opacity: 0;
       transform: scale(0.6);
+      animation-timing-function: var(--ease-out-expo);
     }
-    12%,
-    70% {
-      opacity: 1;
-      transform: scale(1);
+    64% {
+      opacity: 0.7;
+      animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1);
     }
-    85%,
+    80%,
     100% {
       opacity: 0;
-      transform: scale(1);
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .timing-courbe {
-      stroke-dashoffset: 0;
-      animation: none;
-    }
-    .timing-repere {
-      opacity: 1;
-      animation: none;
+      transform: scale(1.8);
     }
   }
 </style>

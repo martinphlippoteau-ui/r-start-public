@@ -1,177 +1,257 @@
 ---
 /**
- * Illustration de la tuile « Diversifiée » (16/09/2026). Elle REMPLACE LE GLOBE, à la demande de
- * l'équipe : « on diversifie dans les secteurs d'activité et géographique », or un globe ne montre
- * que la moitié du propos. Le fichier du globe reste en place, il n'est simplement plus appelé.
+ * Illustration de la tuile « Diversifiée » (16/09/2026) : un globe, des épingles, un secteur par
+ * épingle.
  *
- * DEUX AXES, DEUX DIMENSIONS. En bas, quatre natures d'immeuble ; à gauche, quatre repères de lieu.
- * Les acquisitions se posent dans le plan, jamais deux dans la même colonne ni dans la même rangée :
- * c'est le dessin qui porte l'idée de répartition, pas une légende.
+ * MÊME GRAMMAIRE QUE LES QUATRE AUTRES DESSINS DES CARTES (StrategySelect.astro la décrit en tête).
  *
- * CE QU'ELLE NE DIT PAS : ni où, ni dans quoi, ni combien. Les glyphes des axes sont génériques et les
- * points n'ont pas de valeur. R Start n'a pas encore de patrimoine ; l'image montre une INTENTION de
- * répartition, ce que le texte de la tuile dit en toutes lettres (« R Start diversifiera »).
+ * TROISIÈME FORME. Le globe en rotation (StrategyGlobe.astro, un canvas) a été écarté le 16/09/2026 :
+ * « on diversifie dans les secteurs d'activité et géographique », or il ne montrait que la géographie.
+ * Le plan à deux axes qui l'a remplacé montrait les deux, mais abstraitement, quatre glyphes et quatre
+ * gouttes le long d'une grille ; l'équipe n'en était pas convaincue (16/09/2026 au soir).
+ * CELLE-CI RÉUNIT LES DEUX SUJETS DANS UNE SEULE IMAGE : un globe filaire, et des épingles qui s'y
+ * plantent une à une, PARTOUT (le monde) ; la tête de chaque épingle porte un pictogramme de secteur,
+ * bureaux, commerces, logistique, santé (tous les secteurs). Une épingle dit donc « ici » et « dans
+ * quoi » d'un seul geste.
  *
- * MÊME GRAMMAIRE QUE LES DEUX AUTRES TUILES : trait clair sur fond ink, carré, boucle lente,
- * animation coupée en `prefers-reduced-motion`. Décorative (aria-hidden).
+ * CE QU'ELLE NE DIT PAS : ni où précisément, ni combien. Le globe est filaire, sans côtes ni frontières,
+ * les positions ne désignent aucun pays : R Start n'a pas encore de patrimoine. L'image montre une
+ * INTENTION de répartition, ce que le texte dit en toutes lettres (« R Start diversifiera »).
+ *
+ * LE GLOBE NE SE VIDE JAMAIS D'UN COUP : chaque épingle vit le même temps puis se retire, dans l'ordre
+ * où elle est arrivée, pendant que les suivantes reviennent. Entre deux et six épingles à tout
+ * instant, jamais zéro : un patrimoine qui tourne, pas un GIF qui repart de zéro.
+ *
+ * Décorative (aria-hidden) : le texte de la tuile porte le sens.
  */
+
+/** Le globe : centre et rayon dans un cadre de 160 × 120. */
+const CX = 80;
+const CY = 62;
+const R = 50;
+/*
+ * Parallèles et méridiens vus de face, légèrement inclinés : un parallèle est une ellipse aplatie,
+ * un méridien une ellipse verticale. Les rayons des parallèles hors équateur suivent la sphère :
+ * à 25 unités du centre, la sphère fait 43,3 de demi-largeur.
+ */
+const PARALLELES = [
+  { cy: CY, rx: R, ry: 11 },
+  { cy: CY - 25, rx: 43.3, ry: 9.5 },
+  { cy: CY + 25, rx: 43.3, ry: 9.5 },
+];
+const MERIDIENS = [20, 40];
 
 /*
- * Les huit acquisitions, en (colonne, rangée) sur une grille de 4 × 4. Une seule par colonne et par
- * rangée sur les quatre premières, puis quatre intermédiaires : l'œil doit lire « réparti », jamais
- * « aligné ». L'ordre du tableau est celui de l'apparition.
+ * Six épingles, la pointe posée sur la sphère, réparties sur tout le disque : les quatre secteurs
+ * tournent, deux reviennent. L'ordre du tableau est celui de l'apparition, d'un bord à l'autre et
+ * jamais deux voisines de suite.
  */
-const POINTS = [
-  { c: 0, r: 2 },
-  { c: 2, r: 0 },
-  { c: 1, r: 3 },
-  { c: 3, r: 1 },
-  { c: 2, r: 2 },
-  { c: 0, r: 0 },
-  { c: 3, r: 3 },
-  { c: 1, r: 1 },
+type Secteur = 'bureaux' | 'commerces' | 'logistique' | 'sante';
+const EPINGLES: { x: number; y: number; secteur: Secteur }[] = [
+  { x: 60, y: 44, secteur: 'bureaux' },
+  { x: 118, y: 68, secteur: 'commerces' },
+  { x: 98, y: 94, secteur: 'logistique' },
+  { x: 104, y: 38, secteur: 'sante' },
+  { x: 44, y: 78, secteur: 'bureaux' },
+  { x: 74, y: 82, secteur: 'commerces' },
 ];
 
-/** Repère du plan : la première colonne est à 38, puis un pas de 22. Idem pour les rangées. */
-const X = (c: number): number => 38 + c * 22;
-const Y = (r: number): number => 26 + r * 22;
+/** L'épingle : une goutte dont la pointe est en (x, y), la tête un disque de rayon 6,5 centré 13 plus haut. */
+const goutte = (x: number, y: number): string =>
+  `M${x} ${y}C${x - 3} ${y - 4} ${x - 6.5} ${y - 8} ${x - 6.5} ${y - 13}a6.5 6.5 0 0 1 13 0c0 5-3.5 9-6.5 13z`;
+
+/**
+ * Les quatre pictogrammes, dessinés dans la tête (centre hx, hy, 7 unités de côté) : deux fenêtres
+ * sur deux pour les bureaux, un auvent pour les commerces, un hangar à toit plat et large porte pour
+ * la logistique (un toit en pente ferait une maison), une croix pour la santé. Les mêmes signes que sur la version précédente, ils se lisaient à 14 px.
+ */
+const picto = (secteur: Secteur, hx: number, hy: number): string => {
+  switch (secteur) {
+    case 'bureaux':
+      return `M${hx - 3} ${hy - 3}h2.4v2.4h-2.4zM${hx + 0.6} ${hy - 3}h2.4v2.4h-2.4zM${hx - 3} ${hy + 0.6}h2.4v2.4h-2.4zM${hx + 0.6} ${hy + 0.6}h2.4v2.4h-2.4z`;
+    case 'commerces':
+      return `M${hx - 4} ${hy - 1}l1.5-2.5h5l1.5 2.5zM${hx - 3} ${hy - 1}v4.5h6v-4.5`;
+    case 'logistique':
+      return `M${hx - 4} ${hy + 3.5}v-6h8v6zM${hx - 1.5} ${hy + 3.5}v-3h3v3`;
+    case 'sante':
+      return `M${hx} ${hy - 3.4}v6.8M${hx - 3.4} ${hy}h6.8`;
+  }
+};
 ---
 
-<figure class="div-figure" aria-hidden="true">
-  <svg viewBox="0 0 120 120" fill="none" class="div-svg">
-    {/* La trame du plan, assez pâle pour ne pas concurrencer les points. */}
-    {[0, 1, 2, 3].map((i) => <path d={`M28 ${Y(i)}h72`} class="div-trame" />)}
-    {[0, 1, 2, 3].map((i) => <path d={`M${X(i)} 16v76`} class="div-trame" />)}
+<figure class="div-figure" aria-hidden="true" data-in-view="illus-en-vue">
+  <svg viewBox="0 0 160 120" fill="none" class="div-svg">
+    {/* La sphère : un disque à peine teinté, son limbe, ses parallèles et ses méridiens. */}
+    <circle cx={CX} cy={CY} r={R} class="div-disque" />
+    {PARALLELES.map((p) => <ellipse cx={CX} cy={p.cy} rx={p.rx} ry={p.ry} class="div-trame" />)}
+    <path d={`M${CX} ${CY - R}v${2 * R}`} class="div-trame" />
+    {MERIDIENS.map((rx) => <ellipse cx={CX} cy={CY} rx={rx} ry={R} class="div-trame" />)}
+    <circle cx={CX} cy={CY} r={R} class="div-limbe" />
 
     {
-      /*
-       * AXE DU BAS : quatre natures d'immeuble. Chacune tient en deux ou trois traits, c'est tout ce
-       * qu'on peut lire à 14 px de haut : un bureau à étages, un commerce sous auvent, un entrepôt à
-       * toit plat et large porte, une santé marquée d'une croix.
-       */
+      /* Les épingles. Chacune a son onde au sol, qui s'élargit quand elle se plante, et son
+        pictogramme dans la tête. Le groupe porte la chute, l'onde son propre battement. */
     }
-    <g class="div-axe">
-      {[0, 1, 2, 3].map((c) => {
-        const x = X(c);
-        const glyphes = [
-          `M${x - 5} 108v-9h10v9M${x - 2} 102h4`,
-          `M${x - 6} 108v-7h12v7M${x - 7} 101l3-3h8l3 3`,
-          `M${x - 6} 108v-8h12v8M${x - 2} 108v-4h4v4`,
-          `M${x - 5} 108v-9h10v9M${x} 101v4M${x - 2} 103h4`,
-        ];
-        return <path d={glyphes[c]} class="div-glyphe" />;
-      })}
-    </g>
-
     {
-      /*
-       * AXE DE GAUCHE : quatre repères de lieu, une goutte et son point, le signe le plus court qui se
-       * lise comme « ici ». Ils ne désignent aucun pays : R Start n'en a encore acheté aucun.
-       */
+      EPINGLES.map((e, i) => (
+        <g class="div-epingle" style={`--rang:${i}`}>
+          <ellipse cx={e.x} cy={e.y} rx="7" ry="2.6" class="div-onde" />
+          <g class="div-chute">
+            <path d={goutte(e.x, e.y)} class="div-goutte" />
+            <path d={picto(e.secteur, e.x, e.y - 13)} class={`div-picto div-picto--${e.secteur}`} />
+          </g>
+        </g>
+      ))
     }
-    <g class="div-axe">
-      {[0, 1, 2, 3].map((r) => {
-        const y = Y(r);
-        return (
-          <path
-            d={`M16 ${y - 4}a4 4 0 0 1 8 0c0 3-4 7-4 7s-4-4-4-7z`}
-            class="div-glyphe"
-          />
-        );
-      })}
-    </g>
-
-    {
-      /* Les acquisitions. Chacune arrive à son tour et reste : à la fin du cycle, le plan est couvert
-        dans les deux sens, ce que ne montrerait aucune image figée. */
-    }
-    {POINTS.map((p, i) => (
-      <g class="div-point" style={`--rang:${i}`}>
-        <circle cx={X(p.c)} cy={Y(p.r)} r="7" class="div-halo" />
-        <circle cx={X(p.c)} cy={Y(p.r)} r="3.2" class="div-pastille" />
-      </g>
-    ))}
   </svg>
 </figure>
 
 <style>
   .div-figure {
     margin: 0;
+    /* Pleine largeur de la carte : enfant d\'une boîte flex, la figure retomberait sinon à la largeur
+       intrinsèque du SVG, 300 px. */
+    width: 100%;
+    --cycle: 8s;
+    /* Une épingle toutes les demi-secondes : six en trois secondes, puis le globe reste couvert. */
+    --pas: 0.5s;
+    --decal: var(--illus-decalage, 0s);
   }
   .div-svg {
     display: block;
     width: 100%;
-    aspect-ratio: 1;
+    aspect-ratio: 160 / 120;
+  }
+  .div-disque {
+    fill: var(--color-teal-400);
+    fill-opacity: 0.06;
+  }
+  .div-limbe {
+    stroke: rgb(169 221 230 / 0.32);
+    stroke-width: 1;
   }
   .div-trame {
     stroke: rgb(169 221 230 / 0.16);
     stroke-width: 1;
   }
-  .div-glyphe {
-    stroke: rgb(169 221 230 / 0.45);
+  .div-goutte {
+    fill: var(--color-ink);
+    stroke: var(--color-teal-200);
     stroke-width: 1.3;
+    stroke-linejoin: round;
+  }
+  .div-picto {
+    stroke: var(--color-teal-200);
+    stroke-width: 1.2;
     stroke-linecap: round;
     stroke-linejoin: round;
   }
-  .div-pastille {
+  .div-picto--bureaux {
     fill: var(--color-teal-200);
+    stroke: none;
   }
-  .div-halo {
-    stroke: var(--color-teal-400);
-    stroke-width: 1.2;
+  .div-picto--sante {
+    stroke-width: 1.6;
   }
 
   /*
-   * HUIT POINTS SUR 8 s : un toutes les 0,55 s, puis le plan reste couvert le temps qu'on le lise,
-   * avant de repartir. Le halo ne bat qu'à l'arrivée de son point, sinon huit halos pulseraient
-   * ensemble et l'image deviendrait bruyante.
+   * ÉTAT DE REPOS = IMAGE COMPLÈTE (`prefers-reduced-motion`, navigateurs sans animation) : les six
+   * épingles plantées, le globe couvert, aucune onde.
    */
-  .div-point {
-    opacity: 0;
-    animation: div-pose 8s ease-out infinite;
-    animation-delay: calc(var(--rang) * 0.55s);
+  .div-epingle {
+    opacity: 1;
   }
-  .div-halo {
+  .div-chute {
+    transform: translateY(0);
+  }
+  .div-onde {
+    stroke: var(--color-teal-400);
+    stroke-width: 1.2;
+    opacity: 0;
     transform-box: fill-box;
     transform-origin: center;
-    animation: div-halo 8s ease-out infinite;
-    animation-delay: calc(var(--rang) * 0.55s);
   }
 
-  @keyframes div-pose {
+  /*
+   * LE CYCLE, 8 s, par épingle (chacune décalée de son rang × 0,5 s, à partir de 0,4 s) :
+   *    0 –  7 %  elle tombe et se plante : elle descend de douze unités, dépasse d'un cheveu, se
+   *              pose ; son onde s'élargit au sol et s'éteint ;
+   *    7 – 64 %  elle est là ;
+   *   64 – 70 %  elle se retire, en remontant d'un cran.
+   * Chaque épingle vit donc 5,6 s. La première revient 2,9 s après le départ de la dernière : le globe
+   * garde toujours deux ou trois épingles, jamais zéro.
+   */
+  @media (prefers-reduced-motion: no-preference) {
+    .div-epingle,
+    .div-chute,
+    .div-onde {
+      animation-duration: var(--cycle);
+      animation-iteration-count: infinite;
+      animation-fill-mode: both;
+      animation-delay: calc(var(--decal) + 0.4s + var(--rang) * var(--pas));
+    }
+    .div-epingle {
+      animation-name: div-presence;
+    }
+    .div-chute {
+      animation-name: div-chute;
+    }
+    .div-onde {
+      animation-name: div-onde;
+    }
+  }
+
+  @keyframes div-presence {
     0% {
       opacity: 0;
+      animation-timing-function: var(--ease-out-expo);
     }
-    6%,
-    88% {
+    5% {
       opacity: 1;
+      animation-timing-function: linear;
     }
-    96%,
+    64% {
+      opacity: 1;
+      animation-timing-function: cubic-bezier(0.7, 0, 0.84, 0);
+    }
+    70%,
     100% {
       opacity: 0;
     }
   }
-  @keyframes div-halo {
+  @keyframes div-chute {
     0% {
+      transform: translateY(-12px);
+      animation-timing-function: cubic-bezier(0.34, 1.3, 0.64, 1);
+    }
+    7% {
+      transform: translateY(0);
+      animation-timing-function: linear;
+    }
+    64% {
+      transform: translateY(0);
+      animation-timing-function: cubic-bezier(0.7, 0, 0.84, 0);
+    }
+    70%,
+    100% {
+      transform: translateY(-6px);
+    }
+  }
+  @keyframes div-onde {
+    0%,
+    5% {
+      opacity: 0;
+      transform: scale(0.3);
+      animation-timing-function: var(--ease-out-expo);
+    }
+    7% {
       opacity: 0.9;
-      transform: scale(0.4);
+      animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1);
     }
-    10%,
+    17%,
     100% {
       opacity: 0;
-      transform: scale(1.5);
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    /* À l'arrêt : les huit acquisitions sont posées, le plan est couvert dans les deux sens. */
-    .div-point {
-      animation: none;
-      opacity: 1;
-    }
-    .div-halo {
-      animation: none;
-      opacity: 0.35;
+      transform: scale(1.7);
     }
   }
 </style>

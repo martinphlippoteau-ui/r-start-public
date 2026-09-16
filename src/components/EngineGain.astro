@@ -2,64 +2,133 @@
 /**
  * Illustration du moteur 02, « Les plus-values réalisées sur les ventes d'immeuble » (16/09/2026).
  *
- * MÊME GRAMMAIRE QUE LES TROIS TUILES et que le moteur 01 : trait clair sur fond ink, boucle lente,
- * animation coupée en `prefers-reduced-motion`, format 236 × 100 comme le bandeau de la carte.
+ * MÊME GRAMMAIRE QUE LES QUATRE AUTRES DESSINS DES CARTES (StrategySelect.astro la décrit en tête) :
+ * trait clair sur fond ink, boucle lente, en pause hors écran, complet et immobile en
+ * `prefers-reduced-motion`. Format 236 × 100, pleine largeur de la carte.
  *
- * DEUXIÈME VERSION. La première montrait un échange, immeuble d'un côté, prix de l'autre, sans rien
- * qui monte : une vente, pas un gain. L'équipe a demandé « plutôt une hausse de prix », en
- * connaissance de cause, et c'est ce que montre celle-ci.
+ * QUATRIÈME VERSION, ET C'EST L'ÉQUIPE QUI A CHOISI LA FORME (16/09/2026 au soir : « utilise une
+ * courbe de prix € qui monte »). Avant : un échange immeuble/prix sans hausse ; une étiquette sur une
+ * pente ; une étiquette qui montait le long de la façade puis filait vers la marque, en miroir du
+ * moteur 01, jugée « pas terrible du tout ».
  *
- * CE QU'ELLE MONTRE, ET SES LIMITES : une étiquette de prix qui monte d'un palier bas vers un palier
- * haut. AUCUN CHIFFRE, aucune devise, aucune échelle, aucune durée, aucune unité : rien ne permet de
- * lire une ampleur ni une période, et il n'y a pas de courbe de performance. C'est le mécanisme
- * qu'elle nomme, celui que le texte de la carte décrit, pas un résultat attendu.
- * Le bloc Risques de la page porte l'avertissement correspondant.
+ * CE QU'ELLE MONTRE : l'immeuble à gauche, celui du moteur 01 ; à sa droite, un point d'achat, puis UNE
+ * COURBE DE PRIX QUI MONTE, révélée de gauche à droite avec la surface qu'elle couvre, une pointe
+ * lumineuse à son extrémité ; au sommet, une pastille « € » se pose : la vente, et la plus-value
+ * réalisée. Puis tout s'efface, un temps de silence, et un autre immeuble.
+ *
+ * SES LIMITES, tenues à la lettre : AUCUN CHIFFRE, aucun axe gradué, aucune échelle, aucune date,
+ * aucune durée. La courbe monte sans à-coup ni creux : elle nomme le mécanisme que le texte de la
+ * carte décrit, la recherche de plus-values à la vente, elle ne dessine ni un historique ni une
+ * promesse. Le bloc Risques de la page porte l'avertissement correspondant. Le signe « € » est un
+ * symbole, pas un montant.
+ *
+ * LA RÉVÉLATION EST FAITE PAR UN DÉCOUPAGE (`clip-path: inset`) qui avance à vitesse constante de
+ * gauche à droite, sur la courbe ET sur sa surface ensemble : les deux ont donc toujours exactement
+ * le même bord. La pointe, elle, est portée le long de la courbe par `offset-path`, dont la vitesse
+ * est celle du CHEMIN, pas celle de l'abscisse : pour qu'elle reste au bord du découpage, sa courbe
+ * de temps est une fonction `linear()` CALCULÉE ci-dessous à partir de la géométrie, abscisse par
+ * abscisse. Un navigateur sans `linear()` la remplace par une progression uniforme : la pointe
+ * dérive alors de quelques unités au plus, toujours sur la courbe.
  *
  * Décorative (aria-hidden) : le texte de la carte porte le sens.
  */
+import { fenetres } from '@/lib/immeuble';
+
+/** L'immeuble du moteur 01, un peu plus étroit pour laisser la place à la courbe. */
+const CADRE = { x: 18, y: 30, w: 48, h: 54 };
+const FENETRES = fenetres(CADRE, { colonnes: 3, rangees: 4, taille: 7, ecart: 4 });
+const SOL = 84;
+
+/*
+ * LA COURBE, quatre cubiques raccordées tangentes à tangentes (les tangentes entrante et sortante de
+ * chaque nœud sont colinéaires : aucun angle). Elle part du point d'achat et monte jusqu'au sommet,
+ * sans creux, sa pente variant juste assez pour ne pas être une droite.
+ */
+type Pt = [number, number];
+const SEGMENTS: [Pt, Pt, Pt, Pt][] = [
+  [[84, 76], [96, 75], [104, 71], [116, 66]],
+  [[116, 66], [128, 61], [134, 60], [142, 54]],
+  [[142, 54], [150, 48], [160, 45], [172, 40]],
+  [[172, 40], [184, 35], [192, 30], [204, 26]],
+];
+const DEPART = SEGMENTS[0]![0];
+const SOMMET = SEGMENTS[SEGMENTS.length - 1]![3];
+const COURBE =
+  `M${DEPART[0]} ${DEPART[1]}` +
+  SEGMENTS.map(([, p1, p2, p3]) => `C${p1[0]} ${p1[1]} ${p2[0]} ${p2[1]} ${p3[0]} ${p3[1]}`).join('');
+const SURFACE = `${COURBE}V${SOL}H${DEPART[0]}Z`;
+
+/*
+ * ÉCHANTILLONNAGE de la courbe : pour chaque abscisse (32 pas uniformes entre le départ et le sommet),
+ * la fraction de LONGUEUR de chemin déjà parcourue. C'est la courbe de temps de la pointe : quand le
+ * découpage est à u % de la largeur, la pointe doit être à s(u) % du chemin.
+ */
+const bezier = ([p0, p1, p2, p3]: [Pt, Pt, Pt, Pt], t: number): Pt => {
+  const u = 1 - t;
+  return [
+    u * u * u * p0[0] + 3 * u * u * t * p1[0] + 3 * u * t * t * p2[0] + t * t * t * p3[0],
+    u * u * u * p0[1] + 3 * u * u * t * p1[1] + 3 * u * t * t * p2[1] + t * t * t * p3[1],
+  ];
+};
+const echantillons: { x: number; l: number }[] = [{ x: DEPART[0], l: 0 }];
+let longueur = 0;
+let precedent: Pt = DEPART;
+for (const seg of SEGMENTS) {
+  for (let i = 1; i <= 100; i += 1) {
+    const p = bezier(seg, i / 100);
+    longueur += Math.hypot(p[0] - precedent[0], p[1] - precedent[1]);
+    echantillons.push({ x: p[0], l: longueur });
+    precedent = p;
+  }
+}
+const PAS = 32;
+const fractions = Array.from({ length: PAS + 1 }, (_, k) => {
+  const x = DEPART[0] + ((SOMMET[0] - DEPART[0]) * k) / PAS;
+  const e = echantillons.find((s) => s.x >= x) ?? echantillons[echantillons.length - 1]!;
+  return Math.round((e.l / longueur) * 1000) / 1000;
+});
+const TEMPS_POINTE = `linear(${fractions.join(', ')})`;
 ---
 
-<figure class="gain-figure" aria-hidden="true">
+<figure class="gain-figure" aria-hidden="true" data-in-view="illus-en-vue">
   <svg viewBox="0 0 236 100" fill="none" class="gain-svg">
-    {
-      /* L'immeuble vendu, à gauche : la même grille de fenêtres que le moteur 01, pour que les deux
-        cartes montrent bien le même objet. */
-    }
-    <rect x="20" y="26" width="52" height="58" rx="5" class="gain-cadre" />
-    {
-      [0, 1, 2].flatMap((colonne) =>
-        [0, 1, 2, 3].map((ligne) => (
-          <rect x={29 + colonne * 13} y={35 + ligne * 12} width="8" height="7" rx="1.5" class="gain-fenetre" />
-        ))
-      )
-    }
+    {/* L'immeuble vendu, et le sol qu'il partage avec la courbe. */}
+    <rect x={CADRE.x} y={CADRE.y} width={CADRE.w} height={CADRE.h} rx="5" class="gain-cadre" />
+    {FENETRES.map((f) => <rect x={f.x} y={f.y} width={f.w} height={f.h} rx="1.5" class="gain-fenetre" />)}
+    <path d={`M${CADRE.x} ${SOL + 0.5}H218`} class="gain-sol" />
 
-    {/* Les deux paliers, bas et haut, et la pente entre les deux. */}
-    <path d="M92 76h30" class="gain-palier" />
-    <path d="M197 34h18" class="gain-palier gain-palier--haut" />
-    <path d="M122 76 184 34" class="gain-pente" />
-
-    {
-      /*
-       * L'ÉTIQUETTE DE PRIX, et non un chiffre : elle dit « prix » sans avancer de montant. Elle monte
-       * le long de la pente, du palier bas au palier haut, puis disparaît et recommence.
-       * Le trou de l'étiquette est un cercle plein de la couleur du fond, pas un masque : un masque
-       * SVG coûterait une couche de rendu pour un point de 2 px.
-       */
-    }
-    <g class="gain-etiquette">
-      <path d="M-11-9h13l9 9-13 13-9-9v-13z" class="gain-etiquette-corps" />
-      <circle cx="-6.5" cy="-4.5" r="2.2" class="gain-etiquette-trou" />
+    {/* La courbe et sa surface, révélées ensemble par le même découpage. */}
+    <g class="gain-courbe">
+      <path d={SURFACE} class="gain-surface" />
+      <path d={COURBE} class="gain-trait" />
     </g>
 
-    {/* La flèche du palier haut : elle se pose quand l'étiquette arrive. */}
-    <path d="M206 26v-9M201 21l5-5 5 5" class="gain-fleche" />
+    {/* Le point d'achat, au départ de la courbe. */}
+    <circle cx={DEPART[0]} cy={DEPART[1]} r="3" class="gain-achat" />
+
+    {/* La pointe qui mène la courbe : un point et sa lueur, dessinés autour de (0, 0). */}
+    <g class="gain-pointe">
+      <circle r="5" class="gain-pointe-lueur" />
+      <circle r="2.2" class="gain-pointe-corps" />
+    </g>
+
+    {/* La vente, au sommet : l'onde, puis la pastille et son signe. */}
+    <circle cx={SOMMET[0]} cy={SOMMET[1]} r="13" class="gain-onde" />
+    <g class="gain-vente">
+      <circle cx={SOMMET[0]} cy={SOMMET[1]} r="9" class="gain-vente-fond" />
+      <text x={SOMMET[0]} y={SOMMET[1] + 0.5} class="gain-euro">€</text>
+    </g>
   </svg>
 </figure>
 
-<style>
+<style define:vars={{ courbe: `path("${COURBE}")`, tempsPointe: TEMPS_POINTE }}>
   .gain-figure {
     margin: 0;
+    /* Pleine largeur de la carte : enfant d'une boîte flex, la figure retomberait sinon à la largeur
+       intrinsèque du SVG, 300 px. */
+    width: 100%;
+    --cycle: 8s;
+    --decal: var(--illus-decalage, 0s);
   }
   .gain-svg {
     display: block;
@@ -67,99 +136,233 @@
     aspect-ratio: 236 / 100;
   }
   .gain-cadre {
-    stroke: rgb(169 221 230 / 0.42);
+    stroke: rgb(169 221 230 / 0.38);
     stroke-width: 1.6;
   }
   .gain-fenetre {
     fill: rgb(169 221 230 / 0.3);
   }
-  .gain-palier {
-    stroke: rgb(169 221 230 / 0.28);
-    stroke-width: 1.4;
-    stroke-linecap: round;
-  }
-  .gain-pente {
+  .gain-sol {
     stroke: rgb(169 221 230 / 0.2);
-    stroke-width: 1.2;
-    stroke-dasharray: 3 7;
+    stroke-width: 1;
+  }
+  .gain-surface {
+    fill: var(--color-teal-400);
+    fill-opacity: 0.14;
+  }
+  .gain-trait {
+    stroke: var(--color-teal-200);
+    stroke-width: 2;
     stroke-linecap: round;
   }
-  .gain-etiquette-corps {
-    fill: var(--color-teal-200);
-  }
-  .gain-etiquette-trou {
+  .gain-achat {
     fill: var(--color-ink);
+    stroke: var(--color-teal-200);
+    stroke-width: 1.4;
+    transform-box: fill-box;
+    transform-origin: center;
   }
-  .gain-fleche {
-    stroke: var(--color-teal-400);
-    stroke-width: 1.8;
-    stroke-linecap: round;
-    stroke-linejoin: round;
+  .gain-pointe-lueur {
+    fill: var(--color-teal-400);
+    opacity: 0.3;
+  }
+  .gain-pointe-corps {
+    fill: var(--color-teal-100);
+  }
+  .gain-vente-fond {
+    fill: var(--color-ink);
+    stroke: var(--color-teal-200);
+    stroke-width: 1.4;
+  }
+  .gain-euro {
+    fill: var(--color-teal-200);
+    font-family: inherit;
+    font-size: 10px;
+    font-weight: 700;
+    text-anchor: middle;
+    dominant-baseline: central;
   }
 
   /*
-   * UNE MONTÉE PAR CYCLE de 6,5 s. L'étiquette part du palier bas (122, 76), suit la pente jusqu'au
-   * palier haut (184, 34), s'y tient, puis s'efface. Le palier haut et la flèche s'allument à son
-   * arrivée et s'éteignent avec elle.
-   * Les positions sont écrites en translations depuis l'origine du viewBox : le groupe est dessiné
-   * autour de (0, 0), ce qui permet de l'animer en `transform` sans rouvrir son tracé.
+   * ÉTAT DE REPOS = IMAGE COMPLÈTE (`prefers-reduced-motion`, navigateurs sans animation) : la courbe
+   * et sa surface entières, le point d'achat, la pastille au sommet ; ni pointe ni onde.
    */
-  .gain-etiquette {
-    animation: gain-montee 6.5s ease-in-out infinite;
+  .gain-courbe {
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
   }
-  .gain-palier--haut {
-    animation: gain-arrivee 6.5s ease-in-out infinite;
+  .gain-pointe {
+    offset-path: var(--courbe);
+    offset-rotate: 0deg;
+    offset-distance: 100%;
+    opacity: 0;
   }
-  .gain-fleche {
-    animation: gain-arrivee 6.5s ease-in-out infinite;
+  @supports not (offset-path: path('M0 0h1')) {
+    .gain-pointe {
+      display: none;
+    }
+  }
+  .gain-onde {
+    stroke: var(--color-teal-400);
+    stroke-width: 1.2;
+    opacity: 0;
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+  .gain-vente {
+    opacity: 1;
+    transform-box: fill-box;
+    transform-origin: center;
   }
 
-  @keyframes gain-montee {
+  /*
+   * LE CYCLE, 8 s comme les quatre autres dessins :
+   *    0 –  5 %  silence : l'immeuble, le sol, rien d'autre ;
+   *    5 – 10 %  le point d'achat se pose ;
+   *   10 – 56 %  la courbe se révèle de gauche à droite, à vitesse constante, la pointe à son bord ;
+   *   56 – 62 %  la pastille « € » se pose au sommet, son onde s'élargit, la pointe s'y fond ;
+   *   62 – 80 %  on lit ;
+   *   80 – 90 %  tout s'efface ;
+   *   90 – 100 % silence.
+   */
+  @media (prefers-reduced-motion: no-preference) {
+    .gain-courbe,
+    .gain-achat,
+    .gain-pointe,
+    .gain-onde,
+    .gain-vente {
+      animation-duration: var(--cycle);
+      animation-iteration-count: infinite;
+      animation-fill-mode: both;
+      animation-delay: var(--decal);
+    }
+    .gain-courbe {
+      animation-name: gain-courbe;
+    }
+    .gain-achat {
+      animation-name: gain-achat;
+    }
+    .gain-pointe {
+      animation-name: gain-pointe;
+      /* LA COURBE DE TEMPS CALCULÉE EST POSÉE ICI, SUR L'ÉLÉMENT, et non dans l'image-clé : une
+         règle `@keyframes` est analysée sans élément, `var()` n'y est pas résolu pour
+         `animation-timing-function`, et la pointe retombait sur `ease`, loin devant le bord (constaté
+         le 16/09/2026). Sur l'élément, elle vaut pour tout segment qui n'en déclare pas une autre :
+         le parcours, donc. Le fondu final garde la sienne, écrite dans l'image-clé. */
+      animation-timing-function: var(--tempsPointe);
+    }
+    .gain-onde {
+      animation-name: gain-onde;
+    }
+    .gain-vente {
+      animation-name: gain-vente;
+    }
+  }
+
+  @keyframes gain-courbe {
     0%,
     10% {
-      transform: translate(122px, 76px);
-      opacity: 0;
-    }
-    18% {
-      transform: translate(122px, 76px);
+      clip-path: inset(0 100% 0 0);
       opacity: 1;
+      animation-timing-function: linear;
     }
-    52%,
+    56% {
+      clip-path: inset(0 0 0 0);
+      animation-timing-function: linear;
+    }
     80% {
-      transform: translate(184px, 34px);
+      clip-path: inset(0 0 0 0);
       opacity: 1;
+      animation-timing-function: cubic-bezier(0.7, 0, 0.84, 0);
     }
-    92%,
+    90%,
     100% {
-      transform: translate(184px, 34px);
+      clip-path: inset(0 0 0 0);
       opacity: 0;
     }
   }
-  @keyframes gain-arrivee {
+  @keyframes gain-achat {
     0%,
-    46% {
-      opacity: 0.25;
+    5% {
+      opacity: 0;
+      transform: scale(0.4);
+      animation-timing-function: cubic-bezier(0.34, 1.3, 0.64, 1);
     }
-    56%,
+    10% {
+      opacity: 1;
+      transform: scale(1);
+      animation-timing-function: linear;
+    }
     80% {
       opacity: 1;
+      transform: scale(1);
+      animation-timing-function: cubic-bezier(0.7, 0, 0.84, 0);
     }
-    92%,
+    90%,
     100% {
-      opacity: 0.25;
+      opacity: 0;
+      transform: scale(1);
     }
   }
-
-  @media (prefers-reduced-motion: reduce) {
-    .gain-etiquette,
-    .gain-palier--haut,
-    .gain-fleche {
-      animation: none;
+  /* Mêmes bornes que le découpage ; la courbe de temps de l'élément tient la pointe à son bord. */
+  @keyframes gain-pointe {
+    0%,
+    10% {
+      offset-distance: 0%;
+      opacity: 0;
+    }
+    12% {
       opacity: 1;
     }
-    /* À l'arrêt : l'étiquette est posée sur le palier haut, la hausse se lit d'un coup d'œil. */
-    .gain-etiquette {
-      transform: translate(184px, 34px);
+    56% {
+      offset-distance: 100%;
+      opacity: 1;
+      animation-timing-function: cubic-bezier(0.7, 0, 0.84, 0);
+    }
+    60%,
+    100% {
+      offset-distance: 100%;
+      opacity: 0;
+    }
+  }
+  @keyframes gain-onde {
+    0%,
+    56% {
+      opacity: 0;
+      transform: scale(0.5);
+      animation-timing-function: var(--ease-out-expo);
+    }
+    60% {
+      opacity: 0.7;
+      animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1);
+    }
+    78%,
+    100% {
+      opacity: 0;
+      transform: scale(1.8);
+    }
+  }
+  @keyframes gain-vente {
+    0%,
+    56% {
+      opacity: 0;
+      transform: scale(0.5);
+      animation-timing-function: cubic-bezier(0.34, 1.3, 0.64, 1);
+    }
+    62% {
+      opacity: 1;
+      transform: scale(1);
+      animation-timing-function: linear;
+    }
+    80% {
+      opacity: 1;
+      transform: scale(1);
+      animation-timing-function: cubic-bezier(0.7, 0, 0.84, 0);
+    }
+    90%,
+    100% {
+      opacity: 0;
+      transform: scale(0.9);
     }
   }
 </style>

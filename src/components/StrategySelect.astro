@@ -1,56 +1,136 @@
 ---
 /**
- * Illustration de la tuile « Sélective » (16/09/2026) : neuf immeubles, un seul retenu.
+ * Illustration de la tuile « Sélective » (16/09/2026) : douze immeubles, un seul retenu.
  *
- * PENDANT DU GLOBE, dans la même grammaire : dessin au trait clair sur fond ink, carré, calé sur la
- * largeur de sa tuile. Le globe est un canvas parce qu'il projette une sphère ; ici un SVG suffit et
- * coûte cent fois moins.
+ * ┌ GRAMMAIRE COMMUNE AUX CINQ DESSINS DES CARTES DE /strategie ───────────────────────────────────┐
+ * │ (EngineRent, EngineGain, StrategySelect, StrategyDiversify, StrategyTiming ; reprise le         │
+ * │ 16/09/2026, demande de l'équipe : « 10/10 en fluidité, design, élégance, haut de gamme »,       │
+ * │ « parfaitement adaptées à chaque card », « qu'elles prennent une bonne partie de la carte »)    │
+ * │                                                                                                 │
+ * │  - PLEINE LARGEUR DE LA CARTE, dans l'espace qui reste entre le titre et le bouton : format     │
+ * │    paysage 160 × 120 pour les trois volets, 236 × 100 pour les deux moteurs. Le dessin remplit  │
+ * │    la carte au lieu d'y flotter.                                                                │
+ * │  - DES IMMEUBLES QUI RESSEMBLENT À DES IMMEUBLES : un cadre et une grille de fenêtres            │
+ * │    (src/lib/immeuble.ts), jamais trois traits dans un carré.                                    │
+ * │  - UN SEUL TEMPO : cycle de 8 s partout, le même que la canalisation entre les deux rangées      │
+ * │    (04-Strategy.astro, --pont-cycle).                                                           │
+ * │  - UNE HISTOIRE PAR DESSIN, celle du texte de sa carte, en quatre temps : silence, mise en       │
+ * │    place, lecture, effacement. Jamais de réinitialisation brutale : ce qui disparaît s'efface   │
+ * │    en fondu, un temps de silence sépare deux cycles, et ce qui boucle sans fin (les versements   │
+ * │    des loyers) boucle sans couture.                                                             │
+ * │  - LES COURBES DU SITE : arrivées sur `--ease-out-expo`, départs sur son miroir                 │
+ * │    cubic-bezier(0.7, 0, 0.84, 0), déplacements longs en cubic-bezier(0.65, 0, 0.35, 1). Jamais   │
+ * │    `ease` ni `linear` par défaut, `linear` seulement quand la régularité est le sujet.           │
+ * │  - CAUSALITÉ : un élément réagit à un autre (la marque s'éclaire quand un versement arrive,     │
+ * │    l'immeuble s'allume quand le viseur se referme). Rien ne bat à sa propre horloge.            │
+ * │  - ÉCHELLE DEPUIS LE CENTRE : `transform-box: fill-box` + `transform-origin: center` sur tout ce  │
+ * │    qui grandit. Sans cela, un élément SVG grandit depuis le coin haut gauche du dessin.          │
+ * │  - ÉTAT DE REPOS = IMAGE COMPLÈTE, écrit dans les styles de base : c'est ce que voient           │
+ * │    `prefers-reduced-motion` et tout navigateur qui n'anime pas. Les animations ne sont déclarées │
+ * │    que sous `no-preference` et partent de leur propre première image ; rien n'est à annuler.     │
+ * │  - EN PAUSE HORS ÉCRAN ET DERRIÈRE UNE CARTE RETOURNÉE : `data-in-view="illus-en-vue"` sur la    │
+ * │    figure (motion.ts pose la classe tant qu'elle est à l'écran), règle commune dans global.css   │
+ * │    (« Illustrations des cartes »). Un dessin commence donc son histoire quand on le voit, pas    │
+ * │    au chargement, et ne coûte rien pendant qu'on lit le reste.                                   │
+ * │  - `--illus-decalage`, posé par la section sur chaque carte : les dessins voisins entrent en      │
+ * │    vague, pas à l'unisson.                                                                      │
+ * │  - `animation-fill-mode: both` sur tout ce qui est retardé : pendant le retard, c'est la première │
+ * │    image qui s'affiche, jamais l'image de repos. Sans lui, l'image complète clignotait un tiers   │
+ * │    de seconde avant que l'histoire commence (constaté le 16/09/2026 sur les cartes décalées).    │
+ * │  - `transform`, `opacity`, le tiret des tracés et `offset-distance` seulement ; aucun filtre,    │
+ * │    aucun masque.                                                                                │
+ * └─────────────────────────────────────────────────────────────────────────────────────────────────┘
  *
- * CE QU'ELLE DIT : on regarde beaucoup d'immeubles, on en garde un. C'est le propos de la zone, pas
- * une décoration. Le balayage passe sur les neuf et s'arrête sur celui du centre, qui reste allumé.
+ * CE QU'ELLE DIT : on regarde beaucoup d'immeubles, on en garde un. C'est le propos de la tuile
+ * (« Tout commence par le choix des immeubles »), pas une décoration. Douze immeubles de trois
+ * gabarits, sur trois rues ; le regard passe sur chacun, l'un après l'autre ; le viseur se pose et se
+ * referme sur l'un d'eux ; c'est À CET INSTANT que ses fenêtres s'allument et que les onze autres
+ * s'effacent d'un cran. Le retenu est de GABARIT INTERMÉDIAIRE, comme le texte de la tuile
+ * (« principalement des immeubles de taille intermédiaire »).
  *
  * Décorative (aria-hidden) : le texte de la tuile porte le sens, l'image ne l'ajoute pas.
- * Animation coupée en `prefers-reduced-motion` : l'immeuble retenu est alors simplement allumé.
  */
+import { fenetres } from '@/lib/immeuble';
+
+/*
+ * Trois rues de quatre cases de 30, gouttière de 8, marges de 8 et 7 : la grille fait 152 × 113 dans
+ * un cadre de 160 × 120, centrée. Chaque immeuble est POSÉ AU SOL de sa case (aligné en bas), et une
+ * ligne de rue court sous chaque rangée : c'est une ville, pas un tableau.
+ */
+const CASE = 30;
+const PAS = 38;
+const MARGE_X = 8;
+const MARGE_Y = 7;
+/** Trois gabarits, tour à tour : haut et étroit, intermédiaire, bas et large. */
+const GABARITS = [
+  { w: 18, h: 26, colonnes: 2, rangees: 4 },
+  { w: 24, h: 22, colonnes: 3, rangees: 3 },
+  { w: 28, h: 16, colonnes: 4, rangees: 2 },
+] as const;
+/* Ordre des gabarits, case par case : deux voisins n'ont jamais le même. */
+const ORDRE = [0, 1, 2, 1, 2, 0, 1, 0, 1, 2, 0, 2];
+const RETENU = 6; // deuxième rue, troisième case : un gabarit intermédiaire
+
+const immeubles = ORDRE.map((g, i) => {
+  const gabarit = GABARITS[g]!;
+  const cx = MARGE_X + (i % 4) * PAS;
+  const cy = MARGE_Y + Math.floor(i / 4) * PAS;
+  const cadre = { x: cx + (CASE - gabarit.w) / 2, y: cy + CASE - gabarit.h, w: gabarit.w, h: gabarit.h };
+  return {
+    i,
+    cadre,
+    fenetres: fenetres(cadre, { colonnes: gabarit.colonnes, rangees: gabarit.rangees, taille: 3.2, ecart: 2 }),
+    centre: { x: cx + CASE / 2, y: cy + CASE / 2 },
+  };
+});
+const retenu = immeubles[RETENU]!;
 ---
 
-<figure class="select-figure" aria-hidden="true">
-  <svg viewBox="0 0 120 120" fill="none" class="select-svg">
+<figure class="select-figure" aria-hidden="true" data-in-view="illus-en-vue">
+  <svg viewBox="0 0 160 120" fill="none" class="select-svg">
+    {/* Les trois rues. */}
+    {[0, 1, 2].map((r) => <path d={`M${MARGE_X} ${MARGE_Y + r * PAS + CASE + 0.5}h${4 * CASE + 3 * (PAS - CASE)}`} class="select-rue" />)}
+
+    {/* La lueur sous l'immeuble retenu : elle s'allume au verrouillage du viseur. */}
+    <rect x={retenu.centre.x - 19} y={retenu.centre.y - 19} width="38" height="38" rx="8" class="select-lueur" />
+
+    {/* Les douze immeubles. `select-parc` porte l'effacement des écartés, chaque bloc son passage. */}
+    <g class="select-parc">
+      {
+        immeubles.map(({ i, cadre, fenetres: f }) => (
+          <g class="select-bloc" style={`--rang:${i}`}>
+            <rect x={cadre.x} y={cadre.y} width={cadre.w} height={cadre.h} rx="2" class="select-cadre" />
+            {f.map((w) => <rect x={w.x} y={w.y} width={w.w} height={w.h} rx="0.6" class="select-fenetre" />)}
+          </g>
+        ))
+      }
+    </g>
+
     {
-      /* Trois rangées de trois. L'ordre des index suit la lecture, le balayage aussi. */
-      [0, 1, 2].map((ligne) =>
-        [0, 1, 2].map((colonne) => {
-          const i = ligne * 3 + colonne;
-          const x = 14 + colonne * 38;
-          const y = 14 + ligne * 38;
-          const retenu = i === 4;
-          return (
-            <g class={retenu ? 'select-bloc select-bloc--retenu' : 'select-bloc'} style={`--rang:${i}`}>
-              <rect x={x} y={y} width="26" height="26" rx="4" class="select-cadre" />
-              <path d={`M${x + 6} ${y + 20}v-8M${x + 13} ${y + 20}v-12M${x + 20} ${y + 20}v-6`} class="select-trait" />
-            </g>
-          );
-        })
-      )
+      /* L'immeuble retenu, ALLUMÉ : une copie en trait plein, fenêtres pleines, posée sur le bloc et
+        révélée quand le viseur se referme. Une copie plutôt qu'une couleur animée : la couleur d'un
+        trait ne se compose pas sur le GPU, l'opacité si. */
     }
+    <g class="select-retenu">
+      <rect x={retenu.cadre.x} y={retenu.cadre.y} width={retenu.cadre.w} height={retenu.cadre.h} rx="2" class="select-retenu-cadre" />
+      {retenu.fenetres.map((w) => <rect x={w.x} y={w.y} width={w.w} height={w.h} rx="0.6" class="select-retenu-fenetre" />)}
+    </g>
+
     {
       /*
-       * LE VISEUR qui se pose sur l'immeuble retenu, une fois le balayage terminé (16/09/2026 : c'était
-       * un cercle en pointillé, l'équipe a demandé un viseur).
-       * Quatre équerres aux angles et une croix au centre : ce sont les deux signes qui font lire un
-       * viseur, et ils tiennent au trait sans remplissage, comme le reste du dessin.
-       * Dessiné autour de (0, 0) puis translaté : le groupe peut ainsi se refermer en `scale` sans que
-       * son centre dérive.
+       * LE VISEUR qui se pose sur l'immeuble retenu, une fois le regard passé (16/09/2026 : c'était
+       * un cercle en pointillé, l'équipe a demandé un viseur). Quatre équerres aux angles et une
+       * croix au centre : les deux signes qui font lire un viseur, au trait, comme le reste.
+       * Dessiné autour de (0, 0) puis translaté sur la case retenue : le corps se referme en `scale`
+       * sans que son centre dérive. La croix vient après les équerres, une fois le point fait.
        */
     }
-    <g class="select-viseur">
+    <g class="select-viseur" style={`--cx:${retenu.centre.x}px; --cy:${retenu.centre.y}px`}>
       <g class="select-viseur-corps">
-        {/* Les quatre équerres, une par angle, obtenues par rotation d'un quart de tour. */}
         {[0, 90, 180, 270].map((angle) => (
-          <path d="M-20-11v-9h9" class="select-equerre" style={`--angle:${angle}deg`} />
+          <path d="M-19-10v-9h9" class="select-equerre" style={`--angle:${angle}deg`} />
         ))}
-        {/* La croix centrale, en deux traits courts qui laissent l'immeuble visible au milieu. */}
-        <path d="M-9 0h5M4 0h5M0-9v5M0 4v5" class="select-croix" />
+        <path d="M-8 0h4M4 0h4M0-8v4M0 4v4" class="select-croix" />
       </g>
     </g>
   </svg>
@@ -59,44 +139,60 @@
 <style>
   .select-figure {
     margin: 0;
+    /* Pleine largeur de la carte : enfant d\'une boîte flex, la figure retomberait sinon à la largeur
+       intrinsèque du SVG, 300 px. */
+    width: 100%;
+    --cycle: 8s;
+    --decal: var(--illus-decalage, 0s);
   }
   .select-svg {
     display: block;
     width: 100%;
-    aspect-ratio: 1;
+    aspect-ratio: 160 / 120;
+  }
+  .select-rue {
+    stroke: rgb(169 221 230 / 0.14);
+    stroke-width: 1;
   }
   .select-cadre {
-    stroke: rgb(169 221 230 / 0.35);
-    stroke-width: 1.4;
+    stroke: rgb(169 221 230 / 0.6);
+    stroke-width: 1.3;
   }
-  .select-trait {
-    stroke: rgb(169 221 230 / 0.28);
-    stroke-width: 1.1;
-    stroke-linecap: round;
+  .select-fenetre {
+    fill: rgb(169 221 230 / 0.42);
   }
 
-  /* Le balayage : chaque bloc s'allume à son tour, décalé par son rang. Neuf blocs, 0,18 s d'écart,
-     et un cycle de 6 s pour que l'ensemble respire sans jamais réclamer l'attention. */
+  /*
+   * ÉTAT DE REPOS = IMAGE COMPLÈTE (`prefers-reduced-motion`, navigateurs sans animation) : les onze
+   * écartés en retrait, le retenu allumé sous sa lueur, le viseur refermé, croix comprise.
+   */
+  .select-parc {
+    opacity: 0.6;
+  }
   .select-bloc {
-    animation: select-passage 6s ease-in-out infinite;
-    animation-delay: calc(var(--rang) * 0.18s);
+    opacity: 0.5;
   }
-  .select-bloc--retenu .select-cadre {
+  .select-lueur {
+    fill: var(--color-teal-400);
+    opacity: 0.14;
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+  .select-retenu {
+    opacity: 1;
+  }
+  .select-retenu-cadre {
     stroke: var(--color-teal-200);
-    stroke-width: 1.8;
+    stroke-width: 1.6;
   }
-  .select-bloc--retenu .select-trait {
-    stroke: var(--color-teal-200);
-  }
-  .select-bloc--retenu {
-    animation: none;
+  .select-retenu-fenetre {
+    fill: var(--color-teal-200);
   }
   .select-viseur {
-    /* Le viseur est dessiné autour de (0, 0) : cette translation le pose sur l'immeuble du centre. */
-    transform: translate(60px, 60px);
+    transform: translate(var(--cx), var(--cy));
   }
   .select-viseur-corps {
-    animation: select-viseur 6s ease-in-out infinite;
+    opacity: 1;
   }
   .select-equerre {
     stroke: var(--color-teal-400);
@@ -109,44 +205,175 @@
     stroke: var(--color-teal-400);
     stroke-width: 1.4;
     stroke-linecap: round;
+    opacity: 1;
+  }
+
+  /*
+   * LE CYCLE, 8 s :
+   *    0 –  5 %  silence, les douze au même retrait ;
+   *    5 – 40 %  le regard passe, immeuble par immeuble dans l'ordre de lecture, 0,16 s d'écart :
+   *              chacun s'éclaire vite et retombe lentement ;
+   *   30 – 43 %  le viseur arrive large et se referme, mise au point avec un cheveu de sous-tension ;
+   *   37 – 47 %  l'immeuble s'allume sous lui, les onze autres s'effacent d'un cran, puis la croix ;
+   *   47 – 80 %  on lit ;
+   *   80 – 90 %  le viseur s'ouvre et s'efface, l'immeuble s'éteint, les autres reviennent ;
+   *   90 – 100 % silence.
+   */
+  @media (prefers-reduced-motion: no-preference) {
+    .select-bloc {
+      animation: select-passage var(--cycle) infinite both;
+      animation-delay: calc(var(--decal) + 0.4s + var(--rang) * 0.16s);
+    }
+    .select-parc,
+    .select-lueur,
+    .select-retenu,
+    .select-viseur-corps,
+    .select-croix {
+      animation-duration: var(--cycle);
+      animation-iteration-count: infinite;
+      animation-fill-mode: both;
+      animation-delay: var(--decal);
+    }
+    .select-parc {
+      animation-name: select-ecart;
+    }
+    .select-lueur {
+      animation-name: select-lueur;
+    }
+    .select-retenu {
+      animation-name: select-retenu;
+    }
+    .select-viseur-corps {
+      animation-name: select-viseur;
+    }
+    .select-croix {
+      animation-name: select-croix;
+    }
   }
 
   @keyframes select-passage {
-    0%,
-    24%,
-    100% {
-      opacity: 0.55;
+    0% {
+      opacity: 0.5;
+      animation-timing-function: var(--ease-out-expo);
     }
-    12% {
+    3.5% {
+      opacity: 1;
+      animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1);
+    }
+    13%,
+    100% {
+      opacity: 0.5;
+    }
+  }
+  @keyframes select-ecart {
+    0%,
+    36% {
+      opacity: 1;
+      animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1);
+    }
+    44% {
+      opacity: 0.6;
+      animation-timing-function: linear;
+    }
+    80% {
+      opacity: 0.6;
+      animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1);
+    }
+    90%,
+    100% {
       opacity: 1;
     }
   }
-  /* Le viseur arrive large et se referme sur l'immeuble, comme une mise au point ; il s'ouvre à
-     nouveau pour disparaître, ce qui évite qu'il semble se replier sur lui-même. */
+  @keyframes select-lueur {
+    0%,
+    37% {
+      opacity: 0;
+      transform: scale(0.85);
+      animation-timing-function: var(--ease-out-expo);
+    }
+    46% {
+      opacity: 0.14;
+      transform: scale(1);
+      animation-timing-function: linear;
+    }
+    80% {
+      opacity: 0.14;
+      transform: scale(1);
+      animation-timing-function: cubic-bezier(0.7, 0, 0.84, 0);
+    }
+    90%,
+    100% {
+      opacity: 0;
+      transform: scale(1);
+    }
+  }
+  @keyframes select-retenu {
+    0%,
+    37% {
+      opacity: 0;
+      animation-timing-function: var(--ease-out-expo);
+    }
+    44% {
+      opacity: 1;
+      animation-timing-function: linear;
+    }
+    80% {
+      opacity: 1;
+      animation-timing-function: cubic-bezier(0.7, 0, 0.84, 0);
+    }
+    90%,
+    100% {
+      opacity: 0;
+    }
+  }
+  /* Le viseur arrive large et se referme, comme une mise au point : il passe un cheveu sous sa taille
+     puis s'y pose. Il s'ouvre à nouveau pour disparaître, ce qui évite qu'il semble se replier. */
   @keyframes select-viseur {
     0%,
     30% {
       opacity: 0;
-      transform: scale(1.5);
+      transform: scale(1.6);
+      animation-timing-function: var(--ease-out-expo);
     }
-    45%,
-    88% {
+    32% {
+      opacity: 1;
+    }
+    39% {
+      transform: scale(0.985);
+      animation-timing-function: cubic-bezier(0.33, 1, 0.68, 1);
+    }
+    43% {
+      transform: scale(1);
+      animation-timing-function: linear;
+    }
+    80% {
       opacity: 1;
       transform: scale(1);
+      animation-timing-function: cubic-bezier(0.7, 0, 0.84, 0);
     }
+    90%,
     100% {
       opacity: 0;
-      transform: scale(1.25);
+      transform: scale(1.15);
     }
   }
-
-  @media (prefers-reduced-motion: reduce) {
-    .select-bloc,
-    .select-viseur-corps {
-      animation: none;
+  @keyframes select-croix {
+    0%,
+    41% {
+      opacity: 0;
+      animation-timing-function: var(--ease-out-expo);
     }
-    .select-viseur-corps {
+    47% {
       opacity: 1;
+      animation-timing-function: linear;
+    }
+    80% {
+      opacity: 1;
+      animation-timing-function: cubic-bezier(0.7, 0, 0.84, 0);
+    }
+    88%,
+    100% {
+      opacity: 0;
     }
   }
 </style>

@@ -2,34 +2,51 @@
 /**
  * Illustration du moteur 01, « Les loyers versés par les entreprises locataires » (16/09/2026).
  *
- * MÊME GRAMMAIRE QUE LES TROIS TUILES de la sélection (StrategySelect, StrategyGlobe,
- * StrategyTiming) : dessin au trait clair sur fond ink, animé en boucle lente, coupé en
- * `prefers-reduced-motion`. Elle remplace la photo d'illustration qui occupait ce bandeau.
- * Format 236 × 100, le rapport natif du bandeau de la carte : le cadre ne change pas.
+ * MÊME GRAMMAIRE QUE LES QUATRE AUTRES DESSINS DES CARTES (StrategySelect.astro la décrit en tête) :
+ * trait clair sur fond ink, animé en boucle lente, en pause hors écran, complet et immobile en
+ * `prefers-reduced-motion`. Format 236 × 100, le rapport natif du bandeau de la carte.
  *
- * CE QU'ELLE DIT : des entreprises occupent l'immeuble, et il en sort un flux RÉGULIER. C'est le
- * pendant exact du moteur 02, qui montre lui un échange ponctuel. Les fenêtres s'allument l'une
- * après l'autre (les locataires), et les versements partent à intervalles égaux vers la droite.
+ * CE QU'ELLE DIT : des entreprises occupent l'immeuble, et il en sort un flux RÉGULIER vers R Start.
+ * C'est le pendant exact du moteur 02, qui montre un gain ponctuel. Les fenêtres s'allument (les
+ * locataires), les versements partent à intervalles égaux et sont reçus par la marque.
  *
  * AUCUN CHIFFRE, aucune échelle, rien qui monte : le flux est régulier, pas croissant. L'image ne
  * dit rien du montant ni de la régularité future des loyers, elle nomme le mécanisme.
  *
+ * MOUVEMENT REPRIS LE 16/09/2026 (demande de l'équipe : « 10/10 en fluidité, design, élégance, haut de
+ * gamme »). Trois défauts corrigés :
+ *  - les fenêtres s'allumaient colonne par colonne, en chenillard. Elles s'occupent maintenant dans un
+ *    ordre mélangé et fixe, comme un immeuble le soir, et les deux tiers restent allumées à tout
+ *    instant : l'immeuble est OCCUPÉ, il ne clignote pas ;
+ *  - les versements s'éteignaient dans le vide, avant la marque, et la marque battait toute seule à son
+ *    propre rythme. Chaque versement est maintenant ABSORBÉ par la marque, qui répond par une onde et
+ *    un éclat : c'est l'arrivée qui fait battre, plus une horloge ;
+ *  - trois versements en vol au lieu de quatre, plus espacés : la régularité se lit mieux quand chaque
+ *    point a de l'air. Le vol reste LINÉAIRE, c'est la régularité qui est le sujet ; seuls le départ
+ *    (émission) et l'arrivée (absorption) sont courbés.
+ *
  * Décorative (aria-hidden) : le texte de la carte porte le sens.
  */
 
-/* Les quatre versements en vol. Retards NÉGATIFS : au chargement, le flux est déjà installé, la
-   carte ne s'ouvre pas sur une ligne vide qui attendrait son premier point. */
-const versements = [0, 1, 2, 3];
-/* Trois colonnes de quatre fenêtres. L'ordre sert le décalage d'allumage. */
+/* Trois versements en vol, à intervalles égaux. Retards NÉGATIFS : au premier regard, le flux est déjà
+   installé, la ligne n'attend pas son premier point. */
+const versements = [0, 1, 2];
+/* Trois colonnes de quatre fenêtres, index = colonne × 4 + ligne. */
 const fenetres = [0, 1, 2].flatMap((colonne) => [0, 1, 2, 3].map((ligne) => ({ colonne, ligne })));
+/*
+ * ORDRE D'ALLUMAGE, mélangé une fois pour toutes (une permutation de 0 à 11, une phase par fenêtre).
+ * Deux voisines n'ont jamais deux phases voisines : l'œil ne doit lire ni colonne ni ligne, seulement
+ * un immeuble qui vit.
+ */
+const PHASES = [5, 0, 9, 3, 11, 7, 1, 8, 4, 10, 2, 6];
 ---
 
-<figure class="rent-figure" aria-hidden="true">
+<figure class="rent-figure" aria-hidden="true" data-in-view="illus-en-vue">
   <svg viewBox="0 0 236 100" fill="none" class="rent-svg">
     {/* L'immeuble : les entreprises locataires que la ligne nomme. */}
     <rect x="24" y="22" width="60" height="62" rx="5" class="rent-cadre" />
     {
-      fenetres.map(({ colonne, ligne }) => (
+      fenetres.map(({ colonne, ligne }, i) => (
         <rect
           x={35 + colonne * 15}
           y={32 + ligne * 13}
@@ -37,18 +54,28 @@ const fenetres = [0, 1, 2].flatMap((colonne) => [0, 1, 2, 3].map((ligne) => ({ c
           height="8"
           rx="1.5"
           class="rent-fenetre"
-          style={`--rang:${colonne * 4 + ligne}`}
+          style={`--phase:${PHASES[i]}`}
         />
       ))
     }
 
-    {/* Le chemin des versements, de l'immeuble vers la droite. */}
-    <path d="M96 56h86" class="rent-ligne" />
+    {/* Le chemin des versements, de l'immeuble vers la marque. */}
+    <path d="M92 56h94" class="rent-ligne" />
+    {
+      /* Deux niveaux par versement : le groupe VOLE (translation linéaire, d'un bout à l'autre), le
+        disque NAÎT ET S'ÉTEINT (échelle et opacité, courbées). Une seule propriété `transform` par
+        élément : les deux mouvements ne se disputent pas la même courbe. */
+    }
     {
       versements.map((i) => (
-        <circle cx="98" cy="56" r="3.2" class="rent-versement" style={`--rang:${i}`} />
+        <g class="rent-versement" style={`--rang:${i}`}>
+          <circle cx="90" cy="56" r="3.2" class="rent-versement-corps" />
+        </g>
       ))
     }
+
+    {/* L'onde de réception : un anneau qui naît sous la marque et s'élargit à chaque arrivée. */}
+    <circle cx="206" cy="55" r="18" class="rent-onde" />
 
     {
       /*
@@ -61,7 +88,8 @@ const fenetres = [0, 1, 2].flatMap((colonne) => [0, 1, 2, 3].map((ligne) => ({ c
        * `<svg>` imbriqué et non `<use>` : le fichier est un `astro:assets`, il n'est pas servi tel quel
        * à une URL stable. Son propre viewBox (94,08 × 88,98, la boîte exacte du tracé, mesurée et non
        * devinée) le recale sans le déformer.
-       * `rent-marque` la fait battre au passage de chaque versement, comme le faisait le cercle.
+       * Elle S'ÉCLAIRE à chaque versement reçu, sans changer de taille : une marque qui grossit et
+       * rapetisse a l'air d'un bouton.
        */
     }
     <svg x="190" y="40" width="32" height="30" viewBox="0 0 94.08 88.98" class="rent-marque">
@@ -73,6 +101,16 @@ const fenetres = [0, 1, 2].flatMap((colonne) => [0, 1, 2, 3].map((ligne) => ({ c
 <style>
   .rent-figure {
     margin: 0;
+    /* Pleine largeur de la carte : enfant d\'une boîte flex, la figure retomberait sinon à la largeur
+       intrinsèque du SVG, 300 px. */
+    width: 100%;
+    /* Un versement vit quatre secondes, de l'émission à l'absorption ; il en part un toutes les
+       1,333 s, d'où trois en vol. Les fenêtres tournent sur le cycle commun des cinq dessins, 8 s. */
+    --vol: 4s;
+    --intervalle: calc(var(--vol) / 3);
+    --cycle: 8s;
+    /* Décalage posé par la section (--illus-decalage) : deux cartes voisines ne battent pas à l'unisson. */
+    --decal: var(--illus-decalage, 0s);
   }
   .rent-svg {
     display: block;
@@ -90,79 +128,138 @@ const fenetres = [0, 1, 2].flatMap((colonne) => [0, 1, 2, 3].map((ligne) => ({ c
     stroke-linecap: round;
   }
 
-  /* Les fenêtres s'allument par vagues : douze, 0,22 s d'écart, cycle de 4,8 s, le même que celui
-     des versements pour que les deux mouvements restent en phase. */
+  /*
+   * ÉTAT DE REPOS = IMAGE COMPLÈTE. C'est ce que voient `prefers-reduced-motion` et tout navigateur
+   * qui n'anime pas : l'immeuble est occupé, les versements sont posés le long du chemin à intervalles
+   * égaux, la marque est pleine. Les animations, déclarées plus bas et seulement si le mouvement est
+   * accepté, partent de leur propre première image ; rien n'est à annuler.
+   */
   .rent-fenetre {
-    fill: rgb(169 221 230 / 0.16);
-    animation: rent-occupation 4.8s ease-in-out infinite;
-    animation-delay: calc(var(--rang) * 0.22s);
-  }
-
-  /* Quatre versements pour un cycle de 4,8 s : un départ toutes les 1,2 s, à intervalles égaux.
-     C'est la régularité qui est le sujet, d'où un `linear` et non une courbe qui accélérerait. */
-  .rent-versement {
     fill: var(--color-teal-200);
-    animation: rent-flux 4.8s linear infinite;
-    animation-delay: calc(var(--rang) * -1.2s);
+    opacity: 0.5;
+  }
+  .rent-versement {
+    transform: translateX(calc(14px + var(--rang) * 34px));
+  }
+  .rent-versement-corps {
+    fill: var(--color-teal-200);
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+  .rent-onde {
+    stroke: var(--color-teal-400);
+    stroke-width: 1.2;
+    opacity: 0;
+    transform-box: fill-box;
+    transform-origin: center;
   }
   .rent-marque {
     fill: var(--color-teal-200);
-    transform-origin: 206px 55px;
-    animation: rent-marque 1.2s ease-out infinite;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    /* Douze fenêtres, douze phases réparties sur le cycle : retard négatif, l'immeuble est déjà
+       habité au premier regard. Allumée 58 % du temps, chacune s'allume vite et s'éteint lentement. */
+    .rent-fenetre {
+      animation: rent-occupation var(--cycle) infinite both;
+      animation-delay: calc(var(--decal) + var(--phase) * (var(--cycle) / -12));
+    }
+    .rent-versement {
+      animation: rent-vol var(--vol) linear infinite both;
+      animation-delay: calc(var(--decal) + var(--rang) * -1 * var(--intervalle));
+    }
+    .rent-versement-corps {
+      animation: rent-versement var(--vol) infinite both;
+      animation-delay: calc(var(--decal) + var(--rang) * -1 * var(--intervalle));
+    }
+    /* L'onde et l'éclat sont calés sur les ARRIVÉES : un versement arrive toutes les 1,333 s, le
+       premier à 1,333 s. Même période, même retard, et l'accord ne dérive jamais. */
+    .rent-onde {
+      animation: rent-onde var(--intervalle) infinite both;
+      animation-delay: calc(var(--decal) + var(--intervalle));
+    }
+    .rent-marque {
+      animation: rent-eclat var(--intervalle) infinite both;
+      animation-delay: calc(var(--decal) + var(--intervalle));
+    }
   }
 
   @keyframes rent-occupation {
-    0%,
-    70%,
-    100% {
-      fill: rgb(169 221 230 / 0.16);
+    0% {
+      opacity: 0.16;
+      animation-timing-function: var(--ease-out-expo);
     }
-    20%,
-    50% {
-      fill: rgb(169 221 230 / 0.62);
+    7% {
+      opacity: 0.62;
+      animation-timing-function: linear;
+    }
+    58% {
+      opacity: 0.62;
+      animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1);
+    }
+    72%,
+    100% {
+      opacity: 0.16;
     }
   }
-  @keyframes rent-flux {
-    0% {
+  /* Le vol : 98 unités, du flanc de l'immeuble au bord de la marque, à vitesse constante. */
+  @keyframes rent-vol {
+    from {
       transform: translateX(0);
+    }
+    to {
+      transform: translateX(98px);
+    }
+  }
+  /* Émission puis absorption : le disque naît en grandissant, vole plein, puis se résorbe dans la
+     marque au lieu de s'évanouir en chemin. */
+  @keyframes rent-versement {
+    0% {
       opacity: 0;
+      transform: scale(0.3);
+      animation-timing-function: var(--ease-out-expo);
+    }
+    9% {
+      opacity: 1;
+      transform: scale(1);
+      animation-timing-function: linear;
+    }
+    86% {
+      opacity: 1;
+      transform: scale(1);
+      animation-timing-function: cubic-bezier(0.7, 0, 0.84, 0);
+    }
+    100% {
+      opacity: 0;
+      transform: scale(0.3);
+    }
+  }
+  @keyframes rent-onde {
+    0% {
+      opacity: 0;
+      transform: scale(0.7);
+      animation-timing-function: var(--ease-out-expo);
     }
     12% {
-      opacity: 1;
-    }
-    88% {
-      opacity: 1;
+      opacity: 0.6;
+      animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1);
     }
     100% {
-      transform: translateX(84px);
       opacity: 0;
+      transform: scale(1.45);
     }
   }
-  @keyframes rent-marque {
-    0%,
+  @keyframes rent-eclat {
+    0% {
+      fill-opacity: 0.55;
+      animation-timing-function: var(--ease-out-expo);
+    }
+    8% {
+      fill-opacity: 1;
+      animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1);
+    }
     100% {
       fill-opacity: 0.55;
-      transform: scale(1);
-    }
-    12% {
-      fill-opacity: 1;
-      transform: scale(1.1);
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .rent-fenetre,
-    .rent-versement,
-    .rent-marque {
-      animation: none;
-    }
-    /* À l'arrêt : l'immeuble est occupé et les versements sont posés le long du chemin, à intervalles
-       égaux. L'image dit la même chose, sans mouvement. */
-    .rent-fenetre {
-      fill: rgb(169 221 230 / 0.5);
-    }
-    .rent-versement {
-      transform: translateX(calc(var(--rang) * 21px));
     }
   }
 </style>

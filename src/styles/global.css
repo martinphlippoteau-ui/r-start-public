@@ -1488,6 +1488,27 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   cursor: pointer;
 }
 
+/*
+ * ILLUSTRATIONS DES CARTES (16/09/2026) : les cinq dessins animés de /strategie (EngineRent, EngineGain,
+ * StrategySelect, StrategyDiversify, StrategyTiming ; grammaire commune décrite en tête de
+ * StrategySelect.astro) sont EN PAUSE HORS ÉCRAN et DERRIÈRE UNE CARTE RETOURNÉE.
+ * `data-in-view="illus-en-vue"` sur la figure : motion.ts pose la classe tant qu'elle traverse le
+ * viewport (marge 10 %). Un dessin commence donc son histoire quand on le voit, pas au chargement, et
+ * cinq boucles ne tournent pas pendant qu'on lit le reste de la page.
+ * SEULEMENT SI UN SCRIPT TOURNE (`scripting: enabled`) : sans lui, personne ne poserait jamais la classe
+ * et les dessins resteraient figés sur leur première image ; ils tournent alors librement, et un
+ * navigateur qui ignore cette requête média fait de même. Sous `reduce`, rien n'est animé de toute façon.
+ * `[inert]` est posé par carteRetournee.ts sur la face cachée : ce qu'on ne voit pas ne bouge pas.
+ * L'attribut est répété pour PESER PLUS que les sélecteurs des composants, qui portent une classe et
+ * l'attribut de portée d'Astro : sans cela, l'ordre des feuilles déciderait.
+ */
+@media (prefers-reduced-motion: no-preference) and (scripting: enabled) {
+  [data-in-view='illus-en-vue'][data-in-view]:not(.illus-en-vue) *,
+  .carte-recto[inert] [data-in-view='illus-en-vue'] * {
+    animation-play-state: paused;
+  }
+}
+
 
 
 /* --- Hero (fond ink + halo de marque + grain ; plus d'image de fond depuis le 11/09/2026) --- */

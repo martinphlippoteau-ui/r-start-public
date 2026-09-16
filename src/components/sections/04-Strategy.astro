@@ -176,12 +176,15 @@ const pontVisible = !strategy.engines.outro && !strategy.engines.disclaimer;
                 <p class="text-display-sm mt-3 text-sand">{item.lead}</p>
 
                 {
-                  /* L'illustration est CENTRÉE ET BORNÉE comme celles des volets, au lieu d'occuper
-                    toute la largeur en bandeau : c'est ce qui fait que les cinq cartes se composent
-                    pareil. 24rem et non 11rem : ces dessins-là sont en 236 × 100 et non carrés, et la
-                    carte d'un moteur est deux fois plus large que celle d'un volet. */
+                  /* L'ILLUSTRATION REMPLIT LA CARTE (16/09/2026 au soir, « je veux que les animations
+                    prennent une bonne partie de la carte pour la remplir ») : pleine largeur, et
+                    centrée dans tout l'espace qui reste entre le titre et le bouton (`flex-1`). Elle
+                    était bornée à 24 rem et posée sous le titre, le bas de la carte restait vide.
+                    `--illus-decalage` : le dessin de la seconde carte part un tiers de seconde après
+                    le premier ; deux dessins voisins qui battraient à l'unisson auraient l'air d'un
+                    seul mécanisme (grammaire commune en tête de StrategySelect.astro). */
                 }
-                <div class="mx-auto mt-6 w-full max-w-[24rem]">
+                <div class="flex w-full flex-1 items-center py-6" style={`--illus-decalage:${i * 0.35}s`}>
                   {i === 0 && <EngineRent />}
                   {i === 1 && <EngineGain />}
                 </div>
@@ -415,16 +418,18 @@ const pontVisible = !strategy.engines.outro && !strategy.engines.disclaimer;
 
                 {
                   /* UNE ILLUSTRATION PAR TUILE (16/09/2026). Le globe n'en avait plus qu'une sur trois,
-                    les deux autres restaient nues. Les trois sont maintenant dans la même grammaire :
-                    dessin au trait clair sur fond ink, carré, calé sur la largeur de la tuile, animé
-                    en boucle lente et coupé en `prefers-reduced-motion`.
+                    les deux autres restaient nues. Les trois sont maintenant dans la même grammaire
+                    (en tête de StrategySelect.astro) : dessin au trait clair sur fond ink, en boucle
+                    lente, en pause hors écran, complet en `prefers-reduced-motion`.
                     Les trois sont des SVG. Le globe en canvas a été retiré le 16/09/2026 : il ne
                     montrait que la moitié du propos de sa tuile, qui parle de secteurs autant que de
-                    géographie. Son fichier reste au dépôt, il n'est simplement plus appelé.
-                    Bornées à 11rem : en `aspect-ratio: 1`, elles pousseraient sinon la tuile hors de
-                    sa rangée. */
+                    géographie. Son fichier reste au dépôt, il n'est simplement plus appelé ; le globe
+                    filaire de StrategyDiversify, lui, porte un secteur sur chaque épingle.
+                    PLEINE LARGEUR ET AU FORMAT PAYSAGE (160 × 120) depuis le 16/09/2026 au soir, pour
+                    remplir la tuile ; `flex-1` centre le dessin dans tout l'espace qui reste. Elles
+                    étaient carrées et bornées à 11 rem, la moitié basse de la tuile restait vide. */
                 }
-                <div class="mx-auto mt-4 w-full max-w-[11rem]">
+                <div class="flex w-full flex-1 items-center py-5" style={`--illus-decalage:${z * 0.35}s`}>
                   {z === 0 && <StrategySelect />}
                   {z === 1 && <StrategyDiversify />}
                   {z === 2 && <StrategyTiming />}
@@ -527,7 +532,7 @@ const pontVisible = !strategy.engines.outro && !strategy.engines.disclaimer;
       display: block;
       /* Boîte de HAUTEUR NULLE : elle ne sert que de repère, elle ne pousse rien. */
       position: relative;
-      --pont-cycle: 6s;
+      --pont-cycle: 8s;
       /*
        * HAUTEUR DE LA BANDE, écrite UNE SEULE FOIS parce que trois règles en dépendent : le tracé, le
        * nœud à mi-hauteur et les chevrons tout en haut. C'est la marge basse de la section des moteurs
@@ -656,8 +661,10 @@ const pontVisible = !strategy.engines.outro && !strategy.engines.disclaimer;
   }
 
   /*
-   * UN SEUL CYCLE DE SIX SECONDES, celui des cinq dessins des cartes, pour que la page n'ait pas deux
-   * pouls. Les proportions suivent les distances réelles, environ 145 px par seconde partout :
+   * UN SEUL CYCLE DE HUIT SECONDES, celui des cinq dessins des cartes, pour que la page n'ait pas deux
+   * pouls (six secondes jusqu'au 16/09/2026, quand les dessins ont été alignés sur un tempo unique ;
+   * les pour-cent ci-dessous n'ont pas bougé, l'impulsion est seulement un quart moins rapide).
+   * Les proportions suivent les distances réelles, environ 110 px par seconde partout :
    *   0 à 6 %    l'amorce, de la tuile au bas du titre ;
    *   6 à 16 %   le temps de passer derrière le titre, où rien n'est dessiné ;
    *   16 à 40 %  la montée, du haut du titre au nœud ;
