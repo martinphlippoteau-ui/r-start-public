@@ -129,8 +129,14 @@ const titleId = sections.highlights.id + '-title';
         du produit, mais des modalités. */
       highlights.subscriptionItems && highlights.subscriptionItems.length > 0 && (
         <div class="mt-chapter border-t border-white/20 pt-8 sm:pt-10">
+          {
+            /* Le TITRE du bloc passe en sable le 16/09/2026, pas ses libellés : ceux-ci restent en
+              blanc atténué, comme les libellés des six cartes au-dessus (« Niveau de risque »,
+              « Approche »…). Un libellé nomme, il ne porte pas l'information : le sable est réservé à
+              ce qu'on doit lire, la valeur. Les mettre en sable les faisait rivaliser avec elle. */
+          }
           {highlights.subscriptionTitle && (
-            <h3 class="text-display-sm text-white">{highlights.subscriptionTitle}</h3>
+            <h3 class="text-display-sm text-sand">{highlights.subscriptionTitle}</h3>
           )}
           <ul role="list" class="mt-6 grid gap-6 sm:grid-cols-3 sm:gap-8 lg:mt-8">
             {highlights.subscriptionItems.map((item) => (
