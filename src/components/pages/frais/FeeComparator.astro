@@ -58,10 +58,12 @@ const data = scpis.map((s) => ({
         condition juste en dessous, « au-delà de 6 ans ; avant, 6,00 % TTC du capital retiré ».
         L'information est au plus près du chiffre. */
     }
-    <header class="max-w-5xl">
-      <h2 id={titleId} class="text-display-md text-ink">{comparator.title}</h2>
-      <p class="text-lead mt-4 text-slate-700">{comparator.intro}</p>
-    </header>
+    {
+      /* Le titre est HORS ÉCRAN depuis le 16/09/2026 : la page arrive directement sur le tableau, son
+        en-tête portant déjà « Comparateur de frais SCPI ». Il reste dans le HTML parce qu'il nomme la
+        section et le tableau, et il est descriptif, pas promotionnel (voir comparator.ts). */
+    }
+    <h2 id={titleId} class="visually-hidden">{comparator.title}</h2>
 
     {
       /* Avertissement tant que les taux des autres SCPI ne sont pas relevés. Le script le masque dès que
@@ -145,10 +147,38 @@ const data = scpis.map((s) => ({
                   scope="row"
                   class="py-5 pr-3 text-left align-top font-medium text-ink sm:pr-5"
                 >
-                  {row.label}
+                  {
+                    /* EXPLICATION DÉPLIABLE (16/09/2026) : `basis` ne dit que l'assiette de calcul,
+                      l'explication dit ce que le frais recouvre et qui le paie. Repliée derrière un
+                      bouton, le tableau se lit d'abord en chiffres. Même mécanique que les repères de
+                      l'accueil, même module (src/scripts/infoToggle.ts). */
+                  }
+                  <span class="flex items-start gap-2">
+                    <span>{row.label}</span>
+                    {row.info && (
+                      <button
+                        type="button"
+                        data-info-bouton
+                        hidden
+                        aria-expanded="false"
+                        aria-controls={'info-frais-' + i}
+                        class="mt-0.5 inline-flex size-5 shrink-0 items-center justify-center rounded-full border border-navy/30 text-xs font-semibold text-navy/70 transition-colors hover:border-navy/70 hover:text-navy focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy"
+                      >
+                        <span aria-hidden="true">i</span>
+                        <span class="visually-hidden">
+                          {comparator.infoLabel} : {row.label}
+                        </span>
+                      </button>
+                    )}
+                  </span>
                   <span class="text-caption mt-1 block font-normal text-slate-700">
                     {row.basis}
                   </span>
+                  {row.info && (
+                    <div id={'info-frais-' + i} data-info-panneau class="info-panneau">
+                      <p class="text-caption font-normal text-slate-700">{row.info}</p>
+                    </div>
+                  )}
                 </th>
                 <td role="cell" class="px-3 py-5 text-center align-top sm:px-5">
                   {
@@ -295,11 +325,13 @@ const data = scpis.map((s) => ({
        * barème à paliers ne se compare pas à un taux unique. Une case peut fournir ce nombre par
        * `data-fee-compare` quand ce qu'elle affiche est une fourchette (ligne du retrait).
        *
-       * DEUX RÈGLES AJOUTÉES LE 15/09/2026, demande de l'équipe :
-       *  - R Start à 0 % est marqué même à ÉGALITÉ. Le libellé lu par les lecteurs d'écran reste exact,
-       *    « taux le plus bas de la ligne » : à 0 %, rien n'est plus bas, y compris quand l'autre SCPI
-       *    y est aussi. Elle ne reçoit alors pas la marque, la règle de droite n'a pas changé.
-       *  - la colonne de droite, elle, ne se marque toujours QUE si elle est strictement inférieure.
+       * LA RÈGLE, arrêtée le 16/09/2026 : EST MARQUÉ TOUT TAUX À 0 %, ET SINON LE PLUS BAS DES DEUX.
+       * Elle s'est faite en deux temps. Le 15/09, seule la colonne R Start était marquée à égalité sur
+       * 0 %, la droite ne l'étant que si elle était strictement inférieure. L'équipe a corrigé le
+       * lendemain : « si un concurrent est à 0 % aussi il faut le mettre en valeur. »
+       * C'est le bon arbitrage, et pas seulement parce qu'il vient d'elle : le libellé lu par les
+       * lecteurs d'écran dit « taux le plus bas de la ligne », et il était inexact de le réserver à une
+       * colonne quand les deux portaient le même zéro.
        */
       const seul = (t: string | null | undefined) => {
         if (!t) return null;
@@ -316,7 +348,7 @@ const data = scpis.map((s) => ({
         const d = seul(scpi.values[i]);
         const comparable = g !== null && d !== null;
         const gagneGauche = comparable && (g < d || g === 0);
-        const gagneDroite = comparable && d < g;
+        const gagneDroite = comparable && (d < g || d === 0);
         if (ligne.marqueGauche) ligne.marqueGauche.hidden = !gagneGauche;
         if (ligne.marqueDroite) ligne.marqueDroite.hidden = !gagneDroite;
         /*
@@ -345,4 +377,10 @@ const data = scpis.map((s) => ({
     select.addEventListener('change', render);
     render();
   })();
+</script>
+
+<script>
+  /* Dépliage des explications « i » : module partagé avec les repères de l'accueil, mis dans le paquet
+     une seule fois même quand les deux composants coexistent sur une page (c'est le cas de l'accueil). */
+  import '@/scripts/infoToggle';
 </script>

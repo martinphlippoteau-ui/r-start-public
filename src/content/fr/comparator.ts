@@ -13,9 +13,9 @@ import { innovationNotRevolution } from './legal.ts';
  * cases vides ont disparu, le comparateur ne montre plus les zéros de R Start face à du blanc.
  *
  * IL MANQUE ENCORE LA TROISIÈME CONDITION POUR PUBLIER. Il en fallait trois, SCPI par SCPI :
- *  1. les sept taux — obtenus ;
- *  2. la même base de calcul pour tous — obtenue, tout est HT ;
- *  3. le document et la date d'arrêté d'où vient chaque taux — MANQUANTS. Le relevé est global, sans
+ *  1. les sept taux : obtenus ;
+ *  2. la même base de calcul pour tous : obtenue, tout est HT ;
+ *  3. le document et la date d'arrêté d'où vient chaque taux : MANQUANTS. Le relevé est global, sans
  *     référence par société de gestion, alors que le tableau en nomme dix-neuf. Un taux change, et une
  *     comparaison qu'on ne peut pas remonter à sa source n'est pas vérifiable.
  * Voir SOURCE_EQUIPE plus bas.
@@ -82,13 +82,18 @@ const SOURCE_EQUIPE =
 
 export const comparator = {
   /*
-   * Titre et accroche FOURNIS PAR L'ÉQUIPE le 14/09/2026, repris mot pour mot. Le titre redevient
-   * VISIBLE à cette occasion : il était masqué depuis le 12/09/2026, la page arrivant directement sur
-   * le tableau. La phrase fournie est coupée en deux, la promesse en titre et l'invitation en accroche :
-   * c'est une mise en page, aucun mot n'est ajouté ni retiré.
+   * TITRE ET ACCROCHE SUPPRIMÉS DE L'ÉCRAN le 16/09/2026, demande de l'équipe. Ils disaient « R Start :
+   * la seule SCPI qui ne prend des frais que si vous gagnez. » et « Comparez vous-même ! », fournis par
+   * l'équipe le 14/09. L'accroche disparaît pour de bon ; le titre, lui, NE POUVAIT PAS ÊTRE SIMPLEMENT
+   * EFFACÉ : il nomme la section (`labelledBy`) et sert de légende au tableau (`<caption>`), un tableau
+   * sans nom n'étant pas annoncé aux lecteurs d'écran.
+   *
+   * Il est donc REMPLACÉ par un intitulé descriptif, rendu en `visually-hidden` comme il l'était déjà
+   * entre le 12 et le 14/09. Descriptif et non masqué à l'identique : garder la phrase d'origine hors
+   * écran aurait laissé l'allégation d'exclusivité dans la page, lue par les lecteurs d'écran et
+   * comptée par scripts/check-compliance.mjs. Elle est retirée, pas cachée.
    */
-  title: 'R Start : la seule SCPI qui ne prend des frais que si vous gagnez.',
-  intro: 'Comparez vous-même !',
+  title: 'Comparaison des frais de R Start avec une autre SCPI',
   /** Colonne de gauche, toujours R Start. */
   leftLabel: product.name,
   leftManager: 'CORUM Asset Management',
@@ -113,6 +118,8 @@ export const comparator = {
    * ne dit rien. Il n'apparaît que si LES DEUX cases portent un pourcentage unique et comparable.
    */
   bestLabel: 'taux le plus bas de la ligne',
+  /* Nom du bouton « i » pour les lecteurs d'écran, complété par le libellé de la ligne. */
+  infoLabel: 'Expliquer',
   /** Bandeau d'avertissement tant qu'une seule valeur manque pour la SCPI choisie. */
   pendingNotice:
     'Les taux de cette SCPI ne sont pas encore relevés. Tant qu’ils manquent, ce tableau ne compare rien : il ne montre que les frais de R Start. Aucune conclusion ne peut en être tirée.',
@@ -152,20 +159,29 @@ export const comparator = {
 
   /** Les sept lignes, dans l'ordre du tableau fourni par l'équipe. */
   rows: [
+    /*
+     * EXPLICATIONS « i » (16/09/2026, textes fournis par l'équipe, un par ligne). Elles disent ce que
+     * le frais RECOUVRE et QUI le paie, là où `basis` ne dit que son assiette de calcul. Repliées
+     * derrière un bouton : le tableau se lit d'abord en chiffres, l'explication vient si on la demande.
+     * Le bouton n'apparaît que sur les lignes qui portent un texte.
+     */
     {
       key: 'subscription' as const,
+      info: 'L’épargnant paie ces frais au moment de son investissement. Ils rémunèrent la société de gestion et les intermédiaires avant que l’épargnant perçoive tout revenu. Ils réduisent d’autant le montant réellement investi.',
       label: 'Frais de souscription',
       basis: 'en % du montant investi',
       rstart: fees.subscription.label,
     },
     {
       key: 'acquisition' as const,
+      info: 'L’épargnant paie ces frais à chaque fois que la SCPI achète un immeuble. Ils rémunèrent la recherche et l’acquisition du bien. Ces frais créent un écart entre le montant souscrit et le montant réellement investi par la SCPI. Ils sont prélevés même si la SCPI ne verse aucun revenu à l’épargnant.',
       label: 'Frais d’acquisition',
       basis: 'en % du prix d’achat',
       rstart: fees.acquisition.label,
     },
     {
       key: 'broker' as const,
+      info: 'Ces frais sont payés par l’épargnant lorsque la SCPI achète un immeuble sans avoir recours à un agent immobilier pour ce faire. Ce sont en fait des frais d’acquisition majorés. Ils ne s’additionnent pas aux frais d’acquisition.',
       label: 'Frais d’agent immobilier',
       basis: 'en % du prix d’acquisition',
       rstart: fees.broker.label,
@@ -177,18 +193,21 @@ export const comparator = {
      */
     {
       key: 'works' as const,
+      info: 'L’épargnant paie des frais lorsque la SCPI réalise des travaux sur les immeubles. Ces frais sont prélevés même lorsque la SCPI ne verse aucun revenu à l’épargnant.',
       label: 'Frais de travaux',
       basis: 'en % du montant des travaux',
       rstart: fees.works.label,
     },
     {
       key: 'management' as const,
+      info: 'L’épargnant paie des frais de gestion quand il perçoit des revenus issus des loyers. Autrement dit, ces frais ne sont dus que lorsque l’épargnant gagne de l’argent.',
       label: 'Frais de gestion',
       basis: 'en % des loyers encaissés',
       rstart: fees.management.label,
     },
     {
       key: 'disposal' as const,
+      info: 'L’épargnant paie des frais de cession d’immeubles quand il perçoit des revenus issus de la vente d’immeuble. La plupart des SCPI ne prélèvent des frais qu’à partir d’un certain niveau de plus-value. Autrement dit, ces frais ne sont dus que lorsque l’épargnant gagne de l’argent.',
       label: 'Frais de cession d’immeubles',
       basis: 'en % du prix de vente',
       rstart: range(fees.disposal.tiers.map((t) => t.rate)),
@@ -197,6 +216,7 @@ export const comparator = {
     },
     {
       key: 'withdrawal' as const,
+      info: 'L’épargnant paie des frais de retrait anticipé s’il revend ses parts avant une certaine durée de détention (variable selon la SCPI). Ces frais sont prélevés même lorsque la SCPI ne verse aucun revenu à l’épargnant.',
       label: 'Frais de retrait anticipé',
       basis: 'en % de la valeur de retrait',
       /*

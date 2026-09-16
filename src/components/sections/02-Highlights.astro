@@ -165,35 +165,7 @@ const titleId = sections.highlights.id + '-title';
 </Section>
 
 <script>
-  /**
-   * Explications dépliables des repères (15/09/2026). AMÉLIORATION PROGRESSIVE : le HTML arrive
-   * panneaux OUVERTS et boutons cachés, ce script inverse les deux au chargement. Sans lui, on lit les
-   * explications et aucun bouton ne reste sans effet ; avec lui, la carte est compacte et se déplie.
-   *
-   * L'ouverture est faite par la CSS (`grid-template-rows` de 0fr à 1fr, utilitaire `info-panneau`) :
-   * ici on ne touche qu'à un attribut et à `aria-expanded`. Rien n'est mesuré, rien n'est animé en
-   * JavaScript, et `prefers-reduced-motion` est traité dans la feuille de style.
-   */
-  const init = (): void => {
-    const boutons = document.querySelectorAll<HTMLButtonElement>('[data-info-bouton]');
-    for (const bouton of boutons) {
-      const id = bouton.getAttribute('aria-controls');
-      const panneau = id ? document.getElementById(id) : null;
-      if (!panneau) continue;
-
-      /* Replié à l'arrivée, et le bouton n'apparaît qu'ici : il ne sert à rien sans ce script. */
-      panneau.setAttribute('data-ferme', '');
-      bouton.hidden = false;
-
-      bouton.addEventListener('click', () => {
-        const ouvert = bouton.getAttribute('aria-expanded') === 'true';
-        bouton.setAttribute('aria-expanded', String(!ouvert));
-        if (ouvert) panneau.setAttribute('data-ferme', '');
-        else panneau.removeAttribute('data-ferme');
-      });
-    }
-  };
-
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
-  else init();
+  /* Le dépliage vit dans un module partagé depuis le 16/09/2026 : le comparateur de frais s'en sert
+     aussi, et les deux composants coexistent sur l'accueil. Voir src/scripts/infoToggle.ts. */
+  import '@/scripts/infoToggle';
 </script>
