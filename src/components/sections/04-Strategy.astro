@@ -33,9 +33,9 @@
  * Aucune prop : la section n'appelle plus de note, elle n'a plus besoin du registre de la page.
  */
 import { Picture } from 'astro:assets';
-import Card from '@/components/ui/Card.astro';
 import Container from '@/components/ui/Container.astro';
 import NoteConformite from '@/components/ui/NoteConformite.astro';
+import Picto from '@/components/ui/Picto.astro';
 import Section from '@/components/ui/Section.astro';
 import StrategyGlobe from '@/components/StrategyGlobe.astro';
 import { sections } from '@/config/sections';
@@ -133,13 +133,20 @@ const QUIET_TITLE_Y = 12;
       /* La phrase de méthode ferme le chapitre : elle explique ce que les deux moteurs supposent de
         travail. Détachée par un filet plein largeur, dans la taille des introductions. */
     }
-    <p
+    {
+      /* La phrase de méthode fermait ce chapitre ; elle ouvre maintenant « Tout commence par le
+        choix des immeubles » (16/09/2026). Le rendu reste, conditionnel : si la Conformité ou
+        l'équipe redonnent une chute aux deux moteurs, elle s'affichera sans rien changer ici. */
+    }
+    {strategy.engines.outro && (
+      <p
       class="text-lead mt-12 max-w-4xl border-t border-navy/15 pt-8 text-pretty text-slate-700 lg:mt-16"
       data-animate="fade-up"
       data-animate-y={String(QUIET_TITLE_Y)}
     >
       {strategy.engines.outro}
     </p>
+    )}
 
     {
       /* Mention de la Conformité, jamais animée : un avertissement ne dépend pas d'un défilement pour
@@ -154,50 +161,93 @@ const QUIET_TITLE_Y = 12;
 </Section>
 
 {/* 2. Quoi : le double potentiel visé, illustré par les immeubles */}
-<Section id={ids.what} tone="white">
+{
+  /*
+   * LES TROIS ZONES SONT RÉUNIES EN UN SEUL BLOC (16/09/2026, demande de l'équipe : « que le contenu
+   * des blocs QUOI OÙ et COMMENT soient dans un même bloc avec plusieurs cards »). C'étaient trois
+   * sections pleine page, #quoi en blanc, #ou en ink, #comment en paper : trois écrans pour un propos
+   * qui se lit d'un coup.
+   *
+   * AUCUN TEXTE N'EST AJOUTÉ NI RETIRÉ. Les trois surtitres, les trois titres, les introductions, les
+   * listes et les chutes sont ceux de strategy.ts, dans le même ordre. Les trois titres restent des
+   * H2, comme avant la fusion : le plan du document ne change pas.
+   * La section elle-même n'a donc PAS de titre à elle, il aurait fallu l'inventer.
+   *
+   * MOBILE D'ABORD, et c'est ce qui commande la mise en page : une colonne, chaque carte entière et
+   * lisible sans un geste. Pas d'onglets, qui auraient caché deux tiers du propos derrière une
+   * pression du doigt et cessé de fonctionner sans script. Trois colonnes seulement à partir de `lg`,
+   * où la largeur le permet.
+   * `items-start` sur la grille : sans lui les trois cartes prennent la hauteur de la plus haute, et
+   * « Où » traînerait un tiers de vide sous sa liste de deux items.
+   * La chute est poussée en bas par `mt-auto` : les trois se posent alors sur la même ligne de fond
+   * quand les cartes ont la même hauteur, et restent collées à leur liste sinon.
+   */
+}
+<Section id={ids.what} tone="paper">
   <Container size="wide">
-    <header class="max-w-4xl">
-      <p class="text-eyebrow text-teal-700">{strategy.what.eyebrow}</p>
-      <h2
-        id={ids.what + '-title'}
-        class="text-display-md mt-3 text-ink"
-        data-animate="fade-up"
-        data-animate-y={String(QUIET_TITLE_Y)}
-      >
-        {strategy.what.title}
-      </h2>
-      <p class="text-lead mt-5 text-pretty text-slate-700 sm:mt-6">{strategy.what.intro}</p>
-    </header>
-
     <ul
       role="list"
-      class="mt-10 grid gap-5 sm:grid-cols-2 lg:mt-12 lg:gap-6"
+      class="grid items-start gap-6 lg:grid-cols-3 lg:gap-8"
       data-animate="stagger"
       data-animate-stagger="0.1"
     >
       {
-        strategy.what.items.map((item) => (
-          <Card as="li" tone="paper" class="flex items-start gap-4">
-            <span
-              aria-hidden="true"
-              class="mt-2 size-2.5 shrink-0 rounded-full bg-teal-700 sm:mt-2.5"
-            />
-            <p class="text-display-sm text-ink">
-              {item.lead}
-              {item.rest && <span class="text-lead block mt-2 text-slate-700">{item.rest}</span>}
-            </p>
-          </Card>
+        [strategy.what, strategy.where, strategy.how].map((zone, z) => (
+          <li class="flex h-full flex-col rounded-3xl bg-white p-6 shadow-card ring-1 ring-navy/5 sm:p-8">
+            {zone.eyebrow && <p class="text-eyebrow text-teal-700">{zone.eyebrow}</p>}
+            <h2 id={[ids.what, ids.where, ids.how][z] + '-title'} class="text-display-sm mt-3 text-ink">
+              {zone.title}
+            </h2>
+            <p class="mt-4 text-base leading-snug text-slate-700">{zone.intro}</p>
+            {zone.lead && <p class="mt-4 text-base font-semibold text-ink">{zone.lead}</p>}
+
+            <ul role="list" class="mt-4 space-y-3">
+              {zone.items.map((item) => (
+                <li class="flex items-start gap-3">
+                  {
+                    /* Puce dessinée quand l'item porte une icône, point turquoise sinon : c'est le
+                      contenu qui décide, pas la zone (strategy.ts, champ `icon`). */
+                  }
+                  {item.icon ? (
+                    <Picto name={item.icon} class="mt-0.5 size-6 text-teal-700" />
+                  ) : (
+                    <span aria-hidden="true" class="mt-2 size-2 shrink-0 rounded-full bg-teal-700" />
+                  )}
+                  <p class="text-base leading-snug text-ink">
+                    {item.lead}
+                    {item.rest && <span class="mt-1 block text-slate-700">{item.rest}</span>}
+                  </p>
+                </li>
+              ))}
+            </ul>
+
+            {
+              /* LE GLOBE RESTE DANS SA ZONE, « Où ». Il est en `aspect-ratio: 1` et suit donc la
+                largeur de sa carte ; borné à 13rem pour qu'il ne prenne pas un écran entier sur
+                téléphone, où la carte occupe toute la largeur. */
+            }
+            {zone.map && (
+              <div class="mx-auto mt-6 w-full max-w-[13rem]">
+                <StrategyGlobe>
+                  {AFFICHER_LEGENDES && (
+                    <figcaption class="text-caption mt-4 text-center text-slate-700">
+                      {zone.map.legend}
+                    </figcaption>
+                  )}
+                </StrategyGlobe>
+              </div>
+            )}
+
+            <p class="mt-auto pt-6 text-base leading-snug text-slate-700">{zone.outro}</p>
+          </li>
         ))
       }
     </ul>
 
-    <p class="text-lead mt-8 max-w-4xl text-pretty text-slate-700 lg:mt-10">
-      {strategy.what.outro}
-    </p>
-
     {
       /* Trois photos d'immeubles en bande de même largeur, parallaxe de sens alterné dans chaque cadre.
-        TROIS COLONNES DÈS LE TÉLÉPHONE : empilées, elles ajoutaient à elles seules près de deux écrans. */
+        TROIS COLONNES DÈS LE TÉLÉPHONE : empilées, elles ajoutaient à elles seules près de deux écrans.
+        Elles fermaient la zone « Quoi » avant la fusion ; elles ferment maintenant le bloc entier. */
     }
     <figure class="mt-12 lg:mt-16">
       <ul
@@ -246,136 +296,5 @@ const QUIET_TITLE_Y = 12;
         )
       }
     </figure>
-  </Container>
-</Section>
-
-{/* 3. Où : la zone d'investissement à gauche, le globe à droite */}
-<Section id={ids.where} tone="ink" class="overflow-hidden">
-  <Container size="wide">
-    {
-      /* DEUX COLONNES à partir de `lg` (14/09/2026, demande de l'équipe) : le texte à gauche, le globe
-        à droite, alignés par leur milieu. Sous `lg`, le globe repasse SOUS le texte : à 390 px, deux
-        colonnes donneraient un globe de la taille d'une vignette et un titre en escalier.
-        Le texte occupe sept colonnes sur douze et le globe cinq : à parts égales, « et dans tous les
-        secteurs » passait à trois lignes. */
-    }
-    <div class="lg:grid lg:grid-cols-12 lg:items-center lg:gap-12 xl:gap-16">
-      <div class="lg:col-span-7">
-        <header>
-          <p class="text-eyebrow text-teal-200">{strategy.where.eyebrow}</p>
-          <h2
-            id={ids.where + '-title'}
-            class="text-display-md mt-3 text-white"
-            data-animate="fade-up"
-            data-animate-y={String(QUIET_TITLE_Y)}
-          >
-            {strategy.where.title}
-          </h2>
-          <p class="text-lead mt-5 text-pretty text-white sm:mt-6">{strategy.where.intro}</p>
-        </header>
-
-        {
-          /* Les deux réponses en très grand, l'une sous l'autre, chacune précédée d'un filet qui
-            s'étire à l'arrivée. */
-        }
-        <ul
-          role="list"
-          class="mt-10 grid gap-8 lg:mt-12 lg:gap-10"
-          data-animate="stagger"
-          data-animate-stagger="0.12"
-        >
-          {
-            strategy.where.items.map((item) => (
-              <li>
-                <span aria-hidden="true" data-draw="width" class="block h-px w-full bg-white/20" />
-                <p class="text-display-md pt-6 text-white">
-                  {item.lead}
-                  {item.rest && <span class="text-lead block mt-3 text-white/85">{item.rest}</span>}
-                </p>
-              </li>
-            ))
-          }
-        </ul>
-
-        <p
-          class="text-display-sm mt-12 text-teal-200 lg:mt-14"
-          data-animate="fade-up"
-          data-animate-y={String(QUIET_TITLE_Y)}
-        >
-          {strategy.where.outro}
-        </p>
-      </div>
-
-      {
-        /* Globe en rotation (StrategyGlobe.astro). Il a remplacé le planisphère le 14/09/2026,
-          lui-même arrivé le matin à la place de la carte à deux volets.
-          L'ink est la condition de son existence : le dégradé de la sphère et le tracé des côtes sont
-          réglés pour ce fond, ils disparaîtraient sur un fond clair. */
-      }
-      {
-        strategy.where.map && (
-          <div class="mt-14 lg:col-span-5 lg:mt-0">
-            <StrategyGlobe>
-              {AFFICHER_LEGENDES && (
-                <figcaption class="text-caption mt-6 text-center text-white/85">
-                  {strategy.where.map.legend}
-                </figcaption>
-              )}
-            </StrategyGlobe>
-          </div>
-        )
-      }
-    </div>
-  </Container>
-</Section>
-
-{/* 4. Comment : la méthode d'achat, en trois temps */}
-<Section id={ids.how} tone="paper">
-  <Container size="wide">
-    <header class="max-w-4xl">
-      <p class="text-eyebrow text-teal-700">{strategy.how.eyebrow}</p>
-      <h2
-        id={ids.how + '-title'}
-        class="text-display-md mt-3 text-ink"
-        data-animate="fade-up"
-        data-animate-y={String(QUIET_TITLE_Y)}
-      >
-        {strategy.how.title}
-      </h2>
-      <p class="text-lead mt-5 text-pretty text-slate-700 sm:mt-6">{strategy.how.intro}</p>
-    </header>
-
-    {
-      /* Les trois temps sont NUMÉROTÉS parce qu'ils se suivent vraiment : on repère et on achète, puis
-        on valorise au fil des années, puis on choisit le moment de vendre. L'ordre porte du sens, il
-        n'est pas décoratif, à la différence des deux listes des zones « Quoi » et « Où ». */
-    }
-    <ol
-      class="mt-10 grid gap-8 lg:mt-14 lg:grid-cols-3 lg:gap-10"
-      data-animate="stagger"
-      data-animate-stagger="0.1"
-    >
-      {
-        strategy.how.items.map((item, i) => (
-          <li>
-            <span aria-hidden="true" data-draw="width" class="block h-px w-full bg-navy/15" />
-            <div class="pt-6">
-              <p class="text-caption font-semibold tabular-nums text-teal-700" aria-hidden="true">
-                {String(i + 1).padStart(2, '0')}
-              </p>
-              <p class="text-lead mt-3 text-pretty text-ink">{item.lead}</p>
-            </div>
-          </li>
-        ))
-      }
-    </ol>
-
-    <p
-      class="text-display-sm mt-12 max-w-4xl text-navy lg:mt-16"
-      data-animate="fade-up"
-      data-animate-y={String(QUIET_TITLE_Y)}
-    >
-      {strategy.how.outro}
-    </p>
   </Container>
 </Section>

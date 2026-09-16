@@ -34,7 +34,12 @@ export const isPictoKey = (value: string): value is PictoKey =>
 
 interface Props {
   name: PictoKey;
-  /** Taille ET couleur : classes Tailwind (`size-14 text-teal-700`). */
+  /**
+   * Taille ET couleur : classes Tailwind (`size-14 text-teal-700`).
+   * NE PAS Y METTRE `shrink-0` : le composant le pose déjà lui-même, et html-validate refuse une
+   * classe répétée dans un même attribut (no-dup-class). L'oubli a fait échouer la validation deux
+   * fois, le 15 et le 16/09/2026.
+   */
   class?: string;
   /** Nom accessible facultatif ; sans lui, le picto est purement décoratif. */
   title?: string;

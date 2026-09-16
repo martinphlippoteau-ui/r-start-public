@@ -31,8 +31,9 @@ export const strategy: StrategyContent = {
       { lead: 'Les loyers', rest: 'versés par les entreprises locataires' },
       { lead: 'Les plus-values', rest: 'réalisées sur les ventes d’immeuble' },
     ],
-    outro:
-      'Les opportunités ne tombent pas du ciel : nous suivons une méthode d’investissement précise pour dénicher les bons immeubles, loués par les bonnes entreprises, et générer du rendement potentiel.',
+    /* La phrase de méthode (« Les opportunités ne tombent pas du ciel… ») est descendue sous « Tout
+       commence par le choix des immeubles » le 16/09/2026 : elle y annonce ce qui suit au lieu de
+       fermer les deux moteurs. */
     /*
      * MENTION RETIRÉE DE L'ÉCRAN le 16/09/2026, demande de l'équipe. Elle reproduisait
      * `legal.corumProductsDisclaimer` : « Les produits commercialisés par CORUM L'Épargne sont des
@@ -46,8 +47,14 @@ export const strategy: StrategyContent = {
 
   what: {
     eyebrow: 'Quoi',
-    title: 'Des immeubles offrant un double potentiel',
-    intro: 'L’équipe cible des immeubles avec à la fois :',
+    /* « Tout commence par le choix des immeubles » depuis le 16/09/2026, ex-« Des immeubles offrant un
+       double potentiel ». */
+    title: 'Tout commence par le choix des immeubles',
+    /* Phrase de méthode remontée de la zone 1 le 16/09/2026 : elle ouvre le propos au lieu de fermer
+       le précédent. */
+    intro:
+      'Les opportunités ne tombent pas du ciel : nous suivons une méthode d’investissement précise pour dénicher les bons immeubles, loués par les bonnes entreprises, et générer du rendement potentiel.',
+    lead: 'L’équipe cible des immeubles avec à la fois :',
     items: [
       { lead: 'Un fort potentiel de rendement locatif ;' },
       { lead: 'Et un fort potentiel de plus-value.' },
@@ -60,11 +67,14 @@ export const strategy: StrategyContent = {
     eyebrow: 'Où',
     title: 'Une vaste zone d’investissement',
     intro: 'Pas de limite ! R Start investit :',
+    /* Pictogrammes sur les deux items (16/09/2026, demande de l'équipe) : ce sont les deux éléments
+       importants de la zone, ils prennent une puce dessinée à la place du point. */
     items: [
-      { lead: 'partout dans le monde' },
+      { lead: 'partout dans le monde', icon: 'exploration' },
       {
         lead: 'et dans tous les secteurs',
         rest: '(bureaux, commerces, santé, logistique, hôtellerie…)',
+        icon: 'equipe',
       },
     ],
     outro: 'Seul mot d’ordre : identifier une opportunité.',

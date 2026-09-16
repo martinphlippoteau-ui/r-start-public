@@ -1,3 +1,4 @@
+import type { PictoKey } from '@/components/ui/Picto.astro';
 /**
  * Types partagés du contenu éditorial (src/content/fr/*).
  * Les composants ne contiennent aucun texte en dur : tout vient de ces structures.
@@ -179,12 +180,25 @@ export interface StrategyChapter {
   /** Mot-clé au-dessus du titre (« Quoi », « Où »). Le premier chapitre n'en a pas. */
   eyebrow?: string;
   title: string;
-  /** Annonce de la liste, deux points compris. */
+  /** Texte d'ouverture du chapitre. */
   intro: string;
-  /** `lead` porte l'accent (gras du document), `rest` la suite de la phrase quand il y en a une. */
-  items: { lead: string; rest?: string }[];
-  /** Phrase qui referme le chapitre, sous la liste. */
-  outro: string;
+  /**
+   * Annonce de la liste, deux points compris, quand `intro` sert déjà à autre chose (16/09/2026 : la
+   * zone « Quoi » a reçu une phrase de méthode en ouverture, et son « L'équipe cible… » est descendu
+   * ici). Sans `lead`, c'est `intro` qui annonce la liste, comme avant.
+   */
+  lead?: string;
+  /**
+   * `lead` porte l'accent (gras du document), `rest` la suite de la phrase quand il y en a une.
+   * `icon` met une puce en pictogramme à la place du point (16/09/2026, demande de l'équipe sur les
+   * deux items de la zone « Où ») : clé de ui/Picto.astro.
+   */
+  items: { lead: string; rest?: string; icon?: PictoKey }[];
+  /**
+   * Phrase qui referme le chapitre, sous la liste. Facultative depuis le 16/09/2026 : celle des deux
+   * moteurs est descendue dans la zone « Quoi », où elle ouvre le propos au lieu de fermer le précédent.
+   */
+  outro?: string;
   /** Mention placée par la Conformité sous le chapitre (ui/NoteConformite.astro). */
   disclaimer?: string;
   /** Légende de la carte de la zone d'investissement (zone « Où »), rendue hors du SVG. */
