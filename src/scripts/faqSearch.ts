@@ -9,6 +9,12 @@
  *
  * ON CHERCHE DANS LA QUESTION ET DANS LA RÉPONSE. Chercher dans la seule question passerait à côté de
  * « retrait », qui n'est dans aucun intitulé mais dans trois réponses.
+ *
+ * LE FILTRAGE SE JOUE EN TRANSITION DE VUE (audit du 16/09/2026) : les questions masquées disparaissaient
+ * d'un coup et les suivantes sautaient à leur place. Chaque question porte un nom de transition de vue
+ * unique ; le navigateur suit alors chacune d'elles d'un état à l'autre, et c'est lui qui fait glisser
+ * celles qui restent, s'effacer celles qui partent, paraître celles qui reviennent. La page, elle, ne
+ * bouge pas (global.css, `vt-filtre`). Sans l'API, ou en mouvement réduit : filtrage instantané.
  */
 const sansAccent = (t: string): string =>
   t
@@ -32,7 +38,18 @@ const init = (): void => {
   const gabarit = compte?.dataset.gabarit ?? '';
   const vide = compte?.dataset.vide ?? '';
 
-  const filtrer = (): void => {
+  /* Un nom par question, posé par le CSSOM (aucun attribut `style` inséré, la CSP n'a rien à dire). */
+  lignes.forEach((li, i) => {
+    li.style.setProperty('view-transition-name', `faq-question-${i}`);
+  });
+  const sobre = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const doc = document as Document & {
+    startViewTransition?: (mise: () => void) => { finished: Promise<void> };
+  };
+  /* Plusieurs frappes rapides enchaînent plusieurs transitions : la classe ne tombe qu'avec la dernière. */
+  let enCours = 0;
+
+  const appliquer = (): void => {
     const q = sansAccent(champ.value.trim());
     let trouvees = 0;
     lignes.forEach((li, i) => {
@@ -44,6 +61,22 @@ const init = (): void => {
     if (q === '') compte.textContent = '';
     else if (trouvees === 0) compte.textContent = vide;
     else compte.textContent = gabarit.replace('{n}', String(trouvees));
+  };
+
+  const filtrer = (): void => {
+    if (sobre.matches || typeof doc.startViewTransition !== 'function') {
+      appliquer();
+      return;
+    }
+    enCours += 1;
+    document.documentElement.classList.add('vt-filtre');
+    const transition = doc.startViewTransition(appliquer);
+    void transition.finished
+      .catch(() => undefined)
+      .finally(() => {
+        enCours -= 1;
+        if (enCours === 0) document.documentElement.classList.remove('vt-filtre');
+      });
   };
 
   enveloppe.hidden = false;

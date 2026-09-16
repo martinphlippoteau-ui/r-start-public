@@ -824,18 +824,30 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   pointer-events: none;
 }
 
+/*
+ * NEUF FOIS MOINS DE PIXELS À FLOUTER (audit du 16/09/2026). Chaque foyer est DESSINÉ TROIS FOIS PLUS
+ * PETIT (`--zoom`) : côté, flou et amplitude de dérive divisés par trois, puis le tout est agrandi par
+ * `scale(3)` dans le `transform` déjà animé. Le rendu est le même, un dégradé flou n'a pas de détail à
+ * perdre ; mais un foyer de 64 rem flouté à 80 px, c'est un million de pixels à recalculer chaque fois
+ * que son échelle change, et l'animation la change en continu. À un tiers de côté, c'est neuf fois
+ * moins. C'était la première cause d'images longues mesurées sur le premier écran.
+ * `--taille`, `--flou` et `--amp` restent écrits en vraie grandeur dans 01-Hero.astro.
+ */
 [data-aurora] > span {
+  --zoom: 3;
   position: absolute;
   top: var(--y);
   left: var(--x);
-  height: var(--taille);
-  width: var(--taille);
-  margin-top: calc(var(--taille) / -2);
-  margin-left: calc(var(--taille) / -2);
+  height: calc(var(--taille) / var(--zoom));
+  width: calc(var(--taille) / var(--zoom));
+  margin-top: calc(var(--taille) / var(--zoom) / -2);
+  margin-left: calc(var(--taille) / var(--zoom) / -2);
   border-radius: 9999px;
   background: radial-gradient(circle at 50% 50%, var(--teinte) 0%, transparent 70%);
   opacity: var(--opacite);
-  filter: blur(var(--flou, 60px));
+  filter: blur(calc(var(--flou, 60px) / var(--zoom)));
+  /* État de repos (mouvement réduit, hors animation) : agrandi à sa vraie taille. */
+  transform: scale(var(--zoom));
   /* Pas de `will-change` permanent (audit du 16/09/2026) : l'animation crée sa couche le temps de
      tourner, et elle est en pause hors écran ; quatre couches GPU maintenues en permanence, y compris en
      mouvement réduit, ne servaient à rien. */
@@ -852,16 +864,21 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   }
 }
 
-/* Dérive douce, amplitude donnée par foyer (`--amp`) : les quatre partagent la courbe, pas la course. */
+/* Dérive douce, amplitude donnée par foyer (`--amp`) : les quatre partagent la courbe, pas la course.
+   `--amp` est un pour-cent de la boîte de l'élément, trois fois plus petite que le foyer visible : il est
+   multiplié par `--zoom` pour que la dérive garde sa course en pixels, et chaque échelle l'est aussi. */
 @keyframes aurore {
   from {
-    transform: translate3d(calc(var(--amp) * -1), calc(var(--amp) * 0.6), 0) scale(0.92);
+    transform: translate3d(calc(var(--amp) * var(--zoom) * -1), calc(var(--amp) * var(--zoom) * 0.6), 0)
+      scale(calc(var(--zoom) * 0.92));
   }
   50% {
-    transform: translate3d(calc(var(--amp) * 0.8), calc(var(--amp) * -0.9), 0) scale(1.08);
+    transform: translate3d(calc(var(--amp) * var(--zoom) * 0.8), calc(var(--amp) * var(--zoom) * -0.9), 0)
+      scale(calc(var(--zoom) * 1.08));
   }
   to {
-    transform: translate3d(var(--amp), calc(var(--amp) * 0.4), 0) scale(0.96);
+    transform: translate3d(calc(var(--amp) * var(--zoom)), calc(var(--amp) * var(--zoom) * 0.4), 0)
+      scale(calc(var(--zoom) * 0.96));
   }
 }
 
@@ -2157,6 +2174,27 @@ body:has(#consent-banner:not([hidden])) [data-hero-scroll-hint] {
   ::view-transition-new(pastille-nav) {
     animation: none;
     mix-blend-mode: normal;
+  }
+}
+
+/*
+ * FILTRE DE LA FAQ (audit du 16/09/2026). scripts/faqSearch.ts joue chaque filtrage dans une transition
+ * de vue DU MÊME DOCUMENT : chaque question porte un nom, le navigateur suit donc chacune d'elles d'un
+ * état à l'autre. Celles qui restent glissent à leur nouvelle place, celles qui partent s'effacent,
+ * celles qui reviennent paraissent en fondu. La page entière, elle, ne doit ni se fondre ni monter
+ * comme entre deux pages : `vt-filtre`, posé sur <html> le temps de la transition, neutralise le
+ * fondu de la racine. `mix-blend-mode: normal` : sans lui, ancienne et nouvelle image de la page
+ * s'additionnent en `plus-lighter` et l'écran s'éclaircit le temps du geste.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  html.vt-filtre::view-transition-old(root),
+  html.vt-filtre::view-transition-new(root) {
+    animation: none;
+    mix-blend-mode: normal;
+  }
+  html.vt-filtre::view-transition-group(*) {
+    animation-duration: 320ms;
+    animation-timing-function: var(--ease-out-expo);
   }
 }
 
