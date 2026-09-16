@@ -1306,6 +1306,91 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   }
 }
 
+/* Fenêtre des tuiles de /strategie (16/09/2026). La <dialog> est créée par
+   src/scripts/carteDialog.ts ; ces règles l'habillent, rien de plus.
+   `max-height: 85svh` et non `vh` : sur téléphone, la barre d'adresse mange la différence et le bas de
+   la fenêtre passait sous elle. Le contenu défile à l'intérieur, jamais la page derrière, que <dialog>
+   rend inerte toute seule. */
+.carte-dialog {
+  width: min(40rem, calc(100vw - 2rem));
+  max-height: 85svh;
+  margin: auto;
+  padding: 0;
+  border: 0;
+  border-radius: 1.5rem;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  overflow: visible;
+}
+.carte-dialog::backdrop {
+  background: rgb(13 46 61 / 0.55);
+  backdrop-filter: blur(2px);
+}
+.carte-dialog > [data-carte-detail] {
+  max-height: 85svh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 2rem 1.5rem;
+}
+@media (min-width: 40rem) {
+  .carte-dialog > [data-carte-detail] {
+    padding: 2.5rem;
+  }
+}
+/* Le bouton de fermeture flotte AU-DESSUS de la zone défilante, il ne doit pas partir avec elle. */
+.carte-dialog-fermer {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  z-index: 1;
+  display: inline-flex;
+  width: 2.5rem;
+  height: 2.5rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background: var(--color-ink);
+  color: #fff;
+  font-size: 1.25rem;
+  line-height: 1;
+  transition: background-color 150ms;
+}
+.carte-dialog-fermer:hover {
+  background: var(--color-navy);
+}
+.carte-dialog-fermer:focus-visible {
+  outline: 2px solid var(--color-navy);
+  outline-offset: 2px;
+}
+
+/* Le « + » des tuiles : il tourne d'un huitième de tour au survol, comme chez Apple. */
+@utility carte-plus {
+  display: inline-flex;
+  width: 2.75rem;
+  height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background: rgb(255 255 255 / 0.14);
+  color: #fff;
+  font-size: 1.5rem;
+  line-height: 1;
+  transition:
+    background-color 200ms,
+    transform 200ms;
+
+  &:hover {
+    background: rgb(255 255 255 / 0.26);
+    transform: rotate(45deg);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    transition: background-color 200ms;
+    &:hover {
+      transform: none;
+    }
+  }
+}
+
 /* --- Hero (fond ink + halo de marque + grain ; plus d'image de fond depuis le 11/09/2026) --- */
 
 /* Halo de marque animé : dérive lente (20 s, transform uniquement) des lueurs, coupée en reduced-motion.

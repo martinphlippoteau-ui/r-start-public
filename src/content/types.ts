@@ -212,6 +212,9 @@ export interface StrategyChapter {
  * l'effet de levier. Plus de `notes` non plus : la page n'appelle aucune source.
  */
 export interface StrategyContent {
+  /** Libellés des tuiles à fenêtre : lus par les lecteurs d'écran, jamais affichés (16/09/2026). */
+  dialogOpen?: string;
+  dialogClose?: string;
   /* Ni `eyebrow` ni `title` : le H1 de la page vit dans strategyPage.ts, et un second titre ici aurait
      dérivé du premier à la première correction. Le corps commence directement au premier chapitre. */
   engines: StrategyChapter;

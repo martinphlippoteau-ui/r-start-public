@@ -155,96 +155,113 @@ const QUIET_TITLE_Y = 12;
 {/* 2. Quoi : le double potentiel visé, illustré par les immeubles */}
 {
   /*
-   * LES TROIS ZONES SONT RÉUNIES EN UN SEUL BLOC (16/09/2026, demande de l'équipe : « que le contenu
-   * des blocs QUOI OÙ et COMMENT soient dans un même bloc avec plusieurs cards »). C'étaient trois
-   * sections pleine page, #quoi en blanc, #ou en ink, #comment en paper : trois écrans pour un propos
-   * qui se lit d'un coup.
+   * TUILES À FENÊTRE (16/09/2026, demande de l'équipe : « j'aime bien le format de card sur le site
+   * d'Apple qui ouvre une popup pour le contenu »). Elles remplacent trois cartes qui déroulaient tout
+   * leur contenu : la page s'ouvre maintenant sur trois tuiles qui se lisent d'un coup d'œil, et le
+   * détail vient à la demande.
    *
-   * AUCUN TEXTE N'EST AJOUTÉ NI RETIRÉ. Les trois surtitres, les trois titres, les introductions, les
-   * listes et les chutes sont ceux de strategy.ts, dans le même ordre. Les trois titres restent des
-   * H2, comme avant la fusion : le plan du document ne change pas.
-   * La section elle-même n'a donc PAS de titre à elle, il aurait fallu l'inventer.
+   * AUCUN TEXTE N'EST AJOUTÉ NI RETIRÉ, la répartition change seulement : la tuile porte le surtitre
+   * et le titre, la fenêtre porte l'introduction, la phrase d'annonce, la liste et la chute. Les trois
+   * titres restent des H2, le plan du document ne bouge pas.
    *
-   * MOBILE D'ABORD, et c'est ce qui commande la mise en page : une colonne, chaque carte entière et
-   * lisible sans un geste. Pas d'onglets, qui auraient caché deux tiers du propos derrière une
-   * pression du doigt et cessé de fonctionner sans script. Trois colonnes seulement à partir de `lg`,
-   * où la largeur le permet.
-   * `items-start` sur la grille : sans lui les trois cartes prennent la hauteur de la plus haute, et
-   * « Où » traînerait un tiers de vide sous sa liste de deux items.
-   * La chute est poussée en bas par `mt-auto` : les trois se posent alors sur la même ligne de fond
-   * quand les cartes ont la même hauteur, et restent collées à leur liste sinon.
+   * SANS JAVASCRIPT, TOUT RESTE LISIBLE : le détail est écrit dans le flux, sous sa tuile, et le
+   * bouton d'ouverture arrive `hidden`. Le script inverse les deux (src/scripts/carteDialog.ts). C'est
+   * la seule façon de faire une fenêtre sans perdre les deux tiers du propos pour qui n'exécute pas de
+   * script.
+   *
+   * FOND INK sur les trois. Le globe était sur blanc depuis la fusion et s'y lisait mal : c'est un
+   * dessin au trait clair, il lui faut un fond sombre, celui qu'il avait avant. Les tuiles sombres sur
+   * la section claire donnent au passage le contraste que trois cartes blanches sur blanc n'avaient
+   * pas.
    */
 }
 <Section id={ids.what} tone="paper">
   <Container size="wide">
     <ul
       role="list"
-      class="grid items-start gap-6 lg:grid-cols-3 lg:gap-8"
+      class="grid gap-4 sm:gap-5 lg:grid-cols-3"
       data-animate="stagger"
       data-animate-stagger="0.1"
     >
       {
-        [strategy.what, strategy.where, strategy.how].map((zone, z) => (
-          <li class="flex h-full flex-col rounded-3xl bg-white p-6 shadow-card ring-1 ring-navy/5 sm:p-8">
-            {zone.eyebrow && <p class="text-eyebrow text-teal-700">{zone.eyebrow}</p>}
-            <h2 id={[ids.what, ids.where, ids.how][z] + '-title'} class="text-display-sm mt-3 text-ink">
-              {zone.title}
-            </h2>
-            <p class="mt-4 text-base leading-snug text-slate-700">{zone.intro}</p>
-            {zone.lead && <p class="mt-4 text-base font-semibold text-ink">{zone.lead}</p>}
+        [strategy.what, strategy.where, strategy.how].map((zone, z) => {
+          const ancre = [ids.what, ids.where, ids.how][z];
+          return (
+            <li>
+              <article class="relative flex min-h-[20rem] flex-col overflow-hidden rounded-3xl bg-ink p-6 text-white sm:min-h-[24rem] sm:p-8">
+                {zone.eyebrow && <p class="text-eyebrow text-teal-200">{zone.eyebrow}</p>}
+                <h2 id={ancre + '-title'} class="text-display-sm mt-3 max-w-[16rem] text-sand">
+                  {zone.title}
+                </h2>
 
-            <ul role="list" class="mt-4 space-y-3">
-              {zone.items.map((item) => (
-                <li class="flex items-start gap-3">
-                  {
-                    /* Puce dessinée quand l'item porte une icône, point turquoise sinon : c'est le
-                      contenu qui décide, pas la zone (strategy.ts, champ `icon`). */
-                  }
-                  {item.icon ? (
-                    <Picto name={item.icon} class="mt-0.5 size-6 text-teal-700" />
-                  ) : (
-                    <span aria-hidden="true" class="mt-2 size-2 shrink-0 rounded-full bg-teal-700" />
-                  )}
-                  <p class="text-base leading-snug text-ink">
-                    {item.lead}
-                    {item.rest && <span class="mt-1 block text-slate-700">{item.rest}</span>}
-                  </p>
-                </li>
-              ))}
-            </ul>
+                {
+                  /* Le globe reste dans sa zone et retrouve son fond sombre. Il est en
+                    `aspect-ratio: 1`, donc borné pour ne pas pousser la tuile hors de sa rangée. */
+                }
+                {zone.map && (
+                  <div class="mx-auto mt-4 w-full max-w-[11rem]">
+                    <StrategyGlobe />
+                  </div>
+                )}
 
-            {
-              /* LE GLOBE RESTE DANS SA ZONE, « Où ». Il est en `aspect-ratio: 1` et suit donc la
-                largeur de sa carte ; borné à 13rem pour qu'il ne prenne pas un écran entier sur
-                téléphone, où la carte occupe toute la largeur. */
-            }
-            {zone.map && (
-              <div class="mx-auto mt-6 w-full max-w-[13rem]">
-                <StrategyGlobe>
-                  {AFFICHER_LEGENDES && (
-                    <figcaption class="text-caption mt-4 text-center text-slate-700">
-                      {zone.map.legend}
-                    </figcaption>
-                  )}
-                </StrategyGlobe>
+                <button
+                  type="button"
+                  data-carte-ouvrir
+                  hidden
+                  aria-controls={'detail-' + ancre}
+                  data-carte-titre={zone.title}
+                  data-carte-fermer={strategy.dialogClose}
+                  class="carte-plus mt-auto self-start"
+                >
+                  <span aria-hidden="true">+</span>
+                  <span class="visually-hidden">
+                    {strategy.dialogOpen} : {zone.title}
+                  </span>
+                </button>
+              </article>
+
+              {
+                /* Hôte du détail : visible dans le flux tant que le script n'a pas déplacé son contenu
+                  dans la fenêtre. Il est alors vidé, et le script le masque. */
+              }
+              <div data-carte-detail-hote>
+                <div id={'detail-' + ancre} data-carte-detail class="mt-5 space-y-4">
+                  <p class="text-eyebrow text-teal-700">{zone.eyebrow}</p>
+                  <p class="text-display-sm text-ink">{zone.title}</p>
+                  <p class="text-base leading-snug text-slate-700">{zone.intro}</p>
+                  {zone.lead && <p class="text-base font-semibold text-ink">{zone.lead}</p>}
+
+                  <ul role="list" class="space-y-3">
+                    {zone.items.map((item) => (
+                      <li class="flex items-start gap-3">
+                        {item.icon ? (
+                          <Picto name={item.icon} class="mt-0.5 size-6 text-teal-700" />
+                        ) : (
+                          <span
+                            aria-hidden="true"
+                            class="mt-2 size-2 shrink-0 rounded-full bg-teal-700"
+                          />
+                        )}
+                        <p class="text-base leading-snug text-ink">
+                          {item.lead}
+                          {item.rest && <span class="mt-1 block text-slate-700">{item.rest}</span>}
+                        </p>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <p class="text-base leading-snug text-slate-700">{zone.outro}</p>
+                </div>
               </div>
-            )}
-
-            <p class="mt-auto pt-6 text-base leading-snug text-slate-700">{zone.outro}</p>
-          </li>
-        ))
+            </li>
+          );
+        })
       }
     </ul>
-
-    {
-      /*
-       * BANDE DE TROIS PHOTOS RETIRÉE le 16/09/2026, demande de l'équipe. Elle fermait la zone « Quoi »
-       * avant la fusion, puis le bloc entier après elle : trois cadres en 4/5, parallaxe de sens
-       * alterné, trois colonnes dès le téléphone.
-       * Les trois illustrations restent dans media.ts (`strategy`) et dans src/assets/images : rien
-       * n'est perdu, et elles continuent d'être livrées au navigateur tant qu'elles sont dans ce
-       * dossier. À déplacer vers src/assets/vivier si elles ne doivent plus servir du tout.
-       */
-    }
   </Container>
 </Section>
+
+<script>
+  /* Tuiles à fenêtre : le contenu arrive dans le flux, le script le déplace dans une <dialog>. */
+  import '@/scripts/carteDialog';
+</script>

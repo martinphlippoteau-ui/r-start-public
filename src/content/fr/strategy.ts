@@ -21,6 +21,10 @@ import type { StrategyContent } from '@/content/types';
  */
 
 export const strategy: StrategyContent = {
+  /* Libellés des tuiles à fenêtre (16/09/2026) : lus par les lecteurs d'écran, jamais affichés,
+     le bouton ne montrant qu'un « + ». */
+  dialogOpen: 'En savoir plus',
+  dialogClose: 'Fermer',
   engines: {
     /* « R Start : 2 moteurs au service de la performance » depuis le 16/09/2026, texte de l'équipe.
        Chiffre et non lettre, comme dans « 4 étapes pour souscrire » : un titre se balaie, un
