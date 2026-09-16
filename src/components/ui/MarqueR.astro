@@ -1,0 +1,27 @@
+---
+/**
+ * La marque R Start seule, sans le mot « start » (16/09/2026).
+ *
+ * Le tracé est celui de src/assets/logos/r-start-blanc.svg, sa PREMIÈRE forme : une goutte dont le R
+ * est évidé, d'un seul tenant. Les deux autres formes du fichier dessinent le mot, qui n'a rien à
+ * faire aux tailles où cette marque sert.
+ * Le viewBox est la boîte exacte du tracé, mesurée (94,08 × 88,98) et non devinée : la marque se cale
+ * donc sans marge parasite ni déformation.
+ *
+ * `currentColor` : l'appelant décide de la teinte, comme pour les pictos.
+ * Décorative par défaut. Un appelant qui en ferait un vrai logo doit lui donner un rôle et un nom.
+ */
+interface Props {
+  class?: string;
+}
+const { class: className } = Astro.props as Props;
+---
+
+<svg
+  viewBox="0 0 94.08 88.98"
+  fill="currentColor"
+  aria-hidden="true"
+  class:list={['block', className]}
+>
+  <path d="M68.21.17C36.7,3.24,5.47,23.07,2.44,29.88c-11.59,26.1,21.48,52.52,27.22,55.34,21.52,10.59,48.04-1.99,59.51-27.5C93.5,48.09,104.2-3.34,68.21.17ZM64.76,69.76c-1.25,0-2.36-.57-3.09-1.47l-2.84-3.52c-4.06-4.98-10.05-12.1-12.26-13.54-1.92-1.22-4.48-1.84-7.59-1.84l-7.96.02c-2.02,0-3.66-1.64-3.66-3.66s1.64-3.66,3.66-3.66h18.33c3.05-.01,5.54-2.14,5.54-4.76s-2.49-4.74-5.54-4.74h-18.34c-2.02,0-3.66-1.63-3.66-3.65s1.64-3.66,3.66-3.66h18.34c7.58,0,13.73,5.4,13.73,12.05,0,4.74-3.2,9.03-8.07,10.97,3.22,3.36,7.64,8.61,11.3,13.08l1.52,1.86c.57.69.91,1.57.91,2.54,0,2.2-1.79,3.99-3.99,3.99Z" />
+</svg>

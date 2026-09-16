@@ -1335,9 +1335,12 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   color: var(--color-ink);
   overflow: visible;
 }
+/* Voile ALLÉGÉ le 16/09/2026 : à 55 % et deux pixels de flou, le dos de la carte et sa marque ne se
+   devinaient plus derrière la fenêtre. La fenêtre étant un panneau blanc opaque, son texte ne dépend
+   pas de cette valeur. */
 .carte-dialog::backdrop {
-  background: rgb(13 46 61 / 0.55);
-  backdrop-filter: blur(2px);
+  background: rgb(13 46 61 / 0.42);
+  backdrop-filter: blur(1.5px);
 }
 
 /*
@@ -1413,21 +1416,28 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   }
 }
 /* Le bouton de fermeture flotte AU-DESSUS de la zone défilante, il ne doit pas partir avec elle. */
+/*
+ * « FERMER » EN TOUTES LETTRES depuis le 16/09/2026, demande de l'équipe. C'était une croix de 2,5 rem
+ * avec le mot en lecture d'écran seulement : le mot est maintenant à l'écran, et la pastille s'étire
+ * pour le recevoir. La zone tactile reste au-dessus des 44 px recommandés.
+ */
 .carte-dialog-fermer {
   position: absolute;
   top: 0.75rem;
   right: 0.75rem;
   z-index: 1;
   display: inline-flex;
-  width: 2.5rem;
-  height: 2.5rem;
+  min-height: 2.75rem;
   align-items: center;
   justify-content: center;
+  gap: 0.4rem;
+  padding-inline: 1.1rem;
   border-radius: 9999px;
   background: var(--color-ink);
   color: #fff;
-  font-size: 1.25rem;
-  line-height: 1;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.2;
   transition: background-color 150ms;
 }
 .carte-dialog-fermer:hover {
@@ -1489,9 +1499,35 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
  * dépasse le quart de tour, et la fenêtre, qui arrive de dos, devient visible au même instant. Le
  * relais est exact, rien ne se superpose, et il n'y a aucune face arrière à entretenir.
  */
+/*
+ * LA CARTE A DEUX FACES depuis le 16/09/2026 (« les cards retournées doivent rester visibles en fond
+ * avec un logo R de R Start »). Elle disparaissait au quart de tour, et la fenêtre ouverte flottait
+ * au-dessus d'un trou dans la page.
+ *
+ * `transform-style: preserve-3d` sur l'enveloppe, `backface-visibility: hidden` sur CHAQUE FACE : sans
+ * la première, le dos serait aplati sur le recto et les deux se superposeraient ; sans la seconde, on
+ * lirait le recto en miroir à travers le dos.
+ * C'est l'ENVELOPPE qui tourne, pas l'article : `overflow: hidden` sur l'élément en `preserve-3d`
+ * forcerait son aplatissement, et l'article en a besoin pour ses coins arrondis.
+ */
 @utility carte-face {
-  backface-visibility: hidden;
   transform-origin: center;
+  transform-style: preserve-3d;
+}
+.carte-recto,
+.carte-verso {
+  backface-visibility: hidden;
+}
+/* Le dos occupe exactement le recto : c'est lui qui donne sa hauteur à l'enveloppe. */
+.carte-verso {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 1.5rem;
+  background: var(--color-ink);
+  transform: rotateY(180deg);
 }
 
 /* La main n'apparaît que si le script a tourné : sans lui, la carte n'ouvre rien et promettre un clic

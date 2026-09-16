@@ -125,11 +125,10 @@ const init = (): void => {
     const fermer = document.createElement('button');
     fermer.type = 'button';
     fermer.className = 'carte-dialog-fermer';
-    fermer.innerHTML =
-      '<span aria-hidden="true">×</span>' +
-      '<span class="visually-hidden">' +
-      (bouton.dataset.carteFermer ?? 'Fermer') +
-      '</span>';
+    /* Le mot est À L'ÉCRAN depuis le 16/09/2026, plus seulement pour les lecteurs d'écran : une croix
+       seule demande de deviner. `textContent` et non `innerHTML` : le libellé vient d'un attribut de
+       la page, on ne lui laisse pas la possibilité de porter du balisage. */
+    fermer.textContent = bouton.dataset.carteFermer ?? 'Fermer';
 
     dialog.append(fermer, detail);
     document.body.append(dialog);
