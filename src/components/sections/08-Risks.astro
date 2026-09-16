@@ -68,12 +68,15 @@ const id = sections.risks.id;
                 `text-lead` montait de 18 à 24 px avec la largeur d'écran et portait un interligne
                 de 1,5 : six descriptions de risque à ce corps prenaient deux écrans. `text-base`
                 les fixe à 16 px, `leading-snug` resserre à 1,375.
-                CE QUI NE CHANGE PAS : le titre du risque reste en `text-display-sm`, et les six
+                SABLE DEPUIS LE 16/09/2026 (demande de l'équipe), ex-blanc plein. Relevé à 11,54:1
+                sur le fond ink, contre 14,23 pour le blanc : très au-dessus des 4,5 exigés, et la
+                teinte tient le contraste de loin.
+                CE QUI NE CHANGE PAS : le titre du risque reste en `text-display-sm`, et les
                 descriptions gardent le MÊME corps entre elles. Un risque affiché plus petit que
                 ses voisins, ou plus petit que l'avantage qu'il contrebalance, est ce que l'AMF
                 refuse ; ici aucun avantage ne partage cette section. */
             }
-            <p class="mt-3 text-base leading-snug text-white">{item.description}</p>
+            <p class="mt-3 text-base leading-snug text-sand">{item.description}</p>
           </li>
         ))
       }

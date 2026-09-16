@@ -93,15 +93,23 @@ export const risks: RisksContent = {
       description:
         'La variation du cours des devises implique un risque de perte en capital et des fluctuations potentielles dans les revenus distribués. R Start peut investir hors zone euro, notamment au Canada, et n’aura pas recours à une couverture systématique du risque de change.',
     },
-    {
-      title: 'Effet de levier',
-      description: `R Start peut emprunter jusqu’à ${nb(risk.maxLeverage)} de la valeur d’expertise de ses immeubles. L’endettement amplifie les variations de valeur, à la hausse comme à la baisse, et accroît le risque de perte.`,
-      noteId: 'risques-levier',
-    },
-    {
-      title: 'Absence d’historique',
-      description: `R Start a ouvert ses souscriptions le ${product.openingDate.label}. Elle n’a pas encore d’historique propre. Les résultats passés des autres SCPI CORUM ne préjugent pas de ses résultats futurs.`,
-    },
+    /*
+     * EFFET DE LEVIER ET ABSENCE D'HISTORIQUE RETIRÉS le 16/09/2026, demande de l'équipe. La section
+     * s'en tient donc aux quatre rubriques de corum.fr. Ils disaient :
+     *  - « Effet de levier : R Start peut emprunter jusqu'à [risk.maxLeverage] de la valeur d'expertise
+     *    de ses immeubles. L'endettement amplifie les variations de valeur, à la hausse comme à la
+     *    baisse, et accroît le risque de perte. » (appel de note `risques-levier`) ;
+     *  - « Absence d'historique : R Start a ouvert ses souscriptions le [openingDate]. Elle n'a pas
+     *    encore d'historique propre. Les résultats passés des autres SCPI CORUM ne préjugent pas de ses
+     *    résultats futurs. »
+     *
+     * CE QUE LE SECOND EMPORTE, et la Conformité doit le savoir : c'était la SEULE occurrence de
+     * « ne préjugent pas » sur l'accueil. scripts/check-compliance.mjs y signale une allégation de
+     * performance passée sur des SCPI tierces « sans la mention que les performances passées ne
+     * préjugent pas des performances futures » : l'avertissement portait déjà, il porte désormais sans
+     * contrepartie nulle part dans la page. La mention subsiste sur /a-propos, /presse et /strategie.
+     * Les deux textes sont ci-dessus, une minute pour les rétablir.
+     */
   ],
 
   warningsTitle: 'Les avertissements réglementaires',
