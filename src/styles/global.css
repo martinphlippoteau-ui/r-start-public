@@ -814,8 +814,20 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
  * cinq instants de l'animation, pas estimés.
  *
  * COÛT. Chaque foyer est un dégradé radial sur son propre élément, animé en `transform` seul : c'est
- * composité par le GPU, sans recalcul de mise en page ni de peinture. Rien ne tourne hors écran
- * (`is-in-view`, posé par le moteur), ni en mouvement réduit.
+ * composité par le GPU, sans recalcul de mise en page ni de peinture. Rien ne tourne en mouvement réduit.
+ *
+ * SANS JAMAIS S'ARRÊTER (16/09/2026 au soir, demande de l'équipe : « je veux que ces mouvements ne
+ * s'arrêtent pas en arrière-plan »). Deux choses s'arrêtaient :
+ *  - chaque foyer marquait un temps mort à chaque demi-tour : une seule animation en aller-retour sur
+ *    `ease-in-out`, dont la vitesse tombe à zéro aux deux bouts. La dérive est maintenant portée par DEUX
+ *    HORLOGES : le span glisse à l'horizontale sur `--duree`, son pseudo-élément glisse à la verticale
+ *    sur `--duree` × 1,618 (le nombre d'or, pour que les deux ne se retrouvent presque jamais en phase),
+ *    et la respiration d'échelle est partagée entre les deux. Quand l'un fait demi-tour, l'autre est en
+ *    pleine course : le foyer n'est jamais immobile ;
+ *  - l'aurore était mise en pause dès que le hero quittait l'écran, pour ne rien coûter pendant la
+ *    lecture du reste de la page. Elle tourne désormais en continu : on veut la retrouver ailleurs
+ *    quand on remonte, pas figée là où on l'a laissée. Les couches sont hors champ, le navigateur ne les
+ *    dessine pas ; il ne reste que le tic de l'animation.
  */
 [data-aurora] {
   position: absolute;
@@ -842,45 +854,57 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   width: calc(var(--taille) / var(--zoom));
   margin-top: calc(var(--taille) / var(--zoom) / -2);
   margin-left: calc(var(--taille) / var(--zoom) / -2);
-  border-radius: 9999px;
-  background: radial-gradient(circle at 50% 50%, var(--teinte) 0%, transparent 70%);
   opacity: var(--opacite);
-  filter: blur(calc(var(--flou, 60px) / var(--zoom)));
   /* État de repos (mouvement réduit, hors animation) : agrandi à sa vraie taille. */
   transform: scale(var(--zoom));
   /* Pas de `will-change` permanent (audit du 16/09/2026) : l'animation crée sa couche le temps de
-     tourner, et elle est en pause hors écran ; quatre couches GPU maintenues en permanence, y compris en
-     mouvement réduit, ne servaient à rien. */
+     tourner ; des couches GPU maintenues en mouvement réduit ne serviraient à rien. */
+}
+/* Le dégradé et son flou vivent sur le pseudo-élément : c'est lui qui porte la dérive verticale, le span
+   porte l'horizontale (voir le bandeau ci-dessus, deux horloges). Sa translation est un pour-cent de sa
+   propre boîte, trois fois plus petite, mais le span l'agrandit d'autant : la course en pixels est la
+   bonne sans multiplier par `--zoom`. */
+[data-aurora] > span::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: radial-gradient(circle at 50% 50%, var(--teinte) 0%, transparent 70%);
+  filter: blur(calc(var(--flou, 60px) / var(--zoom)));
 }
 
 @media (prefers-reduced-motion: no-preference) {
   [data-aurora] > span {
-    animation: aurore var(--duree) ease-in-out infinite alternate;
+    animation: aurore-x var(--duree) ease-in-out infinite alternate;
     animation-delay: var(--retard, 0s);
-    animation-play-state: paused;
   }
-  .is-in-view [data-aurora] > span {
-    animation-play-state: running;
+  [data-aurora] > span::before {
+    animation: aurore-y calc(var(--duree) * 1.618) ease-in-out infinite alternate;
+    animation-delay: calc(var(--retard, 0s) * 0.7);
   }
 }
 
-/* Dérive, amplitude donnée par foyer (`--amp`) : les quatre partagent la courbe, pas la course.
-   `--amp` est un pour-cent de la boîte de l'élément, trois fois plus petite que le foyer visible : il est
-   multiplié par `--zoom` pour que la dérive garde sa course en pixels, et chaque échelle l'est aussi.
-   RESPIRATION ÉLARGIE le 16/09/2026 (« pas assez visible ») : de 0,86 à 1,16 au lieu de 0,92 à 1,08, un
-   foyer grossit et rétrécit d'un tiers sur sa course, ce qui se lit même sans suivre sa dérive. */
-@keyframes aurore {
+/* Dérive horizontale du span, amplitude donnée par foyer (`--amp`) : les quatre partagent la courbe, pas
+   la course. `--amp` est un pour-cent de la boîte du span, trois fois plus petite que le foyer visible :
+   multiplié par `--zoom` pour que la course en pixels soit la bonne, et l'échelle l'est aussi.
+   RESPIRATION ÉLARGIE le 16/09/2026 (« pas assez visible ») : 0,86 à 1,16 en tout, partagée entre les
+   deux horloges (0,90 à 1,10 ici, 0,94 à 1,06 sur le pseudo-élément), un foyer grossit et rétrécit d'un
+   tiers, ce qui se lit même sans suivre sa dérive. */
+@keyframes aurore-x {
   from {
-    transform: translate3d(calc(var(--amp) * var(--zoom) * -1), calc(var(--amp) * var(--zoom) * 0.6), 0)
-      scale(calc(var(--zoom) * 0.86));
-  }
-  50% {
-    transform: translate3d(calc(var(--amp) * var(--zoom) * 0.8), calc(var(--amp) * var(--zoom) * -0.9), 0)
-      scale(calc(var(--zoom) * 1.16));
+    transform: translate3d(calc(var(--amp) * var(--zoom) * -1), 0, 0) scale(calc(var(--zoom) * 0.9));
   }
   to {
-    transform: translate3d(calc(var(--amp) * var(--zoom)), calc(var(--amp) * var(--zoom) * 0.4), 0)
-      scale(calc(var(--zoom) * 0.94));
+    transform: translate3d(calc(var(--amp) * var(--zoom)), 0, 0) scale(calc(var(--zoom) * 1.1));
+  }
+}
+/* Dérive verticale du pseudo-élément, sur l'autre horloge. */
+@keyframes aurore-y {
+  from {
+    transform: translate3d(0, calc(var(--amp) * 0.8), 0) scale(0.94);
+  }
+  to {
+    transform: translate3d(0, calc(var(--amp) * -0.9), 0) scale(1.06);
   }
 }
 
@@ -915,9 +939,8 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   pointer-events: none;
   opacity: 0;
 }
-/* EN PAUSE HORS ÉCRAN, comme les foyers de l'aurore juste au-dessus (audit du 16/09/2026) : seule leur
-   opacité suivait `is-in-view`, les deux lueurs continuaient de composer sur le GPU pendant toute la
-   lecture de la page. Même mécanisme, même classe. */
+/* Les lueurs tournent en continu, comme l'aurore (16/09/2026 au soir : « ces mouvements ne s'arrêtent
+   pas en arrière-plan ») ; leur opacité, elle, suit `is-in-view`. */
 @media (prefers-reduced-motion: no-preference) {
   .is-in-view > .halo-blob {
     opacity: 1;
@@ -929,8 +952,6 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
     height: 58%;
     background-image: radial-gradient(closest-side, rgb(20 164 186 / 0.26), transparent 100%);
     animation: halo-blob-a 29s ease-in-out infinite alternate;
-    /* Après le raccourci `animation`, qui remettrait l'état à `running`. */
-    animation-play-state: paused;
   }
   .halo-blob-b {
     right: -12%;
@@ -939,10 +960,6 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
     height: 52%;
     background-image: radial-gradient(closest-side, rgb(17 152 175 / 0.22), transparent 100%);
     animation: halo-blob-b 41s ease-in-out infinite alternate;
-    animation-play-state: paused;
-  }
-  .is-in-view > .halo-blob {
-    animation-play-state: running;
   }
 }
 @keyframes halo-blob-a {
@@ -1595,15 +1612,13 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
    En pause tant que le hero n'est pas à l'écran (classe `is-in-view` posée par `data-in-view`) : aucune
    couche animée pendant la lecture du reste de la page. Pas de will-change permanent (l'animation crée
    déjà sa couche le temps de tourner). */
+/* Plus de pause hors écran depuis le 16/09/2026 au soir (« ces mouvements ne s'arrêtent pas en
+   arrière-plan ») : le halo dérive en continu, comme l'aurore. */
 @utility brand-halo-drift {
   @media (prefers-reduced-motion: no-preference) {
     &::before {
       inset: -8%;
       animation: halo-drift 20s ease-in-out infinite alternate;
-      animation-play-state: paused;
-    }
-    &.is-in-view::before {
-      animation-play-state: running;
     }
   }
 }
