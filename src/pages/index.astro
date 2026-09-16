@@ -16,7 +16,6 @@ import { seo } from '@/content/fr/seo';
 import { faq } from '@/content/fr/faq';
 import { difference } from '@/content/fr/difference';
 import { subscribe } from '@/content/fr/subscribe';
-import { withBase } from '@/lib/href';
 import { faqJsonLd, organizationJsonLd, webPageJsonLd } from '@/lib/seo';
 const modules = import.meta.glob<{ default: any }>('/src/components/sections/*.astro', {
   eager: true,
@@ -92,9 +91,11 @@ const jsonLd = [
     /* Pastille d'appel flottante : au niveau de la page, jamais dans une section, les sections de
       l'accueil sont épinglées au défilement, et un ancêtre transformé capturerait un enfant `fixed`. */
   }
+  {/* `href` SANS `withBase` : StickyCta le pose lui-même, et l'appliquer des deux côtés doublait le
+    préfixe en production (« /r-start-public/r-start-public/frais »). Voir src/lib/href.ts. */}
   <StickyCta
     label={difference.cta.label}
-    href={withBase(difference.cta.href)}
+    href={difference.cta.href}
     watch="[data-hero-scroll-hint]"
     until="#corum"
   />

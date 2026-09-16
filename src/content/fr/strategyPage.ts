@@ -32,7 +32,10 @@ export const strategyPage: { seo: PageSeo; hero: PageHero; cta: Cta } = {
    */
   hero: {
     eyebrow: `Stratégie · SCPI ${product.name}`,
-    title: 'Comment R Start investit l’argent de ses clients ?',
+    /* « R Start : une approche inédite au service de la performance » depuis le 16/09/2026, texte
+       de l'équipe. L'en-tête posait une question, « Comment R Start investit l'argent de ses
+       clients ? » ; il annonce maintenant le propos. */
+    title: 'R Start : une approche inédite au service de la performance',
     /*
      * CHUTE AJOUTÉE LE 15/09/2026, texte fourni par l'équipe. L'en-tête n'avait qu'un titre.
      * L'espace avant le deux-points est une INSÉCABLE (U+00A0) écrite à la main : ce fichier ne passe

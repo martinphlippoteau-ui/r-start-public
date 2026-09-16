@@ -1,5 +1,4 @@
 import type { StrategyContent } from '@/content/types';
-import { corumProductsDisclaimer } from '@/content/fr/legal';
 
 /**
  * Page /strategie, « Stratégie d'investissement ». CONTENU FOURNI PAR L'ÉQUIPE le 14/09/2026 et repris
@@ -23,7 +22,10 @@ import { corumProductsDisclaimer } from '@/content/fr/legal';
 
 export const strategy: StrategyContent = {
   engines: {
-    title: 'R Start table sur deux moteurs de performance',
+    /* « R Start : 2 moteurs au service de la performance » depuis le 16/09/2026, texte de l'équipe.
+       Chiffre et non lettre, comme dans « 4 étapes pour souscrire » : un titre se balaie, un
+       chiffre s'y repère plus vite. */
+    title: 'R Start : 2 moteurs au service de la performance',
     intro: '',
     items: [
       { lead: 'Les loyers', rest: 'versés par les entreprises locataires' },
@@ -31,8 +33,15 @@ export const strategy: StrategyContent = {
     ],
     outro:
       'Les opportunités ne tombent pas du ciel : nous suivons une méthode d’investissement précise pour dénicher les bons immeubles, loués par les bonnes entreprises, et générer du rendement potentiel.',
-    /** Mention de la Conformité, en fin de zone 2. Reproduite à l'identique depuis legal.ts. */
-    disclaimer: corumProductsDisclaimer,
+    /*
+     * MENTION RETIRÉE DE L'ÉCRAN le 16/09/2026, demande de l'équipe. Elle reproduisait
+     * `legal.corumProductsDisclaimer` : « Les produits commercialisés par CORUM L'Épargne sont des
+     * investissements long terme qui n'offrent aucune garantie de rendement ou de performance et
+     * présentent un risque de perte en capital et de liquidité… »
+     * Le texte n'est pas supprimé, il vit toujours dans legal.ts. Ce qu'il disait est par ailleurs
+     * porté, sur cette même page, par le bloc Risques qui la ferme.
+     * Pour la rétablir : `disclaimer: corumProductsDisclaimer`.
+     */
   },
 
   what: {

@@ -26,7 +26,6 @@ import Section from '@/components/ui/Section.astro';
 import Stat from '@/components/ui/Stat.astro';
 import SectionHeading from '@/components/ui/SectionHeading.astro';
 import { pages } from '@/config/pages';
-import { withBase } from '@/lib/href';
 import { sections } from '@/config/sections';
 import { corum } from '@/content/fr/corum';
 import { trust } from '@/content/fr/trust';
@@ -130,7 +129,9 @@ const { stats } = trust;
           l'ink depuis que la bande blanche a disparu avec le déplacement des avis. */
       }
       <div class="mt-section-sm">
-        <Button href={withBase(pages.about.path)} variant="secondary" size="lg">
+        {/* Pas de `withBase` ici : Button le pose lui-même. L'appliquer des deux côtés doublait
+          le préfixe en production (« /r-start-public/r-start-public/a-propos »). */}
+        <Button href={pages.about.path} variant="secondary" size="lg">
           {corum.aboutLink}
         </Button>
       </div>

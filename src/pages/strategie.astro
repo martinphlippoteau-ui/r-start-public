@@ -18,6 +18,7 @@ import StickyCta from '@/components/StickyCta.astro';
 import PageHero from '@/components/ui/PageHero.astro';
 import Strategy from '@/components/sections/04-Strategy.astro';
 import Risks from '@/components/sections/08-Risks.astro';
+import Faq from '@/components/sections/10-Faq.astro';
 import { pages } from '@/config/pages';
 import { strategyPage } from '@/content/fr/strategyPage';
 import { breadcrumbJsonLd, organizationJsonLd, webPageJsonLd } from '@/lib/seo';
@@ -51,6 +52,16 @@ const jsonLd = [
         et le bloc sombre monte par-dessus, comme sur l'accueil. */
     }
     <Risks />
+    {
+      /*
+       * FAQ COURTE EN FIN DE PAGE (16/09/2026) : quatre questions, comme sur l'accueil et
+       * /documentation, avec le renvoi vers /faq. Elle vient APRÈS les risques, jamais avant : le
+       * contre-poids doit être lu avant qu'on reparte vers d'autres réponses.
+       * `revealTitle` reste à sa valeur par défaut : /strategie charge déjà GSAP (data-scene, data-draw)
+       * et ne figure pas dans les sous-pages que tests/performance.spec.ts en protège.
+       */
+    }
+    <Faq tone="paper" />
   </main>
 
   {
