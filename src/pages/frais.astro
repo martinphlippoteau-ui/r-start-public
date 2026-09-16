@@ -65,7 +65,6 @@ const jsonLd = [
       eyebrow={hero.eyebrow}
       title={hero.title}
       intro={hero.intro}
-      punchline={hero.punchline}
     >
       <Breadcrumb slot="breadcrumb" key="fees" tone="dark" />
       <Button slot="cta" position={cta.position} variant="light" size="lg">{cta.label}</Button>
@@ -84,7 +83,10 @@ const jsonLd = [
         NON PUBLIABLE tant que les taux des autres SCPI ne sont pas relevés, le composant l'affiche et le
         script de conformité le signale. */
     }
-    <FeeComparator id="comparateur" />
+    {/* L'accroche « Comparez chaque ligne… » a quitté l'en-tête le 16/09/2026 pour introduire le
+      comparateur, où elle dit ce qu'on va faire au moment de le faire. Le texte n'a pas bougé, il
+      vit toujours dans feesPage.ts (`hero.punchline`). */}
+    <FeeComparator id="comparateur" intro={hero.punchline} />
 
     {
       /* La bande « trois 0 % + les frais réellement prélevés + leur contre-poids » (#zero-frais) a été

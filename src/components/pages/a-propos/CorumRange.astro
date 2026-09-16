@@ -29,6 +29,7 @@ import RiskNote from '@/components/ui/RiskNote.astro';
 import Section from '@/components/ui/Section.astro';
 import Stat from '@/components/ui/Stat.astro';
 import { corum } from '@/content/fr/corum';
+import { corumRange } from '@/content/fr/corumRange';
 import { trust as trustFacts } from '@/content/fr/facts';
 import { trust } from '@/content/fr/trust';
 import { media, AFFICHER_LEGENDES } from '@/content/fr/media';
@@ -232,88 +233,129 @@ const QUIET_TITLE_Y = 12;
 
 <Section id="gamme" tone="white" labelledBy="gamme-title">
   <Container size="wide">
-    <div class="grid gap-10 lg:grid-cols-12 lg:gap-16">
-      <div class="lg:col-span-5">
-        <!-- Titre suivi d'un paragraphe visible d'emblée : fade-up court pour ne pas chevaucher sa première ligne. -->
-        <h2
-          id="gamme-title"
-          class="text-display-md text-ink"
-          data-animate="fade-up"
-          data-animate-y={String(QUIET_TITLE_Y)}
-        >
-          {corum.range.title}
-          <NoteRef notes={notes} id="corum-gamme" tone="light" />
-        </h2>
-        <p class="text-lead mt-5 text-pretty text-slate-700 sm:mt-6">{corum.range.description}</p>
-      </div>
-      <div class="lg:col-span-7">
-        <ul
-          role="list"
-          class="grid grid-cols-2 gap-4 sm:grid-cols-3"
-          data-animate="stagger"
-          data-animate-stagger={String(LOGO_STAGGER)}
-        >
-          {
-            range.map(({ name, current, created }) => (
-              <li
-                class:list={[
-                  'flex min-h-24 items-center justify-center rounded-2xl border p-5 text-center text-lg font-semibold sm:p-6',
-                  current
-                    ? 'border-teal-400 bg-teal-100 text-navy'
-                    : 'border-mist bg-paper text-navy',
-                ]}
-                aria-current={current ? 'true' : undefined}
-              >
-                <span class="flex flex-col items-center gap-1.5">
-                  {current && corum.range.currentBadge && (
-                    <span class="inline-flex items-center rounded-full bg-navy px-2.5 py-0.5 text-[0.7rem] font-semibold tracking-wider text-white uppercase">
-                      {corum.range.currentBadge}
+    {
+      /*
+       * LA GAMME EN CARROUSEL depuis le 16/09/2026, contenu fourni par l'équipe. Cette place portait
+       * « Des SCPI gérées depuis 2012 » : cinq tuiles nommant les SCPI, avec leur année de création et
+       * le logo de R Start. Les chiffres remplacent les noms.
+       *
+       * R START N'Y EST PLUS, et c'est cohérent : elle n'a ni TRI ni rendement à montrer. Le contenu
+       * précédent reste dans corum.ts (`range`) et les années de création dans facts.ts
+       * (`scpiCreated`), prêts à resservir.
+       *
+       * SUR LES CHIFFRES, voir l'en-tête de corumRange.ts : chaque intitulé est celui fourni, la
+       * mention réglementaire sur les performances passées a été ajoutée, et la date d'arrêté reste à
+       * demander à CORUM.
+       */
+    }
+    <header class="max-w-4xl">
+      <h2
+        id="gamme-title"
+        class="text-display-md text-ink"
+        data-animate="fade-up"
+        data-animate-y={String(QUIET_TITLE_Y)}
+      >
+        {corumRange.title}
+      </h2>
+    </header>
+
+    {
+      /* RAIL DÉFILANT. Sans script il se fait déjà défiler au doigt et à la tabulation ; les deux
+        flèches arrivent `hidden` et ne sont révélées que par src/scripts/carrousel.ts.
+        `-mx-5 px-5` fait sortir le rail des marges du conteneur : sur un téléphone, une carte coupée au
+        bord de l'écran annonce qu'il y en a d'autres, là où un rail bien rangé dans sa colonne laisse
+        croire que tout est visible.
+        `scroll-pl-*` ÉGAL AU REMBOURRAGE : sans lui, l'accrochage aligne la première carte sur le bord
+        du contenu et le rail s'ouvre déjà décalé de la valeur du rembourrage, flèche « précédente »
+        active alors qu'on est au départ. Mesuré à 32 px, puis corrigé. */
+    }
+    <div class="relative mt-10 lg:mt-14" data-rail-zone>
+      <ul
+        role="list"
+        aria-label={corumRange.listLabel}
+        tabindex="0"
+        class="-mx-5 flex snap-x snap-mandatory scroll-pl-5 gap-4 overflow-x-auto px-5 pb-4 sm:-mx-8 sm:scroll-pl-8 sm:gap-5 sm:px-8"
+        data-rail
+      >
+        {
+          corumRange.items.map((scpi) => (
+            <li class="flex w-[17rem] shrink-0 snap-start flex-col rounded-3xl bg-ink p-6 text-white sm:w-[19rem] sm:p-7">
+              <p class="text-display-sm text-sand">{scpi.name}</p>
+              {scpi.badge && (
+                <p class="mt-3 inline-flex self-start rounded-full bg-teal-200 px-2.5 py-0.5 text-[0.7rem] font-semibold tracking-wider text-ink uppercase">
+                  {scpi.badge}
+                </p>
+              )}
+
+              {
+                /* LA MESURE MISE EN AVANT, et son intitulé juste dessous : un grand nombre seul ne dit
+                  pas ce qu'il mesure, et ces quatre-là ne mesurent pas la même chose — trois TRI
+                  réalisés et un objectif. */
+              }
+              <p class="text-display-lg mt-6 leading-none text-white">
+                {scpi.principale.value}
+                <span class="text-display-sm text-teal-200">{scpi.principale.unit}</span>
+              </p>
+              <p class="mt-2 text-base leading-snug text-white/80">{scpi.principale.label}</p>
+
+              <ul role="list" class="mt-6 space-y-4 border-t border-white/15 pt-5">
+                {scpi.autres.map((m) => (
+                  <li class="flex items-baseline justify-between gap-3">
+                    <span class="text-base leading-snug text-white/80">{m.label}</span>
+                    <span class="text-lead shrink-0 font-semibold text-sand tabular-nums">
+                      {m.value}
+                      <span class="text-base text-teal-200">{m.unit}</span>
                     </span>
-                  )}
-                  {
-                    /*
-                     * LE LOGO REMPLACE LE NOM sur la carte de R Start (16/09/2026, demande de l'équipe) :
-                     * c'est la seule des cinq dont on possède la marque, les quatre autres sont écrites en
-                     * typographie faute de licence sur leurs logos (décision du 09/09/2026).
-                     * `alt` vide et `aria-hidden` : le nom reste dans le HTML, hors écran, sinon la carte
-                     * ne serait plus annoncée que par son badge. Un lecteur d'écran lit donc « R Start »,
-                     * comme pour les quatre autres.
-                     */
-                  }
-                  {current ? (
-                    <>
-                      <Image src={brandLogo} alt="" aria-hidden="true" width={290} height={89} class="h-7 w-auto" />
-                      <span class="visually-hidden">{name}</span>
-                    </>
-                  ) : (
-                    <span>{name}</span>
-                  )}
-                  {
-                    /*
-                     * La date est en poids normal sous un nom en gras, et d'un cran plus petite : deux
-                     * lignes de même graisse se seraient lues comme deux noms.
-                     * Teintes calculées, pas choisies à l'œil : `slate-700` sur `paper` donne 9,21:1, et
-                     * `navy/80` sur le `teal-100` de la tuile courante 5,00:1. `navy/75`, essayé d'abord,
-                     * tombait à 4,45:1, sous le seuil de 4,5:1 exigé pour ce corps de texte.
-                     */
-                  }
-                  {created && (
-                    <span
-                      class:list={[
-                        'text-caption font-normal',
-                        current ? 'text-navy/80' : 'text-slate-700',
-                      ]}
-                    >
-                      {created}
-                    </span>
-                  )}
-                </span>
-              </li>
-            ))
-          }
-        </ul>
-        <RiskNote text={corum.disclaimer} size="lead" class="mt-6" />
+                  </li>
+                ))}
+              </ul>
+            </li>
+          ))
+        }
+      </ul>
+
+      {
+        /* Les deux flèches, révélées par le script. Sous la liste et non par-dessus : posées sur les
+          cartes, elles masqueraient un chiffre sur un petit écran. */
+      }
+      <div class="mt-5 flex gap-3">
+        <button
+          type="button"
+          data-rail-precedent
+          hidden
+          aria-label={corumRange.previousLabel}
+          class="rail-fleche"
+        >
+          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="size-4">
+            <path d="M10 3 5 8l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+        <button
+          type="button"
+          data-rail-suivant
+          hidden
+          aria-label={corumRange.nextLabel}
+          class="rail-fleche"
+        >
+          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="size-4">
+            <path d="m6 3 5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
       </div>
     </div>
+
+    {
+      /* LA MENTION RÉGLEMENTAIRE D'ABORD, les définitions ensuite : elle qualifie tous les chiffres
+        au-dessus, elle ne peut pas être la sixième ligne d'une liste de notes. Jamais animée. */
+    }
+    <p class="mt-10 max-w-4xl text-base leading-relaxed text-ink">{corumRange.pastPerformance}</p>
+    <ul role="list" class="text-caption mt-5 max-w-4xl space-y-3 text-slate-700">
+      {corumRange.notes.map((note) => <li>{note}</li>)}
+    </ul>
   </Container>
 </Section>
+
+<script>
+  /* Flèches du rail : le rail défile sans elles, elles ne sont révélées que si le script tourne. */
+  import '@/scripts/carrousel';
+</script>

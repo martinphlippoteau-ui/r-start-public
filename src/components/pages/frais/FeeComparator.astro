@@ -28,8 +28,15 @@ import { jsonScript } from '@/lib/jsonScript';
 
 interface Props {
   id: string;
+  /**
+   * Titre VISIBLE, et introduction sous lui (16/09/2026). Absents : le titre reste hors écran, comme
+   * sur /frais, dont l'en-tête dit déjà de quoi il s'agit. L'accueil, lui, arrive sans contexte sur un
+   * tableau de chiffres et a besoin des deux.
+   */
+  heading?: string;
+  intro?: string;
 }
-const { id } = Astro.props as Props;
+const { id, heading, intro } = Astro.props as Props;
 const titleId = id + '-title';
 const selectId = id + '-select';
 const { rows } = comparator;
@@ -63,7 +70,24 @@ const data = scpis.map((s) => ({
         en-tête portant déjà « Comparateur de frais SCPI ». Il reste dans le HTML parce qu'il nomme la
         section et le tableau, et il est descriptif, pas promotionnel (voir comparator.ts). */
     }
-    <h2 id={titleId} class="visually-hidden">{comparator.title}</h2>
+    {
+      /* Un seul H2 dans les deux cas : c'est le même titre de section, il est seulement visible ou non.
+        Quand il est visible, c'est le texte de l'appelant qui s'affiche, et `comparator.title`, plus
+        descriptif, reste la légende du tableau. */
+    }
+    {heading ? (
+      <header class="max-w-4xl">
+        <h2 id={titleId} class="text-display-md text-ink" data-animate="fade-up">
+          {heading}
+        </h2>
+        {intro && <p class="text-lead mt-5 text-pretty text-slate-700">{intro}</p>}
+      </header>
+    ) : (
+      <>
+        <h2 id={titleId} class="visually-hidden">{comparator.title}</h2>
+        {intro && <p class="text-lead max-w-4xl text-pretty text-slate-700">{intro}</p>}
+      </>
+    )}
 
     {
       /* Avertissement tant que les taux des autres SCPI ne sont pas relevés. Le script le masque dès que

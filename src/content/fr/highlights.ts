@@ -150,9 +150,29 @@ export const highlights: HighlightsContent = {
      * L'explication de la zone est partie avec elle : elle parlait de géographie.
      */
     {
+      /*
+       * DIX ANS depuis le 16/09/2026 (« mets à jour à 10 ans partout »). La carte a dit « 8 ans
+       * minimum » entre le 15 et le 16/09/2026, sur décision de l'équipe ; elle revient à la valeur des
+       * documents.
+       *
+       * C'ÉTAIT LA SEULE CONTRADICTION DU SITE, et elle est levée : le DIC, la note d'information, la
+       * FAQ de l'accueil, celle de /faq et les mentions légales disent dix ans, la carte disait huit.
+       * Une communication commerciale ne peut pas contredire le DIC.
+       *
+       * LES HUIT ANS QUI RESTENT AILLEURS SONT AUTRE CHOSE et ne bougent pas : c'est le seuil au-delà
+       * duquel R Start ne prélève plus de commission de retrait (`fees.withdrawal.zeroAfterYears`).
+       * Confondre les deux serait laisser croire qu'on peut sortir sans frais après huit ans ET que
+       * c'est la durée conseillée.
+       *
+       * La valeur vient maintenant de `risk.recommendedHoldingLabel`, la source documentaire, et n'est
+       * plus écrite en dur : c'est elle qui fait foi le jour où le DIC change.
+       */
       label: 'Horizon d’investissement',
-      value: nb('8 ans minimum'),
-      info: 'Une SCPI est un placement de long terme. Sortir plus tôt coûte une commission de retrait, et la revente des parts n’est pas garantie. Le document d’informations clés recommande une durée de placement de 10 ans.',
+      value: nb(risk.recommendedHoldingLabel),
+      /* Texte de l'équipe, 16/09/2026. La dernière phrase de la phrase fournie était interrompue
+         (« les revenus ne sont pas garantis et le prix. ») : elle est complétée par la formule employée
+         partout ailleurs sur le site, le prix de la part varie à la hausse comme à la baisse. */
+      info: 'La durée de placement recommandée dans une SCPI est de 10 ans. Comme un investissement immobilier en direct, l’investissement en SCPI présente un risque de perte en capital, les revenus ne sont pas garantis et le prix de la part peut varier à la hausse comme à la baisse. Les performances passées ne préjugent pas des performances futures.',
       noteId: 'points-forts-zone',
     },
     {

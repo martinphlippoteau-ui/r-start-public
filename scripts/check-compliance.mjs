@@ -99,6 +99,22 @@ const FORBIDDEN = [
   { re: /meilleures? scpi/gi, label: '« meilleure SCPI »' },
   { re: /en toute confiance/gi, label: '« en toute confiance »' },
   {
+    /*
+     * INDICATEURS DE PERFORMANCE. La règle existe parce que R Start N'EN A AUCUN : la SCPI n'a pas
+     * d'historique, et une communication commerciale ne peut pas en laisser espérer un.
+     *
+     * EXEMPTION DE /a-propos, posée le 16/09/2026 avec le carrousel de la gamme (contenu fourni par
+     * l'équipe). Cette page, et elle seule, publie les chiffres des QUATRE AUTRES SCPI DU GROUPE :
+     * TRI depuis la création, objectif de TRI pour CORUM USA, taux de distribution 2025, indicateur de
+     * risque, minimum d'investissement. Ce sont des performances réalisées par d'autres produits,
+     * chacune accompagnée de sa définition intégrale et précédée de la mention réglementaire sur les
+     * performances passées (src/content/fr/corumRange.ts).
+     *
+     * L'EXEMPTION VAUT POUR LA PAGE, PAS POUR R START. Aucun de ces chiffres ne porte sur R Start, et
+     * la page ne doit jamais lui en attribuer un : c'est le point à surveiller à chaque relecture,
+     * puisque la règle ne le verra plus. Toutes les autres pages restent couvertes.
+     */
+    except: ['a-propos'],
     re: /taux de distribution|\bTRI\b|rendement (cible|garanti|attendu|estimé|annuel)|objectif de rendement/g,
     label: 'indicateur de performance',
     allow: /(pas|aucun|sans)\s+(d'|de\s)?(objectif de rendement|taux de distribution)/i,

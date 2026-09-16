@@ -1475,6 +1475,40 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
 
 /* La main n'apparaît que si le script a tourné : sans lui, la carte n'ouvre rien et promettre un clic
    serait un mensonge. Le bouton, lui, garde son propre curseur. */
+/* Exposant des ordinaux (« 1ᵉʳ jour du 6ᵉ mois »). `line-height: 0` et `vertical-align` explicites :
+   sans eux, un <sup> creuse l'interligne de la ligne qui le porte, et deux cartes voisines cessent de
+   s'aligner. La taille suit celle du texte, elle n'est pas écrite en pixels. */
+.ordinal {
+  font-size: 0.62em;
+  line-height: 0;
+  vertical-align: 0.42em;
+}
+
+/* Flèches du rail défilant (carrousel de la gamme SCPI). Désactivées en bout de course : le contraste
+   baisse, le curseur disparaît, mais la flèche reste en place pour ne pas déplacer sa voisine. */
+.rail-fleche {
+  display: inline-flex;
+  height: 2.75rem;
+  width: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  border: 1px solid var(--color-mist);
+  color: var(--color-navy);
+  transition:
+    background-color 200ms,
+    border-color 200ms;
+}
+.rail-fleche:hover:not(:disabled) {
+  border-color: var(--color-navy);
+  background: var(--color-navy);
+  color: #fff;
+}
+.rail-fleche:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
 [data-carte-cliquable] {
   cursor: pointer;
 }

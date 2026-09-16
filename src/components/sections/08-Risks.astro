@@ -29,6 +29,18 @@ import { sections } from '@/config/sections';
 import { risks } from '@/content/fr/risks';
 
 const id = sections.risks.id;
+/*
+ * LE RIDEAU EST FACULTATIF depuis le 16/09/2026. `data-curtain` est un attribut du moteur GSAP, et
+ * tests/performance.spec.ts interdit GSAP sur cinq sous-pages, dont /a-propos, où ce bloc vient d'être
+ * ajouté : la page se mettait à télécharger 45 Ko pour une seule transition.
+ * Le rideau reste par défaut, donc l'accueil et /strategie ne changent pas. Une page qui doit rester
+ * sans GSAP passe `rideau={false}` : elle perd la transition de chapitre, pas une ligne de contenu.
+ */
+interface Props {
+  rideau?: boolean;
+}
+const { rideau = true } = Astro.props as Props;
+
 ---
 
 {
@@ -48,7 +60,7 @@ const id = sections.risks.id;
    * transition de chapitre reste. Si 08b-Presse revenait juste avant, la valeur par défaut suffirait.
    */
 }
-<Section id={id} tone="ink" data-curtain="bottom center">
+<Section id={id} tone="ink" data-curtain={rideau ? 'bottom center' : undefined}>
   <Container size="wide" class="relative">
     {
       /* TOUT LE BLOC EN SABLE depuis le 16/09/2026 (demande de l'équipe) : le titre par la classe

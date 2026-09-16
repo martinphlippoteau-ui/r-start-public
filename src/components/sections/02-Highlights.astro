@@ -40,6 +40,29 @@ const STAGGER = 0.08;
 /** Colonnes de la grille dès `sm` : le délai se calcule par colonne, pas par carte. */
 const COLUMNS = 2;
 const titleId = sections.highlights.id + '-title';
+
+/*
+ * ORDINAUX EN EXPOSANT (16/09/2026, demande de l'équipe : « 1er jour du 6ème mois, mettre en exposant »).
+ *
+ * LE CONTENU RESTE DU TEXTE. Écrire « 1<sup>er</sup> » dans highlights.ts obligerait à rendre ces
+ * valeurs en `set:html`, et à faire confiance à une chaîne pour du balisage ; d'autres pages lisent la
+ * même donnée et y afficheraient les balises. La découpe se fait donc ici, au rendu.
+ *
+ * Le motif ne reconnaît qu'un NOMBRE SUIVI DE SON SUFFIXE ORDINAL en fin de mot : « 1er », « 6e »,
+ * « 2de ». Les autres valeurs des cartes passent au travers sans être touchées — « 8 ans minimum » n'a
+ * pas de suffixe collé au chiffre, « 10 € » non plus.
+ *
+ * LE RENDU TIENT SUR UNE SEULE LIGNE, et ce n'est pas une coquetterie : un retour à la ligne entre deux
+ * expressions JSX produit une espace dans le HTML, et on lisait « 1 er jour du 6 e mois ».
+ */
+const enExposant = (
+  valeur: string
+): (string | { chiffre: string; suffixe: string })[] =>
+  valeur.split(/(\d+(?:ers?|res?|es?|ds?|des?)\b)/).map((bout) => {
+    const m = /^(\d+)(ers?|res?|es?|ds?|des?)$/.exec(bout);
+    return m ? { chiffre: m[1], suffixe: m[2] } : bout;
+  });
+
 ---
 
 {
@@ -114,7 +137,7 @@ const titleId = sections.highlights.id + '-title';
               </p>
             )}
             <p class:list={['text-display-sm text-sand', card.label && 'mt-2']}>
-              {card.value}
+              {enExposant(card.value).map((b) => (typeof b === 'string' ? b : <>{b.chiffre}<sup class="ordinal">{b.suffixe}</sup></>))}
               {!card.label && card.noteId && <NoteRef id={card.noteId} tone="dark" />}
             </p>
             {card.info && (
@@ -149,7 +172,9 @@ const titleId = sections.highlights.id + '-title';
                   {item.label}
                   {item.noteId && <NoteRef id={item.noteId} tone="dark" />}
                 </p>
-                <p class="text-lead mt-1 font-semibold text-sand">{item.value}</p>
+                <p class="text-lead mt-1 font-semibold text-sand">
+              {enExposant(item.value).map((b) => (typeof b === 'string' ? b : <>{b.chiffre}<sup class="ordinal">{b.suffixe}</sup></>))}
+                </p>
               </li>
             ))}
           </ul>

@@ -20,6 +20,7 @@ import Button from '@/components/ui/Button.astro';
 import StickyCta from '@/components/StickyCta.astro';
 import PageHero from '@/components/ui/PageHero.astro';
 import CorumRange from '@/components/pages/a-propos/CorumRange.astro';
+import Risks from '@/components/sections/08-Risks.astro';
 import { pages } from '@/config/pages';
 import { aboutPage } from '@/content/fr/aboutPage';
 import { breadcrumbJsonLd, organizationJsonLd, webPageJsonLd } from '@/lib/seo';
@@ -53,6 +54,16 @@ const jsonLd = [
        */
     }
     <CorumRange notes={notes} />
+
+    {
+      /* BLOC RISQUES sous la gamme (16/09/2026, demande de l'équipe). C'est le bloc commun, celui de
+        l'accueil et de /strategie : un seul texte de risques sur tout le site, jamais une variante
+        écrite pour une page. Il vient après la gamme et avant les avis, c'est-à-dire juste après les
+        chiffres et les SCPI qu'il qualifie. */
+    }
+    {/* `rideau={false}` : la transition en rideau est un effet GSAP, et cette page doit rester sans
+      GSAP (tests/performance.spec.ts). Le contenu du bloc est identique. */}
+    <Risks rideau={false} />
     {
       /* LES AVIS TRUSTPILOT FERMENT LA PAGE (15/09/2026, demande de l'équipe : « mettre les avis
         trustpilot dans la page à propos tout en bas »). Ils occupaient la section « L'expérience

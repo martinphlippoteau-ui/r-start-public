@@ -42,6 +42,27 @@ export interface ComparedScpi {
   unavailable?: string;
 }
 
+/**
+ * Une ligne du comparateur. DÉCLARÉE, et non déduite du tableau : le 16/09/2026, l'équipe a retiré les
+ * deux dernières précisions affichées sous les taux de R Start, plus aucune ligne ne portait
+ * `rstartDetail`, et TypeScript a conclu que la propriété n'existait pas — le composant qui la lit ne
+ * compilait plus. Une ligne peut ne pas en avoir ; le type doit le dire, pas les données du jour.
+ */
+export interface ComparatorRow {
+  key: ComparatorRowKey;
+  /** Texte du « i » de la ligne. */
+  info: string;
+  label: string;
+  /** Assiette du taux, sous le libellé. */
+  basis: string;
+  /** Taux de R Start, ou fourchette. */
+  rstart: string;
+  /** Taux réellement comparé quand la case affiche une fourchette. */
+  rstartCompare?: string;
+  /** Précision sous le taux de R Start. Absente : la case n'affiche que le taux. */
+  rstartDetail?: string;
+}
+
 export type ComparatorRowKey =
   'subscription' | 'acquisition' | 'broker' | 'management' | 'works' | 'disposal' | 'withdrawal';
 
@@ -89,8 +110,104 @@ const withdrawalAfterHolding = fees.withdrawal.steps[fees.withdrawal.steps.lengt
  * donc pas remonter un taux jusqu'à la note d'information ou au DIC dont il sort. La mention reste donc
  * honnête sur ce point plutôt que de laisser croire à une référence par SCPI.
  */
+/* Reformulée le 16/09/2026, texte de l'équipe. L'ancienne version disait que la référence documentaire
+   de chaque société de gestion n'était pas publiée ; celle-ci nomme la source, les notes d'information
+   publiées par chaque société de gestion concernée. */
 const SOURCE_EQUIPE =
-  'étude comparative réalisée par CORUM le 15 septembre 2026, taux exprimés hors taxes. La référence documentaire de chaque société de gestion n’est pas publiée.';
+  'étude comparative réalisée par CORUM au 15 septembre 2026, à partir des notes d’information publiées par chaque société de gestion concernée. Taux exprimés hors taxes.';
+
+const ROWS: ComparatorRow[] = [
+    /*
+     * EXPLICATIONS « i » (16/09/2026, textes fournis par l'équipe, un par ligne). Elles disent ce que
+     * le frais RECOUVRE et QUI le paie, là où `basis` ne dit que son assiette de calcul. Repliées
+     * derrière un bouton : le tableau se lit d'abord en chiffres, l'explication vient si on la demande.
+     * Le bouton n'apparaît que sur les lignes qui portent un texte.
+     */
+    {
+      key: 'subscription' as const,
+      info: 'L’épargnant paie ces frais au moment de son investissement. Ils rémunèrent la société de gestion et les intermédiaires avant que l’épargnant perçoive tout revenu. Ils réduisent d’autant le montant réellement investi.',
+      label: 'Frais de souscription',
+      basis: 'en % du montant investi',
+      rstart: fees.subscription.label,
+    },
+    {
+      key: 'acquisition' as const,
+      info: 'L’épargnant paie ces frais à chaque fois que la SCPI achète un immeuble. Ils rémunèrent la recherche et l’acquisition du bien. Ces frais créent un écart entre le montant souscrit et le montant réellement investi par la SCPI. Ils sont prélevés même si la SCPI ne verse aucun revenu à l’épargnant.',
+      label: 'Frais d’acquisition',
+      basis: 'en % du prix d’achat',
+      rstart: fees.acquisition.label,
+    },
+    {
+      key: 'broker' as const,
+      info: 'L’épargnant paie ces frais lorsque la SCPI achète un immeuble sans passer par un agent immobilier. Il s’agit de frais d’acquisition majorés. Ces frais sont prélevés même si la SCPI ne verse aucun revenu à l’épargnant.',
+      label: 'Frais d’agent immobilier',
+      basis: 'en % du prix d’acquisition',
+      rstart: fees.broker.label,
+    },
+    /*
+     * TRAVAUX AVANT GESTION depuis le 15/09/2026 (demande de l'équipe). Les valeurs suivent seules :
+     * chaque SCPI donne les siennes dans un objet indexé par `key`, l'ordre des colonnes n'a donc
+     * qu'une source, cette liste.
+     */
+    {
+      key: 'works' as const,
+      info: 'L’épargnant paie des frais lorsque la SCPI réalise des travaux sur les immeubles. Ces frais sont prélevés même lorsque la SCPI ne verse aucun revenu à l’épargnant.',
+      label: 'Frais de travaux',
+      basis: 'en % du montant des travaux',
+      rstart: fees.works.label,
+    },
+    {
+      key: 'management' as const,
+      info: 'L’épargnant paie des frais de gestion quand il perçoit des revenus issus des loyers. Autrement dit, ces frais ne sont dus que lorsque l’épargnant gagne de l’argent.',
+      label: 'Frais de gestion',
+      basis: 'en % des loyers encaissés',
+      rstart: fees.management.label,
+    },
+    {
+      key: 'disposal' as const,
+      info: 'L’épargnant paie des frais de cession d’immeubles quand il perçoit des revenus issus de la vente d’immeuble. La plupart des SCPI ne prélèvent des frais qu’à partir d’un certain niveau de plus-value. Autrement dit, ces frais ne sont dus que lorsque l’épargnant gagne de l’argent.',
+      label: 'Frais de cession d’immeubles',
+      basis: 'en % du prix de vente',
+      rstart: range(fees.disposal.tiers.map((t) => t.rate)),
+      /*
+       * DÉTAIL RETIRÉ DE L'ÉCRAN le 16/09/2026, demande de l'équipe (« on changera et on ajoutera plus
+       * tard »). Il déroulait les trois paliers de la commission sur les cessions, « 0 % si la
+       * plus-value est inférieure à 7 %, 6 % entre 7 et 13 %, 12 % au-delà ».
+       * La case garde la FOURCHETTE, de 0 à 12 % : le lecteur voit donc toujours les deux bornes, il
+       * n'a plus la règle qui les sépare. Le détail complet reste sur /frais et dans la FAQ.
+       * Pour rétablir : `rstartDetail: fees.disposal.tiers.map((t) => `${t.rate} ${t.condition}`).join(', ')`.
+       */
+    },
+    {
+      key: 'withdrawal' as const,
+      info: 'L’épargnant paie des frais de retrait anticipé s’il revend ses parts avant une certaine durée de détention (variable selon la SCPI). Ces frais sont prélevés même lorsque la SCPI ne verse aucun revenu à l’épargnant.',
+      label: 'Frais de retrait anticipé',
+      basis: 'en % de la valeur de retrait',
+      /*
+       * FOURCHETTE DEPUIS LE 15/09/2026 (« mets au format de 0 % à 12 % plutôt »). La case affichait le
+       * seul dernier palier, « 0 % », et renvoyait le barème dégressif au détail en dessous : on lisait
+       * donc « 0 % » là où le taux vaut 10 % pour qui sort avant quatre ans. La fourchette dit les deux
+       * bornes, comme la ligne des cessions d'immeubles juste au-dessus.
+       */
+      rstart: range(fees.withdrawal.steps.map((s) => s.rate)),
+      /*
+       * Ce qui est COMPARÉ reste le taux au-delà de la durée retenue, soit 0 %, et non la fourchette :
+       * c'est l'hypothèse de lecture du tableau, dite en clair au-dessus de lui (`holdingNotice`, une
+       * détention d'au moins huit ans). Sans ce champ, la case ne serait plus comparable du tout, un
+       * intervalle ne se départageant pas d'un taux unique.
+       */
+      rstartCompare: withdrawalAfterHolding,
+      /*
+       * DÉTAIL RETIRÉ DE L'ÉCRAN le 16/09/2026, demande de l'équipe. Il disait « au-delà de 8 ans de
+       * détention ; avant, le barème est dégressif : 10 % < 4 ans, 7 % 5e-6e année, 5 % 7e année,
+       * 3 % 8e année ».
+       * ATTENTION, CE QUI RESTE : la case affiche la fourchette « de 0 % à 10 % » et la comparaison se
+       * fait toujours sur le taux au-delà de huit ans, hypothèse dite au-dessus du tableau
+       * (`holdingNotice`). Sans le détail, c'est cette note d'en-tête qui porte seule la condition.
+       * Le barème complet reste sur /frais et dans la FAQ.
+       */
+    },
+];
 
 export const comparator = {
   /*
@@ -106,6 +223,10 @@ export const comparator = {
    * comptée par scripts/check-compliance.mjs. Elle est retirée, pas cachée.
    */
   title: 'Comparaison des frais de R Start avec une autre SCPI',
+  /* Titre VISIBLE du comparateur de l'accueil (16/09/2026, texte de l'équipe). Sur /frais il n'est pas
+     rendu : l'en-tête de la page dit déjà « Comparateur de frais », et `title` y reste hors écran pour
+     nommer la section et le tableau. */
+  homeHeading: 'Un modèle de frais inédit. Comparez par vous-même !',
   /** Colonne de gauche, toujours R Start. */
   leftLabel: product.name,
   leftManager: 'CORUM Asset Management',
@@ -170,87 +291,7 @@ export const comparator = {
   innovationBox: innovationNotRevolution,
 
   /** Les sept lignes, dans l'ordre du tableau fourni par l'équipe. */
-  rows: [
-    /*
-     * EXPLICATIONS « i » (16/09/2026, textes fournis par l'équipe, un par ligne). Elles disent ce que
-     * le frais RECOUVRE et QUI le paie, là où `basis` ne dit que son assiette de calcul. Repliées
-     * derrière un bouton : le tableau se lit d'abord en chiffres, l'explication vient si on la demande.
-     * Le bouton n'apparaît que sur les lignes qui portent un texte.
-     */
-    {
-      key: 'subscription' as const,
-      info: 'L’épargnant paie ces frais au moment de son investissement. Ils rémunèrent la société de gestion et les intermédiaires avant que l’épargnant perçoive tout revenu. Ils réduisent d’autant le montant réellement investi.',
-      label: 'Frais de souscription',
-      basis: 'en % du montant investi',
-      rstart: fees.subscription.label,
-    },
-    {
-      key: 'acquisition' as const,
-      info: 'L’épargnant paie ces frais à chaque fois que la SCPI achète un immeuble. Ils rémunèrent la recherche et l’acquisition du bien. Ces frais créent un écart entre le montant souscrit et le montant réellement investi par la SCPI. Ils sont prélevés même si la SCPI ne verse aucun revenu à l’épargnant.',
-      label: 'Frais d’acquisition',
-      basis: 'en % du prix d’achat',
-      rstart: fees.acquisition.label,
-    },
-    {
-      key: 'broker' as const,
-      info: 'L’épargnant paie ces frais lorsque la SCPI achète un immeuble sans passer par un agent immobilier. Il s’agit de frais d’acquisition majorés. Ces frais sont prélevés même si la SCPI ne verse aucun revenu à l’épargnant.',
-      label: 'Frais d’agent immobilier',
-      basis: 'en % du prix d’acquisition',
-      rstart: fees.broker.label,
-    },
-    /*
-     * TRAVAUX AVANT GESTION depuis le 15/09/2026 (demande de l'équipe). Les valeurs suivent seules :
-     * chaque SCPI donne les siennes dans un objet indexé par `key`, l'ordre des colonnes n'a donc
-     * qu'une source, cette liste.
-     */
-    {
-      key: 'works' as const,
-      info: 'L’épargnant paie des frais lorsque la SCPI réalise des travaux sur les immeubles. Ces frais sont prélevés même lorsque la SCPI ne verse aucun revenu à l’épargnant.',
-      label: 'Frais de travaux',
-      basis: 'en % du montant des travaux',
-      rstart: fees.works.label,
-    },
-    {
-      key: 'management' as const,
-      info: 'L’épargnant paie des frais de gestion quand il perçoit des revenus issus des loyers. Autrement dit, ces frais ne sont dus que lorsque l’épargnant gagne de l’argent.',
-      label: 'Frais de gestion',
-      basis: 'en % des loyers encaissés',
-      rstart: fees.management.label,
-    },
-    {
-      key: 'disposal' as const,
-      info: 'L’épargnant paie des frais de cession d’immeubles quand il perçoit des revenus issus de la vente d’immeuble. La plupart des SCPI ne prélèvent des frais qu’à partir d’un certain niveau de plus-value. Autrement dit, ces frais ne sont dus que lorsque l’épargnant gagne de l’argent.',
-      label: 'Frais de cession d’immeubles',
-      basis: 'en % du prix de vente',
-      rstart: range(fees.disposal.tiers.map((t) => t.rate)),
-      /** Le taux dépend de la plus-value réalisée : le détail des paliers accompagne la fourchette. */
-      rstartDetail: fees.disposal.tiers.map((t) => `${t.rate} ${t.condition}`).join(', '),
-    },
-    {
-      key: 'withdrawal' as const,
-      info: 'L’épargnant paie des frais de retrait anticipé s’il revend ses parts avant une certaine durée de détention (variable selon la SCPI). Ces frais sont prélevés même lorsque la SCPI ne verse aucun revenu à l’épargnant.',
-      label: 'Frais de retrait anticipé',
-      basis: 'en % de la valeur de retrait',
-      /*
-       * FOURCHETTE DEPUIS LE 15/09/2026 (« mets au format de 0 % à 12 % plutôt »). La case affichait le
-       * seul dernier palier, « 0 % », et renvoyait le barème dégressif au détail en dessous : on lisait
-       * donc « 0 % » là où le taux vaut 10 % pour qui sort avant quatre ans. La fourchette dit les deux
-       * bornes, comme la ligne des cessions d'immeubles juste au-dessus.
-       */
-      rstart: range(fees.withdrawal.steps.map((s) => s.rate)),
-      /*
-       * Ce qui est COMPARÉ reste le taux au-delà de la durée retenue, soit 0 %, et non la fourchette :
-       * c'est l'hypothèse de lecture du tableau, dite en clair au-dessus de lui (`holdingNotice`, une
-       * détention d'au moins huit ans). Sans ce champ, la case ne serait plus comparable du tout, un
-       * intervalle ne se départageant pas d'un taux unique.
-       */
-      rstartCompare: withdrawalAfterHolding,
-      rstartDetail: `au-delà de ${HOLDING_YEARS} ans de détention ; avant, le barème est dégressif : ${fees.withdrawal.steps
-        .slice(0, -1)
-        .map((s) => `${s.rate} ${s.short}`)
-        .join(', ')}`,
-    },
-  ],
+  rows: ROWS,
 
   /**
    * Les SCPI proposées au choix, DIX-NEUF depuis le 15/09/2026. Iroko Zen en tête : c'est celle que
