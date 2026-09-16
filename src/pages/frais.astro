@@ -145,16 +145,3 @@ const jsonLd = [
   <Footer />
 </Base>
 
-<style>
-  /* Glissement de la réponse à l'ouverture (transform uniquement, opacité constante ; rien en reduced-motion). */
-  @media (prefers-reduced-motion: no-preference) {
-    .faq-item[open] > .faq-answer {
-      animation: faq-reveal 450ms var(--ease-out-expo) both;
-    }
-    @keyframes faq-reveal {
-      from {
-        transform: translateY(-6px);
-      }
-    }
-  }
-</style>

@@ -36,13 +36,58 @@ import { subscribeSoon } from '@/content/fr/subscribeSoon';
       <button
         type="button"
         data-subscribe-soon-close
-        class="btn-motion inline-flex items-center justify-center rounded-full bg-navy px-6 py-3 font-semibold text-white transition-colors hover:bg-teal-700"
+        class="btn-motion inline-flex items-center justify-center rounded-full bg-navy px-6 py-3 font-semibold text-white hover:bg-teal-700"
       >
         {subscribeSoon.closeLabel}
       </button>
     </div>
   </div>
 </dialog>
+
+<style>
+  /*
+   * OUVERTURE ET FERMETURE EN FONDU (audit du 16/09/2026) : la fenêtre apparaissait d'un coup, alors que
+   * le tiroir du menu, l'autre dialogue modal du site, glisse en 420 ms. Elle se pose maintenant en
+   * montant d'un cheveu, son voile se fond, et les deux repartent de même.
+   * `@starting-style` donne l'état de départ d'un élément qui vient d'être affiché ; `display` et
+   * `overlay` en transition discrète le gardent affiché et dans la couche supérieure le temps de la
+   * sortie. Un navigateur qui ignore ces règles ouvre et ferme d'un coup, comme avant.
+   */
+  @media (prefers-reduced-motion: no-preference) {
+    [data-subscribe-soon] {
+      opacity: 0;
+      transform: translateY(0.75rem) scale(0.98);
+      transition:
+        opacity 240ms var(--ease-out-expo),
+        transform 320ms var(--ease-out-expo),
+        display 320ms allow-discrete,
+        overlay 320ms allow-discrete;
+    }
+    [data-subscribe-soon][open] {
+      opacity: 1;
+      transform: none;
+    }
+    [data-subscribe-soon]::backdrop {
+      opacity: 0;
+      transition:
+        opacity 320ms var(--ease-out-expo),
+        display 320ms allow-discrete,
+        overlay 320ms allow-discrete;
+    }
+    [data-subscribe-soon][open]::backdrop {
+      opacity: 1;
+    }
+    @starting-style {
+      [data-subscribe-soon][open] {
+        opacity: 0;
+        transform: translateY(0.75rem) scale(0.98);
+      }
+      [data-subscribe-soon][open]::backdrop {
+        opacity: 0;
+      }
+    }
+  }
+</style>
 
 <script>
   /* Intercepte les boutons « Souscrire » tant que le tunnel n'est pas configuré. */

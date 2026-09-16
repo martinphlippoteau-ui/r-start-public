@@ -15,6 +15,7 @@ import LegalNotes from '@/components/LegalNotes.astro';
 import Container from '@/components/ui/Container.astro';
 import Section from '@/components/ui/Section.astro';
 import TrustpilotReviews from '@/components/ui/TrustpilotReviews.astro';
+import TrustpilotScript from '@/components/TrustpilotScript.astro';
 import Breadcrumb from '@/components/ui/Breadcrumb.astro';
 import Button from '@/components/ui/Button.astro';
 import StickyCta from '@/components/StickyCta.astro';
@@ -36,6 +37,12 @@ const jsonLd = [
 ---
 
 <Base title={seo.title} description={seo.description} path={page.path} jsonLd={jsonLd}>
+  {
+    /* Script d'amorçage des TrustBox : sans lui, le carrousel d'avis en bas de page ne s'initialisait
+      jamais et retombait sur son lien de repli (audit du 16/09/2026). Il n'était chargé que par
+      l'accueil, où les avis vivaient avant le 15/09/2026. */
+  }
+  <TrustpilotScript slot="head" />
   <SiteNav />
   <main id="contenu">
     <PageHero eyebrow={hero.eyebrow} title={hero.title} intro={hero.intro}>

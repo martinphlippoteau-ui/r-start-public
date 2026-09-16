@@ -52,6 +52,19 @@ export const classList = (value: string | undefined): string[] =>
   (value || '').split(/\s+/).filter(Boolean);
 
 /**
+ * UN SEUIL INATTEIGNABLE NE DOIT PAS LAISSER UN ÉLÉMENT INVISIBLE (audit du 16/09/2026). Les révélations
+ * partent quand le haut de l'élément passe 88 % de l'écran ; un élément logé dans les derniers 12 % du
+ * document n'y arrive jamais, la page ne défile pas assez loin, et il reste à opacité zéro. Constaté
+ * sur téléphone : les colonnes du pied de page de l'accueil. Pour ceux-là, l'entrée dans l'écran suffit.
+ * `ratio` : la part de l'écran que le haut de l'élément doit franchir (0,88 pour « top 88% »).
+ */
+export const seuilAtteignable = (el: Element, ratio: number): boolean => {
+  const haut = el.getBoundingClientRect().top + window.scrollY;
+  const defilementMax = document.documentElement.scrollHeight - window.innerHeight;
+  return haut <= defilementMax + window.innerHeight * ratio;
+};
+
+/**
  * Élément déclencheur d'un effet au scroll : `data-*-trigger` accepte un sélecteur CSS (cherché
  * d'abord parmi les ancêtres, puis dans le document) ou le mot-clé `parent`. Sans valeur : l'élément.
  */

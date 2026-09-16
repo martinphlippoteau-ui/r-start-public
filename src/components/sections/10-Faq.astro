@@ -317,35 +317,11 @@ const items = rendus.map((item) => {
   </Container>
 </Section>
 
-<style>
-  /* Ouverture / fermeture de la réponse : transition de hauteur en CSS pur (aucun JS), sur le pseudo-élément
-     ::details-content qui enveloppe le contenu hors summary. Grille à une rangée 0fr → 1fr (la hauteur
-     « auto » n'est pas interpolable sans interpolate-size) ; `content-visibility` en transition discrète pour
-     que le contenu reste peint pendant la fermeture. `overflow-y: clip` (pas un conteneur de défilement,
-     l'axe horizontal reste visible : anneaux de focus intacts sur les côtés). L'élément de grille
-     (.faq-answer) a `min-height: 0` et ne porte aucun padding ni marge (l'espacement est sur son enfant) :
-     la rangée 0fr descend jusqu'à 0 px, la fermeture est continue, sans plateau ni saut final. Aucune
-     opacité ni transform : les RiskNote de la réponse restent à opacité 1 à tout instant, et rien ne bouge
-     une fois la réponse ouverte. Sans ::details-content ou en reduced-motion : ouverture instantanée native. */
-  @media (prefers-reduced-motion: no-preference) {
-    @supports selector(::details-content) {
-      .faq-item::details-content {
-        display: grid;
-        grid-template-rows: 0fr;
-        overflow-y: clip;
-        transition:
-          grid-template-rows 420ms var(--ease-out-expo),
-          content-visibility 420ms allow-discrete;
-      }
-      .faq-item[open]::details-content {
-        grid-template-rows: 1fr;
-      }
-      .faq-item > .faq-answer {
-        min-height: 0;
-      }
-    }
-  }
-</style>
+{
+  /* L'ouverture animée de la réponse (`.faq-item::details-content`) vit dans global.css depuis le
+    16/09/2026, sous « Accordéons » : la FAQ de /documentation (DocumentationFaq.astro) l'a en partage,
+    au lieu d'un simple glissement sans hauteur animée. */
+}
 
 <script>
   /* Recherche interne de /faq : elle filtre la liste rendue, elle n'interroge rien. Le module ne fait

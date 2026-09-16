@@ -46,7 +46,7 @@ const collapsible = legalBlocks.slice(1);
 const topLabel = footer.backToTopLabel;
 ---
 
-<footer class="relative border-t border-mist bg-white text-ink">
+<footer class="relative border-t border-mist bg-white text-ink" data-in-view="is-in-view">
   {
     /* Filet de marque : il ferme la page. Décoratif, donc aria-hidden ; le dégradé glisse lentement
       et s'arrête net en reduced-motion (l'animation est déclarée dans la media query). */
@@ -260,9 +260,17 @@ const topLabel = footer.backToTopLabel;
     background-size: 200% 100%;
     background-position: 0% 0;
   }
+  /* EN PAUSE HORS ÉCRAN (audit du 16/09/2026) : le filet tournait sur toutes les pages, du chargement à
+     la fermeture, alors que le pied de page est hors de l'écran l'essentiel du temps, et il anime
+     `background-position`, repeinte à chaque image. `data-in-view` sur le <footer> pose `is-in-view`
+     tant qu'il traverse l'écran (motion.ts). */
   @media (prefers-reduced-motion: no-preference) {
     .footer-filet {
       animation: footer-filet 18s linear infinite;
+      animation-play-state: paused;
+    }
+    .is-in-view .footer-filet {
+      animation-play-state: running;
     }
   }
   @keyframes footer-filet {

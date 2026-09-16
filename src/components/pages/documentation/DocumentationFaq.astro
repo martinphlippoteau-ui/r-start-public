@@ -138,17 +138,8 @@ const items = faq.items.map((item) => {
   </Container>
 </Section>
 
-<style>
-  /* Glissement de la réponse à l'ouverture (transform uniquement : l'opacité des RiskNote reste à 1 ;
-     désactivé si l'utilisateur préfère réduire les animations). */
-  @media (prefers-reduced-motion: no-preference) {
-    .faq-item[open] > .faq-answer {
-      animation: faq-reveal 450ms var(--ease-out-expo) both;
-    }
-    @keyframes faq-reveal {
-      from {
-        transform: translateY(-6px);
-      }
-    }
-  }
-</style>
+{
+  /* Plus de glissement propre à cette FAQ depuis le 16/09/2026 : l'ouverture animée en hauteur de
+    `.faq-item::details-content` (global.css, « Accordéons ») est la même ici que sur l'accueil et /faq.
+    Trois accordéons, un seul geste. */
+}

@@ -84,6 +84,13 @@
      invisible (constat du 11/09/2026). Les en-têtes réservent cette hauteur en padding haut. */
   --spacing-nav-total: calc(var(--spacing-subnav) + var(--spacing-nav-gap));
   --radius-nav: 1.75rem;
+
+  /* COURBE ET DURÉE PAR DÉFAUT DES UTILITAIRES `transition-*` DE TAILWIND (audit du 16/09/2026) : une
+     quarantaine de survols (liens de la barre, boutons « i », badges, chevrons…) tombaient sur la courbe
+     de Tailwind, cubic-bezier(0.4, 0, 0.2, 1), absente de nos jetons : deux vocabulaires de courbe dans
+     le même site. Ils prennent maintenant l'expo.out du site, en 180 ms, comme `btn-motion`. */
+  --default-transition-duration: 180ms;
+  --default-transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @layer base {
@@ -290,19 +297,25 @@
 }
 
 /* Lien d'évitement */
+/* Lien d'évitement. Caché AU-DESSUS de l'écran par une translation (deux fois sa hauteur), et non par
+   `top: -100 %` animé : `top` est une propriété de mise en page, `transform` se compose (audit du
+   16/09/2026). Rien n'est animé en mouvement réduit, le lien apparaît d'un coup au focus. */
 @utility skip-link {
   position: absolute;
   left: 1rem;
-  top: -100%;
+  top: 1rem;
   z-index: 100;
   padding: 0.75rem 1.25rem;
   border-radius: 9999px;
   background: var(--color-navy);
   color: white;
   font-weight: 600;
-  transition: top 150ms;
+  transform: translateY(-200%);
+  @media (prefers-reduced-motion: no-preference) {
+    transition: transform 200ms var(--ease-out-expo);
+  }
   &:focus-visible {
-    top: 1rem;
+    transform: none;
   }
 }
 
@@ -676,6 +689,47 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   }
 }
 
+/*
+ * LA BASCULE DU GAGNANT SE FOND AU LIEU DE SAUTER (audit du 16/09/2026). Au changement de SCPI, la
+ * pastille et la couleur du chiffre changeaient d'un coup. Les deux cases portent en permanence une
+ * pastille INVISIBLE, que `fee-gagnant` révèle : une pseudo-boîte qui n'existerait qu'avec la classe ne
+ * pourrait pas se transitionner. Géométrie et couleur identiques à l'utilitaire ci-dessus.
+ */
+[data-comparator] [data-fee-value],
+[data-comparator] [data-comparator-cell] {
+  position: relative;
+  isolation: isolate;
+  display: inline-block;
+}
+[data-comparator] [data-fee-value]::before,
+[data-comparator] [data-comparator-cell]::before {
+  content: '';
+  position: absolute;
+  inset: -0.3em -0.75em;
+  z-index: -1;
+  border-radius: 9999px;
+  background: var(--color-navy);
+  pointer-events: none;
+  opacity: 0;
+  transform: scale(0.92);
+}
+[data-comparator] .fee-gagnant::before {
+  opacity: 1;
+  transform: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  [data-comparator] [data-fee-value],
+  [data-comparator] [data-comparator-cell] {
+    transition: color 240ms ease;
+  }
+  [data-comparator] [data-fee-value]::before,
+  [data-comparator] [data-comparator-cell]::before {
+    transition:
+      opacity 240ms ease,
+      transform 240ms var(--ease-out-expo);
+  }
+}
+
 /* Tiroir du menu (SiteNav.astro) : il entre par la DROITE et le voile se pose derrière lui. L'état ouvert
    est porté par `data-open`, jamais par `hidden`, celui-ci ne revient qu'à la fin de la sortie, pour que
    le glissement ait lieu. Sans transition en mouvement réduit : le tiroir est simplement là. */
@@ -782,7 +836,9 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   background: radial-gradient(circle at 50% 50%, var(--teinte) 0%, transparent 70%);
   opacity: var(--opacite);
   filter: blur(var(--flou, 60px));
-  will-change: transform;
+  /* Pas de `will-change` permanent (audit du 16/09/2026) : l'animation crée sa couche le temps de
+     tourner, et elle est en pause hors écran ; quatre couches GPU maintenues en permanence, y compris en
+     mouvement réduit, ne servaient à rien. */
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -839,8 +895,10 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   position: absolute;
   pointer-events: none;
   opacity: 0;
-  will-change: transform;
 }
+/* EN PAUSE HORS ÉCRAN, comme les foyers de l'aurore juste au-dessus (audit du 16/09/2026) : seule leur
+   opacité suivait `is-in-view`, les deux lueurs continuaient de composer sur le GPU pendant toute la
+   lecture de la page. Même mécanisme, même classe. */
 @media (prefers-reduced-motion: no-preference) {
   .is-in-view > .halo-blob {
     opacity: 1;
@@ -852,6 +910,8 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
     height: 58%;
     background-image: radial-gradient(closest-side, rgb(20 164 186 / 0.26), transparent 100%);
     animation: halo-blob-a 29s ease-in-out infinite alternate;
+    /* Après le raccourci `animation`, qui remettrait l'état à `running`. */
+    animation-play-state: paused;
   }
   .halo-blob-b {
     right: -12%;
@@ -860,6 +920,10 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
     height: 52%;
     background-image: radial-gradient(closest-side, rgb(17 152 175 / 0.22), transparent 100%);
     animation: halo-blob-b 41s ease-in-out infinite alternate;
+    animation-play-state: paused;
+  }
+  .is-in-view > .halo-blob {
+    animation-play-state: running;
   }
 }
 @keyframes halo-blob-a {
@@ -1306,11 +1370,6 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   }
 }
 
-/* Fenêtre des tuiles de /strategie (16/09/2026). La <dialog> est créée par
-   src/scripts/carteDialog.ts ; ces règles l'habillent, rien de plus.
-   `max-height: 85svh` et non `vh` : sur téléphone, la barre d'adresse mange la différence et le bas de
-   la fenêtre passait sous elle. Le contenu défile à l'intérieur, jamais la page derrière, que <dialog>
-   rend inerte toute seule. */
 /*
  * ENTRÉES « DOCUMENT BIENTÔT DISPONIBLE » du pied de page (16/09/2026). Le marqueur natif du <summary>
  * est retiré des deux façons qu'il faut : `list-style` pour la plupart des navigateurs, le
@@ -1335,7 +1394,6 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   font-size: 0.95rem;
   font-weight: 600;
   line-height: 1.2;
-  transition: background-color 200ms;
 
   &:hover {
     background: rgb(255 255 255 / 0.26);
@@ -1344,29 +1402,25 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
     width: 1rem;
     height: 1rem;
     flex-shrink: 0;
-    transition: transform 200ms;
   }
-  &:hover .carte-savoir-fleche {
-    transform: translateX(0.2rem);
-  }
-  @media (prefers-reduced-motion: reduce) {
+  /* Même vocabulaire que `btn-motion` : couleur en 200 ms `ease`, déplacement en 180 ms expo.out, et
+     rien en mouvement réduit (audit du 16/09/2026 : la transition n'avait pas de courbe, et seule la
+     flèche était couverte par la garde). */
+  @media (prefers-reduced-motion: no-preference) {
+    transition: background-color 200ms ease;
     & .carte-savoir-fleche {
-      transition: none;
+      transition: transform 180ms var(--ease-out-expo);
     }
     &:hover .carte-savoir-fleche {
-      transform: none;
+      transform: translateX(0.2rem);
     }
   }
 }
 
 /*
- * LA CARTE SE RETOURNE POUR OUVRIR LA FENÊTRE (16/09/2026, demande de l'équipe). Le retournement
- * lui-même est joué par src/scripts/carteDialog.ts, en même temps que celui de la fenêtre : les deux
- * doivent partager une seule horloge, et deux animations CSS indépendantes dériveraient.
- *
- * `backface-visibility: hidden` EST LA PIÈCE MAÎTRESSE : la carte devient invisible dès qu'elle
- * dépasse le quart de tour, et la fenêtre, qui arrive de dos, devient visible au même instant. Le
- * relais est exact, rien ne se superpose, et il n'y a aucune face arrière à entretenir.
+ * LA CARTE SE RETOURNE (16/09/2026, demande de l'équipe). Le retournement est joué par
+ * src/scripts/carteRetournee.ts (Web Animations API, 460 ms) ; il ouvrait d'abord une <dialog>, qui a
+ * disparu le jour même au profit d'un dos de carte.
  */
 /*
  * LA CARTE A DEUX FACES depuis le 16/09/2026 (« les cards retournées doivent rester visibles en fond
@@ -1467,7 +1521,12 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   font-size: 0.95rem;
   font-weight: 600;
   line-height: 1.2;
-  transition: background-color 200ms;
+}
+/* Jumeau de `carte-savoir`, même transition, même garde. */
+@media (prefers-reduced-motion: no-preference) {
+  .carte-retour {
+    transition: background-color 200ms ease;
+  }
 }
 .carte-retour:hover {
   background: rgb(255 255 255 / 0.26);
@@ -1562,6 +1621,37 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
     @media (width >= 40rem) {
       border-start-start-radius: 2.5rem;
       border-start-end-radius: 2.5rem;
+    }
+  }
+}
+
+/* --- Accordéons (FAQ de l'accueil, /faq, /strategie et /documentation) ---
+   Ouverture / fermeture de la réponse : transition de hauteur en CSS pur (aucun JS), sur le pseudo-élément
+   ::details-content qui enveloppe le contenu hors summary. Grille à une rangée 0fr → 1fr (la hauteur
+   « auto » n'est pas interpolable sans interpolate-size) ; `content-visibility` en transition discrète pour
+   que le contenu reste peint pendant la fermeture. `overflow-y: clip` (pas un conteneur de défilement,
+   l'axe horizontal reste visible : anneaux de focus intacts sur les côtés). L'élément de grille
+   (.faq-answer) a `min-height: 0` et ne porte aucun padding ni marge (l'espacement est sur son enfant) :
+   la rangée 0fr descend jusqu'à 0 px, la fermeture est continue, sans plateau ni saut final. Aucune
+   opacité ni transform : les RiskNote de la réponse restent à opacité 1 à tout instant, et rien ne bouge
+   une fois la réponse ouverte. Sans ::details-content ou en reduced-motion : ouverture instantanée native.
+   ICI ET NON DANS 10-Faq.astro depuis le 16/09/2026 : la FAQ de /documentation, qui n'avait qu'un
+   glissement sans hauteur animée, joue maintenant le même geste. */
+@media (prefers-reduced-motion: no-preference) {
+  @supports selector(::details-content) {
+    .faq-item::details-content {
+      display: grid;
+      grid-template-rows: 0fr;
+      overflow-y: clip;
+      transition:
+        grid-template-rows 420ms var(--ease-out-expo),
+        content-visibility 420ms allow-discrete;
+    }
+    .faq-item[open]::details-content {
+      grid-template-rows: 1fr;
+    }
+    .faq-item > .faq-answer {
+      min-height: 0;
     }
   }
 }
@@ -1663,6 +1753,13 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
     display: inline-block;
     animation: intro-hero-mot 700ms var(--ease-out-expo) backwards;
     animation-delay: calc(400ms + var(--mot, 0) * 70ms);
+  }
+  /* ET LE PARAGRAPHE LUI-MÊME NE JOUE RIEN (audit du 16/09/2026) : la règle générique `[data-intro]` lui
+     donnait `intro-in`, un fondu d'opacité de 700 ms, par-dessus la cascade de ses mots. Deux animations
+     sur le même texte, et un texte à mi-opacité, ce que le bandeau ci-dessus interdit ; l'accroche, plus
+     grand texte du premier écran, entrait de surcroît dans le LCP avec 700 ms de retard. */
+  html.intro #apercu [data-intro='3'] {
+    animation: none;
   }
 
   /* 600 ms, les boutons et la ligne risques, ENSEMBLE et sans décalage entre eux : c'est la demande.
@@ -1799,6 +1896,12 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
 @media (prefers-reduced-motion: no-preference) {
   [data-hero-scroll-hint] svg {
     animation: hint-bob 2s var(--ease-in-out-quart) 1500ms infinite;
+    /* En pause dès que la flèche quitte l'écran (`data-in-view` sur le lien, audit du 16/09/2026) :
+       elle battait jusqu'au bas de la page. */
+    animation-play-state: paused;
+  }
+  [data-hero-scroll-hint].is-in-view svg {
+    animation-play-state: running;
   }
 }
 @keyframes hint-bob {
@@ -1822,6 +1925,55 @@ body:has(#consent-banner:not([hidden])) [data-hero-scroll-hint] {
 @media (width >= 64rem) {
   body:has(#consent-banner:not([hidden])) [data-hero-copy] {
     margin-bottom: 2.5rem;
+  }
+  /* La copie redescend en douceur quand le bandeau s'en va, au lieu de sauter de 32 à 40 px : une
+     transition de mise en page, mais jouée une seule fois par visite (audit du 16/09/2026). */
+  @media (prefers-reduced-motion: no-preference) {
+    [data-hero-copy] {
+      transition: margin-bottom 420ms var(--ease-out-expo);
+    }
+  }
+}
+
+/*
+ * LE BANDEAU COOKIES ENTRE ET SORT EN GLISSANT (audit du 16/09/2026) : il apparaissait et disparaissait
+ * par bascule de `hidden`, d'un coup, alors qu'il occupe le bas de l'écran. Le script ne change pas
+ * (scripts/consent.ts pose et retire `hidden`) : `@starting-style` donne l'état de départ à l'arrivée,
+ * et `display` en transition discrète garde le bandeau affiché le temps de sa sortie. Le panneau
+ * « Personnaliser » se déplie de la même façon. Un navigateur qui ignore ces règles fait comme avant.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  #consent-banner {
+    transition:
+      opacity 320ms var(--ease-out-expo),
+      transform 420ms var(--ease-out-expo),
+      display 420ms allow-discrete;
+  }
+  #consent-banner[hidden] {
+    display: none;
+    opacity: 0;
+    transform: translateY(1.5rem);
+  }
+  [data-consent-panel] {
+    transition:
+      opacity 260ms var(--ease-out-expo),
+      translate 260ms var(--ease-out-expo),
+      display 260ms allow-discrete;
+  }
+  [data-consent-panel][hidden] {
+    display: none;
+    opacity: 0;
+    translate: 0 -0.5rem;
+  }
+  @starting-style {
+    #consent-banner:not([hidden]) {
+      opacity: 0;
+      transform: translateY(1.5rem);
+    }
+    [data-consent-panel]:not([hidden]) {
+      opacity: 0;
+      translate: 0 -0.5rem;
+    }
   }
 }
 @media (width >= 64rem) and (height >= 56rem) {

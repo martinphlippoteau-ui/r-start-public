@@ -15,7 +15,7 @@ export {
   refuse,
   resolveTrigger,
 } from './dom';
-import { refuse } from './dom';
+import { refuse, seuilAtteignable } from './dom';
 
 /**
  * RYTHME UNIQUE des entrées (11/09/2026, passe de sobriété) : une seule courbe, une seule gamme de durées
@@ -35,6 +35,8 @@ export const DISTANCE = 20;
 export const DISTANCE_TITLE = 24;
 export const STAGGER = 0.08;
 export const START = 'top 88%';
+/** Le même seuil, en fraction d'écran, pour le test d'atteignabilité (dom.ts, seuilAtteignable). */
+export const START_RATIO = 0.88;
 export const SCRUB = 0.6;
 
 /** Propriétés autorisées dans les mini-syntaxes (transform et opacity uniquement, jamais de layout). */
@@ -102,6 +104,8 @@ export const scrubWillChange = (
 /** Déclencheur standard des révélations uniques : à 88 % du viewport (START), une seule fois. */
 export const onceTrigger = (trigger: Element, start = START): ScrollTrigger.Vars => ({
   trigger,
-  start,
+  /* Seuil standard inatteignable (élément dans les derniers 12 % du document) : l'entrée dans l'écran
+     suffit, sinon l'élément resterait invisible. Voir dom.ts, seuilAtteignable. */
+  start: start === START && !seuilAtteignable(trigger, START_RATIO) ? 'top bottom' : start,
   once: true,
 });

@@ -27,7 +27,7 @@
  *  - aucun état initial en CSS : l'état de départ est posé en JavaScript, donc sans JavaScript tout
  *    reste visible et stable (anti-CLS).
  */
-import { all, allowed, containsProtected, isProtected, num, refuse } from './dom';
+import { all, allowed, containsProtected, isProtected, num, refuse, seuilAtteignable } from './dom';
 
 /** Mêmes seuils que reveal.ts : déclenchement quand le haut de l'élément passe 88 % du viewport. */
 const START_RATIO = 0.88;
@@ -180,8 +180,14 @@ const observerConteneur = (conteneur: HTMLElement, cibles: HTMLElement[]): void 
       }
     },
     // `top 88%` côté ScrollTrigger : l'élément se révèle quand son haut a franchi 88 % du viewport,
-    // soit une marge basse négative de 12 % de la hauteur d'écran.
-    { rootMargin: `0px 0px -${Math.round((1 - START_RATIO) * 100)}% 0px`, threshold: 0 }
+    // soit une marge basse négative de 12 % de la hauteur d'écran. Seuil inatteignable (conteneur dans
+    // les derniers 12 % du document) : aucune marge, l'entrée dans l'écran suffit (dom.ts).
+    {
+      rootMargin: seuilAtteignable(conteneur, START_RATIO)
+        ? `0px 0px -${Math.round((1 - START_RATIO) * 100)}% 0px`
+        : '0px',
+      threshold: 0,
+    }
   );
   io.observe(conteneur);
 };
