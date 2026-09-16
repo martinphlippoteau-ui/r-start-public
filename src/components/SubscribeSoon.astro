@@ -8,7 +8,6 @@
  * assurés par le navigateur. Sans JavaScript, le lien conserve son comportement d'origine.
  * Contenu : src/content/fr/subscribeSoon.ts.
  */
-import { withBase } from '@/lib/href';
 import { subscribeSoon } from '@/content/fr/subscribeSoon';
 ---
 
@@ -24,17 +23,20 @@ import { subscribeSoon } from '@/content/fr/subscribeSoon';
     <div class="mt-4 space-y-3 text-base leading-relaxed text-slate-700">
       {subscribeSoon.body.map((p) => <p>{p}</p>)}
     </div>
+    {
+      /*
+       * PLUS DE RENVOI VERS LA DOCUMENTATION depuis le 16/09/2026, demande de l'équipe. La fenêtre
+       * s'ouvrait sur deux boutons : « Voir la documentation » puis « Fermer ». Il ne reste que le
+       * second, qui devient donc le bouton principal de la fenêtre.
+       * `documentsLabel` et `documentsHref` restent dans subscribeSoon.ts, non lus : le jour où le
+       * renvoi revient, il n'y a qu'à rétablir ce bouton.
+       */
+    }
     <div class="mt-7 flex flex-wrap gap-3">
-      <a
-        href={withBase(subscribeSoon.documentsHref)}
-        class="btn-motion inline-flex items-center justify-center rounded-full bg-navy px-6 py-3 font-semibold text-white no-underline transition-colors hover:bg-teal-700"
-      >
-        {subscribeSoon.documentsLabel}
-      </a>
       <button
         type="button"
         data-subscribe-soon-close
-        class="btn-motion inline-flex items-center justify-center rounded-full border border-navy/25 px-6 py-3 font-semibold text-navy transition-colors hover:border-navy hover:bg-navy hover:text-white"
+        class="btn-motion inline-flex items-center justify-center rounded-full bg-navy px-6 py-3 font-semibold text-white transition-colors hover:bg-teal-700"
       >
         {subscribeSoon.closeLabel}
       </button>

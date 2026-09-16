@@ -1,7 +1,6 @@
 import type { FooterContent, FooterLink } from '@/content/types';
 import { menuPages, pages } from '@/config/pages';
 import { externalLinks, product } from '@/content/fr/facts';
-import { publishedDocuments } from '@/content/fr/documents';
 import {
   commercialNotice,
   documentsNotice,
@@ -28,22 +27,38 @@ export const footer = {
   columns: [
     {
       title: 'R Start',
-      // Pages du menu (jamais d'ancre de section), puis les deux pages hors menu : la documentation
-      // (sortie du menu le 11/09/2026) et la salle de presse, réservée aux journalistes. : réservée aux journalistes, elle n'est pas au
-      // menu (src/config/pages.ts, inMenu: false) et n'est accessible que d'ici.
-      links: [
-        ...menuPages.map((p): FooterLink => ({ label: p.navLabel ?? p.label, href: p.path })),
-        { label: pages.documentation.label, href: pages.documentation.path } satisfies FooterLink,
-        /* /faq n'est plus listée ici : entrée au menu le 16/09/2026, elle arrive par `menuPages`
-           juste au-dessus. La répéter la ferait figurer deux fois dans la même colonne. */
-        /* La salle de presse est sortie du pied de page le 15/09/2026 : sa route est désactivée
-           (src/pages/_salle-de-presse.astro), le lien pointerait dans le vide. */
-      ],
+      /*
+       * LES PAGES DU MENU, ET RIEN D'AUTRE depuis le 16/09/2026. Le lien vers /documentation a été
+       * retiré à la demande de l'équipe ; la page existe toujours, elle n'est plus appelée d'ici.
+       * /faq est arrivée au menu le même jour, elle vient donc par `menuPages` : la répéter la ferait
+       * figurer deux fois dans la même colonne.
+       * La salle de presse était sortie le 15/09/2026, sa route étant désactivée
+       * (src/pages/_salle-de-presse.astro) : le lien aurait pointé dans le vide.
+       */
+      links: [...menuPages.map((p): FooterLink => ({ label: p.navLabel ?? p.label, href: p.path }))],
     },
     {
       title: 'Documents',
-      // Même liste que la section Documents (statuts exclus tant que le PDF n'est pas remplacé).
-      links: publishedDocuments.map((d): FooterLink => ({ label: d.title, href: d.file })),
+      /*
+       * LES CINQ DOCUMENTS RÉGLEMENTAIRES, liste et ordre donnés par l'équipe le 16/09/2026. Aucun
+       * n'est servi : tous sont marqués `soon`, et le clic déplie « Document bientôt disponible » au
+       * lieu d'ouvrir un fichier.
+       * C'EST UN CHANGEMENT DE FOND. La colonne servait deux PDF réellement hébergés, la note
+       * d'information et le bulletin de souscription ; ils ne sont plus atteignables depuis le pied
+       * de page. Les fichiers restent dans public/documents, et /documentation les sert toujours.
+       * DEUX ENTRÉES N'ONT AUCUN FICHIER au dépôt : le bulletin trimestriel d'information et le
+       * rapport annuel. Le bulletin de souscription, lui, n'est plus listé : la demande énumère cinq
+       * documents, il n'en fait pas partie.
+       * « Document d'informations clés (DIC) » garde son intitulé réglementaire exact, celui que
+       * porte le document, et non la forme abrégée de la demande.
+       */
+      links: [
+        { label: 'Note d’information', href: '', soon: true },
+        { label: 'Statuts', href: '', soon: true },
+        { label: 'Document d’informations clés (DIC)', href: '', soon: true },
+        { label: 'Bulletin trimestriel d’information', href: '', soon: true },
+        { label: 'Rapport annuel', href: '', soon: true },
+      ] satisfies FooterLink[],
     },
     {
       title: 'Informations légales',
@@ -59,6 +74,8 @@ export const footer = {
   ],
   /** aria-label de la navigation du pied de page ; sert aussi de H2 masqué au-dessus des colonnes (H3). */
   navLabel: 'Pied de page',
+  /* Déplié par les cinq entrées de la colonne Documents, toutes en attente (16/09/2026). */
+  soonMessage: 'Document bientôt disponible',
   manageCookiesLabel: 'Gérer les cookies',
   /** Retour en haut, à côté des logos : ancre vers #contenu, comme le lien d'évitement. */
   backToTopLabel: 'Haut de page',

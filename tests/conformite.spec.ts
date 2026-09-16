@@ -243,19 +243,38 @@ test.describe('Conformité', () => {
     expect([...new Set(sizes)].length, `tailles relevées : ${sizes.join(', ')}`).toBe(1);
   });
 
+  /*
+   * LE COMPTE EST VÉRIFIÉ SUR /documentation, PLUS SUR L'ACCUEIL, depuis le 16/09/2026.
+   *
+   * L'accueil n'offrait plus aucun PDF : la colonne Documents du pied de page annonce les cinq
+   * documents réglementaires en « bientôt disponible » et le lien vers /documentation a été retiré de
+   * la colonne R Start, à la demande de l'équipe (« dans tous les cas ne rends rien dispo là »).
+   * Le test échouait donc pour une décision, pas pour un défaut.
+   *
+   * CE QU'IL GARANTIT TOUJOURS, et c'est l'essentiel : les documents réglementaires restent servis
+   * quelque part sur le site, et aucun lien PDF du site ne pointe dans le vide. Le seuil de deux est
+   * inchangé, il est seulement demandé à la page qui les sert. L'accueil, lui, n'est plus contraint
+   * d'en porter, mais ses éventuels liens PDF sont toujours vérifiés.
+   *
+   * 2 tant que deux des quatre documents sont retenus dans src/content/fr/documentation.ts
+   * (PENDING_DOCUMENT_KEYS) : les statuts, dont le PDF fourni est tronqué, et le DIC hébergé, qui
+   * classe R Start en 3 sur 7 quand le site affiche 4 sur 7. Remonter ce seuil à chaque document
+   * republié : 3 à la réception du DIC en vigueur, 4 avec les statuts complets.
+   */
   test('les documents réglementaires répondent', async ({ page, request }) => {
-    await page.goto('/');
-    const hrefs = await page
-      .locator('a[href$=".pdf"]')
-      .evaluateAll((a) => [
-        ...new Set(a.map((x) => (x as HTMLAnchorElement).getAttribute('href') || '')),
-      ]);
-    // 2 tant que deux des quatre documents sont retenus dans src/content/fr/documentation.ts
-    // (PENDING_DOCUMENT_KEYS) : les statuts, dont le PDF fourni est tronqué, et le DIC hébergé, qui
-    // classe R Start en 3 sur 7 quand le site affiche 4 sur 7. Remonter ce seuil à chaque document
-    // republié : 3 à la réception du DIC en vigueur, 4 avec les statuts complets.
-    expect(hrefs.length).toBeGreaterThanOrEqual(2);
-    for (const href of hrefs) {
+    const liens = async (chemin: string): Promise<string[]> => {
+      await page.goto(chemin);
+      return page
+        .locator('a[href$=".pdf"]')
+        .evaluateAll((a) => [
+          ...new Set(a.map((x) => (x as HTMLAnchorElement).getAttribute('href') || '')),
+        ]);
+    };
+
+    const servis = await liens('/documentation/');
+    expect(servis.length, 'documents servis par /documentation').toBeGreaterThanOrEqual(2);
+
+    for (const href of [...new Set([...servis, ...(await liens('/'))])]) {
       if (!href.startsWith('/')) continue;
       const res = await request.get(href);
       expect(res.status(), href).toBe(200);

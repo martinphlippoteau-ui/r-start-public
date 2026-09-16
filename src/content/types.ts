@@ -486,12 +486,20 @@ export interface ConsentContent {
 
 export interface FooterLink {
   label: string;
+  /** Vide quand `soon` est vrai : l'entrée n'est alors pas un lien mais un dépliant. */
   href: string;
   external?: boolean;
+  /**
+   * Document annoncé mais pas encore publié (16/09/2026). L'entrée est rendue en <details> : au clic,
+   * elle déplie `footer.soonMessage` au lieu d'ouvrir un fichier. Voir Footer.astro.
+   */
+  soon?: boolean;
 }
 
 export interface FooterContent {
   columns: { title: string; links: FooterLink[] }[];
+  /** Message déplié par une entrée `soon` (« Document bientôt disponible »). */
+  soonMessage?: string;
   /** aria-label de la navigation unique du pied de page qui englobe les colonnes de liens. */
   navLabel?: string;
   manageCookiesLabel: string;

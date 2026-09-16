@@ -128,24 +128,48 @@ const topLabel = footer.backToTopLabel;
             <div>
               <h3 class="text-eyebrow text-navy">{col.title}</h3>
               <ul class="mt-4 space-y-0.5" role="list">
-                {col.links.map((link) => (
-                  <li>
-                    <a
-                      href={link.external ? link.href : withBase(link.href)}
-                      class="link-underline inline-flex min-h-11 items-center gap-1.5 py-1.5 text-base text-slate-700 hover:text-navy"
-                      target={link.external ? '_blank' : undefined}
-                      rel={link.external ? 'noopener noreferrer' : undefined}
-                    >
-                      {link.label}
-                      {link.external && (
-                        <>
-                          <IconExterne class="size-3.5 shrink-0 text-slate" strokeWidth={1.5} />
-                          {hint && <span class="visually-hidden">({hint})</span>}
-                        </>
-                      )}
-                    </a>
-                  </li>
-                ))}
+                {
+                  /*
+                   * DOCUMENTS EN ATTENTE (16/09/2026) : une entrée `soon` n'est pas un lien, elle
+                   * déplie « Document bientôt disponible ».
+                   * <details> ET NON UN BOUTON À SCRIPT : le pied de page est le dernier endroit où
+                   * l'on veut dépendre de JavaScript, et l'élément natif donne le clic, le clavier,
+                   * l'état ouvert/fermé annoncé aux lecteurs d'écran et le repli, sans une ligne de
+                   * script. Le marqueur par défaut est retiré (`list-item` neutralisé dans
+                   * global.css via .footer-soon), le titre garde donc l'allure des autres entrées.
+                   * Le <summary> n'imite PAS un lien : pas de soulignement au survol, pour ne pas
+                   * promettre un fichier qui n'arrivera pas.
+                   */
+                }
+                {col.links.map((link) =>
+                  link.soon ? (
+                    <li>
+                      <details class="footer-soon">
+                        <summary class="inline-flex min-h-11 cursor-pointer items-center gap-1.5 py-1.5 text-base text-slate-700 hover:text-navy">
+                          {link.label}
+                        </summary>
+                        <p class="pb-1.5 text-sm text-slate-700">{footer.soonMessage}</p>
+                      </details>
+                    </li>
+                  ) : (
+                    <li>
+                      <a
+                        href={link.external ? link.href : withBase(link.href)}
+                        class="link-underline inline-flex min-h-11 items-center gap-1.5 py-1.5 text-base text-slate-700 hover:text-navy"
+                        target={link.external ? '_blank' : undefined}
+                        rel={link.external ? 'noopener noreferrer' : undefined}
+                      >
+                        {link.label}
+                        {link.external && (
+                          <>
+                            <IconExterne class="size-3.5 shrink-0 text-slate" strokeWidth={1.5} />
+                            {hint && <span class="visually-hidden">({hint})</span>}
+                          </>
+                        )}
+                      </a>
+                    </li>
+                  )
+                )}
               </ul>
             </div>
           ))

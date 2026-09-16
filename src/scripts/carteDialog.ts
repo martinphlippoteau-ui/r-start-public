@@ -44,7 +44,42 @@ const init = (): void => {
 
     bouton.hidden = false;
     bouton.dataset.carteLiee = '1';
-    bouton.addEventListener('click', () => dialog.showModal());
+
+    /*
+     * LA TUILE SE RETOURNE POUR OUVRIR LA FENÊTRE (16/09/2026, demande de l'équipe). La carte pivote
+     * jusqu'à se présenter de profil, et la fenêtre s'ouvre à ce moment-là ; à la fermeture, elle
+     * revient.
+     *
+     * ON ATTEND `transitionend`, ET NON UN DÉLAI ÉCRIT EN DUR : la durée vit dans la feuille de style
+     * (.carte-face), et deux valeurs à tenir d'accord finissent toujours par diverger. Un garde-fou
+     * `setTimeout` ouvre quand même la fenêtre si l'événement ne vient pas : une transition sur un
+     * élément masqué, ou interrompue, n'en émet aucun, et la carte resterait alors muette.
+     *
+     * `prefers-reduced-motion` : aucune classe n'est posée, la fenêtre s'ouvre directement. La requête
+     * est relue à chaque clic plutôt que mémorisée, le réglage pouvant changer en cours de visite.
+     */
+    const carte = bouton.closest<HTMLElement>('.carte-face');
+    const sobre = (): boolean => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    bouton.addEventListener('click', () => {
+      if (!carte || sobre()) {
+        dialog.showModal();
+        return;
+      }
+      let ouverte = false;
+      const ouvrir = (): void => {
+        if (ouverte) return;
+        ouverte = true;
+        carte.removeEventListener('transitionend', ouvrir);
+        if (!dialog.open) dialog.showModal();
+      };
+      carte.addEventListener('transitionend', ouvrir);
+      window.setTimeout(ouvrir, 600);
+      carte.classList.add('carte-face--profil');
+    });
+
+    /* La tuile revient dès la fermeture, quelle qu'en soit la cause : bouton, Échap ou clic au fond. */
+    dialog.addEventListener('close', () => carte?.classList.remove('carte-face--profil'));
 
     /* Clic sur le fond : <dialog> ne le distingue pas de la fenêtre, la cible de l'événement est le
        <dialog> lui-même quand on clique à côté de son contenu. */

@@ -33,8 +33,26 @@
         })
       )
     }
-    {/* Le repère qui se pose sur l'immeuble retenu, une fois le balayage terminé. */}
-    <circle cx="60" cy="60" r="22" class="select-repere" />
+    {
+      /*
+       * LE VISEUR qui se pose sur l'immeuble retenu, une fois le balayage terminé (16/09/2026 : c'était
+       * un cercle en pointillé, l'équipe a demandé un viseur).
+       * Quatre équerres aux angles et une croix au centre : ce sont les deux signes qui font lire un
+       * viseur, et ils tiennent au trait sans remplissage, comme le reste du dessin.
+       * Dessiné autour de (0, 0) puis translaté : le groupe peut ainsi se refermer en `scale` sans que
+       * son centre dérive.
+       */
+    }
+    <g class="select-viseur">
+      <g class="select-viseur-corps">
+        {/* Les quatre équerres, une par angle, obtenues par rotation d'un quart de tour. */}
+        {[0, 90, 180, 270].map((angle) => (
+          <path d="M-20-11v-9h9" class="select-equerre" style={`--angle:${angle}deg`} />
+        ))}
+        {/* La croix centrale, en deux traits courts qui laissent l'immeuble visible au milieu. */}
+        <path d="M-9 0h5M4 0h5M0-9v5M0 4v5" class="select-croix" />
+      </g>
+    </g>
   </svg>
 </figure>
 
@@ -73,12 +91,24 @@
   .select-bloc--retenu {
     animation: none;
   }
-  .select-repere {
+  .select-viseur {
+    /* Le viseur est dessiné autour de (0, 0) : cette translation le pose sur l'immeuble du centre. */
+    transform: translate(60px, 60px);
+  }
+  .select-viseur-corps {
+    animation: select-viseur 6s ease-in-out infinite;
+  }
+  .select-equerre {
+    stroke: var(--color-teal-400);
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transform: rotate(var(--angle));
+  }
+  .select-croix {
     stroke: var(--color-teal-400);
     stroke-width: 1.4;
-    stroke-dasharray: 4 6;
-    transform-origin: 60px 60px;
-    animation: select-repere 6s ease-in-out infinite;
+    stroke-linecap: round;
   }
 
   @keyframes select-passage {
@@ -91,29 +121,31 @@
       opacity: 1;
     }
   }
-  @keyframes select-repere {
+  /* Le viseur arrive large et se referme sur l'immeuble, comme une mise au point ; il s'ouvre à
+     nouveau pour disparaître, ce qui évite qu'il semble se replier sur lui-même. */
+  @keyframes select-viseur {
     0%,
     30% {
       opacity: 0;
-      transform: scale(0.7) rotate(0deg);
+      transform: scale(1.5);
     }
     45%,
     88% {
       opacity: 1;
-      transform: scale(1) rotate(0deg);
+      transform: scale(1);
     }
     100% {
       opacity: 0;
-      transform: scale(1.06) rotate(40deg);
+      transform: scale(1.25);
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
     .select-bloc,
-    .select-repere {
+    .select-viseur-corps {
       animation: none;
     }
-    .select-repere {
+    .select-viseur-corps {
       opacity: 1;
     }
   }

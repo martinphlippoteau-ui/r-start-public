@@ -1,0 +1,177 @@
+---
+/**
+ * Illustration de la tuile « Diversifiée » (16/09/2026). Elle REMPLACE LE GLOBE, à la demande de
+ * l'équipe : « on diversifie dans les secteurs d'activité et géographique », or un globe ne montre
+ * que la moitié du propos. Le fichier du globe reste en place, il n'est simplement plus appelé.
+ *
+ * DEUX AXES, DEUX DIMENSIONS. En bas, quatre natures d'immeuble ; à gauche, quatre repères de lieu.
+ * Les acquisitions se posent dans le plan, jamais deux dans la même colonne ni dans la même rangée :
+ * c'est le dessin qui porte l'idée de répartition, pas une légende.
+ *
+ * CE QU'ELLE NE DIT PAS : ni où, ni dans quoi, ni combien. Les glyphes des axes sont génériques et les
+ * points n'ont pas de valeur. R Start n'a pas encore de patrimoine ; l'image montre une INTENTION de
+ * répartition, ce que le texte de la tuile dit en toutes lettres (« R Start diversifiera »).
+ *
+ * MÊME GRAMMAIRE QUE LES DEUX AUTRES TUILES : trait clair sur fond ink, carré, boucle lente,
+ * animation coupée en `prefers-reduced-motion`. Décorative (aria-hidden).
+ */
+
+/*
+ * Les huit acquisitions, en (colonne, rangée) sur une grille de 4 × 4. Une seule par colonne et par
+ * rangée sur les quatre premières, puis quatre intermédiaires : l'œil doit lire « réparti », jamais
+ * « aligné ». L'ordre du tableau est celui de l'apparition.
+ */
+const POINTS = [
+  { c: 0, r: 2 },
+  { c: 2, r: 0 },
+  { c: 1, r: 3 },
+  { c: 3, r: 1 },
+  { c: 2, r: 2 },
+  { c: 0, r: 0 },
+  { c: 3, r: 3 },
+  { c: 1, r: 1 },
+];
+
+/** Repère du plan : la première colonne est à 38, puis un pas de 22. Idem pour les rangées. */
+const X = (c: number): number => 38 + c * 22;
+const Y = (r: number): number => 26 + r * 22;
+---
+
+<figure class="div-figure" aria-hidden="true">
+  <svg viewBox="0 0 120 120" fill="none" class="div-svg">
+    {/* La trame du plan, assez pâle pour ne pas concurrencer les points. */}
+    {[0, 1, 2, 3].map((i) => <path d={`M28 ${Y(i)}h72`} class="div-trame" />)}
+    {[0, 1, 2, 3].map((i) => <path d={`M${X(i)} 16v76`} class="div-trame" />)}
+
+    {
+      /*
+       * AXE DU BAS : quatre natures d'immeuble. Chacune tient en deux ou trois traits, c'est tout ce
+       * qu'on peut lire à 14 px de haut : un bureau à étages, un commerce sous auvent, un entrepôt à
+       * toit plat et large porte, une santé marquée d'une croix.
+       */
+    }
+    <g class="div-axe">
+      {[0, 1, 2, 3].map((c) => {
+        const x = X(c);
+        const glyphes = [
+          `M${x - 5} 108v-9h10v9M${x - 2} 102h4`,
+          `M${x - 6} 108v-7h12v7M${x - 7} 101l3-3h8l3 3`,
+          `M${x - 6} 108v-8h12v8M${x - 2} 108v-4h4v4`,
+          `M${x - 5} 108v-9h10v9M${x} 101v4M${x - 2} 103h4`,
+        ];
+        return <path d={glyphes[c]} class="div-glyphe" />;
+      })}
+    </g>
+
+    {
+      /*
+       * AXE DE GAUCHE : quatre repères de lieu, une goutte et son point, le signe le plus court qui se
+       * lise comme « ici ». Ils ne désignent aucun pays : R Start n'en a encore acheté aucun.
+       */
+    }
+    <g class="div-axe">
+      {[0, 1, 2, 3].map((r) => {
+        const y = Y(r);
+        return (
+          <path
+            d={`M16 ${y - 4}a4 4 0 0 1 8 0c0 3-4 7-4 7s-4-4-4-7z`}
+            class="div-glyphe"
+          />
+        );
+      })}
+    </g>
+
+    {
+      /* Les acquisitions. Chacune arrive à son tour et reste : à la fin du cycle, le plan est couvert
+        dans les deux sens, ce que ne montrerait aucune image figée. */
+    }
+    {POINTS.map((p, i) => (
+      <g class="div-point" style={`--rang:${i}`}>
+        <circle cx={X(p.c)} cy={Y(p.r)} r="7" class="div-halo" />
+        <circle cx={X(p.c)} cy={Y(p.r)} r="3.2" class="div-pastille" />
+      </g>
+    ))}
+  </svg>
+</figure>
+
+<style>
+  .div-figure {
+    margin: 0;
+  }
+  .div-svg {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1;
+  }
+  .div-trame {
+    stroke: rgb(169 221 230 / 0.16);
+    stroke-width: 1;
+  }
+  .div-glyphe {
+    stroke: rgb(169 221 230 / 0.45);
+    stroke-width: 1.3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .div-pastille {
+    fill: var(--color-teal-200);
+  }
+  .div-halo {
+    stroke: var(--color-teal-400);
+    stroke-width: 1.2;
+  }
+
+  /*
+   * HUIT POINTS SUR 8 s : un toutes les 0,55 s, puis le plan reste couvert le temps qu'on le lise,
+   * avant de repartir. Le halo ne bat qu'à l'arrivée de son point, sinon huit halos pulseraient
+   * ensemble et l'image deviendrait bruyante.
+   */
+  .div-point {
+    opacity: 0;
+    animation: div-pose 8s ease-out infinite;
+    animation-delay: calc(var(--rang) * 0.55s);
+  }
+  .div-halo {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: div-halo 8s ease-out infinite;
+    animation-delay: calc(var(--rang) * 0.55s);
+  }
+
+  @keyframes div-pose {
+    0% {
+      opacity: 0;
+    }
+    6%,
+    88% {
+      opacity: 1;
+    }
+    96%,
+    100% {
+      opacity: 0;
+    }
+  }
+  @keyframes div-halo {
+    0% {
+      opacity: 0.9;
+      transform: scale(0.4);
+    }
+    10%,
+    100% {
+      opacity: 0;
+      transform: scale(1.5);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    /* À l'arrêt : les huit acquisitions sont posées, le plan est couvert dans les deux sens. */
+    .div-point {
+      animation: none;
+      opacity: 1;
+    }
+    .div-halo {
+      animation: none;
+      opacity: 0.35;
+    }
+  }
+</style>

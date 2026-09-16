@@ -39,7 +39,7 @@ import Picto from '@/components/ui/Picto.astro';
 import Section from '@/components/ui/Section.astro';
 import EngineGain from '@/components/EngineGain.astro';
 import EngineRent from '@/components/EngineRent.astro';
-import StrategyGlobe from '@/components/StrategyGlobe.astro';
+import StrategyDiversify from '@/components/StrategyDiversify.astro';
 import StrategySelect from '@/components/StrategySelect.astro';
 import StrategyTiming from '@/components/StrategyTiming.astro';
 import { sections } from '@/config/sections';
@@ -191,18 +191,34 @@ const QUIET_TITLE_Y = 12;
       </h2>
     </header>
 
+    {
+      /*
+       * ENTRÉE DES TUILES, reprise le 16/09/2026 (« j'aimerais que ce soit plus spectaculaire »).
+       * Elles montaient de 20 px en fondu, décalées d'un dixième de seconde : à trois tuiles côte à
+       * côte, l'effet se voyait à peine.
+       * `tilt` les fait maintenant basculer en perspective ; la distance passe à 44 px et le décalage
+       * à 0,16 s, assez pour que les trois arrivent l'une après l'autre au lieu d'ensemble.
+       * Le moteur léger suffit, aucun GSAP n'est tiré sur cette page (tests/performance.spec.ts), et
+       * `prefers-reduced-motion` coupe tout dans le moteur lui-même.
+       */
+    }
     <ul
       role="list"
       class="mt-chapter grid gap-4 sm:gap-5 lg:grid-cols-3"
       data-animate="stagger"
-      data-animate-stagger="0.1"
+      data-animate-child="tilt"
+      data-animate-stagger="0.16"
+      data-animate-y="44"
     >
       {
         [strategy.what, strategy.where, strategy.how].map((zone, z) => {
           const ancre = [ids.what, ids.where, ids.how][z];
+          /* La PERSPECTIVE est portée par le <li> et non par la carte : une `perspective` posée sur
+             l'élément qui tourne lui-même n'a aucun effet, le point de fuite doit venir du parent.
+             Sans elle, le retournement n'est qu'une compression horizontale. */
           return (
-            <li>
-              <article class="relative flex min-h-[20rem] flex-col overflow-hidden rounded-3xl bg-ink p-6 text-white sm:min-h-[24rem] sm:p-8">
+            <li class="[perspective:1400px]">
+              <article class="carte-face relative flex min-h-[20rem] flex-col overflow-hidden rounded-3xl bg-ink p-6 text-white sm:min-h-[24rem] sm:p-8">
                 {zone.eyebrow && <p class="text-eyebrow text-teal-200">{zone.eyebrow}</p>}
                 <h3 id={ancre + '-title'} class="text-display-sm mt-3 max-w-[16rem] text-sand">
                   {zone.title}
@@ -213,17 +229,29 @@ const QUIET_TITLE_Y = 12;
                     les deux autres restaient nues. Les trois sont maintenant dans la même grammaire :
                     dessin au trait clair sur fond ink, carré, calé sur la largeur de la tuile, animé
                     en boucle lente et coupé en `prefers-reduced-motion`.
-                    Le globe est un CANVAS parce qu'il projette une sphère ; les deux autres sont des
-                    SVG, qui suffisent et coûtent cent fois moins.
+                    Les trois sont des SVG. Le globe en canvas a été retiré le 16/09/2026 : il ne
+                    montrait que la moitié du propos de sa tuile, qui parle de secteurs autant que de
+                    géographie. Son fichier reste au dépôt, il n'est simplement plus appelé.
                     Bornées à 11rem : en `aspect-ratio: 1`, elles pousseraient sinon la tuile hors de
                     sa rangée. */
                 }
                 <div class="mx-auto mt-4 w-full max-w-[11rem]">
                   {z === 0 && <StrategySelect />}
-                  {z === 1 && <StrategyGlobe />}
+                  {z === 1 && <StrategyDiversify />}
                   {z === 2 && <StrategyTiming />}
                 </div>
 
+                {
+                  /*
+                   * « EN SAVOIR PLUS » EN TOUTES LETTRES depuis le 16/09/2026, demande de l'équipe.
+                   * C'était un « + » rond : le libellé n'existait que pour les lecteurs d'écran, et un
+                   * visiteur voyant devait deviner qu'il y avait quelque chose derrière.
+                   * Le titre de la tuile reste lu, mais hors écran : à l'écran les trois boutons
+                   * portent le même texte, ce qui est juste puisqu'on lit la tuile au-dessus ; pour un
+                   * lecteur d'écran qui parcourt les boutons hors contexte, trois « En savoir plus »
+                   * identiques seraient indiscernables.
+                   */
+                }
                 <button
                   type="button"
                   data-carte-ouvrir
@@ -231,12 +259,13 @@ const QUIET_TITLE_Y = 12;
                   aria-controls={'detail-' + ancre}
                   data-carte-titre={zone.title}
                   data-carte-fermer={strategy.dialogClose}
-                  class="carte-plus mt-auto self-start"
+                  class="carte-savoir mt-auto self-start"
                 >
-                  <span aria-hidden="true">+</span>
-                  <span class="visually-hidden">
-                    {strategy.dialogOpen} : {zone.title}
-                  </span>
+                  <span>{strategy.dialogOpen}</span>
+                  <span class="visually-hidden"> : {zone.title}</span>
+                  <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="carte-savoir-fleche">
+                    <path d="M3 8h9M8.5 4.5 12 8l-3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
                 </button>
               </article>
 

@@ -392,10 +392,27 @@ async function checkIndex() {
 
   // Documents PDF
   const pdfLinks = [...new Set([...html.matchAll(/href="([^"]+\.pdf)"/gi)].map((m) => m[1]))];
-  // 2 tant que les statuts (PDF tronqué à la source) et le DIC (SRI 3/7 contredisant le 4/7 du site,
-  // retour AMF du 10/09/2026) sont exclus de PENDING_DOCUMENT_KEYS (documentation.ts) : il reste la note
-  // d'information et le bulletin. Repasser à 4 dès que les deux fichiers sont remplacés.
-  if (pdfLinks.length < 2) errors.push(`${file} : ${pdfLinks.length} lien(s) PDF (attendu : ≥ 2)`);
+  /*
+   * AVERTISSEMENT ET NON PLUS ERREUR depuis le 16/09/2026, arbitrage de l'équipe (« dans tous les cas
+   * ne rends rien dispo là, on verra plus tard »).
+   *
+   * LA RÈGLE ATTENDAIT DEUX PDF servis depuis la page : la note d'information et le bulletin, les deux
+   * documents publiables (les statuts sont tronqués à la source et le DIC hébergé classe R Start en
+   * 3 sur 7 quand le site affiche 4 sur 7, retour AMF du 10/09/2026). Le pied de page les servait.
+   *
+   * IL N'EN SERT PLUS AUCUN : la colonne Documents annonce les cinq documents réglementaires en
+   * « bientôt disponible », et le lien vers /documentation a été retiré de la colonne R Start. Plus
+   * aucun fichier n'est donc atteignable depuis l'accueil.
+   *
+   * CE QUI RESTE, ET QUI EST LA RAISON POUR LAQUELLE CE N'EST PLUS UNE ERREUR : la mention obligatoire
+   * du pied de page invite toujours à consulter la note d'information et le DIC, et dit où ils se
+   * trouvent (www.corum.fr). L'accès aux documents réglementaires n'est donc pas supprimé, il est
+   * renvoyé hors du site. À rebasculer en erreur le jour où les documents sont publiés ici.
+   */
+  if (pdfLinks.length < 2)
+    warnings.push(
+      `${file} : ${pdfLinks.length} lien(s) PDF (attendu : ≥ 2) — aucun document servi depuis la page, la mention obligatoire renvoie à corum.fr`
+    );
   for (const link of pdfLinks) {
     const local = stripBase(link.replace(/^https?:\/\/[^/]+/, ''));
     if (!local.startsWith('/')) continue;

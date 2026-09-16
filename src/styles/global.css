@@ -1311,6 +1311,19 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
    `max-height: 85svh` et non `vh` : sur téléphone, la barre d'adresse mange la différence et le bas de
    la fenêtre passait sous elle. Le contenu défile à l'intérieur, jamais la page derrière, que <dialog>
    rend inerte toute seule. */
+/*
+ * ENTRÉES « DOCUMENT BIENTÔT DISPONIBLE » du pied de page (16/09/2026). Le marqueur natif du <summary>
+ * est retiré des deux façons qu'il faut : `list-style` pour la plupart des navigateurs, le
+ * pseudo-élément `::-webkit-details-marker` pour Safari, qui ignore la première.
+ * Le curseur et la zone de clic restent ceux d'une entrée de pied de page.
+ */
+.footer-soon > summary {
+  list-style: none;
+}
+.footer-soon > summary::-webkit-details-marker {
+  display: none;
+}
+
 .carte-dialog {
   width: min(40rem, calc(100vw - 2rem));
   max-height: 85svh;
@@ -1434,6 +1447,76 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
 }
 
 /* Le « + » des tuiles : il tourne d'un huitième de tour au survol, comme chez Apple. */
+/*
+ * « EN SAVOIR PLUS » (16/09/2026). Remplace le « + » rond : une pastille lisible, posée en bas de la
+ * tuile. Fond blanc translucide sur le fond ink de la carte, comme l'était le rond.
+ * La flèche avance au survol, le fond s'éclaircit : deux signaux discrets qu'il se passera quelque
+ * chose, sans faire bouger la pastille elle-même, qui se décalerait sous le doigt.
+ */
+@utility carte-savoir {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.1rem;
+  border-radius: 9999px;
+  background: rgb(255 255 255 / 0.14);
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.2;
+  transition: background-color 200ms;
+
+  &:hover {
+    background: rgb(255 255 255 / 0.26);
+  }
+  & .carte-savoir-fleche {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+    transition: transform 200ms;
+  }
+  &:hover .carte-savoir-fleche {
+    transform: translateX(0.2rem);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    & .carte-savoir-fleche {
+      transition: none;
+    }
+    &:hover .carte-savoir-fleche {
+      transform: none;
+    }
+  }
+}
+
+/*
+ * LA CARTE SE RETOURNE POUR OUVRIR LA FENÊTRE (16/09/2026, demande de l'équipe). Le bouton ne fait
+ * plus apparaître la fenêtre d'un coup : la tuile pivote sur son axe vertical jusqu'à se présenter de
+ * profil, et c'est à ce moment-là que la fenêtre s'ouvre. À la fermeture, elle repivote et revient.
+ *
+ * -90deg ET NON 180 : à 180 on verrait le dos de la carte, c'est-à-dire son contenu en miroir, qu'il
+ * faudrait alors masquer et remplacer par une seconde face. À 90 la carte est de profil, donc
+ * invisible, et la fenêtre prend le relais : un seul élément, aucune face arrière à entretenir.
+ *
+ * La classe est posée par src/scripts/carteDialog.ts, qui attend la fin de la transition avant
+ * d'ouvrir. En `prefers-reduced-motion`, le script n'ajoute rien et la fenêtre s'ouvre directement.
+ */
+@utility carte-face {
+  transition: transform 300ms cubic-bezier(0.45, 0, 0.3, 1);
+  transform-origin: center;
+  backface-visibility: hidden;
+}
+.carte-face--profil {
+  transform: rotateY(-90deg);
+}
+@media (prefers-reduced-motion: reduce) {
+  .carte-face {
+    transition: none;
+  }
+  .carte-face--profil {
+    transform: none;
+  }
+}
+
 @utility carte-plus {
   display: inline-flex;
   width: 2.75rem;

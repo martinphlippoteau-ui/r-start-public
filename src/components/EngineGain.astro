@@ -5,14 +5,15 @@
  * MÊME GRAMMAIRE QUE LES TROIS TUILES et que le moteur 01 : trait clair sur fond ink, boucle lente,
  * animation coupée en `prefers-reduced-motion`, format 236 × 100 comme le bandeau de la carte.
  *
- * CE QU'ELLE DIT : un ÉCHANGE, et un seul par cycle. L'immeuble part vers son acquéreur pendant que
- * le prix revient en sens inverse ; le cadre d'en face se referme quand l'opération est conclue.
- * C'est le pendant du moteur 01, qui montre un flux régulier : ici un événement ponctuel.
+ * DEUXIÈME VERSION. La première montrait un échange, immeuble d'un côté, prix de l'autre, sans rien
+ * qui monte : une vente, pas un gain. L'équipe a demandé « plutôt une hausse de prix », en
+ * connaissance de cause, et c'est ce que montre celle-ci.
  *
- * CE QU'ELLE NE DIT PAS, ET C'EST VOULU : rien ne monte. Pas de courbe, pas d'échelle, pas de
- * chiffre, pas de signe « + ». Une vente est représentée, pas un gain : l'illustration ne peut donc
- * pas se lire comme une promesse de plus-value, que le texte de la carte nomme en revanche
- * explicitement comme un moteur possible.
+ * CE QU'ELLE MONTRE, ET SES LIMITES : une étiquette de prix qui monte d'un palier bas vers un palier
+ * haut. AUCUN CHIFFRE, aucune devise, aucune échelle, aucune durée, aucune unité : rien ne permet de
+ * lire une ampleur ni une période, et il n'y a pas de courbe de performance. C'est le mécanisme
+ * qu'elle nomme, celui que le texte de la carte décrit, pas un résultat attendu.
+ * Le bloc Risques de la page porte l'avertissement correspondant.
  *
  * Décorative (aria-hidden) : le texte de la carte porte le sens.
  */
@@ -21,34 +22,38 @@
 <figure class="gain-figure" aria-hidden="true">
   <svg viewBox="0 0 236 100" fill="none" class="gain-svg">
     {
+      /* L'immeuble vendu, à gauche : la même grille de fenêtres que le moteur 01, pour que les deux
+        cartes montrent bien le même objet. */
+    }
+    <rect x="20" y="26" width="52" height="58" rx="5" class="gain-cadre" />
+    {
+      [0, 1, 2].flatMap((colonne) =>
+        [0, 1, 2, 3].map((ligne) => (
+          <rect x={29 + colonne * 13} y={35 + ligne * 12} width="8" height="7" rx="1.5" class="gain-fenetre" />
+        ))
+      )
+    }
+
+    {/* Les deux paliers, bas et haut, et la pente entre les deux. */}
+    <path d="M92 76h30" class="gain-palier" />
+    <path d="M197 34h18" class="gain-palier gain-palier--haut" />
+    <path d="M122 76 184 34" class="gain-pente" />
+
+    {
       /*
-       * L'immeuble détenu, à gauche. FENÊTRES ET NON TRAITS VERTICAUX : trois barres de hauteurs
-       * différentes, à cette taille, se lisaient comme un diagramme, exactement ce que cette
-       * illustration doit éviter. La grille est celle du moteur 01, ce qui donne aussi aux deux
-       * cartes le même immeuble.
+       * L'ÉTIQUETTE DE PRIX, et non un chiffre : elle dit « prix » sans avancer de montant. Elle monte
+       * le long de la pente, du palier bas au palier haut, puis disparaît et recommence.
+       * Le trou de l'étiquette est un cercle plein de la couleur du fond, pas un masque : un masque
+       * SVG coûterait une couche de rendu pour un point de 2 px.
        */
     }
-    <g class="gain-bien">
-      <rect x="20" y="26" width="52" height="58" rx="5" class="gain-cadre" />
-      {
-        [0, 1, 2].flatMap((colonne) =>
-          [0, 1, 2, 3].map((ligne) => (
-            <rect x={29 + colonne * 13} y={35 + ligne * 12} width="8" height="7" rx="1.5" class="gain-fenetre" />
-          ))
-        )
-      }
+    <g class="gain-etiquette">
+      <path d="M-11-9h13l9 9-13 13-9-9v-13z" class="gain-etiquette-corps" />
+      <circle cx="-6.5" cy="-4.5" r="2.2" class="gain-etiquette-trou" />
     </g>
 
-    {/* Le chemin aller : l'immeuble change de mains. */}
-    <path d="M84 40h68" class="gain-voie" />
-    <rect x="84" y="34.5" width="11" height="11" rx="2" class="gain-immeuble" />
-
-    {/* Le chemin retour : le prix de la vente revient. */}
-    <path d="M152 68H84" class="gain-voie gain-voie--retour" />
-    <circle cx="146.5" cy="68" r="5" class="gain-prix" />
-
-    {/* L'acquéreur : cadre en pointillé qui se referme une fois l'opération conclue. */}
-    <rect x="164" y="26" width="52" height="58" rx="5" class="gain-acquereur" />
+    {/* La flèche du palier haut : elle se pose quand l'étiquette arrive. */}
+    <path d="M206 26v-9M201 21l5-5 5 5" class="gain-fleche" />
   </svg>
 </figure>
 
@@ -68,124 +73,93 @@
   .gain-fenetre {
     fill: rgb(169 221 230 / 0.3);
   }
-  .gain-voie {
+  .gain-palier {
+    stroke: rgb(169 221 230 / 0.28);
+    stroke-width: 1.4;
+    stroke-linecap: round;
+  }
+  .gain-pente {
     stroke: rgb(169 221 230 / 0.2);
     stroke-width: 1.2;
     stroke-dasharray: 3 7;
     stroke-linecap: round;
   }
+  .gain-etiquette-corps {
+    fill: var(--color-teal-200);
+  }
+  .gain-etiquette-trou {
+    fill: var(--color-ink);
+  }
+  .gain-fleche {
+    stroke: var(--color-teal-400);
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
 
   /*
-   * UN SEUL ÉCHANGE PAR CYCLE de 7 s, contre un flux continu sur le moteur 01 : c'est la différence
-   * entre les deux moteurs, et elle doit se voir sans lire les textes.
-   * Le bien part (8 → 42 %), le prix revient dans la foulée (22 → 56 %), le cadre d'en face se
-   * referme (50 → 82 %), puis tout reprend sa place pendant le temps mort.
+   * UNE MONTÉE PAR CYCLE de 6,5 s. L'étiquette part du palier bas (122, 76), suit la pente jusqu'au
+   * palier haut (184, 34), s'y tient, puis s'efface. Le palier haut et la flèche s'allument à son
+   * arrivée et s'éteignent avec elle.
+   * Les positions sont écrites en translations depuis l'origine du viewBox : le groupe est dessiné
+   * autour de (0, 0), ce qui permet de l'animer en `transform` sans rouvrir son tracé.
    */
-  .gain-immeuble {
-    fill: var(--color-teal-200);
-    animation: gain-aller 7s ease-in-out infinite;
+  .gain-etiquette {
+    animation: gain-montee 6.5s ease-in-out infinite;
   }
-  .gain-prix {
-    stroke: var(--color-teal-400);
-    stroke-width: 1.6;
-    animation: gain-retour 7s ease-in-out infinite;
+  .gain-palier--haut {
+    animation: gain-arrivee 6.5s ease-in-out infinite;
   }
-  .gain-acquereur {
-    stroke: var(--color-teal-200);
-    stroke-width: 1.6;
-    stroke-dasharray: 5 6;
-    stroke-opacity: 0.3;
-    animation: gain-conclusion 7s ease-in-out infinite;
-  }
-  .gain-bien {
-    animation: gain-depart 7s ease-in-out infinite;
+  .gain-fleche {
+    animation: gain-arrivee 6.5s ease-in-out infinite;
   }
 
-  @keyframes gain-aller {
+  @keyframes gain-montee {
     0%,
-    8% {
-      transform: translateX(0);
+    10% {
+      transform: translate(122px, 76px);
       opacity: 0;
     }
-    14% {
+    18% {
+      transform: translate(122px, 76px);
       opacity: 1;
     }
-    36% {
+    52%,
+    80% {
+      transform: translate(184px, 34px);
       opacity: 1;
     }
-    42%,
+    92%,
     100% {
-      transform: translateX(57px);
+      transform: translate(184px, 34px);
       opacity: 0;
     }
   }
-  @keyframes gain-retour {
+  @keyframes gain-arrivee {
     0%,
-    22% {
-      transform: translateX(0);
-      opacity: 0;
-    }
-    28% {
-      opacity: 1;
-    }
-    50% {
-      opacity: 1;
+    46% {
+      opacity: 0.25;
     }
     56%,
-    100% {
-      transform: translateX(-57px);
-      opacity: 0;
-    }
-  }
-  @keyframes gain-conclusion {
-    0%,
-    50% {
-      stroke-opacity: 0.3;
-      stroke-dasharray: 5 6;
-    }
-    62%,
-    82% {
-      stroke-opacity: 1;
-      stroke-dasharray: 11 0;
-    }
-    100% {
-      stroke-opacity: 0.3;
-      stroke-dasharray: 5 6;
-    }
-  }
-  /* L'immeuble de gauche s'efface le temps que l'opération se conclue, puis revient : le portefeuille
-     tourne, il ne se vide pas. */
-  @keyframes gain-depart {
-    0%,
-    36% {
+    80% {
       opacity: 1;
     }
-    56%,
-    76% {
-      opacity: 0.35;
-    }
-    96%,
+    92%,
     100% {
-      opacity: 1;
+      opacity: 0.25;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .gain-bien,
-    .gain-immeuble,
-    .gain-prix,
-    .gain-acquereur {
+    .gain-etiquette,
+    .gain-palier--haut,
+    .gain-fleche {
       animation: none;
+      opacity: 1;
     }
-    /* À l'arrêt : l'échange est figé à mi-course, les deux sens lisibles d'un coup d'œil. */
-    .gain-immeuble {
-      transform: translateX(28px);
-    }
-    .gain-prix {
-      transform: translateX(-28px);
-    }
-    .gain-acquereur {
-      stroke-opacity: 0.55;
+    /* À l'arrêt : l'étiquette est posée sur le palier haut, la hausse se lit d'un coup d'œil. */
+    .gain-etiquette {
+      transform: translate(184px, 34px);
     }
   }
 </style>
