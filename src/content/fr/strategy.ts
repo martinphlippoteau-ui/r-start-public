@@ -46,7 +46,16 @@ export const strategy: StrategyContent = {
   },
 
   what: {
-    eyebrow: 'Quoi',
+    /*
+     * SURTITRES REMPLACÉS LE 16/09/2026 : « Quoi », « Où », « Comment » deviennent trois adjectifs.
+     * LA CORRESPONDANCE EST FAITE PAR LE SENS, pas par l'ordre de la liste fournie (« Opportuniste,
+     * Sélective et diversifiée ») : l'équipe a joint le contenu de la diversification, et ce contenu
+     * est celui de l'ancienne zone « Où », partout dans le monde et dans tous les secteurs. Les deux
+     * autres suivent : choisir les immeubles, c'est être SÉLECTIVE ; les acheter moins cher que leur
+     * valeur et choisir le moment de vendre, c'est être OPPORTUNISTE. À intervertir si l'équipe
+     * voulait l'ordre de sa liste.
+     */
+    eyebrow: 'Sélective',
     /* « Tout commence par le choix des immeubles » depuis le 16/09/2026, ex-« Des immeubles offrant un
        double potentiel ». */
     title: 'Tout commence par le choix des immeubles',
@@ -64,20 +73,18 @@ export const strategy: StrategyContent = {
   },
 
   where: {
-    eyebrow: 'Où',
-    title: 'Une vaste zone d’investissement',
-    intro: 'Pas de limite ! R Start investit :',
+    eyebrow: 'Diversifiée',
+    /* Contenu fourni par l'équipe le 16/09/2026. Il remplace « Une vaste zone d'investissement » et
+       son « Pas de limite ! R Start investit : ». */
+    title: 'Viser large pour viser juste.',
+    intro: 'R Start diversifiera ses acquisitions :',
     /* Pictogrammes sur les deux items (16/09/2026, demande de l'équipe) : ce sont les deux éléments
        importants de la zone, ils prennent une puce dessinée à la place du point. */
     items: [
       { lead: 'partout dans le monde', icon: 'exploration' },
-      {
-        lead: 'et dans tous les secteurs',
-        rest: '(bureaux, commerces, santé, logistique, hôtellerie…)',
-        icon: 'equipe',
-      },
+      { lead: 'dans tous les secteurs', icon: 'equipe' },
     ],
-    outro: 'Seul mot d’ordre : identifier une opportunité.',
+    outro: 'Un seul mot d’ordre : identifier une opportunité',
     /*
      * CARTE DU MONDE (14/09/2026, demande de l'équipe : « adapte la map au texte »). La carte d'origine
      * montrait le Conseil de l'Europe et le Canada, soit le périmètre du DIC du 20/05/2026, à côté d'un
@@ -97,7 +104,7 @@ export const strategy: StrategyContent = {
 
   /** 4. Comment (zone 5 du document de l'équipe, reçue le 14/09/2026 après les trois autres). */
   how: {
-    eyebrow: 'Comment',
+    eyebrow: 'Opportuniste',
     title: 'Les bons immeubles, au bon prix',
     intro: 'La base de notre travail ?',
     items: [

@@ -82,8 +82,13 @@ const FORBIDDEN = [
   {
     re: /\bgaranti(e|s|es)?\b/gi,
     label: '« garanti »',
+    /*
+     * « ne peut pas être garantie » ajouté le 16/09/2026 : la règle vise les PROMESSES de garantie, et
+     * cette tournure en est la négation, mais aucune des formes admises ne la couvrait (« pas garanti »
+     * suppose les deux mots accolés, ici « être » s'intercale). Faux positif, pas un assouplissement.
+     */
     allow:
-      /(non|pas|aucune|ni)\s+(de\s+)?garanti|ne (sont|est) pas garanti|ne garantit pas|aucune garantie|sans garantie|n'offrent aucune garantie|ne présagent|garantie en capital/i,
+      /(non|pas|aucune|ni)\s+(de\s+)?garanti|ne (sont|est) pas garanti|ne (peut|peuvent) pas être garanti|ne garantit pas|aucune garantie|sans garantie|n'offrent aucune garantie|ne présagent|garantie en capital/i,
   },
   {
     re: /sécuris/gi,
@@ -102,7 +107,34 @@ const FORBIDDEN = [
     re: /\d+(?:[,.]\d+)?\s?%\s?(?:de\s)?(?:rendement|performance|par an|annuel)/gi,
     label: 'pourcentage de performance',
   },
-  { re: /\bcrédit\b/gi, label: 'mention du crédit', allow: /carte de crédit/i },
+  /*
+   * MENTION DU CRÉDIT. La règle bloque le mot, parce que présenter l'achat de parts à crédit oblige à
+   * avertir que le souscripteur reste tenu de rembourser son prêt même si le placement perd de la
+   * valeur, et qu'il ne doit pas compter sur les revenus du placement pour y parvenir.
+   *
+   * EXEMPTION POSÉE LE 16/09/2026 pour la question « Peut-on financer R Start à crédit ? », dont le
+   * texte a été fourni par l'équipe. Sa PREMIÈRE phrase est une négation (« Le financement à crédit
+   * n'est pas proposé à ce jour par CORUM pour R Start »), elle ne promeut rien.
+   *
+   * CE QUI N'EST PAS RÉGLÉ, et qu'il faut lire comme une dette : la SECONDE phrase de la réponse,
+   * « rien n'empêche un épargnant de financer son investissement par ses propres moyens, par exemple
+   * via un crédit obtenu auprès de sa banque », SUGGÈRE de souscrire à crédit sans porter
+   * l'avertissement ci-dessus. C'est précisément ce que cette règle existe pour attraper.
+   *
+   * L'ÉQUIPE A TRANCHÉ LE 16/09/2026, en connaissance de cause, entre trois issues : ne garder que la
+   * première phrase, garder le texte entier en lui adjoignant l'avertissement, ou garder le texte et
+   * lever la règle. C'est la troisième qui a été retenue. Le site part donc avec une mention du crédit
+   * sans son avertissement, et c'est un point à faire arbitrer par la Conformité avant toute
+   * ouverture au public.
+   *
+   * POUR RÉTABLIR LE CONTRÔLE : retirer `via un crédit obtenu` de `allow`. La règle redeviendra
+   * bloquante sur cette réponse, et il faudra alors choisir l'une des deux autres issues.
+   */
+  {
+    re: /\bcrédit\b/gi,
+    label: 'mention du crédit',
+    allow: /financement à crédit n'est pas proposé|via un crédit obtenu|carte de crédit/i,
+  },
   // NOTE (11/09/2026, complétée le 14/09/2026) : quatre formulations ne sont plus BLOQUÉES mais
   // SIGNALÉES EN AVERTISSEMENT plus bas, l'équipe les ayant reprises mot pour mot dans son document.
   // La formule d'alignement (« on ne touche rien tant que vous n'avez pas gagné d'argent ») et

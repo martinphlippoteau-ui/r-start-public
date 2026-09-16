@@ -47,24 +47,16 @@ const id = sections.strategy.id;
 /** Ancres des deux autres chapitres (ids HTML, pas les textes affichés). */
 const ids = { what: 'quoi', where: 'ou', how: 'comment' };
 
-const photos = await Promise.all(
-  media.strategy.map(async (m) => ({ ...m, image: await resolveImage(m.src) }))
-);
 /** Une illustration par moteur, dans l'ordre des items de `strategy.engines`. */
 const enginePhotos = await Promise.all(
   media.engines.map(async (m) => ({ ...m, image: await resolveImage(m.src) }))
 );
-const photoSizes = '(min-width: 1024px) 400px, 33vw';
 /**
  * Les trois photos portent la même mention (« Photo d'illustration. Immeuble non détenu par R Start. ») :
  * une seule légende sous la bande suffit. Répétée trois fois côte à côte, elle occupait trois colonnes
  * pour dire la même chose. Si les crédits diffèrent un jour, chaque photo reprend le sien.
  */
-const credits = photos.map((p) => p.credit).filter(Boolean);
-const sharedCredit =
-  credits.length === photos.length && new Set(credits).size === 1 ? credits[0] : null;
 /** Parallaxe des trois photos : douce, sens alterné (haut, bas, haut) ; cadres surdimensionnés de ±12 %. */
-const PHOTO_PARALLAX = [0.035, -0.03, 0.04];
 /** Titre suivi d'un paragraphe visible d'emblée : fade-up court pour ne pas chevaucher sa première ligne. */
 const QUIET_TITLE_Y = 12;
 ---
@@ -245,56 +237,14 @@ const QUIET_TITLE_Y = 12;
     </ul>
 
     {
-      /* Trois photos d'immeubles en bande de même largeur, parallaxe de sens alterné dans chaque cadre.
-        TROIS COLONNES DÈS LE TÉLÉPHONE : empilées, elles ajoutaient à elles seules près de deux écrans.
-        Elles fermaient la zone « Quoi » avant la fusion ; elles ferment maintenant le bloc entier. */
+      /*
+       * BANDE DE TROIS PHOTOS RETIRÉE le 16/09/2026, demande de l'équipe. Elle fermait la zone « Quoi »
+       * avant la fusion, puis le bloc entier après elle : trois cadres en 4/5, parallaxe de sens
+       * alterné, trois colonnes dès le téléphone.
+       * Les trois illustrations restent dans media.ts (`strategy`) et dans src/assets/images : rien
+       * n'est perdu, et elles continuent d'être livrées au navigateur tant qu'elles sont dans ce
+       * dossier. À déplacer vers src/assets/vivier si elles ne doivent plus servir du tout.
+       */
     }
-    <figure class="mt-12 lg:mt-16">
-      <ul
-        role="list"
-        class="grid grid-cols-3 gap-3 sm:gap-5 lg:gap-6"
-        data-animate="stagger"
-        data-animate-stagger="0.1"
-      >
-        {
-          photos.map((photo, i) => (
-            <li>
-              <div class="img-frame aspect-[3/4] sm:aspect-[4/5]">
-                <div
-                  class="absolute inset-x-0 -top-[12%] h-[124%]"
-                  data-parallax={String(PHOTO_PARALLAX[i] ?? PHOTO_PARALLAX[0])}
-                  data-parallax-trigger="parent"
-                >
-                  <Picture
-                    src={photo.image}
-                    alt={photo.alt}
-                    widths={[480, 800, 1200]}
-                    sizes={photoSizes}
-                    formats={['avif', 'webp']}
-                    fallbackFormat="jpeg"
-                    loading="lazy"
-                    decoding="async"
-                    pictureAttributes={{ class: 'block h-full w-full' }}
-                    class={
-                      i === 1
-                        ? 'h-full w-full object-cover object-[70%_50%]'
-                        : 'h-full w-full object-cover'
-                    }
-                  />
-                </div>
-              </div>
-              {AFFICHER_LEGENDES && !sharedCredit && photo.credit && (
-                <p class="text-caption mt-3 text-slate-700">{photo.credit}</p>
-              )}
-            </li>
-          ))
-        }
-      </ul>
-      {
-        AFFICHER_LEGENDES && sharedCredit && (
-          <figcaption class="text-caption mt-3 text-slate-700">{sharedCredit}</figcaption>
-        )
-      }
-    </figure>
   </Container>
 </Section>

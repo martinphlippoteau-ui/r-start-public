@@ -91,9 +91,24 @@ const {
 const id = sections.faq.id;
 /** id du H2, référencé par aria-labelledby sur la section (convention de Section / SectionHeading). */
 const titleId = id + '-title';
+/*
+ * RUBRIQUES (16/09/2026) : sur /faq, les vingt-deux questions sont groupées en six. Le repère est posé
+ * sur la PREMIÈRE question de chaque rubrique, dans son propre <li>, et non dans un sous-titre entre
+ * deux listes : une liste coupée en six casserait le comptage annoncé aux lecteurs d'écran, et le
+ * filtre de recherche masque des <li>, pas des sections.
+ * Les sélections courtes des autres pages ne les rendent pas : quatre questions n'ont pas de plan.
+ */
+let rubriquePrecedente: string | undefined;
 const items = rendus.map((item) => {
   const from = Math.min(Math.max(item.riskFrom ?? item.answer.length, 0), item.answer.length);
-  return { ...item, advantage: item.answer.slice(0, from), risks: item.answer.slice(from) };
+  const nouvelleRubrique = search && item.category && item.category !== rubriquePrecedente;
+  if (item.category) rubriquePrecedente = item.category;
+  return {
+    ...item,
+    advantage: item.answer.slice(0, from),
+    risks: item.answer.slice(from),
+    rubrique: nouvelleRubrique ? item.category : undefined,
+  };
 });
 ---
 
@@ -151,6 +166,9 @@ const items = rendus.map((item) => {
           {
             items.map((item, i) => (
               <li class="border-b border-navy/15">
+                {item.rubrique && (
+                  <p class="text-eyebrow mt-10 mb-2 text-teal-700 first:mt-0">{item.rubrique}</p>
+                )}
                 <details name="faq" data-faq={item.question} class="faq-item group">
                   <summary class="block cursor-pointer list-none py-6 [&::-webkit-details-marker]:hidden sm:py-8">
                     <h3 class="flex items-start justify-between gap-5 text-xl font-semibold text-ink transition-colors duration-200 group-hover:text-navy sm:gap-8 sm:text-display-sm">
@@ -198,6 +216,67 @@ const items = rendus.map((item) => {
                             item.noteId && i === item.risks.length - 1 ? item.noteId : undefined
                           }
                         />
+                      ))}
+
+                      {
+                        /* Puces, puis tableau, puis conclusion : l'ordre du document de l'équipe.
+                          La conclusion ne se lit qu'une fois le tableau vu, la mettre dans `answer`
+                          l'aurait placée avant lui. */
+                      }
+                      {item.bullets && (
+                        <ul role="list" class="space-y-2">
+                          {item.bullets.map((puce) => (
+                            <li class="flex items-start gap-3">
+                              <span
+                                aria-hidden="true"
+                                class="mt-2.5 size-1.5 shrink-0 rounded-full bg-teal-700"
+                              />
+                              <span class="text-lead text-ink">{puce}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+
+                      {
+                        /* VRAI TABLEAU, avec un en-tête de colonne : un barème de frais se lit aussi
+                          au lecteur d'écran, et il doit pouvoir dire de quelle colonne vient chaque
+                          valeur. Enveloppé dans un conteneur à défilement propre : à 390 px, deux
+                          colonnes de texte peuvent dépasser, et c'est le tableau qui défile, jamais
+                          la page. */
+                      }
+                      {item.table && (
+                        <div class="-mx-1 overflow-x-auto px-1">
+                          <table class="w-full min-w-[18rem] border-collapse text-left">
+                            <thead>
+                              <tr class="border-b border-navy/20">
+                                {item.table.head.map((cellule) => (
+                                  <th scope="col" class="py-3 pr-4 text-base font-semibold text-ink">
+                                    {cellule}
+                                  </th>
+                                ))}
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {item.table.rows.map((ligne) => (
+                                <tr class="border-b border-navy/10 last:border-0">
+                                  <th
+                                    scope="row"
+                                    class="py-3 pr-4 text-base font-normal text-slate-700"
+                                  >
+                                    {ligne[0]}
+                                  </th>
+                                  <td class="py-3 text-base font-semibold text-ink tabular-nums">
+                                    {ligne[1]}
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+
+                      {item.tableAfter?.map((paragraph) => (
+                        <p class="text-lead text-ink">{paragraph}</p>
                       ))}
                     </div>
                   </div>

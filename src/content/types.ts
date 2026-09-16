@@ -375,6 +375,25 @@ export interface FaqItem {
   riskFrom?: number;
   /** Appel de note légale porté par la question (id d'une LegalNote de la section). */
   noteId?: string;
+  /**
+   * Rubrique de la question (16/09/2026). Elle ne sert QUE sur /faq, qui groupe les vingt-deux
+   * questions ; les sélections courtes des autres pages l'ignorent.
+   */
+  category?: string;
+  /**
+   * Tableau à deux colonnes rendu APRÈS les paragraphes de `answer` (barème des frais, commission sur
+   * les plus-values, commission de retrait). Deux colonnes et pas davantage : au-delà, un tableau ne
+   * tient plus sur un téléphone sans défilement latéral.
+   */
+  table?: { head: [string, string]; rows: [string, string][] };
+  /** Puces rendues après les paragraphes, avant le tableau s'il y en a un. */
+  bullets?: string[];
+  /**
+   * Paragraphes rendus APRÈS le tableau ou les puces. Ce sont des phrases de conclusion qui ne se
+   * lisent qu'une fois le tableau vu (« Ainsi, CORUM gagne davantage seulement quand vous gagnez
+   * davantage. ») : les mettre dans `answer` les aurait placées avant lui.
+   */
+  tableAfter?: string[];
 }
 
 export interface FaqContent {
