@@ -136,8 +136,8 @@ export const corumRange = {
   title: 'Nos autres SCPI en quelques chiffres',
   /** Libellé lu par les lecteurs d'écran sur la liste défilante. */
   listLabel: 'Les SCPI du groupe CORUM',
-  previousLabel: 'SCPI précédente',
-  nextLabel: 'SCPI suivante',
+  /* `previousLabel` et `nextLabel` retirés le 16/09/2026 avec les flèches : le bloc est une grille,
+     il n'y a plus rien à faire défiler. */
 
   items: ITEMS,
 

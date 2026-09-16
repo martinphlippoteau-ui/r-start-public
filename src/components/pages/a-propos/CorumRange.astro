@@ -260,95 +260,65 @@ const QUIET_TITLE_Y = 12;
     </header>
 
     {
-      /* RAIL DÉFILANT. Sans script il se fait déjà défiler au doigt et à la tabulation ; les deux
-        flèches arrivent `hidden` et ne sont révélées que par src/scripts/carrousel.ts.
-        `-mx-5 px-5` fait sortir le rail des marges du conteneur : sur un téléphone, une carte coupée au
-        bord de l'écran annonce qu'il y en a d'autres, là où un rail bien rangé dans sa colonne laisse
-        croire que tout est visible.
-        `scroll-pl-*` ÉGAL AU REMBOURRAGE : sans lui, l'accrochage aligne la première carte sur le bord
-        du contenu et le rail s'ouvre déjà décalé de la valeur du rembourrage, flèche « précédente »
-        active alors qu'on est au départ. Mesuré à 32 px, puis corrigé. */
+      /*
+       * UNE GRILLE, PLUS UN RAIL (16/09/2026 : « que les cards prennent la largeur de l'écran, sans
+       * scroll »). Le bloc était un rail défilant à flèches, avec des cartes de largeur fixe : les
+       * quatre SCPI sont peu nombreuses et tiennent dans la largeur, le défilement ne servait qu'à
+       * cacher ce qui pouvait être montré.
+       * Les cartes n'ont plus de largeur propre, c'est la colonne qui la donne : quatre de front à
+       * partir de `lg`, deux sur tablette, une seule au téléphone, où quatre colonnes de 90 px ne
+       * voudraient rien dire. Aucun défilement horizontal à aucune largeur.
+       * Le script du rail (src/scripts/carrousel.ts) et ses flèches sont partis avec ; ils restent dans
+       * l'historique si un jour la gamme compte assez de SCPI pour en avoir besoin.
+       */
     }
-    <div class="relative mt-10 lg:mt-14" data-rail-zone>
-      <ul
-        role="list"
-        aria-label={corumRange.listLabel}
-        tabindex="0"
-        class="-mx-5 flex snap-x snap-mandatory scroll-pl-5 gap-4 overflow-x-auto px-5 pb-4 sm:-mx-8 sm:scroll-pl-8 sm:gap-5 sm:px-8"
-        data-rail
-      >
-        {
-          corumRange.items.map((scpi) => (
-            <li class="flex w-[17rem] shrink-0 snap-start flex-col rounded-3xl bg-ink p-6 text-white sm:w-[19rem] sm:p-7">
-              <p class="text-display-sm text-sand">{scpi.name}</p>
-              {
-                /* La date en poids normal sous un nom en gras, et d'un cran plus petite : deux lignes
-                  de même graisse se liraient comme deux noms. `white/70` sur le fond ink donne 7,7:1,
-                  bien au-dessus du seuil exigé pour ce corps de texte. */
-              }
-              {scpi.created && <p class="text-caption mt-1 font-normal text-white/70">{scpi.created}</p>}
-              {scpi.badge && (
-                <p class="mt-3 inline-flex self-start rounded-full bg-teal-200 px-2.5 py-0.5 text-[0.7rem] font-semibold tracking-wider text-ink uppercase">
-                  {scpi.badge}
-                </p>
-              )}
-
-              {
-                /* LA MESURE MISE EN AVANT, et son intitulé juste dessous : un grand nombre seul ne dit
-                  pas ce qu'il mesure, et ces quatre-là ne mesurent pas la même chose — trois TRI
-                  réalisés et un objectif. */
-              }
-              <p class="text-display-lg mt-6 leading-none text-white">
-                {scpi.principale.value}
-                <span class="text-display-sm text-teal-200">{scpi.principale.unit}</span>
-              </p>
-              <p class="mt-2 text-base leading-snug text-white/80">{scpi.principale.label}</p>
-
-              <ul role="list" class="mt-6 space-y-4 border-t border-white/15 pt-5">
-                {scpi.autres.map((m) => (
-                  <li class="flex items-baseline justify-between gap-3">
-                    <span class="text-base leading-snug text-white/80">{m.label}</span>
-                    <span class="text-lead shrink-0 font-semibold text-sand tabular-nums">
-                      {m.value}
-                      <span class="text-base text-teal-200">{m.unit}</span>
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </li>
-          ))
-        }
-      </ul>
-
+    <ul
+      role="list"
+      aria-label={corumRange.listLabel}
+      class="mt-10 grid gap-4 sm:grid-cols-2 sm:gap-5 lg:mt-14 lg:grid-cols-4"
+    >
       {
-        /* Les deux flèches, révélées par le script. Sous la liste et non par-dessus : posées sur les
-          cartes, elles masqueraient un chiffre sur un petit écran. */
+        corumRange.items.map((scpi) => (
+          <li class="flex flex-col rounded-3xl bg-ink p-6 text-white sm:p-7">
+            <p class="text-display-sm text-sand">{scpi.name}</p>
+            {
+              /* La date en poids normal sous un nom en gras, et d'un cran plus petite : deux lignes de
+                même graisse se liraient comme deux noms. `white/70` sur le fond ink donne 7,7:1, bien
+                au-dessus du seuil exigé pour ce corps de texte. */
+            }
+            {scpi.created && <p class="text-caption mt-1 font-normal text-white/70">{scpi.created}</p>}
+
+            {
+              /* LA MESURE MISE EN AVANT, et son intitulé juste dessous : un grand nombre seul ne dit
+                pas ce qu'il mesure, et ces quatre-là ne mesurent pas la même chose — trois TRI
+                réalisés et un objectif. */
+            }
+            <p class="text-display-lg mt-6 leading-none text-white">
+              {scpi.principale.value}
+              <span class="text-display-sm text-teal-200">{scpi.principale.unit}</span>
+            </p>
+            <p class="mt-2 text-base leading-snug text-white/80">{scpi.principale.label}</p>
+
+            {
+              /* `mt-auto` sur le bloc du bas : les intitulés de la mesure mise en avant font une ou
+                deux lignes selon la SCPI, et sans lui les trois dernières lignes ne s'alignaient pas
+                d'une carte à l'autre. */
+            }
+            <ul role="list" class="mt-auto space-y-4 border-t border-white/15 pt-5">
+              {scpi.autres.map((m) => (
+                <li class="flex items-baseline justify-between gap-3">
+                  <span class="text-base leading-snug text-white/80">{m.label}</span>
+                  <span class="text-lead shrink-0 font-semibold text-sand tabular-nums">
+                    {m.value}
+                    <span class="text-base text-teal-200">{m.unit}</span>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </li>
+        ))
       }
-      <div class="mt-5 flex gap-3">
-        <button
-          type="button"
-          data-rail-precedent
-          hidden
-          aria-label={corumRange.previousLabel}
-          class="rail-fleche"
-        >
-          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="size-4">
-            <path d="M10 3 5 8l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
-        </button>
-        <button
-          type="button"
-          data-rail-suivant
-          hidden
-          aria-label={corumRange.nextLabel}
-          class="rail-fleche"
-        >
-          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="size-4">
-            <path d="m6 3 5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
-        </button>
-      </div>
-    </div>
+    </ul>
 
     {
       /* LA MENTION RÉGLEMENTAIRE D'ABORD, les définitions ensuite : elle qualifie tous les chiffres
@@ -360,8 +330,3 @@ const QUIET_TITLE_Y = 12;
     </ul>
   </Container>
 </Section>
-
-<script>
-  /* Flèches du rail : le rail défile sans elles, elles ne sont révélées que si le script tourne. */
-  import '@/scripts/carrousel';
-</script>
