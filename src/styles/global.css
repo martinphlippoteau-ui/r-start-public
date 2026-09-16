@@ -1324,137 +1324,6 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   display: none;
 }
 
-.carte-dialog {
-  width: min(40rem, calc(100vw - 2rem));
-  max-height: 85svh;
-  margin: auto;
-  padding: 0;
-  border: 0;
-  border-radius: 1.5rem;
-  background: var(--color-paper);
-  color: var(--color-ink);
-  overflow: visible;
-}
-/* Voile ALLÉGÉ le 16/09/2026 : à 55 % et deux pixels de flou, le dos de la carte et sa marque ne se
-   devinaient plus derrière la fenêtre. La fenêtre étant un panneau blanc opaque, son texte ne dépend
-   pas de cette valeur. */
-.carte-dialog::backdrop {
-  background: rgb(13 46 61 / 0.42);
-  backdrop-filter: blur(1.5px);
-}
-
-/*
- * OUVERTURE EN TROIS TEMPS (16/09/2026, demande de l'équipe) : « clic tourne la card, contenu tout
- * petit au dos ; zoom sur ce contenu en affichage final ; fermeture en faisant le flow inverse ».
- *
- * LA SÉQUENCE EST PILOTÉE EN JAVASCRIPT (src/scripts/carteDialog.ts), et c'est une décision, pas une
- * facilité : le zoom doit partir DE LA CARTE CLIQUÉE, dont la position et la taille ne sont connues
- * qu'à l'exécution et changent avec la largeur de l'écran, la colonne et le défilement. Aucune règle
- * CSS ne peut les écrire. Le script mesure la carte, puis joue une seule animation en trois clés :
- * la fenêtre arrive de dos, à la taille de la carte, se retourne, puis s'agrandit.
- *
- * CE QUI RESTE ICI est ce que le script ne doit pas avoir à poser :
- *  - `backface-visibility: hidden`, qui rend la fenêtre invisible tant qu'elle est vue de dos ; c'est
- *    lui qui fait que la carte et la fenêtre se relaient exactement au quart de tour, sans que rien ne
- *    se superpose ;
- *  - le voile, qui n'est pas atteignable par l'API d'animation (aucun sélecteur ne vise ::backdrop) :
- *    il garde donc sa transition CSS, RETARDÉE du temps du retournement pour arriver avec le zoom et
- *    non avec le clic ;
- *  - `allow-discrete` sur `display` et `overlay`, sans quoi la fenêtre disparaîtrait à l'instant de la
- *    fermeture et le retour en arrière n'aurait pas lieu ;
- *  - la solution de repli : sans JavaScript la fenêtre n'existe pas, et en `prefers-reduced-motion` le
- *    script n'anime rien. Les règles ci-dessous laissent alors la fenêtre pleine et nette.
- */
-.carte-dialog {
-  backface-visibility: hidden;
-  transform-origin: center;
-}
-
-.carte-dialog::backdrop {
-  opacity: 0;
-  transition:
-    opacity 260ms ease,
-    display 260ms allow-discrete,
-    overlay 260ms allow-discrete;
-}
-.carte-dialog[open]::backdrop {
-  opacity: 1;
-  /* Le voile attend la fin du retournement : pendant que la carte tourne, la page reste claire. */
-  transition-delay: 260ms;
-}
-@starting-style {
-  .carte-dialog[open]::backdrop {
-    opacity: 0;
-  }
-}
-
-/* Posée par le script au premier instant de la fermeture : le voile s'en va avec le mouvement et
-   non 600 ms après lui, une fois la fenêtre refermée. */
-.carte-dialog--sort::backdrop {
-  opacity: 0;
-  transition-delay: 0ms;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .carte-dialog::backdrop {
-    transition: none;
-  }
-  .carte-dialog[open]::backdrop {
-    transition-delay: 0ms;
-  }
-}
-
-.carte-dialog > [data-carte-detail] {
-  max-height: 85svh;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  padding: 2rem 1.5rem;
-}
-@media (min-width: 40rem) {
-  .carte-dialog > [data-carte-detail] {
-    padding: 2.5rem;
-  }
-}
-/* Le bouton de fermeture flotte AU-DESSUS de la zone défilante, il ne doit pas partir avec elle. */
-/*
- * « FERMER » EN TOUTES LETTRES depuis le 16/09/2026, demande de l'équipe. C'était une croix de 2,5 rem
- * avec le mot en lecture d'écran seulement : le mot est maintenant à l'écran, et la pastille s'étire
- * pour le recevoir. La zone tactile reste au-dessus des 44 px recommandés.
- */
-.carte-dialog-fermer {
-  position: absolute;
-  top: 0.75rem;
-  right: 0.75rem;
-  z-index: 1;
-  display: inline-flex;
-  min-height: 2.75rem;
-  align-items: center;
-  justify-content: center;
-  gap: 0.4rem;
-  padding-inline: 1.1rem;
-  border-radius: 9999px;
-  background: var(--color-ink);
-  color: #fff;
-  font-size: 0.95rem;
-  font-weight: 600;
-  line-height: 1.2;
-  transition: background-color 150ms;
-}
-.carte-dialog-fermer:hover {
-  background: var(--color-navy);
-}
-.carte-dialog-fermer:focus-visible {
-  outline: 2px solid var(--color-navy);
-  outline-offset: 2px;
-}
-
-/* Le « + » des tuiles : il tourne d'un huitième de tour au survol, comme chez Apple. */
-/*
- * « EN SAVOIR PLUS » (16/09/2026). Remplace le « + » rond : une pastille lisible, posée en bas de la
- * tuile. Fond blanc translucide sur le fond ink de la carte, comme l'était le rond.
- * La flèche avance au survol, le fond s'éclaircit : deux signaux discrets qu'il se passera quelque
- * chose, sans faire bouger la pastille elle-même, qui se décalerait sous le doigt.
- */
 @utility carte-savoir {
   display: inline-flex;
   align-items: center;
@@ -1511,6 +1380,7 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
  * forcerait son aplatissement, et l'article en a besoin pour ses coins arrondis.
  */
 @utility carte-face {
+  display: grid;
   transform-origin: center;
   transform-style: preserve-3d;
 }
@@ -1518,16 +1388,89 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
 .carte-verso {
   backface-visibility: hidden;
 }
-/* Le dos occupe exactement le recto : c'est lui qui donne sa hauteur à l'enveloppe. */
+/*
+ * LA FACE CACHÉE NE DOIT PAS CAPTER LES CLICS. `inert` l'empêche d'être activée, mais elle reste la
+ * boîte la plus haute sous le pointeur : le bouton du dos était atteignable au clavier et inatteignable
+ * à la souris, le recto récupérant le clic sans rien en faire. Constaté, puis corrigé ici.
+ * Le sélecteur suit `inert`, posé par le script : un seul état à tenir, pas deux.
+ */
+.carte-recto[inert],
+.carte-verso[inert] {
+  pointer-events: none;
+}
+/*
+ * LES DEUX FACES SONT EMPILÉES EN GRILLE, dans la même cellule, et non posées l'une sur l'autre en
+ * absolu. C'est ce qui change tout depuis que le dos porte le TEXTE : en absolu, le dos ne comptait
+ * pas dans la hauteur et un texte plus long que le recto se serait fait couper. Dans une cellule
+ * partagée, l'enveloppe prend la hauteur de la PLUS GRANDE des deux.
+ *
+ * ET `h-full` SUR L'ENVELOPPE, posé dans le balisage (16/09/2026, « les 3 volets doivent avoir la même
+ * taille en hauteur ») : sans lui, chaque carte se réglait sur SON propre dos, et les trois volets,
+ * dont les textes sont de longueurs différentes, tombaient à trois hauteurs. La rangée de la grille les
+ * étire maintenant toutes sur la plus haute.
+ */
+.carte-recto,
 .carte-verso {
-  position: absolute;
-  inset: 0;
+  grid-area: 1 / 1;
+  min-width: 0;
+}
+.carte-verso {
+  position: relative;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
   border-radius: 1.5rem;
   background: var(--color-ink);
+  padding: 1.5rem;
+  /* ESPACE MINIMUM ENTRE LE TEXTE ET LE BOUTON (16/09/2026, « ne pas coller le contenu avec le CTA
+     Fermer ») : le `margin-top: auto` du bouton le pousse en bas quand il reste de la place, mais il
+     tombe à zéro dès que le texte remplit la carte, et les deux se touchaient. Le `gap` de la colonne
+     est un plancher, il s'ajoute à ce que `auto` laisse. */
+  gap: 1.5rem;
   transform: rotateY(180deg);
+  /* Garde-fou : si un texte dépassait malgré la grille, il défile au lieu d'être coupé. */
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+@media (min-width: 40rem) {
+  .carte-verso {
+    padding: 2rem;
+  }
+}
+/* Le contenu arrive du flux, où il portait une marge haute qui le détachait de la carte au-dessus.
+   Au dos, c'est le rembourrage du dos qui joue ce rôle : la marge ferait double emploi. */
+.carte-verso > [data-carte-detail] {
+  margin-top: 0;
+}
+
+/* La marque, en coin et très en retrait : elle signe le dos sans passer sous le texte. */
+.carte-verso-marque {
+  position: absolute;
+  right: 1.25rem;
+  bottom: 1.25rem;
+  pointer-events: none;
+}
+
+/*
+ * LE RETOUR. Il ferme la carte, et il est le dernier élément du dos : au clavier, on descend le texte
+ * puis on tombe dessus, ce qui est l'ordre attendu. `mt-auto` le colle en bas quand le texte est court.
+ */
+.carte-retour {
+  margin-top: auto;
+  align-self: flex-start;
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  padding-inline: 1.1rem;
+  border-radius: 9999px;
+  background: rgb(255 255 255 / 0.14);
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.2;
+  transition: background-color 200ms;
+}
+.carte-retour:hover {
+  background: rgb(255 255 255 / 0.26);
 }
 
 /* La main n'apparaît que si le script a tourné : sans lui, la carte n'ouvre rien et promettre un clic
@@ -1536,32 +1479,7 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   cursor: pointer;
 }
 
-@utility carte-plus {
-  display: inline-flex;
-  width: 2.75rem;
-  height: 2.75rem;
-  align-items: center;
-  justify-content: center;
-  border-radius: 9999px;
-  background: rgb(255 255 255 / 0.14);
-  color: #fff;
-  font-size: 1.5rem;
-  line-height: 1;
-  transition:
-    background-color 200ms,
-    transform 200ms;
 
-  &:hover {
-    background: rgb(255 255 255 / 0.26);
-    transform: rotate(45deg);
-  }
-  @media (prefers-reduced-motion: reduce) {
-    transition: background-color 200ms;
-    &:hover {
-      transform: none;
-    }
-  }
-}
 
 /* --- Hero (fond ink + halo de marque + grain ; plus d'image de fond depuis le 11/09/2026) --- */
 

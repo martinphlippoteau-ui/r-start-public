@@ -495,14 +495,14 @@ export const press = {
       name: 'Quentin Hacquard',
       role: 'Press & Corporate Communication Manager',
       phone: '+33 6 99 60 10 25',
-      email: '', // à confirmer par CORUM
+      email: 'quentin.hacquard@corumlepargne.fr', // fournie par l'équipe le 16/09/2026
     },
     {
       organisation: "Rud Pedersen France, pour CORUM L'Épargne",
       name: 'Hugues de Tournemire',
       role: 'Relations presse',
       phone: '+33 6 67 07 22 33',
-      email: '', // à confirmer par CORUM
+      email: 'h.detournemire@rudpedersen.com', // fournie par l'équipe le 16/09/2026
     },
   ],
   contactsSource: 'corum.fr, rubrique Contacts presse, consultée le 8 septembre 2026',

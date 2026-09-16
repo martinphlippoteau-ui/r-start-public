@@ -43,27 +43,13 @@ const jsonLd = [
         {press.cta.label}
       </Button>
       {
-        /* Les médias des citations mises en avant, avec leur date : sur grand écran ils occupent la
-          moitié droite restée vide et annoncent qui parle, avant même la première citation. Aucun
-          logo (aucune licence) : les noms sont en typographie, comme dans le reste de la page. */
+        /* LE TABLEAU DES MÉDIAS EST RETIRÉ de l'en-tête le 16/09/2026, demande de l'équipe. Il listait
+          les trois médias cités et leur date dans la moitié droite. Les mêmes médias et les mêmes
+          dates restent lisibles juste en dessous, sur chaque citation : l'information n'est pas perdue,
+          elle n'est plus annoncée deux fois.
+          `press.labels.quotesListLabel` n'est plus lu ; il reste dans press.ts pour le jour où ce bloc
+          reviendrait. */
       }
-      <ul
-        slot="aside"
-        role="list"
-        aria-label={press.labels.quotesListLabel}
-        class="rounded-3xl bg-white/10 p-6 ring-1 ring-white/15 backdrop-blur-sm sm:p-8"
-      >
-        {
-          press.quotes.items.map((quote) => (
-            <li class="flex items-baseline justify-between gap-4 border-b border-white/15 py-3 first:pt-0 last:border-0 last:pb-0">
-              <span class="text-base font-semibold text-white sm:text-lg">{quote.media}</span>
-              <time datetime={quote.dateIso} class="shrink-0 text-base text-white/80">
-                {quote.date}
-              </time>
-            </li>
-          ))
-        }
-      </ul>
     </PageHero>
     <Quotes />
     <Coverage />

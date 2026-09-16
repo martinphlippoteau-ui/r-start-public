@@ -29,6 +29,11 @@ const telHref = (phone: string) => 'tel:' + phone.replace(/[^\d+]/g, '');
   <Container size="wide">
     <header class="max-w-4xl">
       <h2 id={id + '-title'} class="text-display-md text-ink">{contacts.title}</h2>
+      {
+        /* Phrase d'appel entre le titre et la liste (16/09/2026). Rendue seulement si elle existe :
+          la salle de presse n'en a pas toujours eu, et un paragraphe vide laisserait sa marge. */
+      }
+      {contacts.intro && <p class="text-lead mt-5 max-w-3xl text-slate-700">{contacts.intro}</p>}
     </header>
 
     <ul

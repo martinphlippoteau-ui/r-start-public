@@ -455,8 +455,9 @@ export interface PressContent {
     title: string;
     intro: string;
     items: PressArticle[];
-    disclaimer: string;
-    /** Titre de la section qui porte l'avertissement, rendue après la revue. */
+    /** Avertissement rendu dans sa propre bande après la revue. Absent : la bande n'est pas rendue. */
+    disclaimer?: string;
+    /** Titre de cette bande. */
     disclaimerTitle?: string;
   };
   /** Renvoi vers /salle-de-presse, absente du menu principal. */
@@ -472,7 +473,13 @@ export interface PressRoomContent {
   seo: PageSeo;
   hero: PageHero;
   releases: { title: string; intro: string; items: PressRelease[]; emptyLabel: string };
-  contacts: { title: string; items: PressContact[]; source: string };
+  contacts: {
+    title: string;
+    /** Phrase d'appel sous le titre. Absente : la liste suit directement le titre. */
+    intro?: string;
+    items: PressContact[];
+    source: string;
+  };
   mediaKit: {
     title: string;
     intro: string;

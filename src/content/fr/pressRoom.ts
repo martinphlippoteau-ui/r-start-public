@@ -116,7 +116,11 @@ export const pressRoom = {
      * par la salle de presse, dont la route est désactivée, mais par la ZONE 4 de /presse : c'est
      * désormais le seul endroit du site où un journaliste trouve un contact.
      */
-    title: 'Vous êtes journalistes ?',
+    /* Singulier depuis le 16/09/2026 : la question s'adresse à un lecteur, pas à une assemblée. */
+    title: 'Vous êtes journaliste ?',
+    /* Phrase d'appel ajoutée le 16/09/2026, texte de l'équipe : le titre posait une question et la
+       liste de contacts arrivait sans transition. */
+    intro: 'Pour toute question, demande d’information ou d’interview, merci de contacter :',
     items: contacts,
     source: nb(`Source : ${pressFacts.contactsSource}.`),
   },

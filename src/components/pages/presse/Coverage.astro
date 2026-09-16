@@ -111,14 +111,21 @@ const titleClass = 'text-lg font-semibold leading-snug tracking-tight text-ink s
   </Container>
 </Section>
 
-{/* Avertissement (texte normal, jamais animé), dans sa propre bande : il ferme le chapitre */}
-<Section id={disclaimerId} tone="ink" spacing="compact">
-  <Container size="wide">
-    <div class="max-w-4xl">
-      <h2 id={disclaimerId + '-title'} class="text-display-sm text-sand">
-        {coverage.disclaimerTitle}
-      </h2>
-      <p class="text-lead mt-5 text-white">{coverage.disclaimer}</p>
-    </div>
-  </Container>
-</Section>
+{
+  /* Avertissement (texte normal, jamais animé), dans sa propre bande : il fermait le chapitre.
+    RENDU CONDITIONNEL depuis le 16/09/2026 : l'équipe a retiré son texte (press.ts, `coverage`), la
+    bande ne doit donc plus apparaître, ni vide ni avec son seul titre. Elle revient d'elle-même le
+    jour où `disclaimer` est renseigné. */
+}
+{coverage.disclaimer && (
+  <Section id={disclaimerId} tone="ink" spacing="compact">
+    <Container size="wide">
+      <div class="max-w-4xl">
+        <h2 id={disclaimerId + '-title'} class="text-display-sm text-sand">
+          {coverage.disclaimerTitle}
+        </h2>
+        <p class="text-lead mt-5 text-white">{coverage.disclaimer}</p>
+      </div>
+    </Container>
+  </Section>
+)}

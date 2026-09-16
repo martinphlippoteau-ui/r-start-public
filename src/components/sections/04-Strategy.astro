@@ -168,7 +168,7 @@ const pontVisible = !strategy.engines.outro && !strategy.engines.disclaimer;
           /* Même perspective que les volets : sans elle, le retournement n'est qu'un écrasement. */
           return (
             <li class="[perspective:1400px]">
-            <div class="carte-face relative">
+            <div class="carte-face relative h-full">
               <article
                 class="carte-recto relative flex min-h-[24rem] flex-col overflow-hidden rounded-3xl bg-ink p-6 text-white sm:min-h-[26rem] sm:p-8"
               >
@@ -203,11 +203,14 @@ const pontVisible = !strategy.engines.outro && !strategy.engines.disclaimer;
                 </button>
               </article>
               {
-                /* LE DOS : la marque R Start seule, en creux sur le fond de la carte. Ni titre ni
-                  texte, il ne doit rien apprendre — la fenêtre qui s'ouvre porte le propos, le dos
-                  n'est là que pour que la carte ne disparaisse pas pendant qu'on la lit. */
+                /* LE DOS PORTE LE CONTENU depuis le 16/09/2026 (« je veux que le contenu soit au dos
+                  des cards en fait, pas de zoom ni de popup »). Il arrive vide : c'est le script qui y
+                  déplace le texte écrit plus bas dans le flux, pour que la page se lise entière sans
+                  JavaScript. La marque reste, petite et en coin, hors du chemin du texte. */
               }
-              <div class="carte-verso"><MarqueR class="w-24 text-white/20" /></div>
+              <div class="carte-verso">
+                <MarqueR class="carte-verso-marque w-12 text-white/10" />
+              </div>
             </div>
 
               {
@@ -217,9 +220,9 @@ const pontVisible = !strategy.engines.outro && !strategy.engines.disclaimer;
               }
               <div data-carte-detail-hote>
                 <div id={cible} data-carte-detail class="mt-5 space-y-4">
-                  <p class="text-eyebrow text-teal-700 tabular-nums">{numero}</p>
-                  <p class="text-display-sm text-ink">{item.lead}</p>
-                  {item.rest && <p class="text-base leading-relaxed text-slate-700">{item.rest}</p>}
+                  <p class="text-eyebrow text-teal-200 tabular-nums">{numero}</p>
+                  <p class="text-display-sm text-sand">{item.lead}</p>
+                  {item.rest && <p class="text-base leading-relaxed text-white/80">{item.rest}</p>}
                 </div>
               </div>
             </li>
@@ -274,9 +277,9 @@ const pontVisible = !strategy.engines.outro && !strategy.engines.disclaimer;
    * prend le rang H2. C'est le seul texte ajouté à ce bloc depuis la fusion.
    *
    * SANS JAVASCRIPT, TOUT RESTE LISIBLE : le détail est écrit dans le flux, sous sa tuile, et le
-   * bouton d'ouverture arrive `hidden`. Le script inverse les deux (src/scripts/carteDialog.ts). C'est
-   * la seule façon de faire une fenêtre sans perdre les deux tiers du propos pour qui n'exécute pas de
-   * script.
+   * bouton d'ouverture arrive `hidden`. Le script le déplace au DOS de la carte et révèle le bouton
+   * (src/scripts/carteRetournee.ts). C'est la seule façon de cacher un texte derrière un mouvement sans
+   * le perdre pour qui n'exécute pas de script.
    *
    * FOND INK sur les trois. Le globe était sur blanc depuis la fusion et s'y lisait mal : c'est un
    * dessin au trait clair, il lui faut un fond sombre, celui qu'il avait avant. Les tuiles sombres sur
@@ -403,7 +406,7 @@ const pontVisible = !strategy.engines.outro && !strategy.engines.disclaimer;
                   donc deux faces dans un même élément en `preserve-3d`, chacune masquée quand elle
                   présente son envers. */
               }
-            <div class="carte-face relative">
+            <div class="carte-face relative h-full">
               <article class="carte-recto relative flex min-h-[24rem] flex-col overflow-hidden rounded-3xl bg-ink p-6 text-white sm:min-h-[28rem] sm:p-8">
                 {zone.eyebrow && <p class="text-eyebrow text-teal-200">{zone.eyebrow}</p>}
                 <h3 id={ancre + '-title'} class="text-display-sm mt-3 max-w-[16rem] text-sand">
@@ -455,11 +458,14 @@ const pontVisible = !strategy.engines.outro && !strategy.engines.disclaimer;
                 </button>
               </article>
               {
-                /* LE DOS : la marque R Start seule, en creux sur le fond de la carte. Ni titre ni
-                  texte, il ne doit rien apprendre — la fenêtre qui s'ouvre porte le propos, le dos
-                  n'est là que pour que la carte ne disparaisse pas pendant qu'on la lit. */
+                /* LE DOS PORTE LE CONTENU depuis le 16/09/2026 (« je veux que le contenu soit au dos
+                  des cards en fait, pas de zoom ni de popup »). Il arrive vide : c'est le script qui y
+                  déplace le texte écrit plus bas dans le flux, pour que la page se lise entière sans
+                  JavaScript. La marque reste, petite et en coin, hors du chemin du texte. */
               }
-              <div class="carte-verso"><MarqueR class="w-24 text-white/20" /></div>
+              <div class="carte-verso">
+                <MarqueR class="carte-verso-marque w-12 text-white/10" />
+              </div>
             </div>
 
               {
@@ -468,31 +474,31 @@ const pontVisible = !strategy.engines.outro && !strategy.engines.disclaimer;
               }
               <div data-carte-detail-hote>
                 <div id={'detail-' + ancre} data-carte-detail class="mt-5 space-y-4">
-                  <p class="text-eyebrow text-teal-700">{zone.eyebrow}</p>
-                  <p class="text-display-sm text-ink">{zone.title}</p>
-                  <p class="text-base leading-snug text-slate-700">{zone.intro}</p>
-                  {zone.lead && <p class="text-base font-semibold text-ink">{zone.lead}</p>}
+                  <p class="text-eyebrow text-teal-200">{zone.eyebrow}</p>
+                  <p class="text-display-sm text-sand">{zone.title}</p>
+                  <p class="text-base leading-snug text-white/80">{zone.intro}</p>
+                  {zone.lead && <p class="text-base font-semibold text-white">{zone.lead}</p>}
 
                   <ul role="list" class="space-y-3">
                     {zone.items.map((item) => (
                       <li class="flex items-start gap-3">
                         {item.icon ? (
-                          <Picto name={item.icon} class="mt-0.5 size-6 text-teal-700" />
+                          <Picto name={item.icon} class="mt-0.5 size-6 text-teal-200" />
                         ) : (
                           <span
                             aria-hidden="true"
-                            class="mt-2 size-2 shrink-0 rounded-full bg-teal-700"
+                            class="mt-2 size-2 shrink-0 rounded-full bg-teal-200"
                           />
                         )}
-                        <p class="text-base leading-snug text-ink">
+                        <p class="text-base leading-snug text-white">
                           {item.lead}
-                          {item.rest && <span class="mt-1 block text-slate-700">{item.rest}</span>}
+                          {item.rest && <span class="mt-1 block text-white/75">{item.rest}</span>}
                         </p>
                       </li>
                     ))}
                   </ul>
 
-                  <p class="text-base leading-snug text-slate-700">{zone.outro}</p>
+                  <p class="text-base leading-snug text-white/80">{zone.outro}</p>
                 </div>
               </div>
             </li>
@@ -719,5 +725,5 @@ const pontVisible = !strategy.engines.outro && !strategy.engines.disclaimer;
 
 <script>
   /* Tuiles à fenêtre : le contenu arrive dans le flux, le script le déplace dans une <dialog>. */
-  import '@/scripts/carteDialog';
+  import '@/scripts/carteRetournee';
 </script>

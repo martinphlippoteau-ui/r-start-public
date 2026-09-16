@@ -72,7 +72,10 @@ const rawNotes: LegalNote[] = [
 /** Notes de la page, typographiées (espace insécable avant : ; ? ! % €). */
 export const notes: LegalNote[] = rawNotes.map((n) => ({ ...n, text: nb(n.text) }));
 
-export const press = {
+/* ANNOTÉ, et non `satisfies` seul : `satisfies` conserve le type du littéral, et l'avertissement de la
+   revue de presse ayant été retiré le 16/09/2026, le composant ne voyait plus la propriété du tout.
+   L'annotation lui donne le type complet, champs facultatifs compris. */
+export const press: PressContent = {
   seo: {
     /** ≤ 60 caractères. Contient « R Start » et « CORUM ». */
     title: 'La presse en parle : R Start, SCPI CORUM',
@@ -84,7 +87,9 @@ export const press = {
   hero: {
     eyebrow: 'La presse en parle',
     /* Zones réécrites le 15/09/2026, texte fourni par l'équipe. */
-    title: 'R Start dans vos médias',
+    /* « dans les médias » depuis le 16/09/2026, ex-« dans vos médias » : le possessif s'adressait au
+       lecteur alors que la page parle de ce que la presse a écrit. */
+    title: 'R Start dans les médias',
     intro: 'Découvrez les derniers articles parus',
     /* Plus de ligne risques dans l'en-tête (14/09/2026, demande de l'équipe : « supprime les bon à
        savoir de tous les hero sauf celui de la home »). Le « Bon à savoir : … » sous le H1 a disparu de
@@ -96,21 +101,36 @@ export const press = {
   quotes: {
     /* Zone 2, titre du 15/09/2026. Les trois citations ne bougent pas : « Garder les 3 exemples ». */
     title: 'Le verdict des journalistes',
-    intro:
-      'Ces citations sont des extraits d’articles de tiers. Elles n’engagent que leurs auteurs et ne portent sur aucun résultat de R Start.',
+    /* INTRODUCTION SUPPRIMÉE le 16/09/2026, demande de l'équipe. Elle disait que les citations sont des
+       extraits d'articles de tiers, qu'elles n'engagent que leurs auteurs et ne portent sur aucun
+       résultat de R Start. Chaque citation porte toujours le nom de son média et sa date. */
+    intro: '',
     items: quotes,
   },
 
   coverage: {
     /* Zone 3, titre du 15/09/2026, ex-« La revue de presse ». */
     title: 'Revue de presse',
-    intro: nb(
-      `Au lancement de R Start, ${articles.length} articles de la presse économique et financière, avec leur média et leur date. Les titres sont ceux des articles, reproduits tels quels. R Start n’est pas une SCPI sans frais : ${nb(fees.management.label)} de frais de gestion sur les loyers HT, commissions sur les cessions d’immeubles et commission de retrait avant ${fees.withdrawal.zeroAfterYears} ans s’appliquent.`
-    ),
+    /*
+     * INTRODUCTION SUPPRIMÉE le 16/09/2026, demande de l'équipe. Elle annonçait le nombre d'articles et
+     * leur nature, puis rappelait les frais réellement prélevés — « R Start n'est pas une SCPI sans
+     * frais » — en contre-poids des titres de presse qui, eux, emploient la formule.
+     * CE CONTRE-POIDS ÉTAIT LÀ POUR ÇA. Les titres des articles sont reproduits tels quels et certains
+     * disent « sans frais » ; c'est cette phrase qui les qualifiait dans le même bloc. Elle part à la
+     * demande de l'équipe, en connaissance de cause. Les frais restent décrits sur /frais et sur
+     * l'accueil, et la mention obligatoire du pied de page vaut pour toute la page.
+     * Pour la rétablir : reprendre le gabarit dans l'historique de ce fichier.
+     */
+    intro: '',
     items: articles,
-    disclaimer: pressFacts.coverageDisclaimer,
-    /** Titre de la section qui porte l'avertissement, isolée après la revue depuis le 13/09/2026. */
-    disclaimerTitle: 'À lire avec cette revue de presse',
+    /*
+     * BLOC D'AVERTISSEMENT SUPPRIMÉ le 16/09/2026, demande de l'équipe. Sous le titre « À lire avec
+     * cette revue de presse », il rappelait que les articles sont des publications indépendantes qui
+     * n'engagent pas la société de gestion et ne valent pas conseil en investissement, que les
+     * informations reflètent le contexte du lancement, et que l'investissement comporte un risque de
+     * perte en capital. Le texte lui-même reste dans facts.ts (`press.coverageDisclaimer`).
+     * Pour le rétablir : `disclaimer: pressFacts.coverageDisclaimer` et son titre.
+     */
   },
 
   /** Renvoi vers /salle-de-presse, absente du menu principal (arbitrage du 10/09/2026). */

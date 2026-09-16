@@ -514,12 +514,24 @@ async function checkSubPages() {
         requirePhrase(text, b.slice(0, 100), "puce commission d'arbitrage", file);
     }
     if (p === 'presse') {
-      // Les titres et citations reproduits ne valent que couverts par l'avertissement fourni.
-      requirePhrase(
-        text,
-        pressFacts.coverageDisclaimer.slice(0, 120),
-        'avertissement de la revue de presse',
-        file
+      /*
+       * AVERTISSEMENT ET NON PLUS ERREUR depuis le 16/09/2026, arbitrage de l'équipe.
+       *
+       * LA RÈGLE EXIGEAIT l'avertissement de la revue de presse, parce que les titres et les citations
+       * sont reproduits mot pour mot : certains emploient « sans frais », et c'est ce bloc qui les
+       * qualifiait. Il disait que les articles sont des publications indépendantes, qu'ils n'engagent
+       * pas la société de gestion, qu'ils ne valent pas conseil, et que l'investissement comporte un
+       * risque de perte en capital.
+       *
+       * L'ÉQUIPE L'A RETIRÉ, avec l'introduction de la revue qui portait le contre-poids sur les frais.
+       * Il ne reste, autour des citations, que la mention obligatoire du pied de page. La règle est
+       * donc levée en connaissance de cause, et le rapport le redit à chaque exécution.
+       * Pour rétablir : remettre `disclaimer` dans press.ts (`coverage`) et repasser ce contrôle en
+       * erreur.
+       */
+      warnings.push(
+        file +
+          ' : avertissement de la revue de presse absent — les titres et citations de tiers ne sont plus qualifiés que par le pied de page'
       );
       const quoted = (html.match(/data-press-quote/g) || []).length;
       if (!quoted)
