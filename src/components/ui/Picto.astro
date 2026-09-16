@@ -1,8 +1,9 @@
 ---
 /**
- * PLUS IMPORTÉ NULLE PART depuis le 14/09/2026 : les pictogrammes ont quitté les points forts
- * (11/09/2026) puis les piliers de la stratégie et les savoir-faire de /a-propos, remplacés par des
- * photos. Le composant et ses clés sont conservés, comme le bloc `corum.expertise` qui les nomme encore.
+ * DE NOUVEAU UTILISÉ depuis le 15/09/2026, par la mention AMF du hero (sections/01-Hero.astro). Il ne
+ * l'était plus depuis le 14/09 : les pictogrammes avaient quitté les points forts (11/09/2026) puis les
+ * piliers de la stratégie et les savoir-faire de /a-propos, remplacés par des photos. Les autres clés
+ * restent conservées, comme le bloc `corum.expertise` qui les nomme encore.
  *
  * Pictogrammes R Start : dessins au TRAIT PLAT, vus de face, sans support ni volume (la tuile de verre et
  * l'isométrie ont été abandonnées le 11/09/2026 : illisibles à petite taille, et le support jurait avec le
@@ -11,12 +12,14 @@
  * la couleur vient de la classe reçue, contraste tenu sur fond clair comme sur fond sombre.
  * Formes volontairement archi-connues (billet, triangle, feuille, calendrier, immeubles, globe, loupe) :
  * un pictogramme se reconnaît, il ne s'interprète pas.
- * Clés (champ `icon` de strategy.ts / highlights.ts) : argent, alerte, document-valide, calendrier,
+ * Clés (champ `icon` de strategy.ts / highlights.ts) : institution (fronton à colonnes, mention AMF
+ * du hero), argent, alerte, document-valide, calendrier,
  * equipe (deux immeubles et flèche montante), exploration (globe et repère), analyse (immeuble et loupe).
  * Accessibilité : décoratif par défaut (aria-hidden) ; avec `title`, le SVG devient une image nommée.
  * Aucun attribut motion ici : l'animation se pose sur l'enveloppe.
  */
 export const PICTO_KEYS = [
+  'institution',
   'argent',
   'alerte',
   'document-valide',
@@ -44,6 +47,28 @@ const { name, class: className, title } = Astro.props as Props;
  * second niveau qui évite l'effet « gros trait » d'un pictogramme tout en épaisseur unique.
  */
 const glyphs: Record<PictoKey, { trait: string; detail?: string }> = {
+  /*
+   * Fronton à colonnes : le bâtiment d'une autorité. AJOUTÉ LE 16/09/2026 pour la mention AMF du hero,
+   * choisi par l'équipe parmi six candidats présentés sur /test.
+   *
+   * IL Y AVAIT UNE RÉSERVE, elle était affichée à côté du picto au moment du choix et elle est
+   * consignée ici pour la Conformité : ce dessin REPRÉSENTE L'INSTITUTION, donc l'AMF. Posé près d'une
+   * note Trustpilot, il peut se lire comme une caution de l'autorité, ce que la mention standard du
+   * pied de page dit explicitement ne pas être le cas, et c'est la raison pour laquelle le logo de
+   * l'AMF a été retiré la veille. L'équipe a tranché en connaissance de cause.
+   * Le libellé, lui, n'a jamais bougé : « société de gestion agréée », jamais « R Start agréé ».
+   *
+   * Le toit est tracé en deux segments ouverts plutôt qu'en triangle fermé : à 24 px, un tympan plein
+   * se referme en tache. Les quatre colonnes sont le second niveau, plus fines et atténuées.
+   */
+  institution: {
+    trait: [
+      '<path d="M3.6 9.4 12 4.2l8.4 5.2"/>',
+      '<path d="M3.4 20.4h17.2"/>',
+      '<path d="M5.2 9.9v9.2M18.8 9.9v9.2"/>',
+    ].join(''),
+    detail: '<path d="M9.8 10.2v8.6M14.2 10.2v8.6"/>',
+  },
   // Billet et pièce.
   argent: {
     trait: [
