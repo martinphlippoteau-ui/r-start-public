@@ -21,6 +21,7 @@ const PAGES = [
   '/',
   '/frais/',
   '/documentation/',
+  '/faq/',
   '/presse/',
   '/mentions-legales/',
   '/cookies/',

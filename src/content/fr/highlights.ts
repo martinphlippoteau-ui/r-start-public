@@ -129,10 +129,26 @@ export const highlights: HighlightsContent = {
       info: 'R Start investit dans tous secteurs, toutes zones géographiques et tous types d’immeubles pour ne pas dépendre d’une seule source de performance.',
       noteId: 'points-forts-approche',
     },
+    /*
+     * « HORIZON D'INVESTISSEMENT » REMPLACE « ZONE D'INVESTISSEMENT » le 16/09/2026, demande de
+     * l'équipe. La carte disait « Monde », elle dit maintenant la durée.
+     *
+     * LE CHIFFRE N'EST PAS CELUI DEMANDÉ, et il faut que l'équipe le sache. La demande disait « 8 ans
+     * minimum ». Le DIC donne une durée de placement recommandée de DIX ans (facts.ts,
+     * `risk.recommendedHoldingLabel`, sourcé « DIC, bulletin »), et c'est ce que le site affiche
+     * partout ailleurs : dans la FAQ de cette même page, dans celle de /faq, et dans les mentions
+     * légales. Les huit ans sont autre chose : le seuil au-delà duquel R Start ne prélève plus de
+     * commission de retrait (`fees.withdrawal.zeroAfterYears`).
+     * Une communication commerciale ne peut pas contredire le DIC, et l'AMF l'a déjà relevé sur ce
+     * projet à propos de l'indicateur de risque. La carte reprend donc le chiffre du DIC, et il suffit
+     * d'écrire `8 ans minimum` ici pour revenir à la demande si l'équipe l'assume.
+     *
+     * L'explication de la zone est partie avec elle : elle parlait de géographie.
+     */
     {
-      label: 'Zone d’investissement',
-      value: 'Monde',
-      info: 'R Start investit là où les équipes de gestion identifient les meilleures opportunités, en Europe et au-delà, tous secteurs confondus.',
+      label: 'Horizon d’investissement',
+      value: nb(`${risk.recommendedHoldingLabel} minimum`),
+      info: 'Une SCPI est un placement de long terme. Cette durée est celle que recommande le document d’informations clés ; sortir plus tôt coûte une commission de retrait et la revente des parts n’est pas garantie.',
       noteId: 'points-forts-zone',
     },
     {

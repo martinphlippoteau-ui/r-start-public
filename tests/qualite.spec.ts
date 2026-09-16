@@ -8,6 +8,7 @@ const PAGES = [
   '/strategie/',
   '/a-propos/',
   '/documentation/',
+  '/faq/',
   '/presse/',
 ];
 

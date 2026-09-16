@@ -50,7 +50,13 @@ const id = sections.risks.id;
 }
 <Section id={id} tone="ink" data-curtain="bottom center">
   <Container size="wide" class="relative">
-    <SectionHeading id={id} title={risks.title} intro={risks.intro} />
+    {
+      /* TOUT LE BLOC EN SABLE depuis le 16/09/2026 (demande de l'équipe) : le titre par la classe
+        passée à SectionHeading, dont le H2 hérite faute de couleur propre, les intitulés et les
+        descriptions par leurs classes ci-dessous. Relevé à 11,54:1 sur le fond ink, contre 14,23
+        pour le blanc : très au-dessus des 4,5 exigés. */
+    }
+    <SectionHeading id={id} title={risks.title} intro={risks.intro} class="text-sand" />
 
     <!-- Six risques, statiques : intitulé et description visibles d'emblée. -->
     <ul
@@ -59,7 +65,7 @@ const id = sections.risks.id;
       {
         risks.items.map((item) => (
           <li class="border-t border-white/25 pt-6 sm:pt-8">
-            <h3 class="text-display-sm text-white">
+            <h3 class="text-display-sm text-sand">
               {item.title}
               {item.noteId && <NoteRef id={item.noteId} />}
             </h3>

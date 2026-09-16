@@ -14,7 +14,7 @@ import { test, expect } from '@playwright/test';
  * des photos, texte mot à mot et rideau du bloc Risques. La scène épinglée du mot d'ordre, elle, est
  * partie avec son texte le 14/09/2026.
  */
-const SOUS_PAGES = ['/frais/', '/a-propos/', '/documentation/', '/presse/'];
+const SOUS_PAGES = ['/frais/', '/a-propos/', '/documentation/', '/presse/', '/faq/'];
 
 test.describe('Performance', () => {
   for (const route of SOUS_PAGES) {

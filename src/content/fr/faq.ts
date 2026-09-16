@@ -311,12 +311,17 @@ const rawItems: FaqContent['items'] = [
  * Les seize questions restent rendues en entier sur /documentation, qui porte la FAQ complète ; le
  * contrôle ci-dessous échoue au build si un libellé change, plutôt que de réduire la FAQ en silence.
  */
+/*
+ * QUATRE QUESTIONS PAR PAGE depuis le 16/09/2026, demande de l'équipe, contre six auparavant. Les deux
+ * retirées de cette liste, « Les frais d'acquisition, c'est quoi ? » et « Pourquoi R Start n'affiche-t-elle
+ * pas d'objectif de performance ? », ne disparaissent pas : elles sont sur /faq, comme les quatorze autres.
+ * L'ORDRE COMPTE : on commence par ce qu'est une SCPI, puis comment celle-ci crée de la performance, puis
+ * ce que sont les frais d'entrée, et on finit par la question du quand, qui prépare la souscription.
+ */
 const HOME_FAQ = [
   'Une SCPI, c’est quoi ?',
   'Comment R Start compte-t-elle créer de la performance, et en faire profiter ses clients ?',
   'Les frais d’entrée, c’est quoi ?',
-  'Les frais d’acquisition, c’est quoi ?',
-  'Pourquoi R Start n’affiche-t-elle pas d’objectif de performance ?',
   'Quand reçoit-on les premiers revenus et les premières plus-values potentielles avec R Start ?',
 ];
 const homeItems = rawItems.filter((item) => HOME_FAQ.includes(item.question));
@@ -346,8 +351,21 @@ export const faq = {
     answer: answer.map(nb),
   })),
   listLabel: 'Questions fréquentes sur R Start',
-  /** Renvoi vers la FAQ complète : les dix autres questions vivent sur /documentation. */
-  moreLink: { label: 'Toutes les questions', href: pages.documentation.path + '#faq' },
+  /*
+   * Renvoi vers la FAQ complète. Il pointait sur /documentation#faq, qui portait les seize questions ;
+   * elles ont leur propre page depuis le 16/09/2026, avec un champ de recherche.
+   */
+  moreLink: { label: 'Voir toutes les questions', href: pages.faq.path },
+  /** Champ de recherche de /faq : il filtre la liste rendue, il n'interroge rien. */
+  searchLabel: 'Rechercher dans les questions',
+  searchPlaceholder: 'frais, revenus, retrait, risque…',
+  /** Ce qui s'affiche sous le champ, `{n}` étant remplacé par le nombre de questions trouvées. */
+  searchCount: '{n} question(s) trouvée(s)',
+  searchEmpty: 'Aucune question ne correspond. Essayez un autre mot.',
+  /** En-tête de la page /faq, distinct de celui de la section courte. */
+  pageTitle: 'Toutes vos questions sur la SCPI R Start.',
+  pageIntro:
+    'Les réponses sont courtes et factuelles, issues des documents officiels de R Start. Elles ne remplacent pas la lecture du DIC et de la note d’information.',
   cta: { label: 'Souscrire en ligne', position: 'faq' },
   notes,
 } satisfies FaqContent;

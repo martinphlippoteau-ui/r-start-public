@@ -53,16 +53,51 @@ import Section from '@/components/ui/Section.astro';
 import { sections } from '@/config/sections';
 import { faq } from '@/content/fr/faq';
 
+/*
+ * PARAMÉTRÉ LE 16/09/2026 pour servir aussi la page /faq, qui rend les dix-huit questions avec un champ
+ * de recherche. Le composant lisait `faq.items` en dur. Le rendre paramétrable plutôt que le recopier :
+ * l'accordéon, ses transitions `::details-content` et le découpage avantage / contre-poids sont écrits
+ * une fois, et les deux surfaces ne peuvent pas diverger.
+ */
+interface Props {
+  /** Questions à rendre. Par défaut la sélection courte de l'accueil (faq.items). */
+  items?: typeof faq.allItems;
+  /** Renvoi vers la FAQ complète. Masqué sur la page qui EST la FAQ complète. */
+  showMoreLink?: boolean;
+  /** Champ de recherche : seulement là où il y a assez de questions pour qu'il serve. */
+  search?: boolean;
+  /** Titre et introduction, remplaçables par la page hôte. */
+  title?: string;
+  intro?: string;
+  tone?: 'paper' | 'white';
+  /**
+   * Révélation mot à mot du titre (`data-reveal-text`). À LAISSER À FALSE HORS DE L'ACCUEIL : cet
+   * attribut figure dans BESOIN_GSAP (src/scripts/motion.ts) et suffit à faire télécharger les 45 Ko
+   * de GSAP. tests/performance.spec.ts l'interdit sur les sous-pages, et c'est lui qui l'a attrapé
+   * quand /faq est entrée dans la liste.
+   */
+  revealTitle?: boolean;
+}
+const {
+  items: rendus = faq.items,
+  showMoreLink = true,
+  search = false,
+  title = faq.title,
+  intro = faq.intro,
+  tone = 'paper',
+  revealTitle = true,
+} = Astro.props as Props;
+
 const id = sections.faq.id;
 /** id du H2, référencé par aria-labelledby sur la section (convention de Section / SectionHeading). */
 const titleId = id + '-title';
-const items = faq.items.map((item) => {
+const items = rendus.map((item) => {
   const from = Math.min(Math.max(item.riskFrom ?? item.answer.length, 0), item.answer.length);
   return { ...item, advantage: item.answer.slice(0, from), risks: item.answer.slice(from) };
 });
 ---
 
-<Section id={id} tone="paper">
+<Section id={id} tone={tone}>
   <Container size="wide">
     {
       /* En-tête PLEINE LARGEUR depuis le 11/09/2026 : dans sa colonne de cinq douzièmes, le titre ne
@@ -70,20 +105,49 @@ const items = faq.items.map((item) => {
         donc de la grille, comme partout ailleurs, et les questions occupent le reste. */
     }
     <header>
-      <h2 id={titleId} class="text-display-lg text-balance" data-reveal-text>{faq.title}</h2>
+      <h2 id={titleId} class="text-display-lg text-balance" data-reveal-text={revealTitle || undefined}>
+        {title}
+      </h2>
       <p
         class="mt-6 max-w-3xl text-lead opacity-90"
         data-animate="fade-up"
         data-animate-delay="0.1"
       >
-        {faq.intro}
+        {intro}
       </p>
     </header>
 
     <div class="mt-chapter grid gap-12 lg:grid-cols-12 lg:gap-16">
       <!-- Questions -->
       <div class="lg:col-span-8 lg:col-start-3">
-        <ul role="list" aria-label={faq.listLabel} class="border-t border-navy/15">
+        {
+          /* CHAMP DE RECHERCHE (16/09/2026, page /faq). `type="search"` et non `text` : le navigateur
+            y pose sa croix d'effacement et les lecteurs d'écran l'annoncent comme une recherche.
+            Il FILTRE une liste déjà rendue, il n'interroge rien : les dix-huit questions sont dans le
+            HTML, la page marche donc sans script, champ masqué comme les boutons « i ». */
+        }
+        {search && (
+          <div class="mb-8" data-faq-recherche hidden>
+            <label for={id + '-recherche'} class="text-caption font-semibold text-navy">
+              {faq.searchLabel}
+            </label>
+            <input
+              id={id + '-recherche'}
+              type="search"
+              autocomplete="off"
+              placeholder={faq.searchPlaceholder}
+              class="mt-2 block w-full rounded-full border border-navy/25 bg-white px-5 py-3 text-base text-ink transition-colors placeholder:text-slate-600 hover:border-navy/50 focus-visible:border-navy focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy"
+            />
+            <p
+              class="text-caption mt-2 text-slate-700"
+              data-faq-compte
+              data-gabarit={faq.searchCount}
+              data-vide={faq.searchEmpty}
+              aria-live="polite"
+            />
+          </div>
+        )}
+        <ul role="list" aria-label={faq.listLabel} class="border-t border-navy/15" data-faq-liste>
           {
             items.map((item, i) => (
               <li class="border-b border-navy/15">
@@ -151,7 +215,7 @@ const items = faq.items.map((item) => {
             l'action, c'est la suite de la lecture. */
         }
         {
-          faq.moreLink && (
+          showMoreLink && faq.moreLink && (
             <p class="mt-10 sm:mt-12">
               <a
                 href={withBase(faq.moreLink.href)}
@@ -196,3 +260,9 @@ const items = faq.items.map((item) => {
     }
   }
 </style>
+
+<script>
+  /* Recherche interne de /faq : elle filtre la liste rendue, elle n'interroge rien. Le module ne fait
+     rien sur les pages qui n'ont pas de champ, il sort au premier `querySelector` nul. */
+  import '@/scripts/faqSearch';
+</script>

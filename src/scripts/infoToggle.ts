@@ -37,3 +37,8 @@ const init = (): void => {
 
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
 else init();
+
+/* `export {}` : sans import ni export, TypeScript traite le fichier comme un script et non comme
+   un module, et ses déclarations tombent dans l'espace global. Deux fichiers y déclaraient un
+   `init`, d'où un conflit de noms que le build refusait. */
+export {};

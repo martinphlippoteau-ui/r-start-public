@@ -16,6 +16,7 @@ export type PageKey =
   | 'strategy'
   | 'about'
   | 'documentation'
+  | 'faq'
   | 'press'
   | 'pressRoom'
   | 'legal'
@@ -85,6 +86,18 @@ export const pages: Record<PageKey, PageMeta> = {
     label: 'Documentation',
     order: 5,
     // Hors menu depuis le 11/09/2026 : accessible par le pied de page, comme la salle de presse.
+    inMenu: false,
+  },
+  /*
+   * FAQ COMPLÈTE, page créée le 16/09/2026. Les autres pages n'en rendent plus que quatre questions et
+   * renvoient ici pour le reste. HORS MENU, comme la documentation : la barre ne porte que les quatre
+   * pages du parcours (réunion du 10/09/2026), la FAQ s'atteint par les renvois et le pied de page.
+   */
+  faq: {
+    key: 'faq',
+    path: '/faq',
+    label: 'Questions fréquentes',
+    order: 8,
     inMenu: false,
   },
   press: {

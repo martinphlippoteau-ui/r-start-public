@@ -129,10 +129,16 @@ const availableFaqItems = faq.allItems ?? faq.items;
  * que de changer la page en silence.
  */
 /**
- * Depuis le 11/09/2026, cette page porte la FAQ COMPLÈTE : l'accueil n'en rend plus que six questions
- * (faq.ts, HOME_FAQ) et renvoie ici. Plus aucun filtre par sujet : les seize questions sont rendues.
+ * QUATRE QUESTIONS depuis le 16/09/2026, demande de l'équipe : « 4 questions sur chaque page puis un CTA
+ * secondaire pour aller vers la page /faq ». Cette page portait la FAQ complète depuis le 11/09 ; celle-ci
+ * a désormais sa propre page, avec un champ de recherche, et /documentation redevient un centre de
+ * documents avec un aperçu de questions.
+ *
+ * CE SONT LES QUATRE PREMIÈRES, et non une nouvelle sélection par sujet : le filtre par mot-clé qui avait
+ * existé ici dérivait au premier ajustement d'un libellé dans faq.ts, ce que son propre garde-fou disait.
+ * Les seize restent à un lien, sur /faq.
  */
-const faqItems = availableFaqItems;
+const faqItems = availableFaqItems.slice(0, 4);
 const pei = subscription.options.pei;
 const rd = subscription.options.rd;
 const zeroAfter = feeFacts.withdrawal.zeroAfterYears;
@@ -304,12 +310,12 @@ export const documentation = {
   faq: {
     title: 'Questions fréquentes',
     items: faqItems,
-    /** Cette page porte désormais la FAQ complète : le renvoi vers l'accueil n'a plus lieu d'être. */
+    /* Renvoi vers /faq depuis le 16/09/2026 : la page n'en rend plus que quatre. */
     fullFaqLink: {
       intro:
-        'Ces questions reprennent l’intégralité de la foire aux questions du site : documents, souscription, revenus, risques, fiscalité et stratégie.',
-      label: 'Revenir à l’accueil',
-      href: pages.home.path,
+        'Documents, souscription, revenus, risques, fiscalité et stratégie : toutes les questions sont réunies sur une page, avec un champ de recherche.',
+      label: 'Voir toutes les questions',
+      href: pages.faq.path,
     },
   },
 

@@ -363,8 +363,19 @@ export interface FaqContent {
   title: string;
   intro: string;
   items: FaqItem[];
-  /** Toutes les questions, pour la page qui porte la FAQ complète (/documentation). */
+  /** Toutes les questions, pour la page qui porte la FAQ complète (/faq depuis le 16/09/2026). */
   allItems?: FaqItem[];
+  /**
+   * Micro-textes de /faq (16/09/2026) : en-tête propre à la page, et champ de recherche. Celui-ci
+   * FILTRE une liste déjà rendue, il n'interroge rien : les questions sont toutes dans le HTML.
+   */
+  pageTitle?: string;
+  pageIntro?: string;
+  searchLabel?: string;
+  searchPlaceholder?: string;
+  /** `{n}` y est remplacé par le nombre de questions trouvées. */
+  searchCount?: string;
+  searchEmpty?: string;
   /** aria-label de la liste des questions (ex. « Questions fréquentes sur R Start »). */
   listLabel?: string;
   /** Renvoi vers la FAQ complète, rendu sous la liste de l'accueil. */

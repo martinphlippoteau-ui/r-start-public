@@ -1,0 +1,72 @@
+---
+/**
+ * Page /faq, créée le 16/09/2026 : LES DIX-HUIT QUESTIONS, avec un champ de recherche.
+ *
+ * Les autres pages n'en rendent plus que quatre et renvoient ici (faq.moreLink). La FAQ complète vivait
+ * jusque-là sous /documentation#faq, où elle était noyée dans une page de documents.
+ *
+ * ELLE RÉUTILISE LA SECTION DE L'ACCUEIL, paramétrée : l'accordéon, ses transitions
+ * `::details-content` et le découpage avantage / contre-poids sont écrits une seule fois, les deux
+ * surfaces ne peuvent donc pas diverger. Le renvoi est masqué ici, la page EST la destination.
+ *
+ * LA RECHERCHE N'INTERROGE RIEN : les questions sont toutes dans le HTML et le script se contente de
+ * masquer celles qui ne correspondent pas. La page se lit donc entière sans JavaScript, et le champ
+ * n'apparaît que si le script s'exécute.
+ *
+ * Hors menu, comme /documentation : la barre ne porte que les quatre pages du parcours.
+ */
+import Base from '@/layouts/Base.astro';
+import SiteNav from '@/components/SiteNav.astro';
+import Footer from '@/components/Footer.astro';
+import Breadcrumb from '@/components/ui/Breadcrumb.astro';
+import Button from '@/components/ui/Button.astro';
+import PageHero from '@/components/ui/PageHero.astro';
+import StickyCta from '@/components/StickyCta.astro';
+import Faq from '@/components/sections/10-Faq.astro';
+import { pages } from '@/config/pages';
+import { faq } from '@/content/fr/faq';
+import { breadcrumbJsonLd, faqJsonLd, organizationJsonLd, webPageJsonLd } from '@/lib/seo';
+
+const page = pages.faq;
+const titre = faq.pageTitle ?? faq.title;
+const intro = faq.pageIntro ?? faq.intro;
+
+const jsonLd = [
+  organizationJsonLd(),
+  webPageJsonLd({ path: page.path, title: titre, description: intro }),
+  breadcrumbJsonLd('faq'),
+  /* Le JSON-LD porte les DIX-HUIT questions, et non les quatre de l'accueil : c'est cette page que les
+     moteurs doivent associer à la FAQ du site. */
+  faqJsonLd(faq.allItems ?? faq.items),
+];
+---
+
+<Base title={titre} description={intro} path={page.path} jsonLd={jsonLd}>
+  <SiteNav />
+  <main id="contenu">
+    <PageHero eyebrow={faq.eyebrow} title={titre} intro={intro}>
+      <Breadcrumb slot="breadcrumb" key="faq" tone="dark" />
+      <Button slot="cta" position={faq.cta.position} variant="light" size="lg">
+        {faq.cta.label}
+      </Button>
+    </PageHero>
+
+    {
+      /* `showMoreLink` à false : cette page est la destination du renvoi, il n'a rien à pointer.
+        Le titre et l'introduction sont ceux de l'en-tête juste au-dessus, on ne les répète pas : la
+        section reçoit donc des chaînes vides pour son propre en-tête. */
+    }
+    <Faq
+      items={faq.allItems ?? faq.items}
+      showMoreLink={false}
+      search
+      title={faq.listLabel ?? titre}
+      intro=""
+      tone="white"
+      revealTitle={false}
+    />
+  </main>
+
+  <StickyCta label={faq.cta.label} position={faq.cta.position} from="#faq" />
+  <Footer />
+</Base>
