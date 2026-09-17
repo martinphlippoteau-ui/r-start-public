@@ -192,8 +192,10 @@ export interface StrategyChapter {
    * `lead` porte l'accent (gras du document), `rest` la suite de la phrase quand il y en a une.
    * `icon` met une puce en pictogramme à la place du point (16/09/2026, demande de l'équipe sur les
    * deux items de la zone « Où ») : clé de ui/Picto.astro.
+   * `benefit` : ce que le moteur apporte à l'épargnant, en une ligne sous le titre de la carte, côté
+   * recto (17/09/2026, demande de l'équipe, cartes des deux moteurs de /strategie).
    */
-  items: { lead: string; rest?: string; icon?: PictoKey }[];
+  items: { lead: string; rest?: string; icon?: PictoKey; benefit?: string }[];
   /**
    * Phrase qui referme le chapitre, sous la liste. Facultative depuis le 16/09/2026 : celle des deux
    * moteurs est descendue dans la zone « Quoi », où elle ouvre le propos au lieu de fermer le précédent.

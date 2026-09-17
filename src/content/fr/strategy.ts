@@ -46,12 +46,17 @@ export const strategy: StrategyContent = {
      * portent une note de périmètre ; celle-ci n'en a pas encore.
      */
     items: [
+      /* `benefit` : la ligne sous le titre de la carte (17/09/2026, texte de l'équipe mot pour mot).
+         « tous les mois » est exact : distribution mensuelle (facts.ts, `frequency`). « potentiels »
+         est indispensable, les revenus d'une SCPI n'étant pas garantis. */
       {
         lead: 'Les loyers',
+        benefit: 'Pour vous : des revenus potentiels tous les mois',
         rest: 'Comme toute SCPI de rendement, R Start distribue à ses épargnants des revenus potentiels (appelés « dividendes ») issus des loyers facturés aux entreprises locataires de ses immeubles.',
       },
       {
         lead: 'Les plus-values',
+        benefit: 'Pour vous : des revenus potentiels à chaque vente d’immeuble',
         rest:
           'R Start met au cœur de sa démarche la recherche de plus-values sur les ventes d’immeubles. C’est une particularité de cette SCPI. En clair, R Start vise à dégager des plus-values sur vente d’immeubles de façon plus systématique que d’autres SCPI. Les plus-values réalisées sont redistribuées aux épargnants sous forme de dividendes. C’est la deuxième source de revenus potentiels pour les clients de la SCPI R Start.',
       },
