@@ -2530,17 +2530,15 @@ body:has(#consent-banner:not([hidden])) [data-hero-scroll-hint] {
      deux affichées, empilées et opaques : deux blancs à 72 % font 92 %, et la barre virait au blanc
      pendant les 550 ms de la transition, mesuré à 231 de luminosité contre 197 au repos, avant de
      retrouver son verre d'un coup. L'ancienne capture est masquée, seule la nouvelle est là.
-     ET LE FLOU EST REJOUÉ : une capture est une image, elle ne floute rien ; le conteneur des deux
-     captures reçoit donc le filtre d'arrière-plan de la barre, il floute la capture de la page qui
-     passe derrière, comme le verre vivant le fait. Le rayon suit celui de la barre, sans quoi le flou
-     dessinerait un rectangle sous les bouts arrondis. */
+     PAS DE FLOU D'ARRIÈRE-PLAN SUR LA CAPTURE. Une capture est une image, elle ne floute rien, et l'idée
+     de poser le filtre de la barre sur le conteneur des captures (image-pair) a été essayée puis
+     retirée le soir même : ce pseudo-élément n'honore pas `border-radius`, le `saturate(185%)`
+     s'appliquait à sa boîte rectangulaire et dessinait des bords carrés autour de la pastille sur les
+     en-têtes teal (« quand je clique sur le logo ça fait apparaître des bords », Martin). La capture
+     plate à 72 % a la même luminosité moyenne que le verre vivant, seule la texture diffère, sous des
+     dégradés où cela ne se voit pas. */
   ::view-transition-group(barre-nav) {
     animation-duration: 0s;
-  }
-  ::view-transition-image-pair(barre-nav) {
-    border-radius: var(--radius-nav);
-    -webkit-backdrop-filter: saturate(185%) blur(24px);
-    backdrop-filter: saturate(185%) blur(24px);
   }
   ::view-transition-old(barre-nav),
   ::view-transition-new(barre-nav) {
