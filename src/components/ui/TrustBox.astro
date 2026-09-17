@@ -46,9 +46,10 @@ const widget = tp.widgets.templates[template];
  * premier essai : le bandeau du hero ne filtre rien, il n'a donc aucune mention à masquer, et il ne
  * fait que 28 px de haut. Les dix-huit pixels de marge négative lui en retiraient les deux tiers.
  *
- * IL EST ÉTEINT SAUF SI `PUBLIC_TRUSTBOX_CROP=true` EST POSÉ DANS L'ENVIRONNEMENT. La variable est
- * déclarée dans .github/workflows/github-pages.yml, ATTACHÉE AU RÉGIME DE PRÉVISUALISATION : ce
- * déploiement est chiffré par mot de passe et en noindex, aucun épargnant ne le voit.
+ * IL EST ÉTEINT SAUF SI `PUBLIC_TRUSTBOX_CROP=true` EST POSÉ DANS L'ENVIRONNEMENT. Le workflow de
+ * déploiement (.github/workflows/github-pages.yml) l'a posé du 15 au 17/09/2026, tant que la
+ * prévisualisation était chiffrée par mot de passe et en noindex ; le mot de passe retiré, l'équipe a
+ * demandé de « remettre nos avis », la variable n'y est plus. Il ne sert qu'à un aperçu local.
  *
  * CE QUE CE RÉGLAGE FAIT, EN CLAIR. Il masque, sans la supprimer, la seule mention qui dit au visiteur
  * que le carrousel ne présente que les avis favorables. Devant de vrais visiteurs, il présenterait une
