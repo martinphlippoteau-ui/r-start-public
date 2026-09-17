@@ -82,7 +82,9 @@ const init = (): void => {
    * DOM : ce frère est le <script> du composant, rendu en place, dont la boîte vaut zéro. Faute
    * d'invitation, la première section qui suit.
    */
-  const ancre = indice?.hash ? document.getElementById(decodeURIComponent(indice.hash.slice(1))) : null;
+  const ancre = indice?.hash
+    ? document.getElementById(decodeURIComponent(indice.hash.slice(1)))
+    : null;
   let suivante = hero?.nextElementSibling ?? null;
   while (suivante && suivante.tagName !== 'SECTION') suivante = suivante.nextElementSibling;
   const contenu = (ancre ?? suivante) as HTMLElement | null;
@@ -100,10 +102,12 @@ const init = (): void => {
   let dernierCran = 0;
   let sensTraine = 0;
 
-  /** Page verrouillée (tiroir du menu, fenêtre ouverte) : on ne touche à rien. */
+  /** Page verrouillée (tiroir du menu, fenêtre ouverte, recherche du site) : on ne touche à rien. La
+      recherche ne pose pas `overflow: hidden` (elle neutralise les gestes elle-même), d'où son repère. */
   const verrouillee = (): boolean =>
     document.documentElement.style.overflow === 'hidden' ||
-    document.querySelector('dialog[open]') !== null;
+    document.querySelector('dialog[open]') !== null ||
+    document.querySelector('[data-recherche-ouverte]') !== null;
 
   /**
    * Le sens demandé mène-t-il à un passage ? Vers le bas : on est au-dessus du contenu. Vers le haut :
@@ -220,7 +224,8 @@ const init = (): void => {
 
   /* ── Clavier ──────────────────────────────────────────────────────────────────────────────── */
   const surTouche = (e: KeyboardEvent): void => {
-    if (reduit.matches || e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || verrouillee()) return;
+    if (reduit.matches || e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || verrouillee())
+      return;
     const cibleTouche = e.target as HTMLElement | null;
     if (
       cibleTouche?.closest(
@@ -249,7 +254,8 @@ const init = (): void => {
 
   /* ── Invitation à défiler ─────────────────────────────────────────────────────────────────── */
   const surIndice = (e: MouseEvent): void => {
-    if (reduit.matches || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    if (reduit.matches || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey)
+      return;
     e.preventDefault();
     aller(cible(), 1);
     /* Le focus suit, comme après une navigation d'ancre, sans provoquer de défilement propre. */

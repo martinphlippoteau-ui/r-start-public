@@ -123,6 +123,40 @@ test.describe('Recherche du site', () => {
     expect(await barre.evaluate((b) => getComputedStyle(b).backgroundColor)).toBe(verreBarre);
   });
 
+  /*
+   * La page ne défile pas sous le panneau, SANS `overflow: hidden` : ce verrou retirait la barre de
+   * défilement et recentrait la page, ou laissait une gouttière vide. Ce sont les gestes qui sont
+   * neutralisés. Et la fermeture rend le défilement.
+   */
+  test('la page ne défile pas sous le panneau, et redéfile après', async ({ page, isMobile }) => {
+    /* Bureau seulement : au doigt, c'est `touchmove` qui est neutralisé, et Playwright n'a pas de geste
+       de défilement tactile ; sa molette en émulation mobile contourne l'événement `wheel` de la page. */
+    test.skip(isMobile, 'la molette est un geste de bureau');
+    await page.goto('/strategie/');
+    await page.locator('[data-consent-refuse]').click();
+    await page.evaluate(() => window.scrollTo(0, 200));
+    await page.waitForTimeout(300);
+    /* Clic par coordonnées : `locator.click` fait défiler jusqu'au bouton et fausserait la mesure. */
+    const loupe = await page.locator('[data-recherche-ouvrir]').boundingBox();
+    if (!loupe) throw new Error('loupe introuvable');
+    await page.mouse.click(loupe.x + loupe.width / 2, loupe.y + loupe.height / 2);
+    await expect(page.locator('[data-recherche-champ]')).toBeFocused();
+    expect(await page.evaluate(() => document.documentElement.style.overflow)).toBe('');
+
+    const vue = page.viewportSize() ?? { width: 1440, height: 900 };
+    await page.mouse.move(vue.width / 2, vue.height * 0.8);
+    await page.mouse.wheel(0, 600);
+    await page.waitForTimeout(400);
+    expect(await page.evaluate(() => Math.round(window.scrollY)), 'molette neutralisée').toBe(200);
+
+    await page.keyboard.press('Escape');
+    await expect(page.locator('[data-recherche-panneau]')).toBeHidden();
+    await page.mouse.wheel(0, 600);
+    await expect
+      .poll(() => page.evaluate(() => Math.round(window.scrollY)), 'la molette redéfile')
+      .toBeGreaterThan(200);
+  });
+
   test('sans résultat, le panneau le dit et renvoie vers toutes les questions', async ({
     page,
   }) => {

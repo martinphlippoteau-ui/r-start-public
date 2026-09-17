@@ -101,16 +101,6 @@
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
-  /* DOCUMENT VERROUILLÉ (tiroir du menu, recherche : les scripts posent `overflow: hidden` en style
-     sur <html>) : la gouttière de la barre de défilement reste réservée. Avec une barre classique
-     (Windows, souris branchée sur Mac), la barre disparaissait avec le verrou et la page se recentrait
-     de 7 px à chaque ouverture, la pastille de navigation avec elle (17/09/2026). Sans effet avec les
-     barres en surimpression. Limité au verrou et non permanent : Chromium headless, dont les barres sont
-     masquées mais gardent leurs 15 px de métrique, réservait sinon une gouttière vide sur toutes les
-     captures de bureau. */
-  html[style*='overflow: hidden'] {
-    scrollbar-gutter: stable;
-  }
   /* Page /documentation : une seconde barre collante (ancres des groupes) sous la navigation. */
   html:has([data-docsnav]) {
     scroll-padding-top: calc(var(--spacing-subnav) * 2 + var(--spacing-nav-gap) + 1.5rem);
@@ -1615,13 +1605,19 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
 }
 
 /* Peau de l'indicateur : un verre plus dense que celui de la barre, avec sa propre arête claire. Elle
-   ne porte que l'ÉTIREMENT, jamais le déplacement, qui est à l'enveloppe (SiteNav.astro). */
+   ne porte que l'ÉTIREMENT, jamais le déplacement, qui est à l'enveloppe (SiteNav.astro).
+   SA TEINTE NE SUIT PLUS `--nav-glass-on` (17/09/2026). Elle en héritait depuis l'époque du voile de
+   l'accueil, pour s'effacer avec la barre transparente ; la variable vaut 1 partout depuis le 12/09,
+   sauf pendant la recherche, où la barre éteint son verre au profit du panneau : la pastille
+   disparaissait alors d'un coup à l'ouverture et revenait à la fermeture, un scintillement de dix
+   niveaux de gris mesuré image par image, signalé par Martin. Elle reste au-dessus du panneau et
+   garde sa teinte. */
 @utility subnav-pill-skin {
   display: block;
   width: 100%;
   height: 100%;
   border-radius: inherit;
-  background: rgb(2 75 103 / calc(0.08 * var(--nav-glass-on, 1)));
+  background: rgb(2 75 103 / 0.08);
   box-shadow:
     inset 0 1px 0 rgb(255 255 255 / 0.6),
     0 2px 8px rgb(2 75 103 / 0.1);

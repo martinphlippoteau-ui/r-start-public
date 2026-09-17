@@ -49,7 +49,8 @@ export const hero = {
    *    coexistent donc, l'une bornée, l'autre non.
    * Le détail des frais réellement prélevés reste à un clic, dans la note `hero-frais`.
    */
-  tagline: 'La première SCPI sans frais de souscription ni frais d’acquisition.',
+  /* Sans point final depuis le 17/09/2026 (demande de Martin) : une accroche, pas une phrase. */
+  tagline: 'La première SCPI sans frais de souscription ni frais d’acquisition',
   /**
    * Contre-poids unique du hero. La phrase qui énumérait les frais prélevés a été retirée le 11/09/2026
    * à la demande de l'équipe : le bloc ne porte plus que la ligne risques de legal.ts, reproduite mot

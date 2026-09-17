@@ -324,8 +324,12 @@ const QUIET_TITLE_Y = 12;
       /* LA MENTION RÉGLEMENTAIRE D'ABORD, les définitions ensuite : elle qualifie tous les chiffres
         au-dessus, elle ne peut pas être la sixième ligne d'une liste de notes. Jamais animée. */
     }
-    <p class="mt-10 max-w-4xl text-base leading-relaxed text-ink">{corumRange.pastPerformance}</p>
-    <ul role="list" class="text-caption mt-5 max-w-4xl space-y-3 text-slate-700">
+    {
+      /* PLEINE LARGEUR DES CARTES (17/09/2026, demande de Martin) : la mention et les définitions
+        s'alignent sur la grille au-dessus, plus de `max-w-4xl` qui les arrêtait aux trois quarts. */
+    }
+    <p class="mt-10 text-base leading-relaxed text-ink">{corumRange.pastPerformance}</p>
+    <ul role="list" class="text-caption mt-5 space-y-3 text-slate-700">
       {corumRange.notes.map((note) => <li>{note}</li>)}
     </ul>
   </Container>

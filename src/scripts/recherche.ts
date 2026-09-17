@@ -9,6 +9,16 @@
  * sont retirés, en alternant entre la rubrique la plus longue et l'autre, jusqu'à ce que rien ne
  * déborde ; trois ou quatre résultats en général, deux sur un téléphone.
  *
+ * LA PAGE N'EST PAS VERROUILLÉE PAR `overflow: hidden` (17/09/2026, au soir). Ce verrou retire la barre
+ * de défilement : avec une barre classique (Windows, souris branchée sur Mac), la page se recentrait
+ * de 7 px à l'ouverture ; et réserver la gouttière (`scrollbar-gutter: stable`) laissait à sa place une
+ * colonne vide de 15 px que le voile ne couvre pas, « un carré » (Martin). La barre de défilement reste
+ * donc en place, et ce sont les GESTES qui sont neutralisés tant que le panneau est ouvert : molette,
+ * doigt, touches de défilement hors du champ et des boutons. La zone des résultats garde son propre
+ * défilement si elle en a besoin (`overscroll-behavior: contain`, rien ne remonte à la page). Un glissé
+ * de la barre de défilement elle-même reste possible : la page bouge alors sous le voile, et la
+ * contraction de la barre (`data-stuck`) est recopiée sur le panneau au fil de l'eau.
+ *
  * LE RELAIS DES VERRES. Fermé, le panneau est masqué et la barre porte le verre. À l'ouverture, dans la
  * même image, le panneau apparaît sous la barre, à sa hauteur exacte et dans la même matière (jusqu'au
  * `data-stuck` recopié), et la barre éteint le sien (global.css, sélecteur `:has`) ; puis il grandit.
@@ -396,6 +406,37 @@ const init = (): void => {
   const libelleFermer = bouton.dataset.labelFermer ?? libelleOuvrir;
   const sobre = window.matchMedia('(prefers-reduced-motion: reduce)');
 
+  /* --- Défilement de la page ------------------------------------------------------------------- */
+  /** La zone des résultats défile elle-même : seulement si elle déborde, et pour ce qui est dedans. */
+  const defilable = (cible: EventTarget | null): boolean =>
+    cible instanceof Node &&
+    defilement.contains(cible) &&
+    defilement.scrollHeight > defilement.clientHeight + 1;
+  const bloquer = (e: Event): void => {
+    if (!ouvert() || defilable(e.target)) return;
+    e.preventDefault();
+  };
+  document.addEventListener('wheel', bloquer, { passive: false });
+  document.addEventListener('touchmove', bloquer, { passive: false });
+  /** Touches qui font défiler la page quand le focus n'est ni dans le champ ni sur un bouton. */
+  const TOUCHES_DEFILEMENT = new Set([
+    ' ',
+    'PageUp',
+    'PageDown',
+    'Home',
+    'End',
+    'ArrowUp',
+    'ArrowDown',
+  ]);
+
+  /* Même matière que la barre à tout instant : sa contraction au défilement est recopiée à chaque
+     changement, pas seulement à l'ouverture, puisque la page peut encore bouger sous le voile. */
+  if (bar) {
+    new MutationObserver(() =>
+      panneau.toggleAttribute('data-stuck', bar.hasAttribute('data-stuck'))
+    ).observe(bar, { attributes: true, attributeFilter: ['data-stuck'] });
+  }
+
   /* --- Index ------------------------------------------------------------------------------------ */
   let index: Prepare[] | null = null;
   let chargement: Promise<void> | null = null;
@@ -618,7 +659,6 @@ const init = (): void => {
     else minuterieEtabli = window.setTimeout(etablir, SECOURS_OUVERTURE);
     bouton.setAttribute('aria-expanded', 'true');
     bouton.setAttribute('aria-label', libelleFermer);
-    document.documentElement.style.overflow = 'hidden';
     /* Dans le même geste que le clic : iOS n'ouvre le clavier qu'à cette condition. */
     champ.focus({ preventScroll: true });
     champ.select();
@@ -654,7 +694,6 @@ const init = (): void => {
     panneau.style.height = '';
     bouton.setAttribute('aria-expanded', 'false');
     bouton.setAttribute('aria-label', libelleOuvrir);
-    document.documentElement.style.overflow = '';
     if (rendreFocus) bouton.focus({ preventScroll: true });
     window.clearTimeout(minuterieFermeture);
     /* En mouvement réduit, aucune transition ne finira jamais : on masque tout de suite. */
@@ -713,6 +752,12 @@ const init = (): void => {
       return;
     }
     const actif = document.activeElement as HTMLElement | null;
+    if (
+      TOUCHES_DEFILEMENT.has(e.key) &&
+      !(actif instanceof HTMLInputElement) &&
+      !(actif instanceof HTMLButtonElement)
+    )
+      e.preventDefault();
     if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
       const tous = liens();
       if (!tous.length) return;
