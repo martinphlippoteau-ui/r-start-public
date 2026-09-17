@@ -1571,6 +1571,41 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
 }
 
 /*
+ * LUEURS SABLE DES CARTES (17/09/2026, demande de l'équipe : « adoucir les cards avec des ombres sable
+ * comme la hero de la home »). Les cinq cartes de /strategie étaient des aplats ink ; elles reprennent
+ * la lumière de l'aurore du hero : le même sable (#E7CCA5), posé comme lui DANS LE COIN HAUT DROIT, là
+ * où la carte ne porte rien, et un second foyer, plus faible, dans le coin bas gauche.
+ *
+ * LOIN DU TEXTE, COMME DANS LE HERO. Le titre est en sable et à gauche : un foyer de la même teinte
+ * derrière lui l'effacerait. Le grand foyer s'arrête avant la colonne du titre ; le petit passe sous le
+ * bouton, dont le texte blanc garde un contraste très au-dessus de 4,5:1 (tests/qualite.spec.ts).
+ *
+ * FIXES. L'aurore du hero dérive ; ici le dessin de la carte est déjà en mouvement, et un fond qui
+ * bougerait dessous lui ferait concurrence. Dégradés radiaux sans `filter` : rien à recalculer.
+ *
+ * SUR UN PSEUDO-ÉLÉMENT, sous le contenu (`z-index: -1` dans le contexte isolé de la carte), et non en
+ * `background-image` sur la carte : les contrôles de contraste remontent les fonds des ancêtres et
+ * sautent tout élément à image de fond, les boutons des cartes n'y auraient plus été mesurés.
+ * Posée sur les DEUX faces, recto et dos : une carte retournée ne doit pas redevenir un aplat.
+ */
+@utility carte-lueur {
+  --lueur-haut: 0.3;
+  --lueur-bas: 0.14;
+  isolation: isolate;
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    pointer-events: none;
+    background-image:
+      radial-gradient(75% 65% at 100% 0%, rgb(231 204 165 / var(--lueur-haut)) 0%, transparent 70%),
+      radial-gradient(60% 45% at 0% 100%, rgb(231 204 165 / var(--lueur-bas)) 0%, transparent 70%);
+  }
+}
+
+/*
  * LA CARTE SE RETOURNE (16/09/2026, demande de l'équipe). Le retournement est joué par
  * src/scripts/carteRetournee.ts (Web Animations API, 460 ms) ; il ouvrait d'abord une <dialog>, qui a
  * disparu le jour même au profit d'un dos de carte.

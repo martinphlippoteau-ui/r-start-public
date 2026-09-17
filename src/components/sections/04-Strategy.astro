@@ -170,7 +170,7 @@ const pontVisible = !strategy.engines.outro && !strategy.engines.disclaimer;
             <li class="[perspective:1400px]">
             <div class="carte-face relative h-full">
               <article
-                class="carte-recto relative flex min-h-[24rem] flex-col overflow-hidden rounded-3xl bg-ink p-6 text-white sm:min-h-[26rem] sm:p-8"
+                class="carte-recto carte-lueur relative flex min-h-[24rem] flex-col overflow-hidden rounded-3xl bg-ink p-6 text-white sm:min-h-[26rem] sm:p-8"
               >
                 <p class="text-eyebrow text-teal-200 tabular-nums" aria-hidden="true">{numero}</p>
                 <p class="text-display-sm mt-3 text-sand">{item.lead}</p>
@@ -222,7 +222,7 @@ const pontVisible = !strategy.engines.outro && !strategy.engines.disclaimer;
                   déplace le texte écrit plus bas dans le flux, pour que la page se lise entière sans
                   JavaScript. La marque reste, petite et en coin, hors du chemin du texte. */
               }
-              <div class="carte-verso">
+              <div class="carte-verso carte-lueur">
                 <MarqueR class="carte-verso-marque w-12 text-white/10" />
               </div>
             </div>
@@ -421,7 +421,7 @@ const pontVisible = !strategy.engines.outro && !strategy.engines.disclaimer;
                   présente son envers. */
               }
             <div class="carte-face relative h-full">
-              <article class="carte-recto relative flex min-h-[24rem] flex-col overflow-hidden rounded-3xl bg-ink p-6 text-white sm:min-h-[28rem] sm:p-8">
+              <article class="carte-recto carte-lueur relative flex min-h-[24rem] flex-col overflow-hidden rounded-3xl bg-ink p-6 text-white sm:min-h-[28rem] sm:p-8">
                 {zone.eyebrow && <p class="text-eyebrow text-teal-200">{zone.eyebrow}</p>}
                 <h3 id={ancre + '-title'} class="text-display-sm mt-3 max-w-[16rem] text-sand">
                   {zone.title}
@@ -479,7 +479,7 @@ const pontVisible = !strategy.engines.outro && !strategy.engines.disclaimer;
                   déplace le texte écrit plus bas dans le flux, pour que la page se lise entière sans
                   JavaScript. La marque reste, petite et en coin, hors du chemin du texte. */
               }
-              <div class="carte-verso">
+              <div class="carte-verso carte-lueur">
                 <MarqueR class="carte-verso-marque w-12 text-white/10" />
               </div>
             </div>
