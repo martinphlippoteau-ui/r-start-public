@@ -513,6 +513,83 @@ test.describe('Qualité', () => {
   });
 
   /*
+   * CHAQUE BOUTON A SA PEAU ET SE VOIT SUR SON FOND (17/09/2026). Deux accidents rattrapés avant la mise
+   * en ligne des quatre rôles de bouton : `btn-light` et `btn-lg`, composés dynamiquement dans
+   * Button.astro, n'étaient pas générés par Tailwind (le « Souscrire en ligne » du hero s'affichait en
+   * texte nu) ; et un bouton contour blanc avait été posé sur une section blanche (invisible). Le test
+   * relève, pour chaque `.btn` visible, son rembourrage et le contraste texte / fond effectif, fond
+   * obtenu en remontant les ancêtres et en composant les fonds translucides. Un ancêtre à image de fond
+   * rend la mesure incertaine : ce bouton-là est sauté plutôt que jugé à tort.
+   */
+  test('chaque bouton a sa peau et se lit sur son fond', async ({ page }) => {
+    for (const chemin of ['/', '/strategie/', '/frais/', '/a-propos/', '/documentation/', '/404.html']) {
+      await page.goto(chemin);
+      const mesures = await page.evaluate(() => {
+        const toile = document.createElement('canvas');
+        toile.width = toile.height = 1;
+        const ctx = toile.getContext('2d', { willReadFrequently: true })!;
+        const rgba = (c: string) => {
+          ctx.clearRect(0, 0, 1, 1);
+          ctx.fillStyle = '#000';
+          ctx.fillStyle = c;
+          ctx.fillRect(0, 0, 1, 1);
+          const d = ctx.getImageData(0, 0, 1, 1).data;
+          return { r: d[0], g: d[1], b: d[2], a: d[3] / 255 };
+        };
+        type C = { r: number; g: number; b: number };
+        const lum = ({ r, g, b }: C) => {
+          const f = (v: number) => ((v /= 255) <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4);
+          return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+        };
+        const sur = (h: C & { a: number }, bas: C): C => ({
+          r: h.r * h.a + bas.r * (1 - h.a),
+          g: h.g * h.a + bas.g * (1 - h.a),
+          b: h.b * h.a + bas.b * (1 - h.a),
+        });
+        return [...document.querySelectorAll<HTMLElement>('a.btn, button.btn')]
+          .filter((el) => {
+            const r = el.getBoundingClientRect();
+            return (
+              r.width > 0 &&
+              !el.classList.contains('skip-link') &&
+              !el.closest('[hidden], dialog:not([open]), [aria-hidden="true"], .carte-verso')
+            );
+          })
+          .flatMap((el) => {
+            const couches = [];
+            let fond: C | null = null;
+            for (let n: HTMLElement | null = el; n; n = n.parentElement) {
+              const s = getComputedStyle(n);
+              if (s.backgroundImage !== 'none') return [];
+              const c = rgba(s.backgroundColor);
+              if (c.a > 0.99) {
+                fond = c;
+                break;
+              }
+              if (c.a > 0) couches.push(c);
+            }
+            let base: C = fond ?? { r: 255, g: 255, b: 255 };
+            for (const c of couches.reverse()) base = sur(c, base);
+            const texte = sur(rgba(getComputedStyle(el).color), base);
+            const [x, y] = [lum(texte), lum(base)].sort((m, n) => n - m);
+            return [
+              {
+                libelle: (el.textContent ?? '').replace(/\s+/g, ' ').trim(),
+                rembourrage: parseFloat(getComputedStyle(el).paddingLeft),
+                contraste: Math.round(((x + 0.05) / (y + 0.05)) * 100) / 100,
+              },
+            ];
+          });
+      });
+      expect(mesures.length, `${chemin} : aucun bouton mesuré`).toBeGreaterThan(0);
+      for (const m of mesures) {
+        expect(m.rembourrage, `${chemin} « ${m.libelle} » sans rembourrage`).toBeGreaterThanOrEqual(8);
+        expect(m.contraste, `${chemin} « ${m.libelle} » illisible sur son fond`).toBeGreaterThanOrEqual(4.5);
+      }
+    }
+  });
+
+  /*
    * Survol d'un lien de contenu (14/09/2026, « le trait est sur le texte ») : le soulignement doit
    * apparaître AU SURVOL, sous les jambages, et une seule fois. Avant, `hover:underline` posait le
    * trait d'un coup à 0,2 em du texte, et là où la classe accompagnait `nav-link`, deux traits se

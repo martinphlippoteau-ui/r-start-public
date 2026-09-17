@@ -94,7 +94,7 @@ const typeDePage = !chemin
     data-page-type={typeDePage}
     data-souscription-ouverte={site.subscribeOpen ? 'oui' : 'non'}
   >
-    <a href="#contenu" class="skip-link">{nav.skipLink}</a>
+    <a href="#contenu" class="skip-link btn btn-primary btn-md">{nav.skipLink}</a>
     <slot />
     <Consent />
     {!site.subscribeOpen && <SubscribeSoon />}

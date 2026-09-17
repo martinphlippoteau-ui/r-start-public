@@ -86,7 +86,7 @@ const topLabel = footer.backToTopLabel;
           <a
             href="#contenu"
             data-footer-top
-            class="footer-top group inline-flex items-center gap-2.5 rounded-full border border-navy/25 px-5 py-3 text-base font-semibold text-navy no-underline transition-colors hover:border-navy hover:bg-navy hover:text-white focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-navy"
+            class="footer-top group btn btn-motion btn-secondary btn-md"
           >
             {topLabel}
             <svg
@@ -145,7 +145,7 @@ const topLabel = footer.backToTopLabel;
                   link.soon ? (
                     <li>
                       <details class="footer-soon">
-                        <summary class="inline-flex min-h-11 cursor-pointer items-center gap-1.5 py-1.5 text-base text-slate-700 hover:text-navy">
+                        <summary class="link-underline inline-flex min-h-11 cursor-pointer items-center gap-1.5 py-1.5 text-base text-slate-700 hover:text-navy">
                           {link.label}
                         </summary>
                         <p class="pb-1.5 text-sm text-slate-700">{footer.soonMessage}</p>
@@ -181,7 +181,7 @@ const topLabel = footer.backToTopLabel;
       <button
         type="button"
         data-consent-open
-        class="nav-link inline-flex items-center gap-2 rounded-full border border-navy/60 px-4 py-2.5 text-sm font-medium text-navy hover:border-navy hover:bg-navy hover:text-white"
+        class="btn btn-motion btn-secondary btn-sm"
       >
         {footer.manageCookiesLabel}
       </button>
@@ -213,7 +213,7 @@ const topLabel = footer.backToTopLabel;
       {
         collapsible.length > 0 && (
           <details class="footer-legal mt-6 border-t border-mist pt-6 text-xs">
-            <summary class="cursor-pointer list-none font-semibold text-navy underline decoration-1 underline-offset-[0.3em] hover:text-teal-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-navy">
+            <summary class="link-underline cursor-pointer list-none text-sm font-semibold text-navy hover:text-teal-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-navy">
               {footer.legalToggleLabel ?? footer.legalTitle ?? ''}
             </summary>
             <div class="mt-6 space-y-6">

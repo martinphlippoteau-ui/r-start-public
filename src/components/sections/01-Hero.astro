@@ -244,13 +244,15 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
           {
             /* DEUX FOIS PLUS GRANDE, BLANCHE ET PLUS GRASSE (17/09/2026, demande de l'équipe). Elle était
               en sable, 20 px à 390 et 24 px à 1440, semi-grasse, sur 42 rem. Elle passe à 40 et 48 px
-              (le double, `clamp` calé sur les mêmes bornes que les titres), en blanc, en gras, sur 56 rem
-              pour tenir en deux lignes à 48 px. C'est maintenant le plus grand texte du premier écran,
+              dès « sm » (le double, `clamp` calé sur les mêmes bornes que les titres), en blanc, en gras,
+              sur 56 rem pour tenir en deux lignes à 48 px. Sur téléphone, 32 px et non 40 : à 40 px elle
+              prenait cinq lignes et poussait les CTA sous le bandeau cookies (tests/conformite.spec.ts,
+              iPhone 13). C'est maintenant le plus grand texte du premier écran,
               donc le candidat LCP : ses mots se découvrent par `clip-path`, jamais par l'opacité. */
           }
           <p
             data-intro="3"
-            class="mt-6 max-w-4xl text-[clamp(2.5rem,2.07rem+1.53vw,3rem)] leading-[1.12] font-bold tracking-[-0.01em] text-balance text-white sm:mt-8"
+            class="mt-6 max-w-4xl text-[2rem] leading-[1.12] font-bold tracking-[-0.01em] text-balance text-white sm:mt-8 sm:text-[clamp(2.5rem,2.07rem+1.53vw,3rem)]"
           >
             {
               hero.tagline.split(' ').map((mot, i) => (

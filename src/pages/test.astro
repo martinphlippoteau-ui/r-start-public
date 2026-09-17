@@ -24,7 +24,6 @@ import Base from '@/layouts/Base.astro';
 import Container from '@/components/ui/Container.astro';
 import Section from '@/components/ui/Section.astro';
 import Button from '@/components/ui/Button.astro';
-import StoreBadge from '@/components/ui/StoreBadge.astro';
 import IconExterne from '@/components/ui/IconExterne.astro';
 
 /**
@@ -78,24 +77,11 @@ const PICTOS: { id: string; nom: string; note: string; eviter?: true; d: string 
 ];
 
 /**
- * INVENTAIRE DES APPELS À L'ACTION ET DES LIENS (17/09/2026, demande de l'équipe : « fais un inventaire
- * de tous les CTA et liens dans /test, on va faire du tri, il y a beaucoup de choses différentes pour
- * rien, on va rationaliser »). Relevé sur le code le 17/09/2026 : 167 éléments rendus, 22 familles de
- * style, 13 doublons. Chaque famille est RENDUE CI-DESSOUS AVEC SES VRAIES CLASSES, copiées du composant
- * qui la porte (ou avec le composant lui-même quand il existe) : survol, focus et transitions sont ceux
- * du site, pas une maquette. Les réglages typographiques de la page ne s'y appliquent pas.
- * `SOURCES` renvoie au fichier d'origine de chaque famille ; les libellés sont ceux du site.
+ * LE SYSTÈME DE BOUTONS RETENU (17/09/2026). Le matin, cette page rendait l'inventaire des 22 familles de
+ * boutons et de liens du site (167 éléments), pour trier ; l'équipe a tranché sur un artefact de
+ * décision, et le site a été ramené à quatre rôles (global.css, « Les quatre rôles de bouton ») et six
+ * composants à part. La page montre ce qui reste, rendu avec les vrais utilitaires.
  */
-const classesNavLien =
-  'block rounded-full px-2.5 py-1.5 text-base font-medium whitespace-nowrap text-slate-700 no-underline transition-colors hover:text-navy aria-[current]:font-semibold aria-[current]:text-navy sm:px-3.5';
-const classesTiroirLien =
-  'block rounded-2xl px-3 py-2.5 text-base font-medium text-white/85 no-underline transition-colors hover:text-white aria-[current]:text-white aria-[current]:underline aria-[current]:decoration-2 aria-[current]:underline-offset-8';
-const classesInfoClair =
-  'inline-flex size-5 shrink-0 items-center justify-center rounded-full border border-navy/30 text-xs font-semibold text-navy/70 transition-colors hover:border-navy/70 hover:text-navy focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy';
-const classesInfoSombre =
-  'inline-flex size-5 shrink-0 items-center justify-center rounded-full border border-white/35 text-xs font-semibold text-white/80 transition-colors hover:border-white/70 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white';
-const classesChevronFaq =
-  'faq-chevron mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-full border border-navy/40 text-navy transition-[transform,background-color,border-color,color] duration-300 ease-out-expo group-hover:border-navy group-hover:bg-navy group-hover:text-white group-open:rotate-180 group-open:border-navy group-open:bg-navy group-open:text-white motion-reduce:transition-none sm:mt-1 sm:size-12';
 
 /** Le libellé exact du hero, pour juger sur pièce et non sur une phrase d'exemple. */
 const MENTION_AMF = 'Société de gestion agréée par l’AMF';
@@ -341,232 +327,63 @@ const TITRES: { niveau: 1 | 2; avant: string; apres: string }[] = [
 
     <Section id="cta" tone="paper">
       <Container size="wide">
-        <p class="text-eyebrow text-teal-700">Inventaire du 17 septembre 2026</p>
+        <p class="text-eyebrow text-teal-700">Décisions du 17 septembre 2026</p>
         <h2 id="cta-title" class="text-display-md mt-3 text-ink">
-          Appels à l’action et liens : 167 éléments, 22 familles de style
+          Le système retenu : quatre rôles, six composants à part
         </h2>
         <p class="text-lead mt-5 max-w-3xl text-slate-700">
-          Chaque famille est rendue ici avec ses vraies classes : survol, focus et transitions sont
-          ceux du site. À droite de chaque échantillon, où elle sert et combien de fois. Les doublons à
-          trancher sont réunis en bas de page.
+          Vingt-deux familles de boutons et de liens ont été ramenées à ceci. Tout est rendu avec les
+          utilitaires de global.css (« Les quatre rôles de bouton ») que Button.astro compose et que
+          les boutons écrits à la main reprennent tels quels.
         </p>
 
-        <ol class="mt-10 grid gap-6" aria-label="Familles sur fond clair">
+        <ol class="mt-10 grid gap-6" aria-label="Les rôles sur fond clair">
           <li class="grid gap-6 rounded-3xl bg-white p-6 shadow-card lg:grid-cols-[1fr_22rem] lg:gap-10 lg:p-8">
             <div class="flex flex-wrap items-center gap-4">
               <Button href="/frais" variant="primary" size="sm">Souscrire</Button>
               <Button href="/frais" variant="primary" size="md">Souscrire</Button>
               <Button href="/frais" variant="primary" size="lg">Souscrire en ligne</Button>
+              <button type="button" class="btn btn-motion btn-primary btn-sm">Tout accepter</button>
             </div>
             <div class="text-caption text-slate-700">
-              <p class="text-base font-semibold text-ink"><span class="text-teal-700">F1</span> · Pilule pleine navy, composant Button « primary »</p>
-              <p class="mt-1">Fond navy, texte blanc, élévation et halo au survol (btn-motion), appui à 0,98. Trois tailles : 40, 48 et 62 px.</p>
-              <p class="mt-2"><b class="font-semibold text-navy">3 occurrences</b> : « Souscrire » dans la barre (md), « Souscrire en ligne » sous les 4 étapes et en bas de /documentation (lg).</p>
+              <p class="text-base font-semibold text-ink">Principal · Button primary, `btn-primary`</p>
+              <p class="mt-1">L’action que la page attend. Souscrire, et les actions d’une fenêtre : Fermer, Tout accepter et Tout refuser (bandeau cookies), Aller au contenu.</p>
             </div>
           </li>
-
           <li class="grid gap-6 rounded-3xl bg-white p-6 shadow-card lg:grid-cols-[1fr_22rem] lg:gap-10 lg:p-8">
             <div class="flex flex-wrap items-center gap-4">
-              <Button href="/a-propos" variant="secondary" size="lg">Découvrir le groupe CORUM</Button>
+              <Button href="/a-propos" variant="secondary" size="sm">Gérer les cookies</Button>
+              <Button href="/a-propos" variant="secondary" size="md">Haut de page</Button>
               <Button href="https://www.corum.fr" variant="secondary" size="lg" target="_blank">Découvrir CORUM<span class="visually-hidden"> (nouvelle fenêtre)</span></Button>
             </div>
             <div class="text-caption text-slate-700">
-              <p class="text-base font-semibold text-ink"><span class="text-teal-700">F3</span> · Pilule contour navy, composant Button « secondary »</p>
-              <p class="mt-1">Filet navy à 60 %, se remplit en navy au survol, btn-motion. La flèche diagonale s’ajoute seule sur un lien externe.</p>
-              <p class="mt-2"><b class="font-semibold text-navy">2 occurrences</b> : « Découvrir le groupe CORUM » (accueil, section Confiance, posée sur fond sombre alors que la variante est prévue pour fond clair) et « Découvrir CORUM » (/a-propos).</p>
+              <p class="text-base font-semibold text-ink">Secondaire · Button secondary, `btn-secondary`</p>
+              <p class="mt-1">Un contour ; au survol, le contour se renforce et un fond translucide se pose, le texte ne change pas. Haut de page, gérer les cookies, enregistrer mes choix, les six liens de la 404, Découvrir CORUM.</p>
             </div>
           </li>
-
-          <li class="grid gap-6 rounded-3xl bg-white p-6 shadow-card lg:grid-cols-[1fr_22rem] lg:gap-10 lg:p-8">
-            <div class="flex flex-wrap items-center gap-4">
-              <Button href="/frais" variant="ghost">Voir notre comparateur de frais</Button>
-            </div>
-            <div class="text-caption text-slate-700">
-              <p class="text-base font-semibold text-ink"><span class="text-teal-700">F5</span> · Composant Button « ghost »</p>
-              <p class="mt-1">Texte navy souligné au survol, sans pilule ni taille. Déclaré dans Button.astro.</p>
-              <p class="mt-2"><b class="font-semibold text-coral-700">0 occurrence</b> : son seul point d’appel (le lien du premier bloc de l’accueil) a été retiré le 16/09. Variante morte.</p>
-            </div>
-          </li>
-
-          <li class="grid gap-6 rounded-3xl bg-white p-6 shadow-card lg:grid-cols-[1fr_22rem] lg:gap-10 lg:p-8">
-            <div class="flex flex-wrap items-center gap-4">
-              <button type="button" class="btn-motion inline-flex items-center justify-center rounded-full bg-navy px-6 py-3 font-semibold text-white hover:bg-teal-700">Fermer</button>
-              <button type="button" class="min-h-10 rounded-full bg-navy px-3 py-2.5 text-sm font-semibold text-white transition hover:bg-teal-700 sm:px-5">Tout accepter</button>
-              <button type="button" class="min-h-10 rounded-full bg-navy px-3 py-2.5 text-sm font-semibold text-white transition hover:bg-teal-700 sm:px-5">Tout refuser</button>
-              <span class="inline-flex rounded-full bg-navy px-5 py-3 font-semibold text-white">Aller au contenu</span>
-            </div>
-            <div class="text-caption text-slate-700">
-              <p class="text-base font-semibold text-ink"><span class="text-teal-700">F6 · F7 · F8</span> · Pilules pleines navy écrites à la main</p>
-              <p class="mt-1">« Fermer » (fenêtre souscription) copie Button primary md à l’identique, sur un &lt;button&gt;. « Tout accepter » et « Tout refuser » (bandeau cookies) : 14 px, 40 px de haut, sans élévation ni halo. « Aller au contenu » : lien d’évitement, visible au clavier seulement.</p>
-              <p class="mt-2"><b class="font-semibold text-navy">4 occurrences</b>, sur toutes les pages.</p>
-            </div>
-          </li>
-
-          <li class="grid gap-6 rounded-3xl bg-white p-6 shadow-card lg:grid-cols-[1fr_22rem] lg:gap-10 lg:p-8">
-            <div class="flex flex-wrap items-center gap-4">
-              <a href="#cta" class="footer-top group inline-flex items-center gap-2.5 rounded-full border border-navy/25 px-5 py-3 text-base font-semibold text-navy no-underline transition-colors hover:border-navy hover:bg-navy hover:text-white">Haut de page <span aria-hidden="true">↑</span></a>
-              <a href="#cta" class="inline-flex rounded-full border border-navy/25 px-5 py-2.5 font-semibold text-navy no-underline transition-colors hover:border-navy hover:bg-navy hover:text-white">Comparateur de frais</a>
-              <button type="button" class="nav-link inline-flex items-center gap-2 rounded-full border border-navy/60 px-4 py-2.5 text-sm font-medium text-navy hover:border-navy hover:bg-navy hover:text-white">Gérer les cookies</button>
-              <button type="button" class="rounded-full border border-navy px-5 py-2.5 text-sm font-semibold text-navy transition hover:bg-navy hover:text-white">Enregistrer mes choix</button>
-              <button type="button" class="rounded-full border border-navy px-5 py-2.5 text-sm font-semibold text-navy transition hover:bg-navy hover:text-white">Gérer les cookies</button>
-            </div>
-            <div class="text-caption text-slate-700">
-              <p class="text-base font-semibold text-ink"><span class="text-teal-700">F9</span> · Pilule contour navy « qui se remplit », cinq écritures</p>
-              <p class="mt-1">Même intention que F3, sans btn-motion, et cinq réglages : filet à 25, 60 ou 100 %, corps 14 ou 16 px, graisse medium ou semi-gras, hauteur 42 à 50 px. « Gérer les cookies » porte en plus nav-link (barre blanche dans une pilule remplie).</p>
-              <p class="mt-2"><b class="font-semibold text-navy">10 occurrences</b> : pied de page (haut de page, gérer les cookies), 404 (6 liens), bandeau cookies (enregistrer), page /cookies (gérer les cookies).</p>
-            </div>
-          </li>
-
-          <li class="grid gap-6 rounded-3xl bg-white p-6 shadow-card lg:grid-cols-[1fr_22rem] lg:gap-10 lg:p-8">
-            <div class="flex flex-wrap items-center gap-4">
-              <button type="button" class="inline-flex h-10 shrink-0 items-center gap-2 rounded-full px-2.5 text-sm font-semibold text-navy transition-colors hover:bg-navy/8 sm:px-3"><span aria-hidden="true">☰</span> Menu</button>
-              <ul class="flex items-center gap-1" aria-label="Entrées de la barre">
-                <li><a href="#cta" class={classesNavLien}>Comparateur de frais</a></li>
-                <li><a href="#cta" class={classesNavLien} aria-current="page">Notre approche</a></li>
-                <li><a href="#cta" class={classesNavLien}>Vos questions</a></li>
-              </ul>
-            </div>
-            <div class="text-caption text-slate-700">
-              <p class="text-base font-semibold text-ink"><span class="text-teal-700">F10 · F11</span> · Bouton Menu et entrées de la barre</p>
-              <p class="mt-1">Menu : pilule transparente 40 px, fond navy à 8 % au survol. Entrées : lien nu 16 px, gris ardoise vers navy ; la page courante est semi-grasse et porte la pastille de verre qui glisse (non reproduite ici).</p>
-              <p class="mt-2"><b class="font-semibold text-navy">1 + 5 occurrences</b>, sur toutes les pages.</p>
-            </div>
-          </li>
-
-          <li class="grid gap-6 rounded-3xl bg-white p-6 shadow-card lg:grid-cols-[1fr_22rem] lg:gap-10 lg:p-8">
-            <div class="flex flex-wrap items-center gap-4">
-              <a href="#cta" class="nav-link inline-flex items-center rounded-full px-3.5 py-2 text-sm font-semibold whitespace-nowrap text-navy no-underline transition-colors hover:bg-teal-100 sm:text-base">Réglementaire</a>
-              <a href="#cta" class="nav-link [--nav-link-inset:0.5rem] inline-flex items-center gap-2 self-center px-2 py-2 text-base font-semibold text-navy hover:text-teal-700 sm:text-lg">DIC et documentation complète sur corum.fr <IconExterne class="size-4 shrink-0" /></a>
-            </div>
-            <div class="text-caption text-slate-700">
-              <p class="text-base font-semibold text-ink"><span class="text-teal-700">F13</span> · Liens « nav-link » hors menu</p>
-              <p class="mt-1">Barre de 2 px qui s’étire sous le texte, montée d’un pixel au survol. Deux formes claires : pilule sans contour (barre d’ancres de /documentation, fond teal-100 au survol) et lien nu avec flèche externe. La troisième forme, un pavé blanc, est sur fond sombre plus bas.</p>
-              <p class="mt-2"><b class="font-semibold text-navy">5 occurrences</b>, toutes sur /documentation.</p>
-            </div>
-          </li>
-
           <li class="grid gap-6 rounded-3xl bg-white p-6 shadow-card lg:grid-cols-[1fr_22rem] lg:gap-10 lg:p-8">
             <div class="flex flex-wrap items-center gap-x-8 gap-y-4">
               <a href="#cta" class="link-underline text-sm text-slate-700 hover:text-navy">Accueil</a>
               <a href="#cta" class="link-underline inline-flex min-h-11 items-center gap-1.5 py-1.5 text-base text-slate-700 hover:text-navy">Mentions légales</a>
-              <a href="https://www.corum.fr" target="_blank" rel="noopener noreferrer" class="link-underline inline-flex min-h-11 items-center gap-1.5 py-1.5 text-base text-slate-700 hover:text-navy">corum.fr<span class="visually-hidden"> (nouvelle fenêtre)</span> <IconExterne class="size-3.5 shrink-0 text-slate" strokeWidth={1.5} /></a>
-              <a href="#cta" class="text-lead font-semibold text-navy link-underline">Voir toutes les questions</a>
-              <a href="#cta" class="link-underline inline-flex items-center gap-2 text-base font-semibold text-navy hover:text-teal-700 sm:text-lg">Voir toutes les questions <span aria-hidden="true">→</span></a>
-              <a href="#cta" class="link-underline font-semibold text-navy underline-offset-4 hover:text-teal-700">01 23 45 67 89</a>
-              <a href="https://fr.trustpilot.com/review/www.corum.fr" target="_blank" rel="noopener noreferrer" class="link-underline inline-flex items-center gap-2 text-base font-semibold text-teal-700 no-underline hover:text-navy">Lire les avis sur Trustpilot<span class="visually-hidden"> (nouvelle fenêtre)</span> <IconExterne class="size-4 shrink-0" /></a>
+              <a href="#cta" class="link-underline inline-flex items-center gap-2 text-base font-semibold text-navy hover:text-teal-700 sm:text-lg">Voir toutes les questions <svg aria-hidden="true" class="size-4 shrink-0" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h9M8.5 4.5 12 8l-3.5 3.5" /></svg></a>
+              <a href="https://fr.trustpilot.com/review/www.corum.fr" target="_blank" rel="noopener noreferrer" class="link-underline inline-flex items-center gap-2 text-base font-semibold text-navy hover:text-teal-700">Lire les avis sur Trustpilot<span class="visually-hidden"> (nouvelle fenêtre)</span> <IconExterne class="size-4 shrink-0" /></a>
             </div>
             <div class="text-caption text-slate-700">
-              <p class="text-base font-semibold text-ink"><span class="text-teal-700">F14</span> · Liens de contenu « link-underline », six réglages</p>
-              <p class="mt-1">Soulignement en fondu au survol. Dans l’ordre : fil d’Ariane (14 px), pied de page (16 px), pied de page externe, « Voir toutes les questions » accueil (grand, sans flèche) et /documentation (16 px, avec flèche, vers teal), téléphone de la salle de presse (décalage contradictoire), Trustpilot sur /a-propos (« no-underline » annule le soulignement).</p>
-              <p class="mt-2"><b class="font-semibold text-navy">Une vingtaine d’occurrences</b>, sur toutes les pages.</p>
+              <p class="text-base font-semibold text-ink">Lien de contenu · `link-underline`</p>
+              <p class="mt-1">Souligné au survol, deux corps : 14 px en liste (fil d’Ariane, pied de page), 16 px en semi-gras pour une suite de lecture, flèche diagonale s’il sort du site. Plus aucun lien souligné en permanence.</p>
             </div>
           </li>
-
-          <li class="grid gap-6 rounded-3xl bg-white p-6 shadow-card lg:grid-cols-[1fr_22rem] lg:gap-10 lg:p-8">
-            <div class="flex flex-wrap items-center gap-x-8 gap-y-4">
-              <a href="#cta" class="text-sm font-medium text-teal-700 underline underline-offset-[0.3em] decoration-1">Politique cookies</a>
-              <button type="button" class="min-h-10 rounded-full px-1.5 py-2.5 text-sm font-semibold text-navy underline decoration-1 underline-offset-[0.3em] transition hover:text-teal-700 sm:px-5">Personnaliser</button>
-              <span class="text-xs font-semibold text-navy underline decoration-1 underline-offset-[0.3em]">Mentions légales détaillées +</span>
-            </div>
-            <div class="text-caption text-slate-700">
-              <p class="text-base font-semibold text-ink"><span class="text-teal-700">F15</span> · Liens soulignés en permanence</p>
-              <p class="mt-1">Le trait est là au repos, en teal ou en navy, 12 à 14 px. Bandeau cookies (lien et bouton « Personnaliser ») et repli des mentions du pied de page.</p>
-              <p class="mt-2"><b class="font-semibold text-navy">3 occurrences</b>, sur toutes les pages.</p>
-            </div>
-          </li>
-
-          <li class="grid gap-6 rounded-3xl bg-white p-6 shadow-card lg:grid-cols-[1fr_22rem] lg:gap-10 lg:p-8">
-            <ul class="grid gap-4 sm:grid-cols-2" aria-label="Cartes cliquables">
-              <li class="group relative flex flex-col gap-5 rounded-3xl bg-paper p-6 transition-shadow duration-300 hover:shadow-float focus-within:shadow-float">
-                <span aria-hidden="true" class="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-teal-100 text-navy transition-colors duration-300 group-hover:bg-navy group-hover:text-white">
-                  <svg class="size-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z" /><path d="M14 3v5h5" /><path d="M9 13h6M9 17h6" /></svg>
-                </span>
-                <p class="text-display-sm"><a href="#cta" class="text-ink no-underline after:absolute after:inset-0 after:rounded-3xl group-hover:text-navy focus-visible:shadow-none focus-visible:outline-none focus-visible:after:outline-3 focus-visible:after:outline-offset-2 focus-visible:after:outline-navy">Note d’information</a></p>
-                <p class="mt-auto flex items-center justify-between gap-4 text-sm text-slate-700"><span>Version de mai 2026</span><svg aria-hidden="true" class="size-5 shrink-0 text-navy transition-transform duration-300 group-hover:translate-x-1 motion-reduce:transition-none" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10h11M11 5l5 5-5 5" /></svg></p>
-              </li>
-              <li class="group relative flex flex-col gap-4 rounded-3xl bg-paper p-8 ring-1 ring-navy/5 transition-shadow duration-300 hover:shadow-card focus-within:shadow-card">
-                <p class="text-eyebrow text-teal-700">Pierre Papier</p>
-                <p class="text-xl font-semibold"><a href="#cta" class="text-ink no-underline after:absolute after:inset-0 after:rounded-3xl group-hover:text-navy focus-visible:shadow-none focus-visible:outline-none focus-visible:after:outline-3 focus-visible:after:outline-offset-2 focus-visible:after:outline-navy">CORUM AM confirme son statut d’électron libre de la pierre papier</a></p>
-                <p class="mt-auto flex items-center justify-between gap-4 pt-2 text-base text-slate-700"><span>16 septembre 2026</span><svg aria-hidden="true" class="size-5 shrink-0 text-navy transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 motion-reduce:transition-none" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 14 14 6M7 6h7v7" /></svg></p>
-              </li>
-            </ul>
-            <div class="text-caption text-slate-700">
-              <p class="text-base font-semibold text-ink"><span class="text-teal-700">F16</span> · Cartes entièrement cliquables</p>
-              <p class="mt-1">Le lien du titre est étendu à toute la carte. Deux habillages : documents (icône teintée qui passe en navy, flèche horizontale) et presse (anneau, flèche diagonale).</p>
-              <p class="mt-2"><b class="font-semibold text-navy">Une dizaine d’occurrences</b> : 7 documents sur /documentation, les articles sur /presse.</p>
-            </div>
-          </li>
-
-          <li class="grid gap-6 rounded-3xl bg-white p-6 shadow-card lg:grid-cols-[1fr_22rem] lg:gap-10 lg:p-8">
-            <div class="flex flex-wrap items-center gap-6 text-lg text-ink">
-              <span>SCPI <button type="button" aria-expanded="false" class={classesInfoClair + ' ml-1.5 translate-y-[-0.1em] align-middle'}><span aria-hidden="true">i</span><span class="visually-hidden">Définition : SCPI</span></button></span>
-              <span class="flex items-start gap-2 text-base">Frais de souscription <button type="button" aria-expanded="false" class={classesInfoClair + ' mt-0.5'}><span aria-hidden="true">i</span><span class="visually-hidden">Expliquer : Frais de souscription</span></button></span>
-            </div>
-            <div class="text-caption text-slate-700">
-              <p class="text-base font-semibold text-ink"><span class="text-teal-700">F17</span> · Boutons « i », version claire</p>
-              <p class="mt-1">Rond de 20 px, filet navy à 30 %, déplie une explication. Deux copies des mêmes classes, à un calage vertical près. La version sombre est plus bas.</p>
-              <p class="mt-2"><b class="font-semibold text-navy">8 occurrences claires</b> : définition SCPI (accueil), 7 lignes du comparateur (accueil et /frais).</p>
-            </div>
-          </li>
-
-          <li class="grid gap-6 rounded-3xl bg-white p-6 shadow-card lg:grid-cols-[1fr_22rem] lg:gap-10 lg:p-8">
-            <div class="border-t border-navy/15">
-              <details class="faq-item group border-b border-navy/15">
-                <summary class="block cursor-pointer list-none py-6 [&::-webkit-details-marker]:hidden sm:py-8">
-                  <span class="flex items-start justify-between gap-5 text-xl font-semibold text-ink transition-colors duration-200 group-hover:text-navy sm:gap-8 sm:text-display-sm">
-                    <span class="flex min-w-0 flex-col gap-2 sm:flex-row sm:gap-6"><span aria-hidden="true" class="text-eyebrow pt-1.5 text-teal-700 tabular-nums sm:pt-2">01</span><span>Qu’est-ce que R Start ?</span></span>
-                    <span aria-hidden="true" class={classesChevronFaq}><svg class="size-5 sm:size-6" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m5 8 5 5 5-5" stroke-linecap="round" stroke-linejoin="round" /></svg></span>
-                  </span>
-                </summary>
-                <div class="faq-answer"><div class="max-w-3xl pb-8 sm:pl-12"><p class="text-lead text-ink">La réponse se déplie ici, en hauteur animée.</p></div></div>
-              </details>
-              <p class="mt-4 inline-flex min-h-11 cursor-pointer items-center gap-1.5 py-1.5 text-base text-slate-700 hover:text-navy">Note d’information <span class="text-caption">(déplie « Document bientôt disponible »)</span></p>
-            </div>
-            <div class="text-caption text-slate-700">
-              <p class="text-base font-semibold text-ink"><span class="text-teal-700">F19 · F20</span> · Accordéons</p>
-              <p class="mt-1">FAQ : ligne entière cliquable, chevron rond qui se remplit et pivote ; deux copies du même balisage (accueil, /faq, /strategie ; /documentation avec un titre toujours grand). Pied de page : « Document bientôt disponible », même peau que les liens voisins, sans soulignement.</p>
-              <p class="mt-2"><b class="font-semibold text-navy">32 + 5 occurrences</b>.</p>
-            </div>
-          </li>
-
           <li class="grid gap-6 rounded-3xl bg-white p-6 shadow-card lg:grid-cols-[1fr_22rem] lg:gap-10 lg:p-8">
             <div class="flex flex-wrap items-center gap-4">
-              <StoreBadge store="apple" href="https://apps.apple.com/fr/app/mycorum/id6692633584" label="Télécharger sur l’App Store" />
-              <StoreBadge store="google" href="https://play.google.com/store/apps/details?id=com.client.corum&hl=fr" label="Disponible sur Google Play" />
+              <ul class="flex items-center gap-1" aria-label="Entrées de la barre">
+                <li><a href="#cta" class="block rounded-full px-3.5 py-1.5 text-base font-medium whitespace-nowrap text-slate-700 no-underline transition-colors hover:text-navy">Comparateur de frais</a></li>
+                <li><a href="#cta" class="block rounded-full px-3.5 py-1.5 text-base font-semibold whitespace-nowrap text-navy no-underline">Notre approche</a></li>
+              </ul>
+              <a href="#cta" class="nav-link inline-flex items-center rounded-full px-3.5 py-2 text-sm font-semibold whitespace-nowrap text-navy no-underline transition-colors hover:bg-teal-100 sm:text-base">Réglementaire</a>
             </div>
             <div class="text-caption text-slate-700">
-              <p class="text-base font-semibold text-ink"><span class="text-teal-700">F21</span> · Badges de magasin</p>
-              <p class="mt-1">Cartouches noirs à coins de 12 px, seuls objets du site à ce rayon ; montent de 2 px au survol, sans halo.</p>
-              <p class="mt-2"><b class="font-semibold text-navy">4 occurrences</b> : accueil (4 étapes) et /documentation (application).</p>
-            </div>
-          </li>
-
-          <li class="grid gap-6 rounded-3xl bg-white p-6 shadow-card lg:grid-cols-[1fr_22rem] lg:gap-10 lg:p-8">
-            <div class="grid gap-4 sm:grid-cols-2">
-              <label class="block text-sm font-medium text-slate-700">Rechercher dans les questions
-                <input type="search" placeholder="frais, retrait, fiscalité…" class="mt-2 block w-full rounded-full border border-navy/25 bg-white px-5 py-3 text-base text-ink transition-colors placeholder:text-slate-600 hover:border-navy/50 focus-visible:border-navy focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy" />
-              </label>
-              <label class="block text-sm font-medium text-slate-700">Autres SCPI
-                <select class="mt-2 w-full rounded-2xl border border-navy/20 bg-white px-3 py-2.5 text-base font-semibold text-navy focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-navy sm:px-4 sm:py-3"><option>Iroko Zen</option><option>Comète</option></select>
-              </label>
-            </div>
-            <div class="text-caption text-slate-700">
-              <p class="text-base font-semibold text-ink"><span class="text-teal-700">F22</span> · Champs</p>
-              <p class="mt-1">Deux grammaires : la recherche FAQ en pilule (filet à 25 %, transition), le sélecteur du comparateur à coins de 16 px (filet à 20 %, sans transition).</p>
-              <p class="mt-2"><b class="font-semibold text-navy">2 occurrences</b> : /faq ; accueil et /frais.</p>
-            </div>
-          </li>
-
-          <li class="grid gap-6 rounded-3xl bg-white p-6 shadow-card lg:grid-cols-[1fr_22rem] lg:gap-10 lg:p-8">
-            <div class="flex flex-wrap items-center gap-6">
-              <span class="sticky-skin relative isolate inline-flex h-16 min-w-16 items-center justify-center gap-3 rounded-full pl-6 pr-2 text-lg font-semibold">Souscrire en ligne <span class="sticky-dot"><svg aria-hidden="true" class="size-6" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5 10.5 8 6 12.5" /></svg></span></span>
-              <span class="sticky-dot"><svg aria-hidden="true" class="size-6" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5 10.5 8 6 12.5" /></svg></span>
-              <a href="https://fr.trustpilot.com/review/www.corum.fr" target="_blank" rel="noopener noreferrer">Trustpilot</a>
-            </div>
-            <div class="text-caption text-slate-700">
-              <p class="text-base font-semibold text-ink"><span class="text-teal-700">F24 · F26</span> · Pastille flottante et lien de repli Trustpilot</p>
-              <p class="mt-1">Pastille : dépliée (pilule blanche 64 px, rond navy à droite) et repliée (le rond seul) ; réplique statique, la vraie se plie au défilement. Lien Trustpilot : aucune classe, style du navigateur, remplacé par le widget dès que son script charge.</p>
-              <p class="mt-2"><b class="font-semibold text-navy">7 + 2 occurrences</b>.</p>
+              <p class="text-base font-semibold text-ink">Lien de navigation · `nav-link`, pastille</p>
+              <p class="mt-1">Barre (pastille de verre glissante), tiroir (même pastille, fond blanc à 12 % pour la page courante) et barres d’ancres : une seule forme, sans contour.</p>
             </div>
           </li>
         </ol>
@@ -575,85 +392,22 @@ const TITRES: { niveau: 1 | 2; avant: string; apres: string }[] = [
 
     <Section id="cta-sombre" tone="ink">
       <Container size="wide">
-        <h2 id="cta-sombre-title" class="text-eyebrow text-teal-200">Les familles sur fond sombre</h2>
-        <ol class="mt-8 grid gap-6" aria-label="Familles sur fond sombre">
-          <li class="grid gap-6 rounded-3xl bg-ink-800 p-6 lg:grid-cols-[1fr_22rem] lg:gap-10 lg:p-8">
-            <div class="flex flex-wrap items-center gap-4">
-              <Button href="/frais" variant="light" size="lg">Souscrire en ligne</Button>
-              <Button href="/frais" variant="outline-light" size="lg">Comparer les frais</Button>
-              <Button href="/strategie" variant="outline-light" size="md">Découvrir notre approche</Button>
-            </div>
-            <div class="text-caption text-white/70">
-              <p class="text-base font-semibold text-white"><span class="text-teal-200">F2 · F4</span> · Button « light » et « outline-light »</p>
-              <p class="mt-1">Pilule pleine blanche (lg, 7 occurrences : hero, tiroir, en-tête de chaque sous-page) et pilule contour blanc, en deux tailles pour le même rôle (hero en lg, repères en md).</p>
-              <p class="mt-2"><b class="font-semibold text-white">7 + 2 occurrences</b>.</p>
-            </div>
-          </li>
-
-          <li class="grid gap-6 rounded-3xl bg-ink-800 p-6 lg:grid-cols-[1fr_22rem] lg:gap-10 lg:p-8">
-            <div class="flex flex-wrap items-center gap-4">
-              <button type="button" class="inline-flex h-10 items-center gap-2 rounded-full px-3 text-sm font-semibold text-white transition-colors hover:bg-white/10"><span aria-hidden="true">✕</span> Fermer le menu</button>
-              <ul class="flex flex-col gap-1" aria-label="Entrées du tiroir">
-                <li><a href="#cta" class={classesTiroirLien}>Comparateur de frais</a></li>
-                <li><a href="#cta" class={classesTiroirLien} aria-current="page">Notre approche</a></li>
-              </ul>
-              <a href="#cta" class="nav-link flex items-baseline justify-between gap-4 rounded-2xl px-4 py-3 text-white no-underline transition-colors hover:bg-white/10"><span class="text-base font-semibold sm:text-lg">Réglementaire</span> <span class="text-caption text-white/70">4</span></a>
-            </div>
-            <div class="text-caption text-white/70">
-              <p class="text-base font-semibold text-white"><span class="text-teal-200">F10 · F12 · F13</span> · Tiroir du menu et aside de /documentation</p>
-              <p class="mt-1">« Fermer le menu » : pilule transparente 40 px. Entrées du tiroir : coins de 16 px, page courante soulignée (et non en pastille comme dans la barre). Ancre de groupe : pavé nav-link blanc, mêmes cibles que la barre collante de la page.</p>
-              <p class="mt-2"><b class="font-semibold text-white">1 + 5 + 2 occurrences</b>.</p>
-            </div>
-          </li>
-
-          <li class="grid gap-6 rounded-3xl bg-ink-800 p-6 lg:grid-cols-[1fr_22rem] lg:gap-10 lg:p-8">
-            <div class="flex flex-wrap items-center gap-6">
-              <span class="flex items-start gap-2 text-white">Horizon d’investissement <button type="button" aria-expanded="false" class={classesInfoSombre}><span aria-hidden="true">i</span><span class="visually-hidden">Expliquer : Horizon d’investissement</span></button></span>
-              <button type="button" class="carte-savoir"><span>En savoir plus</span><svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="carte-savoir-fleche"><path d="M3 8h9M8.5 4.5 12 8l-3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg></button>
-              <button type="button" class="carte-retour">Fermer</button>
-              <a href="#cta" class="flex flex-col items-center gap-2 rounded-2xl px-4 py-2 text-white/70 no-underline transition-colors hover:text-white focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-white"><span class="text-sm font-semibold tracking-[0.08em]">Découvrir R Start</span><svg aria-hidden="true" class="size-10" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3v14M4 11l6 6 6-6" /></svg></a>
-            </div>
-            <div class="text-caption text-white/70">
-              <p class="text-base font-semibold text-white"><span class="text-teal-200">F17 · F18 · F23</span> · « i » sombre, boutons des cartes, flèche du hero</p>
-              <p class="mt-1">« i » : filet blanc à 35 %. Cartes de /strategie : « En savoir plus » et « Fermer » sont jumeaux (fond blanc à 14 %), à la hauteur et à la flèche près. Flèche « Découvrir R Start » : texte et chevron de 40 px, sans fond.</p>
-              <p class="mt-2"><b class="font-semibold text-white">3 + 10 + 1 occurrences</b>.</p>
-            </div>
-          </li>
-        </ol>
-      </Container>
-    </Section>
-
-    <Section id="doublons" tone="white">
-      <Container size="wide">
-        <h2 id="doublons-title" class="text-display-md text-ink">Treize doublons à trancher</h2>
-        <p class="text-lead mt-5 max-w-3xl text-slate-700">
-          Même rôle, styles différents. Rien n’est modifié : chaque ligne est une décision à prendre.
-        </p>
-        <div class="mt-8 overflow-x-auto">
-          <table class="w-full text-left text-base">
-            <thead>
-              <tr class="border-b border-navy/15 text-caption font-semibold tracking-wider text-slate-700 uppercase">
-                <th scope="col" class="py-3 pr-4">Doublon</th>
-                <th scope="col" class="py-3 pr-4">Où</th>
-                <th scope="col" class="py-3">Proposition</th>
-              </tr>
-            </thead>
-            <tbody class="text-ink">
-              <tr class="border-b border-navy/10 align-top"><th scope="row" class="py-4 pr-4 font-semibold">D1 · Pilule contour navy : six écritures</th><td class="py-4 pr-4">Button secondary + les cinq de F9</td><td class="py-4">Tout ramener à Button secondary, tailles sm (40 px) et md (48 px).</td></tr>
-              <tr class="border-b border-navy/10 align-top"><th scope="row" class="py-4 pr-4 font-semibold">D2 · « Gérer les cookies »</th><td class="py-4 pr-4">Pied de page et page /cookies</td><td class="py-4">Un seul style, Button secondary sm, des deux côtés.</td></tr>
-              <tr class="border-b border-navy/10 align-top"><th scope="row" class="py-4 pr-4 font-semibold">D3 · « Voir toutes les questions »</th><td class="py-4 pr-4">FAQ de l’accueil et de /documentation</td><td class="py-4">Une seule forme de lien de suite de lecture, avec ou sans flèche, mais la même.</td></tr>
-              <tr class="border-b border-navy/10 align-top"><th scope="row" class="py-4 pr-4 font-semibold">D4 · Accordéon FAQ en deux copies</th><td class="py-4 pr-4">10-Faq et DocumentationFaq</td><td class="py-4">Un composant FaqItem partagé ; l’animation d’ouverture est déjà commune.</td></tr>
-              <tr class="border-b border-navy/10 align-top"><th scope="row" class="py-4 pr-4 font-semibold">D5 · « Fermer » recopie Button primary</th><td class="py-4 pr-4">Fenêtre souscription</td><td class="py-4">Button avec une variante bouton, ou un utilitaire btn-primary.</td></tr>
-              <tr class="border-b border-navy/10 align-top"><th scope="row" class="py-4 pr-4 font-semibold">D6 · Boutons cookies sans btn-motion</th><td class="py-4 pr-4">Bandeau cookies</td><td class="py-4">Button primary sm, en gardant les deux boutons de même poids (CNIL).</td></tr>
-              <tr class="border-b border-navy/10 align-top"><th scope="row" class="py-4 pr-4 font-semibold">D7 · Page courante : pastille ou soulignement</th><td class="py-4 pr-4">Barre et tiroir</td><td class="py-4">La pastille de verre partout, même rayon, même couleur d’état.</td></tr>
-              <tr class="border-b border-navy/10 align-top"><th scope="row" class="py-4 pr-4 font-semibold">D8 · Ancres de /documentation en deux habillages</th><td class="py-4 pr-4">Aside de l’en-tête et barre collante</td><td class="py-4">Un composant d’ancre à deux tons, ou supprimer l’aside.</td></tr>
-              <tr class="border-b border-navy/10 align-top"><th scope="row" class="py-4 pr-4 font-semibold">D9 · « En savoir plus » / « Fermer » déclarés deux fois</th><td class="py-4 pr-4">Cartes de /strategie</td><td class="py-4">Un seul utilitaire de peau, même hauteur des deux côtés.</td></tr>
-              <tr class="border-b border-navy/10 align-top"><th scope="row" class="py-4 pr-4 font-semibold">D10 · Bouton « i » clair en deux copies</th><td class="py-4 pr-4">Accueil et comparateur</td><td class="py-4">Un utilitaire info-bouton (et sa version sombre).</td></tr>
-              <tr class="border-b border-navy/10 align-top"><th scope="row" class="py-4 pr-4 font-semibold">D11 · Champs en deux grammaires</th><td class="py-4 pr-4">Recherche FAQ et sélecteur du comparateur</td><td class="py-4">Un utilitaire champ : coins de 16 px, filet à 25 %, transition.</td></tr>
-              <tr class="border-b border-navy/10 align-top"><th scope="row" class="py-4 pr-4 font-semibold">D12 · Flèche « on sort du site » en quatre dessins</th><td class="py-4 pr-4">Button, pied de page, Trustpilot, /documentation</td><td class="py-4">IconExterne partout, deux tailles normalisées.</td></tr>
-              <tr class="align-top"><th scope="row" class="py-4 pr-4 font-semibold">D13 · Défauts à corriger au passage</th><td class="py-4 pr-4">Trustpilot sur /a-propos, salle de presse, pied de page, section Confiance, variante ghost, appels de note</td><td class="py-4">Soulignement annulé par no-underline ; décalage contradictoire ; nav-link dans une pilule remplie ; secondary sur fond sombre ; variante ghost morte ; cinq composants d’appel de note éteints.</td></tr>
-            </tbody>
-          </table>
+        <h2 id="cta-sombre-title" class="text-eyebrow text-teal-200">Les mêmes rôles sur fond sombre</h2>
+        <div class="mt-8 grid gap-6 rounded-3xl bg-ink-800 p-6 lg:p-8">
+          <div class="flex flex-wrap items-center gap-4">
+            <Button href="/frais" variant="light" size="md">Souscrire</Button>
+            <Button href="/frais" variant="light" size="lg">Souscrire en ligne</Button>
+            <Button href="/strategie" variant="outline-light" size="sm">En savoir plus</Button>
+            <Button href="/strategie" variant="outline-light" size="md">Découvrir notre approche</Button>
+            <Button href="/frais" variant="outline-light" size="lg">Comparer les frais</Button>
+          </div>
+          <div class="flex flex-wrap items-center gap-6">
+            <a href="#cta" class="link-underline text-sm text-white/85 hover:text-white">Accueil</a>
+            <a href="#cta" class="block rounded-full px-3.5 py-2.5 text-base font-semibold text-white no-underline bg-white/12">Notre approche</a>
+            <span class="text-white">Horizon <button type="button" class="info-bouton info-bouton-sombre" aria-label="Expliquer"><span aria-hidden="true">i</span></button></span>
+            <span class="text-ink"><button type="button" class="info-bouton bg-white" aria-label="Définition"><span aria-hidden="true">i</span></button></span>
+          </div>
+          <p class="text-caption text-white/70">Principal en blanc plein, Secondaire en contour blanc (dont « En savoir plus » et « Fermer » des cartes de /strategie), lien de contenu en blanc, entrée de tiroir en pastille, bouton « i » en deux tons.</p>
         </div>
       </Container>
     </Section>

@@ -125,12 +125,14 @@ const { stats } = trust;
 
       {
         /* La photo d'ambiance, la gamme des cinq SCPI et les quatre chiffres détaillés vivent sur
-          /a-propos (components/pages/a-propos/CorumRange.astro), atteinte par ce bouton. En clair sur
-          l'ink depuis que la bande blanche a disparu avec le déplacement des avis. */
+          /a-propos (components/pages/a-propos/CorumRange.astro), atteinte par ce bouton. */
       }
       <div class="mt-section-sm">
         {/* Pas de `withBase` ici : Button le pose lui-même. L'appliquer des deux côtés doublait
           le préfixe en production (« /r-start-public/r-start-public/a-propos »). */}
+        {/* `secondary`, le contour navy : la section est sur fond BLANC (`tone="white"`). Le 17/09/2026,
+          il était passé en `outline-light` sur la foi d'un commentaire périmé qui la disait sur l'ink :
+          contour et texte blancs sur blanc, le bouton avait disparu. Rattrapé avant la mise en ligne. */}
         <Button href={pages.about.path} variant="secondary" size="lg">
           {corum.aboutLink}
         </Button>

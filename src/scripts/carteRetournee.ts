@@ -66,7 +66,9 @@ const init = (): void => {
 
     const fermer = document.createElement('button');
     fermer.type = 'button';
-    fermer.className = 'carte-retour';
+    /* Le rôle Secondaire sur fond sombre, comme « En savoir plus » au recto (décision F18 du 17/09/2026) ;
+       `carte-retour` ne porte que son placement. */
+    fermer.className = 'carte-retour btn btn-motion btn-outline-light btn-sm';
     fermer.textContent = bouton.dataset.carteFermer ?? 'Fermer';
     verso.append(fermer);
 

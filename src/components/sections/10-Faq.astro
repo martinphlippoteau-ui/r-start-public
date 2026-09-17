@@ -305,9 +305,10 @@ const items = rendus.map((item) => {
             <p class="mt-10 sm:mt-12">
               <a
                 href={withBase(faq.moreLink.href)}
-                class="text-lead font-semibold text-navy link-underline"
+                class="link-underline inline-flex items-center gap-2 text-base font-semibold text-navy hover:text-teal-700 sm:text-lg"
               >
                 {faq.moreLink.label}
+                <svg aria-hidden="true" class="size-4 shrink-0" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h9M8.5 4.5 12 8l-3.5 3.5" /></svg>
               </a>
             </p>
           )

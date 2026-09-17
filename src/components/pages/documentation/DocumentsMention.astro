@@ -7,6 +7,7 @@
  * Contenu : documentation.mention, corumLink, cta et labels.newTabHint.
  */
 import Button from '@/components/ui/Button.astro';
+import IconExterne from '@/components/ui/IconExterne.astro';
 import Container from '@/components/ui/Container.astro';
 import type { Cta } from '@/content/types';
 
@@ -29,19 +30,10 @@ const { mention, corumLink, cta, newTabHint } = Astro.props;
           href={corumLink.href}
           target="_blank"
           rel="noopener noreferrer"
-          class="nav-link [--nav-link-inset:0.5rem] inline-flex items-center gap-2 self-center px-2 py-2 text-base font-semibold text-navy hover:text-teal-700 sm:text-lg"
+          class="nav-link inline-flex items-center gap-2 self-center rounded-full px-3.5 py-2 text-base font-semibold text-navy no-underline transition-colors hover:bg-teal-100 sm:text-lg"
         >
           {corumLink.label}
-          <svg
-            aria-hidden="true"
-            class="size-4 shrink-0"
-            viewBox="0 0 16 16"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.5"
-          >
-            <path d="M6 3h7v7M13 3 4 12" stroke-linecap="round" stroke-linejoin="round"></path>
-          </svg>
+          <IconExterne class="size-4 shrink-0" />
           {newTabHint && <span class="visually-hidden">({newTabHint})</span>}
         </a>
       </div>

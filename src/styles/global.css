@@ -299,17 +299,14 @@
 /* Lien d'évitement */
 /* Lien d'évitement. Caché AU-DESSUS de l'écran par une translation (deux fois sa hauteur), et non par
    `top: -100 %` animé : `top` est une propriété de mise en page, `transform` se compose (audit du
-   16/09/2026). Rien n'est animé en mouvement réduit, le lien apparaît d'un coup au focus. */
+   16/09/2026). Rien n'est animé en mouvement réduit, le lien apparaît d'un coup au focus.
+   SA PEAU EST CELLE DU RÔLE PRINCIPAL (`btn btn-primary btn-md`, posés dans Base.astro ; décision F8 du
+   17/09/2026) : ici, seulement sa mécanique d'apparition. */
 @utility skip-link {
   position: absolute;
   left: 1rem;
   top: 1rem;
   z-index: 100;
-  padding: 0.75rem 1.25rem;
-  border-radius: 9999px;
-  background: var(--color-navy);
-  color: white;
-  font-weight: 600;
   transform: translateY(-200%);
   @media (prefers-reduced-motion: no-preference) {
     transition: transform 200ms var(--ease-out-expo);
@@ -1255,6 +1252,124 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   }
 }
 
+/*
+ * LES QUATRE RÔLES DE BOUTON (17/09/2026, décisions de l'équipe sur l'inventaire de /test) : le site
+ * comptait vingt-deux familles de boutons et de liens pour cent soixante-sept éléments. Il en reste
+ * quatre rôles, chacun sur fond clair et sur fond sombre, en trois tailles, plus six composants à un seul
+ * exemplaire (pastille flottante, « i », accordéon, carte cliquable, badge de magasin, champ).
+ *  - PRINCIPAL : `btn-primary` sur fond clair, `btn-light` sur fond sombre. Souscrire, et les actions
+ *    qu'une fenêtre attend (Fermer, Tout accepter, Tout refuser, Aller au contenu).
+ *  - SECONDAIRE : `btn-secondary` sur fond clair, `btn-outline-light` sur fond sombre. Un contour ; au
+ *    survol, le contour se renforce et un fond translucide se pose (décision F3 : « ajoute un fond, une
+ *    opacité comme outline-light »), le texte ne change pas de couleur. Remplace les six écritures de
+ *    pilule contour navy (pied de page, 404, cookies) et les deux boutons des cartes de /strategie.
+ *  - LIEN DE CONTENU : `link-underline`, plus bas. LIEN DE NAVIGATION : `nav-link`, plus bas.
+ * UNE SEULE SOURCE : ces utilitaires portent la peau ; ui/Button.astro les compose (`btn btn-motion
+ * btn-<rôle> btn-<taille>`), et un <button> écrit à la main les reprend tels quels au lieu de recopier
+ * des classes. Les hauteurs (bordure comprise) : sm 40 px, md 48 px, lg 62 px.
+ */
+@utility btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 9999px;
+  border: 1px solid transparent;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+@utility btn-sm {
+  padding: 0.625rem 1rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+@utility btn-md {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  line-height: 1.5rem;
+}
+@utility btn-lg {
+  padding: 1rem 2rem;
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+}
+@utility btn-primary {
+  background-color: var(--color-navy);
+  color: #fff;
+  --btn-halo: rgb(20 164 186 / 0.22);
+  &:hover {
+    background-color: var(--color-teal-700);
+  }
+}
+/* Contour navy à 60 % : ≥ 3:1 sur blanc (WCAG 1.4.11), le texte navy reste le repère principal. */
+@utility btn-secondary {
+  border-color: rgb(2 75 103 / 0.6);
+  color: var(--color-navy);
+  --btn-halo: rgb(2 75 103 / 0.14);
+  &:hover {
+    border-color: var(--color-navy);
+    background-color: rgb(2 75 103 / 0.1);
+  }
+}
+@utility btn-light {
+  background-color: #fff;
+  color: var(--color-navy);
+  --btn-halo: rgb(255 255 255 / 0.22);
+  &:hover {
+    background-color: var(--color-teal-100);
+  }
+}
+@utility btn-outline-light {
+  border-color: rgb(255 255 255 / 0.4);
+  color: #fff;
+  --btn-halo: rgb(255 255 255 / 0.16);
+  &:hover {
+    border-color: #fff;
+    background-color: rgb(255 255 255 / 0.1);
+  }
+}
+
+/*
+ * LE BOUTON « i » (17/09/2026, décision F17 : gardé, en un seul utilitaire). Rond de 20 px, filet et
+ * lettre en retrait, qui se renforcent au survol ; `info-bouton-sombre` pour un fond ink.
+ */
+@utility info-bouton {
+  display: inline-flex;
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  border: 1px solid rgb(2 75 103 / 0.3);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgb(2 75 103 / 0.7);
+  transition:
+    color 180ms ease,
+    border-color 180ms ease;
+  &:hover {
+    border-color: rgb(2 75 103 / 0.7);
+    color: var(--color-navy);
+  }
+  &:focus-visible {
+    outline: 2px solid var(--color-navy);
+    outline-offset: 2px;
+  }
+}
+@utility info-bouton-sombre {
+  border-color: rgb(255 255 255 / 0.35);
+  color: rgb(255 255 255 / 0.8);
+  &:hover {
+    border-color: rgb(255 255 255 / 0.7);
+    color: #fff;
+  }
+  &:focus-visible {
+    outline-color: #fff;
+  }
+}
+
 /* Cartes : légère montée + ombre plus profonde au survol. */
 @utility card-lift {
   @media (prefers-reduced-motion: no-preference) {
@@ -1436,31 +1551,16 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   display: none;
 }
 
+/* Les boutons des cartes de /strategie prennent le rôle SECONDAIRE sur fond sombre (`btn btn-motion
+   btn-outline-light btn-sm`, décision F18 du 17/09/2026) ; il ne reste ici que la flèche d'« En savoir
+   plus », qui avance de trois millimètres au survol. */
 @utility carte-savoir {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.6rem 1.1rem;
-  border-radius: 9999px;
-  background: rgb(255 255 255 / 0.14);
-  color: #fff;
-  font-size: 0.95rem;
-  font-weight: 600;
-  line-height: 1.2;
-
-  &:hover {
-    background: rgb(255 255 255 / 0.26);
-  }
   & .carte-savoir-fleche {
     width: 1rem;
     height: 1rem;
     flex-shrink: 0;
   }
-  /* Même vocabulaire que `btn-motion` : couleur en 200 ms `ease`, déplacement en 180 ms expo.out, et
-     rien en mouvement réduit (audit du 16/09/2026 : la transition n'avait pas de courbe, et seule la
-     flèche était couverte par la garde). */
   @media (prefers-reduced-motion: no-preference) {
-    transition: background-color 200ms ease;
     & .carte-savoir-fleche {
       transition: transform 180ms var(--ease-out-expo);
     }
@@ -1561,28 +1661,11 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
  * LE RETOUR. Il ferme la carte, et il est le dernier élément du dos : au clavier, on descend le texte
  * puis on tombe dessus, ce qui est l'ordre attendu. `mt-auto` le colle en bas quand le texte est court.
  */
+/* Sa peau est celle du rôle secondaire sur fond sombre, posée par carteRetournee.ts ; ici, son
+   placement seulement : en bas du dos, au bord gauche. */
 .carte-retour {
   margin-top: auto;
   align-self: flex-start;
-  display: inline-flex;
-  min-height: 2.75rem;
-  align-items: center;
-  padding-inline: 1.1rem;
-  border-radius: 9999px;
-  background: rgb(255 255 255 / 0.14);
-  color: #fff;
-  font-size: 0.95rem;
-  font-weight: 600;
-  line-height: 1.2;
-}
-/* Jumeau de `carte-savoir`, même transition, même garde. */
-@media (prefers-reduced-motion: no-preference) {
-  .carte-retour {
-    transition: background-color 200ms ease;
-  }
-}
-.carte-retour:hover {
-  background: rgb(255 255 255 / 0.26);
 }
 
 /* La main n'apparaît que si le script a tourné : sans lui, la carte n'ouvre rien et promettre un clic
