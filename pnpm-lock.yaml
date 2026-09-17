@@ -61,7 +61,7 @@ importers:
         specifier: ^5.8.0
         version: 5.9.3
       ultrahtml:
-        specifier: 1.7.0
+        specifier: ^1.7.0
         version: 1.7.0
 
 packages:
