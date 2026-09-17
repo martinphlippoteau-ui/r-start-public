@@ -2505,27 +2505,55 @@ body:has(#consent-banner:not([hidden])) [data-hero-scroll-hint] {
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  /* Contenu : fondu doux et légère montée. 350 ms, la durée au-delà de laquelle une navigation se met à
-     paraître lente. La sortie est plus courte que l'entrée : on quitte vite, on arrive posément. */
+  /* Contenu : la nouvelle page arrive EN FONDU ET LÉGÈRE MONTÉE PAR-DESSUS L'ANCIENNE, qui reste en
+     place, pleine, jusqu'au bout. 350 ms, la durée au-delà de laquelle une navigation se met à paraître
+     lente.
+     L'ANCIENNE NE S'EFFACE PLUS (17/09/2026). Elle sortait en 140 ms pendant que la nouvelle n'arrivait
+     qu'en 350 : entre les deux, les captures ne couvraient plus l'écran et le fond clair du document
+     transparaissait sur toute la page, un éclair de lumière à chaque navigation, mesuré à +13 de
+     luminosité à travers la barre et bien davantage sur les en-têtes sombres. Le fondu croisé natif du
+     navigateur évite ce creux par `plus-lighter` et deux courbes complémentaires ; avec deux durées
+     différentes, il faut couvrir autrement : l'ancienne reste opaque dessous, la nouvelle se pose
+     dessus en `normal`. La couverture ne descend jamais sous 100 %. */
   ::view-transition-old(root) {
-    animation: 140ms ease-out both vt-sortie;
+    animation: none;
+    mix-blend-mode: normal;
   }
   ::view-transition-new(root) {
     animation: 350ms 60ms var(--ease-out-expo) both vt-entree;
+    mix-blend-mode: normal;
   }
 
-  /* La barre ne participe à rien : aucune animation sur son groupe, elle est simplement là, continue. */
+  /* La barre ne participe à rien : aucune animation sur son groupe, elle est simplement là, continue.
+     UNE SEULE CAPTURE À LA FOIS (17/09/2026, « la barre est blanche puis la transparence s'applique »,
+     Martin). Sans fondu croisé (`animation: none`), l'ancienne et la nouvelle capture restaient toutes
+     deux affichées, empilées et opaques : deux blancs à 72 % font 92 %, et la barre virait au blanc
+     pendant les 550 ms de la transition, mesuré à 231 de luminosité contre 197 au repos, avant de
+     retrouver son verre d'un coup. L'ancienne capture est masquée, seule la nouvelle est là.
+     ET LE FLOU EST REJOUÉ : une capture est une image, elle ne floute rien ; le conteneur des deux
+     captures reçoit donc le filtre d'arrière-plan de la barre, il floute la capture de la page qui
+     passe derrière, comme le verre vivant le fait. Le rayon suit celui de la barre, sans quoi le flou
+     dessinerait un rectangle sous les bouts arrondis. */
   ::view-transition-group(barre-nav) {
     animation-duration: 0s;
+  }
+  ::view-transition-image-pair(barre-nav) {
+    border-radius: var(--radius-nav);
+    -webkit-backdrop-filter: saturate(185%) blur(24px);
+    backdrop-filter: saturate(185%) blur(24px);
   }
   ::view-transition-old(barre-nav),
   ::view-transition-new(barre-nav) {
     animation: none;
     mix-blend-mode: normal;
   }
+  ::view-transition-old(barre-nav) {
+    opacity: 0;
+  }
 
   /* La pastille glisse d'un lien à l'autre, au ressort, en s'étirant dans le sens du trajet : c'est le
-     groupe que le navigateur interpole entre les deux positions, il suffit de lui donner sa courbe. */
+     groupe que le navigateur interpole entre les deux positions, il suffit de lui donner sa courbe.
+     Même règle que la barre : seule la nouvelle capture est affichée, l'ancienne doublait sa teinte. */
   ::view-transition-group(pastille-nav) {
     animation-duration: 550ms;
     animation-timing-function: var(--ease-spring-nav);
@@ -2534,6 +2562,9 @@ body:has(#consent-banner:not([hidden])) [data-hero-scroll-hint] {
   ::view-transition-new(pastille-nav) {
     animation: none;
     mix-blend-mode: normal;
+  }
+  ::view-transition-old(pastille-nav) {
+    opacity: 0;
   }
 }
 
@@ -2565,13 +2596,6 @@ body:has(#consent-banner:not([hidden])) [data-hero-scroll-hint] {
   ::view-transition-old(*),
   ::view-transition-new(*) {
     animation: none !important;
-  }
-}
-
-@keyframes vt-sortie {
-  to {
-    opacity: 0;
-    transform: translateY(-6px);
   }
 }
 
