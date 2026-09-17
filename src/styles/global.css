@@ -484,76 +484,37 @@
    vers ses deux bords, comme une pastille d'appel qui se déplie. Voir plus bas, `html.intro
    [data-sitenav-bar]` : c'est une entrée, pas un état propre à l'accueil. */
 
-/* La barre de navigation : LE GESTE COMPLET DE LA PASTILLE D'APPEL (14/09/2026, demande de l'équipe).
-   Deux temps, ceux de la pastille, avec ses durées et ses courbes :
-    1. elle se POSE, 300 ms sur `--ease-out-expo`, en fondu et en grandissant de 0,6 à 1, réduite à un
-       rond de 3 rem au centre, comme la pastille repliée ;
-    2. elle se DÉPLOIE, 420 ms sur `--ease-spring`, après le même retard de 300 ms : le rond s'ouvre
-       vers ses deux bords et découvre la barre entière.
-   Les valeurs ne sont pas approchées, elles sont recopiées de `[data-sticky-cta]` et
-   `[data-sticky-label]`, plus bas dans ce fichier : 240 à 300 ms pour la pose, 420 ms et le ressort
-   pour le dépliage, 300 ms de retard entre les deux.
-   Le déploiement est un `clip-path` et non une largeur : la barre garde sa mise en page pendant tout le
-   geste, aucun texte ne se comprime ni ne se replie. Le rayon suit celui de la barre, sans quoi les
-   extrémités seraient coupées au carré pendant l'ouverture. L'échelle du premier temps ne déforme rien
-   de lisible : à cet instant, il n'y a qu'un rond de verre à l'écran.
+/* La barre de navigation : ELLE ARRIVE EN DERNIER, D'UN BLOC (17/09/2026, demande de l'équipe : « au
+   chargement ça ne rend pas bien du tout, j'aimerais voir le logo R Start en gros en premier puis les
+   éléments suivants »). Jusque-là elle jouait le geste de la pastille d'appel : un rond de verre NU se
+   posait à 0 ms, puis se déroulait à 300 ms. Sur téléphone, le premier rendu ne montrait donc qu'un rond
+   gris sans contenu sur un fond vide, le logo n'arrivant qu'à 200 ms, minuscule.
+   Elle descend maintenant de 10 px en se découvrant, pleine dès son premier pixel, à 700 ms : le logo,
+   le surtitre et l'accroche sont déjà là. `clip-path` et non opacité : la barre porte du texte, et un
+   contrôle d'accessibilité ne doit jamais lire un texte à mi-fondu (voir « LE TEXTE NE SE FOND PAS »,
+   plus bas). Le rayon suit celui de la barre, sans quoi ses bouts seraient coupés au carré.
    `:has(#apercu)` EST INDISPENSABLE : contrairement à ce que laisse croire son nom, la classe `intro`
    est rendue sur TOUTES les pages, et seul l'accueil charge le script qui la retire
-   (public/intro-once.js). Sans cette condition, la barre se repliait puis se dépliait à chaque
-   chargement de chaque sous-page, et pour toujours, puisque rien n'y retire la classe. Repéré par le
-   test « la barre ne bouge pas d'une page à l'autre », qui l'a surprise à mi-course entre /frais et
-   /a-propos. Les règles voisines n'avaient pas ce défaut : elles sont préfixées de `#apercu`, qui
-   n'existe que sur l'accueil. */
+   (public/intro-once.js). Sans cette condition, la barre rejouerait son entrée à chaque chargement de
+   chaque sous-page, et pour toujours. Repéré par le test « la barre ne bouge pas d'une page à
+   l'autre ». Les règles voisines n'ont pas ce défaut : elles sont préfixées de `#apercu`, qui n'existe
+   que sur l'accueil. */
 @media (prefers-reduced-motion: no-preference) {
   html.intro:has(#apercu) [data-sitenav-bar] {
-    transform-origin: 50% 50%;
-    animation:
-      intro-nav-pose 300ms var(--ease-out-expo) backwards,
-      intro-nav-deroule 420ms var(--ease-spring) 300ms backwards;
-  }
-  /*
-   * Le contenu de la barre reste CACHÉ pendant le premier temps : sans cela, le rond de verre laisse
-   * voir un fragment de mot pris au milieu d'une entrée du menu (« utils », relevé à 200 ms), là où la
-   * pastille repliée, elle, montre un chevron choisi. Le rond est donc du verre nu, et logo, entrées et
-   * bouton paraissent dès que l'ouverture commence.
-   * `visibility` et non `opacity` : la propriété bascule d'un coup au lieu de traverser des valeurs
-   * intermédiaires, et un contrôle d'accessibilité qui mesurerait les contrastes pendant l'ouverture ne
-   * lirait jamais un texte à mi-fondu. Elle retire aussi ces éléments du parcours au clavier le temps
-   * du geste, ce qui est cohérent : ils ne sont pas encore là.
-   */
-  html.intro:has(#apercu) [data-sitenav-bar] > * {
-    animation: intro-nav-contenu 420ms linear 300ms backwards;
+    animation: intro-nav-entree 500ms var(--ease-out-expo) 700ms backwards;
   }
 }
-@keyframes intro-nav-contenu {
+@keyframes intro-nav-entree {
   from {
-    visibility: hidden;
+    transform: translate3d(0, -10px, 0);
+    clip-path: inset(0 0 100% 0 round var(--radius-nav));
   }
-  15% {
-    visibility: visible;
+  55% {
+    clip-path: inset(0 0 0 0 round var(--radius-nav));
   }
   to {
-    visibility: visible;
-  }
-}
-/* Temps 1 : elle se pose, comme la pastille qui arrive en grandissant. */
-@keyframes intro-nav-pose {
-  from {
-    opacity: 0;
-    transform: scale(0.6);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-/* Temps 2 : le rond s'ouvre vers ses deux bords. `backwards` le maintient replié pendant le retard. */
-@keyframes intro-nav-deroule {
-  from {
-    clip-path: inset(0 calc(50% - 1.5rem) 0 calc(50% - 1.5rem) round 9999px);
-  }
-  to {
-    clip-path: inset(0 0 0 0 round 9999px);
+    transform: translate3d(0, 0, 0);
+    clip-path: inset(0 0 0 0 round var(--radius-nav));
   }
 }
 
@@ -1730,14 +1691,18 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
     --intro-i: 5;
   }
 }
-/* Ouverture de l'accueil, RÉÉCRITE le 14/09/2026 (cadence donnée par l'équipe).
-   Sept temps, en millisecondes depuis le premier rendu :
-     0    la barre de navigation se déroule, comme une pastille d'appel qui s'ouvre ;
-     100  le surtitre paraît en resserrant son interlettrage ;
-     200  le logo : le pictogramme grandit, puis « start » se découvre de gauche à droite ;
-     400  l'accroche, mot à mot, 70 ms d'écart ;
-     600  les boutons et la ligne risques, ensemble, sans décalage entre eux ;
-     800  les avis et la flèche, en fondu ; la flèche enchaîne sur son oscillation, en boucle.
+/* Ouverture de l'accueil, RÉÉCRITE le 14/09/2026 (cadence donnée par l'équipe), puis RECADENCÉE le
+   17/09/2026 : « au chargement ça ne rend pas bien du tout, j'aimerais voir le logo R Start en gros en
+   premier puis les éléments suivants ». Le premier rendu, sur téléphone, était un fond vide avec un
+   rond de verre en haut ; le logo n'arrivait qu'à 200 ms, à 20 % de sa taille.
+   Six temps, en millisecondes depuis le premier rendu :
+     0    LE LOGO, EN GROS ET EN PREMIER : il est là dès la première image, un peu plus grand que sa
+          taille, et s'y pose ;
+     350  le surtitre paraît en resserrant son interlettrage ;
+     500  l'accroche, mot à mot, 70 ms d'écart ;
+     750  les boutons et la ligne risques, ensemble, sans décalage entre eux ;
+     700  la barre de navigation descend et se découvre, d'un bloc ;
+     900  les avis et la flèche, en fondu ; la flèche enchaîne sur son oscillation, en boucle.
    Trois principes hérités et conservés :
     - la classe `intro` est posée côté serveur sur <html> (Base.astro) : la décision est prise avant
       tout rendu, sans script, donc sans flash quel que soit le réseau (la CSP interdit l'inline) ;
@@ -1762,31 +1727,30 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
      pendant une demi-seconde. */
   html.intro #apercu [data-intro='2'] {
     animation-name: intro-hero-eyebrow;
-    --intro-delay: 100ms;
+    --intro-delay: 350ms;
+    --intro-dur: 700ms;
+  }
+
+  /* 0 ms, LE LOGO, EN GROS ET EN PREMIER (17/09/2026, demande de l'équipe). Il est là dès la première
+     image, à 118 % de sa taille et déjà presque plein, et se pose à sa taille en 900 ms : c'est la
+     première chose qu'on voit, et elle est grande. L'apparition « façon PowerPoint » du 14/09/2026, qui
+     partait de 20 % après 200 ms d'attente, laissait l'écran vide puis un point qui grossit.
+     Le dévoilement du mot-symbole par masque reste écarté : un découpage sur une image qui change
+     d'échelle se lit mal. Le logo entre d'un bloc. */
+  html.intro #apercu [data-intro='1'] {
+    animation-name: intro-hero-brand;
+    transform-origin: 50% 50%;
+    --intro-delay: 0ms;
     --intro-dur: 900ms;
   }
 
-  /* 200 ms, le logo : UNE APPARITION FAÇON POWERPOINT (14/09/2026, demande de l'équipe). Il surgit de
-     tout petit et invisible, 20 % de sa taille, et grandit depuis son centre jusqu'à la sienne, sur une
-     courbe qui dépasse légèrement sa cible avant de s'y poser.
-     Le dévoilement du mot-symbole par masque, essayé la veille, est abandonné : les deux gestes se
-     contrariaient, un découpage sur une image qui grandit se lit mal. Le logo entre donc d'un bloc.
-     Aucun tracé au `stroke-dashoffset` non plus : le R est une forme pleine, pas un trait. */
-  html.intro #apercu [data-intro='1'] {
-    animation-name: intro-hero-brand;
-    animation-timing-function: cubic-bezier(0.22, 1.14, 0.32, 1);
-    transform-origin: 50% 50%;
-    --intro-delay: 200ms;
-    --intro-dur: 1100ms;
-  }
-
-  /* 400 ms, l'accroche mot à mot. Le paragraphe ne porte plus d'animation, ses mots en portent une
+  /* 500 ms, l'accroche mot à mot. Le paragraphe ne porte plus d'animation, ses mots en portent une
      chacun, décalée de 70 ms (`--mot`, posé dans 01-Hero.astro). `inline-block` : un span en ligne
      ignore `transform`. */
   html.intro #apercu [data-intro='3'] [data-intro-mot] {
     display: inline-block;
     animation: intro-hero-mot 700ms var(--ease-out-expo) backwards;
-    animation-delay: calc(400ms + var(--mot, 0) * 70ms);
+    animation-delay: calc(500ms + var(--mot, 0) * 70ms);
   }
   /* ET LE PARAGRAPHE LUI-MÊME NE JOUE RIEN (audit du 16/09/2026) : la règle générique `[data-intro]` lui
      donnait `intro-in`, un fondu d'opacité de 700 ms, par-dessus la cascade de ses mots. Deux animations
@@ -1796,43 +1760,42 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
     animation: none;
   }
 
-  /* 600 ms, les boutons et la ligne risques, ENSEMBLE et sans décalage entre eux : c'est la demande.
+  /* 750 ms, les boutons et la ligne risques, ENSEMBLE et sans décalage entre eux : c'est la demande.
      Les boutons montent de 12 px, la ligne risques ne bouge pas, elle s'annonce, elle ne se met pas en
      scène. */
   html.intro #apercu [data-intro='4'] {
     animation-name: intro-hero-cta;
-    --intro-delay: 600ms;
+    --intro-delay: 750ms;
     --intro-dur: 700ms;
   }
   html.intro #apercu [data-intro='5'] {
     animation-name: intro-hero-risk;
-    --intro-delay: 600ms;
+    --intro-delay: 750ms;
     --intro-dur: 700ms;
   }
 
-  /* 800 ms, les avis et la flèche, en fondu seul. Ni l'un ni l'autre ne porte de texte dont le contraste
+  /* 900 ms, les avis et la flèche, en fondu seul. Ni l'un ni l'autre ne porte de texte dont le contraste
      soit mesuré : le cadre d'avis est une iframe Trustpilot, la flèche un dessin. */
   html.intro #apercu [data-intro='6'],
   html.intro #apercu [data-intro='7'] {
     animation-name: intro-hero-fondu;
-    --intro-delay: 800ms;
+    --intro-delay: 900ms;
     --intro-dur: 700ms;
   }
 }
 
-/* Le logo : invisible et minuscule, puis il grandit depuis son centre jusqu'à sa taille.
+/* Le logo : là dès la première image, un peu plus grand que sa taille (118 %), et il s'y pose.
    L'opacité est admise ici, elle l'est partout où il n'y a pas de texte à mesurer : c'est une image
-   décorative (aria-hidden, alt vide). Le fondu est BREF, pleine opacité à 30 % de la durée, parce que
-   c'est le plus grand élément affiché, donc le candidat LCP, et qu'un élément à opacité nulle n'est pas
-   peint : allonger ce fondu retarderait d'autant la mesure de performance.
-   L'échelle, elle, continue jusqu'au bout, et la courbe la fait dépasser sa cible avant de s'y poser :
-   c'est ce léger rebond qui donne l'effet d'apparition. */
+   décorative (aria-hidden, alt vide). Le fondu est BREF, pleine opacité à 18 % de la durée, soit 160 ms,
+   parce que c'est le plus grand élément affiché, donc le candidat LCP, et qu'un élément à opacité nulle
+   n'est pas peint. Le recul d'échelle, lui, va jusqu'au bout des 900 ms sur la courbe expo.out : vif
+   au départ, posé à la fin. */
 @keyframes intro-hero-brand {
   from {
     opacity: 0;
-    transform: scale(0.2);
+    transform: scale(1.18);
   }
-  30% {
+  18% {
     opacity: 1;
   }
   to {
@@ -1924,12 +1887,12 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
    `opacity`, parce que le scrub pose une opacité en ligne qui l'emporterait, et parce que cela la
    retire aussi du parcours au clavier.
    DEUX SECONDES et un départ RETARDÉ depuis le 14/09/2026 (cadence donnée par l'équipe) : la flèche
-   paraît d'abord en fondu au rang 7, à 800 ms, puis enchaîne sur son oscillation. Le retard couvre
-   l'entrée, 800 ms de délai et 700 ms de durée. Au retour depuis une autre page, l'ouverture ne se
+   paraît d'abord en fondu au rang 7, à 900 ms, puis enchaîne sur son oscillation. Le retard couvre
+   l'entrée, 900 ms de délai et 700 ms de durée. Au retour depuis une autre page, l'ouverture ne se
    rejoue pas et la flèche attend simplement ce même temps avant de respirer. */
 @media (prefers-reduced-motion: no-preference) {
   [data-hero-scroll-hint] svg {
-    animation: hint-bob 2s var(--ease-in-out-quart) 1500ms infinite;
+    animation: hint-bob 2s var(--ease-in-out-quart) 1600ms infinite;
     /* En pause dès que la flèche quitte l'écran (`data-in-view` sur le lien, audit du 16/09/2026) :
        elle battait jusqu'au bas de la page. */
     animation-play-state: paused;
