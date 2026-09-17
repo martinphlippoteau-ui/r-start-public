@@ -39,7 +39,13 @@ export const START = 'top 88%';
 export const START_RATIO = 0.88;
 export const SCRUB = 0.6;
 
-/** Propriétés autorisées dans les mini-syntaxes (transform et opacity uniquement, jamais de layout). */
+/**
+ * Propriétés autorisées dans les mini-syntaxes (transform et opacity, jamais de layout).
+ * `blur` (17/09/2026) : un flou en pixels, traduit en `filter: blur()` par scroll.ts. C'est la seule
+ * propriété non composée du vocabulaire : un filtre se repeint à chaque image. Réservé à un objet
+ * décoratif isolé, jamais à du texte ; aujourd'hui le seul usage est le logo du hero, qui triple de
+ * taille et se floute pendant que le rideau le recouvre.
+ */
 const SCRUB_PROPS = new Set([
   'x',
   'y',
@@ -51,11 +57,13 @@ const SCRUB_PROPS = new Set([
   'rotate',
   'rotation',
   'opacity',
+  'blur',
 ]);
 
 export interface FromTo {
-  from: Record<string, number>;
-  to: Record<string, number>;
+  /* Des nombres, sauf `filter`, posé par scroll.ts à partir de `blur`. */
+  from: Record<string, number | string>;
+  to: Record<string, number | string>;
 }
 
 /**
@@ -74,7 +82,7 @@ export const parseFromTo = (spec: string, el: Element, attr = 'data-scrub'): Fro
       continue;
     }
     if (!SCRUB_PROPS.has(prop)) {
-      refuse(el, attr, `propriété « ${prop} » non autorisée (transform/opacity uniquement)`);
+      refuse(el, attr, `propriété « ${prop} » non autorisée (transform, opacity et blur uniquement)`);
       continue;
     }
     from[prop] = values[0] as number;

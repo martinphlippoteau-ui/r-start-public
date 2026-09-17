@@ -1349,6 +1349,62 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
    ÉTAT PAR DÉFAUT : OUVERT. Le panneau est écrit ouvert dans le HTML et c'est le script qui le referme
    au chargement, en même temps qu'il révèle le bouton. Sans JavaScript, on lit donc les explications,
    et aucun bouton mort ne traîne. */
+/*
+ * LA BULLE D'EXPLICATION (17/09/2026, définition « SCPI » du premier bloc de l'accueil) : posée sous la
+ * phrase qui la porte (`position: relative` sur celle-ci), pointe sous le bouton « i » (`--pointe`,
+ * posée par scripts/infoToggle.ts à l'ouverture). ELLE S'OUVRE COMME LES PASTILLES D'APPEL : opacité en
+ * 240 ms, échelle au ressort (`--ease-spring`, 420 ms, comme le dépliage de la pastille), depuis sa
+ * pointe. Elle se referme plus vite et sans ressort (une fermeture doit être nette), et `visibility`
+ * ne bascule qu'à la fin : plus rien n'est atteignable au clavier une fois refermée.
+ * SANS SCRIPT (`[data-bulle-liee]` absent), c'est un paragraphe ordinaire sous la phrase, lu en clair.
+ */
+@utility info-bulle {
+  margin-top: 0.75rem;
+  color: var(--color-ink);
+
+  &[data-bulle-liee] {
+    position: absolute;
+    left: 0;
+    top: calc(100% + 0.85rem);
+    z-index: 20;
+    width: min(26rem, 100%);
+    margin-top: 0;
+    padding: 1rem 1.25rem;
+    border-radius: 1.25rem;
+    background: #fff;
+    box-shadow: var(--shadow-float);
+    transform-origin: var(--pointe, 1.5rem) top;
+    &::before {
+      content: '';
+      position: absolute;
+      top: -0.4rem;
+      left: calc(var(--pointe, 1.5rem) - 0.45rem);
+      width: 0.9rem;
+      height: 0.9rem;
+      border-radius: 0.15rem;
+      background: #fff;
+      transform: rotate(45deg);
+    }
+    @media (prefers-reduced-motion: no-preference) {
+      transition:
+        opacity 240ms var(--ease-out-expo),
+        transform 420ms var(--ease-spring),
+        visibility 0s;
+    }
+  }
+  &[data-bulle-liee][data-ferme] {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-0.4rem) scale(0.9);
+    @media (prefers-reduced-motion: no-preference) {
+      transition:
+        opacity 160ms ease-in,
+        transform 200ms var(--ease-out-expo),
+        visibility 0s linear 200ms;
+    }
+  }
+}
+
 @utility info-panneau {
   display: grid;
   grid-template-rows: 1fr;
@@ -1983,24 +2039,24 @@ body:has(#consent-banner:not([hidden])) [data-hero-scroll-hint] {
    Le H1 réserve la place du logo en CSS : aucun décalage de page au chargement de l'image. */
 .hero-logo-wrap {
   display: block;
-  /* Sous 40 rem : la marque occupe l'écran (64 vw, 11/09/2026, le logo paraissait timide sur téléphone),
-     tout en laissant la ligne risques ET les deux boutons au-dessus du bandeau cookies au premier
-     chargement (tests/conformite.spec.ts : Pixel 5 et iPhone 13). */
-  width: min(52vw, 13.5rem);
+  /* RÉDUIT D'UN HUITIÈME le 17/09/2026 (« réduis un peu la taille du logo du hero ») : l'accroche, passée
+     à 48 px et en blanc le même jour, porte désormais le premier écran avec lui ; 13,5, 26 et 24 rem
+     deviennent 12, 23 et 21 rem. La ligne risques et les deux boutons restent au-dessus du bandeau
+     cookies au premier chargement (tests/conformite.spec.ts : Pixel 5, iPhone 13, 1440 × 900). */
+  width: min(46vw, 12rem);
   margin-inline: auto;
   aspect-ratio: 290 / 89;
+  /* Le bloc grandit et se floute au défilement (data-scrub, 01-Hero.astro) : depuis son centre. */
+  transform-origin: 50% 50%;
 }
 @media (width >= 40rem) {
   .hero-logo-wrap {
-    width: min(56vw, 26rem);
+    width: min(50vw, 23rem);
   }
 }
 @media (width >= 64rem) {
   .hero-logo-wrap {
-    /* 24 rem : le hero minimal (surtitre, accroche, ligne risques, CTA) laisse la place à une grande
-       marque ; les CTA restent découverts au-dessus du bandeau cookies sur 1440 × 900
-       (tests/conformite.spec.ts). */
-    width: min(34vw, 24rem);
+    width: min(30vw, 21rem);
   }
 }
 

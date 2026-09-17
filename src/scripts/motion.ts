@@ -40,7 +40,8 @@
  * │  data-fill="0.57"             jauge (scaleX, ou scaleY avec data-fill-axis="y")               │
  * │ Scènes au scroll (lissage SCRUB 0,6 partout, transform/opacity), motion/scroll.ts, scene.ts │
  * │  data-parallax="0.15"         + -trigger / -start / -end                                      │
- * │  data-scrub="scale:1,1.08|opacity:1,0"  + -trigger / -start / -end / -ease                    │
+ * │  data-scrub="scale:1,1.08|opacity:1,0"  + -trigger / -start / -end / -ease ; `blur:0,10` (px)  │
+ * │                               admis pour un objet décoratif isolé, jamais du texte (shared.ts)  │
  * │  data-scene + data-scene-end="+=120%"   enfants [data-step] (+ data-step-stay), classe        │
  * │                               `scene-stack` pour superposer les steps ; RiskNote HORS des     │
  * │                               steps (toujours visible).                                        │

@@ -68,8 +68,21 @@ export const setupScrub = (): void => {
     if (!allowed(el, 'data-scrub', true)) return;
     const spec = parseFromTo(el.dataset.scrub || '', el);
     if (!spec) return;
+    /* `blur:a,b` devient `filter: blur(apx)` → `blur(bpx)` : GSAP interpole le nombre dans la chaîne.
+       Voir shared.ts, SCRUB_PROPS, pour la réserve qui accompagne cette propriété. */
+    const flou = 'blur' in spec.to;
+    if (flou) {
+      spec.from.filter = `blur(${spec.from.blur ?? 0}px)`;
+      spec.to.filter = `blur(${spec.to.blur}px)`;
+      delete spec.from.blur;
+      delete spec.to.blur;
+    }
     const props =
-      'opacity' in spec.to && Object.keys(spec.to).length === 1 ? 'opacity' : 'transform, opacity';
+      'opacity' in spec.to && Object.keys(spec.to).length === 1
+        ? 'opacity'
+        : flou
+          ? 'transform, filter'
+          : 'transform, opacity';
     gsap.fromTo(el, spec.from, {
       ...spec.to,
       ease: el.dataset.scrubEase || 'none',

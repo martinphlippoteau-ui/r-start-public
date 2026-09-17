@@ -192,12 +192,35 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
           angle. Elle est HORS du H1 (élément protégé du moteur) et s'efface avec le vol de la marque. */
       }
       <div class="relative mx-auto w-fit max-sm:order-2">
-        <h1 id={titleId} class="hero-logo-wrap">
-          <span class="visually-hidden">{hero.title}</span>
-          {
-            /* Rang 2 de l'ouverture : le logo entre par déplacement seul (candidat LCP, jamais d'opacité). */
-          }
-          <span class="hero-logo-stack" aria-hidden="true" data-intro="1" data-intro-move>
+        {
+          /* LE H1 NE PORTE PLUS QUE SON TEXTE (17/09/2026). Le logo vivait dedans ; il en sort pour pouvoir
+            être animé au défilement, le moteur refusant tout effet sur un H1 et sur ce qu'il contient
+            (motion/dom.ts, PROTECTED). Le titre reste le nom accessible de la section (`titleId`), et
+            la place du logo est toujours réservée en CSS par .hero-logo-wrap, désormais sur le bloc
+            décoratif qui suit. */
+        }
+        <h1 id={titleId} class="visually-hidden">{hero.title}</h1>
+        {
+          /* LE LOGO S'EFFACE EN GRANDISSANT ET EN SE FLOUTANT (17/09/2026, demande de l'équipe : « au
+            scroll, quand tous les autres éléments sont partis, tu peux le flouter et l'agrandir à
+            fond »). Les autres éléments partent sur les 30 premiers % d'un écran de défilement
+            (flightScrub) ; le logo, lui, ne bouge pas avant, puis triple de taille et se floute sur les
+            50 % suivants, pendant que le rideau le recouvre. `blur` est une extension du vocabulaire de
+            data-scrub réservée à cet usage (motion/scroll.ts) : un seul élément, jamais du texte.
+            Le scrub est sur l'ENVELOPPE, l'entrée (data-intro) sur l'enfant : GSAP réécrit la transform
+            en ligne, une animation CSS sur le même élément se battrait avec elle. */
+        }
+        <div
+          class="hero-logo-wrap"
+          aria-hidden="true"
+          data-scrub="scale:1,3|blur:0,10"
+          data-scrub-trigger="html"
+          data-scrub-start="top top-=30%"
+          data-scrub-end="+=50%"
+          data-scrub-ease="power1.in"
+        >
+          {/* Rang 1 de l'ouverture : le logo entre par déplacement seul (candidat LCP, jamais d'opacité). */}
+          <span class="hero-logo-stack" data-intro="1" data-intro-move>
             <Image
               src={brandLogo}
               alt=""
@@ -207,7 +230,7 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
               decoding="async"
             />
           </span>
-        </h1>
+        </div>
         <div {...copyScrubUp} class="flex flex-col items-center max-sm:order-3">
           {
             /*
@@ -218,9 +241,16 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
              * L'espace entre les mots est rendu HORS des spans, sinon il disparaît avec le découpage.
              */
           }
+          {
+            /* DEUX FOIS PLUS GRANDE, BLANCHE ET PLUS GRASSE (17/09/2026, demande de l'équipe). Elle était
+              en sable, 20 px à 390 et 24 px à 1440, semi-grasse, sur 42 rem. Elle passe à 40 et 48 px
+              (le double, `clamp` calé sur les mêmes bornes que les titres), en blanc, en gras, sur 56 rem
+              pour tenir en deux lignes à 48 px. C'est maintenant le plus grand texte du premier écran,
+              donc le candidat LCP : ses mots se découvrent par `clip-path`, jamais par l'opacité. */
+          }
           <p
             data-intro="3"
-            class="mt-6 max-w-2xl text-xl leading-snug font-semibold text-balance text-sand sm:mt-8 sm:text-display-sm"
+            class="mt-6 max-w-4xl text-[clamp(2.5rem,2.07rem+1.53vw,3rem)] leading-[1.12] font-bold tracking-[-0.01em] text-balance text-white sm:mt-8"
           >
             {
               hero.tagline.split(' ').map((mot, i) => (
