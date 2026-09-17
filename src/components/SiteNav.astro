@@ -15,6 +15,11 @@
  * Sur téléphone, le libellé « Menu » est désormais visible à côté du chevron (il était en `sr-only`) :
  * au premier écran de l'accueil, le logo et le CTA sont encore à opacité 0, ils arrivent par le vol
  * d'ouverture, et la barre paraissait vide.
+ * SOUS 26 REM, IL REPASSE EN `sr-only` depuis le 17/09/2026 : la loupe de la recherche prend sa place.
+ * Logo, loupe, Souscrire et « Menu » en toutes lettres demandaient 380 px sur un Pixel 5 qui en offre
+ * 369, et le mot sortait de la pastille. L'icône seule suffit, comme sur apple.com, et la barre n'est
+ * plus vide : logo, loupe et CTA arrivent ensemble. Souscrire y perd aussi 8 px de chaque côté, sans
+ * quoi rien ne tenait à 360 px.
  *
  * Entrées : uniquement les pages du menu (src/config/pages.ts, `menuPages`), l'accueil excepté, sur
  * toutes les pages, jamais d'ancre de section (décision du 10/09/2026). Aucun libellé en dur :
@@ -48,6 +53,11 @@
  * sous-pages, où elle était pleine d'emblée. Rien ne distingue plus une page d'une autre : mêmes
  * entrées, même CTA, même verre, même hauteur.
  * L'ombre n'apparaît qu'une fois la page défilée (`data-stuck` sur la barre).
+ *
+ * RECHERCHE DU SITE (17/09/2026) : une loupe à gauche de Souscrire, à toutes les largeurs. Elle ouvre
+ * le panneau de SiteSearch.astro, posé sous la barre dans la même enveloppe : la pastille s'allonge
+ * vers le bas. La barre passe devant le panneau (`z-20`) et éteint son verre tant qu'il est ouvert
+ * (`data-recherche-ouverte` sur le <nav>, global.css).
  * La barre est `sticky` sans filtre : le panneau `fixed` reste bien calé sur le viewport (un
  * `backdrop-filter` sur un ancêtre en ferait le bloc conteneur), d'où la surface vitrée posée sur
  * l'enfant `[data-sitenav-bar]`.
@@ -55,10 +65,12 @@
 import { Image } from 'astro:assets';
 import brandLogo from '@/assets/logos/r-start-couleur.svg';
 import logoWhite from '@/assets/logos/r-start-blanc.svg';
+import SiteSearch from '@/components/SiteSearch.astro';
 import Button from '@/components/ui/Button.astro';
 import Container from '@/components/ui/Container.astro';
 import { menuPages, pages } from '@/config/pages';
 import { nav } from '@/content/fr/nav';
+import { search } from '@/content/fr/search';
 import { withBase } from '@/lib/href';
 
 /** Chemin courant normalisé (sans barre finale) pour l'état actif du menu. */
@@ -92,6 +104,7 @@ const entries: Entry[] = menuPages
 /** Le logo ramène toujours à l'accueil (aucune ancre dans la navigation). */
 const logoHref = withBase(pages.home.path);
 const panelId = 'site-nav-panel';
+const rechercheId = 'site-search';
 const menuLabel = nav.menuLabel ?? nav.brand;
 const closeLabel = nav.closeLabel ?? menuLabel;
 const menuAriaLabel = nav.menuAriaLabel ?? nav.brand;
@@ -119,10 +132,12 @@ const linkClass =
         clignote pas. Le nom est ici et non sur le <nav>, qui porte aussi le tiroir en `position: fixed`
         (un élément capturé devient le bloc conteneur de ses descendants fixes). */
     }
+    {/* Enveloppe de la barre et du panneau de recherche, qui se pose dessous (SiteSearch.astro). */}
+    <div class="relative">
     <div
       data-sitenav-bar
       style="view-transition-name: barre-nav"
-      class="nav-glass flex h-subnav items-center gap-2 px-3 sm:gap-4 sm:px-4 lg:grid lg:grid-cols-[1fr_auto_1fr] lg:pr-[3px]"
+      class="nav-glass z-20 flex h-subnav items-center gap-2 px-3 sm:gap-4 sm:px-4 lg:grid lg:grid-cols-[1fr_auto_1fr] lg:pr-[3px]"
     >
       <a
         href={logoHref}
@@ -180,7 +195,43 @@ const linkClass =
       {
         /* Sous « lg », la liste est masquée : un seul menu (le panneau), le CTA reste visible et pousse à droite. */
       }
-      <div class="ml-auto shrink-0 lg:ml-0 lg:justify-self-end">
+      <div class="ml-auto flex shrink-0 items-center gap-1 lg:ml-0 lg:justify-self-end">
+        {/* LOUPE (17/09/2026) : ouvre la recherche du site. Affichée seulement si les scripts
+          s'exécutent (`recherche-loupe`, global.css), sans rien à retirer au chargement. L'icône passe
+          de la loupe à la croix quand le panneau est ouvert. */}
+        <button
+          type="button"
+          data-recherche-ouvrir
+          aria-expanded="false"
+          aria-controls={rechercheId}
+          aria-label={search.openLabel}
+          data-label-fermer={search.closeLabel}
+          class="recherche-loupe size-10 shrink-0 rounded-full text-navy transition-colors hover:bg-navy/8"
+        >
+          <svg
+            aria-hidden="true"
+            class="recherche-loupe-icone size-5"
+            viewBox="0 0 20 20"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+          >
+            <circle cx="8.75" cy="8.75" r="5.25"></circle>
+            <path d="m12.75 12.75 4 4"></path>
+          </svg>
+          <svg
+            aria-hidden="true"
+            class="recherche-croix-icone size-5"
+            viewBox="0 0 20 20"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+          >
+            <path d="M5 5l10 10M15 5 5 15"></path>
+          </svg>
+        </button>
         {/* AGRANDI LE 15/09/2026 : `sm` (40 px de haut) devient `md` (48 px). La barre en fait 56,
           il reste donc 4 px de part et d'autre, et la contraction au défilement (scale 0.92,
           utilitaire `subnav-cta`) le ramène à 44 px, toujours au-dessus des 44 px de cible tactile.
@@ -190,7 +241,7 @@ const linkClass =
           les deux étant à rayon plein. Le resserrement ne vaut QU'À PARTIR DE `lg` : en dessous, ce
           n'est pas le CTA qui borde la barre à droite mais le bouton du menu, plus petit (40 px), qui
           demande son propre retrait. */}
-        <Button position="nav" variant="primary" size="md" class="subnav-cta px-7">{ctaLabel}</Button>
+        <Button position="nav" variant="primary" size="md" class="subnav-cta px-7 max-[26rem]:px-5">{ctaLabel}</Button>
       </div>
 
       <button
@@ -211,8 +262,10 @@ const linkClass =
         >
           <path d="M3 5.5h14M3 10h14M3 14.5h14"></path>
         </svg>
-        <span class="max-[22rem]:sr-only">{menuLabel}</span>
+        <span class="max-[26rem]:sr-only">{menuLabel}</span>
       </button>
+    </div>
+    <SiteSearch id={rechercheId} />
     </div>
   </div>
 

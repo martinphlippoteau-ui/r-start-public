@@ -45,6 +45,7 @@
  * accessible dès l'ouverture, jamais en même temps que le marqueur de la question.
  * Contenu : src/content/fr/faq.ts.
  */
+import { ancreQuestion } from '@/lib/ancre';
 import { withBase } from '@/lib/href';
 import Container from '@/components/ui/Container.astro';
 import NoteRef from '@/components/ui/NoteRef.astro';
@@ -176,7 +177,14 @@ const items = rendus.map((item) => {
                 {item.rubrique && (
                   <p class="text-eyebrow mt-10 mb-2 text-teal-700 first:mt-0">{item.rubrique}</p>
                 )}
-                <details name="faq" data-faq={item.question} class="faq-item group">
+                {/* `id` : ancre de la question (src/lib/ancre.ts). Un résultat de la recherche du site
+                  mène ici, et la question s'ouvre à l'arrivée (src/scripts/faqAncre.ts). */}
+                <details
+                  name="faq"
+                  id={ancreQuestion(item.question)}
+                  data-faq={item.question}
+                  class="faq-item group"
+                >
                   <summary class="block cursor-pointer list-none py-6 [&::-webkit-details-marker]:hidden sm:py-8">
                     <h3 class="flex items-start justify-between gap-5 text-xl font-semibold text-ink transition-colors duration-200 group-hover:text-navy sm:gap-8 sm:text-display-sm">
                       <span class="flex min-w-0 flex-col gap-2 sm:flex-row sm:gap-6">
@@ -328,4 +336,6 @@ const items = rendus.map((item) => {
   /* Recherche interne de /faq : elle filtre la liste rendue, elle n'interroge rien. Le module ne fait
      rien sur les pages qui n'ont pas de champ, il sort au premier `querySelector` nul. */
   import '@/scripts/faqSearch';
+  /* Question visée par l'ancre de l'adresse (/faq#question-…) : elle s'ouvre. */
+  import '@/scripts/faqAncre';
 </script>

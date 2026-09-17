@@ -1,0 +1,216 @@
+---
+/**
+ * PANNEAU DE RECHERCHE DU SITE (17/09/2026, demande de Martin : « même mécanique que celle
+ * d'apple.com », sans page de résultats). Rendu par SiteNav.astro, juste après la barre, dans la même
+ * enveloppe : la loupe de la barre l'ouvre.
+ *
+ * LA PASTILLE S'ALLONGE. Le panneau est posé SOUS la barre, à ses coordonnées exactes, et porte la
+ * même matière (`nav-glass`). Fermé, il est découpé à la hauteur de la barre ; ouvert, le découpage
+ * descend jusqu'à son pied, et la barre éteint son propre verre pour que les deux ne fassent qu'une
+ * pièce (global.css, « Recherche du site »). La barre reste au-dessus : logo, pages et Souscrire
+ * restent visibles et cliquables pendant la recherche. Derrière, un voile floute la page.
+ * Le texte n'est jamais fondu : il se découvre avec le découpage (règle « le texte ne se fond pas »).
+ *
+ * CONTENU. Le champ reste en tête ; dessous, défilant si besoin :
+ *  - panneau vide : les liens rapides (src/content/fr/search.ts) ;
+ *  - recherche : deux rubriques, « Pages » puis « Questions », construites par le script à partir des
+ *    deux gabarits ci-dessous. La mise en forme reste donc ici, le script ne pose aucune classe ;
+ *  - aucun résultat : un message et un renvoi vers toutes les questions.
+ *
+ * ACCESSIBILITÉ. Dialogue modal (`aria-modal`), focus sur le champ à l'ouverture, piège à tabulation,
+ * Échap, retour du focus sur la loupe. Flèches haut et bas d'un résultat à l'autre, Entrée ouvre le
+ * premier. Le nombre de résultats est annoncé. Un bouton Fermer, visible au focus seulement, reste
+ * atteignable au lecteur d'écran sur téléphone, où la loupe de la barre est hors du dialogue.
+ *
+ * SANS JAVASCRIPT, la loupe n'est pas affichée (`@media (scripting: enabled)`, global.css) : aucun
+ * saut dans la barre au chargement, contrairement à un `hidden` retiré par script.
+ */
+import { pages } from '@/config/pages';
+import { faq } from '@/content/fr/faq';
+import { search } from '@/content/fr/search';
+import { ancreQuestion } from '@/lib/ancre';
+import { withBase } from '@/lib/href';
+
+interface Props {
+  /** id du panneau, visé par `aria-controls` sur la loupe de la barre. */
+  id: string;
+}
+const { id } = Astro.props;
+const champId = id + '-champ';
+
+/* Liens rapides : une question doit exister telle quelle dans la FAQ, sinon le build s'arrête plutôt
+   que de publier un lien vers une ancre disparue. */
+const questions = faq.allItems ?? faq.items;
+const liensRapides = search.quickLinks.map((lien) => {
+  if ('question' in lien) {
+    const item = questions.find((q) => q.question.replace(/\s/g, ' ') === lien.question);
+    if (!item)
+      throw new Error(`search.ts : lien rapide vers une question introuvable, ${lien.question}`);
+    return {
+      label: lien.label ?? item.question,
+      href: `${withBase(pages.faq.path)}#${ancreQuestion(item.question)}`,
+    };
+  }
+  const page = pages[lien.page];
+  return {
+    label: lien.label ?? page.navLabel ?? page.label,
+    href: withBase(page.path) + ('section' in lien && lien.section ? `#${lien.section}` : ''),
+  };
+});
+
+/* Fond commun aux liens du panneau, au survol et au focus. */
+const lienClass =
+  'rounded-2xl px-3 py-2.5 text-ink no-underline transition-colors hover:bg-navy/6 focus-visible:bg-navy/6';
+---
+
+<div data-recherche-voile class="recherche-voile fixed inset-0 z-0" hidden></div>
+
+<div
+  id={id}
+  data-recherche-panneau
+  data-index={withBase('/recherche.json')}
+  data-compte-un={search.countOne}
+  data-compte-plusieurs={search.countMany}
+  data-chargement={search.loading}
+  data-erreur={search.error}
+  role="dialog"
+  aria-modal="true"
+  aria-label={search.dialogLabel}
+  class="recherche-panneau nav-glass absolute inset-x-0 top-0 z-10 flex flex-col"
+  hidden
+>
+  {/* La barre se pose ici, par-dessus le panneau. */}
+  <div class="h-subnav shrink-0"></div>
+
+  <div class="mx-auto w-full max-w-3xl shrink-0 px-4 pt-3 sm:px-8 sm:pt-5">
+    {
+      /* Zone de recherche et non <form> : il n'y a rien à envoyer, pas de page de résultats. Entrée
+        ouvre le premier résultat (src/scripts/recherche.ts). */
+    }
+    <div
+      role="search"
+      data-recherche-formulaire
+      class="recherche-formulaire relative flex items-center gap-2 border-b border-navy/12 pb-2"
+    >
+      <label for={champId} class="sr-only">{search.inputLabel}</label>
+      <svg
+        aria-hidden="true"
+        class="pointer-events-none absolute left-0 size-6 text-slate sm:size-7"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linecap="round"
+      >
+        <circle cx="10.5" cy="10.5" r="6.5"></circle>
+        <path d="m15.5 15.5 5 5"></path>
+      </svg>
+      <input
+        id={champId}
+        data-recherche-champ
+        type="search"
+        autocomplete="off"
+        autocapitalize="off"
+        spellcheck="false"
+        enterkeyhint="go"
+        placeholder={search.placeholder}
+        aria-controls={id + '-resultats'}
+        class="recherche-champ min-w-0 flex-1 border-0 bg-transparent py-2 pl-9 text-2xl font-semibold text-ink placeholder:font-medium placeholder:text-slate sm:pl-11 sm:text-3xl"
+      />
+      <button
+        type="button"
+        data-recherche-fermer
+        class="sr-only rounded-full px-3 py-2 text-sm font-semibold text-navy focus-visible:not-sr-only"
+      >
+        {search.closeLabel}
+      </button>
+    </div>
+    <p data-recherche-statut class="sr-only" aria-live="polite"></p>
+  </div>
+
+  <div
+    id={id + '-resultats'}
+    data-recherche-defilement
+    class="min-h-0 flex-1 overflow-y-auto overscroll-contain"
+  >
+    <div class="mx-auto w-full max-w-3xl px-1 pt-4 pb-6 sm:px-5 sm:pt-6 sm:pb-9">
+      {
+        /* Libellés de rubrique en paragraphes qui NOMMENT leur liste, et non en titres : le panneau est
+          un dialogue, et un dialogue ouvre sa propre hiérarchie de titres, qui devrait commencer à h1. */
+      }
+      <div data-recherche-rapides>
+        <p id={id + '-rapides'} class="text-caption px-3 font-semibold text-slate">
+          {search.quickLinksTitle}
+        </p>
+        <ul role="list" aria-labelledby={id + '-rapides'} class="mt-1">
+          {
+            liensRapides.map((lien) => (
+              <li>
+                <a
+                  href={lien.href}
+                  data-recherche-lien
+                  data-rubrique="liens_rapides"
+                  class:list={[lienClass, 'group flex items-center gap-3 font-semibold']}
+                >
+                  <svg
+                    aria-hidden="true"
+                    class="size-4 shrink-0 text-slate transition-transform group-hover:translate-x-0.5"
+                    viewBox="0 0 16 16"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.6"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M3 8h9M8.5 4.5 12 8l-3.5 3.5" />
+                  </svg>
+                  <span>{lien.label}</span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <div data-recherche-resultats hidden></div>
+
+      <div data-recherche-vide class="px-3" hidden>
+        <p class="text-lead text-ink" data-recherche-vide-texte data-gabarit={search.empty}></p>
+        <p class="mt-3">
+          <a
+            href={withBase(pages[search.emptyLink.page].path)}
+            data-recherche-lien
+            data-rubrique="aucun_resultat"
+            class="link-underline inline-flex items-center gap-2 text-base font-semibold text-navy hover:text-teal-700"
+          >
+            {search.emptyLink.label}
+          </a>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  {
+    /* Gabarits clonés par src/scripts/recherche.ts : toute la mise en forme reste dans ce fichier. */
+  }
+  <template data-recherche-gabarit-rubrique>
+    <div class="mt-6 first:mt-0">
+      <p class="text-caption px-3 font-semibold text-slate" data-rubrique-titre></p>
+      <ul role="list" class="mt-1" data-liste></ul>
+    </div>
+  </template>
+  <template data-recherche-gabarit-resultat>
+    <li>
+      <a data-recherche-lien class:list={[lienClass, 'block']}>
+        <span class="text-caption block font-medium text-teal-700" data-contexte></span>
+        <span class="block text-base leading-snug font-semibold text-ink sm:text-lg" data-titre
+        ></span>
+        <span class="recherche-extrait text-caption mt-1 text-slate-700" data-extrait></span>
+      </a>
+    </li>
+  </template>
+</div>
+
+<script>
+  import '@/scripts/recherche';
+</script>

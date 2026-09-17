@@ -1,4 +1,5 @@
 import type { PictoKey } from '@/components/ui/Picto.astro';
+import type { PageKey } from '@/config/pages';
 /**
  * Types partagés du contenu éditorial (src/content/fr/*).
  * Les composants ne contiennent aucun texte en dur : tout vient de ces structures.
@@ -537,3 +538,42 @@ export interface SeoContent {
   ogImageAlt: string;
   keywords: string[];
 }
+
+/**
+ * Recherche du site (17/09/2026) : loupe de la barre, panneau, liens rapides et synonymes.
+ * Voir src/content/fr/search.ts.
+ */
+export interface SearchContent {
+  /** aria-label de la loupe, panneau fermé puis ouvert. */
+  openLabel: string;
+  closeLabel: string;
+  /** Nom du dialogue et libellé (masqué) du champ. */
+  dialogLabel: string;
+  inputLabel: string;
+  placeholder: string;
+  quickLinksTitle: string;
+  /**
+   * Liens rapides du panneau vide. Une cible et une seule par lien : une page du plan du site, une
+   * question de la FAQ (libellé exact, l'ancre en est dérivée), ou une section d'une page.
+   */
+  quickLinks: ({ label?: string } & (
+    | { page: PageKey; section?: string }
+    | { question: string }
+  ))[];
+  /** Titres des deux rubriques de résultats. */
+  groups: { pages: string; questions: string };
+  /** Décompte lu par les lecteurs d'écran ; `{n}` est remplacé. */
+  countOne: string;
+  countMany: string;
+  /** Aucun résultat ; `{q}` est remplacé par la recherche. */
+  empty: string;
+  emptyLink: { label: string; page: PageKey };
+  loading: string;
+  error: string;
+  /**
+   * Groupes de synonymes : chercher l'un trouve les autres. Écrits en français courant, accents
+   * compris ; la comparaison les retire.
+   */
+  synonyms: string[][];
+}
+

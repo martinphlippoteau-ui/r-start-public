@@ -2,6 +2,7 @@
 import { defineConfig, envField } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
+import recherche from './scripts/search-index.mjs';
 
 // URL canonique du site. Placeholder tant que le domaine n'est pas connu.
 const SITE_URL = process.env.PUBLIC_SITE_URL || 'https://r-start.com';
@@ -35,6 +36,8 @@ export default defineConfig({
     },
   },
   integrations: [
+    /* Recherche du site (17/09/2026) : écrit dist/recherche.json à partir des pages construites. */
+    recherche(),
     sitemap({
       filter: (page) =>
         !page.includes('/404') &&

@@ -131,14 +131,14 @@ export const legalPages: LegalPage[] = [
         paragraphs: [
           'Ce site est un site de présentation. Il ne comporte aucun formulaire : il ne collecte ni votre nom, ni votre adresse e-mail, ni aucune donnée de souscription.',
           'La souscription se déroule sur le tunnel de souscription en ligne de CORUM, qui applique sa propre politique de protection des données, disponible sur www.corum.fr.',
-          'Avec votre accord uniquement, des données de navigation sont collectées à des fins de mesure d’audience. Il s’agit des pages consultées, de la durée et du parcours de visite. S’y ajoutent le type d’appareil, de navigateur et de système, une localisation approximative (pays, ville) et un identifiant de cookie. L’adresse IP sert à la localisation approximative et n’est pas enregistrée par Google Analytics 4.',
+          'Avec votre accord uniquement, des données de navigation sont collectées à des fins de mesure d’audience. Il s’agit des pages consultées, de la durée et du parcours de visite, ainsi que des mots saisis dans la recherche du site. S’y ajoutent le type d’appareil, de navigateur et de système, une localisation approximative (pays, ville) et un identifiant de cookie. L’adresse IP sert à la localisation approximative et n’est pas enregistrée par Google Analytics 4.',
           'L’hébergeur conserve des journaux techniques de connexion (adresse IP, horodatage, page demandée), nécessaires au fonctionnement et à la sécurité du service.',
         ],
       },
       {
         title: 'Finalités et bases légales',
         paragraphs: [
-          'Mesure d’audience : comprendre comment le site est consulté pour l’améliorer. Base légale : votre consentement (article 6.1.a du RGPD et article 82 de la loi Informatique et Libertés). Vous pouvez le retirer à tout moment.',
+          'Mesure d’audience : comprendre comment le site est consulté et ce que ses visiteurs y cherchent, pour l’améliorer. Base légale : votre consentement (article 6.1.a du RGPD et article 82 de la loi Informatique et Libertés). Vous pouvez le retirer à tout moment.',
           'Mémorisation de votre choix en matière de cookies : intérêt légitime à respecter votre choix et à ne pas vous solliciter à chaque visite. Ce cookie est exempté de consentement.',
           'Journaux techniques de l’hébergeur : intérêt légitime à assurer le fonctionnement et la sécurité du site.',
         ],

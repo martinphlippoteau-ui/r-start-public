@@ -19,13 +19,17 @@
  *  parcours   cta_souscrire_click · souscription_indisponible · lien_sortant · retour_haut
  *  frais      comparateur_scpi
  *  lecture    document_download · faq_open · lecture_profondeur
+ *  recherche  recherche (terme, nb_resultats) · recherche_clic (terme, rubrique, rang, resultat,
+ *             destination), émis par src/scripts/recherche.ts depuis le 17/09/2026
  *  incidents  page_introuvable
  *  RETIRÉS le 14/09/2026 avec les simulateurs eux-mêmes, À RETIRER DE GA4 ET DE GTM : les quatre
  *  événements outil_ouvert, outil_niveau, outil_etape et outil_resultat.
  *  Le consentement est envoyé par scripts/consent.ts, qui le connaît de première main.
  *
  * JAMAIS DANS LE DATALAYER : aucun montant saisi dans un simulateur, aucune donnée personnelle. Les
- * hypothèses patrimoniales d'un visiteur n'ont rien à faire dans un outil de mesure d'audience.
+ * hypothèses patrimoniales d'un visiteur n'ont rien à faire dans un outil de mesure d'audience. Les
+ * termes de recherche sont écartés par recherche.ts quand ils ressemblent à une adresse électronique ou
+ * portent une suite de chiffres.
  */
 import { campagne } from './campagne';
 
@@ -104,6 +108,14 @@ const init = () => {
         /* adresse inexploitable (mailto:, tel:) : rien à compter */
       }
     }
+  });
+
+  /* Recherche du site : les événements arrivent tout formés de src/scripts/recherche.ts, par un
+     événement DOM plutôt qu'un import. Deux scripts de page qui importent ce module pourraient en
+     exécuter deux copies, et chaque clic partirait deux fois. */
+  document.addEventListener('rstart:mesure', (e) => {
+    const detail = (e as CustomEvent<Record<string, unknown>>).detail;
+    if (detail && typeof detail.event === 'string') push(detail);
   });
 
   /* Questions de la FAQ : seule l'ouverture compte, la fermeture ne dit rien. */

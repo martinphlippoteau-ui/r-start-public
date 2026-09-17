@@ -742,6 +742,169 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   }
 }
 
+/* ===========================================================================================
+   RECHERCHE DU SITE (SiteNav.astro, SiteSearch.astro, src/scripts/recherche.ts ; 17/09/2026)
+   ===========================================================================================
+   La loupe n'est affichée que si les scripts s'exécutent : sans eux, elle n'ouvrirait rien. Par la
+   requête média et non par un `hidden` retiré au chargement, pour que la barre ne change pas d'un
+   pixel entre le premier rendu et l'exécution du script (et d'une page à l'autre, en transition de
+   vue). Un navigateur qui ne connaît pas `scripting` ne l'affiche pas : c'est le repli sûr. */
+.recherche-loupe {
+  display: none;
+}
+@media (scripting: enabled) {
+  .recherche-loupe {
+    display: grid;
+    place-items: center;
+  }
+}
+/* La loupe et la croix occupent la même case ; l'une tourne et s'efface quand l'autre arrive. Pas de
+   texte ici, l'opacité est admise. */
+.recherche-loupe > svg {
+  grid-area: 1 / 1;
+}
+.recherche-croix-icone {
+  opacity: 0;
+  transform: rotate(-90deg) scale(0.5);
+}
+[data-recherche-ouverte] .recherche-loupe-icone {
+  opacity: 0;
+  transform: rotate(90deg) scale(0.5);
+}
+[data-recherche-ouverte] .recherche-croix-icone {
+  opacity: 1;
+  transform: none;
+}
+
+/* LA PASTILLE S'ALLONGE. Le panneau est posé sous la barre, à ses coordonnées, dans la même matière.
+   Fermé, il est découpé à la hauteur exacte de la barre, qui le recouvre ; ouvert, le découpage descend
+   jusqu'à son pied. Le découpage ouvert déborde de 3 rem de chaque côté : à zéro, il rognerait l'ombre
+   portée du verre. Le verre est plus dense que celui de la barre (0,9 contre 0,72) : on y lit des
+   paragraphes, pas quatre libellés. Le texte n'est jamais fondu, il se découvre avec le découpage. */
+.recherche-panneau {
+  --nav-glass-tint: 0.9;
+  max-height: calc(100vh - 2 * var(--spacing-nav-gap));
+  max-height: calc(100dvh - 2 * var(--spacing-nav-gap));
+  clip-path: inset(0 0 calc(100% - var(--spacing-subnav)) 0 round var(--radius-nav));
+}
+[data-recherche-ouverte] .recherche-panneau {
+  clip-path: inset(-3rem round var(--radius-nav));
+}
+/* Pendant ce temps, la barre éteint son propre verre et reprend sa taille pleine : les deux ne font
+   plus qu'une pièce, sans couture ni double blanc sur la hauteur de la barre. */
+[data-recherche-ouverte] [data-sitenav-bar] {
+  --nav-glass-on: 0;
+  transform: none;
+}
+/* Même règle que le tiroir : la barre passe devant le bandeau de consentement tant que le panneau est
+   présent, sortie comprise. */
+[data-sitenav]:has([data-recherche-panneau]:not([hidden])) {
+  z-index: 60;
+}
+
+/* Voile : la page se floute et s'assombrit à peine derrière le panneau. Pas de texte, fondu admis. */
+.recherche-voile {
+  background-color: rgb(13 46 61 / 0.22);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  opacity: 0;
+}
+[data-recherche-ouverte] .recherche-voile {
+  opacity: 1;
+}
+
+/* Champ : la ligne sous le champ tient lieu d'anneau de focus, l'anneau global encadrerait un titre. */
+.recherche-champ {
+  appearance: none;
+}
+/* La croix d'effacement du navigateur, redessinée : un petit rond ardoise, comme la croix d'un champ
+   de recherche d'iOS, au lieu de la grande croix bleue par défaut de Chrome. */
+.recherche-champ::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 1.375rem;
+  height: 1.375rem;
+  flex-shrink: 0;
+  border-radius: 9999px;
+  background: var(--color-slate)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M3.5 3.5l5 5M8.5 3.5l-5 5' stroke='white' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E")
+    center / 0.8rem no-repeat;
+  opacity: 0.55;
+  cursor: pointer;
+}
+.recherche-champ::-webkit-search-cancel-button:hover {
+  opacity: 0.8;
+}
+.recherche-champ:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+.recherche-formulaire:focus-within {
+  border-bottom-color: var(--color-navy);
+}
+
+/* Résultats : l'extrait tient sur deux lignes, le mot trouvé prend la couleur de la sélection du site. */
+.recherche-extrait {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+.recherche-panneau mark {
+  background-color: var(--color-teal-100);
+  color: var(--color-navy);
+  border-radius: 0.2em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .recherche-loupe > svg {
+    transition:
+      opacity 200ms ease,
+      transform 360ms var(--ease-out-expo);
+  }
+  /* Courbe d'Apple pour un volet qui se déplie : longue détente, arrivée nette. */
+  .recherche-panneau {
+    transition: clip-path 380ms cubic-bezier(0.32, 0.72, 0, 1);
+  }
+  .recherche-voile {
+    transition: opacity 320ms ease;
+  }
+  .recherche-formulaire {
+    transition: border-color 180ms var(--ease-out-expo);
+  }
+}
+
+/* ARRIVÉE SUR LE PASSAGE : le titre de la section ou la question visée s'éclaire puis s'éteint. Un
+   anneau et un voile teal très léger, sans toucher à la couleur du texte : le titre reste lisible sur
+   les sections claires comme sur les sombres. En mouvement réduit, l'anneau est fixe et disparaît
+   d'un coup (src/scripts/recherche.ts). */
+[data-recherche-cible] {
+  border-radius: 0.75rem;
+}
+@media (prefers-reduced-motion: no-preference) {
+  [data-recherche-cible] {
+    animation: recherche-cible 2400ms var(--ease-out-expo) both;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-recherche-cible] {
+    box-shadow: 0 0 0 0.5rem rgb(20 164 186 / 0.35);
+  }
+}
+@keyframes recherche-cible {
+  0%,
+  35% {
+    background-color: rgb(20 164 186 / 0.12);
+    box-shadow: 0 0 0 0.5rem rgb(20 164 186 / 0.35);
+  }
+  100% {
+    background-color: rgb(20 164 186 / 0);
+    box-shadow: 0 0 0 0.5rem rgb(20 164 186 / 0);
+  }
+}
+
 /* Surface translucide (navigation collée, barres) */
 @utility surface-glass {
   background-color: rgb(255 255 255 / 0.78);
@@ -1824,6 +1987,11 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
     }
     .faq-item[open]::details-content {
       grid-template-rows: 1fr;
+    }
+    /* Question ouverte par l'ancre de l'adresse (src/scripts/faqAncre.ts) : d'un coup, pour que la page
+       défile vers une réponse qui a déjà sa hauteur. */
+    .faq-item[data-sans-transition]::details-content {
+      transition: none;
     }
     .faq-item > .faq-answer {
       min-height: 0;
