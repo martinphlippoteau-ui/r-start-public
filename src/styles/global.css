@@ -128,6 +128,12 @@
     box-shadow: 0 0 0 5px #fff;
     border-radius: 0.25rem;
   }
+  /* Une cible de focus posée par script (`tabindex="-1"`, section d'arrivée du hero) n'est pas une
+     commande : l'anneau autour de toute une section ne signalerait rien d'activable (17/09/2026). */
+  [tabindex='-1']:focus {
+    outline: none;
+    box-shadow: none;
+  }
   h1,
   h2,
   h3,

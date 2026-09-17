@@ -73,7 +73,9 @@
  *    contenu visible et stable ; cascade CSS et transitions coupées par @media.
  *  - Transform et opacity uniquement (mini-syntaxe filtrée, `clip` limité aux médias) ; `will-change`
  *    posé le temps de l'animation (onToggle pour les scènes) ; pins avec anticipatePin/fastScrollEnd ;
- *    scrub ≤ 1 ; pas de scroll hijacking.
+ *    scrub ≤ 1 ; pas de scroll hijacking, À UNE EXCEPTION PRÈS, décidée par l'équipe le 17/09/2026 :
+ *    le passage du hero de l'accueil au contenu se fait d'un seul geste (src/scripts/heroAvance.ts,
+ *    coupé en mouvement réduit).
  *  - Jamais d'état initial invisible en CSS : c'est GSAP qui pose l'état de départ (anti-CLS, no-JS) ;
  *    la cascade d'entrée CSS se résout seule (animation-fill-mode: backwards, 850 ms au plus).
  *  - Les valeurs finales (compteurs, jauges, textes) sont dans le HTML : sans JS, tout est exact.

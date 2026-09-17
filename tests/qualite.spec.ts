@@ -213,6 +213,49 @@ test.describe('Qualité', () => {
   });
 
   /*
+   * LE HERO SE FRANCHIT D'UN SEUL GESTE (17/09/2026, src/scripts/heroAvance.ts). Un cran de molette
+   * depuis le haut mène au début du contenu, un cran vers le haut en revient ; plus bas, la molette est
+   * native ; en mouvement réduit, rien n'est intercepté.
+   */
+  test('un cran de molette fait passer du hero au contenu, et retour', async ({ page, browser }) => {
+    const position = () => page.evaluate(() => Math.round(window.scrollY));
+    const cible = () =>
+      page.evaluate(() =>
+        Math.round(document.querySelector('#ce-qui-change')!.getBoundingClientRect().top + window.scrollY)
+      );
+    await page.goto('/');
+    await page.locator('#consent-banner button').first().click();
+    const haut = await cible();
+    await page.mouse.move(200, 300);
+
+    await page.mouse.wheel(0, 100);
+    await expect.poll(position, { message: 'un cran vers le bas mène au contenu', timeout: 4000 }).toBe(haut);
+
+    await page.waitForTimeout(1500);
+    await page.mouse.wheel(0, -100);
+    await expect.poll(position, { message: 'un cran vers le haut ramène au hero', timeout: 4000 }).toBe(0);
+
+    await page.waitForTimeout(1500);
+    await page.evaluate((y) => {
+      document.documentElement.style.scrollBehavior = 'auto';
+      window.scrollTo(0, y);
+    }, haut + 1200);
+    await page.mouse.wheel(0, 100);
+    await expect.poll(position, { message: 'plus bas, la molette est native', timeout: 3000 }).toBe(haut + 1300);
+
+    const reduit = await browser.newContext({ reducedMotion: 'reduce', baseURL: new URL(page.url()).origin });
+    const calme = await reduit.newPage();
+    await calme.goto('/');
+    await calme.locator('#consent-banner button').first().click();
+    await calme.mouse.move(200, 300);
+    await calme.mouse.wheel(0, 100);
+    await calme.waitForTimeout(1200);
+    expect(await calme.evaluate(() => Math.round(window.scrollY)), 'mouvement réduit : défilement natif').toBe(100);
+    await reduit.close();
+  });
+
+
+  /*
    * La pastille d'appel et l'invitation à défiler du hero se relaient : jamais visibles ensemble, jamais
    * absentes ensemble une fois le hero passé. Le test descend la page et vérifie la complémentarité à
    * chaque palier. Sur grand écran le hero est ÉPINGLÉ, la boîte de l'invitation ne quitte donc jamais
