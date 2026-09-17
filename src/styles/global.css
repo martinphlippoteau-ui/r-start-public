@@ -2539,6 +2539,16 @@ body:has(#consent-banner:not([hidden])) [data-hero-scroll-hint] {
      dégradés où cela ne se voit pas. */
   ::view-transition-group(barre-nav) {
     animation-duration: 0s;
+    /* LE FILTRE D'ARRIÈRE-PLAN DE LA BARRE EST RECOPIÉ ICI PAR LE NAVIGATEUR (la spécification copie
+       `backdrop-filter` sur le groupe), mais pas son rayon : pendant la transition, le
+       `saturate(185%) blur(24px)` s'appliquait à la boîte RECTANGULAIRE du groupe, et un rectangle
+       teal plus clair, à angles droits, débordait des bouts arrondis de la pastille. Vers l'accueil
+       c'était pire : la barre y naît clippée par son entrée (`intro-nav-entree`), sa capture est vide,
+       et il ne restait que le rectangle (« quand je clique sur le logo ça fait apparaître des bords »,
+       Martin, 17/09/2026). Le filtre est annulé sur le groupe ; la capture plate à 72 % a la même
+       luminosité que le verre vivant. */
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
   }
   ::view-transition-old(barre-nav),
   ::view-transition-new(barre-nav) {
