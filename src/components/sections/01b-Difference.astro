@@ -67,11 +67,23 @@ const morceaux = (() => {
     la ligne risques : le moteur se limite à épingler et recouvrir, sans recul ni fondu (scroll.ts). Sous 64 rem,
     aucun épinglage : défilement normal. */
 }
-<Section id={id} tone="paper" data-curtain>
+<Section id={id} tone="paper" data-curtain class="overflow-hidden">
   <Container size="wide">
-    <header>
-      <h2 id={titleId} class="text-display-lg text-balance" data-reveal-text>{difference.title}</h2>
-    </header>
+    {
+      /* DEUX MOITIÉS depuis le 17/09/2026 (demande de l'équipe : « ce bloc en deux parties, texte à
+        gauche et image full bloc à droite »). À partir de `lg`, tout le texte, titre compris, tient
+        dans la moitié gauche de la boîte de contenu ; la photo occupe la moitié droite de l'ÉCRAN, du
+        haut au bas du bloc et jusqu'au bord (figure absolue, après le Container). Les deux moitiés se
+        rejoignent au milieu de l'écran, qui est aussi le milieu de la boîte de contenu centrée : le bord
+        gauche de la photo tombe à l'écart de colonne exact. Sous `lg`, le texte puis la photo en pleine
+        largeur, collée au bas du bloc. La photo était jusque-là une carte arrondie de cinq colonnes sur
+        douze, à côté du texte, sous un titre pleine largeur. */
+    }
+    <div class="lg:grid lg:grid-cols-2 lg:gap-14">
+      <div>
+        <header>
+          <h2 id={titleId} class="text-display-lg text-balance" data-reveal-text>{difference.title}</h2>
+        </header>
 
     {
       /* Le contre-poids chiffré (frais de gestion, cessions, retrait, coût total inconnu) a été retiré de
@@ -101,8 +113,7 @@ const morceaux = (() => {
         au lieu de `mt-6` et `sm:mt-8`. Le titre garde sa place en tête de section, c'est l'air sous lui
         qui grandit. */
     }
-    <div class="mt-10 grid items-start gap-8 sm:mt-14 lg:grid-cols-12 lg:gap-14">
-      <div class="text-lg text-ink lg:col-span-7">
+        <div class="mt-10 text-lg text-ink sm:mt-14">
         {
           /* La question d'accroche est un H3 (11/09/2026) : mise en valeur et nettement détachée du H2,
             elle ouvre la démonstration au lieu de la commenter. */
@@ -122,7 +133,7 @@ const morceaux = (() => {
             si le terme en sortait un jour, la phrase s'affiche entière et sans bouton. */
         }
         {difference.lead && (
-          <p class="mt-6">
+          <p class="relative mt-6">
             {morceaux ? (
               <>
                 {morceaux[0]}
@@ -149,8 +160,16 @@ const morceaux = (() => {
             )}
           </p>
         )}
+        {
+          /* UNE BULLE, PAS UN PANNEAU (17/09/2026, demande de l'équipe : « un toggle bulle qui s'ouvre
+            avec une animation fluide comme les CTA dynamiques, et qui se referme aussi »). La bulle est
+            posée sous la phrase, sa pointe sous le « i » (position calculée par infoToggle.ts), et
+            s'ouvre au ressort des pastilles (`info-bulle`, global.css). Elle se referme au second clic,
+            à Échap, ou d'un clic ailleurs. Sans script, elle est un simple paragraphe sous la phrase,
+            lu en clair. Le paragraphe porteur est `relative` : c'est lui qui la positionne. */
+        }
         {morceaux && (
-          <div id="info-scpi" data-info-panneau class="info-panneau">
+          <div id="info-scpi" data-info-panneau data-info-bulle class="info-bulle">
             <p class="text-base leading-snug text-slate-700">
               <strong class="font-semibold text-ink">{difference.definition!.term}</strong> :{' '}
               {difference.definition!.text}
@@ -225,31 +244,42 @@ const morceaux = (() => {
         }
       </div>
 
-      <figure class="lg:col-span-5" data-animate="clip">
-        <div class="img-frame aspect-[4/3]">
-          <Picture
-            src={photo}
-            alt={media.documents.alt}
-            widths={[480, 800, 1200]}
-            sizes="(min-width: 64rem) 26rem, 100vw"
-            formats={['avif', 'webp']}
-            fallbackFormat="jpeg"
-            loading="lazy"
-            decoding="async"
-            pictureAttributes={{ class: 'block h-full w-full' }}
-            class="h-full w-full object-cover"
-          />
-        </div>
-        {
-          AFFICHER_LEGENDES && media.documents.credit && (
-            <figcaption class="text-caption mt-3 text-slate-700">
-              {media.documents.credit}
-            </figcaption>
-          )
-        }
-      </figure>
+      </div>
     </div>
   </Container>
+
+  {
+    /* LA PHOTO, « full bloc » : à partir de `lg`, absolue, du haut au bas de la section et du milieu de
+      l'écran au bord droit ; `overflow-hidden` sur la section la coupe aux coins arrondis du rideau.
+      En dessous, elle suit le texte, en pleine largeur, et `-mb-section` annule la marge basse de la
+      section pour qu'elle touche le bas du bloc. Un seul élément pour les deux cas : les descripteurs
+      `sizes` disent au navigateur qu'elle fait la moitié de l'écran à partir de `lg`, tout l'écran en
+      dessous. La révélation `clip` reste celle des médias. */
+  }
+  <figure
+    class="-mb-section mt-10 lg:absolute lg:inset-y-0 lg:left-1/2 lg:right-0 lg:mt-0 lg:mb-0"
+    data-animate="clip"
+  >
+    <Picture
+      src={photo}
+      alt={media.documents.alt}
+      widths={[640, 960, 1280, 1600]}
+      sizes="(min-width: 64rem) 50vw, 100vw"
+      formats={['avif', 'webp']}
+      fallbackFormat="jpeg"
+      loading="lazy"
+      decoding="async"
+      pictureAttributes={{ class: 'block h-full w-full' }}
+      class="aspect-[4/3] h-auto w-full object-cover lg:aspect-auto lg:h-full"
+    />
+    {
+      AFFICHER_LEGENDES && media.documents.credit && (
+        <figcaption class="text-caption px-5 pt-3 text-slate-700 sm:px-8 lg:absolute lg:right-5 lg:bottom-4 lg:rounded-full lg:bg-ink/70 lg:px-3 lg:py-1 lg:pt-1 lg:text-white/85">
+          {media.documents.credit}
+        </figcaption>
+      )
+    }
+  </figure>
 </Section>
 
 <script>
