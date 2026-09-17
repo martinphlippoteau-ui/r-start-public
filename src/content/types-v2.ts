@@ -116,6 +116,12 @@ export interface DifferenceContent {
   intro: string;
   /** Phrase qui annonce les deux situations, juste avant la liste. */
   lead?: string;
+  /**
+   * Définition dépliable d'un terme de `lead` (17/09/2026) : `term` est le mot tel qu'il apparaît dans la
+   * phrase (sa première occurrence reçoit le bouton « i »), `text` la définition, `label` le libellé du
+   * bouton pour les lecteurs d'écran.
+   */
+  definition?: { term: string; text: string; label: string };
   /** Les deux situations où des frais sont prélevés. `strong` est le mot mis en valeur dans `text`. */
   situations?: { text: string; strong?: string }[];
   /** Surtitre du bloc des deux moteurs (ex. « Deux moteurs »). */
