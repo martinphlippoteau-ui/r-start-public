@@ -4,6 +4,18 @@
  * AUCUNE PAGE DE RÉSULTATS. Les résultats s'affichent à chaque frappe dans le panneau, en deux
  * rubriques, « Pages » puis « Questions ». Entrée ouvre le premier ; un résultat mène au passage exact.
  *
+ * LE PANNEAU A UNE HAUTEUR FIXE : celle du panneau vide, liens rapides visibles, mesurée à chaque
+ * ouverture (demande de Martin du 17/09/2026). Les résultats sont ROGNÉS pour y tenir : les derniers
+ * sont retirés, en alternant entre la rubrique la plus longue et l'autre, jusqu'à ce que rien ne
+ * déborde ; trois ou quatre résultats en général, deux sur un téléphone.
+ *
+ * LE RELAIS DES VERRES. Fermé, le panneau est masqué et la barre porte le verre. À l'ouverture, dans la
+ * même image, le panneau apparaît sous la barre, à sa hauteur exacte et dans la même matière (jusqu'au
+ * `data-stuck` recopié), et la barre éteint le sien (global.css, sélecteur `:has`) ; puis il grandit.
+ * À la fermeture, il redescend, et c'est à la FIN du mouvement (`transitionend`, minuterie de secours)
+ * qu'il est masqué et que la barre rallume son verre, sans transition (`data-sans-transition`, le temps
+ * d'une image). Les deux verres ne sont jamais allumés ensemble : rien ne clignote.
+ *
  * L'INDEX (dist/recherche.json, scripts/search-index.mjs) n'est demandé qu'à la première intention :
  * survol ou focus de la loupe, sinon ouverture. Une visite qui ne cherche rien ne le télécharge pas.
  *
@@ -77,9 +89,12 @@ interface Trouve {
 }
 
 const CLE_ARRIVEE = 'rstart:recherche:arrivee';
-const DUREE_FERMETURE = 380;
+/** Durées des mouvements (global.css), plus une marge : minuteries de secours si `transitionend` manque. */
+const SECOURS_OUVERTURE = 440 + 120;
+const SECOURS_FERMETURE = 320 + 120;
 const PAUSE_MESURE = 1500;
-const MAX_PAR_RUBRIQUE = 6;
+/** Plafond avant rognage : la hauteur du panneau en garde rarement plus de deux par rubrique. */
+const MAX_PAR_RUBRIQUE = 4;
 const POIDS_SYNONYME = 0.8;
 
 const VIDES = new Set(
@@ -309,8 +324,9 @@ const surligner = (
   if (curseur < fin) cible.append(texte.slice(curseur, fin));
 };
 
-const LONGUEUR_EXTRAIT = 150;
-const AVANT_EXTRAIT = 45;
+/* Une seule ligne d'extrait, tronquée par le style : elle commence peu avant le premier mot trouvé. */
+const LONGUEUR_EXTRAIT = 120;
+const AVANT_EXTRAIT = 30;
 
 const extrait = (cible: HTMLElement, p: Prepare, liste: Concept[]): void => {
   const texte = p.doc.texte;
@@ -349,6 +365,7 @@ const init = (): void => {
   const panneau = document.querySelector<HTMLElement>('[data-recherche-panneau]');
   const voile = document.querySelector<HTMLElement>('[data-recherche-voile]');
   if (!nav || !bouton || !panneau || !voile) return;
+  const bar = nav.querySelector<HTMLElement>('[data-sitenav-bar]');
   const champ = panneau.querySelector<HTMLInputElement>('[data-recherche-champ]');
   const statut = panneau.querySelector<HTMLElement>('[data-recherche-statut]');
   const rapides = panneau.querySelector<HTMLElement>('[data-recherche-rapides]');
@@ -377,6 +394,7 @@ const init = (): void => {
 
   const libelleOuvrir = bouton.getAttribute('aria-label') ?? '';
   const libelleFermer = bouton.dataset.labelFermer ?? libelleOuvrir;
+  const sobre = window.matchMedia('(prefers-reduced-motion: reduce)');
 
   /* --- Index ------------------------------------------------------------------------------------ */
   let index: Prepare[] | null = null;
@@ -413,6 +431,7 @@ const init = (): void => {
   /* --- Mesure ----------------------------------------------------------------------------------- */
   let derniereMesuree = '';
   let minuterieMesure = 0;
+  /** Résultats trouvés, avant rognage : c'est ce chiffre qui dit ce que le site ne couvre pas. */
   let nbResultats = 0;
 
   const mesurerRecherche = (): void => {
@@ -452,11 +471,12 @@ const init = (): void => {
       a.href = t.p.doc.url;
       a.dataset.rubrique = cle;
       a.dataset.rang = String(rang + 1);
-      if (t.p.doc.contexte) contexte.textContent = t.p.doc.contexte;
-      else contexte.remove();
       surligner(titreEl, t.p.doc.titre, plages(t.p.motsTitre, liste));
       if (t.p.doc.texte) extrait(extraitEl, t.p, liste);
       else extraitEl.remove();
+      /* Sur la même ligne que l'extrait, séparés d'un point médian s'ils sont tous deux là. */
+      if (t.p.doc.contexte) contexte.textContent = t.p.doc.contexte + (t.p.doc.texte ? ' · ' : '');
+      else contexte.remove();
       ul.append(item);
     });
     return fragment;
@@ -509,30 +529,93 @@ const init = (): void => {
     resultats.hidden = nbResultats === 0;
     vide.hidden = nbResultats > 0;
     if (!nbResultats) videTexte.textContent = (videTexte.dataset.gabarit ?? '').replace('{q}', q);
+    const affiches = ajuster();
     defilement.scrollTop = 0;
 
+    /* Annoncés : les résultats VISIBLES, ceux qu'un lecteur d'écran va parcourir. */
     annoncer(
-      nbResultats === 0
+      affiches === 0
         ? (videTexte.textContent ?? '')
-        : nbResultats === 1
+        : affiches === 1
           ? (panneau.dataset.compteUn ?? '')
-          : (panneau.dataset.comptePlusieurs ?? '').replace('{n}', String(nbResultats))
+          : (panneau.dataset.comptePlusieurs ?? '').replace('{n}', String(affiches))
     );
+  };
+
+  /* --- Hauteur fixe ----------------------------------------------------------------------------- */
+  /** Hauteur ouverte du panneau, en pixels : celle du panneau vide, mesurée à chaque ouverture. */
+  let hauteurOuverte = 0;
+
+  /**
+   * Mesure du panneau vide : liens rapides visibles, hauteur libre. Deux mises en page forcées dans le
+   * même tour, rien n'est peint entre les deux. `max-height` (global.css) borne déjà la mesure sur un
+   * petit écran. L'appelant rétablit ensuite ce qui doit être visible, par `afficher()`.
+   */
+  const mesurerHauteur = (): number => {
+    rapides.hidden = false;
+    resultats.hidden = true;
+    vide.hidden = true;
+    panneau.style.height = 'auto';
+    const h = panneau.offsetHeight;
+    panneau.style.height = '';
+    return h;
+  };
+
+  /**
+   * Les résultats tiennent dans la hauteur du panneau vide. Tant que la liste déborde de la place qui
+   * lui revient (hauteur ouverte moins le haut du panneau : barre et champ), le dernier résultat de la
+   * rubrique la plus longue est retiré ; à égalité, celui des « Pages », les questions étant les
+   * réponses les plus précises. Une rubrique vidée disparaît avec son titre. La mesure ne dépend pas de
+   * la hauteur courante du panneau, qui peut être en train de grandir : le haut ne bouge pas, et
+   * `scrollHeight` lit le contenu, pas la boîte. Renvoie le nombre de résultats restés visibles.
+   */
+  const ajuster = (): number => {
+    const compter = (): number => resultats.querySelectorAll('a[href]').length;
+    if (!hauteurOuverte || resultats.hidden) return compter();
+    const dispo = hauteurOuverte - defilement.offsetTop;
+    for (let garde = 0; garde < 2 * MAX_PAR_RUBRIQUE + 2; garde += 1) {
+      if (defilement.scrollHeight <= dispo) break;
+      const listes = Array.from(resultats.querySelectorAll<HTMLElement>('[data-liste]'));
+      if (!listes.length) break;
+      const cible = listes.reduce((a, b) => (b.children.length > a.children.length ? b : a));
+      if (!cible.lastElementChild) break;
+      cible.lastElementChild.remove();
+      if (!cible.children.length) cible.closest('[data-rubrique-bloc]')?.remove();
+    }
+    return compter();
   };
 
   /* --- Ouverture et fermeture ------------------------------------------------------------------- */
   let minuterieFermeture = 0;
+  let minuterieEtabli = 0;
   const ouvert = (): boolean => nav.hasAttribute('data-recherche-ouverte');
+
+  /**
+   * Panneau ÉTABLI : arrivé à sa hauteur. C'est seulement alors que la zone des résultats peut défiler
+   * (global.css, `recherche-defilement`) : défilante pendant le mouvement, elle prenait une barre de
+   * défilement classique le temps de grandir, et le contenu sautait de 7 px quand celle-ci disparaissait.
+   */
+  const etablir = (): void => {
+    window.clearTimeout(minuterieEtabli);
+    if (ouvert()) nav.setAttribute('data-recherche-etabli', '');
+  };
 
   const ouvrir = (): void => {
     if (ouvert()) return;
     window.clearTimeout(minuterieFermeture);
+    /* Même matière que la barre à cet instant : sa contraction au défilement est recopiée AVANT que le
+       panneau soit affiché, pour qu'il naisse contracté, sans transition. */
+    panneau.toggleAttribute('data-stuck', bar?.hasAttribute('data-stuck') ?? false);
     panneau.hidden = false;
     voile.hidden = false;
-    /* La position fermée doit être enregistrée avant que l'état ouvert ne soit posé, sans quoi le
+    hauteurOuverte = mesurerHauteur();
+    /* La hauteur fermée doit être enregistrée avant que l'état ouvert ne soit posé, sans quoi le
        panneau apparaît déjà déplié, sans transition. */
     void panneau.offsetHeight;
     nav.setAttribute('data-recherche-ouverte', '');
+    panneau.style.height = `${hauteurOuverte}px`;
+    if (sobre.matches) etablir();
+    else minuterieEtabli = window.setTimeout(etablir, SECOURS_OUVERTURE);
     bouton.setAttribute('aria-expanded', 'true');
     bouton.setAttribute('aria-label', libelleFermer);
     document.documentElement.style.overflow = 'hidden';
@@ -543,23 +626,48 @@ const init = (): void => {
     afficher();
   };
 
+  /**
+   * Le relais : le panneau disparaît et la barre rallume son verre dans la même image, sans fondu. Le
+   * verre de la barre porte une transition de 320 ms sur sa couleur et son ombre ; `data-sans-transition`
+   * la suspend le temps que le changement soit enregistré, puis s'efface deux images plus tard.
+   */
+  const masquer = (): void => {
+    if (ouvert() || panneau.hidden) return;
+    window.clearTimeout(minuterieFermeture);
+    bar?.setAttribute('data-sans-transition', '');
+    panneau.hidden = true;
+    voile.hidden = true;
+    if (bar) {
+      void bar.offsetWidth;
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => bar.removeAttribute('data-sans-transition'));
+      });
+    }
+  };
+
   const fermer = ({ rendreFocus = true, instantane = false } = {}): void => {
     if (!ouvert()) return;
     mesurerRecherche();
     nav.removeAttribute('data-recherche-ouverte');
+    nav.removeAttribute('data-recherche-etabli');
+    window.clearTimeout(minuterieEtabli);
+    panneau.style.height = '';
     bouton.setAttribute('aria-expanded', 'false');
     bouton.setAttribute('aria-label', libelleOuvrir);
     document.documentElement.style.overflow = '';
     if (rendreFocus) bouton.focus({ preventScroll: true });
     window.clearTimeout(minuterieFermeture);
-    const masquer = (): void => {
-      if (ouvert()) return;
-      panneau.hidden = true;
-      voile.hidden = true;
-    };
-    if (instantane) masquer();
-    else minuterieFermeture = window.setTimeout(masquer, DUREE_FERMETURE);
+    /* En mouvement réduit, aucune transition ne finira jamais : on masque tout de suite. */
+    if (instantane || sobre.matches) masquer();
+    else minuterieFermeture = window.setTimeout(masquer, SECOURS_FERMETURE);
   };
+
+  /* La fin réelle du mouvement, plutôt qu'une minuterie calée sur la durée du style. */
+  panneau.addEventListener('transitionend', (e) => {
+    if (e.target !== panneau || e.propertyName !== 'height') return;
+    if (ouvert()) etablir();
+    else masquer();
+  });
 
   bouton.addEventListener('click', () => (ouvert() ? fermer() : ouvrir()));
   /* Intention : l'index est demandé avant même le clic. */

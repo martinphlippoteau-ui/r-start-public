@@ -85,6 +85,44 @@ test.describe('Recherche du site', () => {
       .toContain('Comment sont imposés les revenus de R Start ?');
   });
 
+  /*
+   * LA HAUTEUR NE BOUGE PAS (17/09/2026, demande de Martin) : le panneau ouvert a la hauteur du panneau
+   * vide, et les résultats sont rognés pour y tenir, sans défilement. Le verre est celui de la barre.
+   */
+  test('le panneau garde la hauteur du panneau vide et le verre de la barre', async ({ page }) => {
+    await page.goto('/frais/');
+    const barre = page.locator('[data-sitenav-bar]');
+    const verreBarre = await barre.evaluate((b) => getComputedStyle(b).backgroundColor);
+    await ouvrir(page);
+    const panneau = page.locator('[data-recherche-panneau]');
+    /* Le mouvement d'ouverture doit être fini : la hauteur du panneau vide est la référence. */
+    await expect
+      .poll(() => panneau.evaluate((p) => Math.round(p.getBoundingClientRect().height)))
+      .toBe(await panneau.evaluate((p) => Math.round(parseFloat(p.style.height))));
+    const hauteurVide = await panneau.evaluate((p) => Math.round(p.getBoundingClientRect().height));
+    expect(hauteurVide).toBeGreaterThan(200);
+    /* Un seul verre à la fois : le panneau a pris la teinte de la barre, la barre l'a éteinte. */
+    expect(await panneau.evaluate((p) => getComputedStyle(p).backgroundColor)).toBe(verreBarre);
+    expect(await barre.evaluate((b) => getComputedStyle(b).backgroundColor)).toMatch(/, 0\)$/);
+
+    await page.locator('[data-recherche-champ]').fill('frais');
+    await expect(page.locator('[data-recherche-resultats] a').first()).toBeVisible();
+    expect(await panneau.evaluate((p) => Math.round(p.getBoundingClientRect().height))).toBe(
+      hauteurVide
+    );
+    const liste = page.locator('[data-recherche-defilement]');
+    expect(
+      await liste.evaluate((l) => l.scrollHeight - l.clientHeight),
+      'les résultats tiennent sans défiler'
+    ).toBeLessThanOrEqual(1);
+    expect(await page.locator('[data-recherche-resultats] a').count()).toBeGreaterThanOrEqual(2);
+
+    /* Fermé : le panneau est masqué et la barre a retrouvé son verre. */
+    await page.keyboard.press('Escape');
+    await expect(panneau).toBeHidden();
+    expect(await barre.evaluate((b) => getComputedStyle(b).backgroundColor)).toBe(verreBarre);
+  });
+
   test('sans résultat, le panneau le dit et renvoie vers toutes les questions', async ({
     page,
   }) => {

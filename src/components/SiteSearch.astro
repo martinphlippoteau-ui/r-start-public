@@ -5,16 +5,22 @@
  * enveloppe : la loupe de la barre l'ouvre.
  *
  * LA PASTILLE S'ALLONGE. Le panneau est posé SOUS la barre, à ses coordonnées exactes, et porte la
- * même matière (`nav-glass`). Fermé, il est découpé à la hauteur de la barre ; ouvert, le découpage
- * descend jusqu'à son pied, et la barre éteint son propre verre pour que les deux ne fassent qu'une
- * pièce (global.css, « Recherche du site »). La barre reste au-dessus : logo, pages et Souscrire
- * restent visibles et cliquables pendant la recherche. Derrière, un voile floute la page.
- * Le texte n'est jamais fondu : il se découvre avec le découpage (règle « le texte ne se fond pas »).
+ * même matière qu'elle (`nav-glass`, même teinte, même ombre, `data-stuck` recopié). Fermé, il a la
+ * hauteur de la barre et il est masqué ; à l'ouverture, la barre éteint son verre d'un coup et le
+ * panneau grandit en hauteur jusqu'à celle du PANNEAU VIDE, ses liens rapides visibles, puis garde
+ * cette hauteur quoi qu'on tape (demande de Martin du 17/09/2026 : le bloc ouvert garde le style de la
+ * barre, et sa hauteur ne bouge pas). Mécanique dans global.css, « Recherche du site », et dans le
+ * script. La barre reste au-dessus : logo, pages et Souscrire restent visibles et cliquables pendant
+ * la recherche. Derrière, un voile floute la page. Le texte n'est jamais fondu : il se découvre avec
+ * la hauteur (règle « le texte ne se fond pas »).
  *
- * CONTENU. Le champ reste en tête ; dessous, défilant si besoin :
+ * CONTENU. Le champ reste en tête ; dessous :
  *  - panneau vide : les liens rapides (src/content/fr/search.ts) ;
  *  - recherche : deux rubriques, « Pages » puis « Questions », construites par le script à partir des
- *    deux gabarits ci-dessous. La mise en forme reste donc ici, le script ne pose aucune classe ;
+ *    deux gabarits ci-dessous. La mise en forme reste donc ici, le script ne pose aucune classe. Un
+ *    résultat tient sur DEUX LIGNES, son titre puis sa page ou sa rubrique et un extrait sur une seule
+ *    ligne : c'est ce qui laisse trois ou quatre résultats dans la hauteur du panneau vide. Le script
+ *    retire les derniers résultats, en alternant entre les deux rubriques, jusqu'à ce que tout tienne ;
  *  - aucun résultat : un message et un renvoi vers toutes les questions.
  *
  * ACCESSIBILITÉ. Dialogue modal (`aria-modal`), focus sur le champ à l'ouverture, piège à tabulation,
@@ -60,7 +66,7 @@ const liensRapides = search.quickLinks.map((lien) => {
 
 /* Fond commun aux liens du panneau, au survol et au focus. */
 const lienClass =
-  'rounded-2xl px-3 py-2.5 text-ink no-underline transition-colors hover:bg-navy/6 focus-visible:bg-navy/6';
+  'rounded-2xl px-3 text-ink no-underline transition-colors hover:bg-navy/6 focus-visible:bg-navy/6';
 ---
 
 <div data-recherche-voile class="recherche-voile fixed inset-0 z-0" hidden></div>
@@ -76,13 +82,13 @@ const lienClass =
   role="dialog"
   aria-modal="true"
   aria-label={search.dialogLabel}
-  class="recherche-panneau nav-glass absolute inset-x-0 top-0 z-10 flex flex-col"
+  class="recherche-panneau nav-glass absolute inset-x-0 top-0 z-10 flex flex-col overflow-hidden"
   hidden
 >
   {/* La barre se pose ici, par-dessus le panneau. */}
   <div class="h-subnav shrink-0"></div>
 
-  <div class="mx-auto w-full max-w-3xl shrink-0 px-4 pt-3 sm:px-8 sm:pt-5">
+  <div class="mx-auto w-full max-w-3xl shrink-0 px-4 pt-3 sm:px-8 sm:pt-4">
     {
       /* Zone de recherche et non <form> : il n'y a rien à envoyer, pas de page de résultats. Entrée
         ouvre le premier résultat (src/scripts/recherche.ts). */
@@ -95,7 +101,7 @@ const lienClass =
       <label for={champId} class="sr-only">{search.inputLabel}</label>
       <svg
         aria-hidden="true"
-        class="pointer-events-none absolute left-0 size-6 text-slate sm:size-7"
+        class="pointer-events-none absolute left-0 size-6 text-slate"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
@@ -115,7 +121,7 @@ const lienClass =
         enterkeyhint="go"
         placeholder={search.placeholder}
         aria-controls={id + '-resultats'}
-        class="recherche-champ min-w-0 flex-1 border-0 bg-transparent py-2 pl-9 text-2xl font-semibold text-ink placeholder:font-medium placeholder:text-slate sm:pl-11 sm:text-3xl"
+        class="recherche-champ min-w-0 flex-1 border-0 bg-transparent py-2 pl-9 text-xl font-semibold text-ink placeholder:font-medium placeholder:text-slate sm:text-2xl"
       />
       <button
         type="button"
@@ -128,12 +134,18 @@ const lienClass =
     <p data-recherche-statut class="sr-only" aria-live="polite"></p>
   </div>
 
+  {
+    /* `recherche-defilement` (global.css) : la zone ne devient défilante qu'une fois le panneau arrivé
+      à sa hauteur. Pendant le mouvement, elle est plus courte que son contenu ; avec des barres de
+      défilement classiques, une barre y apparaissait puis disparaissait, et les liens rapides se
+      décalaient de 7 px à la dernière image (signalé par Martin le 17/09/2026). */
+  }
   <div
     id={id + '-resultats'}
     data-recherche-defilement
-    class="min-h-0 flex-1 overflow-y-auto overscroll-contain"
+    class="recherche-defilement min-h-0 flex-1 overscroll-contain"
   >
-    <div class="mx-auto w-full max-w-3xl px-1 pt-4 pb-6 sm:px-5 sm:pt-6 sm:pb-9">
+    <div class="mx-auto w-full max-w-3xl px-1 pt-4 pb-5 sm:px-5 sm:pb-7">
       {
         /* Libellés de rubrique en paragraphes qui NOMMENT leur liste, et non en titres : le panneau est
           un dialogue, et un dialogue ouvre sa propre hiérarchie de titres, qui devrait commencer à h1. */
@@ -150,7 +162,7 @@ const lienClass =
                   href={lien.href}
                   data-recherche-lien
                   data-rubrique="liens_rapides"
-                  class:list={[lienClass, 'group flex items-center gap-3 font-semibold']}
+                  class:list={[lienClass, 'group flex items-center gap-3 py-2.5 font-semibold']}
                 >
                   <svg
                     aria-hidden="true"
@@ -194,18 +206,23 @@ const lienClass =
     /* Gabarits clonés par src/scripts/recherche.ts : toute la mise en forme reste dans ce fichier. */
   }
   <template data-recherche-gabarit-rubrique>
-    <div class="mt-6 first:mt-0">
+    <div class="mt-4 first:mt-0" data-rubrique-bloc>
       <p class="text-caption px-3 font-semibold text-slate" data-rubrique-titre></p>
       <ul role="list" class="mt-1" data-liste></ul>
     </div>
   </template>
+  {
+    /* Les deux <span> de la seconde ligne se touchent à dessein : une espace entre eux serait rendue
+      avant l'extrait. */
+  }
   <template data-recherche-gabarit-resultat>
     <li>
-      <a data-recherche-lien class:list={[lienClass, 'block']}>
-        <span class="text-caption block font-medium text-teal-700" data-contexte></span>
-        <span class="block text-base leading-snug font-semibold text-ink sm:text-lg" data-titre
+      <a data-recherche-lien class:list={[lienClass, 'block py-1.5']}>
+        <span class="block text-base leading-snug font-semibold text-pretty text-ink" data-titre
         ></span>
-        <span class="recherche-extrait text-caption mt-1 text-slate-700" data-extrait></span>
+        <span class="text-caption block truncate text-slate-700"
+          ><span class="font-medium text-navy" data-contexte></span><span data-extrait></span></span
+        >
       </a>
     </li>
   </template>

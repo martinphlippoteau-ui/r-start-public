@@ -56,8 +56,9 @@
  *
  * RECHERCHE DU SITE (17/09/2026) : une loupe à gauche de Souscrire, à toutes les largeurs. Elle ouvre
  * le panneau de SiteSearch.astro, posé sous la barre dans la même enveloppe : la pastille s'allonge
- * vers le bas. La barre passe devant le panneau (`z-20`) et éteint son verre tant qu'il est ouvert
- * (`data-recherche-ouverte` sur le <nav>, global.css).
+ * vers le bas, dans la même matière. La barre passe devant le panneau (`z-20`) et éteint son verre,
+ * d'un coup, tant que le panneau est présent (global.css, « Recherche du site ») : un seul verre à la
+ * fois, identiques au pixel à l'instant du relais. Le script recopie `data-stuck` sur le panneau.
  * La barre est `sticky` sans filtre : le panneau `fixed` reste bien calé sur le viewport (un
  * `backdrop-filter` sur un ancêtre en ferait le bloc conteneur), d'où la surface vitrée posée sur
  * l'enfant `[data-sitenav-bar]`.

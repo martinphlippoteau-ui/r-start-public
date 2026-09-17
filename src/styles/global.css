@@ -101,6 +101,16 @@
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
+  /* DOCUMENT VERROUILLÉ (tiroir du menu, recherche : les scripts posent `overflow: hidden` en style
+     sur <html>) : la gouttière de la barre de défilement reste réservée. Avec une barre classique
+     (Windows, souris branchée sur Mac), la barre disparaissait avec le verrou et la page se recentrait
+     de 7 px à chaque ouverture, la pastille de navigation avec elle (17/09/2026). Sans effet avec les
+     barres en surimpression. Limité au verrou et non permanent : Chromium headless, dont les barres sont
+     masquées mais gardent leurs 15 px de métrique, réservait sinon une gouttière vide sur toutes les
+     captures de bureau. */
+  html[style*='overflow: hidden'] {
+    scrollbar-gutter: stable;
+  }
   /* Page /documentation : une seconde barre collante (ancres des groupes) sous la navigation. */
   html:has([data-docsnav]) {
     scroll-padding-top: calc(var(--spacing-subnav) * 2 + var(--spacing-nav-gap) + 1.5rem);
@@ -776,25 +786,40 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   transform: none;
 }
 
-/* LA PASTILLE S'ALLONGE. Le panneau est posé sous la barre, à ses coordonnées, dans la même matière.
-   Fermé, il est découpé à la hauteur exacte de la barre, qui le recouvre ; ouvert, le découpage descend
-   jusqu'à son pied. Le découpage ouvert déborde de 3 rem de chaque côté : à zéro, il rognerait l'ombre
-   portée du verre. Le verre est plus dense que celui de la barre (0,9 contre 0,72) : on y lit des
-   paragraphes, pas quatre libellés. Le texte n'est jamais fondu, il se découvre avec le découpage. */
+/* LA PASTILLE S'ALLONGE. Le panneau est posé sous la barre, à ses coordonnées, dans la MÊME MATIÈRE :
+   même teinte, même flou, même arête, même ombre, même contraction au défilement (`data-stuck`, recopié
+   par le script à l'ouverture). Fermé, il a exactement la hauteur de la barre, et il est masqué.
+   À l'ouverture, il apparaît sous elle, la barre éteint son verre D'UN COUP, et lui grandit jusqu'à sa
+   hauteur ouverte, posée en style par le script : celle du panneau vide, ses liens rapides visibles,
+   quoi qu'on tape ensuite (les résultats sont rognés pour y tenir). À la fermeture, l'inverse : il
+   redescend à la hauteur de la barre puis, le mouvement fini, il est masqué et la barre rallume son
+   verre, d'un coup aussi. Les deux verres ne sont jamais allumés ensemble, et ils sont identiques au
+   pixel à l'instant du relais : rien ne clignote.
+   `height` et non `clip-path` (version du matin du 17/09/2026, jugée « pas fluide ») : l'ombre suit le
+   bord réel du panneau à chaque image, alors qu'un découpage la coupait ; et la barre s'éteignait alors
+   en fondu de 320 ms sur un panneau plus dense (0,9), les deux se superposaient un instant. */
 .recherche-panneau {
-  --nav-glass-tint: 0.9;
+  height: var(--spacing-subnav);
   max-height: calc(100vh - 2 * var(--spacing-nav-gap));
   max-height: calc(100dvh - 2 * var(--spacing-nav-gap));
-  clip-path: inset(0 0 calc(100% - var(--spacing-subnav)) 0 round var(--radius-nav));
 }
-[data-recherche-ouverte] .recherche-panneau {
-  clip-path: inset(-3rem round var(--radius-nav));
+/* Le reflet spéculaire de la matière s'étend sur la moitié haute de l'élément : sur un panneau de
+   400 px il descendrait sur 200 px, sur la barre il tient dans 28. Il est borné à la hauteur de la barre,
+   pour que le haut du panneau reste la barre, au pixel près, et que la lumière reste sur l'arête. */
+.recherche-panneau::before {
+  background-size: 100% var(--spacing-subnav);
+  background-repeat: no-repeat;
 }
-/* Pendant ce temps, la barre éteint son propre verre et reprend sa taille pleine : les deux ne font
-   plus qu'une pièce, sans couture ni double blanc sur la hauteur de la barre. */
-[data-recherche-ouverte] [data-sitenav-bar] {
+/* Le verre de la barre est éteint tant que le panneau est présent, sortie comprise, et il s'éteint et se
+   rallume SANS TRANSITION : c'est le panneau qui porte la matière pendant ce temps. Au retour, le script
+   pose `data-sans-transition` le temps d'une image, sans quoi le verre reviendrait en fondu de 320 ms
+   sur une barre déjà nue. */
+[data-sitenav]:has([data-recherche-panneau]:not([hidden])) [data-sitenav-bar] {
   --nav-glass-on: 0;
-  transform: none;
+  transition: none;
+}
+[data-sitenav-bar][data-sans-transition] {
+  transition: none;
 }
 /* Même règle que le tiroir : la barre passe devant le bandeau de consentement tant que le panneau est
    présent, sortie comprise. */
@@ -811,6 +836,19 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
 }
 [data-recherche-ouverte] .recherche-voile {
   opacity: 1;
+}
+
+/* LA ZONE DES RÉSULTATS NE DÉFILE QU'À L'ARRÊT. Pendant que le panneau grandit ou se referme, elle est
+   plus courte que son contenu : en `overflow: auto`, une barre de défilement classique (Windows, souris
+   sur Mac) y apparaissait le temps du mouvement, puis disparaissait à la dernière image, et le contenu
+   sautait de 7 px vers la droite (signalé par Martin le 17/09/2026). Elle ne devient défilante que
+   lorsque le script pose `data-recherche-etabli`, à la fin du mouvement d'ouverture ; les résultats sont
+   de toute façon rognés pour tenir, seul un très petit écran a besoin de défiler. */
+.recherche-defilement {
+  overflow-y: hidden;
+}
+[data-recherche-etabli] .recherche-defilement {
+  overflow-y: auto;
 }
 
 /* Champ : la ligne sous le champ tient lieu d'anneau de focus, l'anneau global encadrerait un titre. */
@@ -843,13 +881,7 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   border-bottom-color: var(--color-navy);
 }
 
-/* Résultats : l'extrait tient sur deux lignes, le mot trouvé prend la couleur de la sélection du site. */
-.recherche-extrait {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  overflow: hidden;
-}
+/* Résultats : le mot trouvé prend la couleur de la sélection du site. */
 .recherche-panneau mark {
   background-color: var(--color-teal-100);
   color: var(--color-navy);
@@ -864,9 +896,13 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
       opacity 200ms ease,
       transform 360ms var(--ease-out-expo);
   }
-  /* Courbe d'Apple pour un volet qui se déplie : longue détente, arrivée nette. */
+  /* Courbe d'Apple pour un volet qui se déplie : longue détente, arrivée nette. L'ouverture prend son
+     temps, la fermeture est plus courte : on quitte vite. La durée est celle de l'état d'ARRIVÉE. */
   .recherche-panneau {
-    transition: clip-path 380ms cubic-bezier(0.32, 0.72, 0, 1);
+    transition: height 320ms cubic-bezier(0.32, 0.72, 0, 1);
+  }
+  [data-recherche-ouverte] .recherche-panneau {
+    transition-duration: 440ms;
   }
   .recherche-voile {
     transition: opacity 320ms ease;
