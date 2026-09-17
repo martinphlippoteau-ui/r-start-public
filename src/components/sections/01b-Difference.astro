@@ -47,17 +47,6 @@ const situations = (difference.situations ?? []).map((s) => {
     ? { before: s.text, strong: '', after: '' }
     : { before: s.text.slice(0, i), strong: s.strong!, after: s.text.slice(i + s.strong!.length) };
 });
-/*
- * La phrase d'annonce coupée autour du terme défini : [avant, après], ou `null` si le terme n'y est pas
- * (la phrase est alors rendue entière, sans bouton). Coupée à la PREMIÈRE occurrence seulement.
- */
-const morceaux = (() => {
-  const d = difference.definition;
-  const lead = difference.lead;
-  if (!d || !lead) return null;
-  const i = lead.indexOf(d.term);
-  return i === -1 ? null : ([lead.slice(0, i), lead.slice(i + d.term.length)] as const);
-})();
 ---
 
 {
@@ -125,56 +114,10 @@ const morceaux = (() => {
           {difference.intro}
         </h3>
         {
-          /* LA PHRASE D'ANNONCE, avec un « i » collé au mot « SCPI » (17/09/2026) : la définition se
-            déplie dessous, même mécanisme que les repères de l'accueil et le comparateur
-            (scripts/infoToggle.ts, utilitaire `info-panneau`). Sans script, la définition est lue en
-            clair et le bouton n'existe pas. La phrase est coupée à la première occurrence du terme :
-            si le terme en sortait un jour, la phrase s'affiche entière et sans bouton. */
+          /* LA PHRASE D'ANNONCE, en clair. Le « i » collé au mot « SCPI » et sa bulle de définition,
+            ajoutés le 17/09/2026, ont été retirés le même jour à la demande de l'équipe. */
         }
-        {difference.lead && (
-          <p class="relative mt-6">
-            {morceaux ? (
-              <>
-                {morceaux[0]}
-                <span class="whitespace-nowrap">
-                  <dfn class="not-italic">{difference.definition!.term}</dfn>
-                  <button
-                    type="button"
-                    data-info-bouton
-                    hidden
-                    aria-expanded="false"
-                    aria-controls="info-scpi"
-                    class="info-bouton ml-1.5 translate-y-[-0.1em] align-middle"
-                  >
-                    <span aria-hidden="true">i</span>
-                    <span class="visually-hidden">
-                      {difference.definition!.label} : {difference.definition!.term}
-                    </span>
-                  </button>
-                </span>
-                {morceaux[1]}
-              </>
-            ) : (
-              difference.lead
-            )}
-          </p>
-        )}
-        {
-          /* UNE BULLE, PAS UN PANNEAU (17/09/2026, demande de l'équipe : « un toggle bulle qui s'ouvre
-            avec une animation fluide comme les CTA dynamiques, et qui se referme aussi »). La bulle est
-            posée sous la phrase, sa pointe sous le « i » (position calculée par infoToggle.ts), et
-            s'ouvre au ressort des pastilles (`info-bulle`, global.css). Elle se referme au second clic,
-            à Échap, ou d'un clic ailleurs. Sans script, elle est un simple paragraphe sous la phrase,
-            lu en clair. Le paragraphe porteur est `relative` : c'est lui qui la positionne. */
-        }
-        {morceaux && (
-          <div id="info-scpi" data-info-panneau data-info-bulle class="info-bulle">
-            <p class="text-base leading-snug text-slate-700">
-              <strong class="font-semibold text-ink">{difference.definition!.term}</strong> :{' '}
-              {difference.definition!.text}
-            </p>
-          </div>
-        )}
+        {difference.lead && <p class="mt-6">{difference.lead}</p>}
 
         <ul role="list" class="mt-4 space-y-2">
           {
@@ -273,9 +216,3 @@ const morceaux = (() => {
     }
   </figure>
 </Section>
-
-<script>
-  /* Dépliage de la définition « SCPI » : le module des repères de l'accueil et du comparateur, importé
-     une seule fois par page quel que soit le nombre de composants qui s'en servent. */
-  import '@/scripts/infoToggle';
-</script>

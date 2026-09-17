@@ -73,19 +73,6 @@ export const difference: DifferenceContent = {
   intro: 'R Start, un modèle de frais gagnant-gagnant',
   /* « de la SCPI R Start » depuis le 17/09/2026, texte de l'équipe. */
   lead: 'Quand vous détenez des parts de la SCPI R Start, on ne vous prélève des frais que dans deux situations :',
-  /*
-   * DÉFINITION DE « SCPI », dépliable derrière un « i » (17/09/2026, demande de l'équipe : « tu peux
-   * aussi ajouter une définition de SCPI, tu dois l'avoir quelque part, ne l'invente pas »).
-   * RIEN N'EST INVENTÉ : les deux phrases sont celles de la FAQ, réponse « Qu'est-ce que R Start ? »
-   * (faq.ts, texte fourni par l'équipe) : « SCPI (société civile de placement immobilier) » et
-   * « Concrètement, vous placez votre argent dans l'immobilier professionnel (bureaux, commerces,
-   * etc.) ». Le site n'a pas d'autre définition ; en changer une, c'est changer les deux.
-   */
-  definition: {
-    term: 'SCPI',
-    label: 'Définition',
-    text: 'Société civile de placement immobilier. Concrètement, vous placez votre argent dans l’immobilier professionnel (bureaux, commerces, etc.).',
-  },
   /** Les deux situations, en liste. `strong` est le mot mis en valeur par le gabarit. */
   situations: [
     { text: 'Quand elle encaisse des loyers qu’elle vous redistribue', strong: 'loyers' },
