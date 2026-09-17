@@ -36,6 +36,10 @@ env:
   # mot de passe : masquer cette mention devant de vrais visiteurs présenterait une sélection d'avis
   # favorables comme si elle n'en était pas une. Les deux sorties propres sont alors de retirer le
   # filtre (`stars` dans src/content/fr/facts.ts) ou de changer de gabarit Trustpilot.
+  # L'ÉCRAN DE MOT DE PASSE A DISPARU LE 17/09/2026 (secret retiré par l'équipe) : le rognage ne tient
+  # plus que par le noindex, et quiconque a l'adresse voit le carrousel rogné. À trancher avec la
+  # Conformité avant que l'adresse circule ; tant que rien n'est tranché, la variable reste telle
+  # que l'équipe l'a demandée le 15/09/2026.
   PUBLIC_TRUSTBOX_CROP: 'true'
   # Vide tant que le tunnel de souscription n'a pas ouvert : les CTA ouvrent la fenêtre d'attente.
   # Le jour de l'ouverture, passer à 'true' ET renseigner PUBLIC_SUBSCRIBE_URL.
@@ -120,9 +124,11 @@ jobs:
             test-results/
           retention-days: 7
 
-      # Chiffre chaque page derrière un écran de mot de passe. Sans le secret PREVIEW_PASSWORD,
-      # l'étape échoue : rien n'est publié sans protection.
-      - name: Protection par mot de passe
+      # Chiffre chaque page derrière un écran de mot de passe, SI le secret PREVIEW_PASSWORD existe.
+      # Sans lui, le script ne fait rien et le site est publié en clair (décision de l'équipe du
+      # 17/09/2026 : le mot de passe rendait l'arrivée sur le site « pas fluide du tout »). Avant,
+      # l'étape échouait sans secret, et rien n'était publié sans protection.
+      - name: Protection par mot de passe (si le secret existe)
         run: node scripts/encrypt-preview.mjs
         env:
           PREVIEW_PASSWORD: ${{ secrets.PREVIEW_PASSWORD }}

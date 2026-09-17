@@ -2,6 +2,14 @@
 // clé dérivée par PBKDF2) et remplacée par un écran de saisie autonome qui la déchiffre côté
 // navigateur. Sans le mot de passe, le HTML livré ne contient que du texte chiffré.
 //
+// SANS SECRET, PUBLICATION EN CLAIR (17/09/2026, décision de l'équipe : « j'ai enlevé le mot de passe
+// pour accéder, ça rendait l'arrivée pas fluide du tout »). Jusque-là, un PREVIEW_PASSWORD vide faisait
+// ÉCHOUER l'étape, et rien n'était publié sans protection : c'était le garde-fou d'une prévisualisation
+// confidentielle. Le secret ayant été retiré du dépôt, ce garde-fou aurait fait échouer chaque
+// déploiement. Le script ne fait donc plus rien quand le secret est absent, et le dit. Pour rétablir
+// la protection : remettre le secret PREVIEW_PASSWORD (Settings → Secrets and variables → Actions),
+// rien d'autre à changer.
+//
 // Limite assumée : les fichiers servis directement (PDF, images, CSS, JS) restent téléchargeables
 // par leur adresse exacte. Pour une protection complète, il faut une authentification en amont
 // (Cloudflare Access, App Service, etc.).
@@ -18,11 +26,10 @@ const PASSWORD = process.env.PREVIEW_PASSWORD || '';
 const ITERATIONS = 250_000;
 
 if (!PASSWORD) {
-  console.error(
-    'PREVIEW_PASSWORD est vide : la prévisualisation ne sera pas publiée sans protection.\n' +
-      'Définissez le secret PREVIEW_PASSWORD dans le dépôt (Settings → Secrets and variables → Actions).'
+  console.log(
+    'PREVIEW_PASSWORD absent : publication EN CLAIR, aucune page chiffrée (choix de l’équipe du 17/09/2026).'
   );
-  process.exit(1);
+  process.exit(0);
 }
 
 const enc = new TextEncoder();
