@@ -13,6 +13,7 @@ import * as legal from '../src/content/fr/legal.ts';
    périmètre plus bas : à remettre en même temps qu'eux. */
 import { marketComparison, press as pressFacts, risk } from '../src/content/fr/facts.ts';
 import { comparator } from '../src/content/fr/comparator.ts';
+import { lignesOg } from './og-lignes.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const DIST = path.join(ROOT, 'dist');
@@ -620,8 +621,10 @@ async function checkOtherPages() {
         break;
       } catch {}
     }
+    /* ERREUR et non plus avertissement (audit du 18/09/2026) : un site publié sans ses mentions légales
+       ou sa politique de confidentialité passait le contrôle avec « 0 erreur ». */
     if (!html) {
-      warnings.push(`page /${p} absente`);
+      errors.push(`page /${p} absente de dist`);
       continue;
     }
     checkForbidden(toText(html), `${p}`);
@@ -660,6 +663,67 @@ async function checkNoSourceFiles() {
  *    le renvoi « Voir toutes les questions » de /documentation, seul lien du site posé sans withBase,
  *    cassé en ligne depuis sa création.
  */
+/**
+ * CE QUI SE LIT HORS DU CORPS DE LA PAGE (audit du 18/09/2026). `toText` retire les <script> et toutes
+ * les balises avec leurs attributs : la meta description, les balises Open Graph et Twitter, les
+ * `alt`, `aria-label` et `title`, et les données structurées échappaient donc aux formulations
+ * interdites. Ce sont pourtant les textes les plus diffusés HORS du site : l'extrait affiché par
+ * Google, l'aperçu partagé sur les réseaux, la réponse reprise par un assistant.
+ */
+function texteHorsCorps(html) {
+  const morceaux = [];
+  for (const [, balise] of html.matchAll(/<meta\b([^>]*)>/gi)) {
+    const nom = /\b(?:name|property)="([^"]+)"/i.exec(balise)?.[1] ?? '';
+    const contenu = /\bcontent="([^"]*)"/i.exec(balise)?.[1];
+    if (contenu && /^(description|og:|twitter:)/i.test(nom) && !/(:url|:image$|:type|:locale|:card|:site)/i.test(nom))
+      morceaux.push(contenu);
+  }
+  for (const [, , valeur] of html.matchAll(/\s(alt|aria-label|title)="([^"]+)"/gi)) morceaux.push(valeur);
+  const chaines = (v) => {
+    if (typeof v === 'string') morceaux.push(v);
+    else if (Array.isArray(v)) v.forEach(chaines);
+    else if (v && typeof v === 'object')
+      for (const [cle, val] of Object.entries(v))
+        if (/^(name|description|headline|text|alternateName|slogan)$/.test(cle) || typeof val === 'object') chaines(val);
+  };
+  for (const [, corps] of html.matchAll(/<script type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/gi)) {
+    try {
+      chaines(JSON.parse(corps));
+    } catch {
+      /* JSON-LD invalide : déjà signalé par le contrôle de la page */
+    }
+  }
+  return norm(morceaux.join(' · '));
+}
+
+/** Pages dont le corps est déjà contrôlé, avec leurs exigences propres, par les fonctions ci-dessus. */
+const PAGES_DEJA_CONTROLEES = new Set([
+  'index.html',
+  ...['frais', 'strategie', 'a-propos', 'documentation', 'faq', 'presse'].map((p) => p + '/index.html'),
+  ...['mentions-legales', 'politique-de-confidentialite', 'cookies'].map((p) => p + '/index.html'),
+]);
+
+/**
+ * L'IMAGE OPEN GRAPH AFFICHE-T-ELLE LES CHIFFRES DU SITE ? Un JPEG ne se relit pas : on compare les
+ * lignes que scripts/make-og.mjs a consignées à sa dernière génération avec celles que facts.ts et
+ * legal.ts donnent aujourd'hui (scripts/og-lignes.mjs). Un écart veut dire que l'aperçu partagé sur les
+ * réseaux affiche une ancienne valeur.
+ */
+async function checkOgImage() {
+  let consignees;
+  try {
+    consignees = JSON.parse(await fs.readFile(path.join(ROOT, 'scripts', 'og-lignes.json'), 'utf8'));
+  } catch {
+    errors.push('scripts/og-lignes.json illisible : relancer node scripts/make-og.mjs');
+    return;
+  }
+  const attendues = lignesOg();
+  if (JSON.stringify(consignees) !== JSON.stringify(attendues))
+    errors.push(
+      `image Open Graph périmée : elle affiche « ${[consignees.chiffres, ...(consignees.risques ?? [])].join(' ')} », les sources donnent « ${[attendues.chiffres, ...attendues.risques].join(' ')} » ; relancer node scripts/make-og.mjs`
+    );
+}
+
 async function checkWholeSite() {
   const walk = async (dir, base = '') => {
     let out = [];
@@ -676,7 +740,25 @@ async function checkWholeSite() {
 
   for (const file of pages) {
     const html = await readHtml(file);
-    for (const [, attr, value] of html.matchAll(/\s(href|src|action|poster)="([^"]*)"/gi)) {
+
+    /* 3. TOUTES LES PAGES, pas une liste : une page ajoutée dans src/pages partait en production sans
+       aucun contrôle de formulation, et le script affichait « 0 erreur » (/test et 404.html y
+       échappaient). Celles qui ont déjà leur contrôle dédié ne sont pas relues deux fois. */
+    if (!PAGES_DEJA_CONTROLEES.has(file)) {
+      const texte = toText(html);
+      checkForbidden(texte, file);
+      checkHeroClaims(texte, file);
+    }
+    /* 4. Et, sur toutes, ce qui se lit hors du corps : meta, attributs, données structurées. Les
+       citations de presse sont retirées avant, comme pour le corps de /presse. */
+    checkForbidden(texteHorsCorps(stripPressQuotes(html)), `${file} (meta, attributs, JSON-LD)`);
+
+    const urls = [];
+    for (const [, attr, value] of html.matchAll(/\s(href|src|action|poster|data-index)="([^"]*)"/gi))
+      urls.push([attr, value]);
+    for (const [, value] of html.matchAll(/\ssrcset="([^"]*)"/gi))
+      for (const candidat of value.split(',')) urls.push(['srcset', candidat.trim().split(/\s+/)[0] ?? '']);
+    for (const [attr, value] of urls) {
       if (!value.startsWith('/') || value.startsWith('//')) continue;
       const clean = value.split('#')[0].split('?')[0];
       linked.add(decodeURI(stripBase(clean)));
@@ -700,6 +782,7 @@ await checkOtherPages();
 await checkNoSourceFiles();
 await checkSubPages();
 await checkWholeSite();
+await checkOgImage();
 
 for (const w of warnings) console.log(`⚠ ${w}`);
 for (const e of errors) console.log(`✖ ${e}`);

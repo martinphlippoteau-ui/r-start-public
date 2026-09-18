@@ -1,5 +1,6 @@
 import {
   PUBLIC_GTM_ID,
+  PUBLIC_NOINDEX,
   PUBLIC_SITE_URL,
   PUBLIC_SUBSCRIBE_OPEN,
   PUBLIC_SUBSCRIBE_URL,
@@ -11,6 +12,21 @@ import type { CtaPosition } from '@/content/types';
  * Configuration unique du site. Les valeurs sensibles au déploiement viennent des variables
  * d'environnement PUBLIC_* (voir .env.example et astro.config.mjs).
  */
+
+/**
+ * UN INTERRUPTEUR D'ENVIRONNEMENT SE LIT D'UNE SEULE FAÇON, ET REFUSE CE QU'IL NE COMPREND PAS (audit du
+ * 18/09/2026). PUBLIC_NOINDEX était comparé strictement à 'true' : « True », « 1 » ou « true » suivi
+ * d'une espace laissaient la prévisualisation d'un produit financier INDEXABLE, sans un mot, alors que
+ * PUBLIC_SUBSCRIBE_OPEN acceptait ces graphies. Les deux passent ici : vrai pour true, 1 ou oui ; faux
+ * pour vide, false, 0 ou non ; et toute autre valeur ARRÊTE LE BUILD plutôt que d'être lue comme « faux ».
+ */
+const interrupteur = (nom: string, valeur: string): boolean => {
+  const v = valeur.trim();
+  if (/^(true|1|oui)$/i.test(v)) return true;
+  if (v === '' || /^(false|0|non)$/i.test(v)) return false;
+  throw new Error(`${nom} vaut « ${valeur} » : attendu true, 1, oui, false, 0, non, ou vide`);
+};
+
 export const site = {
   name: 'R Start',
   publisher: "CORUM L'Épargne",
@@ -27,8 +43,10 @@ export const site = {
    * « Souscrire » ouvrent la fenêtre « la souscription arrive bientôt », personne ne quitte le site.
    */
   subscribeOpen:
-    /^(true|1|oui)$/i.test(PUBLIC_SUBSCRIBE_OPEN.trim()) &&
+    interrupteur('PUBLIC_SUBSCRIBE_OPEN', PUBLIC_SUBSCRIBE_OPEN) &&
     !/placeholder/i.test(PUBLIC_SUBSCRIBE_URL),
+  /** Prévisualisation : meta robots « noindex » partout et robots.txt en Disallow. */
+  noindex: interrupteur('PUBLIC_NOINDEX', PUBLIC_NOINDEX),
   gtmId: PUBLIC_GTM_ID,
   ogImagePath: '/og/og-rstart.jpg',
   consent: {

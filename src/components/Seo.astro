@@ -1,10 +1,10 @@
 ---
 import { site } from '@/config/site';
 import { withBase } from '@/lib/href';
-import { PUBLIC_NOINDEX } from 'astro:env/client';
 
 /** Prévisualisation : aucune page n'est indexable, quelle que soit la valeur passée par la page. */
-const preview = PUBLIC_NOINDEX === 'true';
+/* Lu par src/config/site.ts, qui refuse une valeur qu'il ne comprend pas au lieu de la lire « faux ». */
+const preview = site.noindex;
 
 interface Props {
   title: string;

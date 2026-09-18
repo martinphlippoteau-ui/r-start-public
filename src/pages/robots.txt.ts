@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { PUBLIC_NOINDEX } from 'astro:env/client';
+import { site as reglages } from '@/config/site';
 import { withBase } from '@/lib/href';
 
 /**
@@ -8,7 +8,8 @@ import { withBase } from '@/lib/href';
  */
 export const GET: APIRoute = ({ site }) => {
   const origin = (site?.toString() ?? '').replace(/\/$/, '');
-  const preview = PUBLIC_NOINDEX === 'true';
+  /* `reglages` et non `site` : la route reçoit déjà un paramètre `site`, l'adresse du site. */
+  const preview = reglages.noindex;
   const body = preview
     ? ['# Prévisualisation : indexation refusée.', 'User-agent: *', 'Disallow: /', ''].join('\n')
     : [
