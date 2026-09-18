@@ -1396,6 +1396,18 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   &::after {
     display: none;
   }
+
+  /* L'ANNEAU DE FOCUS GARDE SON LISERÉ BLANC (audit du 18/09/2026). L'anneau du site est double, contour
+     navy et liseré blanc en `box-shadow` ; cet utilitaire redéfinit `box-shadow` pour son ombre portée,
+     et il ne restait que le contour navy. Au-dessus d'une section sombre (repères de l'accueil,
+     risques), navy sur ink donne 1,49:1 : le focus était invisible. Le liseré revient, l'ombre avec. */
+  &:focus-visible {
+    outline: 3px solid var(--color-navy);
+    outline-offset: 3px;
+    box-shadow:
+      0 0 0 6px #fff,
+      0 16px 40px -18px rgb(2 75 103 / 0.45);
+  }
 }
 
 /* Le rond du chevron : couleur de CTA primaire, taille fixe. 3 rem dans une pastille de 4 rem, soit
@@ -1542,6 +1554,16 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
  */
 @utility info-bouton {
   display: inline-flex;
+  /* CIBLE DE 44 PX SANS TOUCHER AU DESSIN (audit du 18/09/2026) : le rond fait 20 px, c'était la plus
+     petite commande du site, treize fois sur téléphone (repères de l'accueil, lignes du comparateur).
+     Un pseudo-élément invisible élargit la zone de 12 px de chaque côté, comme pour les appels de note. */
+  position: relative;
+  &::after {
+    content: '';
+    position: absolute;
+    inset: -0.75rem;
+    border-radius: 9999px;
+  }
   width: 1.25rem;
   height: 1.25rem;
   flex-shrink: 0;

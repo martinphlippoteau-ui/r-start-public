@@ -9,10 +9,14 @@
  *
  * Accents retirés, apostrophes et espaces en tirets : « Quel est le prix d’une part ? » donne
  * « question-quel-est-le-prix-d-une-part ».
+ *
+ * `slug` est le pliage seul, sans préfixe : les pages légales s'en servent pour leurs sections depuis le
+ * 18/09/2026. Elles pliaient de leur côté, SANS retirer les accents, qui devenaient des séparateurs :
+ * « s--diteur-du-site », « s-r-clamations », « s-h-bergement ». Ce sont les ancres qu'on cite pour
+ * renvoyer à une mention légale précise.
  */
-export const ancreQuestion = (question: string): string =>
-  'question-' +
-  question
+export const slug = (texte: string): string =>
+  texte
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
@@ -20,3 +24,5 @@ export const ancreQuestion = (question: string): string =>
     .replace(/^-+|-+$/g, '')
     .slice(0, 80)
     .replace(/-+$/, '');
+
+export const ancreQuestion = (question: string): string => 'question-' + slug(question);

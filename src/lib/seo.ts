@@ -90,7 +90,23 @@ export function faqJsonLd(items: FaqItem[]): JsonLd {
     mainEntity: items.map((item) => ({
       '@type': 'Question',
       name: item.question,
-      acceptedAnswer: { '@type': 'Answer', text: item.answer.join('\n\n') },
+      /* TOUT ce que la page affiche, dans le même ordre : paragraphes, puces, tableau, conclusion.
+         Seul `answer` était repris : « Quels sont les frais de R Start ? » perdait son tableau (les
+         15 % de gestion, le 0 / 6 / 12 %, les frais de retrait) et ne disait plus que « aucun frais
+         quand vous investissez » ; « Quel est le niveau de risque » s'arrêtait sur « Pourquoi un peu
+         plus élevé ? », sans les raisons ni « le capital et les revenus ne sont pas garantis ». C'est
+         la version que les moteurs et les assistants citent hors contexte (audit du 18/09/2026). */
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: [
+          ...item.answer,
+          ...(item.bullets ?? []),
+          ...(item.table
+            ? [item.table.head.join(' : '), ...item.table.rows.map((ligne) => ligne.join(' : '))]
+            : []),
+          ...(item.tableAfter ?? []),
+        ].join('\n\n'),
+      },
     })),
   };
 }

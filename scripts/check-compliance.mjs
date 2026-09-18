@@ -520,13 +520,13 @@ async function checkSubPages() {
     if (p === 'documentation') {
       /*
        * Avertissements reproduits in extenso, descendus de l'accueil le 11/09/2026. Ils étaient rendus
-       * par RiskNote sur les fiches de documents : ils sont donc partis le 14/09/2026 avec tous les
-       * « Bon à savoir », et ces deux exigences sont commentées comme les autres. CE SONT DEUX TEXTES
-       * RÉGLEMENTAIRES, pas des contre-poids rédigés : ils figurent en tête de la liste de ce que la
-       * Conformité a à replacer. Leur contenu reste dans src/content/fr/legal.ts.
+       * par RiskNote sur les fiches de documents, et sont partis le 14/09/2026 avec tous les « Bon à
+       * savoir ». CE SONT DEUX TEXTES RÉGLEMENTAIRES, pas des contre-poids rédigés : depuis le
+       * 18/09/2026 la page les rend en paragraphes directs (MandatoryWarnings.astro), et les deux
+       * exigences sont de nouveau actives.
        */
-      // requirePhrase(text, legal.bulletinWarning.slice(0, 120), 'avertissement du bulletin', file);
-      // requirePhrase(text, legal.dicWarning, 'avertissement du DIC', file);
+      requirePhrase(text, legal.bulletinWarning.slice(0, 120), 'avertissement du bulletin', file);
+      requirePhrase(text, legal.dicWarning, 'avertissement du DIC', file);
       for (const b of legal.arbitrageWarningBullets)
         requirePhrase(text, b.slice(0, 100), "puce commission d'arbitrage", file);
     }
@@ -752,6 +752,24 @@ async function checkWholeSite() {
     /* 4. Et, sur toutes, ce qui se lit hors du corps : meta, attributs, données structurées. Les
        citations de presse sont retirées avant, comme pour le corps de /presse. */
     checkForbidden(texteHorsCorps(stripPressQuotes(html)), `${file} (meta, attributs, JSON-LD)`);
+
+    /* 5. ON NE BALISE QUE CE QUE LE VISITEUR PEUT LIRE. Chaque question d'un FAQPage doit figurer dans
+       le texte de la même page : /frais a publié pendant quatre jours les quatre questions d'une
+       section retirée, réponses chiffrées comprises, que personne ne pouvait lire ni relire. C'est la
+       règle écrite de src/lib/seo.ts, et celle des moteurs de recherche. */
+    const visible = toText(html).toLowerCase();
+    for (const [, corps] of html.matchAll(/<script type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/gi)) {
+      let blocs;
+      try {
+        blocs = [JSON.parse(corps)].flat();
+      } catch {
+        continue;
+      }
+      for (const bloc of blocs.filter((b) => b && b['@type'] === 'FAQPage'))
+        for (const q of bloc.mainEntity ?? [])
+          if (!visible.includes(norm(String(q.name ?? '')).toLowerCase()))
+            errors.push(`${file} : question balisée en FAQPage mais absente de la page, « ${q.name} »`);
+    }
 
     const urls = [];
     for (const [, attr, value] of html.matchAll(/\s(href|src|action|poster|data-index)="([^"]*)"/gi))

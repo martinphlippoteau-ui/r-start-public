@@ -429,8 +429,10 @@ export interface FaqContent {
   pageIntro?: string;
   searchLabel?: string;
   searchPlaceholder?: string;
-  /** `{n}` y est remplacé par le nombre de questions trouvées. */
+  /** `{n}` y est remplacé par le nombre de questions trouvées (pluriel). */
   searchCount?: string;
+  /** Une seule question trouvée. */
+  searchCountOne?: string;
   searchEmpty?: string;
   /** aria-label de la liste des questions (ex. « Questions fréquentes sur R Start »). */
   listLabel?: string;

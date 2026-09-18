@@ -36,6 +36,7 @@ const init = (): void => {
   );
 
   const gabarit = compte?.dataset.gabarit ?? '';
+  const gabaritUn = compte?.dataset.gabaritUn ?? gabarit;
   const vide = compte?.dataset.vide ?? '';
 
   /* Un nom par question, posé par le CSSOM (aucun attribut `style` inséré, la CSP n'a rien à dire). */
@@ -48,6 +49,7 @@ const init = (): void => {
   };
   /* Plusieurs frappes rapides enchaînent plusieurs transitions : la classe ne tombe qu'avec la dernière. */
   let enCours = 0;
+  let annonce = 0;
 
   const appliquer = (): void => {
     const q = sansAccent(champ.value.trim());
@@ -66,9 +68,21 @@ const init = (): void => {
       if (rubrique) rubriqueVisible = rubrique;
     });
     if (!compte) return;
-    if (q === '') compte.textContent = '';
-    else if (trouvees === 0) compte.textContent = vide;
-    else compte.textContent = gabarit.replace('{n}', String(trouvees));
+    /* LE DÉCOMPTE EST ÉCRIT À LA FIN DE LA FRAPPE, pas à chaque lettre (audit du 18/09/2026) : c'est
+       une zone `aria-live`, et taper « retrait » déclenchait sept annonces qui se chevauchaient avec
+       l'écho des touches. Même délai que la recherche du site. Un champ vidé efface tout de suite. */
+    window.clearTimeout(annonce);
+    if (q === '') {
+      compte.textContent = '';
+      return;
+    }
+    const texte =
+      trouvees === 0
+        ? vide
+        : (trouvees === 1 ? gabaritUn : gabarit).replace('{n}', String(trouvees));
+    annonce = window.setTimeout(() => {
+      compte.textContent = texte;
+    }, 450);
   };
 
   const filtrer = (): void => {

@@ -21,6 +21,14 @@
  * molette. La première version annulait tout `wheel` et tout `touchmove` : menu ou recherche ouverts,
  * un visiteur malvoyant ne pouvait plus agrandir la page. heroAvance.ts faisait déjà l'exception.
  *
+ * LA PAGE EST AUSSI RENDUE INERTE (audit du 18/09/2026). Le tiroir et la recherche se déclarent
+ * `aria-modal` et piègent la tabulation, mais ni l'un ni l'autre n'arrête le curseur virtuel d'un
+ * lecteur d'écran ou le balayage tactile : TalkBack, là où le tiroir sert, et plusieurs versions de
+ * VoiceOver n'honorent pas `aria-modal`, et l'utilisateur partait lire la page recouverte par le voile.
+ * `inert` est posé sur tous les enfants de <body> qui ne contiennent pas la surface (le contenu, le pied
+ * de page, le bandeau de consentement, les pastilles), plus les éléments que l'appelant désigne (la
+ * barre, sous le tiroir). Seuls les éléments rendus inertes ICI sont rétablis à la fin.
+ *
  * Plusieurs propriétaires sont admis : le verrou ne tombe qu'au dernier rendu. LES ÉCOUTEURS SONT
  * RETIRÉS AVEC LUI : `wheel` et `touchmove` sont posés en `passive: false`, et un écouteur non passif
  * oblige le navigateur à attendre le script avant chaque défilement. Gardés « pour la suite », ils
@@ -29,6 +37,8 @@
 
 /** Propriétaire → sa zone défilante, s'il en a une. */
 const proprietaires = new Map<object, HTMLElement | null>();
+/** Propriétaire → les éléments qu'il a rendus inertes, et lui seul. */
+const neutralises = new Map<object, HTMLElement[]>();
 
 /** Touches qui font défiler la page. */
 const TOUCHES = new Set([' ', 'PageUp', 'PageDown', 'Home', 'End', 'ArrowUp', 'ArrowDown']);
@@ -91,15 +101,39 @@ const cesserDEcouter = (): void => {
  * Verrouille la page pour `proprietaire` (un objet quelconque, l'élément de la surface fait l'affaire).
  * `zone` est l'élément qui, lui, garde le droit de défiler.
  */
-export const verrouiller = (proprietaire: object, zone: HTMLElement | null = null): void => {
+export const verrouiller = (
+  proprietaire: object,
+  zone: HTMLElement | null = null,
+  aussiInertes: (HTMLElement | null)[] = []
+): void => {
   ecouter();
   proprietaires.set(proprietaire, zone);
   document.documentElement.setAttribute('data-verrou', '');
+
+  if (neutralises.has(proprietaire)) return;
+  const surface = proprietaire instanceof Node ? proprietaire : null;
+  const cibles = [
+    ...Array.from(document.body.children).filter(
+      (el): el is HTMLElement =>
+        el instanceof HTMLElement &&
+        !/^(SCRIPT|STYLE|DIALOG)$/.test(el.tagName) &&
+        !(surface && el.contains(surface))
+    ),
+    ...aussiInertes.filter((el): el is HTMLElement => el instanceof HTMLElement),
+  ].filter((el) => !el.inert);
+  cibles.forEach((el) => {
+    el.inert = true;
+  });
+  neutralises.set(proprietaire, cibles);
 };
 
 /** Rend la page à son propriétaire précédent, ou au visiteur s'il n'y en a plus. */
 export const deverrouiller = (proprietaire: object): void => {
   proprietaires.delete(proprietaire);
+  (neutralises.get(proprietaire) ?? []).forEach((el) => {
+    el.inert = false;
+  });
+  neutralises.delete(proprietaire);
   if (proprietaires.size) return;
   document.documentElement.removeAttribute('data-verrou');
   cesserDEcouter();

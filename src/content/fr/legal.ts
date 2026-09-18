@@ -93,7 +93,7 @@ export const managementCompany = {
     "Société de gestion de portefeuille agréée et réglementée par l'AMF sous le numéro GP-11000012 le 14 avril 2011, agrément AIFM en date du 10 juillet 2014 au titre de la directive 2011/61/UE.",
   amfAddress: 'Autorité des marchés financiers, 17 place de la Bourse, 75082 Paris Cedex 02',
   complaintsEmail: 'conformite@corum-am.com',
-  complaintsPolicyUrl: 'https://www.corumbutler.com/mentions-legales',
+  complaintsPolicyUrl: 'https://www.corum.fr/mentions-legales',
 } as const;
 
 /** Bloc RGPD (responsable de traitement, droits, DPO). */

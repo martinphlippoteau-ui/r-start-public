@@ -203,7 +203,9 @@ async function main() {
     MANIFEST,
     JSON.stringify(
       {
-        generatedFrom: ASSETS,
+        /* Le NOM du dossier source, pas son chemin : le manifeste est versionné, et il publiait le
+           chemin absolu du poste qui l'avait généré (nom d'utilisateur compris). */
+        generatedFrom: path.basename(ASSETS),
         images,
         logos: logos.map((l) => `logos/${l.file}`),
         publicFiles: publicFiles.map((p) => p.file),

@@ -5,11 +5,16 @@
  * à la demande de l'équipe : ils allongeaient la section Risques d'un pavé de texte réglementaire, et
  * leur place est ici, à côté des documents dont ils sont extraits.
  * Ces textes sont IMPOSÉS et reproduits à l'identique (src/content/fr/legal.ts, via risks.ts) : ils ne
- * sont ni réécrits, ni résumés, ni animés. Le script de conformité les exige désormais sur cette page.
- * Le contrôle de leur présence sur le site reste à arbitrer avec la compliance CORUM.
+ * sont ni réécrits, ni résumés, ni animés. Le script de conformité les exige sur cette page.
+ *
+ * RENDUS EN PARAGRAPHES DIRECTS, et plus par RiskNote (audit du 18/09/2026). RiskNote ne rend plus rien
+ * depuis le 14/09/2026 (« supprime tous les bon à savoir du site »), et ces deux avertissements
+ * passaient par lui : ils ont disparu par ricochet, alors que ce ne sont pas des « Bon à savoir » mais
+ * des textes réglementaires reproduits in extenso. Pire, leurs TITRES restaient affichés, chacun dans
+ * son cadre, suivis de rien : la page annonçait un avertissement et ne le donnait pas. Ils s'affichent
+ * de nouveau, comme les puces de la commission d'arbitrage qui n'ont jamais quitté la page.
  */
 import Container from '@/components/ui/Container.astro';
-import RiskNote from '@/components/ui/RiskNote.astro';
 import Section from '@/components/ui/Section.astro';
 import { risks } from '@/content/fr/risks';
 
@@ -27,13 +32,13 @@ const title = risks.warningsTitle;
 
     <div class="mt-8 rounded-3xl border border-navy/15 p-6 sm:p-8 lg:mt-10 lg:p-10">
       {risks.bulletinWarningTitle && <h3 class="text-display-sm">{risks.bulletinWarningTitle}</h3>}
-      <RiskNote text={risks.bulletinWarning} size="lead" class="mt-5" />
+      <p class="text-lead mt-5 text-ink">{risks.bulletinWarning}</p>
     </div>
 
     <div class="mt-6 grid gap-6 lg:grid-cols-2">
       <div class="rounded-3xl border border-navy/15 p-6 sm:p-8 lg:p-10">
         {risks.dicWarningTitle && <h3 class="text-display-sm">{risks.dicWarningTitle}</h3>}
-        <RiskNote text={risks.dicWarning} size="lead" class="mt-5" />
+        <p class="text-lead mt-5 text-ink">{risks.dicWarning}</p>
       </div>
       <div class="rounded-3xl border border-navy/15 p-6 sm:p-8 lg:p-10">
         {

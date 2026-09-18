@@ -213,6 +213,41 @@ test.describe('Qualité', () => {
   });
 
   /*
+   * DONNÉES STRUCTURÉES ET ANCRES (audit du 18/09/2026).
+   *  - La réponse balisée reprend TOUT ce que la page affiche : le tableau des frais manquait, et la
+   *    réponse sur les frais ne disait plus que « aucun frais quand vous investissez ».
+   *  - /frais ne balise plus une FAQ que personne ne peut lire.
+   *  - Les ancres des pages légales plient les accents au lieu de les remplacer par des tirets.
+   *  - La page d'essai interne n'est jamais indexable.
+   */
+  test('données structurées fidèles à la page, ancres légales lisibles, page d’essai hors index', async ({
+    page,
+  }) => {
+    const faqPages = () =>
+      page.evaluate(() =>
+        [...document.querySelectorAll('script[type="application/ld+json"]')]
+          .flatMap((s) => [JSON.parse(s.textContent ?? 'null')].flat())
+          .filter((b) => b && b['@type'] === 'FAQPage')
+      );
+    await page.goto('/faq/');
+    const [faq] = await faqPages();
+    const frais = (faq.mainEntity as { name: string; acceptedAnswer: { text: string } }[]).find((q) =>
+      /Quels sont les frais/.test(q.name)
+    );
+    expect(frais?.acceptedAnswer.text, 'le tableau des frais est dans la réponse balisée').toContain('15 %');
+
+    await page.goto('/frais/');
+    expect(await faqPages(), '/frais : aucune FAQ balisée sans FAQ visible').toEqual([]);
+
+    await page.goto('/mentions-legales/');
+    await expect(page.locator('#s-editeur-du-site')).toHaveCount(1);
+    await expect(page.locator('#s-reclamations')).toHaveCount(1);
+
+    await page.goto('/test/');
+    await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/);
+  });
+
+  /*
    * COMPARATEUR DE FRAIS, trois défauts de l'audit du 18/09/2026.
    *  1. Une SCPI sans valeur sur une ligne héritait de la pastille « taux le plus bas » de la SCPI
    *     choisie avant elle. Le cas n'existe pas dans les données d'aujourd'hui : la page est servie avec
@@ -362,6 +397,13 @@ test.describe('Qualité', () => {
     await expect(page.locator('[data-menu-panel]')).toHaveAttribute('data-open', '');
 
     expect(await largeurs(), 'ni la barre ni la page ne se décalent').toEqual(avant);
+    /* Sous le tiroir, tout est inerte, la barre comprise : il la recouvre. */
+    expect(
+      await page.evaluate(() => [
+        document.querySelector<HTMLElement>('main')!.inert,
+        document.querySelector<HTMLElement>('[data-sitenav-bar]')!.inert,
+      ])
+    ).toEqual([true, true]);
     expect(await page.evaluate(() => Math.round(window.scrollY))).toBe(200);
     await page.mouse.move(300, 600);
     await page.mouse.wheel(0, 600);

@@ -31,13 +31,14 @@ import PageHero from '@/components/ui/PageHero.astro';
 import FeeComparator from '@/components/pages/frais/FeeComparator.astro';
 import { pages } from '@/config/pages';
 import { feesPage } from '@/content/fr/feesPage';
-import { breadcrumbJsonLd, faqJsonLd, organizationJsonLd, webPageJsonLd } from '@/lib/seo';
+import { breadcrumbJsonLd, organizationJsonLd, webPageJsonLd } from '@/lib/seo';
 
 const page = pages.fees;
-const { seo, hero, faq, cta } = feesPage;
+const { seo, hero, cta } = feesPage;
 /*
- * `faq` n'est plus rendu : la page a perdu sa section Questions le 14/09/2026. Il reste lu pour la
- * donnée structurée FAQPage, que les moteurs exploitent même sans bloc visible.
+ * `faq` n'est plus lu : la page a perdu sa section Questions le 14/09/2026, et sa donnée structurée
+ * FAQPage le 18/09/2026 (on ne balise pas ce que le visiteur ne peut pas lire). Le contenu reste dans
+ * feesPage.ts.
  * `labels`, `groups`, `htNote` et `htNoteLabel` ont quitté ce tri le 16/09/2026 avec le barème :
  * les quatre tableaux, leurs intitulés et la mention HT restent dans feesPage.ts, la page ne les
  * appelle plus.
@@ -47,7 +48,11 @@ const jsonLd = [
   organizationJsonLd(),
   webPageJsonLd({ path: page.path, title: seo.title, description: seo.description }),
   breadcrumbJsonLd('fees'),
-  faqJsonLd(faq.items),
+  /* PAS DE FAQPage ICI (audit du 18/09/2026). La section Questions de cette page a été retirée le
+     14/09/2026, mais ses quatre questions et leurs réponses chiffrées restaient publiées en données
+     structurées : un contenu balisé que le visiteur ne peut pas lire, contraire à la règle du dépôt
+     (src/lib/seo.ts, « strictement les questions / réponses visibles ») comme à celle des moteurs.
+     scripts/check-compliance.mjs refuse désormais toute question balisée absente de la page. */
 ];
 
 ---

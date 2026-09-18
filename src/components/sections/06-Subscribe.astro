@@ -120,7 +120,7 @@ const OPTION_Y = 12;
       class:list={['mt-10 sm:mt-16 lg:mt-24', 'grid gap-12 lg:grid-cols-12 lg:gap-16']}
     >
       <!-- Stepper -->
-      <ol
+      <ol role="list"
         aria-label={subscribe.stepsLabel}
         class:list={['relative space-y-10 sm:space-y-14', 'lg:col-span-7']}
       >
@@ -290,7 +290,7 @@ const OPTION_Y = 12;
               </h3>
             )}
             {/* Chaque carte contient sa RiskPair : la carte n'est jamais animée, seul son bloc titre entre (fade-up court). */}
-            <ul class="mt-8 grid gap-6 sm:grid-cols-2">
+            <ul role="list" class="mt-8 grid gap-6 sm:grid-cols-2">
               {subscribe.options.map((option, i) => (
                 <Card as="li" tone="paper" class="lg:p-10">
                   <div

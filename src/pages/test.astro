@@ -99,7 +99,14 @@ const TITRES: { niveau: 1 | 2; avant: string; apres: string }[] = [
 ];
 ---
 
-<Base title="Essai typographique" description="Page d’essai interne, hors menu." path="/test">
+{/* `noindex` : le bandeau de ce fichier le promettait, la prop n'était pas passée. Hors
+  prévisualisation, cette page interne sortait en « index, follow » (audit du 18/09/2026). */}
+<Base
+  title="Essai typographique"
+  description="Page d’essai interne, hors menu."
+  path="/test"
+  noindex
+>
   <main id="contenu">
     <Section id="essai" tone="paper">
       <Container size="wide">

@@ -16,6 +16,7 @@ import Container from '@/components/ui/Container.astro';
 import { legalPages } from '@/content/fr/pages';
 import { consent } from '@/content/fr/consent';
 import { pages, type PageKey } from '@/config/pages';
+import { slug } from '@/lib/ancre';
 import { breadcrumbJsonLd, organizationJsonLd, webPageJsonLd } from '@/lib/seo';
 
 export const getStaticPaths = (() =>
@@ -56,10 +57,10 @@ const jsonLd = [
         {
           page.sections.map((section) => (
             <section
-              aria-labelledby={'s-' + section.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}
+              aria-labelledby={'s-' + slug(section.title)}
             >
               <h2
-                id={'s-' + section.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}
+                id={'s-' + slug(section.title)}
                 class="text-display-sm"
               >
                 {section.title}

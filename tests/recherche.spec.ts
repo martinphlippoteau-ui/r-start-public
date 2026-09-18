@@ -265,6 +265,27 @@ test.describe('Recherche du site', () => {
    * AUDIT DU 18/09/2026 : sept défauts relevés dans la recherche et le verrou de page, écrits la veille.
    * Chacun a ici le test qui l'aurait attrapé.
    */
+  /*
+   * SOUS UNE SURFACE MODALE, LA PAGE EST INERTE (audit du 18/09/2026). `aria-modal` et le piège à
+   * tabulation n'arrêtent ni le curseur virtuel d'un lecteur d'écran ni le balayage tactile : plusieurs
+   * technologies d'assistance laissaient lire la page recouverte par le voile. La barre reste active
+   * pendant la recherche, c'est voulu.
+   */
+  test('la page est inerte sous la recherche, et ne l’est plus après', async ({ page }) => {
+    await page.goto('/frais/');
+    const inertes = () =>
+      page.evaluate(() => ({
+        contenu: document.querySelector<HTMLElement>('main')!.inert,
+        pied: document.querySelector<HTMLElement>('footer')!.inert,
+        barre: document.querySelector<HTMLElement>('[data-sitenav-bar]')!.inert,
+      }));
+    await ouvrir(page);
+    expect(await inertes()).toEqual({ contenu: true, pied: true, barre: false });
+    await page.keyboard.press('Escape');
+    await expect(page.locator('[data-recherche-panneau]')).toBeHidden();
+    expect(await inertes()).toEqual({ contenu: false, pied: false, barre: false });
+  });
+
   test('le verrou de page laisse agrandir, et ses écouteurs partent avec lui', async ({ page }) => {
     await page.goto('/frais/');
     /* Une molette synthétique : on lit seulement si le site l'annule. */
@@ -406,6 +427,8 @@ test.describe('Recherche du site', () => {
     const libelle = retenues.first().locator('[data-faq-rubrique]');
     await expect(libelle).toBeVisible();
     await expect(libelle).toHaveText('Souscrire et accéder à R Start');
+    /* Le décompte, écrit à la fin de la frappe, au singulier et sans parenthèses. */
+    await expect(page.locator('[data-faq-compte]')).toHaveText('1 question trouvée');
 
     /* Champ vidé : retour au rendu d'origine, un libellé par rubrique et pas un de plus. */
     await page.locator('[data-faq-recherche] input').fill('');

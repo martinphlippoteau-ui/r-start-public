@@ -516,7 +516,8 @@ const linkClass =
         opener.setAttribute('aria-expanded', 'true');
         /* La page ne défile plus derrière le tiroir, mais elle garde sa barre de défilement : le tiroir,
            lui, garde la sienne (voir src/scripts/verrou.ts, et le « carré » du 17/09/2026). */
-        verrouiller(panel, panel.querySelector<HTMLElement>('[data-menu-drawer]'));
+        /* Troisième argument : la barre devient inerte elle aussi, le tiroir la recouvre. */
+        verrouiller(panel, panel.querySelector<HTMLElement>('[data-menu-drawer]'), [bar]);
         /* Le bouton « Fermer », pas le voile : `[data-menu-close]:not(a)` attrapait le <div> du voile,
            qui n'est pas focalisable. Le focus restait alors sur le bouton Menu, donc hors du dialogue,
            et le `:focus-within` de la barre rallumait ses entrées derrière le tiroir. */

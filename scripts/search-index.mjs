@@ -263,7 +263,10 @@ export default function rechercheIntegration() {
         server.middlewares.use(async (req, res, next) => {
           if ((req.url ?? '').split('?')[0] !== avecBase('/' + FICHIER_INDEX)) return next();
           try {
-            const origine = `http://${req.headers.host}`;
+            /* L'adresse du serveur lui-même, pas celle de l'en-tête `Host` de la requête : un en-tête
+               forgé faisait aller chercher les pages sur un hôte au choix de l'appelant. */
+            const port = server.httpServer?.address()?.port ?? server.config.server.port ?? 4321;
+            const origine = `http://localhost:${port}`;
             const rendus = await Promise.all(
               menuPages.map(async (p) => ({
                 key: p.key,

@@ -386,7 +386,10 @@ export const faq = {
   searchLabel: 'Rechercher dans les questions',
   searchPlaceholder: 'frais, revenus, retrait, risque…',
   /** Ce qui s'affiche sous le champ, `{n}` étant remplacé par le nombre de questions trouvées. */
-  searchCount: '{n} question(s) trouvée(s)',
+  /* Deux gabarits depuis le 18/09/2026 : « question(s) trouvée(s) » était lu tel quel, parenthèses
+     comprises, par les synthèses vocales. */
+  searchCount: '{n} questions trouvées',
+  searchCountOne: '1 question trouvée',
   searchEmpty: 'Aucune question ne correspond. Essayez un autre mot.',
   /** En-tête de la page /faq, distinct de celui de la section courte. */
   pageTitle: 'Toutes vos questions sur la SCPI R Start.',

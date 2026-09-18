@@ -408,7 +408,7 @@ export const documents = [
 
 export const externalLinks = {
   corum: 'https://www.corum.fr',
-  corumLegal: 'https://www.corumbutler.com/mentions-legales',
+  corumLegal: 'https://www.corum.fr/mentions-legales',
   amfMediator: 'https://www.amf-france.org',
   /** Application MyCORUM (CORUM L'Épargne) : suivi de l'épargne après souscription. */
   myCorumAppStore: 'https://apps.apple.com/fr/app/mycorum/id6692633584',

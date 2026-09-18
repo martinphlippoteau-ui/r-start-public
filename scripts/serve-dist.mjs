@@ -55,7 +55,15 @@ const sansPrefixe = (chemin) =>
 
 /** Chemin sur le disque, ou null si la demande sort de `dist/` (traversée de répertoire). */
 const resoudre = (url) => {
-  const brut = sansPrefixe(decodeURIComponent(new URL(url, 'http://x').pathname));
+  /* Une adresse mal encodée (« /% ») levait une URIError non rattrapée : le serveur tombait, et toute la
+     suite de tests avec lui. Elle vaut « introuvable ». */
+  let chemin;
+  try {
+    chemin = decodeURIComponent(new URL(url, 'http://x').pathname);
+  } catch {
+    return null;
+  }
+  const brut = sansPrefixe(chemin);
   const cible = path.normalize(path.join(DIST, brut));
   return cible === DIST || cible.startsWith(DIST + path.sep) ? cible : null;
 };
