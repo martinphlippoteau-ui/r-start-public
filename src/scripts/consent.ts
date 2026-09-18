@@ -21,13 +21,27 @@ const cookieName = banner?.dataset.cookieName || 'rstart_consent';
 const maxAgeDays = Number(banner?.dataset.maxAgeDays || 180);
 
 window.dataLayer = window.dataLayer || [];
-function gtag(...args: unknown[]) {
-  window.dataLayer.push(args);
+/**
+ * `arguments`, ET SURTOUT PAS UN TABLEAU (audit du 18/09/2026). GTM ne reconnaît une commande gtag que
+ * si l'entrée du dataLayer est un objet Arguments ; un tableau, ce que donnait le paramètre de reste
+ * `...args`, est lu comme un « command array » et ignoré sans un mot. Aucun signal du Consent Mode
+ * n'arrivait donc au conteneur : ni le refus par défaut posé plus bas, ni l'accord, ni, surtout, le
+ * RETRAIT, après lequel les tags continuaient. C'est la forme de la documentation de Google, à ne pas
+ * « moderniser » : une fonction déclarée (une fléchée n'a pas d'`arguments`), et le paramètre de reste
+ * n'est là que pour le typage des appels. tests/qualite.spec.ts vérifie la forme de l'entrée.
+ */
+function gtag(..._commande: unknown[]): void {
+  // eslint-disable-next-line prefer-rest-params
+  window.dataLayer.push(arguments);
 }
 
 const readCookie = (): ConsentStatus => {
   const match = document.cookie.match(new RegExp('(?:^|; )' + cookieName + '=([^;]*)'));
-  const value = match ? decodeURIComponent(match[1] ?? '') : '';
+  /* SANS `decodeURIComponent` (audit du 18/09/2026) : les deux seules valeurs admises sont de l'ASCII
+     pur, et un cookie mal encodé (« % », que tout sous-domaine peut écrire) levait une URIError à
+     l'évaluation du module. Celui-ci est livré dans le même fichier que la mesure, la campagne et le
+     moteur d'animation : tout tombait avec lui, à chaque page, pendant les 180 jours de vie du cookie. */
+  const value = match?.[1] ?? '';
   return value === 'granted' || value === 'denied' ? value : 'unset';
 };
 

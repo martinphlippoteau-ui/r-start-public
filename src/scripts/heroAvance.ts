@@ -17,6 +17,8 @@
  *    aucune interception (et suit un changement de réglage en cours de visite) ;
  *  - rien quand un champ, un bouton ou un lien a le focus au clavier pour la touche Espace (elle les
  *    active), ni quand une fenêtre ou le tiroir du menu est ouvert (le document est alors verrouillé) ;
+ *  - rien quand le hero ne tient pas dans la fenêtre (zoom à 200 %, téléphone en paysage) : le passage
+ *    sauterait ce qui dépasse sous le premier écran ;
  *  - jamais sur un zoom à deux doigts, ni sur un glissé horizontal ;
  *  - un clic dans la barre de défilement (pointeur) interrompt le trajet : la main reprend la main ;
  *  - Origine, Fin, les liens d'ancre et le passage au clavier par Tab restent natifs.
@@ -113,6 +115,13 @@ const init = (): void => {
    * on est au-dessous du haut de page, et pas plus bas que le début du contenu.
    */
   const destination = (sens: number): number | null => {
+    /* LE HERO DOIT TENIR DANS LA FENÊTRE, sinon on ne touche à rien (audit du 18/09/2026). Il est en
+       `min-h-svh` : avec un zoom de 200 % ou un téléphone en paysage, son contenu dépasse l'écran, et
+       un seul geste sautait alors par-dessus tout ce qui était sous le premier écran, les deux boutons
+       et la mention de la société de gestion agréée compris. Au doigt, sans barre de défilement, ils
+       devenaient inatteignables. Évalué à chaque geste : le zoom et la rotation changent en cours de
+       visite. Le défilement natif reprend alors ses droits, comme en mouvement réduit. */
+    if (hero.offsetHeight > window.innerHeight + MARGE) return null;
     const haut = cible();
     const pos = y();
     if (sens > 0 && pos < haut - MARGE) return haut;

@@ -644,10 +644,62 @@ async function checkNoSourceFiles() {
   for (const p of leaked) errors.push('source de rédaction publiée dans dist, ' + p);
 }
 
+/**
+ * CONTRÔLES SUR TOUT LE SITE CONSTRUIT (audit du 18/09/2026), et non sur une liste de pages : ils
+ * parcourent chaque fichier HTML de dist, une page ajoutée demain y entre sans que personne y pense.
+ *
+ * 1. AUCUN DOCUMENT ORPHELIN. Tout fichier de dist/documents doit être lié par au moins une page. Les
+ *    trois PDF « en attente » (DIC, statuts, simulation des frais) n'étaient liés nulle part et
+ *    répondaient pourtant 200 à leur adresse directe : retirer un lien ne retire pas un fichier. Un
+ *    document sans lien est soit un oubli de publication, soit un document qui ne devrait pas être là ;
+ *    dans les deux cas le build s'arrête. Voir src/content/fr/pendingDocuments.ts.
+ *
+ * 2. AUCUN LIEN INTERNE SANS LE PRÉFIXE DU SITE. Sous un sous-chemin (PUBLIC_BASE_PATH, GitHub Pages de
+ *    projet), un `href="/faq"` sort du site et tombe en 404. Invisible en local, où la base vaut « / » :
+ *    la règle ne mord donc que là où le défaut existe, c'est-à-dire sur la forge. Elle a été écrite pour
+ *    le renvoi « Voir toutes les questions » de /documentation, seul lien du site posé sans withBase,
+ *    cassé en ligne depuis sa création.
+ */
+async function checkWholeSite() {
+  const walk = async (dir, base = '') => {
+    let out = [];
+    for (const entry of await fs.readdir(dir, { withFileTypes: true })) {
+      const rel = base ? base + '/' + entry.name : entry.name;
+      if (entry.isDirectory()) out = out.concat(await walk(path.join(dir, entry.name), rel));
+      else out.push(rel);
+    }
+    return out;
+  };
+  const files = await walk(DIST);
+  const pages = files.filter((f) => f.endsWith('.html'));
+  const linked = new Set();
+
+  for (const file of pages) {
+    const html = await readHtml(file);
+    for (const [, attr, value] of html.matchAll(/\s(href|src|action|poster)="([^"]*)"/gi)) {
+      if (!value.startsWith('/') || value.startsWith('//')) continue;
+      const clean = value.split('#')[0].split('?')[0];
+      linked.add(decodeURI(stripBase(clean)));
+      if (BASE_PREFIX && clean !== BASE_PREFIX && !clean.startsWith(BASE_PREFIX + '/'))
+        errors.push(
+          `${file} : ${attr}="${value}" sans le préfixe du site (${BASE_PREFIX}), 404 en ligne ; passer par withBase()`
+        );
+    }
+  }
+
+  for (const f of files.filter((f) => f.startsWith('documents/'))) {
+    if (!linked.has('/' + f))
+      errors.push(
+        `dist/${f} : document publié qu'aucune page ne lie ; le lier, ou le retirer de public/documents (src/content/fr/pendingDocuments.ts)`
+      );
+  }
+}
+
 await checkIndex();
 await checkOtherPages();
 await checkNoSourceFiles();
 await checkSubPages();
+await checkWholeSite();
 
 for (const w of warnings) console.log(`⚠ ${w}`);
 for (const e of errors) console.log(`✖ ${e}`);

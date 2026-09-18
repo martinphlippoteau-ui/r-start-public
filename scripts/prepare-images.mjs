@@ -9,6 +9,7 @@ import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
+import { PENDING_DOCUMENT_KEYS } from '../src/content/fr/pendingDocuments.ts';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const argIndex = process.argv.indexOf('--assets');
@@ -55,39 +56,51 @@ const PUBLIC_FILES = [
   ['1 - Logos R Start/apple-touch-icon.png', 'apple-touch-icon.png'],
 ];
 
-/** Documents réglementaires : nom source → slug public. */
+/**
+ * Documents réglementaires : clé (celle de facts.ts), nom source, slug public.
+ * Une clé listée dans PENDING_DOCUMENT_KEYS n'est PAS copiée, et une copie restée dans
+ * public/documents est effacée : voir src/content/fr/pendingDocuments.ts.
+ */
 const DOCUMENTS = [
-  ['7 - Documents/R- Start - DIC - V7.pdf', 'r-start-dic.pdf'],
+  ['dic', '7 - Documents/R- Start - DIC - V7.pdf', 'r-start-dic.pdf'],
   [
+    'note',
     "7 - Documents/R Start - Note d'information - projet V8 24022026 V2.1-20260407T113945 (1).pdf",
     'r-start-note-information.pdf',
   ],
-  ['7 - Documents/R Start - Statuts à jour V3.pdf', 'r-start-statuts.pdf'],
+  ['statuts', '7 - Documents/R Start - Statuts à jour V3.pdf', 'r-start-statuts.pdf'],
   [
+    'bulletin',
     '7 - Documents/R Start - Bulletin de souscription partenaire - 2026.05.pdf',
     'r-start-bulletin-souscription.pdf',
   ],
   [
+    'simulation',
     '7 - Documents/R Start - Simulation des frais ex-ante 2026 V2-20260327T174149.pdf',
     'r-start-simulation-frais-ex-ante.pdf',
   ],
   [
+    'pei',
     '7 - Documents/CORUM Start - Plan épargne immobilier V2.5.pdf',
     'r-start-adhesion-plan-epargne-immobilier.pdf',
   ],
   [
+    'rd',
     '7 - Documents/CORUM Start - Réinvestissement des dividendes V2.5.pdf',
     'r-start-adhesion-reinvestissement-dividendes.pdf',
   ],
   [
+    'mandat',
     '7 - Documents/R Start- Mandat de prélèvement V2.1-20260414T141237.pdf',
     'r-start-mandat-prelevement.pdf',
   ],
   [
+    'retrait',
     '7 - Documents/CORUM AM - Formulaire de retrait de parts_2026 V2.2-20260414T141131.pdf',
     'corum-am-formulaire-retrait-parts.pdf',
   ],
   [
+    'rib-change',
     '7 - Documents/CORUM AM - Formulaire de changement de coordonnées bancaires V2.1-20260414T141049.pdf',
     'corum-am-formulaire-changement-coordonnees-bancaires.pdf',
   ],
@@ -174,7 +187,12 @@ async function main() {
   const publicFiles = [];
   for (const [rel, out] of PUBLIC_FILES) publicFiles.push(await copyFile(rel, OUT_PUBLIC, out));
   const documents = [];
-  for (const [rel, out] of DOCUMENTS) {
+  for (const [cle, rel, out] of DOCUMENTS) {
+    if (PENDING_DOCUMENT_KEYS.includes(cle)) {
+      await fs.rm(path.join(OUT_DOCS, out), { force: true });
+      console.log(`  document en attente, non copié : ${out}`);
+      continue;
+    }
     await copyFile(rel, OUT_DOCS, out);
     const stat = await fs.stat(path.join(OUT_DOCS, out));
     documents.push({ file: `documents/${out}`, kb: Math.round(stat.size / 1024), source: rel });

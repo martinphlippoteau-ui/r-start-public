@@ -15,6 +15,7 @@ import Container from '@/components/ui/Container.astro';
 import RiskNote from '@/components/ui/RiskNote.astro';
 import Section from '@/components/ui/Section.astro';
 import type { DocumentationContent, DocumentationLabels } from '@/content/types-v2';
+import { withBase } from '@/lib/href';
 import DocNoteRef from './DocNoteRef.astro';
 
 interface Props {
@@ -114,8 +115,12 @@ const items = faq.items.map((item) => {
           faq.fullFaqLink && (
             <div class="mt-8 border-t border-navy/15 pt-8">
               <p class="text-base leading-relaxed text-slate-700">{faq.fullFaqLink.intro}</p>
+              {/* `withBase` : c'était le SEUL chemin interne du site posé brut. Sous le sous-chemin de
+                GitHub Pages il sortait du site et tombait en 404 (audit du 18/09/2026) ; invisible en
+                local, où la base vaut « / ». scripts/check-compliance.mjs refuse désormais tout lien
+                interne sans le préfixe du site. */}
               <a
-                href={faq.fullFaqLink.href}
+                href={withBase(faq.fullFaqLink.href)}
                 class="link-underline mt-4 inline-flex items-center gap-2 text-base font-semibold text-navy hover:text-teal-700 sm:text-lg"
               >
                 {faq.fullFaqLink.label}

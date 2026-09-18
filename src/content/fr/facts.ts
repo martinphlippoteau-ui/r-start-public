@@ -220,11 +220,12 @@ export const risk = {
   // VALEUR DE L'ÉQUIPE, 4 sur 7 (14/09/2026, demande explicite de respecter son document à la lettre).
   // Elle revient sur l'arbitrage du 10/09/2026, qui suivait le DIC.
   //
-  // ÉCART À CONNAÎTRE, il n'est pas résolu : le DIC V7 hébergé sur ce site même
-  // (public/documents/r-start-dic.pdf, 20/05/2026, p.2) dit « Nous avons classé ce produit dans la
+  // ÉCART À CONNAÎTRE, il n'est pas résolu : le DIC V7 fourni par CORUM (20/05/2026, p.2 ; le PDF
+  // n'est PLUS hébergé ici depuis le 18/09/2026, il répondait à son adresse directe alors qu'il était
+  // « en attente », voir pendingDocuments.ts) dit « Nous avons classé ce produit dans la
   // classe de risque 3 sur 7, qui est une classe de risque moyenne » (texte extrait du PDF le
   // 10/09/2026). La brochure p.3 et CORUM (08/09/2026) disent 4 sur 7. L'AMF avait relevé cet écart
-  // sur la brochure. Un visiteur qui ouvre le PDF depuis le site lit donc 3 là où la page affiche 4.
+  // sur la brochure. Tant que le PDF était servi, un visiteur y lisait 3 là où la page affiche 4.
   // À trancher avec CORUM : soit le DIC hébergé n'est pas la bonne version, soit la valeur affichée
   // doit redescendre à 3. En attendant, AUCUNE phrase du site n'attribue plus cette valeur au DIC,
   // elle est attribuée à CORUM : le site ne peut pas faire dire au document qu'il héberge autre chose

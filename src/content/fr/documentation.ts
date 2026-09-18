@@ -16,6 +16,7 @@ import {
 import { faq } from '@/content/fr/faq';
 import { documentsNotice, managementCompany, publisher, visaNotice } from '@/content/fr/legal';
 import manifest from '@/content/fr/media.manifest.json';
+import { PENDING_DOCUMENT_KEYS } from '@/content/fr/pendingDocuments';
 
 /**
  * Page /documentation (périmètre v2, plan §12) : centre de documents de R Start.
@@ -92,7 +93,10 @@ const toItem = (d: {
 //    montants d'épargne espérée issus des scénarios du DIC, qui contredisent le 0 % affiché sur tout le
 //    site et publient une donnée de performance (interdite tant que R Start a moins de 12 mois).
 // Les statuts restent en attente pour une autre raison (PDF tronqué à la source, illisible).
-export const PENDING_DOCUMENT_KEYS: readonly string[] = ['statuts', 'dic', 'simulation'];
+// La liste elle-même vit dans pendingDocuments.ts, un module sans import que l'outillage Node peut
+// lire : depuis le 18/09/2026 un document en attente n'est plus seulement sans lien, il n'est plus copié
+// dans public/documents (il y restait téléchargeable à son adresse directe).
+export { PENDING_DOCUMENT_KEYS } from '@/content/fr/pendingDocuments';
 /** Un document de facts.ts est-il publié sur les pages v2 ? */
 export const isDocumentPublished = (key: string): boolean => !PENDING_DOCUMENT_KEYS.includes(key);
 const isPublished = (d: { key: string }): boolean => isDocumentPublished(d.key);

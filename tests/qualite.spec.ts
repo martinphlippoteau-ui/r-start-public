@@ -301,6 +301,79 @@ test.describe('Qualité', () => {
     await reduit.close();
   });
 
+  /*
+   * UN HERO PLUS HAUT QUE LA FENÊTRE SE LIT AU DÉFILEMENT NATIF (audit du 18/09/2026). À 640 × 360, soit
+   * un zoom de 200 % sur un écran de 1280 × 720, le hero mesure près de deux fenêtres : le passage
+   * automatique sautait tout ce qui se trouve sous le premier écran, boutons et mention de la société
+   * de gestion compris. Le test ci-dessus ne couvrait que le cas où le hero tient dans l'écran.
+   */
+  test('un hero qui dépasse de la fenêtre se lit au défilement natif', async ({ page, isMobile }) => {
+    test.skip(isMobile, 'la molette est un geste de bureau');
+    await page.setViewportSize({ width: 640, height: 360 });
+    await page.goto('/');
+    await page.locator('#consent-banner button').first().click();
+    const mesures = await page.evaluate(() => ({
+      hero: document.querySelector<HTMLElement>('#apercu')!.offsetHeight,
+      fenetre: window.innerHeight,
+    }));
+    expect(mesures.hero, 'le cas testé : un hero plus haut que la fenêtre').toBeGreaterThan(
+      mesures.fenetre
+    );
+    await page.mouse.move(200, 200);
+    await page.mouse.wheel(0, 100);
+    await page.waitForTimeout(1200);
+    expect(
+      await page.evaluate(() => Math.round(window.scrollY)),
+      'un cran de molette avance d’un cran, il ne saute pas le bas du hero'
+    ).toBe(100);
+  });
+
+  /*
+   * LE CONSENT MODE ARRIVE À GTM SOUS LA FORME QU'IL ATTEND (audit du 18/09/2026). GTM ne lit une
+   * commande gtag que si l'entrée du dataLayer est un objet Arguments. `gtag(...args)` y poussait un
+   * tableau : ni le refus par défaut, ni l'accord, ni le retrait n'arrivaient au conteneur, et rien ne
+   * le signalait. Le test suit les trois temps, dont le retrait après accord, celui qui compte.
+   */
+  test('le Consent Mode arrive à GTM sous la forme qu’il attend', async ({ page }) => {
+    /* Le conteneur lui-même n'a rien à faire ici, et la forge a un identifiant GTM. */
+    await page.route(/googletagmanager\.com|google-analytics\.com/, (route) => route.abort());
+    const commandes = () =>
+      page.evaluate(() =>
+        ((window as unknown as { dataLayer?: unknown[] }).dataLayer ?? [])
+          .filter((x) => Object.prototype.toString.call(x) === '[object Arguments]')
+          .map((x) => Array.from(x as ArrayLike<unknown>))
+      );
+    const mesure = async () =>
+      (await commandes()).map((c) => [
+        c[0],
+        c[1],
+        (c[2] as Record<string, string> | undefined)?.analytics_storage,
+      ]);
+
+    await page.goto('/frais/');
+    const [premiere] = await commandes();
+    expect(premiere?.slice(0, 2), 'le refus par défaut passe avant tout le reste').toEqual([
+      'consent',
+      'default',
+    ]);
+    expect(premiere?.[2]).toMatchObject({ analytics_storage: 'denied', ad_storage: 'denied' });
+
+    await page.locator('[data-consent-accept]').click();
+    await expect.poll(mesure, { message: 'l’accord est transmis' }).toContainEqual([
+      'consent',
+      'update',
+      'granted',
+    ]);
+
+    await page.locator('[data-consent-open]').first().click();
+    await page.locator('[data-consent-refuse]').click();
+    await expect.poll(mesure, { message: 'le retrait est transmis' }).toContainEqual([
+      'consent',
+      'update',
+      'denied',
+    ]);
+  });
+
 
   /*
    * La pastille d'appel et l'invitation à défiler du hero se relaient : jamais visibles ensemble, jamais

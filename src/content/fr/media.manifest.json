@@ -794,29 +794,14 @@
   "publicFiles": ["favicon.ico", "favicon.svg", "apple-touch-icon.png"],
   "documents": [
     {
-      "file": "documents/r-start-dic.pdf",
-      "kb": 155,
-      "source": "7 - Documents/R- Start - DIC - V7.pdf"
-    },
-    {
       "file": "documents/r-start-note-information.pdf",
       "kb": 2232,
       "source": "7 - Documents/R Start - Note d'information - projet V8 24022026 V2.1-20260407T113945 (1).pdf"
     },
     {
-      "file": "documents/r-start-statuts.pdf",
-      "kb": 60,
-      "source": "7 - Documents/R Start - Statuts à jour V3.pdf"
-    },
-    {
       "file": "documents/r-start-bulletin-souscription.pdf",
       "kb": 268,
       "source": "7 - Documents/R Start - Bulletin de souscription partenaire - 2026.05.pdf"
-    },
-    {
-      "file": "documents/r-start-simulation-frais-ex-ante.pdf",
-      "kb": 81,
-      "source": "7 - Documents/R Start - Simulation des frais ex-ante 2026 V2-20260327T174149.pdf"
     },
     {
       "file": "documents/r-start-adhesion-plan-epargne-immobilier.pdf",
