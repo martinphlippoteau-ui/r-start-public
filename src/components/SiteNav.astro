@@ -356,6 +356,8 @@ const linkClass =
    * compact au-delà de 40 % du document, panneau plein écran sous « lg ». Aucune dépendance au moteur
    * d'animation : identique sur toutes les pages.
    */
+  import { deverrouiller, verrouiller } from '@/scripts/verrou';
+
   const root = document.querySelector<HTMLElement>('[data-sitenav]');
   if (root) {
     const bar = root.querySelector<HTMLElement>('[data-sitenav-bar]');
@@ -509,19 +511,25 @@ const linkClass =
         void panel.offsetWidth;
         panel.dataset.open = '';
         opener.setAttribute('aria-expanded', 'true');
-        document.documentElement.style.overflow = 'hidden';
+        /* La page ne défile plus derrière le tiroir, mais elle garde sa barre de défilement : le tiroir,
+           lui, garde la sienne (voir src/scripts/verrou.ts, et le « carré » du 17/09/2026). */
+        verrouiller(panel, panel.querySelector<HTMLElement>('[data-menu-drawer]'));
         /* Le bouton « Fermer », pas le voile : `[data-menu-close]:not(a)` attrapait le <div> du voile,
            qui n'est pas focalisable. Le focus restait alors sur le bouton Menu, donc hors du dialogue,
            et le `:focus-within` de la barre rallumait ses entrées derrière le tiroir. */
-        panel.querySelector<HTMLElement>('button[data-menu-close]')?.focus();
+        panel.querySelector<HTMLElement>('button[data-menu-close]')?.focus({ preventScroll: true });
       };
 
       const close = (restoreFocus = true) => {
         if (!isOpen()) return;
         delete panel.dataset.open;
         opener.setAttribute('aria-expanded', 'false');
-        document.documentElement.style.overflow = '';
-        if (restoreFocus) opener.focus();
+        deverrouiller(panel);
+        /* `preventScroll` : le bouton Menu vit dans la barre COLLANTE, et rendre le focus à un élément
+           collant fait défiler la page jusqu'à sa position statique, c'est-à-dire tout en haut. Sur une
+           page défilée, fermer le tiroir par Échap ramenait donc le visiteur au sommet (repéré le
+           18/09/2026 par le nouveau test du tiroir ; le défaut précède la recherche). */
+        if (restoreFocus) opener.focus({ preventScroll: true });
         window.clearTimeout(hideTimer);
         hideTimer = window.setTimeout(() => {
           if (!isOpen()) panel.hidden = true;

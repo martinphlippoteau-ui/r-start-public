@@ -4,6 +4,13 @@
  * d'apple.com », sans page de résultats). Rendu par SiteNav.astro, juste après la barre, dans la même
  * enveloppe : la loupe de la barre l'ouvre.
  *
+ * POSITION FIXE, CALÉE SUR LA BARRE (18/09/2026). Le panneau était `absolute` dans l'enveloppe de la
+ * barre, donc dans un élément `sticky` : Chromium déplaçait alors la page de quatre pixels à chaque
+ * frappe, en calculant la position STATIQUE du champ pour le « révéler ». Vingt pixels perdus en tapant
+ * « frais ». Il est donc `fixed`, et le script le cale sur la boîte réelle de la barre à l'ouverture
+ * (et à chaque redimensionnement) : les marges de la barre ne sont pas recopiées ici, elles restent
+ * définies à un seul endroit.
+ *
  * LA PASTILLE S'ALLONGE. Le panneau est posé SOUS la barre, à ses coordonnées exactes, et porte la
  * même matière qu'elle (`nav-glass`, même teinte, même ombre, `data-stuck` recopié). Fermé, il a la
  * hauteur de la barre et il est masqué ; à l'ouverture, la barre éteint son verre d'un coup et le
@@ -82,9 +89,15 @@ const lienClass =
   role="dialog"
   aria-modal="true"
   aria-label={search.dialogLabel}
-  class="recherche-panneau nav-glass absolute inset-x-0 top-0 z-10 flex flex-col overflow-hidden"
+  class="recherche-panneau nav-glass fixed z-10 flex flex-col overflow-clip"
   hidden
 >
+  {
+    /* `overflow-clip` ET NON `overflow-hidden` (18/09/2026) : `hidden` fait du panneau un conteneur de
+      défilement, et Chromium déplaçait alors la page de quatre pixels à CHAQUE FRAPPE pour « révéler »
+      le champ qu'il croyait rogné — vingt pixels perdus en tapant « frais », et la page ne revenait
+      pas. `clip` rogne de la même façon, coins arrondis compris, sans rien rendre défilable. */
+  }
   {/* La barre se pose ici, par-dessus le panneau. */}
   <div class="h-subnav shrink-0"></div>
 

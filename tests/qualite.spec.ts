@@ -213,6 +213,53 @@ test.describe('Qualité', () => {
   });
 
   /*
+   * LE TIROIR NE LAISSE PAS DÉFILER LA PAGE, et il garde sa barre de défilement (18/09/2026,
+   * src/scripts/verrou.ts, le verrou partagé avec la recherche). Il posait `overflow: hidden` sur
+   * <html> : la barre de défilement disparaissait et la page se recentrait de 7 px à chaque ouverture,
+   * visible avec une souris branchée. Ce sont les gestes qui sont neutralisés désormais.
+   * À 1000 px de large : sous le seuil « lg », le seul où le bouton Menu existe, et assez large pour
+   * que la molette de Playwright soit celle d'un vrai bureau (en émulation mobile, elle contourne
+   * l'événement de la page).
+   */
+  test('le tiroir du menu ne laisse pas défiler la page et n’en décale pas la mise en page', async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(isMobile, 'la molette est un geste de bureau');
+    await page.setViewportSize({ width: 1000, height: 800 });
+    await page.goto('/presse/');
+    await page.locator('[data-consent-refuse]').click();
+    await page.evaluate(() => window.scrollTo(0, 200));
+    await page.waitForTimeout(300);
+    const largeurs = () =>
+      page.evaluate(() => [
+        Math.round(document.querySelector('[data-sitenav-bar]')!.getBoundingClientRect().left),
+        document.documentElement.clientWidth,
+      ]);
+    const avant = await largeurs();
+
+    /* Clic par coordonnées : `locator.click` défile jusqu'au bouton et fausserait la mesure. */
+    const menu = await page.locator('[data-menu-open]').boundingBox();
+    if (!menu) throw new Error('bouton Menu introuvable');
+    await page.mouse.click(menu.x + menu.width / 2, menu.y + menu.height / 2);
+    await expect(page.locator('[data-menu-panel]')).toHaveAttribute('data-open', '');
+
+    expect(await largeurs(), 'ni la barre ni la page ne se décalent').toEqual(avant);
+    expect(await page.evaluate(() => Math.round(window.scrollY))).toBe(200);
+    await page.mouse.move(300, 600);
+    await page.mouse.wheel(0, 600);
+    await page.waitForTimeout(400);
+    expect(await page.evaluate(() => Math.round(window.scrollY)), 'molette neutralisée').toBe(200);
+
+    await page.keyboard.press('Escape');
+    await expect(page.locator('[data-menu-panel]')).not.toHaveAttribute('data-open', '');
+    await page.mouse.wheel(0, 600);
+    await expect
+      .poll(() => page.evaluate(() => Math.round(window.scrollY)), 'la molette redéfile')
+      .toBeGreaterThan(200);
+  });
+
+  /*
    * LE HERO SE FRANCHIT D'UN SEUL GESTE (17/09/2026, src/scripts/heroAvance.ts). Un cran de molette
    * depuis le haut mène au début du contenu, un cran vers le haut en revient ; plus bas, la molette est
    * native ; en mouvement réduit, rien n'est intercepté.

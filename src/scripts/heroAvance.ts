@@ -102,12 +102,11 @@ const init = (): void => {
   let dernierCran = 0;
   let sensTraine = 0;
 
-  /** Page verrouillée (tiroir du menu, fenêtre ouverte, recherche du site) : on ne touche à rien. La
-      recherche ne pose pas `overflow: hidden` (elle neutralise les gestes elle-même), d'où son repère. */
+  /** Page verrouillée (tiroir du menu, recherche du site : `data-verrou`, src/scripts/verrou.ts ; ou
+      fenêtre modale) : on ne touche à rien. Un seul repère pour toutes les surfaces. */
   const verrouillee = (): boolean =>
-    document.documentElement.style.overflow === 'hidden' ||
-    document.querySelector('dialog[open]') !== null ||
-    document.querySelector('[data-recherche-ouverte]') !== null;
+    document.documentElement.hasAttribute('data-verrou') ||
+    document.querySelector('dialog[open]') !== null;
 
   /**
    * Le sens demandé mène-t-il à un passage ? Vers le bas : on est au-dessus du contenu. Vers le haut :

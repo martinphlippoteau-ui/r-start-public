@@ -101,6 +101,13 @@ test.describe('Recherche du site', () => {
       .toBe(await panneau.evaluate((p) => Math.round(parseFloat(p.style.height))));
     const hauteurVide = await panneau.evaluate((p) => Math.round(p.getBoundingClientRect().height));
     expect(hauteurVide).toBeGreaterThan(200);
+    /* Le panneau est `fixed` : il doit se caler exactement sur la boîte de la barre. */
+    const boite = (cible: typeof barre) =>
+      cible.evaluate((el) => {
+        const b = el.getBoundingClientRect();
+        return [Math.round(b.left), Math.round(b.top), Math.round(b.width)];
+      });
+    expect(await boite(panneau), 'panneau calé sur la barre').toEqual(await boite(barre));
     /* Un seul verre à la fois : le panneau a pris la teinte de la barre, la barre l'a éteinte. */
     expect(await panneau.evaluate((p) => getComputedStyle(p).backgroundColor)).toBe(verreBarre);
     expect(await barre.evaluate((b) => getComputedStyle(b).backgroundColor)).toMatch(/, 0\)$/);
@@ -126,7 +133,8 @@ test.describe('Recherche du site', () => {
   /*
    * La page ne défile pas sous le panneau, SANS `overflow: hidden` : ce verrou retirait la barre de
    * défilement et recentrait la page, ou laissait une gouttière vide. Ce sont les gestes qui sont
-   * neutralisés. Et la fermeture rend le défilement.
+   * neutralisés (src/scripts/verrou.ts, partagé avec le tiroir du menu). Et la fermeture rend le
+   * défilement.
    */
   test('la page ne défile pas sous le panneau, et redéfile après', async ({ page, isMobile }) => {
     /* Bureau seulement : au doigt, c'est `touchmove` qui est neutralisé, et Playwright n'a pas de geste
@@ -141,7 +149,13 @@ test.describe('Recherche du site', () => {
     if (!loupe) throw new Error('loupe introuvable');
     await page.mouse.click(loupe.x + loupe.width / 2, loupe.y + loupe.height / 2);
     await expect(page.locator('[data-recherche-champ]')).toBeFocused();
-    expect(await page.evaluate(() => document.documentElement.style.overflow)).toBe('');
+    expect(
+      await page.evaluate(() => [
+        document.documentElement.style.overflow,
+        document.documentElement.hasAttribute('data-verrou'),
+      ]),
+      'la barre de défilement reste, le verrou est marqué'
+    ).toEqual(['', true]);
 
     const vue = page.viewportSize() ?? { width: 1440, height: 900 };
     await page.mouse.move(vue.width / 2, vue.height * 0.8);
@@ -151,10 +165,35 @@ test.describe('Recherche du site', () => {
 
     await page.keyboard.press('Escape');
     await expect(page.locator('[data-recherche-panneau]')).toBeHidden();
+    expect(await page.evaluate(() => document.documentElement.hasAttribute('data-verrou'))).toBe(
+      false
+    );
     await page.mouse.wheel(0, 600);
     await expect
       .poll(() => page.evaluate(() => Math.round(window.scrollY)), 'la molette redéfile')
       .toBeGreaterThan(200);
+  });
+
+  /*
+   * TAPER NE DÉPLACE PAS LA PAGE (18/09/2026). Le panneau était `absolute` dans l'enveloppe `sticky` de
+   * la barre : Chromium déplaçait la page de quatre pixels à chaque frappe pour « révéler » le champ,
+   * dont il calculait la position statique. Vingt pixels perdus en tapant « frais », sans retour.
+   */
+  test('taper dans le champ ne déplace pas la page', async ({ page }) => {
+    await page.goto('/presse/');
+    await page.locator('[data-consent-refuse]').click();
+    await page.evaluate(() => window.scrollTo(0, 300));
+    await page.waitForTimeout(300);
+    const loupe = await page.locator('[data-recherche-ouvrir]').boundingBox();
+    if (!loupe) throw new Error('loupe introuvable');
+    await page.mouse.click(loupe.x + loupe.width / 2, loupe.y + loupe.height / 2);
+    await expect(page.locator('[data-recherche-champ]')).toBeFocused();
+    const depart = await page.evaluate(() => Math.round(window.scrollY));
+
+    await page.keyboard.type('frais', { delay: 80 });
+    await expect(page.locator('[data-recherche-resultats] a').first()).toBeVisible();
+    await page.waitForTimeout(300);
+    expect(await page.evaluate(() => Math.round(window.scrollY))).toBe(depart);
   });
 
   test('sans résultat, le panneau le dit et renvoie vers toutes les questions', async ({

@@ -9,15 +9,12 @@
  * sont retirés, en alternant entre la rubrique la plus longue et l'autre, jusqu'à ce que rien ne
  * déborde ; trois ou quatre résultats en général, deux sur un téléphone.
  *
- * LA PAGE N'EST PAS VERROUILLÉE PAR `overflow: hidden` (17/09/2026, au soir). Ce verrou retire la barre
- * de défilement : avec une barre classique (Windows, souris branchée sur Mac), la page se recentrait
- * de 7 px à l'ouverture ; et réserver la gouttière (`scrollbar-gutter: stable`) laissait à sa place une
- * colonne vide de 15 px que le voile ne couvre pas, « un carré » (Martin). La barre de défilement reste
- * donc en place, et ce sont les GESTES qui sont neutralisés tant que le panneau est ouvert : molette,
- * doigt, touches de défilement hors du champ et des boutons. La zone des résultats garde son propre
- * défilement si elle en a besoin (`overscroll-behavior: contain`, rien ne remonte à la page). Un glissé
- * de la barre de défilement elle-même reste possible : la page bouge alors sous le voile, et la
- * contraction de la barre (`data-stuck`) est recopiée sur le panneau au fil de l'eau.
+ * LA PAGE NE DÉFILE PAS derrière le panneau, et sans `overflow: hidden` : le verrou est celui de
+ * src/scripts/verrou.ts, partagé avec le tiroir du menu, qui neutralise les gestes plutôt que de retirer
+ * la barre de défilement (les raisons y sont écrites). La zone des résultats garde son propre
+ * défilement si elle en a besoin. La page peut encore bouger sous le voile, au glissé de la barre de
+ * défilement : la contraction de la barre (`data-stuck`) est donc recopiée sur le panneau au fil de
+ * l'eau, et pas seulement à l'ouverture.
  *
  * LE RELAIS DES VERRES. Fermé, le panneau est masqué et la barre porte le verre. À l'ouverture, dans la
  * même image, le panneau apparaît sous la barre, à sa hauteur exacte et dans la même matière (jusqu'au
@@ -61,6 +58,7 @@
  * est l'affaire de src/scripts/faqAncre.ts.
  */
 import { search } from '@/content/fr/search';
+import { deverrouiller, verrouiller } from '@/scripts/verrou';
 
 interface Doc {
   type: 'page' | 'question';
@@ -406,29 +404,6 @@ const init = (): void => {
   const libelleFermer = bouton.dataset.labelFermer ?? libelleOuvrir;
   const sobre = window.matchMedia('(prefers-reduced-motion: reduce)');
 
-  /* --- Défilement de la page ------------------------------------------------------------------- */
-  /** La zone des résultats défile elle-même : seulement si elle déborde, et pour ce qui est dedans. */
-  const defilable = (cible: EventTarget | null): boolean =>
-    cible instanceof Node &&
-    defilement.contains(cible) &&
-    defilement.scrollHeight > defilement.clientHeight + 1;
-  const bloquer = (e: Event): void => {
-    if (!ouvert() || defilable(e.target)) return;
-    e.preventDefault();
-  };
-  document.addEventListener('wheel', bloquer, { passive: false });
-  document.addEventListener('touchmove', bloquer, { passive: false });
-  /** Touches qui font défiler la page quand le focus n'est ni dans le champ ni sur un bouton. */
-  const TOUCHES_DEFILEMENT = new Set([
-    ' ',
-    'PageUp',
-    'PageDown',
-    'Home',
-    'End',
-    'ArrowUp',
-    'ArrowDown',
-  ]);
-
   /* Même matière que la barre à tout instant : sa contraction au défilement est recopiée à chaque
      changement, pas seulement à l'ouverture, puisque la page peut encore bouger sous le voile. */
   if (bar) {
@@ -583,6 +558,23 @@ const init = (): void => {
     );
   };
 
+  /* --- Géométrie -------------------------------------------------------------------------------- */
+  /**
+   * Le panneau est `fixed` (SiteSearch.astro dit pourquoi) : il se cale sur l'enveloppe de la barre,
+   * dont la boîte est exactement celle de la barre, sans sa contraction au défilement — celle-ci est
+   * une transformation, que le panneau rejoue de son côté avec `data-stuck`.
+   * Sans ce calage, un élément `fixed` sans `top` ni `left` reste à sa position statique, ce qui
+   * coïncide ici par chance ; mais sa largeur, elle, ne suivrait pas la barre.
+   */
+  const enveloppe = panneau.parentElement;
+  const caler = (): void => {
+    if (!enveloppe) return;
+    const r = enveloppe.getBoundingClientRect();
+    panneau.style.top = `${r.top}px`;
+    panneau.style.left = `${r.left}px`;
+    panneau.style.width = `${r.width}px`;
+  };
+
   /* --- Hauteur fixe ----------------------------------------------------------------------------- */
   /** Hauteur ouverte du panneau, en pixels : celle du panneau vide, mesurée à chaque ouverture. */
   let hauteurOuverte = 0;
@@ -649,6 +641,8 @@ const init = (): void => {
     panneau.toggleAttribute('data-stuck', bar?.hasAttribute('data-stuck') ?? false);
     panneau.hidden = false;
     voile.hidden = false;
+    /* Caler AVANT de mesurer : la hauteur du contenu dépend de la largeur. */
+    caler();
     hauteurOuverte = mesurerHauteur();
     /* La hauteur fermée doit être enregistrée avant que l'état ouvert ne soit posé, sans quoi le
        panneau apparaît déjà déplié, sans transition. */
@@ -659,6 +653,7 @@ const init = (): void => {
     else minuterieEtabli = window.setTimeout(etablir, SECOURS_OUVERTURE);
     bouton.setAttribute('aria-expanded', 'true');
     bouton.setAttribute('aria-label', libelleFermer);
+    verrouiller(panneau, defilement);
     /* Dans le même geste que le clic : iOS n'ouvre le clavier qu'à cette condition. */
     champ.focus({ preventScroll: true });
     champ.select();
@@ -677,6 +672,9 @@ const init = (): void => {
     bar?.setAttribute('data-sans-transition', '');
     panneau.hidden = true;
     voile.hidden = true;
+    panneau.style.top = '';
+    panneau.style.left = '';
+    panneau.style.width = '';
     if (bar) {
       void bar.offsetWidth;
       requestAnimationFrame(() => {
@@ -694,12 +692,27 @@ const init = (): void => {
     panneau.style.height = '';
     bouton.setAttribute('aria-expanded', 'false');
     bouton.setAttribute('aria-label', libelleOuvrir);
+    deverrouiller(panneau);
     if (rendreFocus) bouton.focus({ preventScroll: true });
     window.clearTimeout(minuterieFermeture);
     /* En mouvement réduit, aucune transition ne finira jamais : on masque tout de suite. */
     if (instantane || sobre.matches) masquer();
     else minuterieFermeture = window.setTimeout(masquer, SECOURS_FERMETURE);
   };
+
+  /* Redimensionnement, rotation du téléphone : le panneau se recale sur la barre et reprend la hauteur
+     du panneau vide, qui a changé avec la largeur. */
+  window.addEventListener(
+    'resize',
+    () => {
+      if (!ouvert()) return;
+      caler();
+      hauteurOuverte = mesurerHauteur();
+      panneau.style.height = `${hauteurOuverte}px`;
+      afficher();
+    },
+    { passive: true }
+  );
 
   /* La fin réelle du mouvement, plutôt qu'une minuterie calée sur la durée du style. */
   panneau.addEventListener('transitionend', (e) => {
@@ -752,12 +765,6 @@ const init = (): void => {
       return;
     }
     const actif = document.activeElement as HTMLElement | null;
-    if (
-      TOUCHES_DEFILEMENT.has(e.key) &&
-      !(actif instanceof HTMLInputElement) &&
-      !(actif instanceof HTMLButtonElement)
-    )
-      e.preventDefault();
     if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
       const tous = liens();
       if (!tous.length) return;

@@ -776,7 +776,10 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   transform: none;
 }
 
-/* LA PASTILLE S'ALLONGE. Le panneau est posé sous la barre, à ses coordonnées, dans la MÊME MATIÈRE :
+/* LA PASTILLE S'ALLONGE. Le panneau est `fixed` et le script le cale sur la boîte de la barre, dont les
+   marges ne sont donc pas recopiées ici : `absolute` dans l'enveloppe `sticky` de la barre, il faisait
+   déplacer la page par Chromium à chaque frappe (SiteSearch.astro dit pourquoi).
+   Il est posé sous la barre, à ses coordonnées, dans la MÊME MATIÈRE :
    même teinte, même flou, même arête, même ombre, même contraction au défilement (`data-stuck`, recopié
    par le script à l'ouverture). Fermé, il a exactement la hauteur de la barre, et il est masqué.
    À l'ouverture, il apparaît sous elle, la barre éteint son verre D'UN COUP, et lui grandit jusqu'à sa
@@ -835,7 +838,9 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
    lorsque le script pose `data-recherche-etabli`, à la fin du mouvement d'ouverture ; les résultats sont
    de toute façon rognés pour tenir, seul un très petit écran a besoin de défiler. */
 .recherche-defilement {
-  overflow-y: hidden;
+  /* `clip` et non `hidden` : un conteneur de défilement, même verrouillé, fait déplacer la page au
+     navigateur pour révéler ce qui a le focus dedans (voir SiteSearch.astro). */
+  overflow-y: clip;
 }
 [data-recherche-etabli] .recherche-defilement {
   overflow-y: auto;
