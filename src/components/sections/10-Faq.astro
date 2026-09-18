@@ -109,6 +109,8 @@ const items = rendus.map((item) => {
     advantage: item.answer.slice(0, from),
     risks: item.answer.slice(from),
     rubrique: nouvelleRubrique ? item.category : undefined,
+    /* Rubrique de CHAQUE question quand la liste se filtre : voir le commentaire du <li>. */
+    categorie: search ? item.category : undefined,
   };
 });
 ---
@@ -173,9 +175,22 @@ const items = rendus.map((item) => {
         <ul role="list" aria-label={faq.listLabel} class="border-t border-navy/15" data-faq-liste>
           {
             items.map((item, i) => (
-              <li class="border-b border-navy/15">
-                {item.rubrique && (
-                  <p class="text-eyebrow mt-10 mb-2 text-teal-700 first:mt-0">{item.rubrique}</p>
+              <li class="border-b border-navy/15" data-rubrique={item.categorie}>
+                {/* LE LIBELLÉ DE RUBRIQUE EST DANS CHAQUE <li>, masqué sauf sur la première question de la
+                rubrique (audit du 18/09/2026). Il n'était que dans celle-ci, et le filtre masque des <li>
+                entiers : dès que la première question d'une rubrique ne correspondait pas à la recherche,
+                son libellé partait avec elle, et les suivantes s'affichaient sous l'intitulé de la
+                rubrique PRÉCÉDENTE. Une réponse sur les frais rangée sous « Comprendre R Start ». Le
+                script (faqSearch.ts) montre le libellé sur la première question VISIBLE de chaque
+                rubrique. Sans script, le rendu ne change pas. */}
+                {item.categorie && (
+                  <p
+                    class="text-eyebrow mt-10 mb-2 text-teal-700 first:mt-0"
+                    data-faq-rubrique
+                    hidden={!item.rubrique}
+                  >
+                    {item.categorie}
+                  </p>
                 )}
                 {/* `id` : ancre de la question (src/lib/ancre.ts). Un résultat de la recherche du site
                   mène ici, et la question s'ouvre à l'arrivée (src/scripts/faqAncre.ts). */}

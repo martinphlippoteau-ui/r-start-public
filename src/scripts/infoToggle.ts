@@ -28,8 +28,14 @@ const init = (): void => {
     const panneau = id ? document.getElementById(id) : null;
     if (!panneau) continue;
 
-    /* Replié à l'arrivée, et le bouton n'apparaît qu'ici : il ne sert à rien sans ce script. */
+    /* Replié à l'arrivée, et le bouton n'apparaît qu'ici : il ne sert à rien sans ce script.
+       SANS TRANSITION : le panneau est écrit ouvert dans le HTML, il se refermait donc sous les yeux du
+       visiteur à chaque chargement. La transition revient deux images plus tard, pour les clics. */
+    panneau.setAttribute('data-sans-transition', '');
     panneau.setAttribute('data-ferme', '');
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() => panneau.removeAttribute('data-sans-transition'))
+    );
     bouton.hidden = false;
     bouton.dataset.infoLie = '1';
     const bulle = panneau.hasAttribute('data-info-bulle');

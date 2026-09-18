@@ -36,7 +36,6 @@ export const site = {
   /** URL du tunnel de souscription réglementé. */
   subscribeUrl: PUBLIC_SUBSCRIBE_URL,
   /** Vrai tant que l'URL réelle du tunnel n'a pas été fournie. */
-  subscribeIsPlaceholder: /placeholder/i.test(PUBLIC_SUBSCRIBE_URL),
   /**
    * Vrai seulement quand la souscription est réellement ouverte : PUBLIC_SUBSCRIBE_OPEN vaut « true »
    * ET l'URL du tunnel n'est plus celle de repli. Faux (le cas d'aujourd'hui) : tous les CTA
@@ -74,15 +73,34 @@ export function ctaHref(position: CtaPosition): string {
  * fournie n'en contient pas déjà (pour ne pas écraser un code partenaire).
  */
 export function subscribeHref(position: CtaPosition): string {
-  try {
-    const url = new URL(site.subscribeUrl);
-    if (!/utm_/i.test(url.search)) {
-      url.searchParams.set('utm_source', 'site-r-start');
-      url.searchParams.set('utm_medium', 'cta');
-      url.searchParams.set('utm_content', position);
-    }
-    return url.toString();
-  } catch {
-    return site.subscribeUrl;
+  /* Pas de `try` : l'adresse a été validée à la construction de `site` dès que la souscription est
+     ouverte (voir plus bas). Avant, une adresse mal formée était avalée ici et publiée TELLE QUELLE sur
+     tous les boutons « Souscrire », sans un mot au build. */
+  const url = new URL(site.subscribeUrl);
+  if (!/utm_/i.test(url.search)) {
+    url.searchParams.set('utm_source', 'site-r-start');
+    url.searchParams.set('utm_medium', 'cta');
+    url.searchParams.set('utm_content', position);
   }
+  return url.toString();
+}
+
+/*
+ * SOUSCRIPTION OUVERTE = ADRESSE DU TUNNEL VALIDE, OU LE BUILD S'ARRÊTE (audit du 18/09/2026). C'est le
+ * lien le plus sensible du site, et le seul cas où le dépôt publiait du faux en silence : un schéma
+ * oublié, une espace, une valeur tronquée par le « # » d'un .env (déjà arrivé, voir astro.config.mjs),
+ * et tous les CTA partaient avec un href relatif cassé, sans paramètres de campagne. `https:` exigé :
+ * on n'envoie personne souscrire en clair.
+ */
+if (site.subscribeOpen) {
+  let tunnel: URL;
+  try {
+    tunnel = new URL(site.subscribeUrl);
+  } catch {
+    throw new Error(
+      `PUBLIC_SUBSCRIBE_URL vaut « ${site.subscribeUrl} » : ce n'est pas une adresse valide, alors que PUBLIC_SUBSCRIBE_OPEN ouvre la souscription`
+    );
+  }
+  if (tunnel.protocol !== 'https:')
+    throw new Error(`PUBLIC_SUBSCRIBE_URL doit être en https, reçu « ${site.subscribeUrl} »`);
 }

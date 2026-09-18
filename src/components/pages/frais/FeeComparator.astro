@@ -407,8 +407,21 @@ const data = scpis.map((s) => ({
           cell.classList.toggle('text-navy', !gagne && !perd);
         };
         peindre(ligne.gauche, gagneGauche, gagneDroite);
+        /*
+         * LA CASE DE DROITE EST REPEINTE À CHAQUE FOIS, VIDE OU NON (audit du 18/09/2026). Elle ne l'était
+         * que si la SCPI choisie avait une valeur sur la ligne : en passant d'une SCPI qui GAGNAIT la
+         * ligne à une SCPI sans valeur, la case gardait la pastille pleine du gagnant autour de « non
+         * publié ». Un faux « taux le plus bas », sur un comparatif qui nomme des concurrents. Latent
+         * tant que les dix-neuf SCPI ont leurs sept valeurs ; le code prévoit pourtant la case vide.
+         * Sans valeur, `comparable` est faux : les deux drapeaux aussi, la pastille tombe. Une case vide
+         * reprend ensuite l'ardoise que lui a donnée la boucle du dessus, `peindre` la rendrait navy.
+         */
         const droite = cells[i];
-        if (droite && scpi.values[i]) peindre(droite, gagneDroite, gagneGauche);
+        peindre(droite, gagneDroite, gagneGauche);
+        if (droite && !scpi.values[i]) {
+          droite.classList.remove('text-navy');
+          droite.classList.add('text-slate-700');
+        }
       });
     };
 

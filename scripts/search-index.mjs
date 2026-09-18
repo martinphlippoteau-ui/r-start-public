@@ -189,8 +189,9 @@ export const construireIndex = (rendus, avecBase) => {
       let rubrique = '';
       for (const li of liste?.children ?? []) {
         if (li.type !== ELEMENT_NODE) continue;
-        const repere = querySelector(li, 'p.text-eyebrow');
-        if (repere) rubrique = texte({ children: [repere] });
+        /* Sur l'attribut du <li>, et non plus sur le <p> : chaque question porte son libellé depuis le
+           18/09/2026, masqué sauf sur la première de la rubrique, et `texte()` ignore ce qui est masqué. */
+        if (li.attributes?.['data-rubrique']) rubrique = decoder(li.attributes['data-rubrique']);
         const details = querySelector(li, 'details[data-faq]');
         if (!details?.attributes.id) continue;
         const reponse = querySelector(details, '.faq-answer');

@@ -16,11 +16,7 @@
  * celles qui restent, s'effacer celles qui partent, paraître celles qui reviennent. La page, elle, ne
  * bouge pas (global.css, `vt-filtre`). Sans l'API, ou en mouvement réduit : filtrage instantané.
  */
-const sansAccent = (t: string): string =>
-  t
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
-    .toLowerCase();
+const sansAccent = (t: string): string => t.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 
 const init = (): void => {
   const enveloppe = document.querySelector<HTMLElement>('[data-faq-recherche]');
@@ -33,7 +29,11 @@ const init = (): void => {
   const lignes = [...liste.children].filter((e): e is HTMLElement => e instanceof HTMLElement);
   /* Le texte de chaque question est relevé UNE FOIS : refaire `textContent` à chaque frappe relit
      dix-huit réponses entières à chaque lettre. */
-  const index = lignes.map((li) => sansAccent(li.textContent ?? ''));
+  /* La QUESTION ET SA RÉPONSE seulement, pas le libellé de rubrique que chaque <li> porte désormais :
+     « frais » retiendrait sinon toute la rubrique « Les frais », questions sans rapport comprises. */
+  const index = lignes.map((li) =>
+    sansAccent((li.querySelector('details') ?? li).textContent ?? '')
+  );
 
   const gabarit = compte?.dataset.gabarit ?? '';
   const vide = compte?.dataset.vide ?? '';
@@ -52,10 +52,18 @@ const init = (): void => {
   const appliquer = (): void => {
     const q = sansAccent(champ.value.trim());
     let trouvees = 0;
+    /* Le libellé de rubrique s'affiche sur la première question VISIBLE de chaque rubrique : le filtre
+       masque des <li> entiers, et le libellé d'une rubrique partait avec sa première question. */
+    let rubriqueVisible: string | undefined;
     lignes.forEach((li, i) => {
       const garde = q === '' || index[i].includes(q);
       li.hidden = !garde;
-      if (garde) trouvees += 1;
+      if (!garde) return;
+      trouvees += 1;
+      const libelle = li.querySelector<HTMLElement>('[data-faq-rubrique]');
+      const rubrique = li.dataset.rubrique;
+      if (libelle) libelle.hidden = !rubrique || rubrique === rubriqueVisible;
+      if (rubrique) rubriqueVisible = rubrique;
     });
     if (!compte) return;
     if (q === '') compte.textContent = '';

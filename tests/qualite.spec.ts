@@ -213,6 +213,123 @@ test.describe('Qualité', () => {
   });
 
   /*
+   * COMPARATEUR DE FRAIS, trois défauts de l'audit du 18/09/2026.
+   *  1. Une SCPI sans valeur sur une ligne héritait de la pastille « taux le plus bas » de la SCPI
+   *     choisie avant elle. Le cas n'existe pas dans les données d'aujourd'hui : la page est servie avec
+   *     une valeur retirée exprès.
+   *  2. Sur téléphone, l'en-tête de colonne « Frais » était en `display: none`, donc hors de l'arbre
+   *     d'accessibilité : les taux étaient annoncés sous l'en-tête de la mauvaise SCPI.
+   *  3. Un panneau « i » replié restait lu par les lecteurs d'écran.
+   */
+  test('comparateur : pas de faux gagnant, en-tête présent pour les lecteurs d’écran, panneau replié muet', async ({
+    page,
+  }) => {
+    let gagnante = -1;
+    let videe = -1;
+    await page.route('**/frais/', async (route) => {
+      const reponse = await route.fetch();
+      let html = await reponse.text();
+      html = html.replace(
+        /(<script[^>]*data-reglages="comparateur"[^>]*>)([\s\S]*?)(<\/script>)/,
+        (_tout, debut: string, json: string, fin: string) => {
+          const reglages = JSON.parse(json) as { data: { values: string[] }[] };
+          gagnante = reglages.data.findIndex((d) => /^0\s*%/.test(d.values[0] ?? ''));
+          videe = reglages.data.findIndex((_d, i) => i !== gagnante);
+          reglages.data[videe]!.values[0] = '';
+          return debut + JSON.stringify(reglages).replace(/</g, '\\u003c') + fin;
+        }
+      );
+      await route.fulfill({ response: reponse, body: html });
+    });
+    await page.goto('/frais/');
+    await page.locator('[data-consent-refuse]').click();
+    expect(gagnante, 'une SCPI à 0 % de frais de souscription existe dans les données').toBeGreaterThan(-1);
+
+    const choix = page.locator('[data-comparator-select]');
+    const premiere = page.locator('[data-comparator-cell="0"]');
+    await choix.selectOption({ index: gagnante });
+    await expect(premiere).toHaveClass(/fee-gagnant/);
+    await choix.selectOption({ index: videe });
+    await expect(premiere, 'la case vide ne garde pas la pastille du gagnant').not.toHaveClass(/fee-gagnant/);
+    await expect(premiere).toHaveClass(/text-slate-700/);
+
+    /* 2. À 390 px, l'en-tête « Frais » n'est plus en `display: none`. */
+    await page.setViewportSize({ width: 390, height: 800 });
+    const entete = page.locator('[data-comparator] thead th').first();
+    expect(await entete.evaluate((th) => getComputedStyle(th).display)).not.toBe('none');
+
+    /* 3. Replié : invisible pour tous. Déplié : visible. */
+    const bouton = page.locator('[data-comparator] [data-info-bouton]').first();
+    const contenu = page.locator(`[id="${await bouton.getAttribute('aria-controls')}"] > *`).first();
+    await expect(contenu).toBeHidden();
+    await bouton.click();
+    await expect(contenu).toBeVisible();
+  });
+
+  /*
+   * SANS JAVASCRIPT, LE DÉTAIL DES CARTES DE /strategie SE LIT (audit du 18/09/2026) : écrit en sable et
+   * blanc pour le dos sombre des cartes, il restait sur le fond clair de la section, à 1,17:1.
+   */
+  test('sans JavaScript, le détail des cartes de /strategie est posé sur un fond sombre', async ({
+    browser,
+    baseURL,
+  }) => {
+    const contexte = await browser.newContext({ javaScriptEnabled: false, baseURL });
+    const page = await contexte.newPage();
+    await page.goto('/strategie/');
+    const fonds = await page
+      .locator('[data-carte-detail-hote]')
+      .evaluateAll((hotes) => hotes.map((h) => getComputedStyle(h).backgroundColor));
+    expect(fonds.length).toBeGreaterThan(0);
+    expect(new Set(fonds), 'le fond du dos des cartes : ink').toEqual(new Set(['rgb(13, 46, 61)']));
+    await contexte.close();
+  });
+
+  /*
+   * SANS JAVASCRIPT, SOUS « lg », ON NAVIGUE ENCORE (audit du 18/09/2026). Le bouton Menu n'ouvre rien
+   * sans script : il disparaît, et la liste des pages revient dans la barre. Et la loupe, qui n'ouvre
+   * rien non plus sans script, reste masquée.
+   */
+  test('sans JavaScript, la barre d’un téléphone porte la liste des pages, pas un bouton mort', async ({
+    browser,
+    baseURL,
+  }) => {
+    const contexte = await browser.newContext({
+      javaScriptEnabled: false,
+      viewport: { width: 390, height: 800 },
+      baseURL,
+    });
+    const page = await contexte.newPage();
+    await page.goto('/frais/');
+    await expect(page.locator('[data-menu-open]')).toBeHidden();
+    await expect(page.locator('[data-recherche-ouvrir]')).toBeHidden();
+    const liens = page.locator('[data-sitenav-list] a');
+    await expect(liens).toHaveCount(5);
+    await expect(liens.first()).toBeVisible();
+    await contexte.close();
+  });
+
+  /*
+   * À L'IMPRESSION, TOUT CE QUI EST ÉCRIT SORT SUR LE PAPIER (audit du 18/09/2026). Les moteurs
+   * d'animation posent `opacity: 0` en ligne sur ce qui attend sous l'écran : sans règle d'impression,
+   * ces blocs s'imprimaient blancs, sous la barre et le bandeau de consentement.
+   */
+  test('à l’impression, aucun contenu ne reste invisible et la barre disparaît', async ({ page }) => {
+    await page.goto('/frais/');
+    await page.emulateMedia({ media: 'print' });
+    const bilan = await page.evaluate(() => {
+      const invisibles = [...document.querySelectorAll<HTMLElement>('main [data-animate], main [data-reveal-text]')]
+        .filter((el) => getComputedStyle(el).opacity !== '1').length;
+      const affiche = (sel: string) => {
+        const el = document.querySelector<HTMLElement>(sel);
+        return el ? getComputedStyle(el).display !== 'none' : false;
+      };
+      return { invisibles, barre: affiche('[data-sitenav]'), bandeau: affiche('#consent-banner') };
+    });
+    expect(bilan).toEqual({ invisibles: 0, barre: false, bandeau: false });
+  });
+
+  /*
    * LE TIROIR NE LAISSE PAS DÉFILER LA PAGE, et il garde sa barre de défilement (18/09/2026,
    * src/scripts/verrou.ts, le verrou partagé avec la recherche). Il posait `overflow: hidden` sur
    * <html> : la barre de défilement disparaissait et la page se recentrait de 7 px à chaque ouverture,

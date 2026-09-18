@@ -389,6 +389,29 @@ test.describe('Recherche du site', () => {
     await expect(page.locator('[data-recherche-vide]')).toBeHidden();
   });
 
+  /*
+   * LE FILTRE DE /faq GARDE CHAQUE QUESTION SOUS SA RUBRIQUE (audit du 18/09/2026). Le libellé vivait
+   * dans la première question de la rubrique et partait avec elle : « démembrement » ne retient que la
+   * deuxième question de « Souscrire et accéder à R Start », qui s'affichait sans intitulé, ou sous
+   * celui de la rubrique précédente.
+   */
+  test('le filtre de la FAQ affiche la rubrique de la première question retenue', async ({
+    page,
+  }) => {
+    await page.goto('/faq/');
+    await page.locator('[data-consent-refuse]').click();
+    await page.locator('[data-faq-recherche] input').fill('démembrement');
+    const retenues = page.locator('[data-faq-liste] > li:not([hidden])');
+    await expect(retenues).toHaveCount(1);
+    const libelle = retenues.first().locator('[data-faq-rubrique]');
+    await expect(libelle).toBeVisible();
+    await expect(libelle).toHaveText('Souscrire et accéder à R Start');
+
+    /* Champ vidé : retour au rendu d'origine, un libellé par rubrique et pas un de plus. */
+    await page.locator('[data-faq-recherche] input').fill('');
+    await expect(page.locator('[data-faq-liste] [data-faq-rubrique]:visible')).toHaveCount(6);
+  });
+
   test('une ancre mal encodée ne casse pas l’ouverture des questions', async ({ page }) => {
     const erreurs: string[] = [];
     page.on('pageerror', (e) => erreurs.push(String(e)));

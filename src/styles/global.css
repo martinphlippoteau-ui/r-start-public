@@ -1732,6 +1732,15 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   }
 }
 
+/* REPLIÉ VEUT DIRE MASQUÉ, pas seulement écrasé (audit du 18/09/2026). Le panneau replié ramenait sa
+   rangée à 0fr, mais son texte restait dans l'arbre d'accessibilité et dans la recherche du
+   navigateur, alors que le bouton annonçait `aria-expanded="false"`. Dans le comparateur, il vit dans
+   l'en-tête de ligne : chaque taux était annoncé avec deux phrases d'explication, repliées ou non.
+   `visibility: hidden` le sort de l'arbre ; il tombe APRÈS le pliage (retard de 260 ms) et revient
+   AVANT le dépliage, l'animation est la même.
+   `data-sans-transition` : posé par infoToggle.ts au chargement, le temps d'une image. Les panneaux
+   sont écrits ouverts dans le HTML (lisibles sans script) et le script les replie : sans cela ils se
+   refermaient sous les yeux du visiteur, en 260 ms, comparateur de /frais compris. */
 @utility info-panneau {
   display: grid;
   grid-template-rows: 1fr;
@@ -1740,13 +1749,27 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   & > * {
     min-height: 0;
     overflow: hidden;
+    visibility: visible;
+    transition: visibility 0s linear 0s;
   }
   &[data-ferme] {
     grid-template-rows: 0fr;
     margin-top: 0;
   }
+  &[data-ferme] > * {
+    visibility: hidden;
+    transition: visibility 0s linear 260ms;
+  }
+  &[data-sans-transition],
+  &[data-sans-transition] > * {
+    transition: none;
+  }
   @media (prefers-reduced-motion: reduce) {
     transition: none;
+    & > *,
+    &[data-ferme] > * {
+      transition: none;
+    }
   }
 }
 
@@ -2459,8 +2482,22 @@ body:has(#consent-banner:not([hidden])) [data-hero-scroll-hint] {
     column-gap: 0.75rem;
   }
 
+  /* MASQUÉ À L'ŒIL, PAS AU LECTEUR D'ÉCRAN (audit du 18/09/2026). En `display: none`, l'en-tête
+     « Frais » sortait de l'arbre d'accessibilité : la ligne d'en-tête n'avait plus que deux cellules
+     quand chaque ligne de frais en garde trois, et le taux de R Start était annoncé sous l'en-tête de
+     la SCPI concurrente. Sur un comparatif qui nomme des concurrents, les frais étaient attribués à
+     la mauvaise SCPI. Hors flux (position absolue), il ne prend pas de place dans la grille à deux
+     colonnes. */
   [data-comparator] thead th:first-child {
-    display: none;
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
   }
 
   /* Les cases d'en-tête ne collent plus une à une : c'est la ligne entière qui colle, d'un seul bloc.
@@ -2622,5 +2659,79 @@ body:has(#consent-banner:not([hidden])) [data-hero-scroll-hint] {
   from {
     opacity: 0;
     transform: translateY(10px);
+  }
+}
+
+/* ===========================================================================================
+   SANS JAVASCRIPT, SOUS « lg » : LA LISTE DES PAGES REVIENT DANS LA BARRE (audit du 18/09/2026)
+   ===========================================================================================
+   Sous « lg », la liste des pages est masquée et le menu passe par le tiroir, que seul le script ouvre.
+   Sans script (désactivé, fichier en échec, erreur d'exécution), un visiteur sur téléphone voyait un
+   bouton « Menu » qui ne faisait rien, et il ne lui restait que les liens du pied de page. Le site
+   applique pourtant partout la règle « aucun bouton mort » : la loupe, les boutons « i » et « En savoir
+   plus » n'apparaissent que si le script tourne.
+   Même mécanique que la loupe, en miroir : sans script, le bouton disparaît et la liste s'affiche. Elle
+   était déjà prévue pour cela (défilement horizontal sans barre, fondu latéral quand elle déborde).
+   Hors de toute couche : une règle sans couche l'emporte sur l'utilitaire `hidden` de Tailwind. Un
+   navigateur qui ignore `scripting` garde le comportement d'avant. */
+/* SANS SCRIPT, LE DÉTAIL DES CARTES DE /strategie SE LIT (audit du 18/09/2026). Il est écrit dans le
+   flux, sous sa carte, et le script le déplace au dos, sur fond sombre : ses couleurs sont donc celles
+   du dos (sable, blanc, teal clair). Sans script il restait sous la carte, sur le fond CLAIR de la
+   section : sable sur paper, 1,17:1, invisible à l'œil, et lu normalement par un lecteur d'écran, ce
+   qui cachait le défaut aux contrôles automatiques. L'hôte prend alors le fond du dos. Sous
+   `scripting: none` seulement : avec script, il est vidé puis masqué, et un fond sombre clignoterait
+   sous chaque carte le temps que le script s'exécute. */
+@media (scripting: none) {
+  [data-carte-detail-hote] {
+    margin-top: 1.25rem;
+    padding: 0.25rem 1.5rem 1.5rem;
+    border-radius: 1.5rem;
+    background: var(--color-ink);
+  }
+  [data-sitenav] [data-menu-open] {
+    display: none;
+  }
+  [data-sitenav] [data-sitenav-list] {
+    display: flex;
+  }
+}
+
+/* ===========================================================================================
+   IMPRESSION ET « ENREGISTRER EN PDF » (audit du 18/09/2026)
+   ===========================================================================================
+   Le site n'avait aucune règle d'impression. Or les deux moteurs d'animation posent `opacity: 0` en
+   style en ligne sur tout ce qui attend sous l'écran : qui imprimait /frais ou l'accueil sans avoir
+   défilé jusqu'en bas obtenait des blocs blancs à la place des contenus, avec la barre collante, la
+   pastille d'appel et le bandeau de consentement posés sur le texte. On imprime volontiers les frais et
+   les risques d'un produit d'épargne : tout ce qui est écrit doit sortir sur le papier.
+   `!important` : il faut passer devant des styles en ligne. Les réponses de FAQ repliées restent
+   repliées, comme à l'écran ; celles qui sont ouvertes s'impriment. */
+@media print {
+  [data-animate],
+  [data-animate] > *,
+  [data-reveal-text],
+  .reveal-word,
+  [data-scrub],
+  [data-draw],
+  [data-intro] {
+    opacity: 1 !important;
+    transform: none !important;
+    clip-path: none !important;
+    filter: none !important;
+    animation: none !important;
+  }
+  /* `transition: none` : le bandeau de consentement sort en glissant, avec une transition sur
+     `display` (420 ms). Sans cela il restait affiché le temps de sa sortie, donc sur le papier. */
+  [data-sitenav],
+  [data-sticky-cta],
+  [data-hero-scroll-hint],
+  #consent-banner,
+  .skip-link {
+    display: none !important;
+    transition: none !important;
+  }
+  /* Le hero et les sections épinglées occupent un écran entier : sur le papier, c'est une page vide. */
+  #apercu {
+    min-height: 0 !important;
   }
 }
