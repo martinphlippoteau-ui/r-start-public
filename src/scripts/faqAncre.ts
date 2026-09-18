@@ -12,7 +12,15 @@
  * position qui change encore. `data-sans-transition` la suspend le temps d'une image.
  */
 const ouvrir = (): void => {
-  const id = decodeURIComponent(location.hash.slice(1));
+  /* Une ancre mal encodée (« /faq#%E0 ») fait lever une URIError à `decodeURIComponent`. Non rattrapée,
+     elle arrêtait le module à sa première ligne utile, et l'écouteur `hashchange` posé plus bas
+     n'existait jamais : plus aucune ancre n'ouvrait de question sur cette page (audit du 18/09/2026). */
+  let id = '';
+  try {
+    id = decodeURIComponent(location.hash.slice(1));
+  } catch {
+    return;
+  }
   if (!id) return;
   const cible = document.getElementById(id);
   if (!(cible instanceof HTMLDetailsElement) || !cible.matches('[data-faq]') || cible.open) return;

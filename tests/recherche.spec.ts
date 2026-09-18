@@ -261,6 +261,147 @@ test.describe('Recherche du site', () => {
     expect(serious.map((v) => `${v.id}: ${v.help} (${v.nodes.length})`)).toEqual([]);
   });
 
+  /*
+   * AUDIT DU 18/09/2026 : sept défauts relevés dans la recherche et le verrou de page, écrits la veille.
+   * Chacun a ici le test qui l'aurait attrapé.
+   */
+  test('le verrou de page laisse agrandir, et ses écouteurs partent avec lui', async ({ page }) => {
+    await page.goto('/frais/');
+    /* Une molette synthétique : on lit seulement si le site l'annule. */
+    const annulee = (ctrlKey: boolean) =>
+      page.evaluate((ctrl) => {
+        const e = new WheelEvent('wheel', {
+          deltaY: 100,
+          ctrlKey: ctrl,
+          bubbles: true,
+          cancelable: true,
+        });
+        document.body.dispatchEvent(e);
+        return e.defaultPrevented;
+      }, ctrlKey);
+
+    /* Les écouteurs RÉELLEMENT posés sur `document`, lus par le protocole du navigateur : un écouteur
+       `wheel` non passif oblige le défilement à attendre le script, il ne doit exister que le temps du
+       verrou. Une molette synthétique ne le prouverait pas, le gestionnaire sort sans rien faire. */
+    const cdp = await page.context().newCDPSession(page);
+    const bloquants = async () => {
+      const { result } = await cdp.send('Runtime.evaluate', { expression: 'document' });
+      const { listeners } = await cdp.send('DOMDebugger.getEventListeners', {
+        objectId: result.objectId!,
+      });
+      return listeners.filter((l) => (l.type === 'wheel' || l.type === 'touchmove') && !l.passive)
+        .length;
+    };
+
+    expect(await annulee(false), 'fermé : la page défile librement').toBe(false);
+    expect(await bloquants(), 'fermé : aucun écouteur bloquant').toBe(0);
+    await ouvrir(page);
+    expect(await bloquants(), 'ouvert : la molette et le doigt sont retenus').toBe(2);
+    expect(await annulee(false), 'ouvert : la molette ne fait plus défiler la page').toBe(true);
+    expect(await annulee(true), 'ouvert : Ctrl + molette agrandit toujours').toBe(false);
+    await page.keyboard.press('Escape');
+    await expect(page.locator('[data-recherche-panneau]')).toBeHidden();
+    expect(await annulee(false), 'refermé : la molette n’est plus retenue').toBe(false);
+    expect(await bloquants(), 'refermé : les écouteurs bloquants sont partis').toBe(0);
+  });
+
+  test('le tiroir du menu referme la recherche, et Tab y circule', async ({ page, isMobile }) => {
+    /* Sous « lg », le seul seuil où le bouton Menu existe ; le clic par coordonnées évite le défilement
+       que `locator.click` provoque sur un élément de la barre collante. */
+    if (!isMobile) await page.setViewportSize({ width: 800, height: 800 });
+    await page.goto('/faq/');
+    await ouvrir(page);
+    const menu = await page.locator('[data-menu-open]').boundingBox();
+    if (!menu) throw new Error('bouton Menu introuvable');
+    await page.mouse.click(menu.x + menu.width / 2, menu.y + menu.height / 2);
+    await expect(page.locator('[data-menu-panel]')).toHaveAttribute('data-open', '');
+    await expect(page.locator('[data-sitenav]')).not.toHaveAttribute('data-recherche-ouverte', '');
+
+    const focus = () =>
+      page.evaluate(() => {
+        const a = document.activeElement;
+        return (a?.textContent ?? '').trim() + '|' + !!a?.closest('[data-menu-panel]');
+      });
+    const parcours = new Set<string>();
+    for (let i = 0; i < 4; i += 1) {
+      await page.keyboard.press('Tab');
+      parcours.add(await focus());
+    }
+    expect(parcours.size, 'Tab avance d’un élément à l’autre').toBeGreaterThan(2);
+    expect(
+      [...parcours].every((f) => f.endsWith('|true')),
+      'et reste dans le tiroir'
+    ).toBe(true);
+  });
+
+  test('Souscrire pendant la recherche : une fenêtre, un Échap, le focus revient à la loupe', async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(isMobile, 'le bouton de la barre est couvert par le champ sur un petit écran');
+    await page.goto('/presse/');
+    await ouvrir(page);
+    await page.locator('[data-sitenav-bar] [data-cta="souscrire"]').click();
+    await expect(page.locator('[data-subscribe-soon]')).toHaveAttribute('open', '');
+    await expect(page.locator('[data-sitenav]')).not.toHaveAttribute('data-recherche-ouverte', '');
+
+    await page.keyboard.press('Escape');
+    await expect(page.locator('[data-subscribe-soon]')).not.toHaveAttribute('open', '');
+    await expect(page.locator('[data-recherche-ouvrir]')).toBeFocused();
+  });
+
+  test('le message « aucun résultat » cite ce qui a été tapé, signes « $ » compris', async ({
+    page,
+  }) => {
+    await page.goto('/frais/');
+    await ouvrir(page);
+    await page.locator('[data-recherche-champ]').fill("$&zzqq$'");
+    await expect(page.locator('[data-recherche-vide-texte]')).toHaveText(/« \$&zzqq\$' »/);
+  });
+
+  test('sur une fenêtre très basse, il reste toujours un résultat à lire', async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(isMobile, 'le cas visé est un zoom de 400 % sur un écran de bureau');
+    await page.setViewportSize({ width: 320, height: 256 });
+    await page.goto('/frais/');
+    await ouvrir(page);
+    await page.locator('[data-recherche-champ]').fill('frais');
+    await expect(page.locator('[data-recherche-resultats] a').first()).toBeAttached();
+    expect(await page.locator('[data-recherche-resultats] a').count()).toBeGreaterThanOrEqual(1);
+  });
+
+  test('tant que l’index n’est pas arrivé, le panneau le dit à l’écran', async ({ page }) => {
+    let liberer: () => void = () => undefined;
+    const attente = new Promise<void>((resolve) => (liberer = resolve));
+    await page.route('**/recherche.json', async (route) => {
+      await attente;
+      await route.continue();
+    });
+    await page.goto('/frais/');
+    await ouvrir(page);
+    await page.locator('[data-recherche-champ]').fill('frais');
+    await expect(page.locator('[data-recherche-vide-texte]')).toHaveText('Recherche en cours…');
+    await expect(page.locator('[data-recherche-vide-lien]')).toBeHidden();
+    liberer();
+    await expect(page.locator('[data-recherche-resultats] a').first()).toBeVisible();
+    await expect(page.locator('[data-recherche-vide]')).toBeHidden();
+  });
+
+  test('une ancre mal encodée ne casse pas l’ouverture des questions', async ({ page }) => {
+    const erreurs: string[] = [];
+    page.on('pageerror', (e) => erreurs.push(String(e)));
+    await page.goto('/faq/#%E0');
+    await page.locator('[data-consent-refuse]').click();
+    const id = await page.locator('details[data-faq]').nth(3).getAttribute('id');
+    await page.evaluate((h) => {
+      location.hash = h ?? '';
+    }, id);
+    await expect(page.locator(`[id="${id}"]`)).toHaveAttribute('open', '');
+    expect(erreurs, 'aucune erreur de script').toEqual([]);
+  });
+
   test('la loupe tient dans la barre, jusqu’à 360 px', async ({ page }) => {
     await page.setViewportSize({ width: 360, height: 740 });
     await page.goto('/frais/');

@@ -17,9 +17,14 @@
  * pas intercepter la molette pendant qu'une surface est ouverte ; il y avait là trois détections
  * différentes, une par surface, et chaque nouvelle surface en demandait une de plus.
  *
- * Plusieurs propriétaires sont admis (le tiroir peut s'ouvrir par-dessus le panneau) : le verrou ne
- * tombe qu'au dernier rendu. Les écouteurs sont posés à la première ouverture et gardés ensuite ; ils
- * sortent en une comparaison tant que rien n'est verrouillé.
+ * LE ZOOM N'EST JAMAIS NEUTRALISÉ (audit du 18/09/2026) : ni le pincement à deux doigts, ni Ctrl +
+ * molette. La première version annulait tout `wheel` et tout `touchmove` : menu ou recherche ouverts,
+ * un visiteur malvoyant ne pouvait plus agrandir la page. heroAvance.ts faisait déjà l'exception.
+ *
+ * Plusieurs propriétaires sont admis : le verrou ne tombe qu'au dernier rendu. LES ÉCOUTEURS SONT
+ * RETIRÉS AVEC LUI : `wheel` et `touchmove` sont posés en `passive: false`, et un écouteur non passif
+ * oblige le navigateur à attendre le script avant chaque défilement. Gardés « pour la suite », ils
+ * ralentissaient le défilement de toute la page, jusqu'au rechargement, dès le premier usage du menu.
  */
 
 /** Propriétaire → sa zone défilante, s'il en a une. */
@@ -42,6 +47,10 @@ const dansUneZone = (cible: EventTarget | null): boolean => {
 
 const bloquerGeste = (e: Event): void => {
   if (!proprietaires.size || dansUneZone(e.target)) return;
+  /* Agrandir la page reste permis : Ctrl + molette (c'est aussi le pincement d'un trackpad, que le
+     navigateur traduit ainsi) et le pincement à deux doigts sur un écran tactile. */
+  if (e instanceof WheelEvent && e.ctrlKey) return;
+  if (typeof TouchEvent !== 'undefined' && e instanceof TouchEvent && e.touches.length > 1) return;
   e.preventDefault();
 };
 
@@ -70,6 +79,13 @@ const ecouter = (): void => {
   document.addEventListener('touchmove', bloquerGeste, { passive: false });
   document.addEventListener('keydown', bloquerTouche);
 };
+const cesserDEcouter = (): void => {
+  if (!ecoute) return;
+  ecoute = false;
+  document.removeEventListener('wheel', bloquerGeste);
+  document.removeEventListener('touchmove', bloquerGeste);
+  document.removeEventListener('keydown', bloquerTouche);
+};
 
 /**
  * Verrouille la page pour `proprietaire` (un objet quelconque, l'élément de la surface fait l'affaire).
@@ -84,5 +100,7 @@ export const verrouiller = (proprietaire: object, zone: HTMLElement | null = nul
 /** Rend la page à son propriétaire précédent, ou au visiteur s'il n'y en a plus. */
 export const deverrouiller = (proprietaire: object): void => {
   proprietaires.delete(proprietaire);
-  if (!proprietaires.size) document.documentElement.removeAttribute('data-verrou');
+  if (proprietaires.size) return;
+  document.documentElement.removeAttribute('data-verrou');
+  cesserDEcouter();
 };

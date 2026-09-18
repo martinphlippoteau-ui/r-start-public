@@ -101,6 +101,8 @@ const CLE_ARRIVEE = 'rstart:recherche:arrivee';
 const SECOURS_OUVERTURE = 440 + 120;
 const SECOURS_FERMETURE = 320 + 120;
 const PAUSE_MESURE = 1500;
+/** Délai d'abandon du téléchargement de l'index, en millisecondes. */
+const DELAI_INDEX = 8000;
 /** Plafond avant rognage : la hauteur du panneau en garde rarement plus de deux par rubrique. */
 const MAX_PAR_RUBRIQUE = 4;
 const POIDS_SYNONYME = 0.8;
@@ -380,6 +382,7 @@ const init = (): void => {
   const resultats = panneau.querySelector<HTMLElement>('[data-recherche-resultats]');
   const vide = panneau.querySelector<HTMLElement>('[data-recherche-vide]');
   const videTexte = panneau.querySelector<HTMLElement>('[data-recherche-vide-texte]');
+  const videLien = panneau.querySelector<HTMLElement>('[data-recherche-vide-lien]');
   const defilement = panneau.querySelector<HTMLElement>('[data-recherche-defilement]');
   const gabaritRubrique = panneau.querySelector<HTMLTemplateElement>(
     'template[data-recherche-gabarit-rubrique]'
@@ -400,6 +403,12 @@ const init = (): void => {
   )
     return;
 
+  /* LA LOUPE EST AFFICHÉE PAR `@media (scripting: enabled)` (global.css), que Safari 16, Chrome 119 et
+     leurs aînés ignorent : ce script s'y exécutait sans que personne voie le bouton qui l'ouvre (les
+     iPhone 8 et X, bloqués sur iOS 16). Puisqu'on est là, c'est que les scripts tournent : on l'affiche.
+     Le petit saut de la barre ne concerne que ces navigateurs, qui n'avaient rien du tout. */
+  if (getComputedStyle(bouton).display === 'none') bouton.classList.add('recherche-loupe-forcee');
+
   const libelleOuvrir = bouton.getAttribute('aria-label') ?? '';
   const libelleFermer = bouton.dataset.labelFermer ?? libelleOuvrir;
   const sobre = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -419,7 +428,15 @@ const init = (): void => {
 
   const charger = (): Promise<void> => {
     if (!chargement) {
-      chargement = fetch(panneau.dataset.index ?? '', { credentials: 'same-origin' })
+      /* Une nouvelle tentative repart d'un état neutre : le panneau dit « recherche en cours », pas
+         l'erreur de la tentative précédente. */
+      echec = false;
+      /* Huit secondes, pas davantage : sur un réseau qui pend (portail captif, mobile dégradé), la
+         requête ne rejetait jamais et le panneau restait muet. L'abandon tombe dans le `catch`, qui
+         affiche le message d'erreur et autorise une nouvelle tentative à la prochaine frappe. */
+      const signal =
+        typeof AbortSignal.timeout === 'function' ? AbortSignal.timeout(DELAI_INDEX) : undefined;
+      chargement = fetch(panneau.dataset.index ?? '', { credentials: 'same-origin', signal })
         .then((r) => {
           if (!r.ok) throw new Error(String(r.status));
           return r.json() as Promise<{ docs: Doc[] }>;
@@ -461,8 +478,12 @@ const init = (): void => {
   /* --- Rendu ------------------------------------------------------------------------------------ */
   let annonce = 0;
 
+  /* La zone est VIDÉE tout de suite, puis écrite à la minuterie : réécrire la même chaîne dans une zone
+     `aria-live` n'annonce rien, et deux recherches de suite qui donnent « 3 résultats » restaient
+     muettes la seconde fois. */
   const annoncer = (texte: string): void => {
     window.clearTimeout(annonce);
+    statut.textContent = '';
     annonce = window.setTimeout(() => {
       statut.textContent = texte;
     }, 450);
@@ -508,21 +529,26 @@ const init = (): void => {
       resultats.hidden = true;
       vide.hidden = true;
       nbResultats = 0;
+      /* L'annonce en attente est ANNULÉE : effacer le champ en moins de 450 ms faisait lire
+         « 4 résultats » devant un panneau revenu à ses liens rapides. */
+      window.clearTimeout(annonce);
       statut.textContent = '';
       return;
     }
     rapides.hidden = true;
 
+    /* L'index n'est pas encore là, ou n'a pas pu venir : on le DIT, à l'écran comme au lecteur d'écran.
+       « Recherche en cours » n'était écrit que dans la zone `sr-only` : à l'œil, un panneau vide. */
     if (!index) {
+      const message = echec ? (panneau.dataset.erreur ?? '') : (panneau.dataset.chargement ?? '');
       resultats.hidden = true;
-      vide.hidden = true;
-      annoncer(echec ? (panneau.dataset.erreur ?? '') : (panneau.dataset.chargement ?? ''));
-      if (echec) {
-        videTexte.textContent = panneau.dataset.erreur ?? '';
-        vide.hidden = false;
-      }
+      videTexte.textContent = message;
+      if (videLien) videLien.hidden = !echec;
+      vide.hidden = false;
+      annoncer(message);
       return;
     }
+    if (videLien) videLien.hidden = false;
 
     const expression = decouper(q).map((m) => m.n);
     let trouves = index.map((p) => evaluer(p, liste, expression)).filter((t) => t.concepts > 0);
@@ -544,7 +570,10 @@ const init = (): void => {
       resultats.append(rubrique(search.groups.questions, 'questions', questions, liste));
     resultats.hidden = nbResultats === 0;
     vide.hidden = nbResultats > 0;
-    if (!nbResultats) videTexte.textContent = (videTexte.dataset.gabarit ?? '').replace('{q}', q);
+    /* Fonction et non chaîne : `replace` interprète « $& », « $' » et « $` » dans une chaîne de
+       remplacement, et le message affichait autre chose que ce que le visiteur avait tapé. */
+    if (!nbResultats)
+      videTexte.textContent = (videTexte.dataset.gabarit ?? '').replace('{q}', () => q);
     const affiches = ajuster();
     defilement.scrollTop = 0;
 
@@ -608,6 +637,11 @@ const init = (): void => {
     const dispo = hauteurOuverte - defilement.offsetTop;
     for (let garde = 0; garde < 2 * MAX_PAR_RUBRIQUE + 2; garde += 1) {
       if (defilement.scrollHeight <= dispo) break;
+      /* JAMAIS MOINS D'UN RÉSULTAT. Sur une fenêtre très basse (zoom de 400 %, 320 × 256), la place
+         disponible est inférieure à un seul résultat : le rognage les retirait tous, le panneau restait
+         blanc et l'annonce était vide. Le dernier reste, et la zone, défilante une fois le panneau
+         établi, montre ce qui dépasse. */
+      if (compter() <= 1) break;
       const listes = Array.from(resultats.querySelectorAll<HTMLElement>('[data-liste]'));
       if (!listes.length) break;
       const cible = listes.reduce((a, b) => (b.children.length > a.children.length ? b : a));
@@ -722,6 +756,23 @@ const init = (): void => {
   });
 
   bouton.addEventListener('click', () => (ouvert() ? fermer() : ouvrir()));
+
+  /* UNE SEULE SURFACE À LA FOIS. Le tiroir du menu demande la fermeture avant de s'ouvrir
+     (SiteNav.astro) : ouverts ensemble, les deux pièges à tabulation se renvoyaient le focus à chaque
+     Tab et les entrées du menu devenaient inatteignables au clavier. Par un événement DOM, comme
+     `rstart:mesure` : aucun des deux modules n'a à connaître l'autre. */
+  document.addEventListener('rstart:recherche:fermer', () =>
+    fermer({ rendreFocus: false, instantane: true })
+  );
+
+  /* « Souscrire » cliqué dans la barre pendant la recherche, tunnel fermé : la fenêtre « bientôt » va
+     s'ouvrir (SubscribeSoon.astro, écouteur sur `document`, donc APRÈS celui-ci). On ferme d'abord, et
+     le focus revient sur la loupe : c'est là que le navigateur le rendra à la fermeture de la fenêtre,
+     au lieu de le perdre sur un panneau masqué. */
+  nav.addEventListener('click', (e) => {
+    if (!ouvert() || document.body.dataset.souscriptionOuverte === 'oui') return;
+    if ((e.target as HTMLElement | null)?.closest('[data-cta="souscrire"]')) fermer();
+  });
   /* Intention : l'index est demandé avant même le clic. */
   bouton.addEventListener('pointerenter', () => void charger(), { once: true });
   bouton.addEventListener('focus', () => void charger(), { once: true });
@@ -731,6 +782,9 @@ const init = (): void => {
     ?.addEventListener('click', () => fermer());
 
   champ.addEventListener('input', () => {
+    /* Nouvelle tentative après un échec, À LA FRAPPE et pas dans `afficher()` : celui-ci est rappelé
+       par la fin de chaque téléchargement, un échec s'y relancerait lui-même sans fin. */
+    if (echec) void charger();
     afficher();
     window.clearTimeout(minuterieMesure);
     minuterieMesure = window.setTimeout(mesurerRecherche, PAUSE_MESURE);
@@ -758,7 +812,9 @@ const init = (): void => {
     );
 
   document.addEventListener('keydown', (e) => {
-    if (!ouvert()) return;
+    /* Une fenêtre native ouverte par-dessus (« la souscription ouvre bientôt ») a la main sur le
+       clavier : annuler Échap ici empêchait sa fermeture, il fallait appuyer deux fois. */
+    if (!ouvert() || document.querySelector('dialog[open]')) return;
     if (e.key === 'Escape') {
       e.preventDefault();
       fermer();
@@ -853,7 +909,12 @@ const arriver = (): void => {
     return;
   }
   if (!attendue || attendue !== sansBarre(location.pathname) + location.hash) return;
-  const id = decodeURIComponent(location.hash.slice(1));
+  let id = '';
+  try {
+    id = decodeURIComponent(location.hash.slice(1));
+  } catch {
+    return;
+  }
   const cible = id ? document.getElementById(id) : null;
   if (!cible) return;
   /* Une question refermée à la main puis visée de nouveau depuis la même page : pas de changement

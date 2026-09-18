@@ -758,6 +758,12 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
     place-items: center;
   }
 }
+/* Navigateurs qui exécutent les scripts mais ignorent `@media (scripting)` (Safari 16, Chrome 119 et
+   plus anciens) : src/scripts/recherche.ts pose cette classe quand il trouve la loupe masquée. */
+.recherche-loupe.recherche-loupe-forcee {
+  display: grid;
+  place-items: center;
+}
 /* La loupe et la croix occupent la même case ; l'une tourne et s'efface quand l'autre arrive. Pas de
    texte ici, l'opacité est admise. */
 .recherche-loupe > svg {
