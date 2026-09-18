@@ -220,7 +220,7 @@ export const legalPages: LegalPage[] = [
         title: 'Modifier votre choix',
         paragraphs: [
           'Vous pouvez changer d’avis à tout moment. Cliquez sur « Gérer les cookies », en bas de chaque page : le bandeau s’affiche à nouveau et votre nouveau choix remplace le précédent.',
-          'Après un refus, plus aucune donnée n’est envoyée à Google Analytics. Les cookies _ga et _ga_* déjà déposés peuvent être supprimés depuis les paramètres de votre navigateur.',
+          'Après un refus, plus aucune donnée n’est envoyée à Google Analytics, et les cookies _ga et _ga_* déjà déposés sont effacés par le site.',
           `Votre choix, accord ou refus, est conservé ${consentCookie.days} jours. Passé ce délai, le bandeau s’affiche à nouveau.`,
           `Vous pouvez aussi configurer votre navigateur pour bloquer ou supprimer les cookies. Si le cookie ${consentCookie.name} est bloqué, le bandeau s’affiche à chaque visite.`,
         ],

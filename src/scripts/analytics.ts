@@ -138,7 +138,17 @@ const init = () => {
   initProfondeur();
 
   if (document.body.dataset.pageType === '404') {
-    push({ event: 'page_introuvable', chemin: location.pathname, referent: document.referrer });
+    /* Le référent SANS sa chaîne de requête ni son ancre : l'adresse de la page qui a envoyé ici peut
+       porter une recherche, un identifiant ou un jeton, qui n'ont rien à faire dans la mesure. Ce qui
+       sert à retrouver un lien mort, c'est le site et la page. */
+    let referent = '';
+    try {
+      const r = new URL(document.referrer);
+      referent = r.origin + r.pathname;
+    } catch {
+      /* pas de référent, ou inexploitable */
+    }
+    push({ event: 'page_introuvable', chemin: location.pathname, referent });
   }
 };
 

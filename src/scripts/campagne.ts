@@ -16,6 +16,15 @@
  * ajoute l'identifiant client de GA4, pour que CORUM puisse rapprocher une souscription de la visite
  * qui l'a produite, sans qu'aucune donnée personnelle ne transite par le site.
  *
+ * LES DEUX IDENTIFIANTS NE PARTENT QU'AVEC L'ACCORD EN VIGUEUR (audit du 18/09/2026). L'identifiant
+ * client et `gclid` désignent un navigateur ou un clic, pas une campagne : ils ne sont ni gardés ni
+ * transmis tant que le cookie de consentement ne vaut pas « granted ». La première version lisait le
+ * cookie `_ga` sans regarder le consentement : après un retrait, le cookie existait encore et
+ * l'identifiant partait quand même. Les `utm_*`, eux, décrivent la campagne et non le visiteur, ils
+ * sont gardés comme avant.
+ * L'ÉTIQUETAGE SE REFAIT AU CLIC, et plus seulement au chargement : le consentement donné sur la page
+ * même crée le cookie `_ga` après coup, et un retrait doit RETIRER l'identifiant d'un lien déjà étiqueté.
+ *
  * QUAND. Uniquement sur les liens SORTANTS. Tant que la souscription n'est pas ouverte, les appels
  * pointent vers /documentation : il n'y a rien à étiqueter, et le module ne touche à rien.
  *
@@ -32,7 +41,26 @@ const CLES = [
   'utm_term',
   'gclid',
 ] as const;
+/** Clés qui identifient un navigateur ou un clic, et non une campagne : soumises au consentement. */
+const IDENTIFIANTS: readonly string[] = ['gclid'];
 const RANGEMENT = 'rstart_campagne';
+
+/**
+ * Une valeur de campagne vient de l'adresse, donc de n'importe qui. Elle repart vers le dataLayer et
+ * vers le tunnel : on ne garde que du texte court, sans caractère de contrôle ni chevron.
+ */
+const LONGUEUR_MAX = 120;
+const nettoyer = (valeur: unknown): string => {
+  if (typeof valeur !== 'string') return '';
+  const propre = valeur.replace(/[\u0000-\u001f\u007f<>"'`]/g, '').trim();
+  return propre.slice(0, LONGUEUR_MAX);
+};
+
+/** Le consentement EN VIGUEUR, relu à chaque fois : il peut changer pendant la visite. */
+const consentementDonne = (): boolean => {
+  const nom = document.getElementById('consent-banner')?.dataset.cookieName || 'rstart_consent';
+  return new RegExp('(?:^|; )' + nom + '=granted(?:;|$)').test(document.cookie);
+};
 
 /**
  * Nom du paramètre qui porte l'identifiant client vers le tunnel. À ALIGNER AVEC CORUM : le tunnel doit
@@ -43,10 +71,18 @@ const PARAM_IDENTIFIANT = 'cid';
 
 type Campagne = Partial<Record<(typeof CLES)[number], string>>;
 
+/** Ce qui est relu du stockage passe par le même filtre que ce qui vient de l'adresse. */
 const lireRangement = (): Campagne => {
   try {
     const brut = sessionStorage.getItem(RANGEMENT);
-    return brut ? (JSON.parse(brut) as Campagne) : {};
+    const lu: unknown = brut ? JSON.parse(brut) : null;
+    if (!lu || typeof lu !== 'object') return {};
+    const retenue: Campagne = {};
+    for (const cle of CLES) {
+      const valeur = nettoyer((lu as Record<string, unknown>)[cle]);
+      if (valeur) retenue[cle] = valeur;
+    }
+    return retenue;
   } catch {
     return {};
   }
@@ -64,7 +100,8 @@ export const campagne = (): Campagne => {
   const params = new URLSearchParams(location.search);
   const trouvee: Campagne = {};
   for (const cle of CLES) {
-    const valeur = params.get(cle);
+    if (IDENTIFIANTS.includes(cle) && !consentementDonne()) continue;
+    const valeur = nettoyer(params.get(cle));
     if (valeur) trouvee[cle] = valeur;
   }
   if (!Object.keys(trouvee).length) return {};
@@ -79,11 +116,11 @@ export const campagne = (): Campagne => {
 
 /**
  * Identifiant client de GA4, lu dans son cookie `_ga`, de forme `GA1.1.<id>.<horodatage>`. L'identifiant
- * attendu est la concaténation des deux derniers segments. Vide tant que GA4 n'a pas écrit son cookie,
- * c'est-à-dire tant que le visiteur n'a pas accepté la mesure : c'est le comportement voulu, rien n'est
- * transmis sans consentement.
+ * attendu est la concaténation des deux derniers segments. Vide sans consentement EN VIGUEUR : le
+ * cookie `_ga` survit à un retrait tant qu'il n'a pas été effacé, sa seule présence ne prouve rien.
  */
 export const identifiantClient = (): string => {
+  if (!consentementDonne()) return '';
   const m = document.cookie.match(/(?:^|;\s*)_ga=GA\d+\.\d+\.(\d+\.\d+)/);
   return m?.[1] ?? '';
 };
@@ -114,11 +151,15 @@ const etiqueter = (a: HTMLAnchorElement, origine: Campagne, cid: string): void =
     /* utm_content reste la position du CTA : la campagne ne la connaît pas, le site oui. */
     if (cle === 'utm_content') continue;
     const valeur = origine[cle];
-    if (valeur) url.searchParams.set(cle, valeur);
+    if (IDENTIFIANTS.includes(cle) && !consentementDonne()) url.searchParams.delete(cle);
+    else if (valeur) url.searchParams.set(cle, valeur);
   }
   const position = a.dataset.ctaPosition;
   if (position) url.searchParams.set('utm_content', position);
+  /* Posé s'il y en a un, RETIRÉ sinon : un lien étiqueté pendant l'accord ne garde pas son identifiant
+     après un retrait. */
   if (cid) url.searchParams.set(PARAM_IDENTIFIANT, cid);
+  else url.searchParams.delete(PARAM_IDENTIFIANT);
 
   a.href = url.toString();
 };
@@ -127,10 +168,23 @@ const init = (): void => {
   const origine = campagne();
   const cid = identifiantClient();
   /* Rien à transmettre et rien à identifier : on ne touche à aucun lien. */
-  if (!Object.keys(origine).length && !cid) return;
-  document
-    .querySelectorAll<HTMLAnchorElement>('a[data-cta="souscrire"]')
-    .forEach((a) => etiqueter(a, origine, cid));
+  if (Object.keys(origine).length || cid) {
+    document
+      .querySelectorAll<HTMLAnchorElement>('a[data-cta="souscrire"]')
+      .forEach((a) => etiqueter(a, origine, cid));
+  }
+
+  /* AU CLIC, en phase de capture, donc avant toute navigation : le lien part avec le consentement du
+     moment, pas avec celui du chargement. `pointerdown` couvre le clic du milieu et le menu « ouvrir
+     dans un nouvel onglet », qui ne déclenchent pas `click`. */
+  const auMoment = (e: Event): void => {
+    const a = (e.target as HTMLElement | null)?.closest<HTMLAnchorElement>(
+      'a[data-cta="souscrire"]'
+    );
+    if (a) etiqueter(a, campagne(), identifiantClient());
+  };
+  document.addEventListener('pointerdown', auMoment, true);
+  document.addEventListener('click', auMoment, true);
 };
 
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);

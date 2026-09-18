@@ -334,6 +334,60 @@ test.describe('Qualité', () => {
    * tableau : ni le refus par défaut, ni l'accord, ni le retrait n'arrivaient au conteneur, et rien ne
    * le signalait. Le test suit les trois temps, dont le retrait après accord, celui qui compte.
    */
+  /*
+   * UN RETRAIT DE CONSENTEMENT QUI RETIRE VRAIMENT (audit du 18/09/2026). Les cookies `_ga` survivaient
+   * treize mois à un refus donné après un accord, et l'identifiant client, lu dans `_ga` sans regarder
+   * le consentement, continuait de partir vers le tunnel. Le lien du tunnel est simulé : tant que la
+   * souscription est fermée, les CTA du site sont internes et le module n'a rien à étiqueter.
+   */
+  test('un retrait de consentement efface les cookies de mesure et retire les identifiants des liens', async ({
+    page,
+    context,
+    baseURL,
+  }) => {
+    await page.route(/googletagmanager\.com|google-analytics\.com/, (route) => route.abort());
+    const url = baseURL ?? 'http://127.0.0.1:4321';
+    await context.addCookies([
+      { name: 'rstart_consent', value: 'granted', url },
+      { name: '_ga', value: 'GA1.1.123456789.1700000000', url },
+      { name: '_ga_ABC123', value: 'GS1.1.1700000000.1.0.1700000000.0.0.0', url },
+    ]);
+    await page.goto('/frais/?utm_source=essai&gclid=clic123');
+
+    const lienDuTunnel = () =>
+      page.evaluate(() => {
+        let a = document.querySelector<HTMLAnchorElement>('a[data-essai-tunnel]');
+        if (!a) {
+          a = document.createElement('a');
+          a.setAttribute('data-cta', 'souscrire');
+          a.setAttribute('data-essai-tunnel', '');
+          a.href = 'https://tunnel.example/';
+          document.body.append(a);
+        }
+        a.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+        return a.href;
+      });
+
+    const avec = await lienDuTunnel();
+    expect(avec, 'avec accord : l’identifiant client part').toContain('cid=123456789.1700000000');
+    expect(avec).toContain('gclid=clic123');
+
+    await page.locator('[data-consent-open]').first().click();
+    await page.locator('[data-consent-refuse]').click();
+    const sans = await lienDuTunnel();
+    expect(sans, 'après retrait : plus d’identifiant client').not.toContain('cid=');
+    expect(sans, 'ni d’identifiant de clic').not.toContain('gclid=');
+    expect(sans, 'la campagne, elle, reste').toContain('utm_source=essai');
+    const restants = (await context.cookies()).map((c) => c.name).filter((n) => n.startsWith('_ga'));
+    expect(restants, 'les cookies de mesure sont effacés').toEqual([]);
+  });
+
+  test('le bandeau de consentement ne donne pas le focus à « Tout accepter »', async ({ page }) => {
+    await page.goto('/frais/');
+    await expect(page.locator('#consent-banner')).toBeVisible();
+    await expect(page.locator('#consent-title')).toBeFocused();
+  });
+
   test('le Consent Mode arrive à GTM sous la forme qu’il attend', async ({ page }) => {
     /* Le conteneur lui-même n'a rien à faire ici, et la forge a un identifiant GTM. */
     await page.route(/googletagmanager\.com|google-analytics\.com/, (route) => route.abort());

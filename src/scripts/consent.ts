@@ -103,19 +103,78 @@ const pousserChoix = (
 /** Le bandeau a-t-il été rouvert depuis le pied de page, ou est-ce le premier affichage ? */
 let rouvert = false;
 
+/**
+ * Efface les cookies de Google Analytics (`_ga`, `_ga_<propriété>`) sur l'hôte et sur chacun de ses
+ * domaines parents : on ne sait pas sur lequel GA4 les a posés, et un cookie ne s'efface que sur le
+ * domaine exact où il a été écrit.
+ */
+const effacerCookiesMesure = () => {
+  const noms = document.cookie
+    .split(';')
+    .map((c) => c.split('=')[0]?.trim() ?? '')
+    .filter((nom) => /^_ga($|_)/.test(nom));
+  if (!noms.length) return;
+  const segments = location.hostname.split('.');
+  const domaines = [''];
+  for (let i = 0; i < segments.length - 1; i += 1) domaines.push('.' + segments.slice(i).join('.'));
+  for (const nom of noms) {
+    for (const domaine of domaines) {
+      document.cookie =
+        nom + '=; Max-Age=0; Path=/' + (domaine ? '; Domain=' + domaine : '') + '; SameSite=Lax';
+    }
+  }
+};
+
+/** Dernier choix appliqué sur cette page : il dit si un refus est un RETRAIT, et un accord un revirement. */
+let applique: ConsentStatus = 'unset';
+
+/**
+ * CE QUE « REFUSER APRÈS AVOIR ACCEPTÉ » DOIT VRAIMENT FAIRE (audit du 18/09/2026). Le signal de refus
+ * était envoyé, mais les cookies `_ga` posés pendant l'accord restaient en place pour treize mois, alors
+ * que la politique du site dit « plus aucune donnée n'est envoyée ». Ils sont effacés au retrait.
+ *
+ * ET L'INVERSE : ACCEPTER APRÈS AVOIR REFUSÉ. La file `dataLayer` garde tout ce que la page y a poussé,
+ * et GTM la rejoue en entier à son chargement : les gestes faits PENDANT le refus seraient envoyés à
+ * GA4 après coup. Ils sont retirés de la file avant le chargement du conteneur. La file n'est PAS
+ * purgée pour un visiteur qui n'a encore rien choisi : c'est le fonctionnement voulu du plan de
+ * taggage, rien n'est perdu entre l'arrivée et l'accord.
+ */
 const applyConsent = (status: ConsentStatus) => {
   if (status === 'granted') {
+    if (applique === 'denied') {
+      const gardes = window.dataLayer.filter(
+        (x) =>
+          Object.prototype.toString.call(x) === '[object Arguments]' ||
+          (x as { event?: unknown } | null)?.event === 'consentement'
+      );
+      window.dataLayer.splice(0, window.dataLayer.length, ...gardes);
+    }
     gtag('consent', 'update', { analytics_storage: 'granted' });
     loadGtm();
   } else if (status === 'denied') {
     gtag('consent', 'update', { analytics_storage: 'denied' });
+    effacerCookiesMesure();
   }
+  applique = status;
 };
 
+/**
+ * LE FOCUS VA AU TITRE DU BANDEAU, pas à « Tout accepter » (audit du 18/09/2026). Les deux boutons ont
+ * le même poids à l'écran, mais au clavier Entrée acceptait d'office : le choix n'était neutre que pour
+ * la souris. Le titre est lu par le lecteur d'écran, et Tab mène ensuite aux boutons dans leur ordre.
+ */
 const show = () => {
   if (!banner) return;
   banner.hidden = false;
-  banner.querySelector<HTMLElement>('[data-consent-accept]')?.focus();
+  const titre = banner.querySelector<HTMLElement>('#consent-title');
+  if (titre) {
+    titre.tabIndex = -1;
+    /* Un titre n'est pas un contrôle : il reçoit le focus pour être lu, sans l'anneau des éléments
+       interactifs. Par le CSSOM, la CSP n'a rien à dire. */
+    titre.style.setProperty('outline', 'none');
+    titre.style.setProperty('box-shadow', 'none');
+    titre.focus({ preventScroll: true });
+  }
 };
 const hide = () => {
   if (banner) banner.hidden = true;
