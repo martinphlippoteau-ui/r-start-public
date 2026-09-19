@@ -468,72 +468,68 @@ test.describe('Qualité', () => {
   });
 
   /*
-   * LE HERO SE FRANCHIT D'UN SEUL GESTE (17/09/2026, src/scripts/heroAvance.ts). Un cran de molette
-   * depuis le haut mène au début du contenu, un cran vers le haut en revient ; plus bas, la molette est
-   * native ; en mouvement réduit, rien n'est intercepté.
+   * LE HERO DÉFILE COMME LE RESTE DE LA PAGE (19/09/2026, demande de Martin). Du 17 au 19/09/2026, un
+   * script le faisait franchir d'un seul geste : le premier cran de molette menait au contenu, le
+   * suivant vers le haut ramenait au hero. Il est retiré. Un cran avance d'un cran, dès le premier
+   * pixel, et plus aucun écouteur `wheel` ou `touchmove` non passif n'attend sur la page : le navigateur
+   * défile sans consulter aucun script. Les écouteurs sont lus par le protocole du navigateur.
    */
-  test('un cran de molette fait passer du hero au contenu, et retour', async ({ page, browser }) => {
-    const position = () => page.evaluate(() => Math.round(window.scrollY));
-    const cible = () =>
-      page.evaluate(() =>
-        Math.round(document.querySelector('#ce-qui-change')!.getBoundingClientRect().top + window.scrollY)
-      );
+  test('le hero défile nativement, sans aucun écouteur bloquant', async ({ page, isMobile }) => {
+    test.skip(isMobile, 'la molette est un geste de bureau');
     await page.goto('/');
     await page.locator('#consent-banner button').first().click();
-    const haut = await cible();
+    const position = () => page.evaluate(() => Math.round(window.scrollY));
     await page.mouse.move(200, 300);
 
     await page.mouse.wheel(0, 100);
-    await expect.poll(position, { message: 'un cran vers le bas mène au contenu', timeout: 4000 }).toBe(haut);
-
-    await page.waitForTimeout(1500);
+    await page.waitForTimeout(1200);
+    expect(await position(), 'un cran vers le bas avance d’un cran, pas jusqu’au contenu').toBe(
+      100
+    );
     await page.mouse.wheel(0, -100);
-    await expect.poll(position, { message: 'un cran vers le haut ramène au hero', timeout: 4000 }).toBe(0);
+    await page.waitForTimeout(1200);
+    expect(await position(), 'un cran vers le haut en revient').toBe(0);
 
-    await page.waitForTimeout(1500);
-    await page.evaluate((y) => {
-      document.documentElement.style.scrollBehavior = 'auto';
-      window.scrollTo(0, y);
-    }, haut + 1200);
-    await page.mouse.wheel(0, 100);
-    await expect.poll(position, { message: 'plus bas, la molette est native', timeout: 3000 }).toBe(haut + 1300);
-
-    const reduit = await browser.newContext({ reducedMotion: 'reduce', baseURL: new URL(page.url()).origin });
-    const calme = await reduit.newPage();
-    await calme.goto('/');
-    await calme.locator('#consent-banner button').first().click();
-    await calme.mouse.move(200, 300);
-    await calme.mouse.wheel(0, 100);
-    await calme.waitForTimeout(1200);
-    expect(await calme.evaluate(() => Math.round(window.scrollY)), 'mouvement réduit : défilement natif').toBe(100);
-    await reduit.close();
+    const cdp = await page.context().newCDPSession(page);
+    for (const cible of ['window', 'document']) {
+      const { result } = await cdp.send('Runtime.evaluate', { expression: cible });
+      const { listeners } = await cdp.send('DOMDebugger.getEventListeners', {
+        objectId: result.objectId!,
+      });
+      expect(
+        listeners
+          .filter((l) => (l.type === 'wheel' || l.type === 'touchmove') && !l.passive)
+          .map((l) => l.type),
+        `aucun écouteur bloquant sur ${cible}`
+      ).toEqual([]);
+    }
   });
 
   /*
-   * UN HERO PLUS HAUT QUE LA FENÊTRE SE LIT AU DÉFILEMENT NATIF (audit du 18/09/2026). À 640 × 360, soit
-   * un zoom de 200 % sur un écran de 1280 × 720, le hero mesure près de deux fenêtres : le passage
-   * automatique sautait tout ce qui se trouve sous le premier écran, boutons et mention de la société
-   * de gestion compris. Le test ci-dessus ne couvrait que le cas où le hero tient dans l'écran.
+   * L'INVITATION À DÉFILER RESTE UN LIEN QUI MARCHE SEUL. Le script retiré l'interceptait pour jouer son
+   * propre trajet ; c'est maintenant une ancre ordinaire, que le navigateur suit : la section visée
+   * arrive en haut de l'écran, sous la barre (`scroll-padding-top`).
    */
-  test('un hero qui dépasse de la fenêtre se lit au défilement natif', async ({ page, isMobile }) => {
-    test.skip(isMobile, 'la molette est un geste de bureau');
-    await page.setViewportSize({ width: 640, height: 360 });
+  test('l’invitation à défiler du hero mène au contenu', async ({ page }) => {
     await page.goto('/');
     await page.locator('#consent-banner button').first().click();
-    const mesures = await page.evaluate(() => ({
-      hero: document.querySelector<HTMLElement>('#apercu')!.offsetHeight,
-      fenetre: window.innerHeight,
-    }));
-    expect(mesures.hero, 'le cas testé : un hero plus haut que la fenêtre').toBeGreaterThan(
-      mesures.fenetre
+    const invitation = page.locator('[data-hero-scroll-hint]');
+    await expect(invitation).toBeVisible();
+    const ancre = await invitation.getAttribute('href');
+    expect(ancre, 'un vrai lien d’ancre').toMatch(/^#.+/);
+    await invitation.click();
+    await expect.poll(() => page.evaluate(() => location.hash)).toBe(ancre);
+    const haut = () =>
+      page.evaluate(
+        (id) => Math.round(document.getElementById(id)!.getBoundingClientRect().top),
+        ancre!.slice(1)
+      );
+    await expect
+      .poll(haut, { message: 'la section arrive en haut de l’écran', timeout: 5000 })
+      .toBeLessThanOrEqual(160);
+    expect(await haut(), 'et pas au-dessus : son titre reste sous la barre').toBeGreaterThanOrEqual(
+      0
     );
-    await page.mouse.move(200, 200);
-    await page.mouse.wheel(0, 100);
-    await page.waitForTimeout(1200);
-    expect(
-      await page.evaluate(() => Math.round(window.scrollY)),
-      'un cran de molette avance d’un cran, il ne saute pas le bas du hero'
-    ).toBe(100);
   });
 
   /*
@@ -561,77 +557,6 @@ test.describe('Qualité', () => {
     });
     expect(releve.length, 'les deux pastilles de l’accueil').toBe(2);
     expect(releve.filter((r) => !r.equivalent)).toEqual([]);
-  });
-
-  /*
-   * HORS DU PREMIER ÉCRAN, LE DÉFILEMENT NE DOIT RIEN AU SCRIPT (audit du 18/09/2026). Le passage du hero
-   * a besoin de deux écouteurs non passifs, `wheel` et `touchmove`, et un écouteur non passif sur `window`
-   * oblige le navigateur à attendre le script avant chaque défilement. Ils restaient posés jusqu'au pied
-   * de page. Les écouteurs sont lus par le protocole du navigateur : une molette synthétique ne prouverait
-   * rien, le gestionnaire sortait déjà sans rien faire.
-   */
-  test('les écouteurs bloquants du hero ne vivent que dans la zone du passage', async ({
-    page,
-    isMobile,
-  }) => {
-    test.skip(isMobile, 'la molette est un geste de bureau');
-    await page.goto('/');
-    await page.locator('#consent-banner button').first().click();
-    const cdp = await page.context().newCDPSession(page);
-    const bloquants = async () => {
-      const { result } = await cdp.send('Runtime.evaluate', { expression: 'window' });
-      const { listeners } = await cdp.send('DOMDebugger.getEventListeners', {
-        objectId: result.objectId!,
-      });
-      return listeners
-        .filter((l) => (l.type === 'wheel' || l.type === 'touchmove') && !l.passive)
-        .map((l) => l.type)
-        .sort();
-    };
-    const allerA = (y: number) =>
-      page.evaluate(
-        (v) =>
-          new Promise<void>((resolve) => {
-            document.documentElement.style.scrollBehavior = 'auto';
-            window.scrollTo(0, v);
-            requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
-          }),
-        y
-      );
-    const haut = await page.evaluate(() =>
-      Math.round(
-        document.querySelector('#ce-qui-change')!.getBoundingClientRect().top + window.scrollY
-      )
-    );
-
-    expect(await bloquants(), 'en haut de page : le passage écoute').toEqual([
-      'touchmove',
-      'wheel',
-    ]);
-    await allerA(haut);
-    expect(await bloquants(), 'au début du contenu : il écoute encore, pour le retour').toEqual([
-      'touchmove',
-      'wheel',
-    ]);
-    await allerA(haut + 1200);
-    await expect
-      .poll(bloquants, { message: 'plus bas : plus aucun écouteur bloquant' })
-      .toEqual([]);
-
-    /* Et il reprend son service au retour : un cran vers le haut depuis le début du contenu ramène au
-       hero, comme avant d'être allé voir plus bas. */
-    await allerA(haut);
-    await expect
-      .poll(bloquants, { message: 'de retour dans la zone : il écoute de nouveau' })
-      .toEqual(['touchmove', 'wheel']);
-    await page.mouse.move(200, 300);
-    await page.mouse.wheel(0, -100);
-    await expect
-      .poll(() => page.evaluate(() => Math.round(window.scrollY)), {
-        message: 'le passage fonctionne après un aller-retour hors zone',
-        timeout: 4000,
-      })
-      .toBe(0);
   });
 
   /*

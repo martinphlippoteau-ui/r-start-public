@@ -13,13 +13,13 @@
  * la page. Un glissé de la barre de défilement elle-même passe encore, et c'est très bien : le geste
  * est délibéré, la page bouge alors sous le voile.
  *
- * `data-verrou` SUR <html> EST LE REPÈRE UNIQUE de cet état. src/scripts/heroAvance.ts le lit pour ne
- * pas intercepter la molette pendant qu'une surface est ouverte ; il y avait là trois détections
- * différentes, une par surface, et chaque nouvelle surface en demandait une de plus.
+ * `data-verrou` SUR <html> EST LE REPÈRE UNIQUE de cet état : un script qui aurait à savoir si une
+ * surface recouvre la page n'a que lui à lire, au lieu d'une détection par surface. Son seul lecteur,
+ * le passage automatique du hero, a été retiré le 19/09/2026 ; les tests le lisent toujours.
  *
  * LE ZOOM N'EST JAMAIS NEUTRALISÉ (audit du 18/09/2026) : ni le pincement à deux doigts, ni Ctrl +
  * molette. La première version annulait tout `wheel` et tout `touchmove` : menu ou recherche ouverts,
- * un visiteur malvoyant ne pouvait plus agrandir la page. heroAvance.ts faisait déjà l'exception.
+ * un visiteur malvoyant ne pouvait plus agrandir la page.
  *
  * LA PAGE EST AUSSI RENDUE INERTE (audit du 18/09/2026). Le tiroir et la recherche se déclarent
  * `aria-modal` et piègent la tabulation, mais ni l'un ni l'autre n'arrête le curseur virtuel d'un

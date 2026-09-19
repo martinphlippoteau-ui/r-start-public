@@ -29,7 +29,7 @@ export const setupRevealText = (): (() => void) => {
    * ce moment-là était découpé en mots, rendu à opacité 0, puis rejoué : il s'éteignait sous les yeux
    * du visiteur. Deux cas sûrs : l'arrivée par une ancre depuis la recherche du site, qui vise des
    * sections dont le H2 porte cet attribut et l'éclaire au même instant ; et un défilement dans la
-   * première seconde, que le passage automatique du hero amène pile sur le H2 suivant.
+   * première seconde, avant que ce moteur soit arrivé.
    * Lectures groupées AVANT toute écriture, pour ne pas alterner mesure et découpage.
    */
   const titres = all('[data-reveal-text]');
