@@ -109,7 +109,7 @@ const lienClass =
   <div class="mx-auto w-full max-w-3xl shrink-0 px-4 pt-3 sm:px-8 sm:pt-4">
     {
       /* Zone de recherche et non <form> : il n'y a rien à envoyer, pas de page de résultats. Entrée
-        ouvre le premier résultat (src/scripts/recherche.ts). */
+        ouvre le premier résultat (src/scripts/recherche/panneau.ts). */
     }
     <div
       role="search"
@@ -225,7 +225,7 @@ const lienClass =
   </div>
 
   {
-    /* Gabarits clonés par src/scripts/recherche.ts : toute la mise en forme reste dans ce fichier. */
+    /* Gabarits clonés par src/scripts/recherche/panneau.ts : toute la mise en forme reste dans ce fichier. */
   }
   <template data-recherche-gabarit-rubrique>
     <div class="mt-4 first:mt-0" data-rubrique-bloc>
@@ -251,5 +251,5 @@ const lienClass =
 </div>
 
 <script>
-  import '@/scripts/recherche';
+  import '@/scripts/recherche/index';
 </script>

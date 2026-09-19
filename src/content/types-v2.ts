@@ -1,6 +1,7 @@
 /**
  * Types du périmètre v2 (08/09/2026) : blocs de confiance, page Frais, page Documentation, page Presse.
- * Fichier séparé de types.ts pour ne pas interférer avec le lot design ; fusion prévue à l'intégration.
+ * Fichier séparé de types.ts, à l'origine pour ne pas interférer avec le lot design. La fusion annoncée
+ * alors n'a pas été faite : les deux fichiers coexistent, celui-ci n'importe de l'autre que des types.
  */
 import type {
   AdvantageRisk,

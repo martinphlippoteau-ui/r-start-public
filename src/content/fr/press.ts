@@ -1,6 +1,6 @@
 import type { LegalNote } from '@/content/types';
 import type { PressArticle, PressContent, PressQuote } from '@/content/types-v2';
-import { fees, press as pressFacts } from '@/content/fr/facts';
+import { press as pressFacts } from '@/content/fr/facts';
 
 /**
  * Page /presse, « La presse en parle » (grand public, arbitrage du 10/09/2026).

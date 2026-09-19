@@ -9,7 +9,7 @@ import type { SectionKey, SectionMeta } from '@/content/types';
  * et income. La photo pleine largeur 03a-Immeuble (entre Confiance et Souscrire) n'a
  * ni titre, ni note, ni entrée ici : SectionKey (src/content/types.ts) ne la prévoit pas, elle porte son id.
  * Menu (réunion du 10/09/2026) : uniquement des pages (src/config/pages.ts), jamais d'ancre de section :
- * `inNav` est donc false partout et n'est conservé que pour la page de prévisualisation des sections.
+ * `inNav` est donc false partout, et plus rien ne le lit (voir la note sous la table).
  */
 export const sections: Record<SectionKey, SectionMeta> = {
   hero: { id: 'apercu', label: 'Aperçu', order: 1, inNav: false },

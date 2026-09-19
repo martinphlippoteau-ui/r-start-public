@@ -1,36 +1,37 @@
 ---
 /**
- * Stratégie d'investissement : QUATRE sections, rendues uniquement par /strategie.
+ * Stratégie d'investissement : DEUX sections, rendues uniquement par /strategie.
+ *  1. #strategie (paper) les deux moteurs de performance : deux cartes qui se retournent, chacune
+ *                        illustrée par son dessin animé (EngineRent, EngineGain) ;
+ *  2. #quoi      (paper) « Une approche en 3 volets pour les alimenter » : trois tuiles ink, Quoi, Où et
+ *                        Comment (ancres #quoi, #ou, #comment), chacune avec son dessin (StrategySelect,
+ *                        StrategyDiversify, StrategyTiming) et son détail au dos de la carte. Une
+ *                        canalisation les relie aux deux moteurs sur grand écran.
  *
- * REFONTE DU 14/09/2026. L'équipe a fourni le texte exact de la page, « ni plus ni moins ». Elle en
- * comptait cinq (mot d'ordre, deux leviers, trois piliers, zone + types d'actifs, effet de levier),
- * elle en compte quatre, ceux du document (le « Comment » est arrivé après les trois autres) :
- *  1. #strategie (paper) les deux moteurs de performance, numérotés, puis la phrase de méthode ;
- *  2. #quoi      (white) le double potentiel visé, puis la bande de trois photos d'immeubles ;
- *  3. #ou        (ink)   la zone d'investissement à gauche, le globe en rotation à droite ;
- *  4. #comment   (paper) la méthode d'achat en trois temps, et le mot de la fin.
- * La zone « Comment » est arrivée le 14/09/2026, après les trois autres : les images du document
- * fourni étaient coupées, elle n'y figurait pas.
- * Ce qui a disparu avec elles : le mot d'ordre en scène épinglée, les piliers et leurs pictos, la
- * CARTE (elle montrait le Conseil de l'Europe et le Canada, la page dit désormais « partout dans le
- * monde » : elle disait le contraire du texte), les pastilles de types d'actifs, l'effet de levier et
- * les quatre appels de note.
+ * D'OÙ ELLE VIENT. Le 14/09/2026 l'équipe a fourni le texte exact de la page, « ni plus ni moins » :
+ * quatre sections alors (moteurs, quoi, où, comment), avec trois photos d'immeubles et un globe en
+ * rotation. Le 16/09/2026 les trois dernières ont fusionné en trois tuiles à détail, les photos et le
+ * globe ont cédé la place aux dessins. Étaient déjà partis le 14/09 : le mot d'ordre en scène épinglée,
+ * les piliers et leurs pictos, la CARTE (elle montrait le Conseil de l'Europe et le Canada quand la
+ * page dit « partout dans le monde »), les pastilles de types d'actifs, l'effet de levier et les quatre
+ * appels de note.
  *
- * FONDS. Un seul bloc sombre, le dernier. L'en-tête de la page est déjà sombre : une première section
+ * FONDS. Les deux sections sont claires. L'en-tête de la page est déjà sombre : une première section
  * ink enchaînerait deux pavés sombres sans coupure, et un test l'interdit sur toutes les sous-pages.
- * Le ton ink ferme ici la page au lieu de l'ouvrir, et porte la phrase la plus courte du document.
+ * Le sombre est porté par les trois tuiles, puis par le bloc des risques que la page rend ensuite.
  *
- * UNE SEULE MENTION DE RISQUE, en fin de zone 2 : celle que la Conformité a placée elle-même le
- * 14/09/2026, rendue par ui/NoteConformite.astro et non par RiskNote, qui ne rend plus rien. L'en-tête
- * n'en porte plus. D'où l'absence de [data-advantage] et de RiskNote dans le reste de la page.
+ * AUCUNE MENTION DE RISQUE DANS CES DEUX SECTIONS aujourd'hui : celle qui suivait les deux moteurs
+ * (`strategy.engines.disclaimer`, rendue par ui/NoteConformite.astro) a été retirée de l'écran le
+ * 16/09/2026 à la demande de l'équipe, strategy.ts dit comment la rétablir. Le gabarit la rend dès que
+ * le contenu la porte, et la canalisation s'efface alors (`pontVisible`). Les risques sont portés par
+ * le bloc Risques que la page rend ensuite. Aucun [data-advantage] ni RiskNote ici.
  *
- * Motion (src/scripts/motion.ts, tout par attributs) : aucun rideau, la section suit directement
- * l'en-tête ; H2 du premier chapitre mot à mot (data-reveal-text), les deux autres en
- * fade-up court ; filets qui s'étirent (data-draw="width") ; listes en cascade ; photos en cascade
- * avec parallaxe de sens alterné dans chaque cadre (élément surdimensionné de ±12 % pour ne jamais
- * découvrir le bord).
- * Contenu : src/content/fr/strategy.ts. Plus aucune photo depuis le 16/09/2026 : les deux moteurs et
- * les trois tuiles sont illustrés par des dessins animés, chacun dans son propre composant.
+ * Motion (src/scripts/motion.ts, tout par attributs) : aucun rideau ici, la section suit directement
+ * l'en-tête ; H2 du premier chapitre mot à mot (data-reveal-text), celui des volets en fade-up court ;
+ * les trois tuiles entrent en cascade, en bascule (`data-animate-child="tilt"`) ; la canalisation ne
+ * s'anime qu'à l'écran (`data-in-view`). Ni tracé `data-draw` ni parallaxe : relevé sur dist le
+ * 19/09/2026. Les dessins s'animent dans leurs propres composants.
+ * Contenu : src/content/fr/strategy.ts. Plus aucune photo depuis le 16/09/2026.
  * Aucune prop : la section n'appelle plus de note, elle n'a plus besoin du registre de la page.
  */
 import Container from '@/components/ui/Container.astro';
@@ -50,13 +51,6 @@ const id = sections.strategy.id;
 /** Ancres des deux autres chapitres (ids HTML, pas les textes affichés). */
 const ids = { what: 'quoi', where: 'ou', how: 'comment' };
 
-/** Une illustration par moteur, dans l'ordre des items de `strategy.engines`. */
-/**
- * Les trois photos portent la même mention (« Photo d'illustration. Immeuble non détenu par R Start. ») :
- * une seule légende sous la bande suffit. Répétée trois fois côte à côte, elle occupait trois colonnes
- * pour dire la même chose. Si les crédits diffèrent un jour, chaque photo reprend le sien.
- */
-/** Parallaxe des trois photos : douce, sens alterné (haut, bas, haut) ; cadres surdimensionnés de ±12 %. */
 /** Titre suivi d'un paragraphe visible d'emblée : fade-up court pour ne pas chevaucher sa première ligne. */
 const QUIET_TITLE_Y = 12;
 
@@ -90,9 +84,12 @@ const centreColonne = (i: number, n: number, gouttiere: number): number => {
   return Math.round(((i * (colonne + gouttiere) + colonne / 2) / LARGEUR_REF) * 10000) / 10;
 };
 /** Deux moteurs : `sm:grid-cols-2` et `lg:gap-12` (48 px). */
-const [MOTEUR_G, MOTEUR_D] = [0, 1].map((i) => centreColonne(i, 2, 48));
+const MOTEUR_G = centreColonne(0, 2, 48);
+const MOTEUR_D = centreColonne(1, 2, 48);
 /** Trois volets : `lg:grid-cols-3` et `sm:gap-5` (20 px). */
-const [VOLET_G, VOLET_C, VOLET_D] = [0, 1, 2].map((i) => centreColonne(i, 3, 20));
+const VOLET_G = centreColonne(0, 3, 20);
+const VOLET_C = centreColonne(1, 3, 20);
+const VOLET_D = centreColonne(2, 3, 20);
 const NOEUD_X = 500;
 const NOEUD_Y = 150;
 
@@ -276,7 +273,7 @@ const pontVisible = !strategy.engines.outro && !strategy.engines.disclaimer;
   </Container>
 </Section>
 
-{/* 2. Quoi : le double potentiel visé, illustré par les immeubles */}
+{/* 2. Les trois volets : Quoi, Où, Comment */}
 {
   /*
    * TUILES À FENÊTRE (16/09/2026, demande de l'équipe : « j'aime bien le format de card sur le site
@@ -745,6 +742,6 @@ const pontVisible = !strategy.engines.outro && !strategy.engines.disclaimer;
 </style>
 
 <script>
-  /* Tuiles à fenêtre : le contenu arrive dans le flux, le script le déplace dans une <dialog>. */
+  /* Cartes qui se retournent : le détail arrive dans le flux, le script le déplace au dos de la carte. */
   import '@/scripts/carteRetournee';
 </script>

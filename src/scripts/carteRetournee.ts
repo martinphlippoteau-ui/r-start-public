@@ -58,7 +58,10 @@ const init = (): void => {
     const carte = bouton.closest<HTMLElement>('.carte-face');
     const verso = carte?.querySelector<HTMLElement>('.carte-verso');
     const recto = carte?.querySelector<HTMLElement>('.carte-recto');
-    if (!detail || !carte || !verso || !recto) continue;
+    /* Le libellé du bouton de retour vient du contenu (`strategy.dialogClose`, obligatoire). Sans lui,
+       la carte reste dans son état sans script, détail lisible dans le flux : aucun texte en dur ici. */
+    const libelleFermer = bouton.dataset.carteFermer;
+    if (!detail || !carte || !verso || !recto || !libelleFermer) continue;
 
     /* Le contenu quitte le flux pour le dos de la carte. */
     verso.append(detail);
@@ -69,7 +72,7 @@ const init = (): void => {
     /* Le rôle Secondaire sur fond sombre, comme « En savoir plus » au recto (décision F18 du 17/09/2026) ;
        `carte-retour` ne porte que son placement. */
     fermer.className = 'carte-retour btn btn-motion btn-outline-light btn-sm';
-    fermer.textContent = bouton.dataset.carteFermer ?? 'Fermer';
+    fermer.textContent = libelleFermer;
     verso.append(fermer);
 
     bouton.hidden = false;

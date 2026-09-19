@@ -38,6 +38,14 @@
  *
  * `scroll-behavior: smooth` (global.css) est suspendu pendant le trajet : chaque `scrollTo` de l'animation
  * lancerait sinon son propre défilement doux, et les deux se battraient.
+ *
+ * LES DEUX ÉCOUTEURS NON PASSIFS NE VIVENT QUE DANS LA ZONE DU PASSAGE (audit du 18/09/2026). `wheel` et
+ * `touchmove` doivent pouvoir annuler le geste, donc `passive: false` ; or un écouteur non passif sur
+ * `window` interdit au navigateur de défiler sur le fil du compositeur : chaque cran de molette, chaque
+ * début de glissé attend le script. Posés pour toute la vie de la page, ils freinaient le défilement
+ * jusqu'au pied de page, sur la page où le fil principal est le plus chargé, pour conclure « rien à
+ * faire » dès qu'on avait quitté le premier écran. Un écouteur `scroll` passif les pose et les retire :
+ * présents du haut de la page jusqu'à `ZONE` pixels sous le début du contenu, absents au-delà.
  */
 
 const HERO = '#apercu';
@@ -50,6 +58,12 @@ const PAUSE_GESTE = 160;
 const PLAFOND_TRAINE = 1200;
 /** Glissé minimal du doigt avant de décider d'un sens. */
 const SEUIL_DOIGT = 8;
+/**
+ * Marge de la zone d'écoute sous le début du contenu, en pixels. Le passage lui-même s'arrête au début
+ * du contenu ; la marge laisse la traîne d'inertie qui suit l'arrivée se faire absorber comme avant,
+ * même si ses derniers crans ont poussé la page de quelques pixels.
+ */
+const ZONE = 240;
 
 /*
  * Courbe cubic-bezier(0.33, 0, 0.15, 1) : un départ franc sans être brutal, qui prolonge le geste déjà
@@ -271,9 +285,36 @@ const init = (): void => {
     contenu.focus({ preventScroll: true });
   };
 
-  window.addEventListener('wheel', surMolette, { passive: false });
+  /* ── Écouteurs non passifs : dans la zone du passage seulement ────────────────────────────── */
+  /* Le début du contenu, en cache pour le seul test de zone, que l'écouteur `scroll` rejoue à chaque
+     image : `destination()` garde sa mesure exacte, prise au moment du geste. */
+  let hautConnu = cible();
+  let aLEcoute = false;
+  const regler = (): void => {
+    const voulu = enCours !== null || y() <= hautConnu + ZONE;
+    if (voulu === aLEcoute) return;
+    aLEcoute = voulu;
+    if (voulu) {
+      window.addEventListener('wheel', surMolette, { passive: false });
+      window.addEventListener('touchmove', surDoigt, { passive: false });
+    } else {
+      window.removeEventListener('wheel', surMolette);
+      window.removeEventListener('touchmove', surDoigt);
+    }
+  };
+  const remesurer = (): void => {
+    hautConnu = cible();
+    regler();
+  };
+  window.addEventListener('scroll', regler, { passive: true });
+  window.addEventListener('resize', remesurer, { passive: true });
+  if (document.readyState !== 'complete')
+    window.addEventListener('load', remesurer, { once: true });
+  /* Le hero change de hauteur sans que la fenêtre change : polices chargées, zoom du texte. */
+  if (typeof ResizeObserver === 'function') new ResizeObserver(remesurer).observe(hero);
+  regler();
+
   window.addEventListener('touchstart', surDebutDoigt, { passive: true });
-  window.addEventListener('touchmove', surDoigt, { passive: false });
   window.addEventListener('touchend', surFinDoigt, { passive: true });
   window.addEventListener('touchcancel', surFinDoigt, { passive: true });
   window.addEventListener('keydown', surTouche);

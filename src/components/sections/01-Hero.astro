@@ -15,7 +15,9 @@
  * transform seul (`data-intro-move`), c'est le cas de TOUS les textes et des CTA depuis le 11/09/2026 :
  * un contrôle d'accessibilité qui mesure la page pendant la cascade voyait le bouton à 30 % d'opacité, donc
  * un contraste de 1,19:1 (axe, reproductible). Le logo n'a ni data-intro ni data-animate ; plus d'image à
- * précharger (src/lib/hero-image.ts est vide).
+ * précharger. Un futur visuel du hero devra n'avoir qu'UNE définition (largeurs, format, `sizes`),
+ * reprise par la balise <Image> et par le <link rel="preload"> d'index.astro : c'était le rôle de
+ * src/lib/hero-image.ts, resté vide du 11/09 au 19/09/2026 puis supprimé.
  * Motion (src/scripts/motion.ts), orchestration d'ouverture (11/09/2026) :
  *  - la marque est le point fixe : peinte au premier rendu (candidat LCP, descendante du H1 : le moteur
  *    refuse tout effet sur elle), elle est le rang 0 autour duquel la cascade `data-intro` (CSS pur,

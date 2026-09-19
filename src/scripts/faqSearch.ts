@@ -1,11 +1,11 @@
 /**
  * Recherche interne de /faq (16/09/2026). Elle FILTRE une liste déjà rendue, elle n'interroge rien :
- * les dix-huit questions sont dans le HTML, la page se lit donc entière sans script, et le champ
+ * toutes les questions sont dans le HTML, la page se lit donc entière sans script, et le champ
  * n'apparaît que si celui-ci s'exécute (il arrive `hidden`, comme les boutons « i »).
  *
  * LA COMPARAISON EST INSENSIBLE AUX ACCENTS ET À LA CASSE : on cherche « frais » et on veut trouver
- * « Frais d'entrée », on tape « interet » et on veut « intérêt ». `normalize('NFD')` décompose les
- * lettres accentuées, la plage U+0300 à U+036F retire les diacritiques.
+ * « Frais d'entrée », on tape « interet » et on veut « intérêt ». Le pliage est celui de tout le site
+ * (src/lib/texte.ts), le même que la recherche de la barre : « oeuvre » trouve « œuvre » ici aussi.
  *
  * ON CHERCHE DANS LA QUESTION ET DANS LA RÉPONSE. Chercher dans la seule question passerait à côté de
  * « retrait », qui n'est dans aucun intitulé mais dans trois réponses.
@@ -16,7 +16,7 @@
  * celles qui restent, s'effacer celles qui partent, paraître celles qui reviennent. La page, elle, ne
  * bouge pas (global.css, `vt-filtre`). Sans l'API, ou en mouvement réduit : filtrage instantané.
  */
-const sansAccent = (t: string): string => t.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+import { plier } from '@/lib/texte';
 
 const init = (): void => {
   const enveloppe = document.querySelector<HTMLElement>('[data-faq-recherche]');
@@ -28,12 +28,10 @@ const init = (): void => {
 
   const lignes = [...liste.children].filter((e): e is HTMLElement => e instanceof HTMLElement);
   /* Le texte de chaque question est relevé UNE FOIS : refaire `textContent` à chaque frappe relit
-     dix-huit réponses entières à chaque lettre. */
+     toutes les réponses, en entier, à chaque lettre. */
   /* La QUESTION ET SA RÉPONSE seulement, pas le libellé de rubrique que chaque <li> porte désormais :
      « frais » retiendrait sinon toute la rubrique « Les frais », questions sans rapport comprises. */
-  const index = lignes.map((li) =>
-    sansAccent((li.querySelector('details') ?? li).textContent ?? '')
-  );
+  const index = lignes.map((li) => plier((li.querySelector('details') ?? li).textContent ?? ''));
 
   const gabarit = compte?.dataset.gabarit ?? '';
   const gabaritUn = compte?.dataset.gabaritUn ?? gabarit;
@@ -52,13 +50,13 @@ const init = (): void => {
   let annonce = 0;
 
   const appliquer = (): void => {
-    const q = sansAccent(champ.value.trim());
+    const q = plier(champ.value.trim());
     let trouvees = 0;
     /* Le libellé de rubrique s'affiche sur la première question VISIBLE de chaque rubrique : le filtre
        masque des <li> entiers, et le libellé d'une rubrique partait avec sa première question. */
     let rubriqueVisible: string | undefined;
     lignes.forEach((li, i) => {
-      const garde = q === '' || index[i].includes(q);
+      const garde = q === '' || (index[i] ?? '').includes(q);
       li.hidden = !garde;
       if (!garde) return;
       trouvees += 1;

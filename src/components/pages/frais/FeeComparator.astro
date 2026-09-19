@@ -322,10 +322,23 @@ const data = scpis.map((s) => ({
    * reste affiché, c'est la seule règle métier ici.
    */
   (() => {
+    /* Ce que le gabarit sérialise plus haut (`data`, dans l'en-tête du composant). `JSON.parse` rend
+       `any` : sans ce type, la règle du « taux le plus bas » n'était vérifiée par personne. */
+    interface Reglages {
+      data: {
+        name: string;
+        manager: string;
+        values: (string | null)[];
+        details: (string | null)[];
+        source: string | null;
+        documentee: boolean;
+      }[];
+      pendingLabel: string;
+      notPublishedLabel: string;
+    }
     const bloc = document.querySelector('[data-reglages="comparateur"]');
     if (!bloc?.textContent) return;
-    const reglages = JSON.parse(bloc.textContent);
-    const { data, pendingLabel, notPublishedLabel } = reglages;
+    const { data, pendingLabel, notPublishedLabel } = JSON.parse(bloc.textContent) as Reglages;
     const table = document.querySelector('[data-comparator]');
     const select = document.querySelector<HTMLSelectElement>('[data-comparator-select]');
     if (!table || !select) return;
@@ -379,7 +392,7 @@ const data = scpis.map((s) => ({
          * nombre est suivi du signe, la valeur était donc lue comme un taux unique de 12 %.
          */
         const m = t.trim().match(/^(\d+(?:[,.]\d+)?)\s*%(?:\s*(?:TTC|HT))?$/);
-        return m ? parseFloat(m[1].replace(',', '.')) : null;
+        return m?.[1] ? parseFloat(m[1].replace(',', '.')) : null;
       };
       lignes.forEach((ligne, i) => {
         const g = seul(ligne.gauche?.dataset.feeCompare || ligne.gauche?.textContent);

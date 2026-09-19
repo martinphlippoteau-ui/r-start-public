@@ -8,24 +8,23 @@
  *  2. bande photo pleine largeur, hors section (décorative, sans titre : elle n'a donc pas d'ancre) ;
  *  3. #gamme   (white) la gamme des cinq SCPI, tuile R Start marquée « Nouveau ».
  * La section #savoir-faire, qui décrivait les trois familles de solutions du groupe, a été RETIRÉE le
- * 14/09/2026 à la demande de l'équipe ; son contenu reste dans corum.ts (`expertise`) et ses trois
- * visuels dans media.ts (`expertise`).
+ * 14/09/2026 à la demande de l'équipe ; son contenu reste dans corum.ts (`expertise`), prêt à
+ * resservir. Ses trois visuels, eux, ont quitté media.ts le 15/09/2026 avec les dernières photographies.
  * Ces blocs étaient sur l'accueil jusqu'au 11/09/2026 ; ils ont leur place ici, où le sujet est la
  * société de gestion.
  * La photo n'a PAS de parallaxe : `data-parallax` exige le moteur GSAP, que cette page n'a aucune autre
  * raison de télécharger (tests/performance.spec.ts). Elle se révèle par `data-animate="clip"`, rendu par
  * le moteur léger.
- * Le contre-poids de la gamme (corum.disclaimer) est toujours passé à RiskNote, qui ne rend plus rien
- * depuis le 14/09/2026 : il reparaîtra avec les autres mentions.
- * Contenu : src/content/fr/corum.ts et media.ts. Notes résolues dans celles de la page (about.notes).
+ * Le contre-poids de la gamme (`disclaimer`, dans corum.ts) n'est plus rendu ici : RiskNote ne rend plus
+ * rien depuis le 14/09/2026, et l'appel est parti avec l'ancienne gamme. Le texte reste dans corum.ts.
+ * Contenu : src/content/fr/corum.ts (le lien vers corum.fr), corumRange.ts, trust.ts et media.ts. Notes
+ * résolues dans celles de la page (about.notes).
  */
 import { Image, Picture } from 'astro:assets';
 import amfLogo from '@/assets/logos/amf.svg';
-import brandLogo from '@/assets/logos/r-start-couleur.svg';
 import Button from '@/components/ui/Button.astro';
 import Container from '@/components/ui/Container.astro';
 import NoteRef from '@/components/ui/NoteRef.astro';
-import RiskNote from '@/components/ui/RiskNote.astro';
 import Section from '@/components/ui/Section.astro';
 import Stat from '@/components/ui/Stat.astro';
 import { corum } from '@/content/fr/corum';
@@ -33,7 +32,6 @@ import { corumRange } from '@/content/fr/corumRange';
 import { trust as trustFacts } from '@/content/fr/facts';
 import { trust } from '@/content/fr/trust';
 import { media, AFFICHER_LEGENDES } from '@/content/fr/media';
-import { product } from '@/content/fr/facts';
 import { resolveImage } from '@/lib/images';
 import type { LegalNote } from '@/content/types';
 
@@ -45,26 +43,7 @@ interface Props {
 const { tone = 'white', notes } = Astro.props as Props;
 const officePhoto = await resolveImage(media.corum.src);
 const stats = trust.stats;
-/*
- * DATE DE CRÉATION SOUS CHAQUE TUILE (16/09/2026, demande de l'équipe). Le gabarit vient du contenu,
- * l'année aussi : le composant ne fabrique aucun texte. Une SCPI sans année rend une tuile inchangée.
- */
-const range = corum.range.scpiNames.map((name) => {
-  const annee = corum.range.scpiCreated?.[name];
-  const gabarit = corum.range.scpiCreatedLabel;
-  return {
-    name,
-    current: name === product.name,
-    created: annee && gabarit ? gabarit.replace('{year}', annee) : undefined,
-  };
-});
-const LOGO_STAGGER = 0.08;
 const QUIET_TITLE_Y = 12;
-/*
- * `corum.expertise` n'est plus lu : la section des trois savoir-faire est partie le 14/09/2026.
- * Le contenu reste dans corum.ts, prêt à resservir ; les trois visuels, eux, ont été retirés de
- * media.ts le 15/09/2026 avec les dernières photographies du site.
- */
 ---
 
 {/* 1. Le groupe CORUM en chiffres */}
@@ -95,7 +74,7 @@ const QUIET_TITLE_Y = 12;
       ]}
     >
       {
-        /* Les chiffres comptent depuis 0, en place, avec une durée liée à leur ordre de grandeur. */
+        /* Chiffres STATIQUES : aucun ne passe `numeric` à Stat, le compteur animé n'est pas déclenché. */
       }
       {
         stats.items.map((s) => (
@@ -225,8 +204,8 @@ const QUIET_TITLE_Y = 12;
   /*
    * SECTION « Les trois savoir-faire de CORUM L'Épargne » SUPPRIMÉE le 14/09/2026, demande de l'équipe.
    * Elle décrivait les trois familles de solutions du groupe (SCPI, fonds obligataires, assurance vie
-   * et plan d'épargne retraite), chacune avec sa photo. Le contenu reste dans corum.ts (`expertise`) et
-   * les trois visuels dans media.ts (`expertise`) : rien n'est perdu, la page ne les appelle plus.
+   * et plan d'épargne retraite), chacune avec sa photo. Le contenu reste dans corum.ts (`expertise`) ;
+   * les trois visuels, eux, ont quitté media.ts le 15/09/2026 (l'historique git les garde).
    * La page passe ainsi de cinq blocs à quatre : l'histoire, les chiffres, la photo des bureaux, la gamme.
    */
 }

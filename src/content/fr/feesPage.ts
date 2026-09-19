@@ -115,7 +115,7 @@ const [w0, w1, w2, w3, w4] = steps;
 /** « 10 / 7 / 5 / 3 / 0 % ». */
 const withdrawalValue = `${steps.map((s) => s.rate.replace(/\s*%$/, '')).join(' / ')} %`;
 /** « 10 à 0 % » : variante courte du barème de retrait pour les écrans étroits. */
-const withdrawalValueShort = `${w0.rate.replace(/\s*%$/, '')} à ${steps[steps.length - 1].rate}`;
+const withdrawalValueShort = `${w0.rate.replace(/\s*%$/, '')} à ${w4.rate}`;
 /** « 10 % (< 4 ans), 7 % (5e-6e année), … ». */
 const withdrawalDetail = `Dégressive selon la durée de détention : ${steps.map((s) => `${s.rate} (${s.short})`).join(', ')}.`;
 /** « 10, 7, 5 ou 3 % ». */

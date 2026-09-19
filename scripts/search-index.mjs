@@ -21,7 +21,7 @@
  * fois.
  *
  * SORTIE : dist/recherche.json, chargé par le panneau à la première ouverture seulement
- * (src/scripts/recherche.ts). En développement, le même index est construit à la volée à partir des
+ * (src/scripts/recherche/panneau.ts). En développement, le même index est construit à la volée à partir des
  * pages servies par le serveur de dev.
  */
 import { promises as fs } from 'node:fs';
@@ -30,6 +30,7 @@ import path from 'node:path';
 import { parse, ELEMENT_NODE, TEXT_NODE } from 'ultrahtml';
 import { querySelector, querySelectorAll } from 'ultrahtml/selector';
 import { menuPages, pages } from '../src/config/pages.ts';
+import { plier } from '../src/lib/texte.ts';
 
 export const FICHIER_INDEX = 'recherche.json';
 
@@ -122,11 +123,9 @@ const texte = (racine, { sauf, titre = false } = {}) => {
   );
 };
 
+/** Clé de comparaison de deux titres de section : le pliage du site (src/lib/texte.ts), mots seuls. */
 const normaliser = (s) =>
-  s
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
+  plier(s)
     .replace(/[^a-z0-9]+/g, ' ')
     .trim();
 

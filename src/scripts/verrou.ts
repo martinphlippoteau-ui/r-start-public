@@ -1,6 +1,6 @@
 /**
  * VERROU DE PAGE (18/09/2026) : la page ne défile plus derrière ce qui la recouvre. Deux surfaces s'en
- * servent, le tiroir du menu (SiteNav.astro) et le panneau de recherche (src/scripts/recherche.ts).
+ * servent, le tiroir du menu (SiteNav.astro) et le panneau de recherche (src/scripts/recherche/panneau.ts).
  *
  * PAS `overflow: hidden` SUR <html>, le verrou classique. Il retire la barre de défilement : avec une
  * barre classique (Windows, souris branchée sur Mac), la page se recentre de 7 px à chaque ouverture,

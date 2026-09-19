@@ -12,8 +12,8 @@
  */
 import Container from '@/components/ui/Container.astro';
 import Section from '@/components/ui/Section.astro';
-import PressNoteRef from '@/components/pages/presse/PressNoteRef.astro';
-import { press } from '@/content/fr/press';
+import NoteRef from '@/components/ui/NoteRef.astro';
+import { notes, press } from '@/content/fr/press';
 
 const id = 'citations-presse';
 const { quotes } = press;
@@ -29,7 +29,7 @@ const labels = press.labels ?? {};
           <p class="text-lead mt-5 text-pretty text-slate-700 sm:mt-6">
             {quotes.intro}
             <span class="whitespace-nowrap">
-              <PressNoteRef id="presse-citations" />
+              <NoteRef id="presse-citations" notes={notes} />
             </span>
           </p>
         )

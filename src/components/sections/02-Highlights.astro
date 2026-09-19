@@ -60,7 +60,7 @@ const enExposant = (
 ): (string | { chiffre: string; suffixe: string })[] =>
   valeur.split(/(\d+(?:ers?|res?|es?|ds?|des?)\b)/).map((bout) => {
     const m = /^(\d+)(ers?|res?|es?|ds?|des?)$/.exec(bout);
-    return m ? { chiffre: m[1], suffixe: m[2] } : bout;
+    return m?.[1] && m[2] ? { chiffre: m[1], suffixe: m[2] } : bout;
   });
 
 ---

@@ -743,7 +743,7 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
 }
 
 /* ===========================================================================================
-   RECHERCHE DU SITE (SiteNav.astro, SiteSearch.astro, src/scripts/recherche.ts ; 17/09/2026)
+   RECHERCHE DU SITE (SiteNav.astro, SiteSearch.astro, src/scripts/recherche/ ; 17/09/2026)
    ===========================================================================================
    La loupe n'est affichée que si les scripts s'exécutent : sans eux, elle n'ouvrirait rien. Par la
    requête média et non par un `hidden` retiré au chargement, pour que la barre ne change pas d'un
@@ -759,7 +759,7 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   }
 }
 /* Navigateurs qui exécutent les scripts mais ignorent `@media (scripting)` (Safari 16, Chrome 119 et
-   plus anciens) : src/scripts/recherche.ts pose cette classe quand il trouve la loupe masquée. */
+   plus anciens) : src/scripts/recherche/panneau.ts pose cette classe quand il trouve la loupe masquée. */
 .recherche-loupe.recherche-loupe-forcee {
   display: grid;
   place-items: center;
@@ -916,7 +916,7 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
 /* ARRIVÉE SUR LE PASSAGE : le titre de la section ou la question visée s'éclaire puis s'éteint. Un
    anneau et un voile teal très léger, sans toucher à la couleur du texte : le titre reste lisible sur
    les sections claires comme sur les sombres. En mouvement réduit, l'anneau est fixe et disparaît
-   d'un coup (src/scripts/recherche.ts). */
+   d'un coup (src/scripts/recherche/panneau.ts). */
 [data-recherche-cible] {
   border-radius: 0.75rem;
 }

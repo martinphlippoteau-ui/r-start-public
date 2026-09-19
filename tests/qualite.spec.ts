@@ -120,7 +120,7 @@ test.describe('Qualité', () => {
       )
     );
     expect(events.length).toBe(1);
-    expect(events[0].cta_position).toBeTruthy();
+    expect(events[0]?.cta_position).toBeTruthy();
   });
 
   test('aucun appel Google avant consentement, cookie posé après refus', async ({
@@ -537,6 +537,104 @@ test.describe('Qualité', () => {
   });
 
   /*
+   * TOUTE PASTILLE FLOTTANTE A SON ÉQUIVALENT DANS LE FLUX (audit du 18/09/2026). Les pastilles sont
+   * rendues après </main> : au clavier, on ne les atteint qu'en bas de page, où celle du comparateur est
+   * repliée depuis longtemps (`visibility: hidden`). Ce n'est acceptable que si la même destination est
+   * offerte par un lien de <main>, que la tabulation rencontre en chemin.
+   */
+  test('chaque pastille flottante a un lien de même destination dans le contenu', async ({
+    page,
+  }) => {
+    await page.goto('/');
+    const releve = await page.evaluate(() => {
+      const chemin = (a: HTMLAnchorElement) => a.pathname.replace(/\/+$/, '') + a.hash;
+      const dansLeFlux = new Set(
+        [...document.querySelectorAll<HTMLAnchorElement>('main a[href]')].map(chemin)
+      );
+      return [...document.querySelectorAll<HTMLAnchorElement>('[data-sticky-cta] a[href]')].map(
+        (a) => ({
+          pastille: (a.textContent ?? '').replace(/\s+/g, ' ').trim(),
+          vers: chemin(a),
+          equivalent: dansLeFlux.has(chemin(a)),
+        })
+      );
+    });
+    expect(releve.length, 'les deux pastilles de l’accueil').toBe(2);
+    expect(releve.filter((r) => !r.equivalent)).toEqual([]);
+  });
+
+  /*
+   * HORS DU PREMIER ÉCRAN, LE DÉFILEMENT NE DOIT RIEN AU SCRIPT (audit du 18/09/2026). Le passage du hero
+   * a besoin de deux écouteurs non passifs, `wheel` et `touchmove`, et un écouteur non passif sur `window`
+   * oblige le navigateur à attendre le script avant chaque défilement. Ils restaient posés jusqu'au pied
+   * de page. Les écouteurs sont lus par le protocole du navigateur : une molette synthétique ne prouverait
+   * rien, le gestionnaire sortait déjà sans rien faire.
+   */
+  test('les écouteurs bloquants du hero ne vivent que dans la zone du passage', async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(isMobile, 'la molette est un geste de bureau');
+    await page.goto('/');
+    await page.locator('#consent-banner button').first().click();
+    const cdp = await page.context().newCDPSession(page);
+    const bloquants = async () => {
+      const { result } = await cdp.send('Runtime.evaluate', { expression: 'window' });
+      const { listeners } = await cdp.send('DOMDebugger.getEventListeners', {
+        objectId: result.objectId!,
+      });
+      return listeners
+        .filter((l) => (l.type === 'wheel' || l.type === 'touchmove') && !l.passive)
+        .map((l) => l.type)
+        .sort();
+    };
+    const allerA = (y: number) =>
+      page.evaluate(
+        (v) =>
+          new Promise<void>((resolve) => {
+            document.documentElement.style.scrollBehavior = 'auto';
+            window.scrollTo(0, v);
+            requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+          }),
+        y
+      );
+    const haut = await page.evaluate(() =>
+      Math.round(
+        document.querySelector('#ce-qui-change')!.getBoundingClientRect().top + window.scrollY
+      )
+    );
+
+    expect(await bloquants(), 'en haut de page : le passage écoute').toEqual([
+      'touchmove',
+      'wheel',
+    ]);
+    await allerA(haut);
+    expect(await bloquants(), 'au début du contenu : il écoute encore, pour le retour').toEqual([
+      'touchmove',
+      'wheel',
+    ]);
+    await allerA(haut + 1200);
+    await expect
+      .poll(bloquants, { message: 'plus bas : plus aucun écouteur bloquant' })
+      .toEqual([]);
+
+    /* Et il reprend son service au retour : un cran vers le haut depuis le début du contenu ramène au
+       hero, comme avant d'être allé voir plus bas. */
+    await allerA(haut);
+    await expect
+      .poll(bloquants, { message: 'de retour dans la zone : il écoute de nouveau' })
+      .toEqual(['touchmove', 'wheel']);
+    await page.mouse.move(200, 300);
+    await page.mouse.wheel(0, -100);
+    await expect
+      .poll(() => page.evaluate(() => Math.round(window.scrollY)), {
+        message: 'le passage fonctionne après un aller-retour hors zone',
+        timeout: 4000,
+      })
+      .toBe(0);
+  });
+
+  /*
    * LE CONSENT MODE ARRIVE À GTM SOUS LA FORME QU'IL ATTEND (audit du 18/09/2026). GTM ne lit une
    * commande gtag que si l'entrée du dataLayer est un objet Arguments. `gtag(...args)` y poussait un
    * tableau : ni le refus par défaut, ni l'accord, ni le retrait n'arrivaient au conteneur, et rien ne
@@ -888,7 +986,7 @@ test.describe('Qualité', () => {
         const clarte = (el: Element) => {
           const canaux = getComputedStyle(el).backgroundColor.match(/\d+/g);
           if (!canaux) return 1;
-          const [r, v, b] = canaux.map(Number);
+          const [r = 0, v = 0, b = 0] = canaux.map(Number);
           return (0.2126 * r + 0.7152 * v + 0.0722 * b) / 255;
         };
         const entete = document.querySelector('#en-tete');
@@ -958,8 +1056,8 @@ test.describe('Qualité', () => {
           ctx.fillStyle = '#000';
           ctx.fillStyle = c;
           ctx.fillRect(0, 0, 1, 1);
-          const d = ctx.getImageData(0, 0, 1, 1).data;
-          return { r: d[0], g: d[1], b: d[2], a: d[3] / 255 };
+          const [r = 0, g = 0, b = 0, a = 0] = ctx.getImageData(0, 0, 1, 1).data;
+          return { r, g, b, a: a / 255 };
         };
         type C = { r: number; g: number; b: number };
         const lum = ({ r, g, b }: C) => {
@@ -996,7 +1094,7 @@ test.describe('Qualité', () => {
             let base: C = fond ?? { r: 255, g: 255, b: 255 };
             for (const c of couches.reverse()) base = sur(c, base);
             const texte = sur(rgba(getComputedStyle(el).color), base);
-            const [x, y] = [lum(texte), lum(base)].sort((m, n) => n - m);
+            const [x = 0, y = 0] = [lum(texte), lum(base)].sort((m, n) => n - m);
             return [
               {
                 libelle: (el.textContent ?? '').replace(/\s+/g, ' ').trim(),

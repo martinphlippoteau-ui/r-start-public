@@ -57,16 +57,17 @@ const AFFICHER = false;
 ---
 
 {
-  AFFICHER && n !== null && interactive && (
-    <a href={'#' + sections.notes.id + '-' + n} class:list={classes} aria-label={label}>
-      {n}
-    </a>
-  )
-}
-{
-  AFFICHER && n !== null && !interactive && (
-    <span class:list={classes} aria-hidden="true">
-      {n}
-    </span>
-  )
+  /* UNE SEULE EXPRESSION, et non deux blocs à la suite : le retour à la ligne entre deux blocs sort en
+    espace dans le HTML, même quand aucun ne rend rien, et se glisserait après chaque appel de note. */
+  AFFICHER &&
+    n !== null &&
+    (interactive ? (
+      <a href={'#' + sections.notes.id + '-' + n} class:list={classes} aria-label={label}>
+        {n}
+      </a>
+    ) : (
+      <span class:list={classes} aria-hidden="true">
+        {n}
+      </span>
+    ))
 }

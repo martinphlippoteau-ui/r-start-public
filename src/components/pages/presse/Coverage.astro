@@ -22,8 +22,8 @@
  */
 import Container from '@/components/ui/Container.astro';
 import Section from '@/components/ui/Section.astro';
-import PressNoteRef from '@/components/pages/presse/PressNoteRef.astro';
-import { press } from '@/content/fr/press';
+import NoteRef from '@/components/ui/NoteRef.astro';
+import { notes, press } from '@/content/fr/press';
 
 const id = 'revue-de-presse';
 const disclaimerId = 'avertissement-presse';
@@ -44,7 +44,9 @@ const titleClass = 'text-lg font-semibold leading-snug tracking-tight text-ink s
     <header class="max-w-4xl">
       <h2 id={id + '-title'} class="text-display-md text-ink">{coverage.title}</h2>
       <p class="text-lead mt-5 text-pretty text-slate-700 sm:mt-6">
-        {coverage.intro}<span class="whitespace-nowrap"><PressNoteRef id="presse-revue" /></span>
+        {coverage.intro}<span class="whitespace-nowrap"
+          ><NoteRef id="presse-revue" notes={notes} /></span
+        >
       </p>
     </header>
     {

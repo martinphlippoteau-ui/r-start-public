@@ -5,7 +5,7 @@
  *  - breadcrumbJsonLd(key) : BreadcrumbList d'une sous-page (src/config/pages.ts → breadcrumb).
  *  - faqJsonLd(items)      : FAQPage, strictement les questions / réponses visibles.
  * Interdits (signaux marchands trompeurs sur un produit financier) : Product, Offer, AggregateRating.
- * Logique extraite de src/pages/index.astro ; l'intégrateur y remplace le bloc inline par ces appels.
+ * Appelé par les pages, l'accueil compris, qui passent le résultat à Base.astro (prop `jsonLd`).
  */
 import publisherLogo from '@/assets/logos/corum-lepargne-couleur.svg';
 import { breadcrumb, type PageKey } from '@/config/pages';

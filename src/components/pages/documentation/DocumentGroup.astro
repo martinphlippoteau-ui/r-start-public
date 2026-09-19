@@ -19,7 +19,8 @@ import type {
   DocumentationLabels,
   DocumentGroupKey,
 } from '@/content/types-v2';
-import DocNoteRef from './DocNoteRef.astro';
+import NoteRef from '@/components/ui/NoteRef.astro';
+import { notes } from '@/content/fr/documentation';
 import { withBase } from '@/lib/href';
 
 interface Props {
@@ -61,7 +62,7 @@ const cardTone = tone === 'paper' ? 'bg-white shadow-card' : 'bg-paper ring-1 ri
             {
               introNoteIds[group.key].map((noteId) => (
                 <span class="whitespace-nowrap">
-                  <DocNoteRef id={noteId} />
+                  <NoteRef id={noteId} notes={notes} />
                 </span>
               ))
             }
@@ -126,7 +127,7 @@ const cardTone = tone === 'paper' ? 'bg-white shadow-card' : 'bg-paper ring-1 ri
                       <span class="relative z-10 tabular-nums">
                         {kbFormat.format(item.kb)}
                         {labels.sizeUnit && <> {labels.sizeUnit}</>}
-                        <DocNoteRef id="documentation-poids" />
+                        <NoteRef id="documentation-poids" notes={notes} />
                       </span>
                     </>
                   )}
@@ -137,7 +138,7 @@ const cardTone = tone === 'paper' ? 'bg-white shadow-card' : 'bg-paper ring-1 ri
                 <p class="mt-4 flex items-center justify-between gap-4 text-sm text-slate-700">
                   <span class="relative z-10">
                     {item.version}
-                    <DocNoteRef id="documentation-versions" />
+                    <NoteRef id="documentation-versions" notes={notes} />
                   </span>
                   <svg
                     aria-hidden="true"

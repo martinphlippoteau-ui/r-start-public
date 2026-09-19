@@ -15,6 +15,11 @@
  *    déclarent que cela : elles ne téléchargent plus GSAP.
  * Les deux ne cohabitent jamais : aucune double animation possible.
  *
+ * EN SOMMEIL (relevé sur dist le 19/09/2026) : `data-on-load`, `data-counter`, `data-fill`, `data-scene`
+ * et `data-pin` ne sont portés par aucune page. Ils restent dans le vocabulaire et dans le moteur, où
+ * ils ne trouvent rien à faire (deux à trois Ko dans un chunk de 122 Ko, chargé au repos). Chaque
+ * module le dit en tête ; qui rallume un effet retire la mention.
+ *
  * ┌ VOCABULAIRE ─────────────────────────────────────────────────────────────────────────────────┐
  * │ Chargement (CSS pur, sans GSAP)                                                               │
  * │  data-intro="1|2|3…"          cascade d'entrée (opacity + translateY 18 px, 500 ms, expo.out,  │

@@ -1,8 +1,9 @@
 ---
 /**
  * Navigation unique du site (plan V2 §1) : une seule barre, collée en haut de page, qui remplace
- * l'ancien couple Header + SubNav. Un seul landmark de navigation par page (`<nav aria-label>`),
- * qui contient la barre et le panneau plein écran des petits écrans.
+ * l'ancien couple Header + SubNav. UN SEUL landmark pour la navigation du site (`<nav aria-label>`),
+ * qui contient la barre et le panneau plein écran des petits écrans. Une page peut en porter
+ * d'autres, chacun nommé : fil d'Ariane, sommaires de /documentation, pied de page.
  *
  * Forme (11/09/2026, demande de l'équipe) : ce n'est plus un bandeau pleine largeur mais une PASTILLE
  * FLOTTANTE, décollée du haut et des bords de `--spacing-nav-gap`, gros rayon (`--radius-nav`),
@@ -42,10 +43,10 @@
  *    demande de l'équipe ; `nav.brandSuffix` n'a plus de consommateur, il reste dans nav.ts parce que
  *    NavContent l'exige encore) ;
  *  - un TIROIR qui entre par la droite (aria-expanded / aria-controls, Échap, piège à focus, retour du
- *    focus sur le bouton, voile cliquable) et liste les mêmes entrées à la verticale. Il vaut à toutes
- *    les largeurs : au premier écran, le bouton Menu est le seul repère de la barre, y compris sur grand
- *    écran, et il n'y montre que ses trois barres, le mot « Menu » n'y est que pour les lecteurs
- *    d'écran tant que la barre n'a pas pris sa matière.
+ *    focus sur le bouton, voile cliquable) et liste les mêmes entrées à la verticale. Il ne s'ouvre que
+ *    SOUS « lg » : au-delà, les pages sont dans la barre et le bouton Menu est masqué (`lg:hidden`).
+ *    Sous 26 rem, le bouton ne montre que ses trois barres, le mot « Menu » reste pour les lecteurs
+ *    d'écran.
  *
  * Matière : la barre est PLEINE dès le premier pixel, sur toutes les pages du site (12/09/2026, demande
  * de l'équipe). Elle portait jusque-là un voile propre à l'accueil, transparent au premier écran, le
@@ -506,7 +507,7 @@ const linkClass =
 
       const open = () => {
         if (isOpen()) return;
-        /* Une seule surface à la fois : la recherche se ferme d'abord (src/scripts/recherche.ts écoute).
+        /* Une seule surface à la fois : la recherche se ferme d'abord (src/scripts/recherche/panneau.ts écoute).
            Ouverts ensemble, les deux pièges à tabulation se renvoyaient le focus à chaque Tab. */
         document.dispatchEvent(new CustomEvent('rstart:recherche:fermer'));
         window.clearTimeout(hideTimer);
@@ -586,9 +587,9 @@ const linkClass =
         }
       });
 
-      /* Le tiroir vaut à TOUTES les largeurs depuis le 11/09/2026 : au premier écran, le bouton Menu est
-         le seul repère de la barre, sur téléphone comme sur grand écran. Plus de fermeture forcée au
-         changement de largeur. */
+      /* AUCUNE FERMETURE FORCÉE AU CHANGEMENT DE LARGEUR. Le tiroir ne s'ouvre que sous « lg » (le
+         bouton Menu porte `lg:hidden`), mais ouvert sur une tablette qu'on fait pivoter il reste ouvert
+         et entier : il se ferme comme partout, par son bouton, le voile ou Échap. */
     }
   }
 </script>

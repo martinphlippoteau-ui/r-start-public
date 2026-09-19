@@ -86,7 +86,10 @@ const range = (rates: readonly string[]): string => {
 };
 
 /** Taux de retrait de R Start au-delà de la durée retenue : le dernier palier du barème. */
-const withdrawalAfterHolding = fees.withdrawal.steps[fees.withdrawal.steps.length - 1].rate;
+const lastWithdrawalStep = fees.withdrawal.steps.at(-1);
+if (!lastWithdrawalStep)
+  throw new Error('comparator.ts : le barème de retrait de facts.ts est vide');
+const withdrawalAfterHolding = lastWithdrawalStep.rate;
 
 /*
  * BARÈME DU RETRAIT, tel que l'équipe l'a formulé le 16/09/2026 pour le comparateur, un palier par

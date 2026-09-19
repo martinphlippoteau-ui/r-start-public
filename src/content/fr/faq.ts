@@ -416,7 +416,7 @@ export const faq = {
     question: nb(question),
     answer: answer.map(nb),
   })),
-  /** Les seize questions, pour /documentation (FAQ complète) : l'accueil n'en rend que six. */
+  /** Toutes les questions, pour la page /faq : les autres pages n'en rendent qu'une sélection. */
   allItems: rawItems.map(({ question, answer, ...rest }) => ({
     ...rest,
     question: nb(question),

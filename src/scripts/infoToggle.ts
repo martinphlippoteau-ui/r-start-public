@@ -22,7 +22,9 @@
  */
 const init = (): void => {
   for (const bouton of document.querySelectorAll<HTMLButtonElement>('[data-info-bouton]')) {
-    /* Garde-fou : le script peut être exécuté deux fois sur une même page (navigation par vues). */
+    /* Garde-fou d'idempotence : un bouton n'est lié qu'une fois, même si `init` était rappelé. Rien ne
+       le rappelle aujourd'hui : le site est multipage (transitions de vue en CSS, pas de routeur), un
+       module ne s'exécute qu'une fois par document. */
     if (bouton.dataset.infoLie === '1') continue;
     const id = bouton.getAttribute('aria-controls');
     const panneau = id ? document.getElementById(id) : null;

@@ -71,6 +71,7 @@ export const setupDraw = (): void => {
   });
 };
 
+/** EN SOMMEIL : aucune page ne porte `data-fill` (relevé sur dist le 19/09/2026). */
 export const setupFill = (): void => {
   all('[data-fill]').forEach((el) => {
     if (!allowed(el, 'data-fill')) return;

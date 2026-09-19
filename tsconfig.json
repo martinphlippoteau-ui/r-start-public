@@ -1,12 +1,18 @@
 {
-  "extends": "astro/tsconfigs/strict",
+  // `strictest` depuis le 19/09/2026 (audit du 18/09) : le code était écrit pour
+  // `noUncheckedIndexedAccess` (`match[1] ?? ''`, `touches[0]!`) sans que l'option soit active, et les
+  // fichiers récents n'étaient donc plus gardés. Le préréglage apporte aussi les variables et paramètres
+  // inutilisés, les retours implicites et les `switch` qui débordent.
+  "extends": "astro/tsconfigs/strictest",
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"]
     },
-    "strictNullChecks": true,
-    "verbatimModuleSyntax": true
+    // Seule option du préréglage écartée : elle refuse `class={className}` dès que `className` peut
+    // valoir `undefined`, soit toutes les props facultatives relayées d'un composant à l'autre. Vingt-
+    // quatre erreurs pour aucun défaut réel.
+    "exactOptionalPropertyTypes": false
   },
   "include": [".astro/types.d.ts", "src/**/*", "scripts/**/*", "tests/**/*"],
   "exclude": ["dist", "node_modules"]

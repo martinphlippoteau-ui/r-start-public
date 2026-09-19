@@ -83,9 +83,9 @@ export interface HeroContent {
   definitionNoteId?: string;
   /** Frais réellement prélevés, obligatoire dès que `definition` annonce une absence de frais (hors hero depuis le 10/09/2026). */
   subtitle?: string;
-  /** Ligne risques visible sans scroller, même taille que le corps du hero. Jamais animée. */
   /** Claim de la trame, en deux temps : l'énoncé puis la réponse (« Oui ! » / « Non ! »), en petit et animé. */
   claims?: { text: string; answer: string }[];
+  /** Ligne risques visible sans scroller, même taille que le corps du hero. Jamais animée. */
   riskLine: string;
   primaryCta: Cta;
   secondaryCta: Cta;
@@ -220,9 +220,14 @@ export interface StrategyContent {
    * bloc n'a pas d'en-tête et c'est le premier volet qui nomme la section, comme avant le 16/09/2026.
    */
   tilesTitle?: string;
-  /** Libellés des tuiles à fenêtre : lus par les lecteurs d'écran, jamais affichés (16/09/2026). */
-  dialogOpen?: string;
-  dialogClose?: string;
+  /**
+   * Libellés VISIBLES des cartes qui se retournent : le bouton du recto (« En savoir plus ») et celui
+   * du dos (« Fermer »), que src/scripts/carteRetournee.ts crée. Obligatoires depuis le 19/09/2026 :
+   * facultatifs, ils laissaient au script un « Fermer » écrit en dur pour repli, seul texte du site à
+   * ne pas venir du contenu.
+   */
+  dialogOpen: string;
+  dialogClose: string;
   /* Ni `eyebrow` ni `title` : le H1 de la page vit dans strategyPage.ts, et un second titre ici aurait
      dérivé du premier à la première correction. Le corps commence directement au premier chapitre. */
   engines: StrategyChapter;
@@ -524,10 +529,9 @@ export interface FooterContent {
   legalToggleLabel?: string;
   /** Mention lue par les lecteurs d'écran sur les liens externes (ex. « nouvelle fenêtre »). */
   externalLinkHint?: string;
-  /** Alt des logos du pied de page. */
   /**
-   * Signature du pied de page : logo R Start, `byLabel` (« par »), logo de l'éditeur.
-   * Sans `byLabel`, les deux logos sont simplement posés côte à côte.
+   * Signature du pied de page : logo R Start, `byLabel` (« par »), logo de l'éditeur, et leurs textes
+   * alternatifs. Sans `byLabel`, les deux logos sont simplement posés côte à côte.
    */
   logos?: { brandAlt: string; publisherAlt: string; byLabel?: string };
   /** Blocs de mentions légales, composés depuis legal.ts (reproduits à l'identique). */

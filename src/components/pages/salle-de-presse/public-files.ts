@@ -46,7 +46,7 @@ export const publicFileKb = (file: string): number | undefined =>
 /** Extension du fichier en capitales (ex. « SVG », « PNG », « PDF »), vide s'il n'en a pas. */
 export const fileExtension = (file: string): string => {
   const m = file.match(/\.([a-z0-9]+)$/i);
-  return m ? m[1].toUpperCase() : '';
+  return m?.[1]?.toUpperCase() ?? '';
 };
 
 /** Clé analytics d'un PDF (data-doc) : nom du fichier sans extension, comme la section Documents. */

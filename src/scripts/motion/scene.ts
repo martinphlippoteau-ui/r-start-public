@@ -5,7 +5,9 @@
  * y 24 → 0, courbe unique EASE) pendant que le précédent sort (opacity 1 → 0, y → −20, EASE_IN, son
  * miroir), sauf s'il porte data-step-stay : il reste alors visible jusqu'à la fin. L'état final montre
  * tous les steps « stay ». Un temps mort de 0,6 clôt la scène. Lissage SCRUB 0,6.
- * Usage (sobriété du 11/09/2026) : sur l'accueil, une seule scène, les frais (03-Fees).
+ * EN SOMMEIL : plus aucune scène épinglée sur le site depuis le 14/09/2026, celle des frais (03-Fees)
+ * est partie avec son texte. Aucune page ne porte `data-scene` (relevé sur dist le 19/09/2026) ; le
+ * module reste câblé dans engine.ts, où `setupScenes` ne trouve rien à faire.
  *
  * Contre-poids réglementaire : placer la RiskNote HORS des [data-step] et hors du `scene-stack`
  * (directement dans la scène, sous ou à côté de la pile), elle est alors visible du premier au

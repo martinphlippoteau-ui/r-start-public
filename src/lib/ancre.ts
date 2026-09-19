@@ -13,13 +13,13 @@
  * `slug` est le pliage seul, sans préfixe : les pages légales s'en servent pour leurs sections depuis le
  * 18/09/2026. Elles pliaient de leur côté, SANS retirer les accents, qui devenaient des séparateurs :
  * « s--diteur-du-site », « s-r-clamations », « s-h-bergement ». Ce sont les ancres qu'on cite pour
- * renvoyer à une mention légale précise.
+ * renvoyer à une mention légale précise. Le pliage lui-même est celui de tout le site
+ * (src/lib/texte.ts) : « œ » y donne « oe », et non plus un tiret.
  */
+import { plier } from '@/lib/texte';
+
 export const slug = (texte: string): string =>
-  texte
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
+  plier(texte)
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '')
     .slice(0, 80)

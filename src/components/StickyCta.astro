@@ -35,6 +35,15 @@
  * Elle disparaît tant que le bandeau cookies est déplié, il occupe la même place, et se retire du
  * parcours au clavier quand elle est invisible (`visibility`, pas seulement l'opacité).
  *
+ * AU CLAVIER, UNE PASTILLE BORNÉE PAR `until` N'EST JAMAIS ATTEINTE (audit du 18/09/2026), et c'est
+ * admis À UNE CONDITION. Les pastilles sont rendues après </main> : elles ne peuvent pas vivre dans une
+ * section, un ancêtre transformé capturerait leur `fixed`. La tabulation les atteint donc en bas de
+ * page, où celle du comparateur est repliée depuis longtemps. La condition : TOUTE PASTILLE A UN
+ * ÉQUIVALENT DANS LE FLUX, un lien de même destination dans <main>. Sur l'accueil, « Comparer les
+ * frais » pour la première, le bouton de « Souscrire en 4 étapes » pour la seconde (qui, elle, reste
+ * affichée jusqu'en bas, donc atteignable). tests/qualite.spec.ts le vérifie : une pastille ajoutée
+ * sans équivalent y échoue.
+ *
  * DEUX DÉCLENCHEURS, un par usage, et il faut en donner exactement un :
  *  - `watch` : la pastille apparaît quand ce repère N'EST PLUS à l'écran (la pastille du comparateur
  *    prend le relais de l'invitation à défiler du hero) ;

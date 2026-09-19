@@ -20,7 +20,7 @@
  *  frais      comparateur_scpi
  *  lecture    document_download · faq_open · lecture_profondeur
  *  recherche  recherche (terme, nb_resultats) · recherche_clic (terme, rubrique, rang, resultat,
- *             destination), émis par src/scripts/recherche.ts depuis le 17/09/2026
+ *             destination), émis par src/scripts/recherche/panneau.ts depuis le 17/09/2026
  *  incidents  page_introuvable
  *  RETIRÉS le 14/09/2026 avec les simulateurs eux-mêmes, À RETIRER DE GA4 ET DE GTM : les quatre
  *  événements outil_ouvert, outil_niveau, outil_etape et outil_resultat.
@@ -28,7 +28,7 @@
  *
  * JAMAIS DANS LE DATALAYER : aucun montant saisi dans un simulateur, aucune donnée personnelle. Les
  * hypothèses patrimoniales d'un visiteur n'ont rien à faire dans un outil de mesure d'audience. Les
- * termes de recherche sont écartés par recherche.ts quand ils ressemblent à une adresse électronique ou
+ * termes de recherche sont écartés par le panneau quand ils ressemblent à une adresse électronique ou
  * portent une suite de chiffres.
  */
 import { campagne } from './campagne';
@@ -110,9 +110,11 @@ const init = () => {
     }
   });
 
-  /* Recherche du site : les événements arrivent tout formés de src/scripts/recherche.ts, par un
-     événement DOM plutôt qu'un import. Deux scripts de page qui importent ce module pourraient en
-     exécuter deux copies, et chaque clic partirait deux fois. */
+  /* Recherche du site : les événements arrivent tout formés de src/scripts/recherche/panneau.ts, par un
+     événement DOM plutôt qu'un import : le panneau n'a pas à connaître la mesure, ni l'inverse, et un
+     émetteur de plus (consentement, fenêtre « bientôt ») ne demande aucun câblage ici. Ce n'est PAS une
+     précaution contre une double exécution : un module importé par deux scripts n'est empaqueté et
+     exécuté qu'une fois (src/scripts/infoToggle.ts le dit aussi, dist le confirme). */
   document.addEventListener('rstart:mesure', (e) => {
     const detail = (e as CustomEvent<Record<string, unknown>>).detail;
     if (detail && typeof detail.event === 'string') push(detail);

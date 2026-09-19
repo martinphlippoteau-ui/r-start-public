@@ -6,7 +6,7 @@
  * <details name="faq" data-faq> (un seul ouvert à la fois), chevron animé en CSS, réponse en text-lead.
  * Dans chaque réponse, les paragraphes « avantage » (data-advantage) sont suivis, dans le même bloc et la
  * même taille, de leur contre-poids RiskNote (data-risk) : la coupure vient du contenu (item.riskFrom),
- * l'appel de note aussi (item.noteId, numéroté par DocNoteRef sur les notes de la page).
+ * l'appel de note aussi (item.noteId, numéroté par NoteRef sur les notes de la page).
  * Animation déclarative : seul chaque <summary> porte un fade-up ; aucun ancêtre des RiskNote n'est animé.
  * Le JSON-LD FAQPage n'est pas émis ici (réservé à l'accueil et à /frais, plan §12).
  * Contenu : documentation.faq et documentation.labels.
@@ -16,7 +16,8 @@ import RiskNote from '@/components/ui/RiskNote.astro';
 import Section from '@/components/ui/Section.astro';
 import type { DocumentationContent, DocumentationLabels } from '@/content/types-v2';
 import { withBase } from '@/lib/href';
-import DocNoteRef from './DocNoteRef.astro';
+import NoteRef from '@/components/ui/NoteRef.astro';
+import { notes } from '@/content/fr/documentation';
 
 interface Props {
   faq: DocumentationContent['faq'];
@@ -66,7 +67,9 @@ const items = faq.items.map((item) => {
                           {/* Marqueur décoratif : un <summary> est déjà interactif, un lien imbriqué y
                               serait une violation « nested-interactive ». Le lien réel est dans la
                               réponse, sous le dernier paragraphe. */}
-                          {item.noteId && <DocNoteRef id={item.noteId} interactive={false} />}
+                          {item.noteId && (
+                            <NoteRef id={item.noteId} notes={notes} interactive={false} />
+                          )}
                         </span>
                       </span>
                       <span
@@ -98,7 +101,7 @@ const items = faq.items.map((item) => {
                     {item.noteId && (
                       <p class="text-base text-slate-700">
                         {labels.faqNoteLead}
-                        <DocNoteRef id={item.noteId} />
+                        <NoteRef id={item.noteId} notes={notes} />
                       </p>
                     )}
                   </div>

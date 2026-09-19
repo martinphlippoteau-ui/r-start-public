@@ -3,8 +3,9 @@ import AxeBuilder from '@axe-core/playwright';
 
 /**
  * RECHERCHE DU SITE (17/09/2026) : la loupe de la barre, le panneau qui s'allonge sous elle, l'index
- * tiré du HTML au build (scripts/search-index.mjs) et l'arrivée sur le passage (src/scripts/recherche.ts,
- * src/scripts/faqAncre.ts).
+ * tiré du HTML au build (scripts/search-index.mjs) et l'arrivée sur le passage
+ * (src/scripts/recherche/arrivee.ts, src/scripts/faqAncre.ts). Le moteur lui-même, classement et
+ * tolérance aux fautes, est éprouvé sans navigateur dans tests/moteur.spec.ts.
  *
  * Ce que ces tests tiennent : il n'y a PAS de page de résultats, les résultats se rangent en « Pages »
  * puis « Questions », les fautes de frappe et les synonymes sont tolérés, un résultat mène au passage

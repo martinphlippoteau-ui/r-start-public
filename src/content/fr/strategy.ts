@@ -12,9 +12,10 @@ import type { StrategyContent } from '@/content/types';
  * (la page n'a donc plus de bloc « Notes » : il n'aurait rien à déplier). Les chiffres correspondants
  * restent dans facts.ts, d'où les autres pages les tirent.
  *
- * UNE SEULE MENTION DE RISQUE, celle que la Conformité a placée elle-même en fin de zone 2 le
- * 14/09/2026 (`disclaimer` ci-dessous, texte de legal.ts reproduit mot pour mot). L'en-tête n'en porte
- * plus, et le corps n'est pas contrebalancé avantage par avantage : c'est la suite du retrait de tous
+ * LA MENTION DE RISQUE placée sous les deux moteurs le 14/09/2026 (`disclaimer`, texte de legal.ts
+ * reproduit mot pour mot) N'EST PLUS À L'ÉCRAN depuis le 16/09/2026 : le commentaire posé à sa place,
+ * plus bas, dit pourquoi et comment la rétablir. L'en-tête de la page n'en porte pas non plus, et le
+ * corps n'est pas contrebalancé avantage par avantage : c'est la suite du retrait de tous
  * les « Bon à savoir » du site, la Conformité replaçant les siennes une par une. Aucun [data-advantage]
  * n'est posé ici, faute de quoi le garde-fou qui exige un contre-poids dans le même bloc réclamerait un
  * texte que la page ne prévoit pas. La mention passe par ui/NoteConformite.astro, pas par RiskNote.

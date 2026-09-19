@@ -1,5 +1,5 @@
 import type { FooterContent, FooterLink } from '@/content/types';
-import { menuPages, pages } from '@/config/pages';
+import { menuPages } from '@/config/pages';
 import { externalLinks, product } from '@/content/fr/facts';
 import {
   commercialNotice,

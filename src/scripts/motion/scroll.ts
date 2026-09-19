@@ -150,6 +150,7 @@ export const setupCurtains = (): void => {
   });
 };
 
+/** EN SOMMEIL : aucune page ne porte `data-pin` (relevé sur dist le 19/09/2026). */
 export const setupPins = (): void => {
   all('[data-pin]').forEach((el) => {
     if (!allowed(el, 'data-pin')) return;

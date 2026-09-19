@@ -2,11 +2,13 @@
 // frontières (GeoJSON Natural Earth simplifié). Contours simplifiés (Douglas-Peucker) pour un SVG léger.
 //
 // TROIS MODES.
-//  - `globe` (défaut depuis le 14/09/2026) : n'écrit PAS de SVG mais les frontières simplifiées en
-//    JSON (src/content/fr/globe.json), que StrategyGlobe.astro projette au canvas et fait tourner.
-//    C'est la seule carte en service ; les deux modes SVG ci-dessous n'ont plus de consommateur et
-//    src/components/StrategyMap.astro, qu'ils écrivaient, a été supprimé. Ils se régénèrent d'un appel,
-//    et il faut alors remettre l'import dans 04-Strategy.astro.
+// AUCUNE CARTE N'EST EN SERVICE depuis le 16/09/2026 : la tuile « Diversifiée » de /strategie est un
+// dessin (src/components/StrategyDiversify.astro). Les trois consommateurs de ce script ont été
+// supprimés et vivent dans l'historique git : StrategyMap.astro, puis StrategyGlobe.astro et son
+// globe.json le 19/09/2026 (338 lignes et 48 Ko sans appelant). Le script reste : il régénère chacun
+// d'un appel, et il faut alors remettre l'import dans 04-Strategy.astro.
+//  - `globe` (défaut) : n'écrit PAS de SVG mais les frontières simplifiées en JSON
+//    (src/content/fr/globe.json), que StrategyGlobe.astro projetait au canvas et faisait tourner ;
 //  - `monde` : UNE carte du monde en projection équirectangulaire, toutes
 //    les terres émergées en teal. C'est ce que dit la page : « partout dans le monde ». L'Antarctique
 //    est écarté, il n'a pas de marché immobilier et il écraserait la projection ;

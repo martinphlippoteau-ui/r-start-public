@@ -17,8 +17,8 @@
  */
 import Container from '@/components/ui/Container.astro';
 import Section from '@/components/ui/Section.astro';
-import PressRoomNoteRef from '@/components/pages/salle-de-presse/PressRoomNoteRef.astro';
-import { pressRoom } from '@/content/fr/pressRoom';
+import NoteRef from '@/components/ui/NoteRef.astro';
+import { notes, pressRoom } from '@/content/fr/pressRoom';
 import { fileKey, kbFormat, publicFileKb } from '@/components/pages/salle-de-presse/public-files';
 import { withBase } from '@/lib/href';
 
@@ -43,7 +43,7 @@ const linkHintId = `${id}-link-hint`;
       <h2 id={id + '-title'} class="text-display-md text-ink">{releases.title}</h2>
       <p class="text-lead mt-5 text-pretty text-slate-700 sm:mt-6">
         {releases.intro}<span class="whitespace-nowrap"
-          ><PressRoomNoteRef id="salle-presse-communiques" /></span
+          ><NoteRef id="salle-presse-communiques" notes={notes} /></span
         >
       </p>
     </header>

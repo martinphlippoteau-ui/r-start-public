@@ -14,8 +14,8 @@
 import Container from '@/components/ui/Container.astro';
 import RiskNote from '@/components/ui/RiskNote.astro';
 import Section from '@/components/ui/Section.astro';
-import PressRoomNoteRef from '@/components/pages/salle-de-presse/PressRoomNoteRef.astro';
-import { pressRoom } from '@/content/fr/pressRoom';
+import NoteRef from '@/components/ui/NoteRef.astro';
+import { notes, pressRoom } from '@/content/fr/pressRoom';
 import {
   fileExtension,
   fileName,
@@ -58,7 +58,7 @@ const logos = mediaKit.logos
           <h3 id={id + '-logos'} class="text-display-sm text-ink">
             {labels.logosTitle}
             <span class="whitespace-nowrap">
-              <PressRoomNoteRef id="salle-presse-kit" />
+              <NoteRef id="salle-presse-kit" notes={notes} />
             </span>
           </h3>
           <ul
@@ -140,7 +140,7 @@ const logos = mediaKit.logos
       <div class="lg:col-span-7">
         <h3 id={id + '-chiffres'} class="text-display-sm text-ink">
           {labels.keyFactsTitle}<span class="whitespace-nowrap"
-            ><PressRoomNoteRef id="salle-presse-chiffres-cles" /></span
+            ><NoteRef id="salle-presse-chiffres-cles" notes={notes} /></span
           >
         </h3>
         <dl

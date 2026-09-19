@@ -3,6 +3,8 @@
  * pose sur ses derniers chiffres ; 1,6 s), formaté fr-FR.
  * Options : data-counter-prefix, data-counter-suffix, data-counter-decimals, data-counter-from (défaut 0),
  * data-counter-duration (s). Démarre à 88 % du viewport (START), une seule fois.
+ * EN SOMMEIL : aucune page ne porte `data-counter` (relevé sur dist le 19/09/2026), Stat.astro ne le pose
+ * que si on lui passe `numeric`, ce que personne ne fait plus.
  * Usage (sobriété du 11/09/2026) : uniquement des chiffres NON réglementaires (clients, encours, avis) ;
  * jamais un taux de frais, un indicateur de risque, un prix de part ni un délai, ces valeurs sont
  * toujours exactes à l'écran. Le compteur est alors le seul effet d'entrée de son bloc.

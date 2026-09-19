@@ -1,11 +1,13 @@
 ---
 /**
- * Section 10, FAQ (id « faq »). Six questions depuis le 11/09/2026 (faq.items, sélection HOME_FAQ) ;
- * la FAQ complète est sur /documentation, atteinte par `faq.moreLink`. Fond paper (après Risques, ink) ;
+ * Section 10, FAQ (id « faq »). Sur l'accueil, une sélection courte (faq.items, liste HOME_FAQ de
+ * faq.ts) ; la FAQ complète a sa page, /faq, atteinte par `faq.moreLink`. AUCUN NOMBRE DE QUESTIONS
+ * N'EST ÉCRIT DANS CES COMMENTAIRES : ils en donnaient quatre différents, tous périmés (audit du
+ * 18/09/2026). Le compte est celui de faq.ts. Fond paper (après Risques, ink) ;
  * DERNIÈRE SECTION de l'accueil : le bloc « Notes et sources » qui la suivait n'est plus rendu depuis le
  * 14/09/2026.
  * Deux colonnes sur grand écran : en-tête collant (surtitre, H2 en text-display-md : la FAQ clôt la page, un
- * cran sous les chapitres) face à la liste des six questions en accordéons natifs <details name="faq"> (un
+ * cran sous les chapitres) face à la liste des questions en accordéons natifs <details name="faq"> (un
  * seul ouvert à la fois), chevron animé en CSS, questions en text-xl (text-display-sm dès sm : une question
  * longue tient sur deux lignes à 375 px), réponse en paragraphes text-lead. Dans chaque réponse, les paragraphes « avantage »
  * (data-advantage) sont suivis, dans le même bloc et la même taille, de leur contre-poids risque
@@ -21,7 +23,7 @@
  *  - en-tête, dans son enveloppe collante (les attributs sont sur les enfants, jamais sur l'élément
  *    sticky) : surtitre statique, H2 mot à mot (data-reveal-text, titre court), intro en fade-up
  *    décalée de 0,1 s ;
- *  - questions : statiques (sobriété du 11/09/2026 : six <summary> entrant un à un formaient une cascade
+ *  - questions : statiques (sobriété du 11/09/2026 : les <summary> entrant un à un formaient une cascade
  *    de plus de quatre éléments, et un `stagger` sur la liste serait refusé par le moteur, chaque réponse
  *    contenant un risque). Le mouvement de la FAQ est celui de l'accordéon (CSS ci-dessous). Ni le H2, ni
  *    la liste, ni aucun ancêtre des RiskNote n'est animé (règle « aucun [data-risk] sous un
@@ -55,7 +57,7 @@ import { sections } from '@/config/sections';
 import { faq } from '@/content/fr/faq';
 
 /*
- * PARAMÉTRÉ LE 16/09/2026 pour servir aussi la page /faq, qui rend les dix-huit questions avec un champ
+ * PARAMÉTRÉ LE 16/09/2026 pour servir aussi la page /faq, qui rend toutes les questions avec un champ
  * de recherche. Le composant lisait `faq.items` en dur. Le rendre paramétrable plutôt que le recopier :
  * l'accordéon, ses transitions `::details-content` et le découpage avantage / contre-poids sont écrits
  * une fois, et les deux surfaces ne peuvent pas diverger.
@@ -93,11 +95,11 @@ const id = sections.faq.id;
 /** id du H2, référencé par aria-labelledby sur la section (convention de Section / SectionHeading). */
 const titleId = id + '-title';
 /*
- * RUBRIQUES (16/09/2026) : sur /faq, les vingt-deux questions sont groupées en six. Le repère est posé
+ * RUBRIQUES (16/09/2026) : sur /faq, les questions sont groupées par rubrique. Le repère est posé
  * sur la PREMIÈRE question de chaque rubrique, dans son propre <li>, et non dans un sous-titre entre
- * deux listes : une liste coupée en six casserait le comptage annoncé aux lecteurs d'écran, et le
+ * deux listes : une liste coupée en morceaux casserait le comptage annoncé aux lecteurs d'écran, et le
  * filtre de recherche masque des <li>, pas des sections.
- * Les sélections courtes des autres pages ne les rendent pas : quatre questions n'ont pas de plan.
+ * Les sélections courtes des autres pages ne les rendent pas : une poignée de questions n'a pas de plan.
  */
 let rubriquePrecedente: string | undefined;
 const items = rendus.map((item) => {
@@ -148,7 +150,7 @@ const items = rendus.map((item) => {
         {
           /* CHAMP DE RECHERCHE (16/09/2026, page /faq). `type="search"` et non `text` : le navigateur
             y pose sa croix d'effacement et les lecteurs d'écran l'annoncent comme une recherche.
-            Il FILTRE une liste déjà rendue, il n'interroge rien : les dix-huit questions sont dans le
+            Il FILTRE une liste déjà rendue, il n'interroge rien : toutes les questions sont dans le
             HTML, la page marche donc sans script, champ masqué comme les boutons « i ». */
         }
         {search && (
@@ -321,7 +323,7 @@ const items = rendus.map((item) => {
           /* Le CTA de souscription qui fermait la FAQ est retiré (12/09/2026, demande de l'équipe) :
             la pastille flottante le porte désormais, de « Souscrire en 4 étapes » jusqu'au bas de la
             page, et il faisait doublon avec elle à quelques centaines de pixels d'intervalle.
-            Le renvoi vers les seize questions reste, en LIEN et non en bouton : ce n'est pas un appel à
+            Le renvoi vers toutes les questions (/faq) reste, en LIEN et non en bouton : pas un appel à
             l'action, c'est la suite de la lecture. */
         }
         {
