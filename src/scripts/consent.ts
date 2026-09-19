@@ -6,6 +6,8 @@
  *  - Réouverture via tout élément [data-consent-open] (lien « Gérer les cookies »).
  */
 
+import { consentCookie } from '@/content/fr/consent';
+
 declare global {
   interface Window {
     dataLayer: unknown[];
@@ -17,8 +19,8 @@ type ConsentStatus = 'granted' | 'denied' | 'unset';
 
 const banner = document.getElementById('consent-banner');
 const gtmId = banner?.dataset.gtmId || '';
-const cookieName = banner?.dataset.cookieName || 'rstart_consent';
-const maxAgeDays = Number(banner?.dataset.maxAgeDays || 180);
+const cookieName = banner?.dataset.cookieName || consentCookie.name;
+const maxAgeDays = Number(banner?.dataset.maxAgeDays || consentCookie.days);
 
 window.dataLayer = window.dataLayer || [];
 /**
@@ -91,13 +93,12 @@ const pousserChoix = (
   choix: 'accepte' | 'refuse' | 'personnalise',
   origine: 'bandeau' | 'reouverture'
 ) => {
-  window.dataLayer = window.dataLayer || [];
-  window.dataLayer.push({
-    event: 'consentement',
-    choix,
-    origine,
-    page_type: document.body.dataset.pageType || 'inconnu',
-  });
+  /* Par le canal commun (`rstart:mesure`, écouté par analytics.ts) et plus en écrivant dans le
+     dataLayer : l'événement ne recevait que `page_type`, sans `souscription_ouverte` ni la campagne
+     d'entrée que le plan de taggage promet « à chaque événement ». */
+  document.dispatchEvent(
+    new CustomEvent('rstart:mesure', { detail: { event: 'consentement', choix, origine } })
+  );
 };
 
 /** Le bandeau a-t-il été rouvert depuis le pied de page, ou est-ce le premier affichage ? */

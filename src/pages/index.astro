@@ -17,9 +17,14 @@ import { faq } from '@/content/fr/faq';
 import { difference } from '@/content/fr/difference';
 import { subscribe } from '@/content/fr/subscribe';
 import { faqJsonLd, organizationJsonLd, webPageJsonLd } from '@/lib/seo';
-const modules = import.meta.glob<{ default: any }>('/src/components/sections/*.astro', {
-  eager: true,
-});
+/* 04-Strategy EST EXCLUE DU MOTIF (audit du 18/09/2026) : elle n'est rendue que par /strategie, qui
+   l'importe directement. Astro rattache à une page la CSS de tout module qu'elle importe : l'accueil
+   chargeait donc en bloquant les 20 Ko de sa feuille (31 @keyframes), dont aucun sélecteur n'existe
+   ici. Même piège que pour les images (src/lib/images.ts) : un glob n'est pas gratuit. */
+const modules = import.meta.glob<{ default: any }>(
+  ['/src/components/sections/*.astro', '!/src/components/sections/04-*.astro'],
+  { eager: true }
+);
 const all = Object.entries(modules)
   .sort(([a], [b]) => a.localeCompare(b))
   .map(([path, mod]) => ({ path, Component: mod.default }));

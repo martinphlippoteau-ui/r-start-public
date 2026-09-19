@@ -213,6 +213,55 @@ test.describe('Qualité', () => {
   });
 
   /*
+   * UNE SEULE FORME D'ADRESSE (audit du 18/09/2026). Le site est publié en dossiers, et l'hébergeur
+   * renvoie « /frais » vers « /frais/ » : chaque lien sans barre finale payait une redirection. Le
+   * serveur de test redirige maintenant comme lui, et ce test échoue au premier lien qui en paie une.
+   */
+  test('aucun lien du menu ne paie de redirection, et le canonical est l’adresse servie', async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(isMobile, 'la liste des pages n’est dans la barre qu’à partir de « lg »');
+    const redirections: string[] = [];
+    page.on('response', (r) => {
+      if (r.status() >= 300 && r.status() < 400) redirections.push(`${r.status()} ${r.url()}`);
+    });
+    await page.goto('/');
+    await page.locator('[data-consent-refuse]').click();
+    const liens = page.locator('[data-sitenav-list] a');
+    const nombre = await liens.count();
+    for (let i = 0; i < nombre; i += 1) {
+      await Promise.all([page.waitForLoadState('load'), liens.nth(i).click()]);
+      await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', /\/$/);
+    }
+    expect(redirections, 'aucune redirection pendant la navigation').toEqual([]);
+    expect(new URL(page.url()).pathname.endsWith('/')).toBe(true);
+  });
+
+  /*
+   * TOUS LES ÉVÉNEMENTS PASSENT PAR LE MÊME CANAL (audit du 18/09/2026). « souscription_indisponible »
+   * est l'issue de tous les clics Souscrire tant que le tunnel est fermé, et il partait sans le type
+   * de page ni la campagne d'entrée, écrit directement dans le dataLayer.
+   */
+  test('« souscription indisponible » porte le type de page et la campagne d’entrée', async ({
+    page,
+  }) => {
+    await page.goto('/frais/?utm_source=lettre&utm_campaign=rentree');
+    await page.locator('[data-consent-refuse]').click();
+    await page.locator('main [data-cta="souscrire"]').first().click();
+    await expect
+      .poll(async () =>
+        (await evenements(page)).find((x) => x.event === 'souscription_indisponible')
+      )
+      .toMatchObject({ page_type: 'frais', campagne_source: 'lettre', campagne_nom: 'rentree' });
+    const consentement = (await evenements(page)).find((x) => x.event === 'consentement');
+    expect(consentement, 'le choix de consentement aussi').toMatchObject({
+      page_type: 'frais',
+      campagne_source: 'lettre',
+    });
+  });
+
+  /*
    * DONNÉES STRUCTURÉES ET ANCRES (audit du 18/09/2026).
    *  - La réponse balisée reprend TOUT ce que la page affiche : le tableau des frais manquait, et la
    *    réponse sur les frais ne disait plus que « aucun frais quand vous investissez ».

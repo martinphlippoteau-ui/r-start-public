@@ -5,6 +5,7 @@ import {
   PUBLIC_SUBSCRIBE_OPEN,
   PUBLIC_SUBSCRIBE_URL,
 } from 'astro:env/client';
+import { consentCookie } from '@/content/fr/consent';
 import { withBase } from '@/lib/href';
 import type { CtaPosition } from '@/content/types';
 
@@ -48,9 +49,10 @@ export const site = {
   noindex: interrupteur('PUBLIC_NOINDEX', PUBLIC_NOINDEX),
   gtmId: PUBLIC_GTM_ID,
   ogImagePath: '/og/og-rstart.jpg',
+  /* Lus dans le contenu, qui alimente aussi la politique cookies : une seule valeur, deux usages. */
   consent: {
-    cookieName: 'rstart_consent',
-    maxAgeDays: 180,
+    cookieName: consentCookie.name,
+    maxAgeDays: consentCookie.days,
   },
 } as const;
 

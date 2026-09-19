@@ -780,6 +780,12 @@ async function checkWholeSite() {
       if (!value.startsWith('/') || value.startsWith('//')) continue;
       const clean = value.split('#')[0].split('?')[0];
       linked.add(decodeURI(stripBase(clean)));
+      /* UNE PAGE S'ADRESSE AVEC SA BARRE FINALE : l'hébergeur redirige sinon (301), et chaque clic paie
+         l'aller-retour. `withBase` la pose ; un lien écrit à la main sans elle s'arrête ici. */
+      if (attr === 'href' && !clean.endsWith('/') && !/\.[a-z0-9]+$/i.test(clean))
+        errors.push(
+          `${file} : href="${value}" sans barre finale, redirigé par l'hébergeur ; passer par withBase()`
+        );
       if (BASE_PREFIX && clean !== BASE_PREFIX && !clean.startsWith(BASE_PREFIX + '/'))
         errors.push(
           `${file} : ${attr}="${value}" sans le préfixe du site (${BASE_PREFIX}), 404 en ligne ; passer par withBase()`

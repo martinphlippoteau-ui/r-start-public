@@ -10,6 +10,7 @@ import {
   shortRiskLine,
   visaNotice,
 } from '@/content/fr/legal';
+import { consentCookie } from '@/content/fr/consent';
 
 /**
  * Pages secondaires : /mentions-legales, /politique-de-confidentialite, /cookies.
@@ -25,8 +26,6 @@ export interface LegalPage {
   sections: { title: string; paragraphs: string[] }[];
 }
 
-/** Nom et durée du cookie de consentement (src/config/site.ts → site.consent). */
-const consentCookie = { name: 'rstart_consent', days: 180 } as const;
 /** Durée de vie des cookies Google Analytics 4, à configurer dans le tag GA4 (cookie_expires). */
 const analyticsCookieLifetime = '13 mois';
 
@@ -157,6 +156,9 @@ export const legalPages: LegalPage[] = [
         paragraphs: [
           'Les données de mesure d’audience sont traitées par Google Ireland Limited (Gordon House, Barrow Street, Dublin 4, Irlande), en qualité de sous-traitant, via Google Analytics 4 et Google Tag Manager.',
           'Elles peuvent être transférées vers les États-Unis. Ces transferts s’appuient sur les mécanismes prévus par le RGPD : la décision d’adéquation UE–États-Unis (Data Privacy Framework) et les clauses contractuelles types de la Commission européenne.',
+          /* Ajouté le 18/09/2026 : la politique cookies décrivait déjà ce traitement, la politique de
+             confidentialité ne citait que Google parmi les destinataires. */
+          'Les avis affichés sur l’accueil et sur la page À propos sont servis directement par Trustpilot : leur affichage suppose une connexion à ses serveurs, qui reçoivent alors votre adresse IP et les informations techniques transmises par votre navigateur. Trustpilot est responsable de ce traitement ; le détail figure dans la politique cookies.',
           `${publisher.name} ne vend ni ne cède vos données de navigation à des tiers à des fins commerciales.`,
         ],
       },
@@ -193,7 +195,7 @@ export const legalPages: LegalPage[] = [
         title: 'Les cookies utilisés sur ce site',
         paragraphs: [
           'Ce site n’utilise que deux catégories de cookies : un cookie strictement nécessaire, et des cookies de mesure d’audience soumis à votre consentement. Aucun cookie publicitaire, aucun cookie de réseau social.',
-          `Nom : ${consentCookie.name}. Déposé par : ce site. Finalité : mémoriser votre choix (accepter ou refuser la mesure d’audience) pour ne pas vous le redemander à chaque visite. Durée : ${consentCookie.days} jours. Consentement : non requis, cookie strictement nécessaire.`,
+          `Nom : ${consentCookie.name}. Déposé par : ce site. Finalité : mémoriser votre choix (accepter ou refuser la mesure d’audience) pour ne pas vous le redemander à chaque visite. Durée : ${consentCookie.days} jours. Consentement : non requis, cookie strictement nécessaire. Sur r-start.com, ce choix vaut aussi pour les sous-domaines du site, dont celui de la souscription en ligne, afin de ne pas vous le redemander.`,
           `Nom : _ga. Déposé par : Google Analytics 4. Finalité : distinguer les visiteurs grâce à un identifiant aléatoire, sans vous identifier personnellement. Durée : ${analyticsCookieLifetime}. Consentement : requis, déposé uniquement après votre accord.`,
           `Nom : _ga_ suivi de l’identifiant de la propriété Google Analytics (par exemple _ga_XXXXXXXXXX). Déposé par : Google Analytics 4. Finalité : conserver l’état de la session en cours. Durée : ${analyticsCookieLifetime}. Consentement : requis, déposé uniquement après votre accord.`,
         ],
@@ -203,9 +205,18 @@ export const legalPages: LegalPage[] = [
           politique affirmerait à tort que le site ne charge aucun contenu tiers. */
         title: 'Les contenus tiers : les avis Trustpilot',
         paragraphs: [
-          'L’accueil affiche les avis publiés sur Trustpilot au sujet de CORUM L’Épargne, distributeur de R Start. Ces avis sont servis directement par Trustpilot : le composant est chargé depuis widget.trustpilot.com, et son contenu est publié et modéré par Trustpilot, pas par CORUM.',
+          'L’accueil et la page À propos affichent les avis publiés sur Trustpilot au sujet de CORUM L’Épargne, distributeur de R Start. Ces avis sont servis directement par Trustpilot : le composant est chargé depuis widget.trustpilot.com, et son contenu est publié et modéré par Trustpilot, pas par CORUM.',
           'Ce composant ne dépose pas de cookie sur votre appareil. En revanche, l’affichage des avis suppose une connexion aux serveurs de Trustpilot, qui reçoivent alors votre adresse IP et les informations techniques transmises par votre navigateur. Trustpilot est responsable de ces traitements : sa politique de confidentialité est accessible depuis fr.trustpilot.com.',
           'Si vous préférez ne pas charger ce composant, vous pouvez bloquer le domaine widget.trustpilot.com dans les paramètres ou les extensions de votre navigateur. Le reste du site continue de fonctionner normalement.',
+        ],
+      },
+      {
+        /* Ajouté le 18/09/2026 : le site écrit dans le stockage de session (campagne d'entrée, passage
+           visé par la recherche), et aucune des deux politiques n'en parlait. */
+        title: 'Le stockage de session de votre navigateur',
+        paragraphs: [
+          'Le site utilise aussi le stockage de session de votre navigateur, qui s’efface à la fermeture de l’onglet. Il y retient la campagne par laquelle vous êtes arrivé (les paramètres « utm » de l’adresse) et, quand vous utilisez la recherche du site, le passage sur lequel vous avez cliqué, pour vous y conduire.',
+          'Ces informations ne quittent pas votre navigateur, à une exception près : la campagne accompagne le lien vers la souscription en ligne et, si vous l’avez acceptée, la mesure d’audience. Les identifiants de clic publicitaire ne sont retenus que si vous avez accepté la mesure d’audience.',
         ],
       },
       {

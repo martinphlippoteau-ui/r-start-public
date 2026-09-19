@@ -233,7 +233,11 @@ const fichierDePage = (chemin) =>
 
 export default function rechercheIntegration() {
   let base = '/';
-  const avecBase = (chemin) => base.replace(/\/+$/, '') + chemin;
+  /* Même forme que `withBase` (src/lib/href.ts) : une page s'adresse avec sa barre finale, l'hébergeur
+     redirige sinon. « /frais » donne « /frais/ », et l'ancre s'ajoute derrière. Un fichier reste tel quel. */
+  const avecBase = (chemin) =>
+    base.replace(/\/+$/, '') +
+    (chemin.endsWith('/') || /\.[a-z0-9]+$/i.test(chemin) ? chemin : chemin + '/');
 
   return {
     name: 'r-start:recherche',

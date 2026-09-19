@@ -69,7 +69,17 @@ const ROGNER = import.meta.env.PUBLIC_TRUSTBOX_CROP === 'true' && widget.stars !
   /* L'enveloppe ne porte PAS la classe `trustpilot-widget` : le script d'amorçage initialise tout élément
     qui la porte, et un conteneur sans identifiants le fait échouer (erreur remontée à Trustpilot). */
 }
-<div class:list={[className, ROGNER && 'tb-rogne']} role="group" aria-label={label}>
+{
+  /* `min-height` : LA PLACE DE L'IFRAME EST RÉSERVÉE (audit du 18/09/2026). Avant l'amorçage du script
+    tiers, l'enveloppe ne contenait que le lien de repli, une ligne de 24 px ; l'iframe arrivait ensuite
+    à `data-style-height`, 140 px pour le carrousel de /a-propos, et poussait tout ce qui suit. */
+}
+<div
+  class:list={[className, ROGNER && 'tb-rogne']}
+  role="group"
+  aria-label={label}
+  style={`min-height:${widget.height}`}
+>
   <div
     class="trustpilot-widget"
     data-locale={tp.widgets.locale}

@@ -90,6 +90,14 @@ const serveur = createServer(async (req, res) => {
     res.writeHead(400).end('Requête refusée');
     return;
   }
+  /* COMME L'HÉBERGEUR : un dossier demandé sans sa barre finale est REDIRIGÉ (301), pas servi. Le
+     serveur de test servait « /frais » directement, et les tests ne voyaient pas que chaque lien du site
+     payait une redirection en production (audit du 18/09/2026). */
+  const demande = new URL(req.url ?? '/', 'http://x');
+  if (!demande.pathname.endsWith('/') && (await lisible(path.join(base, 'index.html')))) {
+    res.writeHead(301, { Location: demande.pathname + '/' + demande.search }).end();
+    return;
+  }
   const candidats = [base, path.join(base, 'index.html'), base + '.html'];
   for (const c of candidats) {
     const trouve = await lisible(c);

@@ -27,7 +27,9 @@ const {
   type = 'website',
 } = Astro.props;
 
-const canonical = new URL(withBase(path), site.url + '/').toString().replace(/\/$/, '') || site.url;
+/* La barre finale RESTE (18/09/2026) : c'est la forme que l'hébergeur sert et que le sitemap liste. Elle
+   était retirée ici, et la page servie en « /frais/ » déclarait canonique « /frais », qui redirige. */
+const canonical = new URL(withBase(path), site.url + '/').toString();
 const ogImageUrl = new URL(withBase(ogImage), site.url + '/').toString();
 ---
 

@@ -392,8 +392,11 @@ const pontVisible = !strategy.engines.outro && !strategy.engines.disclaimer;
        * côte, l'effet se voyait à peine.
        * `tilt` les fait maintenant basculer en perspective ; la distance passe à 44 px et le décalage
        * à 0,16 s, assez pour que les trois arrivent l'une après l'autre au lieu d'ensemble.
-       * Le moteur léger suffit, aucun GSAP n'est tiré sur cette page (tests/performance.spec.ts), et
-       * `prefers-reduced-motion` coupe tout dans le moteur lui-même.
+       * CETTE PAGE EST SERVIE PAR LE MOTEUR GSAP, pas par le moteur léger : ses titres mot à mot et le
+       * rideau des Risques l'exigent (tests/performance.spec.ts la sort de la liste des pages sans
+       * GSAP). Ce commentaire disait l'inverse jusqu'au 18/09/2026, et `data-animate-child` n'était lu
+       * que par le moteur léger : la bascule n'a donc jamais été jouée ici. Les deux moteurs le lisent
+       * maintenant. `prefers-reduced-motion` coupe tout dans le moteur lui-même.
        */
     }
     <ul

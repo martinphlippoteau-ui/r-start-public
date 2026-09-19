@@ -270,6 +270,9 @@ export const comparator = {
    * qu'une donnée manquante, et ce n'est surtout pas 0 % : une absence de mention ne vaut pas gratuité.
    */
   notPublishedLabel: 'Non publié',
+  /** En-tête de la première colonne, lu par les lecteurs d'écran (masqué à l'œil). Il était écrit en
+      dur dans FeeComparator.astro, seul texte du tableau à ne pas venir d'ici. */
+  feeColumnLabel: 'Frais',
   /**
    * Le taux le plus bas d'une ligne est mis en avant par la COULEUR et la GRAISSE, l'autre est atténué.
    * Jamais par la TAILLE : un frais affiché plus petit que ses voisins est précisément ce que l'AMF a

@@ -177,11 +177,17 @@ for await (const file of htmlFiles(DIST)) {
 }
 
 // Le plan du site listerait les adresses des pages : inutile en prévisualisation (déjà en noindex).
-for (const name of ['sitemap-index.xml', 'sitemap-0.xml']) {
+// L'INDEX DE RECHERCHE, lui, contient le TEXTE INTÉGRAL des pages du menu et de la FAQ (audit du
+// 18/09/2026) : laissé en place, il suffisait de demander /recherche.json pour lire en clair ce que
+// les pages chiffrent. Il est retiré avec le plan du site ; le panneau de recherche affiche alors son
+// message « momentanément indisponible », ce qui est exact.
+for (const name of ['sitemap-index.xml', 'sitemap-0.xml', 'recherche.json']) {
   await fs.rm(path.join(DIST, name), { force: true });
 }
 
-console.log(`Prévisualisation protégée : ${count} page(s) chiffrée(s), plan du site retiré.`);
+console.log(
+  `Prévisualisation protégée : ${count} page(s) chiffrée(s), plan du site et index de recherche retirés.`
+);
 console.log(
   'Rappel : les fichiers PDF, images et scripts restent accessibles par adresse directe.'
 );

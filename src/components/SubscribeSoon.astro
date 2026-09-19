@@ -98,11 +98,17 @@ import { subscribeSoon } from '@/content/fr/subscribeSoon';
       const cta = target?.closest<HTMLAnchorElement>('[data-cta="souscrire"]');
       if (!cta) return;
       event.preventDefault();
-      const dataLayer = ((window as unknown as { dataLayer?: unknown[] }).dataLayer ??= []);
-      dataLayer.push({
-        event: 'souscription_indisponible',
-        cta_position: cta.dataset.ctaPosition || 'unknown',
-      });
+      /* Par le canal commun (`rstart:mesure`, écouté par src/scripts/analytics.ts), qui joint le type de
+         page et la campagne d'entrée. C'est aujourd'hui l'issue de TOUS les clics « Souscrire », et
+         l'événement partait sans ces deux paramètres, écrit directement dans le dataLayer. */
+      document.dispatchEvent(
+        new CustomEvent('rstart:mesure', {
+          detail: {
+            event: 'souscription_indisponible',
+            cta_position: cta.dataset.ctaPosition || 'unknown',
+          },
+        })
+      );
       if (!dialog.open) dialog.showModal();
     });
 

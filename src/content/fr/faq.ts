@@ -2,9 +2,11 @@ import type { FaqContent, LegalNote } from '@/content/types';
 import { pages } from '@/config/pages';
 import {
   corumGroup,
+  fees,
   income,
   product,
   risk,
+  share,
   strategy as strategyFacts,
   subscription,
 } from '@/content/fr/facts';
@@ -351,6 +353,50 @@ const homeItems = rawItems.filter((item) => HOME_FAQ.includes(item.question));
 if (homeItems.length !== HOME_FAQ.length) {
   const manquantes = HOME_FAQ.filter((q) => !rawItems.some((item) => item.question === q));
   throw new Error(`faq.ts : questions de l’accueil introuvables, ${manquantes.join(' ; ')}`);
+}
+
+/*
+ * LA FAQ NE PEUT PLUS CONTREDIRE facts.ts EN SILENCE (audit du 18/09/2026). Son contenu, fourni par
+ * l'équipe le 16/09/2026, est repris mot pour mot : les chiffres y sont donc écrits en toutes lettres,
+ * alors que facts.ts s'ouvre sur « aucun chiffre du site ne doit venir d'ailleurs ». Le SRI est
+ * précisément la valeur en arbitrage ouvert avec CORUM : s'il changeait dans facts.ts, la carte de
+ * l'accueil suivrait, et la FAQ (quatre pages, les données structurées, l'index de recherche)
+ * continuerait d'afficher l'ancien. Le texte de l'équipe n'est pas réécrit : le BUILD S'ARRÊTE si l'une
+ * de ces valeurs de facts.ts ne se retrouve plus dans la réponse qui la porte.
+ */
+{
+  const texteDe = (question: string): string => {
+    const item = rawItems.find((i) => i.question.startsWith(question));
+    if (!item) throw new Error(`faq.ts : question introuvable pour le garde-fou, « ${question} »`);
+    return [
+      ...item.answer,
+      ...(item.bullets ?? []),
+      ...(item.table ? item.table.rows.flat() : []),
+      ...(item.tableAfter ?? []),
+    ]
+      .join(' ')
+      .replace(/\s/g, ' ');
+  };
+  const attendus: [string, string[]][] = [
+    ['Quel est le niveau de risque', [risk.sriLabel]],
+    ['Quel est le prix d’une part', [share.priceLabel]],
+    ['Combien de temps faut-il conserver', [`${risk.recommendedHoldingYears} ans`]],
+    [
+      'Quels sont les frais de R Start',
+      [fees.management.label, ...fees.disposal.tiers.map((t) => t.rate)],
+    ],
+    ['Comment fonctionne la commission', fees.disposal.tiers.map((t) => t.rate)],
+    ['Que sont les frais de retrait', fees.withdrawal.steps.map((e) => e.rate)],
+  ];
+  for (const [question, valeurs] of attendus) {
+    const texte = texteDe(question);
+    for (const valeur of valeurs) {
+      if (!texte.includes(valeur.replace(/\s/g, ' ')))
+        throw new Error(
+          `faq.ts : « ${question}… » ne contient plus « ${valeur} », la valeur de facts.ts. La FAQ et facts.ts doivent dire la même chose.`
+        );
+    }
+  }
 }
 
 /** Notes appelées par les six questions de l'accueil ; `notes` reste complet pour /documentation. */

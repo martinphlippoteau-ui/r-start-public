@@ -205,7 +205,7 @@ test.describe('Recherche du site', () => {
     const vide = page.locator('[data-recherche-vide]');
     await expect(vide).toBeVisible();
     await expect(vide).toContainText('« xylophone »');
-    await expect(vide.locator('a')).toHaveAttribute('href', /\/faq$/);
+    await expect(vide.locator('a')).toHaveAttribute('href', /\/faq\/$/);
   });
 
   test('Entrée mène à la question, ouverte sous la barre', async ({ page }) => {

@@ -107,15 +107,26 @@ export const setupReveals = (): void => {
       case 'clip':
         gsap.from(el, { ...base, clipPath: 'inset(0 0 100% 0)', duration: DURATION_TITLE });
         break;
-      case 'stagger':
+      case 'stagger': {
         if (!(targets as Element[]).length) return;
+        /*
+         * `data-animate-child` EST LU ICI AUSSI (audit du 18/09/2026). Seul le moteur léger le lisait,
+         * alors que son unique emploi, les trois tuiles de /strategie (`tilt`, « plus spectaculaire »,
+         * demande de l'équipe du 16/09/2026), vit sur une page servie par CE moteur : l'effet demandé
+         * n'a jamais été joué en production, la cascade retombait sur son `fade-up`.
+         * Mêmes valeurs que le type `tilt` ci-dessus, pour que les deux moteurs rendent la même chose.
+         */
+        const bascule = el.dataset.animateChild === 'tilt';
+        const distance = num(el.dataset.animateY, DISTANCE);
         gsap.from(targets, {
           ...base,
           opacity: 0,
-          y: num(el.dataset.animateY, DISTANCE),
+          y: bascule ? Math.max(distance, DISTANCE_TITLE) : distance,
+          ...(bascule ? { rotationX: 6, transformPerspective: 900, duration: DURATION_TITLE } : {}),
           stagger: num(el.dataset.animateStagger, STAGGER),
         });
         break;
+      }
       case 'fade-up':
       default:
         gsap.from(el, { ...base, opacity: 0, y });

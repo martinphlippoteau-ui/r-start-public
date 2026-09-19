@@ -37,6 +37,19 @@ test.describe('Performance', () => {
     });
   }
 
+  /*
+   * L'ACCUEIL NE CHARGE PAS LA FEUILLE DE /strategie (audit du 18/09/2026). Son `import.meta.glob`
+   * prenait toutes les sections, et Astro rattache à une page la CSS de tout module importé : 20 Ko de
+   * feuille bloquante, dont aucun sélecteur n'existe sur l'accueil.
+   */
+  test('l’accueil ne charge pas la feuille de style de /strategie', async ({ page }) => {
+    await page.goto('/');
+    const feuilles = await page
+      .locator('link[rel="stylesheet"]')
+      .evaluateAll((liens) => liens.map((l) => l.getAttribute('href') ?? ''));
+    expect(feuilles.filter((f) => /04-Strategy/.test(f))).toEqual([]);
+  });
+
   test('l’accueil charge bien le moteur GSAP', async ({ page }) => {
     const scripts: string[] = [];
     page.on('request', (req) => {
