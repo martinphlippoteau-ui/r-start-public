@@ -255,7 +255,7 @@ export const simulator = {
       rate: {
         title: nb('Quelle hypothèse de taux voulez-vous tester ?'),
         help: nb(
-          `${product.name} n’a pas encore d’historique : le site ne lui suppose aucun taux. C’est vous qui fixez l’hypothèse, et vous pourrez la changer ensuite.`
+          `${product.name} n’a pas encore d’historique, c’est vous qui fixez l’hypothèse, et vous pourrez la changer ensuite.`
         ),
       },
     },
