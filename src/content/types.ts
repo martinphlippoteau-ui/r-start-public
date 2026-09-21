@@ -43,6 +43,8 @@ export type CtaPosition =
   | 'nav'
   | 'hero'
   | 'frais'
+  | 'simulateur'
+  | 'simulateur-resultat'
   | 'souscrire'
   | 'strategie'
   | 'presse'

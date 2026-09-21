@@ -1,0 +1,1056 @@
+---
+/**
+ * SIMULATEUR de /simulateur (19-20/09/2026, demande de Martin, d'après le prototype qu'il a fourni).
+ *
+ * UN PARCOURS GUIDÉ, PUIS UN RÉSULTAT AJUSTABLE (arbitrage de Martin du 20/09/2026). La première
+ * version posait les cinq réglages d'un coup, à côté des résultats, comme le prototype : un tableau de
+ * bord, trop lourd pour qui découvre le produit. Ici :
+ *  1. LE PARCOURS : quatre questions, une par écran (montant, versement mensuel, revenus, taux), avec
+ *     « Retour » et « Continuer ». La dernière ne se franchit pas sans avoir choisi un taux ;
+ *  2. LE RÉSULTAT : les chiffres, l'avertissement, le graphique, et à côté « Vos hypothèses », où chaque
+ *     réglage est replié sur sa valeur et se rouvre d'un clic. Le résultat suit en direct.
+ *
+ * UN SEUL JEU DE CHAMPS POUR LES DEUX. Chaque réglage est un bloc `[data-simu-champ]` qui porte son
+ * résumé (un bouton, montré sur l'écran de résultat) et son corps (la question et ses commandes). Le
+ * script n'en duplique aucun : il choisit lesquels montrer selon `data-mode` sur la racine, `parcours`
+ * ou `resultat`. La durée n'a pas d'étape : elle arrive à sa valeur par défaut et s'ouvre la première
+ * sur l'écran de résultat, c'est le réglage avec lequel on joue.
+ *
+ * L'ORDRE DU DOM EST CELUI DE LA LECTURE : les résultats d'abord, les hypothèses ensuite. Sur
+ * téléphone ils s'empilent dans cet ordre ; sur grand écran les résultats sont à gauche, les hypothèses
+ * dans une colonne étroite à droite, collée sous la barre. Aucune des deux colonnes ne défile en
+ * elle-même.
+ *
+ * TOUTE LA STRUCTURE EST RENDUE ICI, le script ne pose ni classe ni texte à lui : il remplit des
+ * nombres, trace des chemins SVG dans un squelette déjà en place, et bascule `hidden`, `aria-pressed`,
+ * `aria-expanded`. Les libellés viennent de src/content/fr/simulator.ts, le contrôle de conformité du
+ * build les lit donc tous. L'AVERTISSEMENT EST DANS LE BLOC DES RÉSULTATS, à côté des chiffres.
+ *
+ * LE GRAPHIQUE est un SVG de 720 × 290 dont le squelette est ici. Il est décoratif pour les lecteurs
+ * d'écran (`aria-hidden`), qui ont le même contenu dans le tableau replié dessous ; au clavier,
+ * l'enveloppe est focalisable et les flèches promènent le curseur année par année.
+ *
+ * SANS JAVASCRIPT le simulateur ne peut rien calculer : il est masqué (`@media (scripting: none)`,
+ * global.css) et un message le dit. Mécanique : src/scripts/simulateur/page.ts ; calcul :
+ * src/scripts/simulateur/moteur.ts ; styles des curseurs : global.css, « Simulateur ».
+ */
+import Button from '@/components/ui/Button.astro';
+import Container from '@/components/ui/Container.astro';
+import Picto from '@/components/ui/Picto.astro';
+import Section from '@/components/ui/Section.astro';
+import { pages } from '@/config/pages';
+import { simulator } from '@/content/fr/simulator';
+import { withBase } from '@/lib/href';
+import { jsonScript } from '@/lib/jsonScript';
+
+interface Props {
+  id?: string;
+}
+const { id = 'simulateur' } = Astro.props;
+const { rules, markers, gate, steps, summary, form, results, next, chart, hypotheses, mobileBar } =
+  simulator;
+
+const nfEuros = new Intl.NumberFormat('fr-FR', {
+  style: 'currency',
+  currency: 'EUR',
+  maximumFractionDigits: 0,
+});
+/* L'espace fine insécable d'`Intl` (U+202F) n'a pas de largeur dans la police du site : voir page.ts. */
+const euros = (v: number): string => nfEuros.format(v).replace(/\u202f/g, '\u00a0');
+/** Largeur de la poignée des curseurs, en pixels : la même valeur que `--simu-poignee` (global.css). */
+const POIGNEE = 22;
+/** Position d'un repère sur la piste : le centre de la poignée ne va pas d'un bord à l'autre. */
+const surLaPiste = (p: number): string =>
+  `calc(${(p * 100).toFixed(3)}% + ${((0.5 - p) * POIGNEE).toFixed(2)}px)`;
+
+/** Les quatre questions du parcours, dans l'ordre. La durée n'en est pas une. */
+const ETAPES = ['initial', 'monthly', 'income', 'rate'] as const;
+
+const resume =
+  'simu-tactile flex min-h-11 w-full items-center justify-between gap-3 py-2 text-left transition-colors hover:text-navy';
+const question = 'text-display-sm text-ink outline-none';
+const aideQuestion = 'mt-2 text-base text-slate-700';
+const aide = 'mt-2 text-sm text-slate-700';
+const erreur = 'mt-2 text-sm font-semibold text-coral-700';
+const montant =
+  'flex items-center gap-2 rounded-2xl border border-navy/20 bg-white px-4 py-2.5 transition-colors focus-within:border-navy focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-navy data-[invalide]:border-coral-700';
+const saisie =
+  'min-w-0 flex-1 border-0 bg-transparent p-0 text-2xl font-bold text-ink tabular-nums outline-none focus-visible:shadow-none focus-visible:outline-none';
+const pastille =
+  'simu-tactile min-h-11 rounded-full border border-navy/20 bg-white px-3.5 py-2 text-sm font-semibold text-slate-700 transition-colors hover:border-navy/50 aria-pressed:border-navy aria-pressed:bg-teal-50 aria-pressed:text-navy';
+const choix =
+  'simu-tactile rounded-2xl border-2 border-mist bg-white p-4 text-left text-ink transition-colors hover:border-teal-200 aria-pressed:border-navy aria-pressed:bg-teal-50 aria-pressed:text-navy';
+const kpi = 'rounded-2xl border-2 border-teal-200 bg-teal-50 p-5';
+const kpiNombre = 'mt-2 text-2xl leading-tight font-bold text-navy tabular-nums';
+const note = 'flex items-start gap-3 rounded-2xl border p-4 text-sm leading-snug';
+const bascule =
+  'min-h-11 lg:min-h-9 rounded-full px-3.5 py-1.5 text-sm font-semibold text-slate-700 transition-colors aria-pressed:bg-navy aria-pressed:text-white';
+const tableau =
+  'w-full border-collapse text-sm tabular-nums [&_td]:border-b [&_td]:border-mist [&_td]:px-3 [&_td]:py-1.5 [&_td]:text-right [&_td]:whitespace-nowrap [&_td:first-child]:text-left [&_th]:sticky [&_th]:top-0 [&_th]:bg-paper [&_th]:px-3 [&_th]:py-2 [&_th]:text-right [&_th]:font-semibold [&_th]:whitespace-nowrap [&_th:first-child]:text-left';
+
+/* Couches du graphique : la clé est celle de `Annee` (moteur.ts), la classe donne la couleur. */
+const couches = [
+  { key: 'initial', label: chart.layers.initial, fill: 'fill-navy', puce: 'bg-navy' },
+  { key: 'programmes', label: chart.layers.programmes, fill: 'fill-teal-400', puce: 'bg-teal-400' },
+  { key: 'reinvestis', label: chart.layers.reinvestis, fill: 'fill-coral', puce: 'bg-coral' },
+  { key: 'cumGross', label: chart.layers.cumGross, fill: 'fill-teal-200', puce: 'bg-teal-200' },
+] as const;
+
+/** Libellé de chaque réglage sur l'écran de résultat. */
+const reglages = {
+  initial: form.initial.label,
+  monthly: form.monthly.label,
+  income: form.income.shortLabel,
+  rate: form.rate.label,
+  years: form.years.label,
+} as const;
+type Reglage = keyof typeof reglages;
+/** L'étape qui pose ce réglage ; aucune pour la durée. */
+const etapeDe = (cle: Reglage): number | undefined => {
+  const rang = (ETAPES as readonly string[]).indexOf(cle);
+  return rang === -1 ? undefined : rang + 1;
+};
+---
+
+<Section id={id} tone="paper" labelledBy={id + '-title'} class="pt-10 sm:pt-12 lg:pt-16">
+  <Container size="wide">
+    <h2 id={id + '-title'} class="visually-hidden">{form.title}</h2>
+    <p class="simu-sans-script rounded-2xl border border-mist bg-white p-5 text-base text-ink">
+      {simulator.noScript}
+    </p>
+
+    <div
+      data-simulateur
+      data-mode="parcours"
+      data-panneau="non"
+      data-sens="avant"
+      inert
+      class="simu-avec-script group/simu grid grid-cols-1 gap-6 lg:items-start lg:gap-8 data-[panneau=oui]:lg:grid-cols-[minmax(0,1.2fr)_minmax(22rem,0.8fr)]"
+    >
+      <div
+        data-simu-scene
+        class="min-w-0 group-data-[panneau=non]/simu:mx-auto group-data-[panneau=non]/simu:w-full group-data-[panneau=non]/simu:max-w-2xl"
+      >
+        {/* ── Le parcours : une question à la fois ──────────────────────────────────────── */}
+        <div data-simu-carte class="rounded-3xl border border-mist bg-white p-5 shadow-card sm:p-8">
+          {/* En-tête du parcours : où l'on en est. */}
+          <div class="mb-6 flex items-center justify-between gap-4">
+            <p
+              class="text-eyebrow text-teal-700"
+              data-simu-etape-libelle
+              data-gabarit={steps.progress}
+            >
+            </p>
+            <ol role="list" class="flex items-center gap-1.5" aria-hidden="true">
+              {ETAPES.map((_, i) => <li data-simu-pas={i + 1} class="simu-pas" />)}
+            </ol>
+          </div>
+
+          {
+            /* Les corps des cinq réglages. Pendant le parcours, celui de la question en cours est ici ;
+            sur l'écran de résultat, le script les range chacun sous sa ligne de « Vos hypothèses ». */
+          }
+          <div data-simu-questions>
+            {
+              (Object.keys(reglages) as Reglage[]).map((cle) => (
+                <div
+                  id={`${id}-corps-${cle}`}
+                  data-simu-corps={cle}
+                  data-etape={etapeDe(cle)}
+                  class="simu-corps"
+                  hidden={cle !== 'initial'}
+                >
+                  {cle === 'initial' && (
+                    <>
+                      <h3 class={question} data-simu-question tabindex="-1">
+                        {steps.questions.initial.title}
+                      </h3>
+                      <p class={aideQuestion} data-simu-question-aide>
+                        {steps.questions.initial.help}
+                      </p>
+                      <label class="visually-hidden" for={id + '-initial'}>
+                        {form.initial.label}
+                      </label>
+                      <div
+                        class:list={[montant, 'mt-5 group-data-[mode=resultat]/simu:mt-0']}
+                        data-simu-boite="initial"
+                      >
+                        <input
+                          id={id + '-initial'}
+                          data-simu-initial
+                          type="text"
+                          inputmode="numeric"
+                          autocomplete="off"
+                          enterkeyhint="next"
+                          aria-describedby={id + '-initial-erreur'}
+                          class={saisie}
+                        />
+                        <span aria-hidden="true" class="font-semibold text-slate-700">
+                          {form.initial.unit}
+                        </span>
+                      </div>
+                      <p
+                        id={id + '-initial-erreur'}
+                        data-simu-erreur="initial"
+                        data-gabarit={form.initial.errorMin}
+                        role="alert"
+                        class={erreur}
+                        hidden
+                      />
+                      <div
+                        class="mt-3 flex flex-wrap gap-2"
+                        role="group"
+                        aria-label={form.initial.chipsLabel}
+                      >
+                        {rules.initialChips.map((v) => (
+                          <button
+                            type="button"
+                            class={pastille}
+                            data-simu-puce="initial"
+                            data-v={v}
+                            aria-pressed="false"
+                          >
+                            {euros(v)}
+                          </button>
+                        ))}
+                      </div>
+                    </>
+                  )}
+
+                  {cle === 'monthly' && (
+                    <>
+                      <h3 class={question} data-simu-question tabindex="-1">
+                        {steps.questions.monthly.title}
+                      </h3>
+                      <p class={aideQuestion} data-simu-question-aide>
+                        {steps.questions.monthly.help}
+                      </p>
+                      <div
+                        class="mt-5 flex flex-wrap gap-2 group-data-[mode=resultat]/simu:mt-0"
+                        role="group"
+                        aria-label={form.monthly.chipsLabel}
+                      >
+                        {rules.monthlyChips.map((v) => (
+                          <button
+                            type="button"
+                            class={pastille}
+                            data-simu-puce="monthly"
+                            data-v={v}
+                            aria-pressed="false"
+                          >
+                            {v === 0 ? form.monthly.none : euros(v)}
+                          </button>
+                        ))}
+                      </div>
+                      <label
+                        class="mt-4 block text-sm font-semibold text-slate-700"
+                        for={id + '-mensuel'}
+                      >
+                        {form.monthly.other}
+                      </label>
+                      <div class:list={[montant, 'mt-2']} data-simu-boite="monthly">
+                        <input
+                          id={id + '-mensuel'}
+                          data-simu-mensuel
+                          type="text"
+                          inputmode="numeric"
+                          autocomplete="off"
+                          enterkeyhint="next"
+                          aria-describedby={id + '-mensuel-erreur'}
+                          class={saisie}
+                        />
+                        <span
+                          aria-hidden="true"
+                          class="font-semibold whitespace-nowrap text-slate-700"
+                        >
+                          {form.monthly.unit}
+                        </span>
+                      </div>
+                      <p
+                        id={id + '-mensuel-erreur'}
+                        data-simu-erreur="monthly"
+                        data-gabarit={form.monthly.errorMin}
+                        role="alert"
+                        class={erreur}
+                        hidden
+                      />
+                    </>
+                  )}
+
+                  {cle === 'income' && (
+                    <>
+                      <h3 class={question} data-simu-question tabindex="-1">
+                        {steps.questions.income.title}
+                      </h3>
+                      <p class={aideQuestion} data-simu-question-aide>
+                        {steps.questions.income.help}
+                      </p>
+                      <div
+                        class="mt-5 grid grid-cols-1 gap-2 group-data-[mode=resultat]/simu:mt-0 sm:grid-cols-2 group-data-[mode=resultat]/simu:sm:grid-cols-1"
+                        role="group"
+                        aria-label={form.income.label}
+                      >
+                        <button
+                          type="button"
+                          class={choix}
+                          data-simu-reinvestir="0"
+                          aria-pressed="true"
+                        >
+                          <span class="block font-bold">{form.income.paid.title}</span>
+                          <span class="mt-1 block text-sm text-slate-700">
+                            {form.income.paid.detail}
+                          </span>
+                        </button>
+                        <button
+                          type="button"
+                          class={choix}
+                          data-simu-reinvestir="1"
+                          aria-pressed="false"
+                        >
+                          <span class="block font-bold">{form.income.reinvested.title}</span>
+                          <span class="mt-1 block text-sm text-slate-700">
+                            {form.income.reinvested.detail}
+                          </span>
+                        </button>
+                      </div>
+                      <div
+                        class="mt-3 rounded-2xl border border-mist p-4"
+                        data-simu-panneau-part
+                        hidden
+                      >
+                        <div class="flex items-center justify-between gap-3 text-sm text-slate-700">
+                          <label for={id + '-part'}>{form.income.shareLabel}</label>
+                          <span class="font-bold text-navy tabular-nums" data-simu-part-valeur />
+                        </div>
+                        <input
+                          id={id + '-part'}
+                          data-simu-part
+                          data-gabarit-valeur={form.income.shareValue}
+                          type="range"
+                          min={rules.reinvest.min}
+                          max={rules.reinvest.max}
+                          step={rules.reinvest.step}
+                          value={rules.reinvest.max}
+                          class="simu-curseur"
+                        />
+                      </div>
+                    </>
+                  )}
+
+                  {cle === 'rate' && (
+                    <>
+                      <h3 class={question} data-simu-question tabindex="-1">
+                        {steps.questions.rate.title}
+                      </h3>
+                      <p class={aideQuestion} data-simu-question-aide>
+                        {steps.questions.rate.help}
+                      </p>
+                      <div class="mt-5 flex items-baseline justify-between gap-3 group-data-[mode=resultat]/simu:mt-0">
+                        <label class="text-base font-bold text-ink" for={id + '-taux'}>
+                          {form.rate.label}
+                        </label>
+                        <span
+                          class="text-lg font-bold text-navy tabular-nums"
+                          data-simu-taux-valeur
+                          data-vide={form.rate.unset}
+                        >
+                          {form.rate.unset}
+                        </span>
+                      </div>
+                      {/* Repères au-dessus de la piste : leur abscisse est celle du CENTRE de la poignée. */}
+                      <div class="pointer-events-none relative mt-2 h-5" aria-hidden="true">
+                        {markers.map((m) => (
+                          <span
+                            class:list={[
+                              'simu-repere absolute bottom-0 flex -translate-x-1/2 flex-col items-center text-[0.6875rem] leading-none font-bold whitespace-nowrap',
+                              m.id === 'aspim' ? 'text-coral-700' : 'text-teal-700',
+                            ]}
+                            style={`left:${surLaPiste((m.rate - rules.rate.min) / (rules.rate.max - rules.rate.min))}`}
+                          >
+                            {m.short}
+                          </span>
+                        ))}
+                      </div>
+                      <input
+                        id={id + '-taux'}
+                        data-simu-taux
+                        data-vide-lu={form.rate.unsetSpoken}
+                        type="range"
+                        min={rules.rate.min}
+                        max={rules.rate.max}
+                        step={rules.rate.step}
+                        value={rules.rate.min}
+                        aria-describedby={id + '-taux-aide'}
+                        class="simu-curseur"
+                      />
+                      <div class="flex justify-between text-xs text-slate-700" aria-hidden="true">
+                        <span>{rules.rate.min} %</span>
+                        <span>{rules.rate.max} %</span>
+                      </div>
+                      <p class={aide} id={id + '-taux-aide'}>
+                        {form.rate.help}
+                      </p>
+                      <div
+                        class="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2 group-data-[mode=resultat]/simu:sm:grid-cols-1"
+                        role="group"
+                        aria-label={form.rate.markersLabel}
+                      >
+                        {markers.map((m) => (
+                          <button
+                            type="button"
+                            data-simu-repere
+                            data-taux={m.rate}
+                            aria-pressed="false"
+                            class:list={[
+                              'simu-tactile rounded-2xl border-2 border-transparent p-3 text-left transition-colors hover:border-navy/40 aria-pressed:border-navy',
+                              m.id === 'aspim' ? 'bg-sand-200 text-ink' : 'bg-teal-50 text-ink',
+                            ]}
+                          >
+                            <span class="flex items-center justify-between gap-2 font-bold">
+                              <span>{m.label}</span>
+                              <span class="rounded-full bg-white px-2 py-0.5 text-sm tabular-nums">
+                                {m.rateLabel}
+                              </span>
+                            </span>
+                            <span class="mt-1.5 block text-xs leading-snug text-slate-700">
+                              {m.source}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                      <p class:list={[aide, 'mt-3']}>{form.rate.pastPerformance}</p>
+                    </>
+                  )}
+
+                  {cle === 'years' && (
+                    <>
+                      <label class="visually-hidden" for={id + '-duree'}>
+                        {form.years.label}
+                      </label>
+                      <input
+                        id={id + '-duree'}
+                        data-simu-duree
+                        type="range"
+                        min={rules.years.min}
+                        max={rules.years.max}
+                        step="1"
+                        value={rules.years.def}
+                        class="simu-curseur"
+                      />
+                      <div class="flex justify-between text-xs text-slate-700" aria-hidden="true">
+                        <span>
+                          {rules.years.min} {form.years.unit}
+                        </span>
+                        <span>
+                          {rules.years.max} {form.years.unit}
+                        </span>
+                      </div>
+                      <div
+                        class="mt-2 flex flex-wrap gap-2"
+                        role="group"
+                        aria-label={form.years.chipsLabel}
+                      >
+                        {rules.years.presets.map((v) => (
+                          <button
+                            type="button"
+                            class={pastille}
+                            data-simu-puce="years"
+                            data-v={v}
+                            aria-pressed="false"
+                          >
+                            {v} {form.years.unit}
+                          </button>
+                        ))}
+                      </div>
+                      <p class={aide}>{form.years.help}</p>
+                    </>
+                  )}
+                </div>
+              ))
+            }
+          </div>
+
+          {
+            /* Pied du parcours. « Continuer » ne passe pas la dernière question sans taux choisi. */
+          }
+          <p data-simu-alerte-taux role="alert" class:list={[erreur, 'mt-4']} hidden>
+            {steps.needRate}
+          </p>
+          {
+            /* COLLÉ EN BAS DE L'ÉCRAN sous « lg » : à la question du taux, la carte fait près de 900 px
+              de haut sur un téléphone et « Voir ma simulation » tombait deux cents pixels sous le pli.
+              Le bouton principal d'un parcours doit rester sous le pouce. `simu-pied` (global.css) lui
+              donne son fond et la marge de la zone sûre des téléphones à encoche. */
+          }
+          <div class="simu-pied mt-7 flex items-center justify-between gap-3">
+            <button
+              type="button"
+              data-simu-retour
+              class="min-h-11 rounded-full px-4 py-2 text-base font-semibold text-slate-700 transition-colors hover:text-navy"
+              hidden
+            >
+              {steps.back}
+            </button>
+            <button
+              type="button"
+              data-simu-suivant
+              data-suite={steps.next}
+              data-fin={steps.finish}
+              class="btn btn-motion btn-primary btn-md ml-auto"
+            >
+              {steps.next}
+            </button>
+          </div>
+        </div>
+
+        {/* ── Les résultats : masqués pendant le parcours ───────────────────────────────────── */}
+        <section aria-labelledby={id + '-resultats-titre'} data-simu-resultats hidden>
+          <h3
+            id={id + '-resultats-titre'}
+            class="text-display-sm text-ink outline-none"
+            tabindex="-1"
+          >
+            {results.title}
+          </h3>
+
+          <div
+            data-simu-etat="erreur"
+            class="mt-5 rounded-3xl border border-dashed border-coral-700/40 bg-white px-6 py-9 text-center"
+            hidden
+          >
+            <p class="text-lg font-bold text-ink">{results.invalid.title}</p>
+            <p class="mt-1 text-base text-slate-700" data-simu-erreur-texte></p>
+          </div>
+
+          <div data-simu-etat="sorties" class="mt-5 grid gap-4" hidden>
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              {
+                /* Deux jeux de cartes, un seul affiché : le visiteur perçoit ses revenus, ou son capital
+                grandit (versement programmé, réinvestissement). */
+              }
+              <article class={kpi} data-simu-kpi="income">
+                <p class="text-sm font-semibold text-navy">{results.income.first.label}</p>
+                <p class={kpiNombre}>
+                  <span data-n="monthlyNow"></span>
+                  <span class="text-base font-bold">{results.income.first.unit}</span>
+                </p>
+                <p class="mt-2 text-sm text-ink">{results.income.first.sub}</p>
+                <p
+                  class="mt-3 border-t border-teal-200 pt-2.5 text-sm text-ink"
+                  data-gabarit={results.income.first.rule}
+                  data-t="incomeRule"
+                >
+                </p>
+              </article>
+              <article class={kpi} data-simu-kpi="income">
+                <p
+                  class="text-sm font-semibold text-navy"
+                  data-gabarit={results.income.second.label}
+                  data-t="incomeLabel"
+                >
+                </p>
+                <p class={kpiNombre} data-n="cumPaid"></p>
+                <p
+                  class="mt-2 text-sm text-ink"
+                  data-gabarit={results.income.second.sub}
+                  data-t="incomeSub"
+                >
+                </p>
+                <p
+                  class="mt-3 border-t border-teal-200 pt-2.5 text-sm text-ink"
+                  data-gabarit={results.income.second.rule}
+                  data-t="incomeCapital"
+                >
+                </p>
+              </article>
+
+              <article class={kpi} data-simu-kpi="growth" hidden>
+                <p
+                  class="text-sm font-semibold text-navy"
+                  data-gabarit={results.growth.first.label}
+                  data-t="growthLabel"
+                >
+                </p>
+                <p class={kpiNombre} data-n="capitalFinal"></p>
+                <p
+                  class="mt-2 text-sm text-ink"
+                  data-gabarit={results.growth.first.sub}
+                  data-t="growthSub"
+                >
+                </p>
+                <p
+                  class="mt-3 border-t border-teal-200 pt-2.5 text-sm text-ink"
+                  data-gabarit={results.growth.first.rule}
+                  data-t="growthRule"
+                >
+                </p>
+              </article>
+              <article class={kpi} data-simu-kpi="growth" hidden>
+                <p class="text-sm font-semibold text-navy">{results.growth.second.label}</p>
+                <p class={kpiNombre} data-n="gain"></p>
+                <p
+                  class="mt-2 text-sm text-ink"
+                  data-gabarit={results.growth.second.sub}
+                  data-t="gainSub"
+                >
+                </p>
+                <p
+                  class="mt-3 border-t border-teal-200 pt-2.5 text-sm text-ink"
+                  data-gabarit-percu={results.growth.second.rulePaid}
+                  data-gabarit-aucun={results.growth.second.ruleNone}
+                  data-t="gainRule"
+                >
+                </p>
+              </article>
+            </div>
+
+            <p class:list={[note, 'border-sand bg-sand-200 text-ink']} data-simu-avertissement>
+              <svg
+                aria-hidden="true"
+                class="mt-0.5 size-5 shrink-0 text-coral-700"
+                viewBox="0 0 20 20"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M10 3.2 17.5 16H2.5L10 3.2ZM10 8v3.6M10 13.9v.1"></path>
+              </svg>
+              <span>{results.warning}</span>
+            </p>
+
+            <p
+              class:list={[note, 'border-teal-200 bg-teal-50 text-ink']}
+              data-simu-note-retrait
+              hidden
+            >
+              <svg
+                aria-hidden="true"
+                class="mt-0.5 size-5 shrink-0 text-navy"
+                viewBox="0 0 20 20"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linecap="round"
+              >
+                <circle cx="10" cy="10" r="7.2"></circle>
+                <path d="M10 9.2v4.4M10 6.4v.1"></path>
+              </svg>
+              <span data-gabarit={results.exitFee} data-t="exitFee"></span>
+            </p>
+
+            <div class="rounded-2xl border border-mist bg-white p-4 sm:p-5">
+              <div class="flex flex-wrap items-center justify-between gap-3">
+                <p
+                  class="font-bold text-ink"
+                  data-simu-titre-graphique
+                  data-revenus={chart.titleIncome}
+                  data-capital={chart.titleCapital}
+                >
+                  {chart.titleIncome}
+                </p>
+                <div
+                  class="inline-flex rounded-full border border-mist bg-paper p-1"
+                  role="group"
+                  aria-label={chart.toggleLabel}
+                  data-simu-bascule
+                  hidden
+                >
+                  <button type="button" class={bascule} data-simu-vue="revenus" aria-pressed="true">
+                    {chart.toggleIncome}
+                  </button>
+                  <button
+                    type="button"
+                    class={bascule}
+                    data-simu-vue="capital"
+                    aria-pressed="false"
+                  >
+                    {chart.toggleCapital}
+                  </button>
+                </div>
+              </div>
+
+              <div
+                class="relative mt-3 touch-pan-y rounded-lg"
+                data-simu-graphique
+                tabindex="0"
+                role="group"
+                aria-label={chart.description}
+              >
+                <svg
+                  viewBox="0 0 720 290"
+                  class="block h-auto w-full"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  {
+                    [0, 1, 2, 3, 4].map((i) => (
+                      <g>
+                        <line
+                          data-grille={i}
+                          x1="64"
+                          x2="700"
+                          class={i === 0 ? 'stroke-navy/30' : 'stroke-mist'}
+                          stroke-dasharray={i === 0 ? undefined : '3 4'}
+                        />
+                        <text
+                          data-axe-y={i}
+                          x="56"
+                          text-anchor="end"
+                          font-size="12"
+                          class="fill-slate-700"
+                        />
+                      </g>
+                    ))
+                  }
+                  {couches.map((c) => <path data-couche={c.key} class={c.fill} />)}
+                  <path
+                    data-ligne
+                    fill="none"
+                    class="stroke-navy"
+                    stroke-width="2.5"
+                    stroke-linejoin="round"></path>
+                  <path
+                    data-ligne-verse
+                    fill="none"
+                    class="stroke-ink"
+                    stroke-width="2"
+                    stroke-dasharray="5 4"></path>
+                  {
+                    [0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                      <text
+                        data-axe-x={i}
+                        y="267"
+                        text-anchor="middle"
+                        font-size="12"
+                        class="fill-slate-700"
+                      />
+                    ))
+                  }
+                  <text
+                    data-axe-titre
+                    x="382"
+                    y="286"
+                    text-anchor="middle"
+                    font-size="12"
+                    class="fill-slate-700"
+                  >
+                    {chart.axisYears}
+                  </text>
+                  <g data-curseur visibility="hidden">
+                    <line data-curseur-trait y1="16" y2="250" class="stroke-ink" stroke-width="1"
+                    ></line>
+                    <circle data-curseur-point r="5" class="fill-white stroke-navy" stroke-width="3"
+                    ></circle>
+                  </g>
+                </svg>
+
+                {
+                  /* Bulle du curseur. Toutes ses lignes existent, le script affiche celles de la vue. */
+                }
+                <div
+                  data-simu-bulle
+                  class="pointer-events-none absolute top-1.5 rounded-xl bg-ink px-3 py-2 text-xs leading-relaxed whitespace-nowrap text-white tabular-nums shadow-float"
+                  hidden
+                >
+                  <p
+                    class="font-bold"
+                    data-bulle-titre
+                    data-depart={chart.start}
+                    data-annee={chart.year}
+                  >
+                  </p>
+                  <p data-bulle-ligne="capital" data-gabarit={chart.tipCapital}></p>
+                  {
+                    couches
+                      .filter((c) => c.key !== 'cumGross')
+                      .map((c) => (
+                        <p data-bulle-ligne={c.key} class="flex items-center gap-1.5">
+                          <span class:list={['inline-block size-2 rounded-xs', c.puce]} />
+                          <span>{c.label} :</span>
+                          <span data-bulle-valeur />
+                        </p>
+                      ))
+                  }
+                  <p data-bulle-ligne="cumGross" data-gabarit={chart.tipCumulative}></p>
+                  <p data-bulle-ligne="monthlyIncome" data-gabarit={chart.tipMonthly}></p>
+                </div>
+              </div>
+
+              <ul role="list" class="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-slate-700">
+                {
+                  couches.map((c) => (
+                    <li data-legende={c.key} class="inline-flex items-center gap-1.5">
+                      <span class:list={['inline-block h-2.5 w-3.5 rounded-xs', c.puce]} />
+                      {c.label}
+                    </li>
+                  ))
+                }
+                <li data-legende="invested" class="inline-flex items-center gap-1.5">
+                  <span class="inline-block w-3.5 border-t-2 border-dashed border-ink"></span>
+                  {chart.layers.invested}
+                </li>
+              </ul>
+
+              <details class="mt-3 text-sm">
+                <summary class="cursor-pointer py-1 font-semibold text-navy"
+                  >{chart.table.summary}</summary
+                >
+                <div class="mt-2 max-h-64 overflow-auto rounded-xl border border-mist" tabindex="0">
+                  <table class={tableau} data-simu-table="revenus">
+                    <thead>
+                      <tr>
+                        <th scope="col">{chart.table.year}</th>
+                        <th scope="col">{chart.table.cumulative}</th>
+                        <th scope="col">{chart.table.monthly}</th>
+                      </tr>
+                    </thead>
+                    <tbody></tbody>
+                  </table>
+                  <table class={tableau} data-simu-table="capital" hidden>
+                    <thead>
+                      <tr>
+                        <th scope="col">{chart.table.year}</th>
+                        <th scope="col">{chart.table.capital}</th>
+                        <th scope="col">{chart.table.invested}</th>
+                        <th scope="col">{chart.table.reinvested}</th>
+                      </tr>
+                    </thead>
+                    <tbody></tbody>
+                  </table>
+                </div>
+              </details>
+            </div>
+
+            <details class="rounded-2xl border border-mist bg-white px-5 py-3 text-sm">
+              <summary class="cursor-pointer py-1 font-semibold text-navy"
+                >{hypotheses.title}</summary
+              >
+              <ul class="mt-2 mb-1 list-disc space-y-1.5 pl-5 text-slate-700">
+                {hypotheses.items.map((h) => <li>{h}</li>)}
+              </ul>
+            </details>
+          </div>
+        </section>
+      </div>
+
+      {/* ── « Vos hypothèses » : se remplit dès la première question ────────────────────── */}
+      {
+        /* « VOS HYPOTHÈSES », ET LA SUITE DEDANS (demandes de Martin du 20/09/2026). Le bloc est COMPACT
+          pour que « Commencer ma souscription » reste à l'écran sans défiler : titre et « Recommencer »
+          sur une ligne, réglages de 44 px de haut (le plancher tactile, pas moins), aucun ouvert
+          d'emblée. Le bouton ferme la carte, sur fond ink : un CTA de souscription comme les autres
+          (mesure d'audience, fenêtre « bientôt » tant que le tunnel est fermé), auquel le script ajoute
+          les choix du visiteur quand la souscription est ouverte
+          (src/scripts/simulateur/souscription.ts). Il s'efface si un montant est à corriger : on ne
+          propose pas de souscrire un projet invalide. */
+      }
+      <aside
+        data-simu-panneau
+        aria-labelledby={id + '-hypotheses'}
+        class="simu-panneau overflow-hidden rounded-3xl border border-mist bg-white shadow-card"
+        hidden
+      >
+        <div class="px-5 pt-4 pb-1 sm:px-6 sm:pt-5">
+          <div class="flex items-center justify-between gap-3">
+            <h3 id={id + '-hypotheses'} class="text-lg font-bold text-ink">{summary.title}</h3>
+            <button
+              type="button"
+              data-simu-recommencer
+              class="simu-tactile -mr-2 min-h-11 rounded-full px-3 text-sm font-semibold text-teal-700 transition-colors hover:text-navy"
+              hidden
+            >
+              {summary.restart}
+            </button>
+          </div>
+          <p
+            class="text-sm text-slate-700"
+            data-simu-panneau-aide
+            data-parcours={summary.building}
+            data-resultat={summary.subtitle}
+          >
+            {summary.building}
+          </p>
+          <ul role="list" class="mt-2">
+            {
+              (Object.keys(reglages) as Reglage[]).map((cle) => (
+                <li
+                  data-simu-champ={cle}
+                  data-etape={etapeDe(cle)}
+                  class="simu-ligne border-t border-mist first:border-t-0"
+                  hidden={cle !== 'initial'}
+                >
+                  <button
+                    type="button"
+                    data-simu-resume
+                    aria-controls={`${id}-corps-${cle}`}
+                    class={resume}
+                  >
+                    <span class="text-sm text-slate-700">{reglages[cle]}</span>
+                    <span class="flex items-center gap-3">
+                      <span
+                        class="text-base font-bold whitespace-nowrap text-navy tabular-nums"
+                        data-simu-resume-valeur
+                      />
+                      <span
+                        class="text-sm font-semibold text-teal-700"
+                        data-simu-resume-action
+                        data-ouvrir={summary.edit}
+                        data-fermer={summary.close}
+                      >
+                        {summary.edit}
+                      </span>
+                    </span>
+                  </button>
+                  <div data-simu-hote class="simu-hote" />
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+
+        <div
+          data-simu-suite
+          class="simu-suite mt-2 bg-ink px-5 py-4 text-white sm:px-6 sm:py-5"
+          hidden
+        >
+          <p class="text-base font-bold">{next.title}</p>
+          <Button position={next.position} variant="light" size="md" class="mt-3 w-full">
+            {next.label}
+          </Button>
+          <p class="mt-2.5 text-xs leading-snug text-white/75">{next.text}</p>
+        </div>
+      </aside>
+    </div>
+
+    <p class="mt-8 max-w-4xl text-sm leading-relaxed text-slate-700">{simulator.footerNote}</p>
+  </Container>
+</Section>
+
+{
+  /* Barre de synthèse des petits écrans, sur l'écran de résultat seulement. Rendue hors de la section :
+    `fixed`, elle ne doit avoir aucun ancêtre transformé. Elle s'efface quand les résultats sont à
+    l'écran, quand le pied de page arrive, et tant que le bandeau de consentement occupe le bas de
+    l'écran (global.css). */
+}
+<div
+  data-simu-barre
+  data-croissance={mobileBar.growth}
+  data-revenus={mobileBar.income}
+  data-erreur={results.invalid.title}
+  class="simu-barre fixed inset-x-0 bottom-0 z-30 flex items-center justify-between gap-3 border-t border-mist bg-white px-4 pt-2.5 pb-[calc(0.625rem+env(safe-area-inset-bottom))] shadow-float lg:hidden"
+  hidden
+>
+  <p class="min-w-0">
+    <span class="block truncate text-xs text-slate-700" data-barre-libelle></span>
+    <span class="block text-lg leading-tight font-bold text-navy tabular-nums" data-barre-valeur
+    ></span>
+  </p>
+  <button
+    type="button"
+    data-barre-action
+    data-detail={mobileBar.detail}
+    data-corriger={results.invalid.action}
+    class="btn btn-primary btn-sm shrink-0"
+  >
+  </button>
+</div>
+
+<p
+  class="sr-only"
+  aria-live="polite"
+  data-simu-annonce
+  data-croissance={simulator.live.growth}
+  data-revenus={simulator.live.income}
+>
+</p>
+
+{
+  /*
+   * FENÊTRE D'ACCÈS (20/09/2026, demande de Martin). Elle s'ouvre à l'arrivée, et le simulateur reste
+   * `inert` tant qu'on n'a pas répondu « J'ai compris » : ni Échap ni un clic sur le voile ne la
+   * referment, il n'y a que deux issues, accepter ou repartir vers l'accueil. Élément <dialog> natif,
+   * comme la fenêtre « la souscription ouvre bientôt » : piège à focus et page inerte assurés par le
+   * navigateur. Rien n'est mémorisé : elle revient à chaque visite de la page, aucun stockage, rien à
+   * ajouter à la politique de confidentialité.
+   * TROIS POINTS QUI SE LISENT D'UN REGARD, le texte complet à un clic dessous : src/content/fr/simulator.ts
+   * dit d'où vient chaque paragraphe.
+   */
+}
+<dialog
+  data-simu-acces
+  aria-labelledby={id + '-acces-titre'}
+  class="simu-acces m-auto max-h-[calc(100svh-2rem)] w-[min(36rem,calc(100vw-2rem))] overflow-hidden rounded-3xl border border-mist bg-white p-0 text-ink shadow-float backdrop:bg-ink/60 backdrop:backdrop-blur-sm"
+>
+  {
+    /* DEUX ÉTAGES : le texte défile, LES DEUX ISSUES RESTENT À L'ÉCRAN. Sur un téléphone de 664 px de
+      haut, la fenêtre dépassait et « J'ai compris » n'était atteint qu'en défilant dedans, ce que rien
+      n'indiquait. Le cadre est une colonne de la hauteur de la fenêtre (`simu-acces`, global.css). */
+  }
+  <div class="simu-acces-texte overflow-y-auto overscroll-contain p-5 pb-4 sm:p-8 sm:pb-5">
+    <p class="text-eyebrow text-teal-700">{gate.eyebrow}</p>
+    <h2 id={id + '-acces-titre'} class="text-display-sm mt-3 outline-none" tabindex="-1">
+      {gate.title}
+    </h2>
+    <ul role="list" class="mt-5 space-y-3.5 sm:mt-6 sm:space-y-4">
+      {
+        gate.points.map((point) => (
+          <li class="simu-acces-point flex items-start gap-4">
+            <span class="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-teal-50">
+              <Picto name={point.icon} class="size-6 text-navy" />
+            </span>
+            <p class="text-base leading-snug text-slate-700">
+              <span class="block font-bold text-ink">{point.title}</span>
+              {point.text}
+            </p>
+          </li>
+        ))
+      }
+    </ul>
+    <details class="mt-5 text-sm">
+      <summary class="cursor-pointer py-1 font-semibold text-navy">{gate.fullLabel}</summary>
+      <div class="mt-2 space-y-3 leading-relaxed text-slate-700">
+        {gate.full.map((paragraphe) => <p>{paragraphe}</p>)}
+      </div>
+    </details>
+  </div>
+  <div
+    class="flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-mist bg-white px-5 py-4 pb-[calc(1rem+env(safe-area-inset-bottom))] sm:px-8"
+  >
+    <button type="button" data-simu-accepter class="btn btn-motion btn-primary btn-md">
+      {gate.accept}
+    </button>
+    <a
+      href={withBase(pages.home.path)}
+      class="link-underline inline-flex min-h-11 items-center text-base font-semibold text-navy"
+    >
+      {gate.leave}
+    </a>
+  </div>
+</dialog>
+
+{
+  /* Réglages dans un bloc de DONNÉES, non exécutable, comme le comparateur de frais : la politique de
+    sécurité du contenu ne le soumet pas à `script-src`. */
+}
+<script
+  type="application/json"
+  data-reglages="simulateur"
+  is:inline
+  set:html={jsonScript({
+    rules,
+    next: { params: next.params, origin: next.origin },
+    texts: {
+      monthlyNone: summary.monthlyNone,
+      monthlyUnit: form.monthly.unit,
+      incomePaid: summary.incomePaid,
+      incomeReinvested: summary.incomeReinvested,
+      yearsUnit: form.years.unit,
+    },
+  })}
+/>
+
+<script>
+  import '@/scripts/simulateur/page';
+</script>

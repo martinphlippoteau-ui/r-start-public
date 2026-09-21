@@ -5,6 +5,7 @@ import AxeBuilder from '@axe-core/playwright';
 const PAGES = [
   '/',
   '/frais/',
+  '/simulateur/',
   '/strategie/',
   '/a-propos/',
   '/documentation/',
@@ -233,9 +234,53 @@ test.describe('Qualité', () => {
     for (let i = 0; i < nombre; i += 1) {
       await Promise.all([page.waitForLoadState('load'), liens.nth(i).click()]);
       await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', /\/$/);
+      /* /simulateur s'ouvre sur sa fenêtre d'accès, qui rend le reste de la page inerte, barre
+         comprise : on l'accepte pour pouvoir cliquer l'entrée suivante. */
+      const accepter = page.locator('[data-simu-acces][open] [data-simu-accepter]');
+      if (await accepter.count()) await accepter.click();
     }
     expect(redirections, 'aucune redirection pendant la navigation').toEqual([]);
     expect(new URL(page.url()).pathname.endsWith('/')).toBe(true);
+  });
+
+  /*
+   * LA BARRE TIENT À TOUTES LES LARGEURS DE BUREAU (20/09/2026). Avec le simulateur, elle porte six
+   * entrées, qui ne tiennent pas entre 1024 et 1180 px environ : la liste gardait toute sa largeur,
+   * ÉCRASAIT le logo (36 px de large à 1024) et passait sous la loupe. Elle doit alors défiler dans sa
+   * colonne, avec son fondu, logo et loupe entiers ; et ne pas défiler du tout quand elle tient.
+   */
+  test('la barre garde son logo et sa loupe entiers, que la liste des pages tienne ou non', async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(isMobile, 'la liste des pages n’est dans la barre qu’à partir de « lg »');
+    for (const largeur of [1024, 1100, 1280, 1440]) {
+      await page.setViewportSize({ width: largeur, height: 800 });
+      await page.goto('/frais/');
+      const m = await page.evaluate(() => {
+        const cadre = (s: string) => document.querySelector(s)!.getBoundingClientRect();
+        const liste = document.querySelector<HTMLElement>('[data-sitenav-list]')!;
+        return {
+          logo: Math.round(cadre('[data-nav-brand]').width),
+          logoDroite: cadre('[data-nav-brand]').right,
+          listeGauche: liste.getBoundingClientRect().left,
+          listeDroite: liste.getBoundingClientRect().right,
+          loupeGauche: cadre('[data-recherche-ouvrir]').left,
+          defile: liste.scrollWidth - liste.clientWidth,
+        };
+      });
+      expect(m.logo, `logo entier à ${largeur} px`).toBeGreaterThan(80);
+      expect(
+        m.listeGauche,
+        `la liste ne recouvre pas le logo à ${largeur} px`
+      ).toBeGreaterThanOrEqual(m.logoDroite);
+      expect(
+        m.listeDroite,
+        `la liste ne passe pas sous la loupe à ${largeur} px`
+      ).toBeLessThanOrEqual(m.loupeGauche + 1);
+      if (largeur >= 1280) expect(m.defile, `rien à faire défiler à ${largeur} px`).toBe(0);
+      else expect(m.defile, `la liste défile à ${largeur} px`).toBeGreaterThan(0);
+    }
   });
 
   /*
@@ -388,7 +433,8 @@ test.describe('Qualité', () => {
     await expect(page.locator('[data-menu-open]')).toBeHidden();
     await expect(page.locator('[data-recherche-ouvrir]')).toBeHidden();
     const liens = page.locator('[data-sitenav-list] a');
-    await expect(liens).toHaveCount(5);
+    /* Six entrées depuis le 19/09/2026 : le simulateur est entré au menu. */
+    await expect(liens).toHaveCount(6);
     await expect(liens.first()).toBeVisible();
     await contexte.close();
   });

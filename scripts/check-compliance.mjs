@@ -114,8 +114,17 @@ const FORBIDDEN = [
      * L'EXEMPTION VAUT POUR LA PAGE, PAS POUR R START. Aucun de ces chiffres ne porte sur R Start, et
      * la page ne doit jamais lui en attribuer un : c'est le point à surveiller à chaque relecture,
      * puisque la règle ne le verra plus. Toutes les autres pages restent couvertes.
+     *
+     * SECONDE EXEMPTION, /simulateur, posée le 19/09/2026 avec la page (demande de Martin). Le
+     * simulateur ne peut pas se passer du mot : son curseur EST un taux de distribution, celui que le
+     * visiteur choisit de tester. La règle ne tombe pas pour autant, elle change de forme :
+     * `checkSimulateur`, plus bas, exige ce qui rend la page défendable. Une fenêtre d'avertissement
+     * avant tout accès, qui reproduit l'avertissement du bulletin ; aucun taux présélectionné,
+     * aucun résultat à l'arrivée (la page s'ouvre sur la première question du parcours),
+     * l'avertissement dans le bloc des résultats, la mention sur les performances passées, et des
+     * repères de marché qui portent leur année et leur source.
      */
-    except: ['a-propos'],
+    except: ['a-propos', 'simulateur'],
     re: /taux de distribution|\bTRI\b|rendement (cible|garanti|attendu|estimé|annuel)|objectif de rendement/g,
     label: 'indicateur de performance',
     allow: /(pas|aucun|sans)\s+(d'|de\s)?(objectif de rendement|taux de distribution)/i,
@@ -452,10 +461,102 @@ async function checkIndex() {
   }
 }
 
+/**
+ * /SIMULATEUR : LES CONDITIONS DE SON EXEMPTION (19/09/2026). La page est la seule, avec /a-propos, à
+ * pouvoir écrire « taux de distribution » ; en échange, le build vérifie ce qui la rend défendable pour
+ * une SCPI sans historique. Tout se lit dans le HTML publié : src/content/fr/simulator.ts importe par
+ * l'alias `@/`, que ce script ne résout pas.
+ */
+async function checkSimulateur() {
+  const file = 'simulateur/index.html';
+  let html;
+  try {
+    html = await readHtml(file);
+  } catch {
+    return; // l'absence de la page est déjà une erreur de checkSubPages
+  }
+  const text = toText(html);
+  const balise = (motif) => html.match(motif)?.[0] ?? '';
+
+  /* LA FENÊTRE D'ACCÈS : le simulateur arrive inerte, derrière une fenêtre qui reproduit l'avertissement
+     du bulletin de souscription de R Start, mot pour mot. */
+  const acces = html.match(/<dialog\b[^>]*data-simu-acces[\s\S]*?<\/dialog>/i)?.[0] ?? '';
+  if (!acces) errors.push(file + ' : fenêtre d’accès absente ([data-simu-acces])');
+  else {
+    requirePhrase(
+      toText(acces),
+      legal.bulletinWarning,
+      'avertissement du bulletin dans la fenêtre d’accès',
+      file
+    );
+    if (!/data-simu-accepter/.test(acces))
+      errors.push(file + ' : la fenêtre d’accès n’a pas de bouton d’acceptation');
+  }
+  if (!/\binert\b/.test(balise(/<div\b[^>]*data-simulateur[^>]*>/i)))
+    errors.push(
+      file + ' : le simulateur doit arriver inerte, tant que la fenêtre d’accès n’est pas acceptée'
+    );
+
+  /* AUCUN TAUX PRÉSÉLECTIONNÉ : le curseur arrive à son minimum, et le libellé dit « à choisir ». */
+  const curseur = balise(/<input\b[^>]*data-simu-taux[^>]*>/i);
+  if (!curseur) errors.push(file + ' : curseur du taux introuvable ([data-simu-taux])');
+  else {
+    const valeur = curseur.match(/\bvalue="([^"]*)"/)?.[1];
+    const minimum = curseur.match(/\bmin="([^"]*)"/)?.[1];
+    if (valeur === undefined || valeur !== minimum)
+      errors.push(
+        `${file} : le curseur du taux arrive à ${valeur} (minimum ${minimum}) : aucun taux ne doit être présélectionné`
+      );
+  }
+
+  /* AUCUN RÉSULTAT À L'ARRIVÉE : la page s'ouvre sur le parcours, la zone des résultats est masquée.
+     Que le parcours ne se franchisse pas sans taux choisi, c'est tests/simulateur.spec.ts qui le tient :
+     cela ne se lit pas dans du HTML statique. */
+  const racine = balise(/<div\b[^>]*data-simulateur[^>]*>/i);
+  const zone = balise(/<section\b[^>]*data-simu-resultats[^>]*>/i);
+  if (!/data-mode="parcours"/.test(racine))
+    errors.push(file + ' : le simulateur doit s’ouvrir sur le parcours (data-mode="parcours")');
+  if (!zone || !/\bhidden\b/.test(zone))
+    errors.push(
+      file + ' : la zone des résultats doit arriver masquée ([data-simu-resultats] hidden)'
+    );
+
+  /* L'AVERTISSEMENT EST DANS LE BLOC DES RÉSULTATS : on ne lit pas un montant sans lui. */
+  const debut = html.indexOf('data-simu-etat="sorties"');
+  const avertissement = html.indexOf('data-simu-avertissement');
+  const graphique = html.indexOf('data-simu-graphique');
+  if (!(debut !== -1 && avertissement > debut && graphique > avertissement))
+    errors.push(
+      file + ' : l’avertissement doit se trouver dans le bloc des résultats, avant le graphique'
+    );
+  for (const [quoi, motif] of [
+    ['« ni un objectif, ni une prévision »', /ni un objectif, ni une prévision/i],
+    [
+      'la mention sur les performances passées',
+      /performances passées ne préjugent pas des performances futures/i,
+    ],
+    ['le risque de perte en capital', /risque de perte en capital/i],
+    ['« simulation non contractuelle »', /simulation non contractuelle/i],
+  ])
+    if (!motif.test(text)) errors.push(`${file} : ${quoi} absent de la page`);
+
+  /* CHAQUE REPÈRE DE MARCHÉ PORTE SON ANNÉE ET SA SOURCE. */
+  const reperes = html.match(/<button\b[^>]*data-simu-repere[\s\S]*?<\/button>/gi) ?? [];
+  if (!reperes.length) warnings.push(file + ' : aucun repère de marché sous le curseur du taux');
+  reperes.forEach((repere, i) => {
+    const contenu = toText(repere);
+    if (!/\b20\d\d\b/.test(contenu))
+      errors.push(`${file} : le repère de marché n° ${i + 1} ne dit pas son année`);
+    if (!/source|publiés sur/i.test(contenu))
+      errors.push(`${file} : le repère de marché n° ${i + 1} ne dit pas sa source`);
+  });
+}
+
 /** Sous-pages produit : mêmes interdits, ligne risques dans l'en-tête, mentions obligatoires, structure. */
 async function checkSubPages() {
   for (const p of [
     'frais',
+    'simulateur',
     'strategie',
     'a-propos',
     'documentation',
@@ -699,7 +800,9 @@ function texteHorsCorps(html) {
 /** Pages dont le corps est déjà contrôlé, avec leurs exigences propres, par les fonctions ci-dessus. */
 const PAGES_DEJA_CONTROLEES = new Set([
   'index.html',
-  ...['frais', 'strategie', 'a-propos', 'documentation', 'faq', 'presse'].map((p) => p + '/index.html'),
+  ...['frais', 'simulateur', 'strategie', 'a-propos', 'documentation', 'faq', 'presse'].map(
+    (p) => p + '/index.html'
+  ),
   ...['mentions-legales', 'politique-de-confidentialite', 'cookies'].map((p) => p + '/index.html'),
 ]);
 
@@ -805,6 +908,7 @@ await checkIndex();
 await checkOtherPages();
 await checkNoSourceFiles();
 await checkSubPages();
+await checkSimulateur();
 await checkWholeSite();
 await checkOgImage();
 

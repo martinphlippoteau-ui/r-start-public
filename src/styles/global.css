@@ -2685,6 +2685,383 @@ body:has(#consent-banner:not([hidden])) [data-hero-scroll-hint] {
 }
 
 /* ===========================================================================================
+   SIMULATEUR (/simulateur, src/components/pages/simulateur/Simulator.astro ; 19/09/2026)
+   ===========================================================================================
+   LES CURSEURS. Piste et poignée redessinées pour deux raisons : les repères de marché posés au-dessus
+   de la piste doivent tomber EXACTEMENT sous le centre de la poignée, ce que l'apparence native ne
+   garantit pas d'un navigateur à l'autre, et la piste se remplit jusqu'à la poignée (`--p`, posée par
+   src/scripts/simulateur/page.ts) dans la couleur du site.
+   `--simu-poignee` vaut 22 px : la même valeur est écrite dans Simulator.astro et page.ts (POIGNEE),
+   qui en tirent l'abscisse des repères et du remplissage. Le centre de la poignée ne parcourt pas
+   toute la piste, il s'arrête à une demi-poignée de chaque bord : d'où le `calc()` des deux côtés.
+   La hauteur de l'élément, 2,75 rem, donne la cible de 44 px que le site s'impose ailleurs. */
+@utility simu-curseur {
+  --simu-poignee: 22px;
+  appearance: none;
+  display: block;
+  width: 100%;
+  height: 2.75rem;
+  margin: 0;
+  padding: 1.1875rem 0;
+  border-radius: 9999px;
+  background: linear-gradient(
+    to right,
+    var(--color-navy) var(--p, 0%),
+    var(--color-mist) var(--p, 0%)
+  );
+  background-clip: content-box;
+  cursor: pointer;
+
+  &::-webkit-slider-runnable-track {
+    height: 0.375rem;
+    background: transparent;
+  }
+  &::-moz-range-track {
+    height: 0.375rem;
+    background: transparent;
+  }
+  &::-webkit-slider-thumb {
+    appearance: none;
+    width: var(--simu-poignee);
+    height: var(--simu-poignee);
+    margin-top: -0.5rem;
+    border: 3px solid #fff;
+    border-radius: 50%;
+    background: var(--color-navy);
+    box-shadow: 0 2px 7px rgb(13 46 61 / 0.3);
+  }
+  /* Firefox compte la bordure EN PLUS de la largeur : 16 + 2 × 3 = 22 px. */
+  &::-moz-range-thumb {
+    width: 1rem;
+    height: 1rem;
+    border: 3px solid #fff;
+    border-radius: 50%;
+    background: var(--color-navy);
+    box-shadow: 0 2px 7px rgb(13 46 61 / 0.3);
+  }
+  /* L'anneau de focus global entoure tout l'élément, soit 44 px de haut pour une piste de 6 : il est
+     ramené sur la poignée, là où l'œil cherche. */
+  &:focus-visible {
+    outline: none;
+    box-shadow: none;
+  }
+  &:focus-visible::-webkit-slider-thumb {
+    outline: 3px solid var(--color-navy);
+    outline-offset: 2px;
+  }
+  &:focus-visible::-moz-range-thumb {
+    outline: 3px solid var(--color-navy);
+    outline-offset: 2px;
+  }
+}
+
+/* Le petit trait sous chaque repère, qui le relie à la piste. */
+.simu-repere::after {
+  content: '';
+  width: 2px;
+  height: 0.4375rem;
+  margin-top: 0.1875rem;
+  border-radius: 2px;
+  background: currentColor;
+}
+
+/* Grand écran : la colonne de droite, « Vos hypothèses » puis « Commencer ma souscription », reste
+   collée sous la barre, pendant le parcours comme devant les résultats. Elle est courte (cinq réglages
+   repliés, un seul ouvert), elle ne défile jamais en elle-même. */
+@media (min-width: 64rem) {
+  .simu-panneau {
+    position: sticky;
+    top: calc(var(--spacing-subnav) + var(--spacing-nav-gap) + 1rem);
+  }
+}
+
+/* SUR TÉLÉPHONE, LE BOUTON PRINCIPAL DU PARCOURS RESTE SOUS LE POUCE : le pied de la carte (« Retour »,
+   « Continuer ») colle au bas de l'écran tant que la carte y est. À la question du taux la carte fait
+   près de 900 px de haut, et « Voir ma simulation » tombait deux cents pixels sous le pli. Le dégradé
+   blanc laisse deviner qu'il y a du contenu derrière ; la marge basse est celle de la zone sûre des
+   téléphones à encoche. Dès « lg », la carte tient à l'écran : le pied reste à sa place. */
+@media (max-width: 63.999rem) {
+  .simu-pied {
+    position: sticky;
+    bottom: 0;
+    z-index: 1;
+    margin-inline: -1.25rem;
+    padding: 1.25rem 1.25rem calc(0.75rem + env(safe-area-inset-bottom));
+    background: linear-gradient(to top, #fff 72%, rgb(255 255 255 / 0));
+    border-radius: 0 0 1.5rem 1.5rem;
+  }
+}
+
+/* LA FENÊTRE D'ACCÈS EST UNE COLONNE : son texte défile, ses deux issues restent à l'écran. Sans cela,
+   sur un téléphone, « J'ai compris » n'était atteint qu'en défilant dans la fenêtre. */
+.simu-acces[open] {
+  display: flex;
+  flex-direction: column;
+}
+.simu-acces-texte {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/* Le corps d'un réglage rangé sous sa ligne, sur l'écran de résultat : un peu d'air dessous. */
+.simu-hote > .simu-corps {
+  padding-bottom: 1.25rem;
+}
+
+/* Les points du parcours : faits, en cours (allongé), à venir. L'état est posé par le script
+   (`data-etat`) ; le libellé « Étape 2 sur 4 », à côté, est ce que lisent les lecteurs d'écran. */
+.simu-pas {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 9999px;
+  background: var(--color-mist);
+  transition:
+    width 180ms ease,
+    background-color 180ms ease;
+}
+.simu-pas[data-etat='fait'] {
+  background: var(--color-teal-400);
+}
+.simu-pas[data-etat='actif'] {
+  width: 1.5rem;
+  background: var(--color-navy);
+}
+
+/* LE MOUVEMENT DU SIMULATEUR (20/09/2026, demande de Martin : « beaucoup d'animations », dans l'esprit
+   des interfaces d'Apple, « que ce soit dynamique »). C'est une EXCEPTION à la sobriété du reste du
+   site (une entrée par bloc, expo.out, 180 ms), bornée à cet outil, où le mouvement sert à suivre ce
+   qui change : la question qui part, celle qui arrive, la ligne qui s'ajoute à « Vos hypothèses ».
+   TOUT EST UN RESSORT : `--simu-ressort` dépasse un peu sa cible puis s'y pose, ce qu'aucune courbe de
+   Bézier ne fait. `linear()` est ignoré des navigateurs anciens, qui gardent alors `ease`.
+   DEUX LIMITES. Rien en mouvement réduit : tout le bloc est sous `no-preference`, et les défilements
+   de chiffres du script regardent le même réglage. L'AVERTISSEMENT DES RÉSULTATS N'EST JAMAIS ANIMÉ
+   (`[data-simu-avertissement]`), règle du site pour toute mention de risque : il est là, entier, à la
+   première image.
+   Les entrées se déclenchent seules : une animation CSS repart quand un élément quitte `hidden`. */
+@media (prefers-reduced-motion: no-preference) {
+  [data-simulateur],
+  .simu-acces {
+    --simu-ressort: linear(
+      0,
+      0.009,
+      0.035 2.1%,
+      0.141 4.4%,
+      0.723 12.9%,
+      0.938 16.7%,
+      1.017 19.4%,
+      1.067,
+      1.099 24.3%,
+      1.108 26%,
+      1.1,
+      1.078 30.1%,
+      1.049 32.5%,
+      0.994 37.3%,
+      0.981 40.2%,
+      0.975 43.5%,
+      0.997 53.5%,
+      1.003 61.3%,
+      1
+    );
+  }
+
+  /* La question : elle arrive par la droite en avançant, par la gauche en revenant. */
+  [data-simu-questions] > .simu-corps {
+    animation: simu-glisse 620ms var(--simu-ressort, ease) both;
+  }
+  [data-simulateur][data-sens='arriere'] [data-simu-questions] > .simu-corps {
+    --simu-dx: -3rem;
+  }
+  @keyframes simu-glisse {
+    from {
+      opacity: 0;
+      transform: translateX(var(--simu-dx, 3rem)) scale(0.97);
+      filter: blur(var(--simu-flou, 6px));
+    }
+  }
+  /* Pas de flou sur les petits écrans : c'est le seul effet du simulateur qui coûte à chaque image, et
+     ce sont les téléphones modestes qui le paieraient. Le glissement, lui, reste. */
+  @media (max-width: 40rem) {
+    [data-simulateur] {
+      --simu-flou: 0px;
+    }
+  }
+
+  /* Une ligne de « Vos hypothèses » éclot quand sa question arrive ; son corps se déplie dessous. */
+  .simu-ligne,
+  .simu-suite {
+    animation: simu-eclot 640ms var(--simu-ressort, ease) both;
+    transform-origin: 50% 0;
+  }
+  .simu-suite {
+    animation-delay: 260ms;
+  }
+  .simu-hote > .simu-corps {
+    animation: simu-deplie 520ms var(--simu-ressort, ease) both;
+    transform-origin: 50% 0;
+  }
+  @keyframes simu-eclot {
+    from {
+      opacity: 0;
+      transform: translateY(0.75rem) scale(0.9);
+    }
+  }
+  @keyframes simu-deplie {
+    from {
+      opacity: 0;
+      transform: translateY(-0.5rem) scaleY(0.92);
+    }
+  }
+
+  /* Les résultats montent l'un après l'autre. L'avertissement, lui, ne bouge pas. */
+  [data-simu-resultats] > h3,
+  [data-simu-etat]:not([hidden]) > :not([data-simu-avertissement]),
+  [data-simu-kpi]:not([hidden]) {
+    animation: simu-monte 700ms var(--simu-ressort, ease) both;
+  }
+  [data-simu-etat] > :nth-child(3) {
+    animation-delay: 60ms;
+  }
+  [data-simu-etat] > :nth-child(4) {
+    animation-delay: 120ms;
+  }
+  [data-simu-etat] > :nth-child(5) {
+    animation-delay: 180ms;
+  }
+  [data-simu-kpi]:nth-of-type(even) {
+    animation-delay: 70ms;
+  }
+  @keyframes simu-monte {
+    from {
+      opacity: 0;
+      transform: translateY(1.25rem) scale(0.97);
+    }
+  }
+
+  /* D'UN ÉCRAN À L'AUTRE : la carte des questions et le panneau portent un nom, le navigateur les suit
+     donc d'un état au suivant (src/scripts/simulateur/page.ts, `changer`). À la deuxième question, la
+     carte glisse du centre vers la gauche et le panneau se pose à côté. La page, elle, ne se fond
+     pas : `vt-simu`, posé sur <html> le temps de la transition, neutralise le fondu de la racine,
+     même motif que `vt-filtre` pour la FAQ. La courbe du groupe ne dépasse pas sa cible : un cadre
+     qui rebondit en changeant de taille se lit comme un défaut. */
+  [data-simu-scene] {
+    view-transition-name: simu-scene;
+  }
+  .simu-panneau {
+    view-transition-name: simu-panneau;
+  }
+  html.vt-simu::view-transition-old(root),
+  html.vt-simu::view-transition-new(root) {
+    animation: none;
+    mix-blend-mode: normal;
+  }
+  html.vt-simu::view-transition-group(simu-scene),
+  html.vt-simu::view-transition-group(simu-panneau) {
+    animation-duration: 520ms;
+    animation-timing-function: var(--ease-out-expo);
+  }
+  html.vt-simu::view-transition-old(simu-scene),
+  html.vt-simu::view-transition-new(simu-scene) {
+    height: 100%;
+    object-fit: none;
+    object-position: top;
+    overflow: clip;
+  }
+
+  /* Retour tactile : ce qui se presse s'enfonce, puis revient au ressort. */
+  .simu-tactile {
+    /* Aucun délai ni zoom au double toucher sur ce qui se presse. */
+    touch-action: manipulation;
+    transition:
+      transform 420ms var(--simu-ressort, ease),
+      color 150ms ease,
+      border-color 150ms ease,
+      background-color 150ms ease;
+  }
+  .simu-tactile:active {
+    transform: scale(0.95);
+    transition-duration: 90ms, 150ms, 150ms, 150ms;
+  }
+  .simu-curseur::-webkit-slider-thumb {
+    transition: transform 320ms var(--simu-ressort, ease);
+  }
+  .simu-curseur:active::-webkit-slider-thumb {
+    transform: scale(1.18);
+  }
+  .simu-curseur::-moz-range-thumb {
+    transition: transform 320ms var(--simu-ressort, ease);
+  }
+  .simu-curseur:active::-moz-range-thumb {
+    transform: scale(1.18);
+  }
+
+  /* La fenêtre d'accès se pose au ressort, ses trois points à la suite ; elle repart en fondu. */
+  .simu-acces {
+    opacity: 0;
+    transform: translateY(1.5rem) scale(0.94);
+    transition:
+      opacity 220ms ease,
+      transform 560ms var(--simu-ressort, ease),
+      display 320ms allow-discrete,
+      overlay 320ms allow-discrete;
+  }
+  .simu-acces[open] {
+    opacity: 1;
+    transform: none;
+  }
+  .simu-acces::backdrop {
+    opacity: 0;
+    transition:
+      opacity 320ms ease,
+      display 320ms allow-discrete,
+      overlay 320ms allow-discrete;
+  }
+  .simu-acces[open]::backdrop {
+    opacity: 1;
+  }
+  @starting-style {
+    .simu-acces[open] {
+      opacity: 0;
+      transform: translateY(1.5rem) scale(0.94);
+    }
+    .simu-acces[open]::backdrop {
+      opacity: 0;
+    }
+  }
+  .simu-acces[open] .simu-acces-point {
+    animation: simu-eclot 640ms var(--simu-ressort, ease) both;
+  }
+  .simu-acces[open] .simu-acces-point:nth-child(1) {
+    animation-delay: 140ms;
+  }
+  .simu-acces[open] .simu-acces-point:nth-child(2) {
+    animation-delay: 220ms;
+  }
+  .simu-acces[open] .simu-acces-point:nth-child(3) {
+    animation-delay: 300ms;
+  }
+}
+
+/* SANS SCRIPT, rien ne peut être calculé : le simulateur est masqué, un message le dit. Avec script,
+   c'est le message qui l'est. Un navigateur qui ignore `scripting` montre le simulateur, ce qui est
+   le bon défaut. Hors de toute couche, pour passer devant l'utilitaire `grid`. */
+.simu-sans-script {
+  display: none;
+}
+@media (scripting: none) {
+  .simu-sans-script {
+    display: block;
+  }
+  .simu-avec-script {
+    display: none;
+  }
+}
+
+/* La barre de synthèse cède le bas de l'écran au bandeau de consentement tant qu'il est déplié. */
+body:has(#consent-banner:not([hidden])) .simu-barre {
+  display: none;
+}
+
+/* ===========================================================================================
    SANS JAVASCRIPT, SOUS « lg » : LA LISTE DES PAGES REVIENT DANS LA BARRE (audit du 18/09/2026)
    ===========================================================================================
    Sous « lg », la liste des pages est masquée et le menu passe par le tiroir, que seul le script ouvre.
@@ -2746,6 +3123,7 @@ body:has(#consent-banner:not([hidden])) [data-hero-scroll-hint] {
      `display` (420 ms). Sans cela il restait affiché le temps de sa sortie, donc sur le papier. */
   [data-sitenav],
   [data-sticky-cta],
+  .simu-barre,
   [data-hero-scroll-hint],
   #consent-banner,
   .skip-link {

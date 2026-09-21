@@ -128,7 +128,9 @@ export const legalPages: LegalPage[] = [
       {
         title: 'Ce que ce site collecte',
         paragraphs: [
-          'Ce site est un site de présentation. Il ne comporte aucun formulaire : il ne collecte ni votre nom, ni votre adresse e-mail, ni aucune donnée de souscription.',
+          /* Réécrit le 20/09/2026 avec le simulateur : « il ne comporte aucun formulaire » n'était plus
+             vrai, et les montants saisis peuvent désormais accompagner le lien vers la souscription. */
+          'Ce site est un site de présentation : il ne collecte ni votre nom, ni votre adresse e-mail, ni aucune donnée de souscription. Le simulateur calcule dans votre navigateur. Les montants que vous y saisissez ne sont ni enregistrés ni transmis, sauf si vous cliquez sur « Commencer ma souscription » : ils accompagnent alors le lien vers la souscription en ligne, pour en préremplir la première étape.',
           'La souscription se déroule sur le tunnel de souscription en ligne de CORUM, qui applique sa propre politique de protection des données, disponible sur www.corum.fr.',
           'Avec votre accord uniquement, des données de navigation sont collectées à des fins de mesure d’audience. Il s’agit des pages consultées, de la durée et du parcours de visite, ainsi que des mots saisis dans la recherche du site. S’y ajoutent le type d’appareil, de navigateur et de système, une localisation approximative (pays, ville) et un identifiant de cookie. L’adresse IP sert à la localisation approximative et n’est pas enregistrée par Google Analytics 4.',
           'L’hébergeur conserve des journaux techniques de connexion (adresse IP, horodatage, page demandée), nécessaires au fonctionnement et à la sécurité du service.',

@@ -204,6 +204,28 @@ export const marketComparison = {
   },
 } as const;
 
+/**
+ * REPÈRE DE MARCHÉ DU SIMULATEUR (19/09/2026, /simulateur). Le taux de distribution moyen des SCPI en
+ * 2025, toutes catégories confondues, PONDÉRÉ PAR LA CAPITALISATION : 4,91 %, en hausse de 0,19 point
+ * sur 2024. Source : communiqué ASPIM-IEIF de février 2026, « Collecte et performance des fonds
+ * immobiliers grand public en 2025 », relu le 19/09/2026.
+ * CE N'EST PAS UN CHIFFRE DE R START, qui n'a pas d'historique : le simulateur le propose comme point
+ * de comparaison, jamais comme hypothèse par défaut. Le second repère, la moyenne des SCPI CORUM,
+ * n'est pas saisi ici : src/content/fr/simulator.ts le CALCULE depuis les taux 2025 de corumRange.ts,
+ * pour qu'il ne puisse pas diverger de ceux que /a-propos affiche.
+ * À REMPLACER chaque année, à la publication des chiffres de l'exercice suivant.
+ */
+export const marketBenchmarks = {
+  aspim: {
+    year: 2025,
+    /** En pourcentage. */
+    distributionRate: 4.91,
+    source: 'ASPIM-IEIF, février 2026',
+    sourceUrl:
+      'https://www.aspim.fr/actualites/collecte-et-performance-des-fonds-immobiliers-grand-public-en-2025-des-signaux-damelioration-dans-des-marches-encore-sous-contraintes/',
+  },
+} as const;
+
 export const income = {
   frequency: 'Mensuelle', // bulletin CGV, DIC
   frequencyLabel: 'Distribution mensuelle des dividendes potentiels',

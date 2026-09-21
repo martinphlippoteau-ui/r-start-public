@@ -1,5 +1,6 @@
 /**
- * Plan du site (mis à jour le 14/09/2026) : cinq pages publiques au menu (Accueil, Les frais, Stratégie
+ * Plan du site (mis à jour le 19/09/2026 : le simulateur entre au menu, voir plus bas). Le 14/09/2026 :
+ * cinq pages publiques au menu (Accueil, Les frais, Stratégie
  * d'investissement, La presse en parle, À propos, cette dernière en bout de menu). « Les outils » et les
  * quatre simulateurs sous /outil ont été SUPPRIMÉS le 14/09/2026, sur demande de l'équipe : ni page, ni
  * composants, ni contenu, ni entrée de menu. Documentation et salle
@@ -13,6 +14,7 @@
 export type PageKey =
   | 'home'
   | 'fees'
+  | 'simulator'
   | 'strategy'
   | 'about'
   | 'documentation'
@@ -57,6 +59,20 @@ export const pages: Record<PageKey, PageMeta> = {
     order: 2,
     inMenu: true,
   },
+  /*
+   * SIMULATEUR, page créée le 19/09/2026 à la demande de Martin, AU MENU (son arbitrage du même jour),
+   * juste après le comparateur : les deux outils du site se suivent. La barre passe de cinq à six
+   * entrées sur grand écran ; sous « lg » elles vivent dans le tiroir, rien ne change.
+   * Les quatre simulateurs de /outil supprimés le 14/09/2026 n'ont rien à voir avec celui-ci : ils
+   * calculaient avec des taux posés par le site. Celui-ci n'en propose aucun (src/content/fr/simulator.ts).
+   */
+  simulator: {
+    key: 'simulator',
+    path: '/simulateur',
+    label: 'Simulateur',
+    order: 3,
+    inMenu: true,
+  },
   strategy: {
     key: 'strategy',
     path: '/strategie',
@@ -70,21 +86,21 @@ export const pages: Record<PageKey, PageMeta> = {
      * de la barre change, et le fil d'Ariane le suit puisqu'il reprend l'intitulé du menu.
      */
     navLabel: 'Notre approche',
-    order: 3,
+    order: 4,
     inMenu: true,
   },
   about: {
     key: 'about',
     path: '/a-propos',
     label: 'À propos',
-    order: 7,
+    order: 8,
     inMenu: true,
   },
   documentation: {
     key: 'documentation',
     path: '/documentation',
     label: 'Documentation',
-    order: 6,
+    order: 7,
     // Hors menu depuis le 11/09/2026 : accessible par le pied de page, comme la salle de presse.
     inMenu: false,
   },
@@ -102,7 +118,7 @@ export const pages: Record<PageKey, PageMeta> = {
     path: '/faq',
     label: 'Questions fréquentes',
     navLabel: 'Vos questions',
-    order: 4,
+    order: 5,
     inMenu: true,
   },
   press: {
@@ -110,7 +126,7 @@ export const pages: Record<PageKey, PageMeta> = {
     path: '/presse',
     label: 'Presse',
     navLabel: 'La presse en parle',
-    order: 5,
+    order: 6,
     inMenu: true,
   },
   // Salle de presse : réservée aux journalistes, accessible depuis le pied de page seulement
@@ -119,7 +135,7 @@ export const pages: Record<PageKey, PageMeta> = {
     key: 'pressRoom',
     path: '/salle-de-presse',
     label: 'Salle de presse',
-    order: 8,
+    order: 9,
     inMenu: false,
   },
   legal: {
