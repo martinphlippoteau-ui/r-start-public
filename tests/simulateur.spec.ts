@@ -48,32 +48,52 @@ test.describe('Simulateur : la fenêtre d’accès', () => {
    * se charge en effet flicker avant la popup »). Elle était ouverte par `showModal()`, donc seulement
    * à l'exécution d'un module différé : le formulaire s'affichait nu en attendant, un demi-seconde sur
    * un réseau lent. Le test retarde tous les scripts d'une demi-seconde et regarde la page pendant ce
-   * temps : la fenêtre doit y être du premier relevé au dernier.
+   * temps.
+   * ET ON LA VOIT, IMAGE PAR IMAGE (21/09/2026, « il y a toujours un effet flick », Martin). La
+   * première version de ce test lisait le DOM : la fenêtre y était, et le test passait, alors que son
+   * voile entrait en fondu depuis l'opacité zéro et que la question se voyait avant elle. Le relevé
+   * est donc pris à CHAQUE IMAGE dès la première, et porte sur l'opacité effective, celle de l'élément
+   * multipliée par celles de ses ancêtres : ce qui est réellement peint.
    */
   test('elle est affichée avant que le moindre script ne s’exécute', async ({ page }) => {
+    await page.addInitScript(() => {
+      const opacite = (el: Element | null): number => {
+        let o = 1;
+        for (let n = el; n; n = n.parentElement) o *= Number(getComputedStyle(n).opacity);
+        return el ? o : 0;
+      };
+      const releves: { voile: number; fenetre: number; question: number }[] = [];
+      (window as unknown as { __releves: typeof releves }).__releves = releves;
+      const image = () => {
+        releves.push({
+          voile: opacite(document.querySelector('[data-simu-acces-voile]')),
+          fenetre: opacite(document.querySelector('[data-simu-acces]')),
+          question: opacite(document.querySelector('[data-simu-corps="initial"]')),
+        });
+        requestAnimationFrame(image);
+      };
+      requestAnimationFrame(image);
+    });
     await page.route(/\.js(\?|$)/, async (route) => {
       await new Promise((r) => setTimeout(r, 500));
       await route.continue();
     });
     await page.goto('/simulateur/', { waitUntil: 'commit' });
-    const nu: number[] = [];
-    for (let i = 0; i < 6; i += 1) {
-      await page.waitForTimeout(60);
-      const etat = await page.evaluate(() => {
-        const vu = (s: string) => {
-          const el = document.querySelector<HTMLElement>(s);
-          if (!el || el.hidden) return false;
-          const r = el.getBoundingClientRect();
-          return r.width > 0 && r.height > 0 && getComputedStyle(el).visibility !== 'hidden';
-        };
-        return {
-          question: vu('[data-simu-corps="initial"] [data-simu-question]'),
-          fenetre: vu('[data-simu-acces]'),
-        };
-      });
-      if (etat.question && !etat.fenetre) nu.push(i);
-    }
-    expect(nu, 'relevés où le formulaire est nu, sans la fenêtre').toEqual([]);
+    await page.waitForTimeout(900);
+    const releves = await page.evaluate(
+      () =>
+        (window as unknown as { __releves: { voile: number; fenetre: number; question: number }[] })
+          .__releves
+    );
+    expect(releves.length, 'images relevées').toBeGreaterThan(10);
+    const nu = releves
+      .map((r, i) => ({ ...r, i }))
+      .filter((r) => r.question > 0 && (r.voile < 1 || r.fenetre < 1));
+    expect(nu, 'images où la question se voit sans la fenêtre pleinement opaque').toEqual([]);
+    expect(
+      releves.filter((r) => r.voile < 1 || r.fenetre < 1),
+      'images où la fenêtre n’est pas pleinement opaque'
+    ).toEqual([]);
   });
 
   test('le simulateur est hors d’atteinte derrière elle', async ({ page }) => {
@@ -118,6 +138,8 @@ test.describe('Simulateur : la fenêtre d’accès', () => {
       await page.locator('[data-simulateur]').evaluate((el) => (el as HTMLElement).inert)
     ).toBe(false);
     await expect(page.locator('[data-simu-corps="initial"] [data-simu-question]')).toBeFocused();
+    /* Elle a attendu « J'ai compris » pour entrer, invisible derrière le voile : elle doit arriver. */
+    await expect(page.locator('[data-simu-corps="initial"]')).toHaveCSS('opacity', '1');
   });
 
   test('elle tient en trois points, et garde l’avertissement du bulletin mot pour mot', async ({

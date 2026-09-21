@@ -3015,12 +3015,21 @@ body:has(#consent-banner:not([hidden])) [data-hero-scroll-hint] {
    * La fenêtre d'accès se pose au ressort, ses trois points à la suite. Une ANIMATION, et non une
    * transition : elle est rendue par le serveur, présente au premier rendu, et il n'y a donc pas
    * d'état d'avant à quitter. C'est aussi ce qui la rend indépendante du script.
+   * NI LE VOILE NI LA FENÊTRE NE PARTENT DE L'OPACITÉ ZÉRO (21/09/2026, « il y a toujours un effet
+   * flick, l'étape 1 s'affiche avant la popup », Martin). Le voile entrait en fondu (260 ms) et la
+   * fenêtre avec lui : mesuré image par image, à 109 ms la question était à 58 % d'opacité, la
+   * fenêtre à 28 %. Présente dans le DOM dès le premier rendu, elle ne se VOYAIT pas encore. Le voile
+   * est donc plein dès la première image, et la fenêtre ne garde de son entrée que le mouvement.
    */
-  .simu-acces-voile {
-    animation: simu-fondu 260ms ease both;
-  }
   .simu-acces {
     animation: simu-pose 560ms var(--simu-ressort, ease) both;
+  }
+  /* La première question n'entre pas derrière le voile, où l'on ne verrait qu'elle bouger : elle
+     attend « J'ai compris ». Le simulateur est `inert` jusque-là (page.ts, `liberer`) ; quand il ne
+     l'est plus, l'animation de glissement retrouve son nom et part, pendant que le voile s'efface. */
+  [data-simulateur][inert] [data-simu-questions] > .simu-corps {
+    animation: none;
+    opacity: 0;
   }
   .simu-acces-point {
     animation: simu-eclot 640ms var(--simu-ressort, ease) both;
@@ -3034,14 +3043,8 @@ body:has(#consent-banner:not([hidden])) [data-hero-scroll-hint] {
   .simu-acces-point:nth-child(3) {
     animation-delay: 300ms;
   }
-  @keyframes simu-fondu {
-    from {
-      opacity: 0;
-    }
-  }
   @keyframes simu-pose {
     from {
-      opacity: 0;
       transform: translateY(1.5rem) scale(0.94);
     }
   }
