@@ -50,6 +50,7 @@ import {
 } from './graphique';
 import { simuler, type Annee, type PalierRetrait, type Simulation } from './moteur';
 import { adresseDeSouscription, type NomsParametres } from './souscription';
+import { deverrouiller, verrouiller } from '@/scripts/verrou';
 
 interface Reglages {
   rules: {
@@ -1023,23 +1024,42 @@ const init = (): void => {
   actualiser();
 
   /* ── Fenêtre d'accès ──────────────────────────────────────────────────────────────────────── */
-  /* Le simulateur arrive `inert` (Simulator.astro). Sans <dialog> utilisable, on ne l'enferme pas
-     derrière une fenêtre qui ne s'ouvrira jamais : il est libéré tout de suite. */
-  const acces = document.querySelector<HTMLDialogElement>('[data-simu-acces]');
+  /*
+   * ELLE EST DÉJÀ À L'ÉCRAN quand ce script s'exécute : le serveur la rend, elle ne dépend de rien
+   * (SimulatorGate.astro dit pourquoi). Il ne reste ici qu'à fermer la page derrière elle, puis à la
+   * retirer quand on a répondu.
+   * Le verrou est celui du site (src/scripts/verrou.ts), partagé avec le tiroir du menu et la
+   * recherche : il rend inertes les enfants de <body> qui ne portent pas la fenêtre — la tabulation ne
+   * peut donc pas en sortir — et neutralise les gestes de défilement, sans jamais empêcher le zoom.
+   */
+  const voile = document.querySelector<HTMLElement>('[data-simu-acces-voile]');
+  const acces = voile?.querySelector<HTMLElement>('[data-simu-acces]');
   const liberer = (): void => {
     racine.inert = false;
   };
-  if (!acces || typeof acces.showModal !== 'function') return liberer();
-  /* Ni Échap ni le voile : on accepte, ou on repart par le lien vers l'accueil. */
-  acces.addEventListener('cancel', (ev) => ev.preventDefault());
+  /* Pas de fenêtre dans la page : on n'enferme pas le simulateur derrière rien. */
+  if (!voile || !acces) return liberer();
+
+  verrouiller(acces);
+  /* Le focus sur le titre, pas sur « J'ai compris » : Entrée ne doit pas valider ce qu'on n'a pas lu. */
+  acces.querySelector<HTMLElement>('h2')?.focus({ preventScroll: true });
+  /* Échap ne referme pas : il n'y a que deux issues, accepter ou repartir par le lien vers l'accueil. */
+  voile.addEventListener('keydown', (ev) => {
+    if (ev.key === 'Escape') ev.preventDefault();
+  });
   acces.querySelector('[data-simu-accepter]')?.addEventListener('click', () => {
-    acces.close();
+    deverrouiller(acces);
     liberer();
+    /* Sortie en fondu, puis retrait : `hidden` seul coupe net, et le verrou est déjà levé. */
+    if (sobre.matches) voile.hidden = true;
+    else {
+      voile.dataset.sortie = '';
+      window.setTimeout(() => {
+        voile.hidden = true;
+      }, 240);
+    }
     question()?.focus({ preventScroll: true });
   });
-  acces.showModal();
-  /* Le focus sur le titre, pas sur « J'ai compris » : Entrée ne doit pas valider ce qu'on n'a pas lu. */
-  acces.querySelector<HTMLElement>('h2')?.focus();
 };
 
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);

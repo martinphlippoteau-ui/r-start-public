@@ -18,6 +18,7 @@ import Breadcrumb from '@/components/ui/Breadcrumb.astro';
 import Button from '@/components/ui/Button.astro';
 import PageHero from '@/components/ui/PageHero.astro';
 import Simulator from '@/components/pages/simulateur/Simulator.astro';
+import SimulatorGate from '@/components/pages/simulateur/SimulatorGate.astro';
 import { pages } from '@/config/pages';
 import { simulator } from '@/content/fr/simulator';
 import { breadcrumbJsonLd, organizationJsonLd, webPageJsonLd } from '@/lib/seo';
@@ -42,4 +43,9 @@ const jsonLd = [
     <Simulator />
   </main>
   <Footer />
+  {
+    /* HORS DE <main>, EN DERNIER : elle recouvre la page dès le premier pixel, et le verrou de page
+      rend inerte tout ce qui n'est pas elle, <main> compris (SimulatorGate.astro dit pourquoi). */
+  }
+  <SimulatorGate />
 </Base>

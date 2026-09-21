@@ -2,8 +2,9 @@ import { test, expect, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
 /**
- * SIMULATEUR (/simulateur, 19-20/09/2026). Trois choses tiennent la page, et chacune a ses tests :
- *  - la FENÊTRE D'ACCÈS : on ne touche pas au simulateur avant d'avoir lu l'avertissement ;
+ * SIMULATEUR (/simulateur, 19-21/09/2026). Trois choses tiennent la page, et chacune a ses tests :
+ *  - la FENÊTRE D'ACCÈS : elle est là dès le premier pixel, et on ne touche pas au simulateur avant
+ *    d'avoir lu l'avertissement ;
  *  - AUCUN TAUX SUPPOSÉ À R START : rien n'est présélectionné, et le parcours ne se termine pas sans
  *    que le visiteur ait choisi lui-même un taux. Le contrôle de conformité du build vérifie le HTML
  *    d'arrivée ; ce qui se joue ensuite ne se lit que dans un navigateur, donc ici ;
@@ -42,9 +43,40 @@ const simuler = async (page: Page, { mensuel = 0, reinvestir = false } = {}) => 
 };
 
 test.describe('Simulateur : la fenêtre d’accès', () => {
-  test('elle s’ouvre à l’arrivée, et le simulateur est hors d’atteinte derrière elle', async ({
-    page,
-  }) => {
+  /*
+   * ELLE EST LÀ AVANT TOUT SCRIPT (21/09/2026, signalé par Martin : « la première étape du simulateur
+   * se charge en effet flicker avant la popup »). Elle était ouverte par `showModal()`, donc seulement
+   * à l'exécution d'un module différé : le formulaire s'affichait nu en attendant, un demi-seconde sur
+   * un réseau lent. Le test retarde tous les scripts d'une demi-seconde et regarde la page pendant ce
+   * temps : la fenêtre doit y être du premier relevé au dernier.
+   */
+  test('elle est affichée avant que le moindre script ne s’exécute', async ({ page }) => {
+    await page.route(/\.js(\?|$)/, async (route) => {
+      await new Promise((r) => setTimeout(r, 500));
+      await route.continue();
+    });
+    await page.goto('/simulateur/', { waitUntil: 'commit' });
+    const nu: number[] = [];
+    for (let i = 0; i < 6; i += 1) {
+      await page.waitForTimeout(60);
+      const etat = await page.evaluate(() => {
+        const vu = (s: string) => {
+          const el = document.querySelector<HTMLElement>(s);
+          if (!el || el.hidden) return false;
+          const r = el.getBoundingClientRect();
+          return r.width > 0 && r.height > 0 && getComputedStyle(el).visibility !== 'hidden';
+        };
+        return {
+          question: vu('[data-simu-corps="initial"] [data-simu-question]'),
+          fenetre: vu('[data-simu-acces]'),
+        };
+      });
+      if (etat.question && !etat.fenetre) nu.push(i);
+    }
+    expect(nu, 'relevés où le formulaire est nu, sans la fenêtre').toEqual([]);
+  });
+
+  test('le simulateur est hors d’atteinte derrière elle', async ({ page }) => {
     await page.goto('/simulateur/');
     const fenetre = page.locator('[data-simu-acces]');
     await expect(fenetre).toBeVisible();
@@ -59,6 +91,21 @@ test.describe('Simulateur : la fenêtre d’accès', () => {
     await page.keyboard.press('Escape');
     await page.mouse.click(5, 5);
     await expect(fenetre).toBeVisible();
+    /* La page derrière est inerte : la tabulation ne peut pas en sortir. C'est ce que le <dialog>
+       natif assurait ; le verrou de page du site (src/scripts/verrou.ts) le fait désormais. */
+    const dehors: string[] = [];
+    for (let i = 0; i < 12; i += 1) {
+      await page.keyboard.press('Tab');
+      const ou = await page.evaluate(() => {
+        const actif = document.activeElement;
+        if (!actif || actif === document.body) return null;
+        return actif.closest('[data-simu-acces]')
+          ? null
+          : `${actif.tagName} ${(actif.textContent ?? '').replace(/\s+/g, ' ').trim().slice(0, 30)}`;
+      });
+      if (ou) dehors.push(ou);
+    }
+    expect(dehors, 'le focus ne sort jamais de la fenêtre').toEqual([]);
     /* Deux issues : accepter, ou repartir vers l'accueil. */
     await expect(fenetre.locator('a[href]')).toHaveAttribute('href', /\/$/);
   });

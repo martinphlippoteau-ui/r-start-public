@@ -1,0 +1,104 @@
+---
+/**
+ * FENÊTRE D'ACCÈS DU SIMULATEUR (20/09/2026, demande de Martin). Elle recouvre la page à l'arrivée sur
+ * /simulateur, et le simulateur reste `inert` tant qu'on n'a pas répondu « J'ai compris » : ni Échap ni
+ * un clic sur le voile ne la referment, il n'y a que deux issues, accepter ou repartir vers l'accueil.
+ * Rien n'est mémorisé : elle revient à chaque visite, aucun stockage, rien à ajouter à la politique de
+ * confidentialité.
+ *
+ * ELLE EST LÀ DÈS LE PREMIER PIXEL, ET C'EST TOUTE LA RAISON DE CE FICHIER (21/09/2026, signalé par
+ * Martin : « la première étape du simulateur se charge en effet flicker avant la popup »). C'était un
+ * <dialog> ouvert par `showModal()` : un dialogue fermé n'existe pas à l'écran, et le script qui
+ * l'ouvre est un module, donc différé. Entre le premier rendu et son exécution, le formulaire
+ * s'affichait NU — un demi-seconde sur un réseau lent, mesuré. Ce n'est plus un <dialog> mais une
+ * surface ordinaire, rendue par le serveur, visible sans que rien ne s'exécute.
+ * CE QUE LE <dialog> APPORTAIT est repris par src/scripts/verrou.ts, le verrou de page du site, déjà
+ * partagé par le tiroir du menu et la recherche : page inerte (donc tabulation piégée) et gestes de
+ * défilement neutralisés. Le panneau de recherche est bâti ainsi depuis le 17/09/2026.
+ *
+ * RENDUE HORS DE <main>, en fin de page (src/pages/simulateur.astro) : `verrou.ts` rend inertes les
+ * enfants de <body> qui ne contiennent pas la surface, et une fenêtre posée dans <main> aurait laissé
+ * le reste de <main> atteignable au clavier.
+ *
+ * SANS JAVASCRIPT elle n'est pas affichée (`@media (scripting: none)`, global.css) : le simulateur ne
+ * s'affiche pas non plus, un message le dit, et une fenêtre dont le bouton ne peut rien faire serait
+ * un cul-de-sac.
+ *
+ * TROIS POINTS QUI SE LISENT D'UN REGARD, le texte complet à un clic dessous :
+ * src/content/fr/simulator.ts dit d'où vient chaque paragraphe.
+ */
+import Picto from '@/components/ui/Picto.astro';
+import { pages } from '@/config/pages';
+import { simulator } from '@/content/fr/simulator';
+import { withBase } from '@/lib/href';
+
+interface Props {
+  /** Préfixe des identifiants, celui du simulateur qu'elle garde. */
+  id?: string;
+}
+const { id = 'simulateur' } = Astro.props;
+const { gate } = simulator;
+---
+
+{
+  /* Le voile porte la fenêtre : un seul élément à masquer, et rien ne peut passer entre les deux. Il
+    n'est PAS cliquable pour fermer, à dessein. */
+}
+<div
+  data-simu-acces-voile
+  class="simu-acces-voile fixed inset-0 z-70 flex items-center justify-center bg-ink/60 p-4 backdrop-blur-sm"
+>
+  <div
+    data-simu-acces
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby={id + '-acces-titre'}
+    class="simu-acces flex max-h-full w-[min(36rem,100%)] flex-col overflow-hidden rounded-3xl border border-mist bg-white text-ink shadow-float"
+  >
+    {
+      /* DEUX ÉTAGES : le texte défile, LES DEUX ISSUES RESTENT À L'ÉCRAN. Sur un téléphone de 664 px de
+        haut, la fenêtre dépassait et « J'ai compris » n'était atteint qu'en défilant dedans, ce que rien
+        n'indiquait. Le cadre est une colonne de la hauteur de la fenêtre (`simu-acces`, global.css). */
+    }
+    <div class="simu-acces-texte overflow-y-auto overscroll-contain p-5 pb-4 sm:p-8 sm:pb-5">
+      <p class="text-eyebrow text-teal-700">{gate.eyebrow}</p>
+      <h2 id={id + '-acces-titre'} class="text-display-sm mt-3 outline-none" tabindex="-1">
+        {gate.title}
+      </h2>
+      <ul role="list" class="mt-5 space-y-3.5 sm:mt-6 sm:space-y-4">
+        {
+          gate.points.map((point) => (
+            <li class="simu-acces-point flex items-start gap-4">
+              <span class="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-teal-50">
+                <Picto name={point.icon} class="size-6 text-navy" />
+              </span>
+              <p class="text-base leading-snug text-slate-700">
+                <span class="block font-bold text-ink">{point.title}</span>
+                {point.text}
+              </p>
+            </li>
+          ))
+        }
+      </ul>
+      <details class="mt-5 text-sm">
+        <summary class="cursor-pointer py-1 font-semibold text-navy">{gate.fullLabel}</summary>
+        <div class="mt-2 space-y-3 leading-relaxed text-slate-700">
+          {gate.full.map((paragraphe) => <p>{paragraphe}</p>)}
+        </div>
+      </details>
+    </div>
+    <div
+      class="flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-mist bg-white px-5 py-4 pb-[calc(1rem+env(safe-area-inset-bottom))] sm:px-8"
+    >
+      <button type="button" data-simu-accepter class="btn btn-motion btn-primary btn-md">
+        {gate.accept}
+      </button>
+      <a
+        href={withBase(pages.home.path)}
+        class="link-underline inline-flex min-h-11 items-center text-base font-semibold text-navy"
+      >
+        {gate.leave}
+      </a>
+    </div>
+  </div>
+</div>

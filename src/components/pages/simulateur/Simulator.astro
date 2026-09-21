@@ -30,24 +30,24 @@
  * d'écran (`aria-hidden`), qui ont le même contenu dans le tableau replié dessous ; au clavier,
  * l'enveloppe est focalisable et les flèches promènent le curseur année par année.
  *
+ * LA FENÊTRE D'ACCÈS qui le précède est rendue à part (./SimulatorGate.astro), hors de <main> : elle
+ * doit exister dès le premier pixel, avant tout script.
+ *
  * SANS JAVASCRIPT le simulateur ne peut rien calculer : il est masqué (`@media (scripting: none)`,
  * global.css) et un message le dit. Mécanique : src/scripts/simulateur/page.ts ; calcul :
  * src/scripts/simulateur/moteur.ts ; styles des curseurs : global.css, « Simulateur ».
  */
 import Button from '@/components/ui/Button.astro';
 import Container from '@/components/ui/Container.astro';
-import Picto from '@/components/ui/Picto.astro';
 import Section from '@/components/ui/Section.astro';
-import { pages } from '@/config/pages';
 import { simulator } from '@/content/fr/simulator';
-import { withBase } from '@/lib/href';
 import { jsonScript } from '@/lib/jsonScript';
 
 interface Props {
   id?: string;
 }
 const { id = 'simulateur' } = Astro.props;
-const { rules, markers, gate, steps, summary, form, results, next, chart, hypotheses, mobileBar } =
+const { rules, markers, steps, summary, form, results, next, chart, hypotheses, mobileBar } =
   simulator;
 
 const nfEuros = new Intl.NumberFormat('fr-FR', {
@@ -979,70 +979,6 @@ const etapeDe = (cle: Reglage): number | undefined => {
   data-revenus={simulator.live.income}
 >
 </p>
-
-{
-  /*
-   * FENÊTRE D'ACCÈS (20/09/2026, demande de Martin). Elle s'ouvre à l'arrivée, et le simulateur reste
-   * `inert` tant qu'on n'a pas répondu « J'ai compris » : ni Échap ni un clic sur le voile ne la
-   * referment, il n'y a que deux issues, accepter ou repartir vers l'accueil. Élément <dialog> natif,
-   * comme la fenêtre « la souscription ouvre bientôt » : piège à focus et page inerte assurés par le
-   * navigateur. Rien n'est mémorisé : elle revient à chaque visite de la page, aucun stockage, rien à
-   * ajouter à la politique de confidentialité.
-   * TROIS POINTS QUI SE LISENT D'UN REGARD, le texte complet à un clic dessous : src/content/fr/simulator.ts
-   * dit d'où vient chaque paragraphe.
-   */
-}
-<dialog
-  data-simu-acces
-  aria-labelledby={id + '-acces-titre'}
-  class="simu-acces m-auto max-h-[calc(100svh-2rem)] w-[min(36rem,calc(100vw-2rem))] overflow-hidden rounded-3xl border border-mist bg-white p-0 text-ink shadow-float backdrop:bg-ink/60 backdrop:backdrop-blur-sm"
->
-  {
-    /* DEUX ÉTAGES : le texte défile, LES DEUX ISSUES RESTENT À L'ÉCRAN. Sur un téléphone de 664 px de
-      haut, la fenêtre dépassait et « J'ai compris » n'était atteint qu'en défilant dedans, ce que rien
-      n'indiquait. Le cadre est une colonne de la hauteur de la fenêtre (`simu-acces`, global.css). */
-  }
-  <div class="simu-acces-texte overflow-y-auto overscroll-contain p-5 pb-4 sm:p-8 sm:pb-5">
-    <p class="text-eyebrow text-teal-700">{gate.eyebrow}</p>
-    <h2 id={id + '-acces-titre'} class="text-display-sm mt-3 outline-none" tabindex="-1">
-      {gate.title}
-    </h2>
-    <ul role="list" class="mt-5 space-y-3.5 sm:mt-6 sm:space-y-4">
-      {
-        gate.points.map((point) => (
-          <li class="simu-acces-point flex items-start gap-4">
-            <span class="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-teal-50">
-              <Picto name={point.icon} class="size-6 text-navy" />
-            </span>
-            <p class="text-base leading-snug text-slate-700">
-              <span class="block font-bold text-ink">{point.title}</span>
-              {point.text}
-            </p>
-          </li>
-        ))
-      }
-    </ul>
-    <details class="mt-5 text-sm">
-      <summary class="cursor-pointer py-1 font-semibold text-navy">{gate.fullLabel}</summary>
-      <div class="mt-2 space-y-3 leading-relaxed text-slate-700">
-        {gate.full.map((paragraphe) => <p>{paragraphe}</p>)}
-      </div>
-    </details>
-  </div>
-  <div
-    class="flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-mist bg-white px-5 py-4 pb-[calc(1rem+env(safe-area-inset-bottom))] sm:px-8"
-  >
-    <button type="button" data-simu-accepter class="btn btn-motion btn-primary btn-md">
-      {gate.accept}
-    </button>
-    <a
-      href={withBase(pages.home.path)}
-      class="link-underline inline-flex min-h-11 items-center text-base font-semibold text-navy"
-    >
-      {gate.leave}
-    </a>
-  </div>
-</dialog>
 
 {
   /* Réglages dans un bloc de DONNÉES, non exécutable, comme le comparateur de frais : la politique de

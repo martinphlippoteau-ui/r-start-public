@@ -479,19 +479,32 @@ async function checkSimulateur() {
   const balise = (motif) => html.match(motif)?.[0] ?? '';
 
   /* LA FENÊTRE D'ACCÈS : le simulateur arrive inerte, derrière une fenêtre qui reproduit l'avertissement
-     du bulletin de souscription de R Start, mot pour mot. */
-  const acces = html.match(/<dialog\b[^>]*data-simu-acces[\s\S]*?<\/dialog>/i)?.[0] ?? '';
-  if (!acces) errors.push(file + ' : fenêtre d’accès absente ([data-simu-acces])');
+     du bulletin de souscription de R Start, mot pour mot. ELLE EST RENDUE PAR LE SERVEUR ET VISIBLE
+     SANS SCRIPT : c'est ce qui garantit qu'aucun formulaire ne s'affiche nu avant elle (21/09/2026 ;
+     ouverte par `showModal()`, elle n'apparaissait qu'à l'exécution d'un module différé). Le <dialog>
+     est donc refusé ici, comme l'est un `hidden` qu'il faudrait retirer. */
+  const voile =
+    html.match(/<div\b[^>]*data-simu-acces-voile[\s\S]*?data-simu-accepter[\s\S]*?<\/div>/i)?.[0] ??
+    '';
+  if (!voile) errors.push(file + ' : fenêtre d’accès absente ([data-simu-acces-voile])');
   else {
     requirePhrase(
-      toText(acces),
+      toText(voile),
       legal.bulletinWarning,
       'avertissement du bulletin dans la fenêtre d’accès',
       file
     );
-    if (!/data-simu-accepter/.test(acces))
-      errors.push(file + ' : la fenêtre d’accès n’a pas de bouton d’acceptation');
+    const enveloppe = voile.slice(0, voile.indexOf('>') + 1);
+    if (/\bhidden\b/.test(enveloppe))
+      errors.push(
+        file + ' : la fenêtre d’accès doit être visible sans script, sans attribut hidden'
+      );
   }
+  if (/<dialog\b[^>]*data-simu-acces/i.test(html))
+    errors.push(
+      file +
+        ' : la fenêtre d’accès ne doit pas être un <dialog>, qui n’existe qu’une fois ouvert par script'
+    );
   if (!/\binert\b/.test(balise(/<div\b[^>]*data-simulateur[^>]*>/i)))
     errors.push(
       file + ' : le simulateur doit arriver inerte, tant que la fenêtre d’accès n’est pas acceptée'

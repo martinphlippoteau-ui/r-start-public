@@ -236,7 +236,7 @@ test.describe('Qualité', () => {
       await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', /\/$/);
       /* /simulateur s'ouvre sur sa fenêtre d'accès, qui rend le reste de la page inerte, barre
          comprise : on l'accepte pour pouvoir cliquer l'entrée suivante. */
-      const accepter = page.locator('[data-simu-acces][open] [data-simu-accepter]');
+      const accepter = page.locator('[data-simu-acces-voile]:not([hidden]) [data-simu-accepter]');
       if (await accepter.count()) await accepter.click();
     }
     expect(redirections, 'aucune redirection pendant la navigation').toEqual([]);
