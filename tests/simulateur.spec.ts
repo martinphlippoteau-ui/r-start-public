@@ -350,6 +350,89 @@ test.describe('Simulateur : le résultat', () => {
   });
 
   /*
+   * LA BULLE GARDE SA FORME JUSQU'AU BORD DROIT (21/09/2026, signalé par Martin). Sur les dernières
+   * années elle se resserrait et chaque ligne se cassait en trois : une boîte en position absolue ne
+   * dispose que de la largeur qui reste jusqu'au bord, et `text-wrap: pretty`, posé sur tout <p> par
+   * global.css, annulait son `nowrap`. Elle doit avoir partout la hauteur qu'elle a au milieu.
+   */
+  test('la bulle du graphique ne se resserre pas sur les dernières années', async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(isMobile, 'les flèches sont un geste de clavier');
+    await simuler(page, { mensuel: 250, reinvestir: true });
+    for (const vue of ['revenus', 'capital']) {
+      await page.locator(`[data-simu-vue="${vue}"]`).click();
+      await page.locator('[data-simu-graphique]').focus();
+      const mesure = () =>
+        page.evaluate(() => {
+          const bulle = document.querySelector<HTMLElement>('[data-simu-bulle]')!;
+          const cadre = document.querySelector('[data-simu-graphique]')!.getBoundingClientRect();
+          const b = bulle.getBoundingClientRect();
+          const lignes = [...bulle.querySelectorAll<HTMLElement>('p:not([hidden])')];
+          const uneLigne = lignes[0]?.offsetHeight ?? 0;
+          return {
+            hauteur: Math.round(b.height),
+            /* Le titre tient toujours sur une ligne : une ligne plus haute que lui est cassée. */
+            cassees: lignes.filter((p) => p.offsetHeight > uneLigne * 1.5).length,
+            dansLeCadre: b.left >= cadre.left - 1 && b.right <= cadre.right + 1,
+          };
+        });
+      await page.keyboard.press('End');
+      const auBord = await mesure();
+      for (let i = 0; i < 12; i += 1) await page.keyboard.press('ArrowLeft');
+      const auMilieu = await mesure();
+      expect(auBord.cassees, `aucune ligne cassée au bord droit (vue ${vue})`).toBe(0);
+      expect(auBord.hauteur, `même hauteur au bord qu’au milieu (vue ${vue})`).toBe(
+        auMilieu.hauteur
+      );
+      expect(auBord.dansLeCadre, `la bulle reste dans le cadre (vue ${vue})`).toBe(true);
+      expect(auMilieu.dansLeCadre).toBe(true);
+    }
+  });
+
+  /*
+   * LE GRAPHIQUE PARLE DANS LES COULEURS DE LA MARQUE (21/09/2026, « ces couleurs-là ne sont pas les
+   * couleurs R Start », Martin). Les revenus réinvestis étaient en corail, qui est sur ce site la
+   * couleur des mentions de risque. Les couches ne prennent que le marine et les turquoises, et vont
+   * du plus sombre au plus clair pour rester distinctes.
+   */
+  test('les couches du graphique n’emploient que le marine et les turquoises de la marque', async ({
+    page,
+  }) => {
+    await simuler(page, { mensuel: 250, reinvestir: true });
+    await page.locator('[data-simu-vue="capital"]').click();
+    /* Le passage d'une vue à l'autre est animé : on attend que les trois couches soient tracées. */
+    await expect(page.locator('[data-couche][d^="M"]')).toHaveCount(3);
+    const releve = await page.evaluate(() => {
+      const jeton = (nom: string) => {
+        const sonde = document.createElement('i');
+        sonde.style.color = `var(${nom})`;
+        document.body.append(sonde);
+        const couleur = getComputedStyle(sonde).color;
+        sonde.remove();
+        return couleur;
+      };
+      return {
+        marque: ['--color-navy', '--color-teal-500', '--color-teal-200'].map(jeton),
+        corail: ['--color-coral', '--color-coral-700'].map(jeton),
+        couches: [...document.querySelectorAll<SVGPathElement>('[data-couche]')]
+          .filter((c) => c.getAttribute('d'))
+          .map((c) => getComputedStyle(c).fill),
+        puces: [...document.querySelectorAll<HTMLElement>('[data-legende]:not([hidden]) span')]
+          .map((p) => getComputedStyle(p).backgroundColor)
+          .filter((c) => c !== 'rgba(0, 0, 0, 0)'),
+      };
+    });
+    expect(releve.couches).toHaveLength(3);
+    for (const couleur of [...releve.couches, ...releve.puces]) {
+      expect(releve.marque, `couleur hors palette : ${couleur}`).toContain(couleur);
+      expect(releve.corail).not.toContain(couleur);
+    }
+    expect(new Set(releve.couches).size, 'trois couches, trois couleurs distinctes').toBe(3);
+  });
+
+  /*
    * L'AVERTISSEMENT N'EST JAMAIS ANIMÉ : règle du site pour toute mention de risque. Tout le reste du
    * simulateur bouge (demande de Martin du 20/09/2026), lui est là, entier, à la première image.
    * Et rien ne bouge en mouvement réduit.

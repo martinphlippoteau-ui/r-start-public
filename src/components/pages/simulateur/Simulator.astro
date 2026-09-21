@@ -88,11 +88,18 @@ const bascule =
 const tableau =
   'w-full border-collapse text-sm tabular-nums [&_td]:border-b [&_td]:border-mist [&_td]:px-3 [&_td]:py-1.5 [&_td]:text-right [&_td]:whitespace-nowrap [&_td:first-child]:text-left [&_th]:sticky [&_th]:top-0 [&_th]:bg-paper [&_th]:px-3 [&_th]:py-2 [&_th]:text-right [&_th]:font-semibold [&_th]:whitespace-nowrap [&_th:first-child]:text-left';
 
-/* Couches du graphique : la clé est celle de `Annee` (moteur.ts), la classe donne la couleur. */
+/*
+ * Couches du graphique : la clé est celle de `Annee` (moteur.ts), la classe donne la couleur.
+ * LA PALETTE DE LA MARQUE, DU PLUS SOMBRE AU PLUS CLAIR : marine, turquoise, turquoise clair
+ * (21/09/2026, « ces couleurs-là ne sont pas les couleurs R Start », Martin). Les revenus réinvestis
+ * étaient en corail, repris du orange du prototype : sur ce site le corail est la couleur des mentions
+ * de risque (RiskNote, avertissements), une part du capital s'y lisait comme une alerte. Il ne reste
+ * dans ce composant que là où il est à sa place : erreurs de saisie et pictogramme de l'avertissement.
+ */
 const couches = [
   { key: 'initial', label: chart.layers.initial, fill: 'fill-navy', puce: 'bg-navy' },
-  { key: 'programmes', label: chart.layers.programmes, fill: 'fill-teal-400', puce: 'bg-teal-400' },
-  { key: 'reinvestis', label: chart.layers.reinvestis, fill: 'fill-coral', puce: 'bg-coral' },
+  { key: 'programmes', label: chart.layers.programmes, fill: 'fill-teal-500', puce: 'bg-teal-500' },
+  { key: 'reinvestis', label: chart.layers.reinvestis, fill: 'fill-teal-200', puce: 'bg-teal-200' },
   { key: 'cumGross', label: chart.layers.cumGross, fill: 'fill-teal-200', puce: 'bg-teal-200' },
 ] as const;
 
@@ -363,7 +370,7 @@ const etapeDe = (cle: Reglage): number | undefined => {
                           <span
                             class:list={[
                               'simu-repere absolute bottom-0 flex -translate-x-1/2 flex-col items-center text-[0.6875rem] leading-none font-bold whitespace-nowrap',
-                              m.id === 'aspim' ? 'text-coral-700' : 'text-teal-700',
+                              m.id === 'aspim' ? 'text-navy' : 'text-teal-700',
                             ]}
                             style={`left:${surLaPiste((m.rate - rules.rate.min) / (rules.rate.max - rules.rate.min))}`}
                           >
@@ -747,11 +754,18 @@ const etapeDe = (cle: Reglage): number | undefined => {
                 </svg>
 
                 {
-                  /* Bulle du curseur. Toutes ses lignes existent, le script affiche celles de la vue. */
+                  /* Bulle du curseur. Toutes ses lignes existent, le script affiche celles de la vue.
+                    ELLE GARDE SA LARGEUR OÙ QU'ELLE SOIT (21/09/2026, signalé par Martin : sur les
+                    dernières années elle se resserrait et ses lignes se cassaient). Deux causes, deux
+                    parades. Une boîte en position absolue ne dispose que de la largeur qui reste jusqu'au
+                    bord de son cadre : `w-max` lui donne celle de son contenu. Et le `whitespace-nowrap`
+                    qu'elle portait n'atteignait pas ses lignes : global.css pose `text-wrap: pretty` sur
+                    tout <p>, et ce raccourci REMET le retour à la ligne à « autorisé ». D'où
+                    `text-nowrap` sur les lignes elles-mêmes. */
                 }
                 <div
                   data-simu-bulle
-                  class="pointer-events-none absolute top-1.5 rounded-xl bg-ink px-3 py-2 text-xs leading-relaxed whitespace-nowrap text-white tabular-nums shadow-float"
+                  class="pointer-events-none absolute top-1.5 w-max rounded-xl bg-ink px-3 py-2 text-xs leading-relaxed text-white tabular-nums shadow-float [&_p]:text-nowrap"
                   hidden
                 >
                   <p
