@@ -2809,6 +2809,22 @@ body:has(#consent-banner:not([hidden])) [data-hero-scroll-hint] {
   }
 }
 
+/* LA FENÊTRE D'ACCÈS AU PREMIER PLAN PENDANT LA TRANSITION ENTRE PAGES (21/09/2026). La barre et sa
+   pastille portent un nom : le navigateur les peint dans la couche de transition, au-dessus de la
+   page qui arrive, fenêtre comprise. En arrivant par le menu, la barre recouvrait donc le haut de la
+   fenêtre (sur téléphone, son surtitre et son titre), puis passait d'un coup dessous à la fin de la
+   transition. Nommée à son tour, la fenêtre est extraite elle aussi, et les groupes s'empilent dans
+   l'ordre de peinture : à `z-70`, elle passe devant la barre (`z-40`). Son image n'est pas animée à
+   l'entrée : elle est là dès la première image de la transition, et la page change sous son voile.
+   En sortant par « Revenir à l'accueil », elle s'efface avec le fondu par défaut du navigateur.
+   Une fois « J'ai compris » pressé, elle est `hidden` et le nom ne compte plus. */
+.simu-acces-voile {
+  view-transition-name: simu-acces;
+}
+::view-transition-new(simu-acces) {
+  animation: none;
+}
+
 /* LE GLISSEMENT DES QUESTIONS NE DÉBORDE PAS DE LA PAGE. Une question entre par la droite, de trois
    rem : sur un téléphone, deux pixels sortaient du cadre le temps de l'animation, et un défilement
    horizontal parasite apparaissait (relevé par tests/qualite.spec.ts le 21/09/2026).
@@ -2959,11 +2975,19 @@ body:has(#consent-banner:not([hidden])) [data-hero-scroll-hint] {
      carte glisse du centre vers la gauche et le panneau se pose à côté. La page, elle, ne se fond
      pas : `vt-simu`, posé sur <html> le temps de la transition, neutralise le fondu de la racine,
      même motif que `vt-filtre` pour la FAQ. La courbe du groupe ne dépasse pas sa cible : un cadre
-     qui rebondit en changeant de taille se lit comme un défaut. */
-  [data-simu-scene] {
+     qui rebondit en changeant de taille se lit comme un défaut.
+     LES NOMS N'EXISTENT QUE LE TEMPS DE CETTE TRANSITION, sous `vt-simu` (21/09/2026, « le chargement
+     de cette page n'est toujours pas ok », Martin). Portés en permanence, ils servaient aussi à la
+     transition ENTRE PAGES du site : en arrivant par le menu, le navigateur extrayait la carte de la
+     première question et la peignait dans la couche de transition, AU-DESSUS de toute la page, fenêtre
+     d'accès comprise. Filmé : « Continuer » paraissait avant même la page, puis la carte recouvrait la
+     fenêtre pendant plus d'une demi-seconde. `vt-simu` est posé avant la capture de l'état de départ
+     et retiré à la fin (page.ts, `changer`) : les deux captures portent les noms, la page au repos
+     n'en porte aucun. */
+  html.vt-simu [data-simu-scene] {
     view-transition-name: simu-scene;
   }
-  .simu-panneau {
+  html.vt-simu .simu-panneau {
     view-transition-name: simu-panneau;
   }
   html.vt-simu::view-transition-old(root),
@@ -3012,9 +3036,12 @@ body:has(#consent-banner:not([hidden])) [data-hero-scroll-hint] {
   }
 
   /*
-   * La fenêtre d'accès se pose au ressort, ses trois points à la suite. Une ANIMATION, et non une
-   * transition : elle est rendue par le serveur, présente au premier rendu, et il n'y a donc pas
-   * d'état d'avant à quitter. C'est aussi ce qui la rend indépendante du script.
+   * La fenêtre d'accès se pose au ressort, D'UN SEUL TENANT. Une ANIMATION, et non une transition :
+   * elle est rendue par le serveur, présente au premier rendu, et il n'y a donc pas d'état d'avant à
+   * quitter. C'est aussi ce qui la rend indépendante du script.
+   * SES TROIS POINTS N'ENTRENT PLUS À LA SUITE (21/09/2026) : décalés de 140 à 300 ms et partis de
+   * l'opacité zéro, ils laissaient la fenêtre vide en son milieu pendant un quart de seconde, un
+   * chargement inachevé à l'œil. Elle arrive entière, et c'est elle qui bouge.
    * NI LE VOILE NI LA FENÊTRE NE PARTENT DE L'OPACITÉ ZÉRO (21/09/2026, « il y a toujours un effet
    * flick, l'étape 1 s'affiche avant la popup », Martin). Le voile entrait en fondu (260 ms) et la
    * fenêtre avec lui : mesuré image par image, à 109 ms la question était à 58 % d'opacité, la
@@ -3030,18 +3057,6 @@ body:has(#consent-banner:not([hidden])) [data-hero-scroll-hint] {
   [data-simulateur][inert] [data-simu-questions] > .simu-corps {
     animation: none;
     opacity: 0;
-  }
-  .simu-acces-point {
-    animation: simu-eclot 640ms var(--simu-ressort, ease) both;
-  }
-  .simu-acces-point:nth-child(1) {
-    animation-delay: 140ms;
-  }
-  .simu-acces-point:nth-child(2) {
-    animation-delay: 220ms;
-  }
-  .simu-acces-point:nth-child(3) {
-    animation-delay: 300ms;
   }
   @keyframes simu-pose {
     from {

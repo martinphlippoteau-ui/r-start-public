@@ -96,6 +96,62 @@ test.describe('Simulateur : la fenêtre d’accès', () => {
     ).toEqual([]);
   });
 
+  /*
+   * RIEN NE PASSE AU-DESSUS D'ELLE EN ARRIVANT PAR LE MENU (21/09/2026, « le chargement de cette page
+   * n'est toujours pas ok », Martin). La transition entre pages extrait de la page tout élément qui
+   * porte un `view-transition-name` et le peint dans sa propre couche, au-dessus du reste. La carte
+   * du simulateur en portait un en permanence (pour le passage d'une question à l'autre) : elle
+   * recouvrait la fenêtre d'accès, « Continuer » compris, le temps de la transition. Les deux tests
+   * d'arrivée directe ne pouvaient pas le voir, il n'y a pas de transition sans page de départ.
+   * La barre, elle, est extraite à dessein, et passait donc aussi devant la fenêtre : la fenêtre est
+   * extraite à son tour, et les groupes s'empilant dans l'ordre de peinture, elle doit y venir
+   * APRÈS la barre, c'est-à-dire sur un plan plus haut.
+   * Relevé au moment où la page se révèle (`pagereveal`) : la barre, sa pastille, la fenêtre, rien
+   * d'autre.
+   */
+  test('en arrivant par le menu, rien du simulateur ne passe devant la fenêtre', async ({
+    page,
+  }) => {
+    await page.addInitScript(() => {
+      window.addEventListener('pagereveal', (e) => {
+        /* Le plan d'un élément : le `z-index` de l'enfant de <body> qui le porte. */
+        const plan = (el: Element): number => {
+          let n: Element | null = el;
+          while (n?.parentElement && n.parentElement !== document.body) n = n.parentElement;
+          return n ? Number(getComputedStyle(n).zIndex) || 0 : 0;
+        };
+        /* `root` est le nom que le navigateur donne à la page elle-même, pas une extraction. */
+        const noms: Record<string, number> = {};
+        for (const el of document.querySelectorAll('*')) {
+          const nom = getComputedStyle(el).viewTransitionName;
+          if (nom && nom !== 'none' && nom !== 'root') noms[nom] = plan(el);
+        }
+        (window as unknown as { __revele: unknown }).__revele = {
+          transition: !!(e as Event & { viewTransition?: unknown }).viewTransition,
+          noms,
+        };
+      });
+    });
+    await page.goto('/');
+    await page.evaluate(() => {
+      const lien = document.querySelector<HTMLAnchorElement>('a[href$="/simulateur/"]');
+      if (lien) location.href = lien.href;
+    });
+    await page.waitForURL('**/simulateur/');
+    await expect
+      .poll(() => page.evaluate(() => (window as unknown as { __revele?: unknown }).__revele))
+      .toBeTruthy();
+    const revele = (await page.evaluate(
+      () => (window as unknown as { __revele: unknown }).__revele
+    )) as { transition: boolean; noms: Record<string, number> };
+    expect(revele.transition, 'la page est arrivée par une transition de vue').toBe(true);
+    expect(Object.keys(revele.noms).sort()).toEqual(['barre-nav', 'pastille-nav', 'simu-acces']);
+    expect(
+      revele.noms['simu-acces'],
+      'la fenêtre sur un plan plus haut que la barre'
+    ).toBeGreaterThan(revele.noms['barre-nav'] ?? 0);
+  });
+
   test('le simulateur est hors d’atteinte derrière elle', async ({ page }) => {
     await page.goto('/simulateur/');
     const fenetre = page.locator('[data-simu-acces]');
@@ -140,6 +196,36 @@ test.describe('Simulateur : la fenêtre d’accès', () => {
     await expect(page.locator('[data-simu-corps="initial"] [data-simu-question]')).toBeFocused();
     /* Elle a attendu « J'ai compris » pour entrer, invisible derrière le voile : elle doit arriver. */
     await expect(page.locator('[data-simu-corps="initial"]')).toHaveCSS('opacity', '1');
+  });
+
+  /* Le revers du test précédent : d'une question à l'autre, la carte porte bien son nom quand la
+     transition capture l'état de départ, et le perd une fois la transition finie. */
+  test('le passage d’une question à l’autre nomme la carte, le temps de la transition', async ({
+    page,
+  }) => {
+    await entrer(page);
+    await page.evaluate(() => {
+      const doc = document as Document & { startViewTransition?: (f: () => void) => unknown };
+      const origine = doc.startViewTransition?.bind(document);
+      if (!origine) return;
+      doc.startViewTransition = (f) => {
+        const scene = document.querySelector('[data-simu-scene]');
+        (window as unknown as { __nom: string }).__nom = scene
+          ? getComputedStyle(scene).viewTransitionName
+          : '';
+        return origine(f);
+      };
+    });
+    await continuer(page);
+    await etape(page, 2);
+    expect(await page.evaluate(() => (window as unknown as { __nom: string }).__nom)).toBe(
+      'simu-scene'
+    );
+    await expect
+      .poll(() =>
+        page.locator('[data-simu-scene]').evaluate((el) => getComputedStyle(el).viewTransitionName)
+      )
+      .toBe('none');
   });
 
   test('elle tient en trois points, et garde l’avertissement du bulletin mot pour mot', async ({

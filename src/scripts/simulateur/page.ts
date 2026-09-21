@@ -858,8 +858,11 @@ const init = (): void => {
    * CHANGER D'ÉCRAN. Là où le navigateur sait faire une transition de vue du même document, la carte
    * glisse de sa place à la suivante (seule et centrée à la première question, à gauche ensuite) et
    * le panneau se pose à côté : le navigateur interpole les deux, global.css (`vt-simu`) donne la
-   * courbe. Ailleurs, et en mouvement réduit, l'écran change d'un coup ; les entrées CSS jouent quand
-   * même. Le focus va au titre de ce qui vient d'apparaître : un lecteur d'écran l'annonce.
+   * courbe, ET LES NOMS : carte et panneau n'en portent que sous `vt-simu`, sans quoi la transition
+   * d'une page à l'autre les peignait par-dessus la fenêtre d'accès. La classe est donc posée AVANT
+   * `startViewTransition`, pour que la capture de départ les porte déjà. Ailleurs, et en mouvement
+   * réduit, l'écran change d'un coup ; les entrées CSS jouent quand même. Le focus va au titre de ce
+   * qui vient d'apparaître : un lecteur d'écran l'annonce.
    */
   const changer = (
     sens: 'avant' | 'arriere',
