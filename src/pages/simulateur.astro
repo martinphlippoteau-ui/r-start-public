@@ -7,16 +7,21 @@
  * sourcés et datés, l'aident à la situer, et l'avertissement accompagne chaque résultat. Le détail est
  * dans src/content/fr/simulator.ts, et scripts/check-compliance.mjs tient ces conditions au build.
  *
+ * UN EN-TÊTE DE PRÉ-TUNNEL, PAS UN HERO (21/09/2026, Martin : « j'aimerais que le hero soit beaucoup
+ * plus discret, c'est une sorte de pré-tunnel »). Plus de bandeau sombre, plus de bouton « Souscrire
+ * en ligne » : sur fond clair, le fil d'Ariane et un titre de taille moyenne, comme les pages légales,
+ * et la première question juste dessous. On ne propose pas de souscrire avant d'avoir simulé ; le
+ * bouton « Souscrire » de la barre reste à l'écran, et le résultat mène à la souscription.
+ *
  * PAS DE PASTILLE FLOTTANTE ICI, contrairement aux autres sous-pages : le bas de l'écran est occupé,
- * sur téléphone, par la barre de synthèse du simulateur. L'appel à souscrire est dans l'en-tête.
+ * sur téléphone, par la barre de synthèse du simulateur.
  * Contenu : src/content/fr/simulator.ts (aucun texte en dur).
  */
 import Base from '@/layouts/Base.astro';
 import SiteNav from '@/components/SiteNav.astro';
 import Footer from '@/components/Footer.astro';
 import Breadcrumb from '@/components/ui/Breadcrumb.astro';
-import Button from '@/components/ui/Button.astro';
-import PageHero from '@/components/ui/PageHero.astro';
+import Container from '@/components/ui/Container.astro';
 import Simulator from '@/components/pages/simulateur/Simulator.astro';
 import SimulatorGate from '@/components/pages/simulateur/SimulatorGate.astro';
 import { pages } from '@/config/pages';
@@ -24,7 +29,7 @@ import { simulator } from '@/content/fr/simulator';
 import { breadcrumbJsonLd, organizationJsonLd, webPageJsonLd } from '@/lib/seo';
 
 const page = pages.simulator;
-const { seo, hero, cta } = simulator;
+const { seo, hero } = simulator;
 
 const jsonLd = [
   organizationJsonLd(),
@@ -35,11 +40,15 @@ const jsonLd = [
 
 <Base title={seo.title} description={seo.description} path={page.path} jsonLd={jsonLd}>
   <SiteNav />
-  <main id="contenu">
-    <PageHero eyebrow={hero.eyebrow} title={hero.title} compact>
-      <Breadcrumb slot="breadcrumb" key="simulator" tone="dark" />
-      <Button slot="cta" position={cta.position} variant="light" size="lg">{cta.label}</Button>
-    </PageHero>
+  {
+    /* La barre flottante recouvre le haut de la page : sa hauteur est réservée ici, comme sur les
+      pages légales (les pages à en-tête sombre la réservent dans leur en-tête). */
+  }
+  <main id="contenu" class="pt-nav-total bg-paper">
+    <Container size="wide" class="pt-5 sm:pt-8">
+      <Breadcrumb key="simulator" tone="light" />
+      <h1 class="text-display-md mt-3 sm:mt-4">{hero.title}</h1>
+    </Container>
     <Simulator />
   </main>
   <Footer />

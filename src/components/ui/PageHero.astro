@@ -52,13 +52,6 @@ interface Props {
    * section contacts de /salle-de-presse) : l'y répéter ferait défiler deux fois la même chose.
    */
   asideOnLarge?: boolean;
-  /**
-   * En-tête encore plus court sur grand écran. Réservé aux pages qui ne sont qu'un sommaire, où le
-   * contenu doit être sous les yeux tout de suite. C'est une PROP et non une classe passée de
-   * l'extérieur : deux utilitaires de même propriété se départagent par leur ordre dans la feuille
-   * compilée, pas par l'ordre de l'attribut, et le surclassement ne prenait pas.
-   */
-  compact?: boolean;
   class?: string;
 }
 const {
@@ -70,7 +63,6 @@ const {
   tone = 'ink',
   id = 'en-tete',
   asideOnLarge = false,
-  compact = false,
   class: className = '',
 } = Astro.props;
 const titleId = id + '-title';
@@ -100,9 +92,7 @@ void eyebrow;
        de flottaison. 2 rem et 3, soit une centaine de pixels rendus à la page. Le téléphone et la
        tablette ne changent pas, ils n'avaient pas ce défaut. */
     'pt-[calc(var(--spacing-nav-total)+0.75rem)] pb-10 sm:pt-[calc(var(--spacing-nav-total)+3.5rem)] sm:pb-20',
-    compact
-      ? 'lg:pt-[calc(var(--spacing-nav-total)+1rem)] lg:pb-8'
-      : 'lg:pt-[calc(var(--spacing-nav-total)+2rem)] lg:pb-12',
+    'lg:pt-[calc(var(--spacing-nav-total)+2rem)] lg:pb-12',
     className,
   ]}
 >

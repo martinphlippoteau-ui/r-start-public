@@ -1,5 +1,4 @@
-import type { Cta } from '@/content/types';
-import type { PageHero, PageSeo } from '@/content/types-v2';
+import type { PageSeo } from '@/content/types-v2';
 import { corumRange } from '@/content/fr/corumRange';
 import {
   fees,
@@ -142,15 +141,15 @@ export const simulator = {
       'Simulez un investissement dans R Start, SCPI CORUM, selon vos hypothèses. Simulation non contractuelle : risque de perte en capital, revenus non garantis.',
   } satisfies PageSeo,
 
+  /**
+   * L'EN-TÊTE D'UN PRÉ-TUNNEL (21/09/2026, demande de Martin) : un titre, rien d'autre. Ni surtitre,
+   * que le fil d'Ariane double, ni bouton « Souscrire en ligne » (src/pages/simulateur.astro dit
+   * pourquoi). PAS D'INTRODUCTION (20/09/2026) : ce qu'elle disait, aucun taux proposé par défaut
+   * faute d'historique, est dit à la question du taux, là où on en a besoin.
+   */
   hero: {
-    eyebrow: `Simulateur · SCPI ${product.name}`,
     title: 'Projetez votre investissement',
-    /* PAS D'INTRODUCTION (20/09/2026, demande de Martin) : l'en-tête tient en son titre, le parcours
-       commence juste dessous. Ce qu'elle disait, aucun taux proposé par défaut faute d'historique, est
-       dit à la question du taux, là où on en a besoin. */
-  } satisfies PageHero,
-
-  cta: { label: 'Souscrire en ligne', position: 'simulateur' } satisfies Cta,
+  },
 
   /** Ce que le script reçoit : les règles du moteur et les bornes du formulaire. */
   rules: {
