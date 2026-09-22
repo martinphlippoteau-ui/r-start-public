@@ -29,11 +29,10 @@ import { breadcrumbJsonLd, faqJsonLd, organizationJsonLd, webPageJsonLd } from '
 
 const page = pages.faq;
 const titre = faq.pageTitle ?? faq.title;
-const intro = faq.pageIntro ?? faq.intro;
 
 const jsonLd = [
   organizationJsonLd(),
-  webPageJsonLd({ path: page.path, title: titre, description: intro }),
+  webPageJsonLd({ path: page.path, title: titre, description: faq.pageDescription }),
   breadcrumbJsonLd('faq'),
   /* Le JSON-LD porte les DIX-HUIT questions, et non les quatre de l'accueil : c'est cette page que les
      moteurs doivent associer à la FAQ du site. */
@@ -41,10 +40,10 @@ const jsonLd = [
 ];
 ---
 
-<Base title={titre} description={intro} path={page.path} jsonLd={jsonLd}>
+<Base title={titre} description={faq.pageDescription} path={page.path} jsonLd={jsonLd}>
   <SiteNav />
   <main id="contenu">
-    <PageHero title={titre} intro={intro}>
+    <PageHero title={titre}>
       <Breadcrumb slot="breadcrumb" key="faq" tone="dark" />
       <Button slot="cta" position={faq.cta.position} variant="light" size="lg">
         {faq.cta.label}
@@ -53,15 +52,13 @@ const jsonLd = [
 
     {
       /* `showMoreLink` à false : cette page est la destination du renvoi, il n'a rien à pointer.
-        Le titre et l'introduction sont ceux de l'en-tête juste au-dessus, on ne les répète pas : la
-        section reçoit donc des chaînes vides pour son propre en-tête. */
+        Le titre de la liste est son libellé propre, l'en-tête de la page étant juste au-dessus. */
     }
     <Faq
       items={faq.allItems ?? faq.items}
       showMoreLink={false}
       search
       title={faq.listLabel ?? titre}
-      intro=""
       tone="white"
       revealTitle={false}
     />

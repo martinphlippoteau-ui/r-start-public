@@ -21,8 +21,7 @@
  *
  * Motion (src/scripts/motion.ts, attributs seulement), même signature que 02-Highlights / 05-Income :
  *  - en-tête, dans son enveloppe collante (les attributs sont sur les enfants, jamais sur l'élément
- *    sticky) : surtitre statique, H2 mot à mot (data-reveal-text, titre court), intro en fade-up
- *    décalée de 0,1 s ;
+ *    sticky) : H2 mot à mot (data-reveal-text, titre court) ;
  *  - questions : statiques (sobriété du 11/09/2026 : les <summary> entrant un à un formaient une cascade
  *    de plus de quatre éléments, et un `stagger` sur la liste serait refusé par le moteur, chaque réponse
  *    contenant un risque). Le mouvement de la FAQ est celui de l'accordéon (CSS ci-dessous). Ni le H2, ni
@@ -69,9 +68,8 @@ interface Props {
   showMoreLink?: boolean;
   /** Champ de recherche : seulement là où il y a assez de questions pour qu'il serve. */
   search?: boolean;
-  /** Titre et introduction, remplaçables par la page hôte. */
+  /** Titre, remplaçable par la page hôte. Pas d'introduction depuis le 16/09/2026. */
   title?: string;
-  intro?: string;
   tone?: 'paper' | 'white';
   /**
    * Révélation mot à mot du titre (`data-reveal-text`). À LAISSER À FALSE HORS DE L'ACCUEIL : cet
@@ -86,7 +84,6 @@ const {
   showMoreLink = true,
   search = false,
   title = faq.title,
-  intro = faq.intro,
   tone = 'paper',
   revealTitle = true,
 } = Astro.props as Props;
@@ -128,20 +125,6 @@ const items = rendus.map((item) => {
       <h2 id={titleId} class="text-display-lg text-balance" data-reveal-text={revealTitle || undefined}>
         {title}
       </h2>
-      {
-        /* Paragraphe rendu SEULEMENT s'il y a un texte (16/09/2026) : l'introduction commune a été
-          supprimée, et /faq passait déjà une chaîne vide. Un <p> vide laissait sa marge haute sous le
-          titre, et les lecteurs d'écran annonçaient un paragraphe sans contenu. */
-      }
-      {intro && (
-        <p
-          class="mt-6 max-w-3xl text-lead opacity-90"
-          data-animate="fade-up"
-          data-animate-delay="0.1"
-        >
-          {intro}
-        </p>
-      )}
     </header>
 
     <div class="mt-chapter grid gap-12 lg:grid-cols-12 lg:gap-16">

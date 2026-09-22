@@ -386,7 +386,6 @@ export interface FaqItem {
 
 export interface FaqContent {
   title: string;
-  intro: string;
   items: FaqItem[];
   /** Toutes les questions, pour la page qui porte la FAQ complète (/faq depuis le 16/09/2026). */
   allItems?: FaqItem[];
@@ -395,7 +394,8 @@ export interface FaqContent {
    * FILTRE une liste déjà rendue, il n'interroge rien : les questions sont toutes dans le HTML.
    */
   pageTitle?: string;
-  pageIntro?: string;
+  /** Meta description de /faq (≤ 155 caractères, rappel de risque compris). */
+  pageDescription: string;
   searchLabel?: string;
   searchPlaceholder?: string;
   /** `{n}` y est remplacé par le nombre de questions trouvées (pluriel). */

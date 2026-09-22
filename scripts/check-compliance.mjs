@@ -899,6 +899,18 @@ async function checkWholeSite() {
             errors.push(`${file} : question balisée en FAQPage mais absente de la page, « ${q.name} »`);
     }
 
+    /* 6. UNE DESCRIPTION SUR CHAQUE PAGE (22/09/2026). /faq a publié pendant six jours une meta
+       description vide : son introduction, vidée au lieu d'être retirée, lui servait de description.
+       Le contrôle ne regardait que la présence de la balise, et sur l'accueil seulement. Le titre de
+       l'accueil garde sa borne de 20 à 70 caractères (reprise d'un test de qualite.spec.ts, doublon). */
+    const description = html.match(/<meta\s+name="description"\s+content="([^"]*)"/i)?.[1] ?? '';
+    if (!description.trim()) errors.push(`${file} : meta description vide ou absente`);
+    if (file === 'index.html') {
+      const titre = html.match(/<title>([^<]*)<\/title>/i)?.[1] ?? '';
+      if (titre.length < 20 || titre.length > 70)
+        errors.push(`${file} : titre de ${titre.length} caractères (attendu : 20 à 70)`);
+    }
+
     const urls = [];
     for (const [, attr, value] of html.matchAll(/\s(href|src|action|poster|data-index)="([^"]*)"/gi))
       urls.push([attr, value]);

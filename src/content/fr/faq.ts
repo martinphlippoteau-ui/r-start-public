@@ -396,11 +396,7 @@ export const homeNotes: LegalNote[] = notes.filter((n) => idsAppeles.includes(n.
 
 export const faq = {
   title: 'Vos questions sur la SCPI R Start.',
-  /* Supprimée le 16/09/2026 à la demande de l'équipe, sur toutes les pages : la phrase annonçait ce
-     que les questions montrent d'elles-mêmes, et le renvoi au DIC et à la note d'information est déjà
-     porté par la section Documents et par le pied de page. Vide et non retirée : `FaqContent.intro`
-     reste exigé par le type, et la section n'affiche plus son paragraphe quand il est vide. */
-  intro: '',
+  /* Pas d'introduction depuis le 16/09/2026 (demande de l'équipe), ni ici ni sur /faq. */
   items: homeItems.map(({ question, answer, ...rest }) => ({
     ...rest,
     question: nb(question),
@@ -429,10 +425,13 @@ export const faq = {
   searchEmpty: 'Aucune question ne correspond. Essayez un autre mot.',
   /** En-tête de la page /faq, distinct de celui de la section courte. */
   pageTitle: 'Toutes vos questions sur la SCPI R Start.',
-  /* Introduction retirée le 16/09/2026, demande de l'équipe. Elle disait : « Les réponses sont courtes
-     et factuelles, issues des documents officiels de R Start. Elles ne remplacent pas la lecture du DIC
-     et de la note d'information. » Le renvoi vers les documents reste dans le pied de page. */
-  pageIntro: '',
+  /*
+   * Meta description de /faq (22/09/2026). La page n'en avait plus depuis le 16/09/2026 : son
+   * introduction, vidée au lieu d'être retirée, servait aussi de description, et une chaîne vide passe
+   * le `??`. Même forme que les autres pages : les sujets, puis le rappel de risque.
+   */
+  pageDescription:
+    'Toutes les réponses sur R Start, SCPI de CORUM : frais, revenus, risques, fiscalité et souscription. Risque de perte en capital, revenus non garantis.',
   cta: { label: 'Souscrire en ligne', position: 'faq' },
   notes,
 } satisfies FaqContent;
