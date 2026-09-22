@@ -13,6 +13,7 @@ export const sections: Record<SectionKey, SectionMeta> = {
   hero: { id: 'apercu' },
   highlights: { id: 'points-forts' },
   difference: { id: 'ce-qui-change' },
+  essentials: { id: 'points-essentiels' },
   fees: { id: 'frais' },
   strategy: { id: 'strategie' },
   subscribe: { id: 'souscrire' },

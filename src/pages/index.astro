@@ -30,12 +30,12 @@ const all = Object.entries(modules)
   .map(([path, mod]) => ({ path, Component: mod.default }));
 /**
  * Trame de l'accueil, par préfixe de fichier ; HOME_ORDER fait foi, dans cet ordre exact : 01 Hero
- * → 01b Qui a envie de payer avant de gagner ? → 02 R Start en un clin d'œil → 03 Comparateur de
- * frais (revenu le 15/09/2026 juste après 02, les tons s'enchaînant ink, white, white) → 07 Le
- * groupe CORUM en quelques chiffres → 03a Immeuble → 06 Souscrire → 08 Risques → 10 FAQ. Aucune
+ * → 01b Qui a envie de payer avant de gagner ? → 01c Points essentiels à connaître (22/09/2026,
+ * ink) → 02 R Start en un clin d'œil (white depuis le 22/09/2026) → 03 Comparateur de
+ * frais → 07 Le groupe CORUM en quelques chiffres → 03a Immeuble → 06 Souscrire → 08 Risques → 10 FAQ. Aucune
  * section n'existe sans être rendue, sauf 04 Stratégie, importée directement par /strategie.
  */
-const HOME_ORDER = ['01-', '01b-', '02-', '03-', '07-', '03a-', '06-', '08-', '10-'];
+const HOME_ORDER = ['01-', '01b-', '01c-', '02-', '03-', '07-', '03a-', '06-', '08-', '10-'];
 const byPrefix = (prefix: string) => all.find((s) => s.path.includes('/sections/' + prefix));
 const hero = byPrefix('01-');
 const rest = HOME_ORDER.slice(1)

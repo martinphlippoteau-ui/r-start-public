@@ -6,6 +6,7 @@ import type { PageKey } from '@/config/pages';
 export type SectionKey =
   | 'hero'
   | 'difference'
+  | 'essentials'
   | 'highlights'
   | 'fees'
   | 'strategy'
@@ -170,6 +171,15 @@ export interface CorumContent {
 export interface RiskItem {
   title: string;
   description: string;
+}
+
+/**
+ * Bloc « Points essentiels à connaître » (accueil, 22/09/2026, demande de Martin) : la mention de
+ * CORUM L'Épargne reprise mot pour mot, dans l'UI du bloc Risques. Un titre, un paragraphe.
+ */
+export interface EssentialsContent {
+  title: string;
+  text: string;
 }
 
 export interface RisksContent {
