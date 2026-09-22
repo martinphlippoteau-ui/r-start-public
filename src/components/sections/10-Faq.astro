@@ -8,7 +8,8 @@
  * En-tête pleine largeur (H2 rendu ici pour porter ses attributs motion), puis la liste des
  * questions en accordéons natifs <details name="faq"> (un seul ouvert à la fois), chevron animé en
  * CSS, questions en text-xl (text-display-sm dès sm : une question longue tient sur deux lignes à
- * 375 px), réponse en paragraphes text-lead, puis puces, tableau et conclusion. Le renvoi vers /faq
+ * 375 px), réponses en text-base et interligne serré COMME LES RISQUES (22/09/2026, demande de
+ * Martin ; elles étaient en text-lead), puces, tableau et conclusion de même. Le renvoi vers /faq
  * ferme la liste.
  * Motion (src/scripts/motion.ts, attributs seulement) : H2 mot à mot (data-reveal-text, accueil
  * seulement, voir `revealTitle`) ; questions statiques (les <summary> entrant un à un formaient une
@@ -188,7 +189,7 @@ const items = rendus.map((item) => {
                   <div class="faq-answer">
                     <div class="max-w-3xl space-y-5 pb-8 sm:pb-10 sm:pl-12">
                       {item.answer.map((paragraph) => (
-                        <p class="text-lead text-ink">
+                        <p class="text-base leading-snug text-ink">
                           {paragraph}
                         </p>
                       ))}
@@ -206,7 +207,7 @@ const items = rendus.map((item) => {
                                 aria-hidden="true"
                                 class="mt-2.5 size-1.5 shrink-0 rounded-full bg-teal-700"
                               />
-                              <span class="text-lead text-ink">{puce}</span>
+                              <span class="text-base leading-snug text-ink">{puce}</span>
                             </li>
                           ))}
                         </ul>
@@ -251,7 +252,7 @@ const items = rendus.map((item) => {
                       )}
 
                       {item.tableAfter?.map((paragraph) => (
-                        <p class="text-lead text-ink">{paragraph}</p>
+                        <p class="text-base leading-snug text-ink">{paragraph}</p>
                       ))}
                     </div>
                   </div>

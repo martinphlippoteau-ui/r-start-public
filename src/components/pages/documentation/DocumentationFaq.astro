@@ -3,7 +3,8 @@
  * FAQ de la page /documentation (id « faq ») : questions importées de faq.ts via documentation.faq
  * (les quatre premières, puis un renvoi vers /faq, voir documentation.ts).
  * Même construction que la section FAQ de l'accueil : en-tête collant face aux accordéons natifs
- * <details name="faq" data-faq> (un seul ouvert à la fois), chevron animé en CSS, réponse en text-lead.
+ * <details name="faq" data-faq> (un seul ouvert à la fois), chevron animé en CSS, réponse en
+ * text-base à interligne serré, comme les risques (22/09/2026, demande de Martin).
  * Animation déclarative : seul chaque <summary> porte un fade-up.
  * Le JSON-LD FAQPage n'est pas émis ici (réservé à l'accueil et à /frais, plan §12).
  * Contenu : documentation.faq et documentation.labels.
@@ -73,7 +74,7 @@ const items = faq.items;
                   </summary>
                   <div class="faq-answer max-w-3xl space-y-5 pb-8 sm:pb-10 sm:pl-12">
                     {item.answer.map((paragraph) => (
-                      <p class="text-lead text-ink">{paragraph}</p>
+                      <p class="text-base leading-snug text-ink">{paragraph}</p>
                     ))}
                   </div>
                 </details>
