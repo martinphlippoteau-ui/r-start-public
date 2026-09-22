@@ -43,9 +43,10 @@ const rawItems: FaqContent['items'] = [
   {
     category: RUB.comprendre,
     question: 'R Start verse-t-elle des revenus réguliers ?',
+    /* Réécrite le 22/09/2026 (demande de Martin) : « revenus (dividendes) potentiels », et plus de
+       second paragraphe sur les deux moteurs. */
     answer: [
-      'R Start verse chaque mois des revenus issus des loyers, comme les autres SCPI CORUM. En revanche, elle n’a pas d’objectif de rendement fixé.',
-      'Sa performance repose sur deux moteurs complémentaires : les loyers encaissés, distribués régulièrement, et les plus-values réalisées lors de la revente d’immeubles.',
+      'R Start verse chaque mois des revenus (dividendes) potentiels issus des loyers, comme les autres SCPI CORUM. En revanche, elle n’a pas d’objectif de rendement fixé.',
     ],
   },
   {
