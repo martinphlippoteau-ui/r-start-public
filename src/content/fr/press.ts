@@ -79,6 +79,10 @@ export const press = {
     title: 'Revue de presse',
     /* Introduction et avertissement retirés le 16/09/2026 : voir l'en-tête. */
     items: articles,
+    /* Sous la liste des articles (22/09/2026, texte de Martin) : les médias cités sont libres de
+       leur ligne et de leurs contenus. */
+    notice:
+      'Les médias et organes de presse cités ci-dessus déterminent librement leur ligne éditoriale ainsi que le contenu de leurs articles.',
   },
 
   cta: { label: 'Souscrire en ligne', position: 'presse' as const },
@@ -87,7 +91,8 @@ export const press = {
      components/pages/presse/Contacts.astro ; au singulier, la question s'adresse à un lecteur. */
   contacts: {
     title: 'Vous êtes journaliste ?',
-    intro: 'Pour toute question, demande d’information ou d’interview, merci de contacter :',
+    /* « vous pouvez contacter » depuis le 22/09/2026 (demande de Martin), ex-« merci de contacter ». */
+    intro: 'Pour toute question, demande d’information ou d’interview, vous pouvez contacter :',
     items: contacts,
   },
 

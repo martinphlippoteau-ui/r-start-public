@@ -501,15 +501,16 @@ async function checkSubPages() {
         requirePhrase(text, b.slice(0, 100), "puce commission d'arbitrage", file);
     }
     if (p === 'presse') {
-      /* AVERTISSEMENT ET NON PLUS ERREUR (16/09/2026, arbitrage de l'équipe). La règle exigeait
-         l'avertissement de la revue de presse (publications indépendantes, n'engageant pas la
-         société de gestion, ne valant pas conseil, risque de perte en capital), qui qualifiait des
-         citations reproduites mot pour mot, certaines avec « sans frais ». Il ne reste autour
-         d'elles que le pied de page. Texte archivé hors du dépôt (.claude/audits) : s'il revient,
-         repasser en erreur. */
-      warnings.push(
-        file +
-          ' : avertissement de la revue de presse absent — les titres et citations de tiers ne sont plus qualifiés que par le pied de page'
+      /* L'avertissement de la revue de presse (22/09/2026, demande de Martin) : les médias cités
+         déterminent librement leur ligne et leurs contenus. Il remplace celui du 10/09/2026
+         (publications indépendantes, n'engageant pas la société de gestion, ne valant pas conseil,
+         risque de perte en capital), retiré le 16/09/2026 et archivé hors du dépôt. Exigé : ce sont
+         des titres et des citations de tiers, reproduits mot pour mot. */
+      requirePhrase(
+        text,
+        'déterminent librement leur ligne éditoriale',
+        'avertissement de la revue de presse (médias libres de leur ligne)',
+        file
       );
       const quoted = (html.match(/data-press-quote/g) || []).length;
       if (!quoted)

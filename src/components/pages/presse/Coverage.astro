@@ -90,5 +90,10 @@ const linkHintId = `${id}-link-hint`;
         ))
       }
     </ul>
+    {
+      /* Avertissement sous la revue (22/09/2026, demande de Martin) ; scripts/check-compliance.mjs
+      l'exige sur la page. Jamais animé. */
+    }
+    <p class="text-caption mt-6 text-slate-700 sm:mt-8">{coverage.notice}</p>
   </Container>
 </Section>

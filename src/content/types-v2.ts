@@ -170,7 +170,12 @@ export interface PressContent {
   seo: PageSeo;
   hero: PageHero;
   quotes: { title: string; items: PressQuote[] };
-  coverage: { title: string; items: PressArticle[] };
+  coverage: {
+    title: string;
+    items: PressArticle[];
+    /** Sous la liste : les médias cités déterminent librement leur ligne et leurs contenus. */
+    notice: string;
+  };
   /** Appel à l'action de la page : en-tête et pastille flottante. */
   cta: Cta;
   /** Zone 4, « Vous êtes journaliste ? » (Contacts.astro). */
