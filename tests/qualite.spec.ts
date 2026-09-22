@@ -14,16 +14,11 @@ const PAGES = [
 ];
 
 /**
- * Défiler jusqu'à `y` PUIS attendre que la page se soit posée, au lieu d'un délai à l'aveugle.
- *
- * L'accueil épingle ses sections avec GSAP : après un `scrollTo`, la géométrie et les opacités menées
- * par le défilement sont recalculées dans la boucle d'animation de GSAP, qui n'est pas la nôtre. Lire
- * l'état juste après revenait à lire la frame d'avant, et le test tombait une fois sur trois en
- * parallèle, quand la machine est chargée.
- *
- * On lit donc l'empreinte de l'état jusqu'à ce que deux lectures consécutives soient identiques. C'est
- * une attente de STABILITÉ, pas une attente du résultat voulu : elle ne masque aucun défaut, elle
- * refuse seulement de juger une page en train de bouger.
+ * Défiler jusqu'à `y` PUIS attendre que la page se soit posée : l'accueil épingle ses sections avec
+ * GSAP, dont la boucle recalcule géométrie et opacités après le `scrollTo` ; lire l'état juste
+ * après revenait à lire la frame d'avant, et le test tombait une fois sur trois en parallèle. On
+ * lit l'empreinte jusqu'à deux lectures identiques : une attente de STABILITÉ, pas du résultat
+ * voulu.
  */
 const allerA = async (page: Page, y: number, empreinte: () => Promise<string>) => {
   await page.evaluate(
@@ -44,11 +39,9 @@ const allerA = async (page: Page, y: number, empreinte: () => Promise<string>) =
 };
 
 /**
- * Descend jusqu'au bas RÉEL du document, puis attend que l'affichage se stabilise.
- * `document.body.scrollHeight` relevé au sommet ne vaut rien ici : les sections épinglées de l'accueil
- * posent leurs cales au fil du défilement et le document s'allonge en cours de route. Viser la hauteur
- * de départ laissait donc le test à un ou deux écrans du bas, là où la première pastille n'a pas encore
- * dépassé sa borne de fin. On redescend tant que la position gagne du terrain.
+ * Descend jusqu'au bas RÉEL du document, puis attend que l'affichage se stabilise. `scrollHeight`
+ * relevé au sommet ne vaut rien : les sections épinglées posent leurs cales au fil du défilement et
+ * le document s'allonge en cours de route. On redescend tant que la position gagne du terrain.
  */
 const allerEnBas = async (page: Page, empreinte: () => Promise<string>) => {
   let precedent = -1;
@@ -84,10 +77,9 @@ test.describe('Qualité', () => {
     const hrefs = await ctas.evaluateAll((a) => a.map((x) => (x as HTMLAnchorElement).href));
     for (const h of hrefs) expect(h).toMatch(/^https?:\/\//);
     await page.evaluate(() => document.addEventListener('click', (e) => e.preventDefault(), true));
-    // Le premier CTA du DOM est celui de la barre. Il est INERTE tant que la page n'a pas défilé : sur une
-    // page à en-tête sombre, la barre n'a ni matière ni contenu visible au premier écran (global.css,
-    // `--nav-glass-on`), donc opacité 0 et `pointer-events: none`. Playwright considère un élément
-    // d'opacité 0 comme visible : on cherche donc le premier CTA réellement ACTIONNABLE.
+    // Playwright considère un élément d'opacité 0 comme visible, et un CTA de la barre a pu être
+    // inerte au premier écran (opacité 0, `pointer-events: none`) : on cherche donc le premier CTA
+    // réellement ACTIONNABLE plutôt que le premier du DOM.
     const index = await ctas.evaluateAll((els) =>
       els.findIndex((node) => {
         const el = node as HTMLElement & {
@@ -141,12 +133,8 @@ test.describe('Qualité', () => {
     expect(serious.map((v) => `${v.id}: ${v.help} (${v.nodes.length})`)).toEqual([]);
   });
 
-  /*
-   * Toutes les pages, pas seulement l'accueil. Le 12/09/2026, /frais débordait de 154 px sur téléphone :
-   * le comparateur était un tableau à largeur minimale posé dans une enveloppe à défilement, et la
-   * colonne de la SCPI comparée, sa liste déroulante comprise, tombait hors de l'écran. Le test ne
-   * visitait que l'accueil, il n'a rien vu.
-   */
+  /* Toutes les pages : /frais a débordé de 154 px sur téléphone sans qu'un test limité à l'accueil
+     le voie. */
   for (const route of PAGES) {
     test(`pas de débordement horizontal (${route})`, async ({ page }) => {
       await page.goto(route);
@@ -157,12 +145,9 @@ test.describe('Qualité', () => {
     });
   }
 
-  /*
-   * La barre de navigation est IDENTIQUE sur toutes les pages (12/09/2026, demande de l'équipe). Elle
-   * portait jusque-là un voile propre à l'accueil, transparent au premier écran. Le test relève une
-   * empreinte par page, avant tout défilement, et exige qu'elles se réduisent à UNE SEULE : hauteur,
-   * verre, flou, et présence de chacun des quatre repères.
-   */
+  /* La barre de navigation est IDENTIQUE sur toutes les pages (12/09/2026, demande de l'équipe) :
+     une empreinte par page, avant tout défilement (hauteur, verre, flou, quatre repères), une
+     seule valeur. */
   test('la barre de navigation est identique sur toutes les pages', async ({ page }) => {
     const empreintes = new Map<string, string>();
 
@@ -200,11 +185,8 @@ test.describe('Qualité', () => {
     expect([...distinctes], JSON.stringify([...empreintes], null, 1)).toHaveLength(1);
   });
 
-  /*
-   * UNE SEULE FORME D'ADRESSE (audit du 18/09/2026). Le site est publié en dossiers, et l'hébergeur
-   * renvoie « /frais » vers « /frais/ » : chaque lien sans barre finale payait une redirection. Le
-   * serveur de test redirige maintenant comme lui, et ce test échoue au premier lien qui en paie une.
-   */
+  /* UNE SEULE FORME D'ADRESSE : l'hébergeur renvoie « /frais » vers « /frais/ », chaque lien sans
+     barre finale payait une redirection. Le serveur de test redirige comme lui. */
   test('aucun lien du menu ne paie de redirection, et le canonical est l’adresse servie', async ({
     page,
     isMobile,
@@ -230,12 +212,9 @@ test.describe('Qualité', () => {
     expect(new URL(page.url()).pathname.endsWith('/')).toBe(true);
   });
 
-  /*
-   * LA BARRE TIENT À TOUTES LES LARGEURS DE BUREAU (20/09/2026). Avec le simulateur, elle porte six
-   * entrées, qui ne tiennent pas entre 1024 et 1180 px environ : la liste gardait toute sa largeur,
-   * ÉCRASAIT le logo (36 px de large à 1024) et passait sous la loupe. Elle doit alors défiler dans sa
-   * colonne, avec son fondu, logo et loupe entiers ; et ne pas défiler du tout quand elle tient.
-   */
+  /* LA BARRE TIENT À TOUTES LES LARGEURS DE BUREAU : entre 1024 et 1180 px, la liste ÉCRASAIT le
+     logo (36 px à 1024) et passait sous la loupe. Elle doit alors défiler dans sa colonne, logo et
+     loupe entiers, et ne pas défiler du tout quand elle tient. */
   test('la barre garde son logo et sa loupe entiers, que la liste des pages tienne ou non', async ({
     page,
     isMobile,
@@ -270,11 +249,8 @@ test.describe('Qualité', () => {
     }
   });
 
-  /*
-   * TOUS LES ÉVÉNEMENTS PASSENT PAR LE MÊME CANAL (audit du 18/09/2026). « souscription_indisponible »
-   * est l'issue de tous les clics Souscrire tant que le tunnel est fermé, et il partait sans le type
-   * de page ni la campagne d'entrée, écrit directement dans le dataLayer.
-   */
+  /* TOUS LES ÉVÉNEMENTS PASSENT PAR LE MÊME CANAL : « souscription_indisponible », écrit
+     directement dans le dataLayer, partait sans le type de page ni la campagne d'entrée. */
   test('« souscription indisponible » porte le type de page et la campagne d’entrée', async ({
     page,
   }) => {
@@ -293,14 +269,10 @@ test.describe('Qualité', () => {
     });
   });
 
-  /*
-   * DONNÉES STRUCTURÉES ET ANCRES (audit du 18/09/2026).
-   *  - La réponse balisée reprend TOUT ce que la page affiche : le tableau des frais manquait, et la
-   *    réponse sur les frais ne disait plus que « aucun frais quand vous investissez ».
-   *  - /frais ne balise plus une FAQ que personne ne peut lire.
-   *  - Les ancres des pages légales plient les accents au lieu de les remplacer par des tirets.
-   *  - La page d'essai interne n'est jamais indexable.
-   */
+  /* DONNÉES STRUCTURÉES ET ANCRES : la réponse balisée reprend TOUT ce que la page affiche (le
+     tableau des frais manquait) ; /frais ne balise pas une FAQ que personne ne peut lire ; les
+     ancres des pages légales plient les accents au lieu de les remplacer par des tirets ; /test
+     n'est jamais indexable. */
   test('données structurées fidèles à la page, ancres légales lisibles, page d’essai hors index', async ({
     page,
   }) => {
@@ -328,15 +300,11 @@ test.describe('Qualité', () => {
     await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/);
   });
 
-  /*
-   * COMPARATEUR DE FRAIS, trois défauts de l'audit du 18/09/2026.
-   *  1. Une SCPI sans valeur sur une ligne héritait de la pastille « taux le plus bas » de la SCPI
-   *     choisie avant elle. Le cas n'existe pas dans les données d'aujourd'hui : la page est servie avec
-   *     une valeur retirée exprès.
-   *  2. Sur téléphone, l'en-tête de colonne « Frais » était en `display: none`, donc hors de l'arbre
-   *     d'accessibilité : les taux étaient annoncés sous l'en-tête de la mauvaise SCPI.
-   *  3. Un panneau « i » replié restait lu par les lecteurs d'écran.
-   */
+  /* COMPARATEUR DE FRAIS : 1. une SCPI sans valeur sur une ligne héritait de la pastille « taux le
+     plus bas » de la SCPI précédente (le cas n'existe pas dans les données, la page est servie avec
+     une valeur retirée exprès) ; 2. sur téléphone, l'en-tête « Frais » en `display: none` sortait
+     de l'arbre d'accessibilité, les taux étaient annoncés sous la mauvaise SCPI ; 3. un panneau « i
+     » replié restait lu par les lecteurs d'écran. */
   test('comparateur : pas de faux gagnant, en-tête présent pour les lecteurs d’écran, panneau replié muet', async ({
     page,
   }) => {
@@ -382,10 +350,8 @@ test.describe('Qualité', () => {
     await expect(contenu).toBeVisible();
   });
 
-  /*
-   * SANS JAVASCRIPT, LE DÉTAIL DES CARTES DE /strategie SE LIT (audit du 18/09/2026) : écrit en sable et
-   * blanc pour le dos sombre des cartes, il restait sur le fond clair de la section, à 1,17:1.
-   */
+  /* SANS JAVASCRIPT, LE DÉTAIL DES CARTES DE /strategie SE LIT : écrit en sable pour le dos sombre,
+     il restait sur le fond clair de la section, à 1,17:1. */
   test('sans JavaScript, le détail des cartes de /strategie est posé sur un fond sombre', async ({
     browser,
     baseURL,
@@ -401,11 +367,8 @@ test.describe('Qualité', () => {
     await contexte.close();
   });
 
-  /*
-   * SANS JAVASCRIPT, SOUS « lg », ON NAVIGUE ENCORE (audit du 18/09/2026). Le bouton Menu n'ouvre rien
-   * sans script : il disparaît, et la liste des pages revient dans la barre. Et la loupe, qui n'ouvre
-   * rien non plus sans script, reste masquée.
-   */
+  /* SANS JAVASCRIPT, SOUS « lg », ON NAVIGUE ENCORE : le bouton Menu disparaît, la liste des pages
+     revient dans la barre, et la loupe, qui n'ouvrirait rien, reste masquée. */
   test('sans JavaScript, la barre d’un téléphone porte la liste des pages, pas un bouton mort', async ({
     browser,
     baseURL,
@@ -420,17 +383,14 @@ test.describe('Qualité', () => {
     await expect(page.locator('[data-menu-open]')).toBeHidden();
     await expect(page.locator('[data-recherche-ouvrir]')).toBeHidden();
     const liens = page.locator('[data-sitenav-list] a');
-    /* Six entrées depuis le 19/09/2026 : le simulateur est entré au menu. */
+    /* Six entrées, simulateur compris. */
     await expect(liens).toHaveCount(6);
     await expect(liens.first()).toBeVisible();
     await contexte.close();
   });
 
-  /*
-   * À L'IMPRESSION, TOUT CE QUI EST ÉCRIT SORT SUR LE PAPIER (audit du 18/09/2026). Les moteurs
-   * d'animation posent `opacity: 0` en ligne sur ce qui attend sous l'écran : sans règle d'impression,
-   * ces blocs s'imprimaient blancs, sous la barre et le bandeau de consentement.
-   */
+  /* À L'IMPRESSION, TOUT CE QUI EST ÉCRIT SORT SUR LE PAPIER : les moteurs d'animation posent
+     `opacity: 0` en ligne sur ce qui attend sous l'écran, et ces blocs s'imprimaient blancs. */
   test('à l’impression, aucun contenu ne reste invisible et la barre disparaît', async ({ page }) => {
     await page.goto('/frais/');
     await page.emulateMedia({ media: 'print' });
@@ -446,15 +406,10 @@ test.describe('Qualité', () => {
     expect(bilan).toEqual({ invisibles: 0, barre: false, bandeau: false });
   });
 
-  /*
-   * LE TIROIR NE LAISSE PAS DÉFILER LA PAGE, et il garde sa barre de défilement (18/09/2026,
-   * src/scripts/verrou.ts, le verrou partagé avec la recherche). Il posait `overflow: hidden` sur
-   * <html> : la barre de défilement disparaissait et la page se recentrait de 7 px à chaque ouverture,
-   * visible avec une souris branchée. Ce sont les gestes qui sont neutralisés désormais.
-   * À 1000 px de large : sous le seuil « lg », le seul où le bouton Menu existe, et assez large pour
-   * que la molette de Playwright soit celle d'un vrai bureau (en émulation mobile, elle contourne
-   * l'événement de la page).
-   */
+  /* LE TIROIR NE LAISSE PAS DÉFILER LA PAGE, et il garde sa barre de défilement
+     (src/scripts/verrou.ts dit pourquoi). À 1000 px de large : sous « lg », seul seuil où le bouton
+     Menu existe, et assez large pour que la molette de Playwright soit celle d'un vrai bureau (en
+     émulation mobile, elle contourne l'événement de la page). */
   test('le tiroir du menu ne laisse pas défiler la page et n’en décale pas la mise en page', async ({
     page,
     isMobile,
@@ -500,13 +455,9 @@ test.describe('Qualité', () => {
       .toBeGreaterThan(200);
   });
 
-  /*
-   * LE HERO DÉFILE COMME LE RESTE DE LA PAGE (19/09/2026, demande de Martin). Du 17 au 19/09/2026, un
-   * script le faisait franchir d'un seul geste : le premier cran de molette menait au contenu, le
-   * suivant vers le haut ramenait au hero. Il est retiré. Un cran avance d'un cran, dès le premier
-   * pixel, et plus aucun écouteur `wheel` ou `touchmove` non passif n'attend sur la page : le navigateur
-   * défile sans consulter aucun script. Les écouteurs sont lus par le protocole du navigateur.
-   */
+  /* LE HERO DÉFILE COMME LE RESTE DE LA PAGE (19/09/2026, demande de Martin) : un cran avance d'un
+     cran, et aucun écouteur `wheel` ou `touchmove` non passif n'attend sur la page (lus par le
+     protocole du navigateur). */
   test('le hero défile nativement, sans aucun écouteur bloquant', async ({ page, isMobile }) => {
     test.skip(isMobile, 'la molette est un geste de bureau');
     await page.goto('/');
@@ -538,11 +489,8 @@ test.describe('Qualité', () => {
     }
   });
 
-  /*
-   * L'INVITATION À DÉFILER RESTE UN LIEN QUI MARCHE SEUL. Le script retiré l'interceptait pour jouer son
-   * propre trajet ; c'est maintenant une ancre ordinaire, que le navigateur suit : la section visée
-   * arrive en haut de l'écran, sous la barre (`scroll-padding-top`).
-   */
+  /* L'INVITATION À DÉFILER RESTE UN LIEN QUI MARCHE SEUL : une ancre ordinaire, la section visée
+     arrive sous la barre (`scroll-padding-top`). */
   test('l’invitation à défiler du hero mène au contenu', async ({ page }) => {
     await page.goto('/');
     await page.locator('#consent-banner button').first().click();
@@ -565,12 +513,9 @@ test.describe('Qualité', () => {
     );
   });
 
-  /*
-   * TOUTE PASTILLE FLOTTANTE A SON ÉQUIVALENT DANS LE FLUX (audit du 18/09/2026). Les pastilles sont
-   * rendues après </main> : au clavier, on ne les atteint qu'en bas de page, où celle du comparateur est
-   * repliée depuis longtemps (`visibility: hidden`). Ce n'est acceptable que si la même destination est
-   * offerte par un lien de <main>, que la tabulation rencontre en chemin.
-   */
+  /* TOUTE PASTILLE FLOTTANTE A SON ÉQUIVALENT DANS LE FLUX : rendues après </main>, elles ne sont
+     atteintes au clavier qu'en bas de page, où celle du comparateur est déjà repliée. Un lien de
+     <main> doit offrir la même destination. */
   test('chaque pastille flottante a un lien de même destination dans le contenu', async ({
     page,
   }) => {
@@ -592,18 +537,12 @@ test.describe('Qualité', () => {
     expect(releve.filter((r) => !r.equivalent)).toEqual([]);
   });
 
-  /*
-   * LE CONSENT MODE ARRIVE À GTM SOUS LA FORME QU'IL ATTEND (audit du 18/09/2026). GTM ne lit une
-   * commande gtag que si l'entrée du dataLayer est un objet Arguments. `gtag(...args)` y poussait un
-   * tableau : ni le refus par défaut, ni l'accord, ni le retrait n'arrivaient au conteneur, et rien ne
-   * le signalait. Le test suit les trois temps, dont le retrait après accord, celui qui compte.
-   */
-  /*
-   * UN RETRAIT DE CONSENTEMENT QUI RETIRE VRAIMENT (audit du 18/09/2026). Les cookies `_ga` survivaient
-   * treize mois à un refus donné après un accord, et l'identifiant client, lu dans `_ga` sans regarder
-   * le consentement, continuait de partir vers le tunnel. Le lien du tunnel est simulé : tant que la
-   * souscription est fermée, les CTA du site sont internes et le module n'a rien à étiqueter.
-   */
+  /* LE CONSENT MODE ARRIVE À GTM SOUS LA FORME QU'IL ATTEND : un objet Arguments, pas un tableau
+     (consent.ts dit pourquoi). Le test suit les trois temps, dont le retrait après accord.
+     UN RETRAIT QUI RETIRE VRAIMENT : les cookies `_ga` survivaient treize mois à un refus donné
+     après un accord, et l'identifiant client continuait de partir vers le tunnel. Le lien du tunnel
+     est simulé : tant que la souscription est fermée, les CTA sont internes et n'ont rien à
+     étiqueter. */
   test('un retrait de consentement efface les cookies de mesure et retire les identifiants des liens', async ({
     page,
     context,
@@ -693,22 +632,18 @@ test.describe('Qualité', () => {
   });
 
 
-  /*
-   * La pastille d'appel et l'invitation à défiler du hero se relaient : jamais visibles ensemble, jamais
-   * absentes ensemble une fois le hero passé. Le test descend la page et vérifie la complémentarité à
-   * chaque palier. Sur grand écran le hero est ÉPINGLÉ, la boîte de l'invitation ne quitte donc jamais
-   * l'écran et c'est son opacité qui tombe : les deux mesures comptent, et une seule des deux laisserait
-   * passer un décalage de mille pixels.
-   */
+  /* La pastille d'appel et l'invitation à défiler se relaient : jamais visibles ensemble, jamais
+     absentes ensemble une fois le hero passé. Sur grand écran le hero est ÉPINGLÉ, la boîte de
+     l'invitation ne quitte jamais l'écran et c'est son opacité qui tombe : les deux mesures
+     comptent. */
   test('la pastille d’appel prend le relais de l’invitation à défiler', async ({ page }) => {
     await page.goto('/');
     await page.locator('[data-consent-refuse]').click();
     /* Après la séquence d'ouverture : avant, l'invitation n'est pas encore entrée. */
     await page.waitForTimeout(2400);
 
-    /* Les deux mesures sont prises dans le MÊME passage : comparer deux relevés pris à des instants
-       différents ferait courir la géométrie contre l'état de la pastille, qui est calculé à la frame
-       précédente. C'est ce qui rendait ce test instable en parallèle. */
+    /* Les deux mesures sont prises dans le MÊME passage : l'état de la pastille est calculé à la
+       frame précédente, deux relevés séparés rendaient ce test instable en parallèle. */
     const releve = () =>
       page.evaluate(() => {
         const invitation = document.querySelector('[data-hero-scroll-hint]')!;
@@ -725,12 +660,8 @@ test.describe('Qualité', () => {
 
     const empreinte = async () => JSON.stringify(await releve());
 
-    /*
-     * On attend que l'invitation soit ENTRÉE, au lieu d'un délai fixe. Elle est au rang 7 de la cascade
-     * d'ouverture et finit son entrée vers 2 350 ms : une attente de 2 400 ms ne laissait que cinquante
-     * millisecondes de marge, que la moindre charge machine mangeait. Le test tombait alors ici, sur une
-     * page qui n'avait pas fini de s'ouvrir.
-     */
+    /* On attend que l'invitation soit ENTRÉE (vers 2 350 ms) : un délai fixe de 2 400 ms ne
+       laissait que cinquante millisecondes de marge. */
     await expect.poll(async () => (await releve()).invitation, { timeout: 8000 }).toBe(true);
 
     /* En haut de page : l'invitation est là, la pastille attend son tour. */
@@ -738,12 +669,9 @@ test.describe('Qualité', () => {
 
     const hauteur = await page.evaluate(() => document.body.scrollHeight);
 
-    /*
-     * Le contrat, c'est qu'elles ne se CHEVAUCHENT jamais, et que le relais a bien lieu. On balaie la
-     * page sans mémoriser aucune position : les sections de l'accueil sont épinglées, et les cales
-     * d'épinglage déplacent tout en cours de route. Exiger un état à une hauteur PRÉCISE reviendrait à
-     * fixer une frontière qui bouge avec la longueur de la page et avec le format.
-     */
+    /* Le contrat : jamais de CHEVAUCHEMENT, et un relais qui a lieu. On balaie la page sans
+       mémoriser aucune position : les cales d'épinglage déplacent tout en cours de route, une
+       frontière à hauteur PRÉCISE bougerait avec la longueur de la page et le format. */
     let relaisVu = false;
     for (let y = 0; y <= hauteur; y += Math.round(hauteur / 12)) {
       await allerA(page, y, empreinte);
@@ -753,45 +681,30 @@ test.describe('Qualité', () => {
     }
     expect(relaisVu, 'la pastille ne s’est affichée nulle part sur la page').toBe(true);
 
-    /*
-     * Remontée : l'invitation revient, la pastille se replie. On ATTEND que l'invitation soit revenue
-     * plutôt que de la lire une fois : remonter du bas au sommet traverse toutes les sections
-     * épinglées, et leur opacité, menée par le défilement, met plusieurs frames à se rétablir. C'est une
-     * attente du retour à l'état de repos, pas une attente du résultat voulu, la pastille est vérifiée
-     * juste après, sans indulgence.
-     */
+    /* Remontée : on ATTEND que l'invitation soit revenue (l'opacité des sections épinglées met
+       plusieurs frames à se rétablir), puis la pastille est vérifiée sans indulgence. */
     await allerA(page, 0, empreinte);
     await expect.poll(async () => (await releve()).invitation, { timeout: 5000 }).toBe(true);
     expect((await releve()).pastille, 'la pastille reste affichée au sommet').toBe(false);
   });
 
-  /*
-   * Les DEUX pastilles de l'accueil se relaient sans jamais se croiser : celle du comparateur se replie
-   * à « L'expérience derrière R Start », celle de la souscription arrive à « Souscrire en 4 étapes »,
-   * qui vient après, et reste jusqu'au bas de la page. Deux pastilles à la même place en bas d'écran
-   * se recouvriraient : le test balaie la page et interdit qu'elles soient ouvertes ensemble.
-   */
+  /* Les DEUX pastilles de l'accueil se relaient sans se croiser : celle du comparateur se replie à
+     « L'expérience derrière R Start », celle de la souscription arrive à « Souscrire en 4 étapes ».
+     À la même place en bas d'écran, elles se recouvriraient. */
   test('les deux pastilles d’appel ne se croisent jamais', async ({ page }) => {
     await page.goto('/');
     await page.locator('[data-consent-refuse]').click();
     await page.waitForTimeout(2400);
 
-    /*
-     * L'ordre des deux sections est la garantie de fond : la première pastille se replie à « corum »,
-     * la seconde arrive à « souscrire ». Si l'ordre s'inversait, elles se recouvriraient en bas d'écran.
-     */
+    /* L'ordre des deux sections est la garantie de fond : inversé, elles se recouvriraient. */
     const ordre = await page.evaluate(() => ({
       corum: document.querySelector('#corum')!.getBoundingClientRect().top,
       souscrire: document.querySelector('#souscrire')!.getBoundingClientRect().top,
     }));
     expect(ordre.corum, 'Corum doit précéder Souscrire').toBeLessThan(ordre.souscrire);
 
-    /*
-     * Balayage par FRACTIONS de la page, sans mémoriser aucune position : les sections de l'accueil sont
-     * épinglées au défilement, et les cales d'épinglage allongent le document en cours de route. Une
-     * position relevée au sommet ne vaut plus rien cent pixels plus bas, ce qui rendait ce test
-     * dépendant du moment où il regardait.
-     */
+    /* Balayage par FRACTIONS de la page, sans mémoriser aucune position (voir le test
+       précédent). */
     const hauteur = await page.evaluate(() => document.body.scrollHeight);
 
     const empreinte = async () =>
@@ -824,11 +737,9 @@ test.describe('Qualité', () => {
       .toEqual([false, true]);
   });
 
-  /*
-   * Navigation d'une page à l'autre : la barre ne doit pas bouger d'un pixel, et l'indicateur doit se
-   * poser sur le nouveau lien actif. C'est ce que garantissent les `view-transition-name` posés sur la
-   * barre et sur l'indicateur (global.css) ; un nom effacé casserait la continuité en silence.
-   */
+  /* D'une page à l'autre, la barre ne bouge pas d'un pixel et l'indicateur se pose sur le nouveau
+     lien : les `view-transition-name` de global.css ; un nom effacé casserait la continuité en
+     silence. */
   test('la barre ne bouge pas d’une page à l’autre et l’indicateur suit', async ({ page }) => {
     const boite = () =>
       page.evaluate(() => {
@@ -865,11 +776,8 @@ test.describe('Qualité', () => {
     }
   });
 
-  /*
-   * Le comparateur ne compare que si ses DEUX colonnes sont à l'écran. Sur téléphone il se lit en cartes
-   * (global.css, sous 48 rem) et la liste déroulante reste dans l'en-tête collant : c'est le seul moyen
-   * de changer de SCPI, elle doit rester atteignable et entièrement visible.
-   */
+  /* Le comparateur ne compare que si ses DEUX colonnes sont à l'écran : sur téléphone (cartes sous
+     48 rem), la liste déroulante de l'en-tête collant est le seul moyen de changer de SCPI. */
   test('le comparateur de frais tient dans la largeur de l’écran', async ({ page }) => {
     await page.goto('/frais/');
     const select = page.locator('[data-comparator-select]');
@@ -889,16 +797,13 @@ test.describe('Qualité', () => {
     expect(debord).toBe(0);
   });
 
-  /*
-   * Refonte du 13/09/2026 : /strategie, /a-propos et /presse tenaient chacune dans une ou deux sections
-   * interminables (la Stratégie faisait à elle seule 8,5 écrans sur téléphone, sans titre intermédiaire).
-   * Le garde-fou vérifie ce qui rendait ces pages illisibles, pas la mise en page du jour : plusieurs
-   * sections, un titre visible par section, et aucune section qui reparte en pavé de plusieurs écrans.
-   */
+  /* Garde-fou de lisibilité : /strategie, /a-propos et /presse ont tenu dans une ou deux sections
+     interminables (8,5 écrans sans titre). On vérifie ce qui les rendait illisibles, pas la mise en
+     page du jour : plusieurs sections, un titre visible par section, aucun pavé de plusieurs
+     écrans. */
   const PAGES_REFONDUES = [
-    /* 5 → 4 le 14/09/2026 : l'équipe a fourni le texte exact de /strategie. Il tenait d'abord en trois
-       chapitres, le « Comment » est arrivé ensuite, et le bloc des risques ferme la page. Le garde-fou
-       reste celui d'origine (plusieurs sections, chacune titrée et courte). */
+    /* Quatre sur /strategie : le texte exact fourni par l'équipe tient en trois chapitres, plus le
+       bloc des risques qui ferme la page. */
     { chemin: '/strategie/', mini: 4 },
     { chemin: '/a-propos/', mini: 2 },
     { chemin: '/presse/', mini: 4 },
@@ -927,11 +832,8 @@ test.describe('Qualité', () => {
     });
   }
 
-  /*
-   * Demande de l'équipe du 13/09/2026 : jamais de bloc sombre juste après l'en-tête, lui-même sombre.
-   * Sur /strategie, le mot d'ordre enchaînait deux pavés ink sans coupure et la page semblait commencer
-   * au deuxième écran. La règle vaut pour toutes les sous-pages, pas seulement celle qui l'a révélée.
-   */
+  /* Demande de l'équipe : jamais de bloc sombre juste après l'en-tête, lui-même sombre (sur
+     /strategie, la page semblait commencer au deuxième écran). Vaut pour toutes les sous-pages. */
   test('aucune sous-page n’enchaîne deux blocs sombres après l’en-tête', async ({ page }) => {
     const fautifs: string[] = [];
     for (const chemin of PAGES.filter((p) => p !== '/')) {
@@ -955,12 +857,10 @@ test.describe('Qualité', () => {
     expect(fautifs).toEqual([]);
   });
 
-  /*
-   * Tant que la souscription n'est pas ouverte (config/site.ts, subscribeOpen), AUCUN CTA « Souscrire »
-   * ne doit quitter le site : le clic ouvre la fenêtre d'attente. Le repérage se faisait par le mot
-   * « placeholder » dans l'URL du tunnel, et ce marqueur était mangé par le découpage des commentaires
-   * du .env : la fenêtre n'était rendue nulle part et tous les boutons partaient sur corum.fr.
-   */
+  /* Tant que la souscription n'est pas ouverte (config/site.ts, subscribeOpen), AUCUN CTA «
+     Souscrire » ne quitte le site : le clic ouvre la fenêtre d'attente. Un repérage par le mot «
+     placeholder » dans l'URL du tunnel était mangé par le découpage des commentaires du .env : tous
+     les boutons partaient sur corum.fr. */
   test('les CTA de souscription ouvrent la fenêtre d’attente', async ({ page }) => {
     for (const chemin of PAGES) {
       await page.goto(chemin);
@@ -990,15 +890,11 @@ test.describe('Qualité', () => {
     }
   });
 
-  /*
-   * CHAQUE BOUTON A SA PEAU ET SE VOIT SUR SON FOND (17/09/2026). Deux accidents rattrapés avant la mise
-   * en ligne des quatre rôles de bouton : `btn-light` et `btn-lg`, composés dynamiquement dans
-   * Button.astro, n'étaient pas générés par Tailwind (le « Souscrire en ligne » du hero s'affichait en
-   * texte nu) ; et un bouton contour blanc avait été posé sur une section blanche (invisible). Le test
-   * relève, pour chaque `.btn` visible, son rembourrage et le contraste texte / fond effectif, fond
-   * obtenu en remontant les ancêtres et en composant les fonds translucides. Un ancêtre à image de fond
-   * rend la mesure incertaine : ce bouton-là est sauté plutôt que jugé à tort.
-   */
+  /* CHAQUE BOUTON A SA PEAU ET SE VOIT SUR SON FOND : `btn-light` et `btn-lg`, composés
+     dynamiquement dans Button.astro, n'étaient pas générés par Tailwind (texte nu), et un contour
+     blanc a été posé sur une section blanche. Pour chaque `.btn` visible : rembourrage et contraste
+     texte / fond effectif, en remontant les ancêtres et en composant les fonds translucides ; un
+     ancêtre à image de fond rend la mesure incertaine, ce bouton-là est sauté. */
   test('chaque bouton a sa peau et se lit sur son fond', async ({ page }) => {
     for (const chemin of ['/', '/strategie/', '/frais/', '/a-propos/', '/documentation/', '/404.html']) {
       await page.goto(chemin);
@@ -1067,25 +963,16 @@ test.describe('Qualité', () => {
     }
   });
 
-  /*
-   * Survol d'un lien de contenu (14/09/2026, « le trait est sur le texte ») : le soulignement doit
-   * apparaître AU SURVOL, sous les jambages, et une seule fois. Avant, `hover:underline` posait le
-   * trait d'un coup à 0,2 em du texte, et là où la classe accompagnait `nav-link`, deux traits se
-   * dessinaient, celui du navigateur et celui du pseudo-élément.
-   */
+  /* Survol d'un lien de contenu (14/09/2026, « le trait est sur le texte ») : le soulignement
+     apparaît AU SURVOL, sous les jambages, et une seule fois. */
   test('le soulignement des liens apparaît au survol, sous le texte', async ({ page }) => {
     await page.goto('/presse/');
-    /* Cible déplacée le 15/09/2026 : le renvoi vers la salle de presse, sortie du site ce jour-là
-       et supprimée le 22/09/2026, a laissé la place aux contacts presse (zone 4). Même page, même
-       utilitaire `link-underline`. */
+    /* Cible : les contacts presse (zone 4), qui portent l'utilitaire `link-underline`. */
     const lien = page.locator('#contacts-presse a').first();
     await lien.scrollIntoViewIfNeeded();
 
-    /*
-     * Relevés en `expect.poll` des deux côtés : la couleur du trait est en TRANSITION (220 ms), et la
-     * feuille de style peut ne pas être encore appliquée au premier coup d'œil. Un relevé unique
-     * tombait tantôt sur l'état de départ, tantôt sur un état intermédiaire.
-     */
+    /* Relevés en `expect.poll` : la couleur du trait est en TRANSITION (220 ms), un relevé unique
+       tombait sur un état intermédiaire. */
     const couleur = () => lien.evaluate((el) => getComputedStyle(el).textDecorationColor);
     await expect.poll(couleur, { message: 'au repos, aucun trait visible' }).toMatch(/,\s*0\)$/);
 
@@ -1103,10 +990,8 @@ test.describe('Qualité', () => {
     expect(pose.skip).toBe('auto');
   });
 
-  /*
-   * Pied de page (refonte du 14/09/2026) : un retour en haut sur chaque page, et des liens réellement
-   * cliquables au doigt. Les pages font jusqu'à quinze écrans, on n'y remontait qu'à la main.
-   */
+  /* Pied de page : un retour en haut sur chaque page (jusqu'à quinze écrans), des liens cliquables
+     au doigt. */
   test('le pied de page ramène en haut et ses liens se touchent au doigt', async ({ page }) => {
     for (const chemin of ['/', '/frais/', '/a-propos/']) {
       await page.goto(chemin);
@@ -1122,13 +1007,9 @@ test.describe('Qualité', () => {
     }
   });
 
-  /*
-   * Plan de taggage du 14/09/2026. Un plan sans test se dégrade au premier remaniement : un attribut
-   * renommé, un sélecteur déplacé, et l'événement disparaît sans que rien ne le dise. Les mesures ne
-   * reviennent jamais rétroactivement, contrairement à un bug d'affichage.
-   * La file `dataLayer` existe avant le chargement de GTM et lui est rejouée : on peut donc tout
-   * vérifier sans conteneur, ce qui est exactement l'état du site tant que PUBLIC_GTM_ID est vide.
-   */
+  /* Plan de taggage : sans test, un attribut renommé fait disparaître un événement sans que rien ne
+     le dise, et les mesures ne reviennent jamais rétroactivement. La file `dataLayer` existe avant
+     GTM et lui est rejouée : tout se vérifie sans conteneur. */
   const evenements = (page: Page) =>
     page.evaluate(() =>
       ((window as unknown as { dataLayer?: Record<string, unknown>[] }).dataLayer ?? [])

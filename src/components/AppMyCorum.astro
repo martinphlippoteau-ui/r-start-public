@@ -1,16 +1,13 @@
 ---
 /**
- * Bloc MyCORUM : l'application de CORUM L'Épargne pour suivre son épargne après la souscription.
- * Rendu sous la dernière étape du guide (« Suivre votre épargne », /documentation) : texte et badges des
- * deux magasins d'applications d'un côté, photo du téléphone de l'autre. Sur petit écran, le téléphone
- * passe sous le texte.
- * Le téléphone est un visuel DÉTOURÉ fourni par l'équipe (src/content/fr/media.ts, `app`) : il porte déjà
- * sa perspective et son ombre, la CSS ne lui en ajoute plus (`phone-shot`). Il illustre l'application :
- * rien de ce qu'il montre ne doit être lu comme une donnée de performance, à vérifier à chaque
- * remplacement du visuel.
- * Contenu : src/content/fr/subscribe.ts (`app`). Badges : ui/StoreBadge.astro (voir l'avertissement sur
- * les chartes de marque Apple et Google avant mise en ligne).
- * Aucune donnée de performance, aucune promesse : ce bloc n'est ni un avantage ni un risque AMF.
+ * Bloc MyCORUM, l'application de CORUM L'Épargne pour suivre son épargne après la souscription,
+ * rendu sous la dernière étape du guide (/documentation) : texte et badges des deux magasins d'un
+ * côté, photo du téléphone de l'autre (sous le texte sur petit écran). Le téléphone est un visuel
+ * DÉTOURÉ fourni par l'équipe (src/content/fr/media.ts, `app`), avec sa perspective et son ombre,
+ * la CSS n'en ajoute pas (`phone-shot`). Rien de ce qu'il montre ne doit être lu comme une donnée
+ * de performance, à vérifier à chaque remplacement du visuel : ce bloc n'est ni un avantage ni un
+ * risque AMF. Contenu : src/content/fr/subscribe.ts (`app`) ; badges : ui/StoreBadge.astro (voir
+ * son avertissement sur les chartes de marque avant mise en ligne).
  */
 import { Picture } from 'astro:assets';
 import Card from '@/components/ui/Card.astro';

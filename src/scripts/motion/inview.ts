@@ -1,10 +1,8 @@
 /**
- * data-in-view="classe", la classe est posée tant que l'élément traverse le viewport (marge 10 %)
- * et retirée dès qu'il en sort (IntersectionObserver). Sert à ne faire tourner une animation CSS
- * continue (ex. dérive du halo du hero, `brand-halo-drift`) que lorsqu'elle est visible : hors écran,
- * `animation-play-state: paused`, aucun coût GPU pendant la lecture du reste de la page.
- * Sans GSAP ; actif aussi en reduced-motion (la classe marque un état, la CSS décide d'animer ou non).
- * Sans IntersectionObserver : la classe est posée d'emblée.
+ * data-in-view="classe" : la classe est posée tant que l'élément traverse le viewport (marge 10 %)
+ * et retirée dès qu'il en sort (IntersectionObserver), pour ne faire tourner une animation CSS
+ * continue que visible. Sans GSAP ; actif aussi en reduced-motion (la classe marque un état, la CSS
+ * décide). Sans IntersectionObserver : la classe est posée d'emblée.
  */
 import { all, classList } from './dom';
 

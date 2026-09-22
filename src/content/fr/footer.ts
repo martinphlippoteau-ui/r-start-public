@@ -25,30 +25,18 @@ export const footer = {
   columns: [
     {
       title: 'R Start',
-      /*
-       * LES PAGES DU MENU, ET RIEN D'AUTRE depuis le 16/09/2026. Le lien vers /documentation a été
-       * retiré à la demande de l'équipe ; la page existe toujours, elle n'est plus appelée d'ici.
-       * /faq est arrivée au menu le même jour, elle vient donc par `menuPages` : la répéter la ferait
-       * figurer deux fois dans la même colonne.
-       * La salle de presse en était sortie le 15/09/2026, sa route étant désactivée ; elle a été
-       * supprimée le 22/09/2026.
-       */
+      /* Les pages du menu, et rien d'autre (16/09/2026, demande de l'équipe) : /documentation n'est
+         plus appelée d'ici, et /faq vient déjà par `menuPages`. */
       links: [...menuPages.map((p): FooterLink => ({ label: p.navLabel ?? p.label, href: p.path }))],
     },
     {
       title: 'Documents',
       /*
-       * LES CINQ DOCUMENTS RÉGLEMENTAIRES, liste et ordre donnés par l'équipe le 16/09/2026. Aucun
-       * n'est servi : tous sont marqués `soon`, et le clic déplie « Document bientôt disponible » au
-       * lieu d'ouvrir un fichier.
-       * C'EST UN CHANGEMENT DE FOND. La colonne servait deux PDF réellement hébergés, la note
-       * d'information et le bulletin de souscription ; ils ne sont plus atteignables depuis le pied
-       * de page. Les fichiers restent dans public/documents, et /documentation les sert toujours.
-       * DEUX ENTRÉES N'ONT AUCUN FICHIER au dépôt : le bulletin trimestriel d'information et le
-       * rapport annuel. Le bulletin de souscription, lui, n'est plus listé : la demande énumère cinq
-       * documents, il n'en fait pas partie.
-       * « Document d'informations clés (DIC) » garde son intitulé réglementaire exact, celui que
-       * porte le document, et non la forme abrégée de la demande.
+       * Les cinq documents réglementaires, liste et ordre donnés par l'équipe le 16/09/2026, tous
+       * marqués `soon` : le clic déplie « Document bientôt disponible ». La note d'information et
+       * le bulletin de souscription ne sont plus atteignables d'ici, /documentation les sert
+       * toujours ; le bulletin trimestriel et le rapport annuel n'ont aucun fichier au dépôt.
+       * « Document d'informations clés (DIC) » garde son intitulé réglementaire exact.
        */
       links: [
         { label: 'Note d’information', href: '', soon: true },
@@ -80,17 +68,11 @@ export const footer = {
   copyright: `© 2026 ${publisher.name}. Tous droits réservés.`,
   legalTitle: 'Mentions légales',
   externalLinkHint: 'nouvelle fenêtre',
-  /*
-   * Signature « R Start par CORUM L'Épargne » (14/09/2026). Il n'existe pas de logo CORUM seul
-   * dans le dépôt (src/assets/logos ne contient que corum-lepargne-couleur.svg) : c'est donc
-   * l'éditeur du site qui signe, ce que répète le copyright et que détaillent les mentions
-   * légales (éditeur, société de gestion) juste en dessous.
-   */
+  /* Signature « R Start par CORUM L'Épargne » : pas de logo CORUM seul au dépôt (src/assets/logos),
+     c'est donc l'éditeur du site qui signe, comme le copyright et les mentions légales dessous. */
   logos: { brandAlt: product.name, publisherAlt: publisher.name, byLabel: 'par' },
-  /**
-   * Libellé du repli des blocs d'identité (plan V2 §4, « alléger sans retirer »). Le premier bloc,
-   * « Communication commerciale », reste déplié : il porte les mentions obligatoires et le visa.
-   */
+  /** Repli des blocs d'identité (« alléger sans retirer ») ; le premier, « Communication
+      commerciale », reste déplié : il porte les mentions obligatoires et le visa. */
   legalToggleLabel: 'Mentions légales détaillées',
   legalBlocks: [
     {

@@ -1,23 +1,20 @@
 ---
 /**
  * Page /a-propos, société de gestion : DEUX sections et une photo pleine largeur.
- *  1. #corum   (white) « Le groupe CORUM en quelques chiffres », les cinq chiffres du groupe. Cinq
- *                      colonnes et une taille de chiffre plus basse dès qu'ils sont cinq : à quatre
- *                      colonnes le cinquième restait seul sur une ligne, et à cinq colonnes en taille
- *                      pleine « 9,6 Md€ » passait à la ligne (14/09/2026) ;
- *  2. bande pleine largeur, hors section (décorative, sans titre : elle n'a donc pas d'ancre), une
- *     illustration depuis le 15/09/2026 ;
+ *  1. #corum   (white) « Le groupe CORUM en quelques chiffres », les cinq chiffres du groupe, puis
+ *                      le cadre réglementaire (logo AMF, deux phrases de facts.ts) et l'appel vers
+ *                      corum.fr ;
+ *  2. bande pleine largeur, hors section (décorative, sans titre : elle n'a donc pas d'ancre) ;
  *  3. #gamme   (white) « Nos autres SCPI en quelques chiffres » : une grille des quatre autres
- *              SCPI du groupe et de leurs chiffres (corumRange.ts), sans R Start, depuis le
- *              16/09/2026.
- * La section #savoir-faire, qui décrivait les trois familles de solutions du groupe, a été RETIRÉE le
- * 14/09/2026 à la demande de l'équipe, son texte le 22/09/2026 (archivé hors du dépôt, .claude/audits).
- * Ces blocs étaient sur l'accueil jusqu'au 11/09/2026 ; ils ont leur place ici, où le sujet est la
- * société de gestion.
- * La photo n'a PAS de parallaxe : `data-parallax` exige le moteur GSAP, que cette page n'a aucune autre
- * raison de télécharger (tests/performance.spec.ts). Elle se révèle par `data-animate="clip"`, rendu par
- * le moteur léger.
- * Contenu : src/content/fr/corum.ts (le lien vers corum.fr), corumRange.ts, trust.ts et media.ts.
+ *              SCPI du groupe et de leurs chiffres (corumRange.ts), sans R Start.
+ * La section #savoir-faire (trois familles de solutions du groupe) et l'histoire du groupe ont été
+ * retirées les 14 et 16/09/2026 à la demande de l'équipe, leurs textes archivés hors du dépôt
+ * (.claude/audits).
+ * La photo n'a PAS de parallaxe : `data-parallax` exige le moteur GSAP, que cette page n'a aucune
+ * autre raison de télécharger (tests/performance.spec.ts). Elle se révèle par
+ * `data-animate="clip"`, rendu par le moteur léger.
+ * Contenu : src/content/fr/corum.ts (le lien vers corum.fr), corumRange.ts, facts.ts, trust.ts et
+ * media.ts.
  */
 import { Image, Picture } from 'astro:assets';
 import amfLogo from '@/assets/logos/amf.svg';
@@ -45,17 +42,15 @@ const QUIET_TITLE_Y = 12;
     </h2>
     {
       /*
-       * Deux colonnes dès le téléphone (13/09/2026) : en une seule, les chiffres prenaient un écran pour
-       * quatre nombres. Plusieurs colonnes dès `lg` seulement : plus étroites, « 160 000 » en text-stat
+       * Deux colonnes dès le téléphone : en une seule, les chiffres prenaient un écran pour quatre
+       * nombres. Plusieurs colonnes dès `lg` seulement : plus étroites, « 160 000 » en text-stat
        * déborde de sa cellule (texte dégradé tronqué).
-       * LE NOMBRE DE COLONNES SUIT LE NOMBRE DE CHIFFRES (14/09/2026) : l'équipe en a ajouté un cinquième,
-       * « 7 bureaux dans le monde », et sur une grille de quatre il se retrouvait seul sur une deuxième
-       * ligne, à côté de trois cases vides. La grille est bornée à cinq : au-delà, on repasse à quatre et
-       * c'est la deuxième ligne qui se remplit.
-       * À CINQ COLONNES, les cases descendent à 215 px sur un écran de 1440 : « 9,6 Md€ » et
-       * « + 160 000 » passaient à la ligne en taille `solid` et les cinq libellés ne s'alignaient plus.
-       * Les chiffres passent donc en `solid-compact`, un cran plus bas, dès qu'ils sont cinq. Un chiffre
-       * un peu plus petit se lit ; cinq chiffres désalignés, non.
+       * LE NOMBRE DE COLONNES SUIT LE NOMBRE DE CHIFFRES (14/09/2026, cinquième chiffre ajouté par
+       * l'équipe) : sur une grille de quatre il restait seul sur une deuxième ligne. La grille est
+       * bornée à cinq ; au-delà, on repasse à quatre et la deuxième ligne se remplit. À CINQ
+       * COLONNES (215 px sur 1440), « 9,6 Md€ » et « + 160 000 » passaient à la ligne en `solid` :
+       * les chiffres passent en `solid-compact` dès qu'ils sont cinq. Un chiffre un peu plus petit
+       * se lit ; cinq chiffres désalignés, non.
        */
     }
     <ul
@@ -81,32 +76,27 @@ const QUIET_TITLE_Y = 12;
     {
       /*
        * CADRE RÉGLEMENTAIRE (16/09/2026, demande de l'équipe : « mettre le logo AMF en disant que
-       * R Start est agréé par l'AMF »).
-       *
-       * LE TEXTE NE DIT PAS CELA, ET C'EST VOULU. R Start n'est pas agréé, il est VISÉ : la note
-       * d'information a obtenu le visa SCPI n° 26-06 du 4 mars 2026. Ce qui est AGRÉÉ, c'est la société
-       * de gestion. Écrire « R Start est agréé par l'AMF » affirmerait exactement ce que la mention
-       * standard du pied de page nie (« le visa n'implique ni approbation de l'opportunité de
-       * l'opération »). L'équipe a arbitré entre trois formulations exactes et retenu celle-ci, qui
-       * porte les DEUX faits.
-       *
-       * LES DEUX PHRASES SONT REPRISES DE trust.ts, mot pour mot : elles viennent du bulletin de
-       * souscription, et celle de l'agrément est la formulation que l'AMF a demandée dans ses retours
-       * sur la brochure (09/2026). Rien n'est reparaphrasé ici.
-       *
-       * LE LOGO reste ce qu'il était sur le hero avant son retrait : un fichier hébergé sur Wikipédia
-       * France au titre d'un usage non libre, et l'AMF ne concède pas son logo aux communications
-       * commerciales. La réserve vaut toujours, l'équipe l'a levée en connaissance de cause.
+       * R Start est agréé par l'AMF »). LE TEXTE NE DIT PAS CELA, ET C'EST VOULU. R Start n'est pas
+       * agréé, il est VISÉ : la note d'information a obtenu le visa SCPI n° 26-06 du 4 mars 2026.
+       * Ce qui est AGRÉÉ, c'est la société de gestion. Écrire « R Start est agréé par l'AMF »
+       * affirmerait exactement ce que la mention standard du pied de page nie (« le visa n'implique
+       * ni approbation de l'opportunité de l'opération »). L'équipe a arbitré entre trois
+       * formulations exactes et retenu celle-ci, qui porte les DEUX faits.
+       * LES DEUX PHRASES SONT REPRISES DE facts.ts, mot pour mot : elles viennent du bulletin de
+       * souscription, et celle de l'agrément est la formulation que l'AMF a demandée dans ses
+       * retours sur la brochure (09/2026). Rien n'est reparaphrasé ici.
+       * LE LOGO : un fichier hébergé sur Wikipédia France au titre d'un usage non libre, et l'AMF
+       * ne concède pas son logo aux communications commerciales. La réserve vaut toujours,
+       * l'équipe l'a levée en connaissance de cause.
        */
     }
     {/* `sm:items-stretch` : la plaque prend la hauteur de la rangée, donc celle du texte à sa
       droite, et le logo la remplit. Une hauteur écrite en dur se serait décalée dès qu'une phrase
       passe d'une ligne à l'autre, ce qui arrive entre 640 et 1024 px. */}
     <div class="mt-section-sm flex flex-col gap-5 sm:flex-row sm:items-stretch sm:gap-7">
-      {/* Logo agrandi deux fois le 16/09/2026 : à 40 px sa ligne de tête (« AUTORITÉ DES MARCHÉS
-      FINANCIERS ») se refermait, à 56 px elle redevenait lisible, et il prend maintenant toute la
-      hauteur du texte à sa droite. Sous `sm`, où la plaque passe au-dessus du texte, il garde ses
-      56 px : rien à épouser dans ce sens-là. */}
+      {/* Le logo prend toute la hauteur du texte à sa droite : à 40 px sa ligne de tête (« AUTORITÉ
+      DES MARCHÉS FINANCIERS ») se refermait. Sous `sm`, la plaque passe au-dessus du texte et il
+      garde ses 56 px, rien à épouser dans ce sens-là. */}
       <span class="flex shrink-0 items-center justify-center rounded-xl bg-white px-5 py-4 ring-1 ring-navy/10">
         <Image
           src={amfLogo}
@@ -124,12 +114,11 @@ const QUIET_TITLE_Y = 12;
 
     {
       /*
-       * APPEL SOUS LES CHIFFRES (16/09/2026, demande de l'équipe). Il SORT DU SITE, vers corum.fr, ce
-       * qu'aucun autre appel ne fait depuis le corps d'une page : d'où `target="_blank"`, le
-       * `rel="noopener noreferrer"` qui va avec, et la mention de nouvelle fenêtre lue par les lecteurs
-       * d'écran mais pas affichée.
-       * `secondary` et non `primary` : il ne mène pas au tunnel de souscription, et la page en porte
-       * déjà un dans son en-tête.
+       * APPEL SOUS LES CHIFFRES (16/09/2026, demande de l'équipe). Il SORT DU SITE, vers corum.fr,
+       * ce qu'aucun autre appel ne fait depuis le corps d'une page : d'où `target="_blank"`, le
+       * `rel="noopener noreferrer"` qui va avec, et la mention de nouvelle fenêtre lue par les
+       * lecteurs d'écran mais pas affichée. `secondary` et non `primary` : il ne mène pas au tunnel
+       * de souscription, et la page en porte déjà un dans son en-tête.
        */
     }
     {corum.siteLink && (
@@ -147,20 +136,19 @@ const QUIET_TITLE_Y = 12;
     )}
 
     {
-      /* Le contre-poids « Ces chiffres sont ceux du groupe CORUM… » et la ligne de source ont été retirés
-        d'ici le 11/09/2026 (décision de l'équipe). Le rappel « cette expérience ne préjuge pas des
-        résultats de R Start, qui n'a pas d'historique propre » n'est plus porté nulle part sur la
-        page : l'introduction de l'en-tête (aboutPage.hero.intro), réécrite le 14/09/2026, ne le dit
-        plus. Reste le bloc Risques, plus bas. */
+      /* Le contre-poids « Ces chiffres sont ceux du groupe CORUM… » et la ligne de source ont été
+        retirés le 11/09/2026 (décision de l'équipe). Le rappel « cette expérience ne préjuge pas
+        des résultats de R Start, qui n'a pas d'historique propre » n'est plus porté nulle part sur
+        la page (l'introduction de l'en-tête ne le dit plus). Reste le bloc Risques, plus bas. */
     }
   </Container>
 </Section>
 
 {
-  /* 2. Bande PLEINE LARGEUR (13/09/2026) : elle sépare les deux chapitres et donne à la page sa seule
-    respiration visuelle. Décorative, aucun avantage, donc aucun contre-poids attendu. Hors <Section> :
-    sans titre, elle n'aurait aucune ancre à désigner en aria-labelledby. Sans légende depuis le
-    15/09/2026, comme les deux autres bandes du site (voir media.ts). */
+  /* 2. Bande PLEINE LARGEUR : elle sépare les deux chapitres et donne à la page sa seule
+    respiration visuelle. Décorative, aucun avantage, donc aucun contre-poids attendu. Hors
+    <Section> : sans titre, elle n'aurait aucune ancre à désigner en aria-labelledby. Sans légende,
+    comme les deux autres bandes du site (voir media.ts). */
 }
 <figure class="relative" data-animate="clip">
   <div
@@ -181,29 +169,16 @@ const QUIET_TITLE_Y = 12;
   </div>
 </figure>
 
-{
-  /*
-   * SECTION « Les trois savoir-faire de CORUM L'Épargne » SUPPRIMÉE le 14/09/2026, demande de l'équipe.
-   * Elle décrivait les trois familles de solutions du groupe (SCPI, fonds obligataires, assurance vie
-   * et plan d'épargne retraite), chacune avec sa photo. L'histoire du groupe a suivi le 16/09/2026 ;
-   * leurs textes ont quitté le code le 22/09/2026 (archivés hors du dépôt, .claude/audits).
-   */
-}
-
 <Section id="gamme" tone="white" labelledBy="gamme-title">
   <Container size="wide">
     {
       /*
-       * LA GAMME EN CARROUSEL depuis le 16/09/2026, contenu fourni par l'équipe. Cette place portait
-       * « Des SCPI gérées depuis 2012 » : cinq tuiles nommant les SCPI, avec leur année de création et
-       * le logo de R Start. Les chiffres remplacent les noms.
-       *
-       * R START N'Y EST PLUS, et c'est cohérent : elle n'a ni TRI ni rendement à montrer. Les années
-       * de création restent dans facts.ts (`scpiCreated`), que la gamme lit toujours.
-       *
+       * LA GAMME (16/09/2026, contenu fourni par l'équipe) : les chiffres remplacent les noms des
+       * SCPI. R START N'Y EST PLUS : elle n'a ni TRI ni rendement à montrer. Les années de création
+       * restent dans facts.ts (`scpiCreated`), que la gamme lit toujours.
        * SUR LES CHIFFRES, voir l'en-tête de corumRange.ts : chaque intitulé est celui fourni, la
-       * mention réglementaire sur les performances passées a été ajoutée, et la date d'arrêté reste à
-       * demander à CORUM.
+       * mention réglementaire sur les performances passées a été ajoutée, et la date d'arrêté reste
+       * à demander à CORUM.
        */
     }
     <header class="max-w-4xl">
@@ -220,14 +195,10 @@ const QUIET_TITLE_Y = 12;
     {
       /*
        * UNE GRILLE, PLUS UN RAIL (16/09/2026 : « que les cards prennent la largeur de l'écran, sans
-       * scroll »). Le bloc était un rail défilant à flèches, avec des cartes de largeur fixe : les
-       * quatre SCPI sont peu nombreuses et tiennent dans la largeur, le défilement ne servait qu'à
-       * cacher ce qui pouvait être montré.
-       * Les cartes n'ont plus de largeur propre, c'est la colonne qui la donne : quatre de front à
-       * partir de `lg`, deux sur tablette, une seule au téléphone, où quatre colonnes de 90 px ne
-       * voudraient rien dire. Aucun défilement horizontal à aucune largeur.
-       * Le script du rail (src/scripts/carrousel.ts) et ses flèches sont partis avec ; ils restent dans
-       * l'historique si un jour la gamme compte assez de SCPI pour en avoir besoin.
+       * scroll ») : quatre SCPI tiennent dans la largeur, le défilement ne servait qu'à cacher ce
+       * qui pouvait être montré. Les cartes n'ont pas de largeur propre, c'est la colonne qui la
+       * donne : quatre de front dès `lg`, deux sur tablette, une au téléphone. Aucun défilement
+       * horizontal à aucune largeur. Le script du rail (carrousel.ts) est dans l'historique git.
        */
     }
     <ul
@@ -247,9 +218,9 @@ const QUIET_TITLE_Y = 12;
             {scpi.created && <p class="text-caption mt-1 font-normal text-white/70">{scpi.created}</p>}
 
             {
-              /* LA MESURE MISE EN AVANT, et son intitulé juste dessous : un grand nombre seul ne dit
-                pas ce qu'il mesure, et ces quatre-là ne mesurent pas la même chose — trois TRI
-                réalisés et un objectif. */
+              /* LA MESURE MISE EN AVANT, et son intitulé juste dessous : un grand nombre seul ne
+                dit pas ce qu'il mesure, et ces quatre-là ne mesurent pas la même chose (trois TRI
+                réalisés et un objectif). */
             }
             <p class="text-display-lg mt-6 leading-none text-white">
               {scpi.principale.value}
@@ -280,11 +251,8 @@ const QUIET_TITLE_Y = 12;
 
     {
       /* LA MENTION RÉGLEMENTAIRE D'ABORD, les définitions ensuite : elle qualifie tous les chiffres
-        au-dessus, elle ne peut pas être la sixième ligne d'une liste de notes. Jamais animée. */
-    }
-    {
-      /* PLEINE LARGEUR DES CARTES (17/09/2026, demande de Martin) : la mention et les définitions
-        s'alignent sur la grille au-dessus, plus de `max-w-4xl` qui les arrêtait aux trois quarts. */
+        au-dessus, elle ne peut pas être la sixième ligne d'une liste de notes. Jamais animée.
+        Pleine largeur des cartes (17/09/2026, demande de Martin) : plus de `max-w-4xl`. */
     }
     <p class="mt-10 text-base leading-relaxed text-ink">{corumRange.pastPerformance}</p>
     <ul role="list" class="text-caption mt-5 space-y-3 text-slate-700">

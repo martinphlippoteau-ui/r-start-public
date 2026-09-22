@@ -1,11 +1,9 @@
 ---
 /**
  * FAQ de la page /documentation (id « faq ») : questions importées de faq.ts via documentation.faq
- * (les quatre premières depuis le 16/09/2026, puis un renvoi vers /faq, voir documentation.ts).
+ * (les quatre premières, puis un renvoi vers /faq, voir documentation.ts).
  * Même construction que la section FAQ de l'accueil : en-tête collant face aux accordéons natifs
  * <details name="faq" data-faq> (un seul ouvert à la fois), chevron animé en CSS, réponse en text-lead.
- * Le découpage des réponses en avantage et contre-poids (`riskFrom`) et les appels de note, que plus
- * aucune question ne portait, ont quitté le code le 22/09/2026.
  * Animation déclarative : seul chaque <summary> porte un fade-up.
  * Le JSON-LD FAQPage n'est pas émis ici (réservé à l'accueil et à /frais, plan §12).
  * Contenu : documentation.faq et documentation.labels.
@@ -120,7 +118,6 @@ const items = faq.items;
 </Section>
 
 {
-  /* Plus de glissement propre à cette FAQ depuis le 16/09/2026 : l'ouverture animée en hauteur de
-    `.faq-item::details-content` (global.css, « Accordéons ») est la même ici que sur l'accueil et /faq.
-    Trois accordéons, un seul geste. */
+  /* L'ouverture animée en hauteur de `.faq-item::details-content` (global.css, « Accordéons ») est
+    la même ici que sur l'accueil et /faq : trois accordéons, un seul geste. */
 }

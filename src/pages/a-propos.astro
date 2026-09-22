@@ -1,14 +1,14 @@
 ---
 /**
- * Page /a-propos, la société de gestion. Contenu fourni par l'équipe le 14/09/2026.
- * SiteNav → main#contenu : PageHero (fil d'Ariane, H1 « R Start, une innovation signée CORUM »,
- * deux paragraphes d'introduction, CTA souscrire, SANS ligne risques) → les cinq chiffres du groupe
- * (#corum), la bande illustrée en pleine largeur et la gamme des autres SCPI en chiffres (#gamme)
- * (CorumRange.astro) → le bloc Risques commun (#risques, 08-Risks.astro) → les avis Trustpilot
- * (#avis) → Footer. Plus de notes légales : retirées de l'écran le 14/09/2026, du code le 22/09/2026.
- * La section des trois savoir-faire a été retirée le 14/09/2026, le bloc #histoire le 16/09/2026 ;
- * leur code et leurs textes ont suivi le 22/09/2026 (archivés hors du dépôt, .claude/audits).
- * Métadonnées et JSON-LD depuis aboutPage.ts, config/pages.ts et src/lib/seo.ts : aucun texte en dur.
+ * Page /a-propos, la société de gestion (contenu fourni par l'équipe le 14/09/2026). SiteNav →
+ * main#contenu : PageHero (fil d'Ariane, H1 « R Start, une innovation signée CORUM », deux
+ * paragraphes d'introduction, CTA souscrire, SANS ligne risques) → les cinq chiffres du groupe
+ * (#corum), la bande illustrée et la gamme des autres SCPI (#gamme, CorumRange.astro) → le bloc
+ * Risques commun (#risques, 08-Risks.astro) → les avis Trustpilot (#avis) → Footer. Les notes
+ * légales, les trois savoir-faire et le bloc #histoire ont quitté la page à la demande de l'équipe
+ * (14 et 16/09/2026), puis le code le 22/09/2026 (archivés hors du dépôt, .claude/audits).
+ * Métadonnées et JSON-LD depuis aboutPage.ts, config/pages.ts et src/lib/seo.ts : aucun texte en
+ * dur.
  */
 import Base from '@/layouts/Base.astro';
 import SiteNav from '@/components/SiteNav.astro';
@@ -39,9 +39,8 @@ const jsonLd = [
 
 <Base title={seo.title} description={seo.description} path={page.path} jsonLd={jsonLd}>
   {
-    /* Script d'amorçage des TrustBox : sans lui, le carrousel d'avis en bas de page ne s'initialisait
-      jamais et retombait sur son lien de repli (audit du 16/09/2026). Il n'était chargé que par
-      l'accueil, où les avis vivaient avant le 15/09/2026. */
+    /* Script d'amorçage des TrustBox : sans lui, le carrousel d'avis en bas de page ne
+      s'initialisait jamais et retombait sur son lien de repli (audit du 16/09/2026). */
   }
   <TrustpilotScript slot="head" />
   <SiteNav />
@@ -53,34 +52,27 @@ const jsonLd = [
       </Button>
     </PageHero>
     {
-      /*
-       * BLOC « En 2011, CORUM a une conviction » RETIRÉ le 16/09/2026, demande de l'équipe. Il racontait
-       * d'où vient CORUM et pourquoi R Start arrive maintenant, entre l'en-tête et les chiffres du
-       * groupe. Le composant et son texte ont quitté le code le 22/09/2026 (archivés hors du dépôt,
-       * .claude/audits).
-       * La page enchaîne donc l'en-tête sur les chiffres, qui portent le même propos en plus court.
-       */
+      /* La page enchaîne l'en-tête sur les chiffres du groupe : le bloc « En 2011, CORUM a une
+        conviction » qui les séparait a été retiré le 16/09/2026 à la demande de l'équipe (archivé
+        hors du dépôt, .claude/audits). */
     }
     <CorumRange />
 
     {
-      /* BLOC RISQUES sous la gamme (16/09/2026, demande de l'équipe). C'est le bloc commun, celui de
-        l'accueil et de /strategie : un seul texte de risques sur tout le site, jamais une variante
-        écrite pour une page. Il vient après la gamme et avant les avis, c'est-à-dire juste après les
-        chiffres et les SCPI qu'il qualifie. */
+      /* BLOC RISQUES sous la gamme (16/09/2026, demande de l'équipe) : le bloc commun, celui de
+        l'accueil et de /strategie, un seul texte de risques sur tout le site, jamais une variante
+        écrite pour une page. Il vient juste après les chiffres et les SCPI qu'il qualifie, avant
+        les avis. */
     }
     {/* `rideau={false}` : la transition en rideau est un effet GSAP, et cette page doit rester sans
       GSAP (tests/performance.spec.ts). Le contenu du bloc est identique. */}
     <Risks rideau={false} />
     {
-      /* LES AVIS TRUSTPILOT FERMENT LA PAGE (15/09/2026, demande de l'équipe : « mettre les avis
-        trustpilot dans la page à propos tout en bas »). Ils occupaient la section « L'expérience
-        derrière R Start » de l'accueil, où le bandeau des chiffres du groupe les a remplacés.
-        Ils tombent bien ici : la page dit qui gère R Start, les avis disent ce qu'on pense de ce
-        gestionnaire. Leur portée est d'ailleurs celle-là, CORUM L'Épargne et non R Start.
-        `paper` après le `white` de la gamme : le carrousel pose ses propres cartes blanches, il lui
-        faut un fond clair mais distinct du leur. `niveau={2}` parce que le bloc est seul dans sa
-        section et doit donc en porter le titre. */
+      /* Les avis Trustpilot ferment la page (15/09/2026, demande de l'équipe : « mettre les avis
+        trustpilot dans la page à propos tout en bas ») : la page dit qui gère R Start, les avis
+        disent ce qu'on pense de ce gestionnaire, leur portée étant bien CORUM L'Épargne et non R
+        Start. `paper` après le `white` de la gamme : le carrousel pose ses propres cartes
+        blanches. `niveau={2}` : le bloc est seul dans sa section et en porte le titre. */
     }
     <Section id="avis" tone="paper" labelledBy="avis-title">
       <Container size="wide">
@@ -89,12 +81,10 @@ const jsonLd = [
     </Section>
   </main>
 
-  {/* Pastille d'appel : rendue au niveau de la page, jamais dans une section. */}
   {
-    /* Pastille d'appel : elle prend le RELAIS du CTA de l'en-tête, dès que celui-ci n'est plus à
-      l'écran, et reste jusqu'au bas de page. Accrochée à la première section de contenu, elle
-      s'affichait alors que le CTA de l'en-tête était encore visible : deux appels identiques à quelques
-      centimètres l'un de l'autre. */
+    /* Pastille d'appel (au niveau de la page, voir StickyCta.astro) : relais du CTA de l'en-tête
+      dès qu'il n'est plus à l'écran, jusqu'au bas de page. Accrochée à la première section, elle
+      doublait un CTA encore visible à quelques centimètres. */
   }
   <StickyCta
     label={aboutPage.cta.label}

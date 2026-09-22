@@ -1,26 +1,19 @@
 ---
 /**
- * Page /frais. DEUX ZONES depuis le 16/09/2026 :
- *  1. l'en-tête : H1 « Comparateur de frais SCPI » (texte de l'équipe du 16/09/2026), introduction,
- *     CTA. Plus de ligne risques : elle a quitté tous les en-têtes de sous-page le 14/09/2026 ;
- *  2. le comparateur SCPI par SCPI (FeeComparator), titre hors écran, accroche (`hero.punchline`),
- *     tableau et, seul rescapé du grand ménage des sources, le bloc « Sources des données ».
- * Puis le Footer.
- *
- * CE QUI A QUITTÉ LA PAGE, puis le code le 22/09/2026 (archivé hors du dépôt, .claude/audits) :
- * le 11/09/2026, l'incidence des coûts du DIC, la bascule pédagogique et le document de référence ;
- * le 14/09/2026, la bande des trois « 0 % », la frise de la commission de retrait, le mécanisme de
- * réserve en cas de moins-value, l'avertissement commission d'arbitrage (toujours reproduit sur
- * /documentation, où le contrôle l'exige), la FAQ des frais, le bloc d'appel final, les huit notes,
- * et, autour du comparateur, son périmètre, ses deux avertissements courts et l'encadré « Une
- * innovation, pas une révolution » ; le 16/09/2026, le barème et sa mention HT (« supprimer tout ce
- * qu'il y a après Un modèle de frais inédit* »). Les taux eux-mêmes restent dans le comparateur,
- * ligne par ligne, et c'est lui qui porte le « 15 % » que scripts/check-compliance.mjs exige ici.
- *
- * Animations déclaratives sobres uniquement (data-animate clip / stagger / fade-up) ; aucun H1 et aucun
- * avertissement sous un data-animate.
- * Contenu : src/content/fr/feesPage.ts (`seo`, `hero`, `cta`) et comparator.ts pour le comparateur.
- * Aucun texte en dur.
+ * Page /frais, deux zones : l'en-tête (H1 « Comparateur de frais SCPI », introduction, CTA ; plus
+ * de ligne risques, retirée de tous les en-têtes de sous-page le 14/09/2026), puis le comparateur
+ * SCPI par SCPI (FeeComparator) avec son accroche (`hero.punchline`), le tableau et le bloc
+ * « Sources des données ». Puis le Footer. Tout ce qui expliquait les frais de R Start autour du
+ * comparateur (incidence des coûts du DIC, bande des trois « 0 % », barème, frise de retrait,
+ * mécanisme de réserve, FAQ des frais, notes, encadrés) a quitté la page entre le 11 et le
+ * 16/09/2026 à la demande de l'équipe (« supprimer tout ce qu'il y a après Un modèle de frais
+ * inédit* »), puis le code le 22/09/2026 ; archivé hors du dépôt (.claude/audits). L'avertissement
+ * commission d'arbitrage reste reproduit sur /documentation, où le contrôle l'exige. Les taux
+ * restent dans le comparateur, ligne par ligne, et c'est lui qui porte le « 15 % » que
+ * scripts/check-compliance.mjs exige ici.
+ * Animations déclaratives sobres uniquement (data-animate clip / stagger / fade-up) ; aucun H1 et
+ * aucun avertissement sous un data-animate. Contenu : src/content/fr/feesPage.ts (`seo`, `hero`,
+ * `cta`) et comparator.ts ; aucun texte en dur.
  */
 import Base from '@/layouts/Base.astro';
 import SiteNav from '@/components/SiteNav.astro';
@@ -41,10 +34,10 @@ const jsonLd = [
   organizationJsonLd(),
   webPageJsonLd({ path: page.path, title: seo.title, description: seo.description }),
   breadcrumbJsonLd('fees'),
-  /* PAS DE FAQPage ICI (audit du 18/09/2026). La section Questions de cette page a été retirée le
-     14/09/2026, mais ses quatre questions et leurs réponses chiffrées restaient publiées en données
-     structurées : un contenu balisé que le visiteur ne peut pas lire, contraire à la règle du dépôt
-     (src/lib/seo.ts, « strictement les questions / réponses visibles ») comme à celle des moteurs.
+  /* PAS DE FAQPage ICI (audit du 18/09/2026) : la section Questions de la page a été retirée, mais
+     ses quatre questions et leurs réponses chiffrées restaient publiées en données structurées, un
+     contenu balisé que le visiteur ne peut pas lire, contraire à la règle du dépôt (src/lib/seo.ts,
+     « strictement les questions / réponses visibles ») comme à celle des moteurs.
      scripts/check-compliance.mjs refuse désormais toute question balisée absente de la page. */
 ];
 
@@ -54,11 +47,9 @@ const jsonLd = [
   <SiteNav />
   <main id="contenu">
     {
-      /* L'introduction REVIENT dans l'en-tête (14/09/2026) : l'équipe a fourni le texte du hero.
-        Elle en était partie le 12/09/2026 pour arriver au comparateur sans défiler ; le comparateur
-        reste juste en dessous, elle ne le repousse pas d'un écran. Elle tient seule sous le titre
-        depuis le 16/09/2026 : la phrase-clé en gras est descendue introduire le comparateur, et il
-        n'y a plus de ligne risques. */
+      /* L'introduction est dans l'en-tête (texte de l'équipe, 14/09/2026), seule sous le titre : la
+        phrase-clé en gras introduit le comparateur, et il n'y a plus de ligne risques. Le
+        comparateur reste juste en dessous, elle ne le repousse pas d'un écran. */
     }
     <PageHero
       title={hero.title}
@@ -67,38 +58,36 @@ const jsonLd = [
       <Breadcrumb slot="breadcrumb" key="fees" tone="dark" />
       <Button slot="cta" position={cta.position} variant="light" size="lg">{cta.label}</Button>
       {
-        /* En-tête MINIMALISTE (11/09/2026, demande de l'équipe) : le tableau des taux qui l'occupait est
-          parti, pour qu'on arrive au comparateur sans défiler. Les 0 % ne sont donc plus annoncés seuls
-          en haut de page, c'est justement ce que l'AMF reproche, et le comparateur qui suit les montre
-          avec les frais réellement prélevés, dans le même tableau. */
+        /* En-tête MINIMALISTE (11/09/2026, demande de l'équipe) : le tableau des taux qui
+          l'occupait est parti, pour qu'on arrive au comparateur sans défiler. Les 0 % ne sont
+          donc plus annoncés seuls en haut de page, c'est justement ce que l'AMF reproche, et le
+          comparateur qui suit les montre avec les frais réellement prélevés, dans le même
+          tableau. */
       }
     </PageHero>
 
     {
-      /* Comparateur SCPI par SCPI, PREMIER ÉLÉMENT de la page (11/09/2026, demande de l'équipe) :
-        on compare d'abord des taux. C'est aussi le DERNIER depuis le 16/09/2026 : les blocs qui
-        expliquaient ensuite les frais de R Start ont tous quitté la page (voir plus bas). Les
-        dix-neuf SCPI ont leurs sept taux et une source depuis le 15/09/2026 : le script de
-        conformité ne signalerait qu'une SCPI sans source. La réserve qui demeure est écrite dans
-        comparator.ts : une source unique et globale, sans document ni date d'arrêté par SCPI. */
+      /* Comparateur SCPI par SCPI, PREMIER ET DERNIER ÉLÉMENT de la page (11 et 16/09/2026, demande
+        de l'équipe) : on compare d'abord des taux. Les dix-neuf SCPI ont leurs sept taux et une
+        source (15/09/2026) : le script de conformité ne signalerait qu'une SCPI sans source. La
+        réserve qui demeure est écrite dans comparator.ts : une source unique et globale, sans
+        document ni date d'arrêté par SCPI. */
     }
-    {/* L'accroche « Comparez chaque ligne… » a quitté l'en-tête le 16/09/2026 pour introduire le
-      comparateur, où elle dit ce qu'on va faire au moment de le faire. Le texte n'a pas bougé, il
-      vit toujours dans feesPage.ts (`hero.punchline`). */}
+    {/* L'accroche « Comparez chaque ligne… » introduit le comparateur (16/09/2026), où elle dit ce
+      qu'on va faire au moment de le faire ; le texte vit dans feesPage.ts (`hero.punchline`). */}
     <FeeComparator id="comparateur" intro={hero.punchline} />
 
     {
-      /* Les blocs qui suivaient le comparateur (bande des trois « 0 % », barème, mécanisme de
-        réserve, FAQ, appel final, notes) ont quitté la page entre le 14 et le 16/09/2026 : voir
-        l'en-tête du fichier. L'appel de la page reste celui de l'en-tête, doublé par la pastille
-        flottante qui prend le relais dès qu'il sort de l'écran. */
+      /* Rien après le comparateur (voir l'en-tête du fichier) : l'appel de la page reste celui de
+        l'en-tête, doublé par la pastille flottante qui prend le relais dès qu'il sort de
+        l'écran. */
     }
   </main>
 
   {
-    /* Pastille d'appel : elle arrive AVEC LE COMPARATEUR depuis le 16/09/2026, et non plus avec le
-      barème qui le suivait, celui-ci ayant été retiré. Sans ce changement elle visait une ancre
-      absente et ne serait jamais apparue. Rendue au niveau de la page, jamais dans une section. */
+    /* Pastille d'appel, rendue au niveau de la page, jamais dans une section : elle arrive avec le
+      comparateur (16/09/2026), le barème qu'elle visait ayant été retiré ; sans ce changement elle
+      visait une ancre absente et n'apparaissait jamais. */
   }
   <StickyCta label={cta.label} position={cta.position} from="#comparateur" />
   <Footer />

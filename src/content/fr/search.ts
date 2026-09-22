@@ -2,22 +2,12 @@ import type { SearchContent } from '@/content/types';
 
 /**
  * Recherche du site (17/09/2026, demande de Martin : « même mécanique que celle d'apple.com »).
- *
- * Arbitrages du 17/09/2026 :
- *  - une loupe dans la barre, à gauche de Souscrire, sur toutes les largeurs ; la pastille s'allonge vers
- *    le bas en un panneau, la page se floute derrière ;
- *  - AUCUNE PAGE DE RÉSULTATS : tout se lit dans le panneau, en deux rubriques, « Pages » (les sections
- *    des pages du menu) et « Questions » (les questions de /faq) ; Entrée ouvre le premier résultat ;
- *  - chaque résultat porte son titre et un extrait où le mot cherché est surligné ; il mène au passage
- *    exact, la question visée s'ouvre à l'arrivée ;
- *  - panneau vide : des liens rapides ;
- *  - accents, fautes de frappe et synonymes tolérés ;
- *  - recherches mesurées dans GA4, après consentement (src/scripts/analytics.ts) ;
- *  - aucune précaution de conformité propre aux extraits (choix de Martin).
- *
- * Les liens rapides et les synonymes sont une PROPOSITION du 17/09/2026, à valider par l'équipe.
- * L'index lui-même n'est pas écrit ici : il est tiré du HTML publié à chaque build
- * (scripts/search-index.mjs).
+ * Arbitrages de Martin : une loupe dans la barre, un panneau qui s'ouvre dessous, AUCUNE PAGE DE
+ * RÉSULTATS (deux rubriques, « Pages » et « Questions », Entrée ouvre le premier résultat) ; chaque
+ * résultat mène au passage exact, extrait surligné ; accents, fautes de frappe et synonymes
+ * tolérés ; recherches mesurées dans GA4 après consentement ; aucune précaution de conformité
+ * propre aux extraits. Les liens rapides et les synonymes sont une PROPOSITION à valider par
+ * l'équipe. L'index n'est pas écrit ici : scripts/search-index.mjs le tire du HTML publié.
  */
 export const search = {
   openLabel: 'Rechercher sur R Start',

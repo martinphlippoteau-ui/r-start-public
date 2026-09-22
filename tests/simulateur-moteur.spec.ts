@@ -11,10 +11,9 @@ import { simuler, tauxDeRetrait, type Regles } from '../src/scripts/simulateur/m
 import { adresseDeSouscription } from '../src/scripts/simulateur/souscription';
 
 /**
- * LE CALCUL DU SIMULATEUR, SANS NAVIGATEUR (19/09/2026). Les règles sont posées par le test, pas lues
- * dans facts.ts : on vérifie que le moteur calcule juste, pas que le produit a tel barème. Les valeurs
+ * LE CALCUL DU SIMULATEUR, SANS NAVIGATEUR. Les règles sont posées par le test, pas lues dans
+ * facts.ts : on vérifie que le moteur calcule juste, pas que le produit a tel barème. Les valeurs
  * attendues sont recalculées ici à la main ou par une formule indépendante de celle du moteur.
- *
  * Les trois profils de Playwright exécuteraient trois fois les mêmes fonctions pures : un seul suffit.
  */
 test.beforeEach(({}, info) => {
@@ -181,10 +180,8 @@ test.describe('Géométrie du graphique', () => {
   });
 });
 
-/*
- * « COMMENCER MA SOUSCRIPTION » (20/09/2026) : les choix du visiteur partent en paramètres vers le
- * tunnel. Ce qui part, ce qui ne part pas, et ce qui était déjà sur l'adresse.
- */
+/* « COMMENCER MA SOUSCRIPTION » : les choix du visiteur partent en paramètres vers le tunnel. Ce
+   qui part, ce qui ne part pas, et ce qui était déjà sur l'adresse. */
 test.describe('Adresse de souscription', () => {
   const NOMS = {
     initial: 'montant',

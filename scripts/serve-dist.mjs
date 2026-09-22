@@ -40,12 +40,9 @@ const TYPES = {
   '.pdf': 'application/pdf',
 };
 
-/*
- * Sous-chemin de publication. En CI, le site est construit avec PUBLIC_BASE_PATH=r-start-public et
- * tous ses liens portent donc ce préfixe, alors que ce serveur sert `dist/` À LA RACINE : sans ce
- * retrait, chaque lien interne tombait en 404 et les trente tests de bout en bout examinaient la page
- * d'erreur au lieu de la page demandée (audit du 14/09/2026). Même règle que scripts/check-compliance.mjs.
- */
+/* Sous-chemin de publication : en CI, tous les liens portent PUBLIC_BASE_PATH alors que ce serveur
+   sert `dist/` À LA RACINE ; sans ce retrait, les tests examinaient la page d'erreur au lieu de la
+   page demandée. Même règle que scripts/check-compliance.mjs. */
 const SEGMENTS = (process.env.PUBLIC_BASE_PATH || '').split('/').filter(Boolean);
 const PREFIXE = SEGMENTS.length ? '/' + SEGMENTS[SEGMENTS.length - 1] : '';
 const sansPrefixe = (chemin) =>
@@ -90,9 +87,9 @@ const serveur = createServer(async (req, res) => {
     res.writeHead(400).end('Requête refusée');
     return;
   }
-  /* COMME L'HÉBERGEUR : un dossier demandé sans sa barre finale est REDIRIGÉ (301), pas servi. Le
-     serveur de test servait « /frais » directement, et les tests ne voyaient pas que chaque lien du site
-     payait une redirection en production (audit du 18/09/2026). */
+  /* COMME L'HÉBERGEUR : un dossier demandé sans sa barre finale est REDIRIGÉ (301), pas servi.
+     Servir « /frais » directement cachait aux tests que chaque lien du site payait une redirection
+     en production. */
   const demande = new URL(req.url ?? '/', 'http://x');
   if (!demande.pathname.endsWith('/') && (await lisible(path.join(base, 'index.html')))) {
     res.writeHead(301, { Location: demande.pathname + '/' + demande.search }).end();

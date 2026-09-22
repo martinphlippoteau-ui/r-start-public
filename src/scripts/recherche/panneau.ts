@@ -1,39 +1,25 @@
 /**
- * RECHERCHE DU SITE (17/09/2026) : LE PANNEAU de SiteSearch.astro, ouvert par la loupe de la barre.
- * Ce qu'une recherche trouve et dans quel ordre est l'affaire de ./moteur.ts ; l'arrivée sur le passage
- * visé, celle de ./arrivee.ts. Ici : l'index, le rendu, la hauteur, le clavier, la mesure.
- *
+ * RECHERCHE DU SITE : LE PANNEAU de SiteSearch.astro, ouvert par la loupe de la barre. Ce qu'une
+ * recherche trouve et dans quel ordre est l'affaire de ./moteur.ts ; l'arrivée sur le passage visé,
+ * celle de ./arrivee.ts. Ici : l'index, le rendu, la hauteur, le clavier, la mesure.
  * AUCUNE PAGE DE RÉSULTATS. Les résultats s'affichent à chaque frappe dans le panneau, en deux
  * rubriques, « Pages » puis « Questions ». Entrée ouvre le premier ; un résultat mène au passage exact.
- *
- * LE PANNEAU A UNE HAUTEUR FIXE : celle du panneau vide, liens rapides visibles, mesurée à chaque
- * ouverture (demande de Martin du 17/09/2026). Les résultats sont ROGNÉS pour y tenir : les derniers
- * sont retirés, en alternant entre la rubrique la plus longue et l'autre, jusqu'à ce que rien ne
- * déborde ; trois ou quatre résultats en général, deux sur un téléphone.
- *
- * LA PAGE NE DÉFILE PAS derrière le panneau, et sans `overflow: hidden` : le verrou est celui de
- * src/scripts/verrou.ts, partagé avec le tiroir du menu, qui neutralise les gestes plutôt que de retirer
- * la barre de défilement (les raisons y sont écrites). La zone des résultats garde son propre
- * défilement si elle en a besoin. La page peut encore bouger sous le voile, au glissé de la barre de
- * défilement : la contraction de la barre (`data-stuck`) est donc recopiée sur le panneau au fil de
- * l'eau, et pas seulement à l'ouverture.
- *
- * LE RELAIS DES VERRES. Fermé, le panneau est masqué et la barre porte le verre. À l'ouverture, dans la
- * même image, le panneau apparaît sous la barre, à sa hauteur exacte et dans la même matière (jusqu'au
- * `data-stuck` recopié), et la barre éteint le sien (global.css, sélecteur `:has`) ; puis il grandit.
- * À la fermeture, il redescend, et c'est à la FIN du mouvement (`transitionend`, minuterie de secours)
- * qu'il est masqué et que la barre rallume son verre, sans transition (`data-sans-transition`, le temps
- * d'une image). Les deux verres ne sont jamais allumés ensemble : rien ne clignote.
- *
- * L'INDEX (dist/recherche.json, scripts/search-index.mjs) n'est demandé qu'à la première intention :
- * survol ou focus de la loupe, sinon ouverture. Une visite qui ne cherche rien ne le télécharge pas.
- *
- * MESURE (après consentement, src/scripts/analytics.ts, qui reçoit un événement `rstart:mesure`) :
- *  - `recherche` : la recherche une fois la frappe posée (1,5 s), ou au départ vers un résultat ;
- *  - `recherche_clic` : le résultat choisi, sa rubrique et son rang.
- * Une recherche qui ressemble à une adresse électronique ou porte une suite de chiffres n'est pas
- * transmise : on ne sait pas ce qu'un visiteur y a tapé, et une donnée personnelle n'a rien à faire
- * dans un outil de mesure d'audience.
+ * LE PANNEAU A UNE HAUTEUR FIXE (demande de Martin) : celle du panneau vide, mesurée à chaque
+ * ouverture ; les résultats sont ROGNÉS pour y tenir, en alternant entre les deux rubriques.
+ * LA PAGE NE DÉFILE PAS derrière le panneau, par le verrou de src/scripts/verrou.ts (les raisons y
+ * sont écrites). Elle peut encore bouger au glissé de la barre de défilement : la contraction de la
+ * barre (`data-stuck`) est donc recopiée sur le panneau au fil de l'eau.
+ * LE RELAIS DES VERRES. À l'ouverture, dans la même image, le panneau apparaît sous la barre, à sa
+ * hauteur et dans sa matière, et la barre éteint son verre (global.css, `:has`) ; puis il grandit.
+ * À la fermeture, il redescend, et c'est à la FIN du mouvement (`transitionend`, minuterie de
+ * secours) qu'il est masqué et que la barre rallume son verre sans transition
+ * (`data-sans-transition`). Les deux verres ne sont jamais allumés ensemble : rien ne clignote.
+ * L'INDEX (dist/recherche.json, scripts/search-index.mjs) n'est demandé qu'à la première intention
+ * (survol ou focus de la loupe, sinon ouverture) : une visite qui ne cherche rien ne le télécharge
+ * pas. MESURE (src/scripts/analytics.ts, événement `rstart:mesure`) : `recherche` une fois la
+ * frappe posée (1,5 s) ou au départ vers un résultat ; `recherche_clic`, le résultat, sa rubrique
+ * et son rang. Une recherche qui ressemble à une adresse électronique ou porte une suite de
+ * chiffres n'est pas transmise : une donnée personnelle n'a rien à faire dans la mesure d'audience.
  */
 import { search } from '@/content/fr/search';
 import { deverrouiller, verrouiller } from '@/scripts/verrou';
@@ -52,7 +38,8 @@ import {
   type Trouve,
 } from './moteur';
 
-/** Durées des mouvements (global.css), plus une marge : minuteries de secours si `transitionend` manque. */
+/** Durées des mouvements (global.css), plus une marge : minuteries de secours si `transitionend`
+    manque. */
 const SECOURS_OUVERTURE = 440 + 120;
 const SECOURS_FERMETURE = 320 + 120;
 const PAUSE_MESURE = 1500;
@@ -145,9 +132,8 @@ export const init = (): void => {
     return;
 
   /* LA LOUPE EST AFFICHÉE PAR `@media (scripting: enabled)` (global.css), que Safari 16, Chrome 119 et
-     leurs aînés ignorent : ce script s'y exécutait sans que personne voie le bouton qui l'ouvre (les
-     iPhone 8 et X, bloqués sur iOS 16). Puisqu'on est là, c'est que les scripts tournent : on l'affiche.
-     Le petit saut de la barre ne concerne que ces navigateurs, qui n'avaient rien du tout. */
+     leurs aînés ignorent (les iPhone 8 et X, bloqués sur iOS 16) : ce script s'y exécutait sans que
+     personne voie le bouton qui l'ouvre. Puisqu'on est là, les scripts tournent : on l'affiche. */
   if (getComputedStyle(bouton).display === 'none') bouton.classList.add('recherche-loupe-forcee');
 
   const libelleOuvrir = bouton.getAttribute('aria-label') ?? '';
@@ -172,9 +158,9 @@ export const init = (): void => {
       /* Une nouvelle tentative repart d'un état neutre : le panneau dit « recherche en cours », pas
          l'erreur de la tentative précédente. */
       echec = false;
-      /* Huit secondes, pas davantage : sur un réseau qui pend (portail captif, mobile dégradé), la
-         requête ne rejetait jamais et le panneau restait muet. L'abandon tombe dans le `catch`, qui
-         affiche le message d'erreur et autorise une nouvelle tentative à la prochaine frappe. */
+      /* Huit secondes, pas davantage : sur un réseau qui pend (portail captif), la requête ne
+         rejetait jamais et le panneau restait muet. L'abandon tombe dans le `catch`, qui affiche
+         l'erreur. */
       const signal =
         typeof AbortSignal.timeout === 'function' ? AbortSignal.timeout(DELAI_INDEX) : undefined;
       chargement = fetch(panneau.dataset.index ?? '', { credentials: 'same-origin', signal })
@@ -215,8 +201,8 @@ export const init = (): void => {
   let annonce = 0;
 
   /* La zone est VIDÉE tout de suite, puis écrite à la minuterie : réécrire la même chaîne dans une zone
-     `aria-live` n'annonce rien, et deux recherches de suite qui donnent « 3 résultats » restaient
-     muettes la seconde fois. */
+     `aria-live` n'annonce rien, deux recherches à « 3 résultats » restaient muettes la seconde
+     fois. */
   const annoncer = (texte: string): void => {
     window.clearTimeout(annonce);
     statut.textContent = '';
@@ -312,13 +298,9 @@ export const init = (): void => {
   };
 
   /* --- Géométrie -------------------------------------------------------------------------------- */
-  /**
-   * Le panneau est `fixed` (SiteSearch.astro dit pourquoi) : il se cale sur l'enveloppe de la barre,
-   * dont la boîte est exactement celle de la barre, sans sa contraction au défilement — celle-ci est
-   * une transformation, que le panneau rejoue de son côté avec `data-stuck`.
-   * Sans ce calage, un élément `fixed` sans `top` ni `left` reste à sa position statique, ce qui
-   * coïncide ici par chance ; mais sa largeur, elle, ne suivrait pas la barre.
-   */
+  /* Le panneau est `fixed` (SiteSearch.astro dit pourquoi) : il se cale sur l'enveloppe de la
+     barre, dont la boîte ignore la contraction au défilement, rejouée avec `data-stuck`. Sans ce
+     calage, sa largeur ne suivrait pas la barre. */
   const enveloppe = panneau.parentElement;
   const caler = (): void => {
     if (!enveloppe) return;
@@ -332,11 +314,8 @@ export const init = (): void => {
   /** Hauteur ouverte du panneau, en pixels : celle du panneau vide, mesurée à chaque ouverture. */
   let hauteurOuverte = 0;
 
-  /**
-   * Mesure du panneau vide : liens rapides visibles, hauteur libre. Deux mises en page forcées dans le
-   * même tour, rien n'est peint entre les deux. `max-height` (global.css) borne déjà la mesure sur un
-   * petit écran. L'appelant rétablit ensuite ce qui doit être visible, par `afficher()`.
-   */
+  /* Mesure du panneau vide, liens rapides visibles, hauteur libre : deux mises en page forcées dans
+     le même tour, rien n'est peint entre les deux. L'appelant rétablit ensuite l'affichage. */
   const mesurerHauteur = (): number => {
     rapides.hidden = false;
     resultats.hidden = true;
@@ -347,24 +326,19 @@ export const init = (): void => {
     return h;
   };
 
-  /**
-   * Les résultats tiennent dans la hauteur du panneau vide. Tant que la liste déborde de la place qui
-   * lui revient (hauteur ouverte moins le haut du panneau : barre et champ), le dernier résultat de la
-   * rubrique la plus longue est retiré ; à égalité, celui des « Pages », les questions étant les
-   * réponses les plus précises. Une rubrique vidée disparaît avec son titre. La mesure ne dépend pas de
-   * la hauteur courante du panneau, qui peut être en train de grandir : le haut ne bouge pas, et
-   * `scrollHeight` lit le contenu, pas la boîte. Renvoie le nombre de résultats restés visibles.
-   */
+  /* Rognage : tant que la liste déborde de la place qui lui revient, le dernier résultat de la
+     rubrique la plus longue est retiré, à égalité celui des « Pages » (les questions sont plus
+     précises). La mesure ne dépend pas de la hauteur courante du panneau, qui peut grandir :
+     `scrollHeight` lit le contenu, pas la boîte. Renvoie le nombre de résultats restés visibles. */
   const ajuster = (): number => {
     const compter = (): number => resultats.querySelectorAll('a[href]').length;
     if (!hauteurOuverte || resultats.hidden) return compter();
     const dispo = hauteurOuverte - defilement.offsetTop;
     for (let garde = 0; garde < 2 * MAX_PAR_RUBRIQUE + 2; garde += 1) {
       if (defilement.scrollHeight <= dispo) break;
-      /* JAMAIS MOINS D'UN RÉSULTAT. Sur une fenêtre très basse (zoom de 400 %, 320 × 256), la place
-         disponible est inférieure à un seul résultat : le rognage les retirait tous, le panneau restait
-         blanc et l'annonce était vide. Le dernier reste, et la zone, défilante une fois le panneau
-         établi, montre ce qui dépasse. */
+      /* JAMAIS MOINS D'UN RÉSULTAT : sur une fenêtre très basse (zoom de 400 %, 320 × 256), le
+         rognage les retirait tous et le panneau restait blanc. La zone, défilante une fois le
+         panneau établi, montre ce qui dépasse. */
       if (compter() <= 1) break;
       const listes = Array.from(resultats.querySelectorAll<HTMLElement>('[data-liste]'));
       if (!listes.length) break;
@@ -381,11 +355,8 @@ export const init = (): void => {
   let minuterieEtabli = 0;
   const ouvert = (): boolean => nav.hasAttribute('data-recherche-ouverte');
 
-  /**
-   * Panneau ÉTABLI : arrivé à sa hauteur. C'est seulement alors que la zone des résultats peut défiler
-   * (global.css, `recherche-defilement`) : défilante pendant le mouvement, elle prenait une barre de
-   * défilement classique le temps de grandir, et le contenu sautait de 7 px quand celle-ci disparaissait.
-   */
+  /** Panneau ÉTABLI : arrivé à sa hauteur. Seulement alors la zone des résultats peut défiler
+      (global.css, `recherche-defilement`, qui dit pourquoi). */
   const etablir = (): void => {
     window.clearTimeout(minuterieEtabli);
     if (ouvert()) nav.setAttribute('data-recherche-etabli', '');
@@ -419,11 +390,9 @@ export const init = (): void => {
     afficher();
   };
 
-  /**
-   * Le relais : le panneau disparaît et la barre rallume son verre dans la même image, sans fondu. Le
-   * verre de la barre porte une transition de 320 ms sur sa couleur et son ombre ; `data-sans-transition`
-   * la suspend le temps que le changement soit enregistré, puis s'efface deux images plus tard.
-   */
+  /* Le relais : le panneau disparaît et la barre rallume son verre dans la même image. Son verre
+     porte une transition de 320 ms ; `data-sans-transition` la suspend, puis s'efface deux
+     images plus tard. */
   const masquer = (): void => {
     if (ouvert() || panneau.hidden) return;
     window.clearTimeout(minuterieFermeture);
@@ -481,18 +450,17 @@ export const init = (): void => {
 
   bouton.addEventListener('click', () => (ouvert() ? fermer() : ouvrir()));
 
-  /* UNE SEULE SURFACE À LA FOIS. Le tiroir du menu demande la fermeture avant de s'ouvrir
-     (SiteNav.astro) : ouverts ensemble, les deux pièges à tabulation se renvoyaient le focus à chaque
-     Tab et les entrées du menu devenaient inatteignables au clavier. Par un événement DOM, comme
-     `rstart:mesure` : aucun des deux modules n'a à connaître l'autre. */
+  /* UNE SEULE SURFACE À LA FOIS : ouverts ensemble, tiroir et panneau se renvoyaient le focus à
+     chaque Tab. Le tiroir demande la fermeture par un événement DOM (SiteNav.astro) : aucun des
+     deux modules n'a à connaître l'autre. */
   document.addEventListener('rstart:recherche:fermer', () =>
     fermer({ rendreFocus: false, instantane: true })
   );
 
-  /* « Souscrire » cliqué dans la barre pendant la recherche, tunnel fermé : la fenêtre « bientôt » va
-     s'ouvrir (SubscribeSoon.astro, écouteur sur `document`, donc APRÈS celui-ci). On ferme d'abord, et
-     le focus revient sur la loupe : c'est là que le navigateur le rendra à la fermeture de la fenêtre,
-     au lieu de le perdre sur un panneau masqué. */
+  /* « Souscrire » cliqué pendant la recherche, tunnel fermé : la fenêtre « bientôt » va s'ouvrir
+     (écouteur sur `document`, donc APRÈS celui-ci). On ferme d'abord et le focus revient sur la
+     loupe, où le navigateur le rendra à la fermeture de la fenêtre, au lieu de le perdre sur un
+     panneau masqué. */
   nav.addEventListener('click', (e) => {
     if (!ouvert() || document.body.dataset.souscriptionOuverte === 'oui') return;
     if ((e.target as HTMLElement | null)?.closest('[data-cta="souscrire"]')) fermer();
@@ -601,9 +569,8 @@ export const init = (): void => {
     fermer({ rendreFocus: false, instantane: !memePage });
     if (!memePage) return;
     /* MÊME PAGE : l'ancre est changée ici, pas par le navigateur. Un lien « /faq#… » suivi depuis
-       « /faq/ » rechargerait toute la page, la barre oblique finale suffit à en faire une autre adresse,
-       et le visiteur perdrait le défilement jusqu'au passage. Même ancre : rien ne changerait, on
-       rejoue l'arrivée. Sans ancre : le haut de la page. */
+       « /faq/ » rechargerait toute la page (la barre finale en fait une autre adresse). Même ancre
+       : rien ne changerait, on rejoue l'arrivée. Sans ancre : le haut de la page. */
     e.preventDefault();
     if (!lien.hash) window.scrollTo({ top: 0 });
     else if (lien.hash !== location.hash) location.hash = lien.hash;

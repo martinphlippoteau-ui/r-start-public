@@ -1,12 +1,9 @@
 /**
- * Dessins à l'entrée dans le viewport (88 %, START), une seule fois, ou au scrub si demandé
- * (lissage SCRUB 0,6). Courbe unique du moteur (EASE) pour les tracés joués une fois.
- *
- *  - data-draw : tracé progressif des formes SVG (path, line, polyline, polygon, circle, ellipse,
- *    rect) contenues dans l'élément (ou de l'élément lui-même) via stroke-dashoffset, en cascade.
- *    Option : data-draw-scrub (présent → piloté par le scroll entre data-draw-start, défaut `top 80%`,
- *    et data-draw-end, défaut `bottom 60%`). Cascade de 0,15 s entre les formes.
- * Sans JS ou en reduced-motion, tout est dessiné. Refusés sur le H1 et [data-no-motion].
+ * data-draw : tracé progressif des formes SVG contenues dans l'élément (ou de l'élément lui-même)
+ * via stroke-dashoffset, en cascade de 0,15 s, à l'entrée dans le viewport (88 %, START, courbe
+ * EASE) ou au scrub (data-draw-scrub, entre data-draw-start `top 80%` et data-draw-end `bottom
+ * 60%`, lissage SCRUB 0,6). Sans JS ou en reduced-motion, tout est dessiné. Refusé sur le H1 et
+ * [data-no-motion].
  */
 import { gsap } from 'gsap';
 import { EASE, SCRUB, all, allowed, onceTrigger } from './shared';

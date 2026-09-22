@@ -1,27 +1,20 @@
 ---
 /**
- * Section 2, « Qui a envie de payer avant de gagner ? » (id « ce-qui-change »), zone 2 de la V2
- * (« Pourquoi gagnant-gagnant ? » jusqu'au 15/09/2026).
- * Réduite au texte fourni par l'équipe le 11/09/2026 : la question en H2, « R Start, un modèle de
- * frais gagnant-gagnant » en H3 (titres permutés le 15/09/2026), la phrase qui annonce les deux
- * situations, les deux situations en liste et la conclusion, face à une illustration. L'allégation
- * de rang (retirée du contenu le 15/09/2026) et le lien vers le comparateur (retiré le 16/09/2026)
- * n'y sont plus. Plus de cartes, plus de sur-titre, plus de mécanisme de réserve : la section tient
- * en un écran.
- * Le bouton qui la fermait est devenu une PASTILLE FLOTTANTE (components/StickyCta.astro, rendue par la
- * page) : le lien vers le comparateur reste atteignable pendant toute la lecture.
+ * Section 2, « Qui a envie de payer avant de gagner ? » (id « ce-qui-change »), zone 2 de la V2.
+ * Texte fourni par l'équipe le 11/09/2026 : la question en H2, « R Start, un modèle de frais
+ * gagnant-gagnant » en H3, la phrase qui annonce les deux situations, les deux situations en liste
+ * et la conclusion, face à une illustration. Ni cartes, ni surtitre, ni appel à l'action : la
+ * section tient en un écran, et le lien vers le comparateur est porté par la PASTILLE FLOTTANTE
+ * (components/StickyCta.astro, rendue par la page).
  * Équilibre AMF : la section ne porte PLUS de couple avantage / risque depuis le 11/09/2026, le
- * contre-poids chiffré a été retiré sur demande réitérée de l'équipe. Les risques de l'accueil
- * reposent sur la seule section Risques depuis le retrait de la ligne du hero (14/09/2026) ; le détail des frais vit sur /frais,
- * atteinte par la pastille flottante, et le comparateur est affiché plus bas sur l'accueil
- * (section 03).
- * Les formulations à défendre en compliance sont dans l'en-tête de src/content/fr/difference.ts (la
- * conclusion est toujours là, l'allégation de rang a quitté la section) ;
- * scripts/check-compliance.mjs signale en avertissement, à chaque exécution, celles qui sont
- * rendues, « gagnant-gagnant » compris.
+ * contre-poids chiffré (frais de gestion, cessions, retrait, coût total inconnu) a été retiré sur
+ * demande réitérée de l'équipe après signalement. Les risques de l'accueil reposent sur la seule
+ * section Risques ; le détail des frais vit sur /frais, et le comparateur est affiché plus bas sur
+ * l'accueil (section 03). Les formulations à défendre en compliance sont dans l'en-tête de
+ * src/content/fr/difference.ts ; scripts/check-compliance.mjs signale en avertissement, à chaque
+ * exécution, celles qui sont rendues, « gagnant-gagnant » compris.
  * Motion (sobriété) : H2 mot à mot, H3 en fade-up, illustration révélée par `clip`. Rien d'autre ne
- * bouge.
- * Contenu : src/content/fr/difference.ts.
+ * bouge. Contenu : src/content/fr/difference.ts.
  */
 import { Picture } from 'astro:assets';
 import Container from '@/components/ui/Container.astro';
@@ -34,11 +27,9 @@ import { resolveImage } from '@/lib/images';
 const id = sections.difference.id;
 const titleId = id + '-title';
 /**
- * Photo d'illustration à droite de la démonstration. Changée le 12/09/2026 : la précédente venait du jeu
- * `strategy`, déjà employé par la section Stratégie, ce qui faisait doublon sur le site. Celle-ci n'est
- * utilisée nulle part ailleurs. C'est un dessin depuis le passage aux illustrations, le 15/09/2026.
- * Purement décorative pour la conformité, elle n'énonce aucun avantage, elle n'entre donc dans aucun
- * couple avantage / risque. Sans légende depuis le 15/09/2026 (voir media.ts).
+ * Illustration à droite de la démonstration, employée nulle part ailleurs sur le site. Purement
+ * décorative pour la conformité : elle n'énonce aucun avantage, elle n'entre donc dans aucun couple
+ * avantage / risque. Sans légende (voir media.ts).
  */
 const photo = await resolveImage(media.documents.src);
 
@@ -55,22 +46,21 @@ const situations = (difference.situations ?? []).map((s) => {
 ---
 
 {
-  /* `data-curtain` (11/09/2026, transition « à la Revolut ») : le hero, section précédente, est épinglé pendant
-    que celle-ci glisse par-dessus (coins arrondis et ombre posés par la CSS [data-curtain]). Le hero contient
-    le H1 (et contenait la ligne risques) : le moteur se limite à épingler et recouvrir, sans recul
-    ni fondu (scroll.ts). Sous 64 rem, aucun épinglage : défilement normal. */
+  /* `data-curtain` (transition « à la Revolut ») : le hero, section précédente, est épinglé pendant
+    que celle-ci glisse par-dessus (coins arrondis et ombre posés par la CSS [data-curtain]). Le
+    hero contient le H1 : le moteur se limite à épingler et recouvrir, sans recul ni fondu
+    (scroll.ts). Sous 64 rem, aucun épinglage : défilement normal. */
 }
 <Section id={id} tone="paper" data-curtain="" class="overflow-hidden">
   <Container size="wide">
     {
-      /* DEUX MOITIÉS depuis le 17/09/2026 (demande de l'équipe : « ce bloc en deux parties, texte à
-        gauche et image full bloc à droite »). À partir de `lg`, tout le texte, titre compris, tient
-        dans la moitié gauche de la boîte de contenu ; la photo occupe la moitié droite de l'ÉCRAN, du
-        haut au bas du bloc et jusqu'au bord (figure absolue, après le Container). Les deux moitiés se
-        rejoignent au milieu de l'écran, qui est aussi le milieu de la boîte de contenu centrée : le bord
-        gauche de la photo tombe à l'écart de colonne exact. Sous `lg`, le texte puis la photo en pleine
-        largeur, collée au bas du bloc. La photo était jusque-là une carte arrondie de cinq colonnes sur
-        douze, à côté du texte, sous un titre pleine largeur. */
+      /* DEUX MOITIÉS (17/09/2026, demande de l'équipe : « ce bloc en deux parties, texte à gauche
+        et image full bloc à droite »). À partir de `lg`, tout le texte, titre compris, tient dans
+        la moitié gauche de la boîte de contenu ; la photo occupe la moitié droite de l'ÉCRAN, du
+        haut au bas du bloc et jusqu'au bord (figure absolue, après le Container). Les deux moitiés
+        se rejoignent au milieu de l'écran, qui est aussi le milieu de la boîte de contenu centrée :
+        le bord gauche de la photo tombe à l'écart de colonne exact. Sous `lg`, le texte puis la
+        photo en pleine largeur, collée au bas du bloc. */
     }
     <div class="lg:grid lg:grid-cols-2 lg:gap-14">
       <div>
@@ -79,38 +69,20 @@ const situations = (difference.situations ?? []).map((s) => {
         </header>
 
     {
-      /* Le contre-poids chiffré (frais de gestion, cessions, retrait, coût total inconnu) a été retiré de
-        cette section le 11/09/2026, sur demande réitérée de l'équipe après signalement. Les risques de
-        l'accueil reposent désormais sur la seule section Risques ; le détail des frais reste sur /frais,
-        atteinte par la pastille flottante depuis le retrait du lien de la section, le
-        16/09/2026. */
-    }
-    {
-      /* CORPS À 18 PX FIXES depuis le 15/09/2026, et espacements resserrés d'un cran.
-        `text-lead` montait de 18 à 24 px avec la largeur d'écran : sur grand écran, la
-        démonstration était rendue au corps d'une introduction, alors qu'elle se lit comme du
-        texte courant. `text-lg` la fixe à 18 px partout. */
-    }
-    {
-      /* LE H3 EST DANS LA GRILLE depuis le 15/09/2026, et non plus dans l'en-tête au-dessus d'elle
-        (« remonte la photo du bloc 2 pour qu'elle s'aligne avec R Start, un modèle de frais
-        gagnant-gagnant »). C'est la seule façon propre d'aligner la photo sur lui : tant qu'il vivait
-        au-dessus, la colonne de droite ne pouvait commencer qu'après. Une marge négative sur la figure
-        aurait donné le même résultat à une largeur donnée et se serait décalée à toutes les autres.
-        Rien ne change sous `lg`, où la grille est en une colonne : le H3 reste au même endroit, suivi
-        du corps puis de la photo, dans cet ordre. */
-    }
-    {
-      /* LE TITRE SE DÉTACHE DU BLOC (16/09/2026 au soir, « remonte un peu "Qui a envie de payer avant de
-        gagner" pour le détacher un peu du bloc ») : la grille descend d'un cran, `mt-10` et `sm:mt-14`
-        au lieu de `mt-6` et `sm:mt-8`. Le titre garde sa place en tête de section, c'est l'air sous lui
-        qui grandit. */
+      /* CORPS À 18 PX FIXES : `text-lead` montait de 18 à 24 px avec la largeur d'écran, la
+        démonstration était rendue au corps d'une introduction alors qu'elle se lit comme du texte
+        courant. `text-lg` la fixe à 18 px partout.
+        LE H3 EST DANS LA GRILLE, et non dans l'en-tête au-dessus d'elle (15/09/2026, « remonte la
+        photo du bloc 2 pour qu'elle s'aligne avec R Start, un modèle de frais gagnant-gagnant ») :
+        c'est la seule façon propre d'aligner la photo sur lui, une marge négative sur la figure se
+        serait décalée à chaque largeur. Sous `lg`, la grille est en une colonne : H3, corps, photo.
+        `mt-10` et `sm:mt-14` (16/09/2026, « remonte un peu "Qui a envie de payer avant de gagner"
+        pour le détacher un peu du bloc ») : c'est l'air sous le titre qui grandit. */
     }
         <div class="mt-10 text-lg text-ink sm:mt-14">
         {
-          /* Le H3 (11/09/2026) portait la question d'accroche ; depuis la permutation du
-            15/09/2026, la question est le H2 et le H3 nomme le modèle. Mis en valeur et nettement
-            détaché du H2, il ouvre la démonstration au lieu de la commenter. */
+          /* Le H3 nomme le modèle, la question est le H2 : mis en valeur et détaché du H2, il ouvre
+            la démonstration au lieu de la commenter. */
         }
         <h3
           data-animate="fade-up"
@@ -120,8 +92,8 @@ const situations = (difference.situations ?? []).map((s) => {
           {difference.intro}
         </h3>
         {
-          /* LA PHRASE D'ANNONCE, en clair. Le « i » collé au mot « SCPI » et sa bulle de définition,
-            ajoutés le 17/09/2026, ont été retirés le même jour à la demande de l'équipe. */
+          /* La phrase d'annonce, en clair : pas de bulle de définition sur « SCPI » (retirée le
+            17/09/2026 à la demande de l'équipe). */
         }
         {difference.lead && <p class="mt-6">{difference.lead}</p>}
 
@@ -151,9 +123,8 @@ const situations = (difference.situations ?? []).map((s) => {
         }
 
         {
-          /* Plus d'appel à l'action dans le bloc (16/09/2026), et plus de variante `ghost` de Button
-            (17/09/2026, décision F5) : le lien « Voir notre comparateur de frais » qui vivait ici était
-            son seul usage. `secondaryCta` reste dans le type ; s'il revenait, ce serait en Secondaire. */
+          /* Plus d'appel à l'action dans le bloc (16/09/2026) ni de variante `ghost` de Button.
+            `secondaryCta` reste dans le type ; s'il revenait, ce serait en Secondaire. */
         }
       </div>
 

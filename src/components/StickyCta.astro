@@ -1,60 +1,26 @@
 ---
 /**
- * Pastille d'appel flottante (12/09/2026, demande de l'équipe). Un rond portant un chevron se pose en bas
- * de l'écran, puis se DÉPLIE en pastille pour révéler son libellé.
- *
- * Déclenchement : la disparition d'un REPÈRE de la page, l'invitation à défiler du hero (« Découvrir
- * R Start »). Tant qu'on la voit, elle dit déjà où aller et la pastille n'a rien à faire là ; dès qu'elle
- * n'est plus à l'écran, la pastille prend le relais. Elle se replie si le repère revient, au défilement
- * vers le haut. Les deux ne sont donc jamais visibles ensemble.
- *
- * Elle se replie aussi À PARTIR d'une section de fin (`until`), dès son premier pixel : au-delà, le
- * visiteur a dépassé ce que la pastille proposait, et elle empiéterait sur la section qui arrive.
- * Elle revient si l'on remonte au-dessus.
- *
- * « Ne plus être à l'écran » se mesure de DEUX façons, et il en faut deux. Sur téléphone, le repère sort
- * simplement du cadre. Sur grand écran, le hero est ÉPINGLÉ par le rideau de la section suivante : sa
- * boîte ne quitte jamais l'écran, elle reste à la même place pendant que le rideau la recouvre, et c'est
- * son opacité, menée par le défilement lié, qui tombe à zéro. Ne regarder que la géométrie ferait
- * apparaître la pastille mille pixels trop tard sur grand écran ; ne regarder que l'opacité la rendrait
- * aveugle sans le moteur d'animation. On regarde les deux.
- *
- * Rendue au niveau de la PAGE, jamais dans une section. Les sections de l'accueil sont épinglées au
- * défilement (`data-curtain`) : un ancêtre transformé devient le bloc conteneur d'un enfant `fixed`, la
- * pastille se calerait alors sur la section au lieu du viewport.
- *
- * Direction artistique en DEUX TEMPS (12/09/2026, demande de l'équipe), qui suit le pliage :
- *  - REPLIÉE, la pastille n'est que son rond de chevron, en couleur de CTA primaire, navy plein. C'est
- *    l'appel, réduit à un point ;
- *  - DÉPLIÉE, elle s'ouvre en BLANC PLEIN, libellé navy, et le rond reste, à droite, inchangé. Le point
- *    d'appel ne disparaît donc jamais, la pastille pousse autour de lui. Pas de verre ici : la pastille
- *    passe au ras du texte courant, et translucide, les lignes du dessous se lisaient à travers elle.
- * Le rond est un élément à part (`.sticky-dot`) : c'est le seul moyen qu'il garde sa taille et sa
- * couleur pendant que tout le reste change autour.
- *
- * Elle disparaît tant que le bandeau cookies est déplié, il occupe la même place, et se retire du
- * parcours au clavier quand elle est invisible (`visibility`, pas seulement l'opacité).
- *
- * AU CLAVIER, UNE PASTILLE BORNÉE PAR `until` N'EST JAMAIS ATTEINTE (audit du 18/09/2026), et c'est
- * admis À UNE CONDITION. Les pastilles sont rendues après </main> : elles ne peuvent pas vivre dans une
- * section, un ancêtre transformé capturerait leur `fixed`. La tabulation les atteint donc en bas de
- * page, où celle du comparateur est repliée depuis longtemps. La condition : TOUTE PASTILLE A UN
- * ÉQUIVALENT DANS LE FLUX, un lien de même destination dans <main>. Sur l'accueil, « Comparer les
- * frais » pour la première, le bouton de « Souscrire en 4 étapes » pour la seconde (qui, elle, reste
- * affichée jusqu'en bas, donc atteignable). tests/qualite.spec.ts le vérifie : une pastille ajoutée
- * sans équivalent y échoue.
- *
- * DEUX DÉCLENCHEURS, un par usage, et il faut en donner exactement un :
- *  - `watch` : la pastille apparaît quand ce repère N'EST PLUS à l'écran (la pastille du comparateur
- *    prend le relais de l'invitation à défiler du hero) ;
- *  - `from` : elle apparaît quand ce repère EST ATTEINT, premier pixel en bas de l'écran (la pastille
- *    de souscription arrive avec la section qui la propose).
- * `until` borne la fin ; sans elle, la pastille reste jusqu'au bas de la page.
- *
- * SANS `href`, c'est un CTA de souscription : `data-cta` pour la mesure d'audience, exactement comme le
- * composant Button, et même destination (config/site.ts, ctaHref) : le tunnel si la souscription est
- * ouverte, sinon la documentation, le clic ouvrant la fenêtre « la souscription arrive bientôt ».
- * Avec `href`, c'est un lien interne, sans `data-cta`, rien à compter côté conformité.
+ * Pastille d'appel flottante (12/09/2026, demande de l'équipe) : un rond à chevron se pose en bas
+ * de l'écran, puis se DÉPLIE en pastille pour révéler son libellé. Rendue au niveau de la PAGE,
+ * après </main>, jamais dans une section : les sections de l'accueil sont épinglées
+ * (`data-curtain`) et un ancêtre transformé devient le bloc conteneur d'un enfant `fixed`.
+ * DEUX DÉCLENCHEURS, il en faut exactement un : `watch`, la pastille apparaît quand ce repère N'EST
+ * PLUS à l'écran (celle du comparateur relaie l'invitation à défiler du hero, jamais visibles
+ * ensemble) ; `from`, elle apparaît quand ce repère EST ATTEINT, premier pixel en bas de l'écran
+ * (celle de la souscription arrive avec sa section). `until` la replie dès le premier pixel d'une
+ * section de fin, sur laquelle elle empiéterait ; sans elle, elle reste jusqu'en bas. « À l'écran »
+ * se mesure en géométrie ET en opacité : voir `visible` dans le script.
+ * Direction artistique (12/09/2026, demande de l'équipe) : REPLIÉE, la pastille n'est que son rond
+ * de chevron, navy plein ; DÉPLIÉE, elle s'ouvre en BLANC PLEIN, libellé navy, le rond (élément à
+ * part, `.sticky-dot`) restant à droite, inchangé. Pas de verre : au ras du texte, les lignes du
+ * dessous se lisaient à travers. Elle disparaît tant que le bandeau cookies est déplié (même place)
+ * et sort du parcours clavier quand elle est invisible (`visibility`, pas seulement l'opacité).
+ * AU CLAVIER, UNE PASTILLE BORNÉE PAR `until` N'EST JAMAIS ATTEINTE (audit du 18/09/2026) : la
+ * tabulation l'atteint en bas de page, repliée. Admis À UNE CONDITION : TOUTE PASTILLE A UN
+ * ÉQUIVALENT DANS LE FLUX, un lien de même destination dans <main> ; tests/qualite.spec.ts le
+ * vérifie.
+ * SANS `href`, c'est un CTA de souscription : `data-cta` pour la mesure d'audience, comme Button,
+ * même destination (config/site.ts, ctaHref). Avec `href`, un lien interne sans `data-cta`.
  */
 import { ctaHref, site } from '@/config/site';
 import { withBase } from '@/lib/href';
@@ -123,14 +89,11 @@ const lien = href ? withBase(href) : ctaHref(position);
 </div>
 
 <script>
-  /*
-   * Un seul attribut porte l'état : `data-on`. Le rond se pose, et le dépliage suit, retardé en CSS
-   * (global.css) : pas de minuterie à tenir en JavaScript, donc rien à annuler si l'on défile vite.
-   *
-   * PLUSIEURS pastilles peuvent cohabiter sur une page, chacune avec son déclencheur : la boucle les
-   * traite toutes, et un seul écouteur de défilement les met à jour ensemble, une fois par frame.
-   * Aucune dépendance au moteur d'animation : elles doivent vivre même si GSAP n'est pas chargé.
-   */
+  /* Un seul attribut porte l'état : `data-on`. Le rond se pose et le dépliage suit, retardé en CSS
+     (global.css) : pas de minuterie en JavaScript, rien à annuler si l'on défile vite. Plusieurs
+     pastilles peuvent cohabiter, chacune avec son déclencheur : un seul écouteur de défilement les
+     met à jour ensemble, une fois par frame. Aucune dépendance au moteur d'animation : elles vivent
+     même sans GSAP. */
   const pastilles = [...document.querySelectorAll<HTMLElement>('[data-sticky-cta]')];
 
   if (pastilles.length) {
@@ -138,15 +101,12 @@ const lien = href ? withBase(href) : ctaHref(position);
     const atteint = (el: Element | null) =>
       !!el && el.getBoundingClientRect().top < window.innerHeight;
 
-    /*
-     * Un repère est VISIBLE s'il est dans le cadre ET pas effacé par le défilement lié.
-     * Les deux mesures comptent. Sur téléphone, le repère sort simplement du cadre. Sur grand écran, le
-     * hero est ÉPINGLÉ par le rideau de la section suivante : sa boîte ne quitte jamais l'écran, elle
-     * reste à la même place pendant que le rideau la recouvre, et c'est son opacité, menée par le
-     * défilement lié, qui tombe à zéro. La géométrie seule ferait apparaître la pastille mille pixels
-     * trop tard sur grand écran ; l'opacité seule serait aveugle sans moteur d'animation, qui est
-     * justement absent quand le hero n'est pas épinglé.
-     */
+    /* Un repère est VISIBLE s'il est dans le cadre ET pas effacé par le défilement lié : sur
+       téléphone, il sort simplement du cadre ; sur grand écran, le hero est ÉPINGLÉ par le rideau
+       de la section suivante, sa boîte ne quitte jamais l'écran et c'est son opacité, menée par le
+       défilement lié, qui tombe à zéro. La géométrie seule ferait apparaître la pastille mille
+       pixels trop tard sur grand écran ; l'opacité seule serait aveugle sans moteur d'animation,
+       absent justement quand le hero n'est pas épinglé. */
     const visible = (el: HTMLElement | null) => {
       if (!el) return false;
       const r = el.getBoundingClientRect();

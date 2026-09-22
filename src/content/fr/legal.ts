@@ -1,7 +1,8 @@
 /**
- * Mentions obligatoires et identité légale. Textes à reproduire À L'IDENTIQUE (validés Conformité CORUM).
- * Sources : Formation Documentation Marketing AMF/ACPR (mentions 1 et 2), DIC V7, Bulletin de souscription 2026.05,
- * corum.fr/mentions-legales.
+ * Mentions obligatoires et identité légale, à reproduire À L'IDENTIQUE (textes validés). Sources :
+ * Formation Documentation Marketing AMF/ACPR (mentions 1 et 2), DIC V7, bulletin de souscription
+ * 2026.05, corum.fr/mentions-legales. Sans import : scripts/check-compliance.mjs le charge avec
+ * node.
  */
 
 /** Mention 1, caractère commercial (obligatoire depuis août 2021). */
@@ -33,11 +34,7 @@ export const arbitrageWarningBullets = [
 export const bulletinWarning =
   "Acheter des parts de R Start est un investissement immobilier. Comme tout placement immobilier, il s'agit d'un investissement long terme dont la liquidité est limitée. Nous vous recommandons une durée de placement de 10 ans. Contrairement au livret A par exemple, ce placement comporte des risques. Il existe tout d'abord un risque de perte en capital. De plus, les revenus ne sont pas garantis et dépendront de l'évolution du marché immobilier et du cours des devises. Nous précisons que CORUM Asset Management ne garantit pas le rachat de vos parts. Enfin, comme pour tout placement, les performances passées ne présagent pas des performances futures.";
 
-/**
- * Ligne risques courte. Écrite pour être visible sans défiler dans le hero de l'accueil, qui ne la
- * porte plus depuis le 14/09/2026 (retrait des « Bon à savoir »), pas plus que les en-têtes des
- * sous-pages. Seules les mentions légales l'affichent (pages.ts), en paragraphe direct.
- */
+/** Ligne risques courte ; seules les mentions légales l'affichent (pages.ts). */
 export const shortRiskLine =
   'Investissement immobilier de long terme, durée de placement recommandée de 10 ans. Risque de perte en capital, revenus non garantis, liquidité limitée, risque de change.';
 

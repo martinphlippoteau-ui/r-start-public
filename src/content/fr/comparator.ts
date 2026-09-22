@@ -5,21 +5,17 @@
 import { fees, product } from './facts.ts';
 
 /**
- * Comparateur de frais, page /frais (11/09/2026, demande de l'équipe, inspiré des comparateurs
- * e-commerce) : R Start à gauche, une SCPI choisie dans une liste à droite, sept lignes de frais.
+ * Comparateur de frais de /frais et de l'accueil : R Start à gauche, une SCPI choisie dans une
+ * liste à droite, sept lignes de frais. Les valeurs de R Start ne sont JAMAIS saisies ici : elles
+ * viennent de facts.fees, comme partout.
  *
- * ÉTAT AU 15/09/2026 : les dix-neuf SCPI ont leurs sept taux, relevé de l'équipe, tous en HT. Les
- * cases vides ont disparu, le comparateur ne montre plus les zéros de R Start face à du blanc.
- *
- * IL MANQUE ENCORE LA TROISIÈME CONDITION POUR PUBLIER. Il en fallait trois, SCPI par SCPI :
- *  1. les sept taux : obtenus ;
- *  2. la même base de calcul pour tous : obtenue, tout est HT ;
- *  3. le document et la date d'arrêté d'où vient chaque taux : MANQUANTS. Le relevé est global, sans
- *     référence par société de gestion, alors que le tableau en nomme dix-neuf. Un taux change, et une
- *     comparaison qu'on ne peut pas remonter à sa source n'est pas vérifiable.
- * Voir SOURCE_EQUIPE plus bas.
- *
- * Les valeurs de R Start ne sont JAMAIS saisies ici : elles viennent de facts.fees, comme partout.
+ * CE QU'IL FAUT SAVOIR CÔTÉ CONFORMITÉ : les dix-neuf SCPI ont leurs sept taux, tous en HT, la même
+ * base que R Start, mais d'une source UNIQUE et globale (SOURCE_EQUIPE). Il manque toujours, SCPI
+ * par SCPI, le document réglementaire et sa date d'arrêté : un lecteur ne peut pas remonter un taux
+ * jusqu'à la note d'information ou au DIC dont il sort, et un taux qui change ne se vérifie pas. Le
+ * tableau nomme dix-neuf sociétés de gestion sans plus rien dire de son périmètre (voir la note
+ * après `sourceOthers`), et il repose sur une hypothèse de lecture que l'écran ne dit pas (voir
+ * avant `range`).
  */
 
 /** Une SCPI du comparateur. `values` vide = données à relever ; la ligne s'affiche « à compléter ». */
@@ -42,10 +38,9 @@ export interface ComparedScpi {
 }
 
 /**
- * Une ligne du comparateur. DÉCLARÉE, et non déduite du tableau : le 16/09/2026, l'équipe a retiré les
- * deux dernières précisions affichées sous les taux de R Start, plus aucune ligne ne portait
- * `rstartDetail`, et TypeScript a conclu que la propriété n'existait pas — le composant qui la lit ne
- * compilait plus. Une ligne peut ne pas en avoir ; le type doit le dire, pas les données du jour.
+ * Une ligne du comparateur. DÉCLARÉE, et non déduite du tableau : le jour où plus aucune ligne n'a
+ * porté `rstartDetail` (16/09/2026), TypeScript a conclu que la propriété n'existait pas et le
+ * composant qui la lit ne compilait plus. Le type dit ce qu'une ligne PEUT avoir.
  */
 export interface ComparatorRow {
   key: ComparatorRowKey;
@@ -59,9 +54,8 @@ export interface ComparatorRow {
   /** Taux réellement comparé quand la case affiche une fourchette. */
   rstartCompare?: string;
   /**
-   * Précision sous le taux de R Start. Absente : la case n'affiche que le taux. Une LISTE depuis le
-   * 16/09/2026 : les deux barèmes à paliers (cessions, retrait) se lisent une ligne par palier, taux
-   * en tête, et non en une phrase où les taux se noient.
+   * Précision sous le taux de R Start. Absente : la case n'affiche que le taux. Une LISTE pour les
+   * barèmes à paliers (cessions, retrait) : une ligne par palier, taux en tête.
    */
   rstartDetail?: string | readonly string[];
 }
@@ -71,12 +65,11 @@ export type ComparatorRowKey =
 
 /**
  * HYPOTHÈSE DE LECTURE DU TABLEAU, JAMAIS DITE À L'ÉCRAN (12/09/2026, demande de l'équipe) : le
- * souscripteur garde ses parts au moins huit ans (facts.fees.withdrawal.zeroAfterYears), la durée
- * après laquelle R Start ne prélève plus de commission de retrait. Elle change la ligne « retrait »
- * de toutes les SCPI : le retrait de R Start s'y compare sur `rstartCompare` (0 %) et peut être
- * marqué « taux le plus bas de la ligne ». La phrase qui devait la dire en clair n'a jamais été
- * affichée et a quitté le code le 22/09/2026 (archivée hors du dépôt, .claude/audits) ; l'écart,
- * lui, demeure, et c'est ici qu'il est consigné.
+ * souscripteur garde ses parts au moins huit ans (facts.fees.withdrawal.zeroAfterYears), durée
+ * au-delà de laquelle R Start ne prélève plus de commission de retrait. Le retrait de R Start se
+ * compare donc sur `rstartCompare` (0 %) et peut être marqué « taux le plus bas de la ligne » sans
+ * que l'hypothèse soit énoncée. La phrase qui devait la dire a quitté le code le 22/09/2026
+ * (archivée hors du dépôt, .claude/audits) ; l'écart, lui, demeure.
  */
 
 /** Fourchette d'un barème à paliers : « de 0 % à 12 % » se lit mieux que « 0 / 6 / 12 % ». */
@@ -94,11 +87,9 @@ if (!lastWithdrawalStep)
 const withdrawalAfterHolding = lastWithdrawalStep.rate;
 
 /*
- * BARÈME DU RETRAIT, tel que l'équipe l'a formulé le 16/09/2026 pour le comparateur, un palier par
- * ligne. LES TAUX VIENNENT DE facts.fees.withdrawal.steps, jamais d'ici ; seules les conditions sont
- * écrites, dans l'ordre des paliers. Le garde-fou vérifie que le barème compte bien autant de
- * conditions que de paliers : un palier ajouté dans facts.ts sans sa condition arrêterait la
- * compilation au lieu de laisser un taux sans phrase.
+ * Conditions du barème de retrait (texte de l'équipe, 16/09/2026), une par palier, dans l'ordre de
+ * facts.fees.withdrawal.steps d'où viennent les taux. Le garde-fou arrête la compilation si un
+ * palier est ajouté dans facts.ts sans sa condition, au lieu de laisser un taux sans phrase.
  */
 const WITHDRAWAL_CONDITIONS = [
   'en cas de sortie avant 4 ans de détention',
@@ -117,43 +108,17 @@ const withdrawalSchedule = fees.withdrawal.steps.map(
 );
 
 /*
- * SOURCE COMMUNE des taux des autres SCPI, relevé transmis par l'équipe le 15/09/2026. Il remplace les
- * relevés faits un à un entre le 11 et le 12/09/2026, qui mêlaient pages marketing et documents
- * réglementaires, et exprimaient les taux tantôt HT tantôt TTC.
- *
- * TOUT EST EN HT dans ce relevé, ce qui est enfin la même base pour les dix-neuf SCPI et pour R Start.
- * C'est le principal gain : jusqu'ici la comparaison portait sur des bases différentes selon la ligne.
- *
- * CE QUI MANQUE ENCORE, et qui doit être obtenu avant publication : pour chaque SCPI, le DOCUMENT et
- * la DATE D'ARRÊTÉ d'où vient le taux (document d'informations clés, note d'information, et leur page).
- * Un comparatif qui nomme dix-neuf sociétés de gestion doit pouvoir dire d'où vient chaque chiffre :
- * c'est ce que dit déjà le bloc « Sources des données » sous le tableau, et il ne peut pas se contenter
- * d'un renvoi global. Tant que ces références ne sont pas là, la ligne reste vraie mais invérifiable.
+ * Source commune des dix-neuf SCPI (texte de l'équipe, 16/09/2026), tout en HT. Elle nomme l'étude
+ * mais reste unique et globale, sans référence documentaire par SCPI : voir l'en-tête. La mention
+ * est honnête sur ce point plutôt que de laisser croire à une référence par société de gestion.
  */
-/*
- * SOURCE NOMMÉE LE 16/09/2026 : « étude comparative réalisée par CORUM le 15 septembre 2026 ».
- * Elle disait jusque-là « relevé comparatif transmis par l'équipe », sans auteur ni nature, et ajoutait
- * que le document et la date d'arrêté de chaque société de gestion restaient à obtenir.
- *
- * CE QUI EST RÉGLÉ : le tableau peut désormais nommer d'où viennent ses chiffres, ce qu'un comparatif
- * qui cite dix-neuf sociétés de gestion doit pouvoir faire.
- * CE QUI NE L'EST PAS, et qu'il faut garder en tête : l'étude est une source UNIQUE et globale. Elle ne
- * donne toujours pas, SCPI par SCPI, le document réglementaire et sa date d'arrêté. Un lecteur ne peut
- * donc pas remonter un taux jusqu'à la note d'information ou au DIC dont il sort. La mention reste donc
- * honnête sur ce point plutôt que de laisser croire à une référence par SCPI.
- */
-/* Reformulée le 16/09/2026, texte de l'équipe. L'ancienne version disait que la référence documentaire
-   de chaque société de gestion n'était pas publiée ; celle-ci nomme la source, les notes d'information
-   publiées par chaque société de gestion concernée. */
 const SOURCE_EQUIPE =
   'étude comparative réalisée par CORUM au 15 septembre 2026, à partir des notes d’information publiées par chaque société de gestion concernée. Taux exprimés hors taxes.';
 
 const ROWS: ComparatorRow[] = [
     /*
-     * EXPLICATIONS « i » (16/09/2026, textes fournis par l'équipe, un par ligne). Elles disent ce que
-     * le frais RECOUVRE et QUI le paie, là où `basis` ne dit que son assiette de calcul. Repliées
-     * derrière un bouton : le tableau se lit d'abord en chiffres, l'explication vient si on la demande.
-     * Le bouton n'apparaît que sur les lignes qui portent un texte.
+     * Textes « i » (16/09/2026, fournis par l'équipe) : ce que le frais RECOUVRE et QUI le paie, là
+     * où `basis` ne dit que l'assiette. Repliés derrière un bouton, absent des lignes sans texte.
      */
     {
       key: 'subscription' as const,
@@ -176,11 +141,8 @@ const ROWS: ComparatorRow[] = [
       basis: 'en % du prix d’acquisition',
       rstart: fees.broker.label,
     },
-    /*
-     * TRAVAUX AVANT GESTION depuis le 15/09/2026 (demande de l'équipe). Les valeurs suivent seules :
-     * chaque SCPI donne les siennes dans un objet indexé par `key`, l'ordre des colonnes n'a donc
-     * qu'une source, cette liste.
-     */
+    /* L'ordre des lignes n'a qu'une source, cette liste : chaque SCPI donne ses valeurs par `key`.
+       Travaux avant gestion depuis le 15/09/2026 (demande de l'équipe). */
     {
       key: 'works' as const,
       info: 'L’épargnant paie des frais lorsque la SCPI réalise des travaux sur les immeubles. Ces frais sont prélevés même lorsque la SCPI ne verse aucun revenu à l’épargnant.',
@@ -201,13 +163,8 @@ const ROWS: ComparatorRow[] = [
       label: 'Frais de cession d’immeubles',
       basis: 'en % du prix de vente',
       rstart: range(fees.disposal.tiers.map((t) => t.rate)),
-      /*
-       * LE BARÈME SOUS LA FOURCHETTE, un palier par ligne (16/09/2026, texte de l'équipe : « 0 % si la
-       * plus-value est inférieure à 7 % », « 6 % si la plus-value est comprise entre 7 % et 13 % »,
-       * « 12 % si la plus-value est supérieure à 13 % »). Il avait été retiré le matin même (« on
-       * changera et on ajoutera plus tard ») ; il revient dans ce format, et non plus en une phrase.
-       * Taux ET conditions viennent de facts.fees.disposal.tiers, dont les libellés sont ceux fournis.
-       */
+      /* Barème sous la fourchette, un palier par ligne (16/09/2026, texte de l'équipe) ; taux et
+         conditions viennent de facts.fees.disposal.tiers. */
       rstartDetail: fees.disposal.tiers.map((t) => `${t.rate} ${t.condition}`),
     },
     {
@@ -215,58 +172,36 @@ const ROWS: ComparatorRow[] = [
       info: 'L’épargnant paie des frais de retrait anticipé s’il revend ses parts avant une certaine durée de détention (variable selon la SCPI). Ces frais sont prélevés même lorsque la SCPI ne verse aucun revenu à l’épargnant.',
       label: 'Frais de retrait anticipé',
       basis: 'en % de la valeur de retrait',
-      /*
-       * FOURCHETTE DEPUIS LE 15/09/2026 (« mets au format de 0 % à 12 % plutôt »). La case affichait le
-       * seul dernier palier, « 0 % », et renvoyait le barème dégressif au détail en dessous : on lisait
-       * donc « 0 % » là où le taux vaut 10 % pour qui sort avant quatre ans. La fourchette dit les deux
-       * bornes, comme la ligne des cessions d'immeubles juste au-dessus.
-       */
+      /* Fourchette, et non le seul dernier palier (15/09/2026, « mets au format de 0 % à 12 %
+         plutôt ») : on lisait « 0 % » là où le taux vaut 10 % pour qui sort avant quatre ans. */
       rstart: range(fees.withdrawal.steps.map((s) => s.rate)),
-      /*
-       * Ce qui est COMPARÉ reste le taux au-delà de la durée retenue, soit 0 %, et non la
-       * fourchette : c'est l'hypothèse de lecture du tableau (une détention d'au moins huit ans),
-       * que l'écran ne dit pas (voir plus haut) : la case peut donc être marquée « taux le plus
-       * bas » sur ce 0 % sans que l'hypothèse soit énoncée. Sans ce champ, la case ne serait plus
-       * comparable du tout, un intervalle ne se départageant pas d'un taux unique.
-       */
+      /* Ce qui est COMPARÉ reste le taux au-delà de la durée retenue, 0 % : c'est l'hypothèse de
+         lecture consignée plus haut. Sans ce champ, la fourchette ne se comparerait à rien. */
       rstartCompare: withdrawalAfterHolding,
-      /*
-       * LE BARÈME SOUS LA FOURCHETTE, un palier par ligne (16/09/2026, texte de l'équipe). Il avait été
-       * retiré le matin même, en une phrase (« au-delà de 8 ans de détention ; avant, le barème est
-       * dégressif : 10 % < 4 ans, 7 % 5e-6e année… ») ; il revient ligne à ligne, taux en tête.
-       * La comparaison, elle, se fait toujours sur le taux au-delà de huit ans (`rstartCompare`),
-       * hypothèse que l'écran ne dit pas : le barème la rend lisible, il ne la change pas.
-       */
+      /* Barème sous la fourchette, un palier par ligne (16/09/2026) : il rend l'hypothèse lisible,
+         il ne la change pas. */
       rstartDetail: withdrawalSchedule,
     },
 ];
 
 export const comparator = {
   /*
-   * TITRE ET ACCROCHE SUPPRIMÉS DE L'ÉCRAN le 16/09/2026, demande de l'équipe. Ils disaient « R Start :
-   * la seule SCPI qui ne prend des frais que si vous gagnez. » et « Comparez vous-même ! », fournis par
-   * l'équipe le 14/09. L'accroche disparaît pour de bon ; le titre, lui, NE POUVAIT PAS ÊTRE SIMPLEMENT
-   * EFFACÉ : il nomme la section (`labelledBy`) et sert de légende au tableau (`<caption>`), un tableau
-   * sans nom n'étant pas annoncé aux lecteurs d'écran.
-   *
-   * Il est donc REMPLACÉ par un intitulé descriptif, rendu en `visually-hidden` comme il l'était déjà
-   * entre le 12 et le 14/09. Descriptif et non masqué à l'identique : garder la phrase d'origine hors
-   * écran aurait laissé l'allégation d'exclusivité dans la page, lue par les lecteurs d'écran et
-   * comptée par scripts/check-compliance.mjs. Elle est retirée, pas cachée.
+   * Titre hors écran (`visually-hidden`) : il nomme la section (`labelledBy`) et sert de
+   * `<caption>` au tableau, sans quoi les lecteurs d'écran ne l'annoncent pas. Le titre visible
+   * « la seule SCPI qui ne prend des frais que si vous gagnez » a été retiré le 16/09/2026 à la
+   * demande de l'équipe, et REMPLACÉ plutôt que masqué : hors écran, l'allégation d'exclusivité
+   * serait restée dans la page, lue par les lecteurs d'écran et comptée par
+   * scripts/check-compliance.mjs.
    */
   title: 'Comparaison des frais de R Start avec une autre SCPI',
-  /* Titre VISIBLE du comparateur de l'accueil (16/09/2026, texte de l'équipe). Sur /frais il n'est pas
-     rendu : l'en-tête de la page dit déjà « Comparateur de frais », et `title` y reste hors écran pour
-     nommer la section et le tableau. */
+  /* Titre VISIBLE du comparateur de l'accueil (16/09/2026, texte de l'équipe). Non rendu sur
+     /frais, dont l'en-tête dit déjà « Comparateur de frais ». */
   homeHeading: 'Un modèle de frais inédit. Comparez par vous-même !',
   /** Colonne de gauche, toujours R Start. */
   leftLabel: product.name,
-  /* Intitulé VISIBLE au-dessus de la liste déroulante (12/09/2026, demande de l'équipe) : il dit ce
-     que la colonne de droite oppose à R Start, là où « SCPI à comparer » ne disait pas laquelle.
-     RACCOURCI le 14/09/2026 à la demande de l'équipe : la mention « dites “sans frais” » tombe. Ce
-     que ces SCPI ont en commun (pas de commission de souscription, mais des frais d'acquisition)
-     devait rester dit par la première phrase du périmètre ; celui-ci a quitté l'écran le soir même
-     (et le code le 22/09/2026), et plus rien ne le dit autour du tableau. */
+  /* Intitulé visible au-dessus de la liste (raccourci le 14/09/2026, demande de l'équipe). Ce que
+     ces SCPI ont en commun (pas de commission de souscription, mais des frais d'acquisition) n'est
+     plus dit nulle part autour du tableau depuis que le périmètre a quitté l'écran. */
   selectLabel: 'Autres SCPI',
   /** Affiché tant que la SCPI n'a pas été documentée du tout (aucune source). */
   pendingLabel: 'À compléter',
@@ -275,24 +210,21 @@ export const comparator = {
    * qu'une donnée manquante, et ce n'est surtout pas 0 % : une absence de mention ne vaut pas gratuité.
    */
   notPublishedLabel: 'Non publié',
-  /** En-tête de la première colonne, lu par les lecteurs d'écran (masqué à l'œil). Il était écrit en
-      dur dans FeeComparator.astro, seul texte du tableau à ne pas venir d'ici. */
+  /** En-tête de la première colonne, lu par les lecteurs d'écran (masqué à l'œil). */
   feeColumnLabel: 'Frais',
   /**
-   * Le taux le plus bas d'une ligne est mis en avant par la COULEUR et la GRAISSE, l'autre est atténué.
-   * Jamais par la TAILLE : un frais affiché plus petit que ses voisins est précisément ce que l'AMF a
-   * reproché à la brochure, et tests/conformite.spec.ts le vérifie.
-   * Ce libellé n'est pas affiché : il est lu par les lecteurs d'écran, pour qui une différence de couleur
-   * ne dit rien. Il n'apparaît que si LES DEUX cases portent un pourcentage unique et comparable.
+   * Le taux le plus bas d'une ligne est mis en avant par la COULEUR et la GRAISSE, jamais par la
+   * TAILLE : un frais affiché plus petit que ses voisins est précisément ce que l'AMF a reproché à
+   * la brochure, et tests/conformite.spec.ts le vérifie. Ce libellé est lu par les lecteurs
+   * d'écran, pour qui la couleur ne dit rien ; il n'apparaît que si LES DEUX cases portent un taux
+   * unique comparable.
    */
   bestLabel: 'taux le plus bas de la ligne',
   /* Nom du bouton « i » pour les lecteurs d'écran, complété par le libellé de la ligne. */
   infoLabel: 'Expliquer',
   /**
-   * Sources affichées sous le tableau, une par colonne : celle de R Start, et celle de la SCPI
-   * choisie (SOURCE_EQUIPE pour les dix-neuf depuis le 15/09/2026). `sourceOthers` n'est plus qu'un
-   * texte de repli : c'est lui que porte le HTML avant le script, et il reste seul affiché sans
-   * script.
+   * Sources sous le tableau, une par colonne. `sourceOthers` est le repli porté par le HTML avant
+   * le script, seul affiché sans script.
    */
   sourceLabel: 'Sources des données',
   /** Qui publie les chiffres de la colonne de gauche, et dans quels documents. */
@@ -302,20 +234,17 @@ export const comparator = {
     'Frais des autres SCPI : à relever dans le document d’informations clés et la note d’information de chacune, avec leur date d’arrêté. Un taux change : la date fait foi.',
   /*
    * TROIS TEXTES ONT QUITTÉ L'ÉCRAN LE 14/09/2026 ET LE CODE LE 22/09/2026 (archivés hors du dépôt,
-   * .claude/audits) : le périmètre du comparatif (des taux affichés, pas des coûts réels ; les seules
-   * SCPI de la liste, pas le marché ; aucune comparaison de résultats), la base HT / TTC de chaque
-   * taux, et l'encadré « Une innovation, pas une révolution » de la brochure. Le tableau nomme
-   * dix-neuf sociétés de gestion sans plus rien dire de tout cela ; les exigences correspondantes
-   * de scripts/check-compliance.mjs sont parties avec les textes.
+   * .claude/audits) : le périmètre du comparatif (des taux affichés, pas des coûts réels ; les
+   * seules SCPI de la liste, pas le marché ; aucune comparaison de résultats), la base HT / TTC de
+   * chaque taux et l'encadré « Une innovation, pas une révolution ». Plus rien ne le dit autour du
+   * tableau, et scripts/check-compliance.mjs ne le contrôle plus.
    */
 
   /** Les sept lignes, dans l'ordre du tableau fourni par l'équipe. */
   rows: ROWS,
 
   /**
-   * Les SCPI proposées au choix, DIX-NEUF depuis le 15/09/2026. Iroko Zen en tête : c'est celle que
-   * l'équipe veut voir d'abord. Immo France Territoires et Atream Atwin, jusque-là écartées faute de
-   * documents publiés, entrent dans la liste avec le relevé de l'équipe.
+   * Dix-neuf SCPI depuis le 15/09/2026, Iroko Zen en tête : celle que l'équipe veut voir d'abord.
    */
   scpis: [
     {
@@ -651,9 +580,3 @@ export const comparator = {
 
 /** Les SCPI réellement proposées au choix : celles qu'on a pu vérifier. */
 export const comparatorScpis = comparator.scpis.filter((s) => !s.unavailable);
-
-/*
- * `comparatorIsIncomplete` a été SUPPRIMÉ le 14/09/2026 : personne ne le lisait. Il disait « vrai tant
- * qu'une SCPI proposée n'a pas été documentée ». Le même calcul est refait à la main dans
- * scripts/check-compliance.mjs, qui est le seul endroit où il servait vraiment.
- */

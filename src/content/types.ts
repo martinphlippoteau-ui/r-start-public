@@ -1,9 +1,7 @@
 import type { PictoKey } from '@/components/ui/Picto.astro';
 import type { PageKey } from '@/config/pages';
-/**
- * Types partagés du contenu éditorial (src/content/fr/*).
- * Les composants ne contiennent aucun texte en dur : tout vient de ces structures.
- */
+/** Types partagés du contenu éditorial (src/content/fr/*).
+    Les composants ne contiennent aucun texte en dur : tout vient de ces structures. */
 
 export type SectionKey =
   | 'hero'
@@ -56,41 +54,27 @@ export interface HeroContent {
 }
 
 export interface HighlightCard {
-  /**
-   * Libellé du repère (ex. « Ticket d'entrée »), au-dessus de la valeur. Facultatif depuis le
-   * 14/09/2026 : le document de l'équipe termine son tableau par « 100 % Digital », qui se suffit à
-   * lui-même. Sans libellé, le bloc ne rend que la valeur.
-   */
+  /** Libellé du repère (ex. « Ticket d'entrée »), au-dessus de la valeur. Sans libellé
+      (« 100 % Digital »), le bloc ne rend que la valeur. */
   label?: string;
   /** Valeur mise en avant (ex. « 200 € »). */
   value: string;
-  /**
-   * Explication dépliable, derrière un bouton « i » posé après le libellé (15/09/2026). Elle dit ce que
-   * la valeur RECOUVRE, quand le mot seul ne suffit pas : « Diversifiée », « Monde ». Ce n'est pas une
-   * note légale, qui porte source et portée ; c'est de la pédagogie.
-   */
+  /** Explication dépliable derrière un bouton « i » : ce que la valeur RECOUVRE quand le mot seul
+      ne suffit pas (« Diversifiée », « Monde »). De la pédagogie, pas une note légale. */
   info?: string;
 }
 
 export interface HighlightsContent {
   title: string;
-  /**
-   * Facultative depuis le 14/09/2026 : le document de l'équipe ouvre la section sur le tableau, sans
-   * texte d'introduction, et la définition de la SCPI qui vivait ici ouvre désormais la FAQ.
-   */
+  /** Facultative : le tableau ouvre la section sans introduction depuis le 14/09/2026. */
   intro?: string;
   cards: HighlightCard[];
-  /**
-   * Bloc à part sous les six repères (11/09/2026) : comment on souscrit et ce qu'on peut automatiser.
-   * Séparé des repères par un filet et un titre, et rendu plus sobre : ce ne sont pas des
-   * caractéristiques du produit mais des modalités.
-   */
+  /** Bloc à part sous les repères, plus sobre : comment on souscrit et ce qu'on peut automatiser,
+      des modalités et non des caractéristiques du produit. */
   subscriptionTitle?: string;
   subscriptionItems?: { label: string; value: string }[];
-  /**
-   * Appel à l'action secondaire, au pied de la section (15/09/2026). Il mène à une page du site, pas
-   * au tunnel : il ne porte donc pas de `position`, contrairement aux CTA de souscription.
-   */
+  /** Appel secondaire au pied de la section : vers une page du site, pas le tunnel, donc sans
+      `position`. */
   secondaryCta?: { label: string; href: string };
   /** Micro-textes : rien n'est écrit en dur dans le composant. */
   labels?: {
@@ -99,58 +83,38 @@ export interface HighlightsContent {
   };
 }
 
-/**
- * Un chapitre de /strategie : un surtitre facultatif, un titre, la phrase qui annonce la liste, la
- * liste, et la phrase qui la referme. Les quatre chapitres de la page (les deux moteurs, puis les
- * trois volets) ont cette forme dans le document fourni par l'équipe, c'est lui qui donne le type.
- */
+/** Un chapitre de /strategie : surtitre facultatif, titre, phrase qui annonce la liste, liste,
+    phrase qui la referme. Le document de l'équipe donne cette forme aux quatre chapitres. */
 export interface StrategyChapter {
   /** Mot-clé au-dessus du titre (« Sélective », « Diversifiée »…). Les moteurs n'en ont pas. */
   eyebrow?: string;
   title: string;
   /** Texte d'ouverture du chapitre. Les moteurs n'en ont pas. */
   intro?: string;
-  /**
-   * Annonce de la liste, deux points compris, quand `intro` sert déjà à autre chose (16/09/2026 : la
-   * zone « Quoi » a reçu une phrase de méthode en ouverture, et son « L'équipe cible… » est descendu
-   * ici). Sans `lead`, c'est `intro` qui annonce la liste, comme avant.
-   */
+  /** Annonce de la liste, deux points compris, quand `intro` sert déjà à autre chose (zone
+      « Quoi »). Sans `lead`, c'est `intro` qui annonce la liste. */
   lead?: string;
   /**
-   * `lead` porte l'accent (gras du document), `rest` la suite de la phrase quand il y en a une.
-   * `icon` met une puce en pictogramme à la place du point (16/09/2026, demande de l'équipe sur les
-   * deux items de la zone « Où ») : clé de ui/Picto.astro.
-   * `benefit` : ce que le moteur apporte à l'épargnant, en une ligne sous le titre de la carte, côté
-   * recto (17/09/2026, demande de l'équipe, cartes des deux moteurs de /strategie).
+   * `lead` porte l'accent (gras du document), `rest` la suite de la phrase. `icon` met une puce en
+   * pictogramme à la place du point (clé de ui/Picto.astro). `benefit` : ce que le moteur apporte à
+   * l'épargnant, en une ligne sous le titre de la carte, côté recto.
    */
   items: { lead: string; rest?: string; icon?: PictoKey; benefit?: string }[];
-  /**
-   * Phrase qui referme le chapitre, sous la liste. Facultative depuis le 16/09/2026 : celle des deux
-   * moteurs est descendue dans la zone « Quoi », où elle ouvre le propos au lieu de fermer le précédent.
-   */
+  /** Phrase qui referme le chapitre, sous la liste. Les moteurs n'en ont pas. */
   outro?: string;
 }
 
 /**
  * /strategie, contenu du 14/09/2026, « ni plus ni moins » : les deux moteurs (`engines`), puis les
- * trois volets (`what`, `where`, `how`), réunis en tuiles le 16/09/2026.
- * Ce que le type ne porte plus, parce que la page ne le dit plus : le mot d'ordre et son contre-poids,
- * les trois piliers, la zone Conseil de l'Europe + Canada et sa carte, les types d'actifs du DIC,
- * l'effet de levier.
+ * trois volets (`what`, `where`, `how`) en tuiles. Le type ne porte plus ce que la page ne dit
+ * plus : mot d'ordre, trois piliers, zone du DIC et sa carte, types d'actifs, effet de levier.
  */
 export interface StrategyContent {
-  /**
-   * Titre commun aux trois volets (Sélective, Diversifiée, Opportuniste) de /strategie, depuis le
-   * 16/09/2026. C'est le H2 qui nomme la section : 04-Strategy.astro le rend sans condition, et son
-   * absence laisserait un H2 vide, le premier volet ne nommant plus la section comme avant.
-   */
+  /** Titre commun aux trois volets : c'est le H2 qui nomme la section, 04-Strategy.astro le rend
+      sans condition, et son absence laisserait un H2 vide. */
   tilesTitle?: string;
-  /**
-   * Libellés VISIBLES des cartes qui se retournent : le bouton du recto (« En savoir plus ») et celui
-   * du dos (« Fermer »), que src/scripts/carteRetournee.ts crée. Obligatoires depuis le 19/09/2026 :
-   * facultatifs, ils laissaient au script un « Fermer » écrit en dur pour repli, seul texte du site à
-   * ne pas venir du contenu.
-   */
+  /** Libellés VISIBLES des cartes qui se retournent, créés par src/scripts/carteRetournee.ts.
+      Obligatoires : facultatifs, ils laissaient au script un « Fermer » écrit en dur pour repli. */
   dialogOpen: string;
   dialogClose: string;
   /* Ni `eyebrow` ni `title` : le H1 de la page vit dans strategyPage.ts, et un second titre ici aurait
@@ -163,7 +127,7 @@ export interface StrategyContent {
 
 export interface StepItem {
   title: string;
-  /** Détail de l'étape : plus rendu sur l'accueil depuis le 11/09/2026 (intitulés seuls). */
+  /** Détail de l'étape ; l'accueil ne rend que les intitulés. */
   description?: string;
 }
 
@@ -198,10 +162,8 @@ export interface CorumContent {
   title: string;
   /** Libellé du bouton vers la page À propos. */
   aboutLink?: string;
-  /**
-   * Appel sous les chiffres du groupe, sur /a-propos (16/09/2026). Il SORT DU SITE, vers corum.fr :
-   * `newTabHint` est ce que les lecteurs d'écran annoncent, il n'est pas affiché.
-   */
+  /** Appel sous les chiffres du groupe, sur /a-propos. Il SORT DU SITE, vers corum.fr :
+      `newTabHint` est ce que les lecteurs d'écran annoncent, il n'est pas affiché. */
   siteLink?: { label: string; href: string; newTabHint: string };
 }
 
@@ -212,10 +174,7 @@ export interface RiskItem {
 
 export interface RisksContent {
   title: string;
-  /**
-   * Facultative depuis le 15/09/2026 : l'équipe a demandé de retirer celle de l'accueil. Le texte reste
-   * dans risks.ts, en commentaire, prêt à revenir.
-   */
+  /** Facultative : celle de l'accueil a été retirée le 15/09/2026 à la demande de l'équipe. */
   intro?: string;
   items: RiskItem[];
   /** Titre (H2) de la section qui regroupe les avertissements reproduits in extenso (/documentation). */
@@ -248,24 +207,15 @@ export interface FaqItem {
   question: string;
   /** Paragraphes de réponse (texte brut, pas de HTML). */
   answer: string[];
-  /**
-   * Rubrique de la question (16/09/2026). Elle ne sert QUE sur /faq, qui groupe les vingt-deux
-   * questions ; les sélections courtes des autres pages l'ignorent.
-   */
+  /** Rubrique de la question. Ne sert QUE sur /faq ; les sélections courtes l'ignorent. */
   category?: string;
-  /**
-   * Tableau à deux colonnes rendu APRÈS les paragraphes de `answer` (barème des frais, commission sur
-   * les plus-values, commission de retrait). Deux colonnes et pas davantage : au-delà, un tableau ne
-   * tient plus sur un téléphone sans défilement latéral.
-   */
+  /** Tableau à deux colonnes rendu APRÈS les paragraphes de `answer`. Deux colonnes et pas
+      davantage : au-delà, un tableau ne tient plus sur un téléphone sans défilement latéral. */
   table?: { head: [string, string]; rows: [string, string][] };
   /** Puces rendues après les paragraphes, avant le tableau s'il y en a un. */
   bullets?: string[];
-  /**
-   * Paragraphes rendus APRÈS le tableau ou les puces. Ce sont des phrases de conclusion qui ne se
-   * lisent qu'une fois le tableau vu (« Ainsi, CORUM gagne davantage seulement quand vous gagnez
-   * davantage. ») : les mettre dans `answer` les aurait placées avant lui.
-   */
+  /** Paragraphes rendus APRÈS le tableau ou les puces : des conclusions qui ne se lisent qu'une
+      fois le tableau vu ; dans `answer`, elles seraient placées avant lui. */
   tableAfter?: string[];
 }
 
@@ -274,10 +224,8 @@ export interface FaqContent {
   items: FaqItem[];
   /** Toutes les questions, pour la page qui porte la FAQ complète (/faq depuis le 16/09/2026). */
   allItems?: FaqItem[];
-  /**
-   * Micro-textes de /faq (16/09/2026) : en-tête propre à la page, et champ de recherche. Celui-ci
-   * FILTRE une liste déjà rendue, il n'interroge rien : les questions sont toutes dans le HTML.
-   */
+  /** Micro-textes de /faq : en-tête propre à la page, et champ de recherche. Celui-ci FILTRE une
+      liste déjà rendue, il n'interroge rien : les questions sont toutes dans le HTML. */
   pageTitle?: string;
   /** Meta description de /faq (≤ 155 caractères, rappel de risque compris). */
   pageDescription: string;
@@ -298,11 +246,8 @@ export interface FaqContent {
 export interface NavContent {
   brand: string;
   cta: Cta;
-  /**
-   * Libellé court du CTA de la barre (ex. « Souscrire ») ; à défaut, `cta.label` est utilisé. Il
-   * fait tenir la barre sur une ligne : avec le logo, la loupe et le bouton Menu sur téléphone, avec
-   * la liste des pages à partir de « lg ». Le nom vient de l'ancienne sous-navigation.
-   */
+  /** Libellé court du CTA de la barre (ex. « Souscrire ») ; à défaut, `cta.label`. Il fait tenir la
+      barre sur une ligne avec le logo, la loupe et le bouton Menu sur téléphone. */
   subnavCtaLabel?: string;
   skipLink: string;
   /** Libellé du lien de retour en haut de page porté par le logo (ex. « R Start, retour en haut »). */
@@ -341,10 +286,8 @@ export interface FooterLink {
   /** Vide quand `soon` est vrai : l'entrée n'est alors pas un lien mais un dépliant. */
   href: string;
   external?: boolean;
-  /**
-   * Document annoncé mais pas encore publié (16/09/2026). L'entrée est rendue en <details> : au clic,
-   * elle déplie `footer.soonMessage` au lieu d'ouvrir un fichier. Voir Footer.astro.
-   */
+  /** Document annoncé mais pas encore publié : l'entrée est rendue en <details> et déplie
+      `footer.soonMessage` au lieu d'ouvrir un fichier (Footer.astro). */
   soon?: boolean;
 }
 
@@ -364,10 +307,8 @@ export interface FooterContent {
   legalToggleLabel?: string;
   /** Mention lue par les lecteurs d'écran sur les liens externes (ex. « nouvelle fenêtre »). */
   externalLinkHint?: string;
-  /**
-   * Signature du pied de page : logo R Start, `byLabel` (« par »), logo de l'éditeur, et leurs textes
-   * alternatifs. Sans `byLabel`, les deux logos sont simplement posés côte à côte.
-   */
+  /** Signature du pied de page : logo R Start, `byLabel` (« par »), logo de l'éditeur, et leurs
+      textes alternatifs. Sans `byLabel`, les deux logos sont simplement posés côte à côte. */
   logos?: { brandAlt: string; publisherAlt: string; byLabel?: string };
   /** Blocs de mentions légales, composés depuis legal.ts (reproduits à l'identique). */
   legalBlocks?: { title: string; paragraphs: string[] }[];
@@ -380,10 +321,7 @@ export interface SeoContent {
   keywords: string[];
 }
 
-/**
- * Recherche du site (17/09/2026) : loupe de la barre, panneau, liens rapides et synonymes.
- * Voir src/content/fr/search.ts.
- */
+/** Recherche du site : loupe de la barre, panneau, liens rapides et synonymes (search.ts). */
 export interface SearchContent {
   /** aria-label de la loupe, panneau fermé puis ouvert. */
   openLabel: string;
@@ -393,10 +331,8 @@ export interface SearchContent {
   inputLabel: string;
   placeholder: string;
   quickLinksTitle: string;
-  /**
-   * Liens rapides du panneau vide. Une cible et une seule par lien : une page du plan du site, une
-   * question de la FAQ (libellé exact, l'ancre en est dérivée), ou une section d'une page.
-   */
+  /** Liens rapides du panneau vide. Une cible et une seule par lien : une page du plan du site, une
+      question de la FAQ (libellé exact, l'ancre en est dérivée), ou une section d'une page. */
   quickLinks: ({ label?: string } & (
     | { page: PageKey; section?: string }
     | { question: string }
@@ -411,10 +347,8 @@ export interface SearchContent {
   emptyLink: { label: string; page: PageKey };
   loading: string;
   error: string;
-  /**
-   * Groupes de synonymes : chercher l'un trouve les autres. Écrits en français courant, accents
-   * compris ; la comparaison les retire.
-   */
+  /** Groupes de synonymes : chercher l'un trouve les autres. Écrits en français courant, accents
+      compris ; la comparaison les retire. */
   synonyms: string[][];
 }
 

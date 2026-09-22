@@ -2,9 +2,8 @@
 /**
  * SIMULATEUR de /simulateur (19-20/09/2026, demande de Martin, d'après le prototype qu'il a fourni).
  *
- * UN PARCOURS GUIDÉ, PUIS UN RÉSULTAT AJUSTABLE (arbitrage de Martin du 20/09/2026). La première
- * version posait les cinq réglages d'un coup, à côté des résultats, comme le prototype : un tableau de
- * bord, trop lourd pour qui découvre le produit. Ici :
+ * UN PARCOURS GUIDÉ, PUIS UN RÉSULTAT AJUSTABLE (arbitrage de Martin du 20/09/2026, contre le
+ * tableau de bord à cinq réglages du prototype, trop lourd pour qui découvre le produit) :
  *  1. LE PARCOURS : quatre questions, une par écran (montant, versement mensuel, revenus, taux), avec
  *     « Retour » et « Continuer ». La dernière ne se franchit pas sans avoir choisi un taux ;
  *  2. LE RÉSULTAT : les chiffres, l'avertissement, le graphique, et à côté « Vos hypothèses », où chaque
@@ -99,10 +98,10 @@ const tableau =
 /*
  * Couches du graphique : la clé est celle de `Annee` (moteur.ts), la classe donne la couleur.
  * LA PALETTE DE LA MARQUE, DU PLUS SOMBRE AU PLUS CLAIR : marine, turquoise, turquoise clair
- * (21/09/2026, « ces couleurs-là ne sont pas les couleurs R Start », Martin). Les revenus réinvestis
- * étaient en corail, repris du orange du prototype : sur ce site le corail est la couleur des mentions
- * de risque et des avertissements, une part du capital s'y lisait comme une alerte. Il ne reste
- * dans ce composant que là où il est à sa place : erreurs de saisie et pictogramme de l'avertissement.
+ * (21/09/2026, « ces couleurs-là ne sont pas les couleurs R Start », Martin). Pas de corail pour
+ * les revenus réinvestis : sur ce site le corail est la couleur des mentions de risque et des
+ * avertissements, une part du capital s'y lisait comme une alerte. Il ne reste dans ce composant
+ * que là où il est à sa place : erreurs de saisie et pictogramme de l'avertissement.
  */
 const couches = [
   { key: 'initial', label: chart.layers.initial, fill: 'fill-navy', puce: 'bg-navy' },

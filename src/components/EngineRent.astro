@@ -1,31 +1,16 @@
 ---
 /**
- * Illustration du moteur 01, « Les loyers versés par les entreprises locataires » (16/09/2026).
- *
- * MÊME GRAMMAIRE QUE LES QUATRE AUTRES DESSINS DES CARTES (StrategySelect.astro la décrit en tête) :
- * trait clair sur fond ink, animé en boucle lente, en pause hors écran, complet et immobile en
- * `prefers-reduced-motion`. Format 236 × 100, le rapport natif du bandeau de la carte.
- *
- * CE QU'ELLE DIT : des entreprises occupent l'immeuble, et il en sort un flux RÉGULIER vers R Start.
- * C'est le pendant exact du moteur 02, qui montre un gain ponctuel. Les fenêtres s'allument (les
- * locataires), les versements partent à intervalles égaux et sont reçus par la marque.
- *
+ * Illustration du moteur 01, « Les loyers versés par les entreprises locataires ». Même grammaire
+ * que les quatre autres dessins des cartes (StrategySelect.astro la décrit en tête) ; format 236 ×
+ * 100 ; décorative (aria-hidden). CE QU'ELLE DIT : des entreprises occupent l'immeuble, et il en
+ * sort un flux RÉGULIER vers R Start, pendant exact du moteur 02 qui montre un gain ponctuel. Les
+ * fenêtres s'allument dans un ordre mélangé et fixe, les deux tiers restant allumées à tout
+ * instant : l'immeuble est OCCUPÉ, il ne clignote pas. Trois versements en vol, à intervalles
+ * égaux, chacun ABSORBÉ par la marque qui répond par une onde et un éclat : c'est l'arrivée qui
+ * fait battre, pas une horloge. Le vol reste LINÉAIRE, la régularité est le sujet ; seuls le départ
+ * et l'arrivée sont courbés (mouvement repris le 16/09/2026, demande de l'équipe).
  * AUCUN CHIFFRE, aucune échelle, rien qui monte : le flux est régulier, pas croissant. L'image ne
  * dit rien du montant ni de la régularité future des loyers, elle nomme le mécanisme.
- *
- * MOUVEMENT REPRIS LE 16/09/2026 (demande de l'équipe : « 10/10 en fluidité, design, élégance, haut de
- * gamme »). Trois défauts corrigés :
- *  - les fenêtres s'allumaient colonne par colonne, en chenillard. Elles s'occupent maintenant dans un
- *    ordre mélangé et fixe, comme un immeuble le soir, et les deux tiers restent allumées à tout
- *    instant : l'immeuble est OCCUPÉ, il ne clignote pas ;
- *  - les versements s'éteignaient dans le vide, avant la marque, et la marque battait toute seule à son
- *    propre rythme. Chaque versement est maintenant ABSORBÉ par la marque, qui répond par une onde et
- *    un éclat : c'est l'arrivée qui fait battre, plus une horloge ;
- *  - trois versements en vol au lieu de quatre, plus espacés : la régularité se lit mieux quand chaque
- *    point a de l'air. Le vol reste LINÉAIRE, c'est la régularité qui est le sujet ; seuls le départ
- *    (émission) et l'arrivée (absorption) sont courbés.
- *
- * Décorative (aria-hidden) : le texte de la carte porte le sens.
  */
 
 /* Trois versements en vol, à intervalles égaux. Retards NÉGATIFS : au premier regard, le flux est déjà
@@ -33,11 +18,9 @@
 const versements = [0, 1, 2];
 /* Trois colonnes de quatre fenêtres, index = colonne × 4 + ligne. */
 const fenetres = [0, 1, 2].flatMap((colonne) => [0, 1, 2, 3].map((ligne) => ({ colonne, ligne })));
-/*
- * ORDRE D'ALLUMAGE, mélangé une fois pour toutes (une permutation de 0 à 11, une phase par fenêtre).
- * Deux voisines n'ont jamais deux phases voisines : l'œil ne doit lire ni colonne ni ligne, seulement
- * un immeuble qui vit.
- */
+/* Ordre d'allumage, mélangé une fois pour toutes (une permutation de 0 à 11, une phase par
+   fenêtre). Deux voisines n'ont jamais deux phases voisines : l'œil ne doit lire ni colonne ni
+   ligne, seulement un immeuble qui vit. */
 const PHASES = [5, 0, 9, 3, 11, 7, 1, 8, 4, 10, 2, 6];
 ---
 
@@ -78,19 +61,13 @@ const PHASES = [5, 0, 9, 3, 11, 7, 1, 8, 4, 10, 2, 6];
     <circle cx="206" cy="55" r="18" class="rent-onde" />
 
     {
-      /*
-       * CE QUI REÇOIT : LA MARQUE R START (16/09/2026, demande de l'équipe, « le rond tout à droite
-       * doit être le logo avec que le R »). C'était un cercle vide, qui ne disait pas où allaient les
-       * versements.
-       * Le tracé est celui de src/assets/logos/r-start-blanc.svg, sa première forme, la seule du
-       * fichier qui porte la marque : une goutte dont le R est évidé. Les deux autres dessinent le mot
-       * « start », qui n'a rien à faire à cette taille.
-       * `<svg>` imbriqué et non `<use>` : le fichier est un `astro:assets`, il n'est pas servi tel quel
-       * à une URL stable. Son propre viewBox (94,08 × 88,98, la boîte exacte du tracé, mesurée et non
-       * devinée) le recale sans le déformer.
-       * Elle S'ÉCLAIRE à chaque versement reçu, sans changer de taille : une marque qui grossit et
-       * rapetisse a l'air d'un bouton.
-       */
+      /* Ce qui reçoit : la marque R Start (16/09/2026, demande de l'équipe : « le rond tout à
+        droite doit être le logo avec que le R »), la première forme de
+        src/assets/logos/r-start-blanc.svg, la goutte au R évidé. `<svg>` imbriqué et non `<use>` :
+        le fichier est un `astro:assets`, il n'est pas servi tel quel à une URL stable. Son propre
+        viewBox (94,08 × 88,98, la boîte exacte du tracé, mesurée) le recale sans le déformer. Elle
+        S'ÉCLAIRE à chaque versement reçu, sans changer de taille : une marque qui grossit et
+        rapetisse a l'air d'un bouton. */
     }
     <svg x="190" y="40" width="32" height="30" viewBox="0 0 94.08 88.98" class="rent-marque">
       <path d="M68.21.17C36.7,3.24,5.47,23.07,2.44,29.88c-11.59,26.1,21.48,52.52,27.22,55.34,21.52,10.59,48.04-1.99,59.51-27.5C93.5,48.09,104.2-3.34,68.21.17ZM64.76,69.76c-1.25,0-2.36-.57-3.09-1.47l-2.84-3.52c-4.06-4.98-10.05-12.1-12.26-13.54-1.92-1.22-4.48-1.84-7.59-1.84l-7.96.02c-2.02,0-3.66-1.64-3.66-3.66s1.64-3.66,3.66-3.66h18.33c3.05-.01,5.54-2.14,5.54-4.76s-2.49-4.74-5.54-4.74h-18.34c-2.02,0-3.66-1.63-3.66-3.65s1.64-3.66,3.66-3.66h18.34c7.58,0,13.73,5.4,13.73,12.05,0,4.74-3.2,9.03-8.07,10.97,3.22,3.36,7.64,8.61,11.3,13.08l1.52,1.86c.57.69.91,1.57.91,2.54,0,2.2-1.79,3.99-3.99,3.99Z" />
@@ -128,12 +105,8 @@ const PHASES = [5, 0, 9, 3, 11, 7, 1, 8, 4, 10, 2, 6];
     stroke-linecap: round;
   }
 
-  /*
-   * ÉTAT DE REPOS = IMAGE COMPLÈTE. C'est ce que voient `prefers-reduced-motion` et tout navigateur
-   * qui n'anime pas : l'immeuble est occupé, les versements sont posés le long du chemin à intervalles
-   * égaux, la marque est pleine. Les animations, déclarées plus bas et seulement si le mouvement est
-   * accepté, partent de leur propre première image ; rien n'est à annuler.
-   */
+  /* État de repos = image complète : l'immeuble occupé, les versements posés le long du chemin à
+     intervalles égaux, la marque pleine. */
   .rent-fenetre {
     fill: var(--color-teal-200);
     opacity: 0.5;

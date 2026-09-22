@@ -1,11 +1,8 @@
 // Prépare les fichiers sources pour le site : copie les logos, les favicons et les documents
 // réglementaires (PDF) vers leurs emplacements, et écrit un manifeste (src/content/fr/media.manifest.json)
-// dont le site lit la liste des documents et leur poids.
-//
-// PLUS DE PHOTOS depuis le 22/09/2026. Le script redimensionnait les photos de la source vers une réserve
-// de curation (src/assets/vivier) ; le site n'affiche plus aucune photographie depuis le 15/09/2026, et la
-// réserve a été supprimée. Les illustrations d'immeubles sont déposées à la main dans src/assets/images
-// et citées par src/content/fr/media.ts.
+// dont le site lit la liste des documents et leur poids. Aucune photo : le site n'en affiche plus,
+// les illustrations d'immeubles sont déposées à la main dans src/assets/images
+// (src/content/fr/media.ts).
 //
 // Usage : node scripts/prepare-images.mjs [--assets "C:\\chemin\\vers\\Assets R Start"]
 // Idempotent : un fichier déjà présent et plus récent que sa source n'est pas retraité.
@@ -27,8 +24,7 @@ const OUT_PUBLIC = path.join(ROOT, 'public');
 const OUT_DOCS = path.join(OUT_PUBLIC, 'documents');
 const MANIFEST = path.join(ROOT, 'src', 'content', 'fr', 'media.manifest.json');
 
-/* Logos vectoriels réellement importés par un composant (copie brute). `globe.svg` en est sorti le
-   14/09/2026 : aucun fichier ne l'importait. */
+/* Logos vectoriels réellement importés par un composant (copie brute). */
 const LOGOS = [
   ['1 - Logos R Start/R_Start_couleur_CMJN.svg', 'r-start-couleur.svg'],
   ['1 - Logos R Start/R_Start_blanc_CMJN.svg', 'r-start-blanc.svg'],
@@ -136,8 +132,8 @@ async function main() {
         /* Le NOM du dossier source, pas son chemin : le manifeste est versionné, et il publiait le
            chemin absolu du poste qui l'avait généré (nom d'utilisateur compris). */
         generatedFrom: path.basename(ASSETS),
-        /* Seule liste lue par le site (documentation.ts) : les logos et fichiers de
-           public/ sont copiés sans être listés, rien ne lisait leur liste (22/09/2026). */
+        /* Seule liste lue par le site (documentation.ts) : les logos et fichiers de public/ sont
+           copiés sans être listés, rien ne lit leur liste. */
         documents,
       },
       null,

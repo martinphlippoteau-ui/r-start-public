@@ -1,18 +1,15 @@
 ---
 /**
  * Grand chiffre façon page produit, statique : `value` est affichée telle quelle, unité comprise.
- * Le compteur animé, en sommeil depuis le 14/09/2026 (aucun appelant ne passait `numeric`), a été
- * retiré le 22/09/2026 avec ses props (`numeric`, `prefix`, `suffix`, `decimals`, `from`, `duration`),
- * ainsi que la taille `display`, qu'aucun appelant ne demandait.
+ * Le compteur animé et la taille `display`, sans appelant, ont été retirés le 22/09/2026.
  */
 interface Props {
   value: string;
   /**
-   * `solid` : encre pleine, chiffres à chasse fixe, pour une grille de chiffres que l'on
-   * compare du regard (11/09/2026 : à 86 px et en dégradé, la grille CORUM était illisible).
-   * `solid-compact` : même encre, un cran plus bas, pour une grille SERRÉE. Introduit le 14/09/2026,
-   * quand le groupe CORUM est passé à cinq chiffres : à cinq colonnes, « 9,6 Md€ » et « + 160 000 »
-   * passaient à la ligne en `solid` et les cinq libellés ne s'alignaient plus.
+   * `solid` : encre pleine, chiffres à chasse fixe, pour une grille de chiffres que l'on compare du
+   * regard (à 86 px et en dégradé, la grille CORUM était illisible). `solid-compact` : même encre,
+   * un cran plus bas, pour une grille SERRÉE : à cinq colonnes, « 9,6 Md€ » et « + 160 000 »
+   * passaient à la ligne en `solid`.
    */
   size: 'solid' | 'solid-compact';
   label: string;
@@ -22,14 +19,10 @@ const { value, size, label, class: className = '' } = Astro.props;
 ---
 
 {
-  /*
-   * HIÉRARCHIE RÉTABLIE LE 16/09/2026. Le chiffre était en `text-display-sm` (20 à 24 px) et son
-   * libellé en `text-lead` (18 à 24 px) : sur grand écran ils faisaient la MÊME TAILLE, et rien ne
-   * disait lequel des deux était le chiffre. Un bloc de chiffres clés dont les chiffres ne dominent
-   * pas manque sa raison d'être.
-   * Le chiffre monte donc d'un cran et le libellé descend, dans les deux tailles pleines. L'écart
-   * passe de 1 à 1,5 environ, ce qui suffit à ce que l'œil attrape le nombre d'abord.
-   */
+  /* Hiérarchie rétablie le 16/09/2026 : le chiffre en `text-display-sm` et son libellé en
+    `text-lead` faisaient la MÊME TAILLE sur grand écran, rien ne disait lequel était le chiffre.
+    Le chiffre monte d'un cran et le libellé descend ; l'écart passe de 1 à 1,5 environ, assez pour
+    que l'œil attrape le nombre d'abord. */
 }
 <div class:list={['flex flex-col gap-1.5', className]}>
   <span

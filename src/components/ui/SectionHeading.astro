@@ -1,13 +1,11 @@
 ---
 /**
- * En-tête de section façon page produit : H2 très grand, introduction en texte lead. Trois appelants :
- * 06-Subscribe, 07-Trust et 08-Risks.
- * `motion` (défaut false) : signature d'entrée commune des chapitres de l'accueil (src/scripts/motion.ts),
- * H2 mot à mot (data-reveal-text, ≤ 12 mots) et introduction en fade-up. Laisser à false quand l'en-tête
- * ne doit pas bouger (ex. 08-Risques, contre-poids global de la page).
- *
- * ALLÉGÉ LE 22/09/2026 : le surtitre (`eyebrow`), reçu sans être rendu depuis que les sections n'en
- * portent plus (11/09/2026), et l'alignement centré, qu'aucun appelant ne passait.
+ * En-tête de section façon page produit : H2 très grand, introduction en texte lead. Trois
+ * appelants : 06-Subscribe, 07-Trust et 08-Risks. `motion` (défaut false) : signature d'entrée
+ * commune des chapitres de l'accueil (src/scripts/motion.ts), H2 mot à mot (data-reveal-text, ≤ 12
+ * mots) et introduction en fade-up ; laisser à false quand l'en-tête ne doit pas bouger
+ * (08-Risques, contre-poids global de la page). Le surtitre et l'alignement centré, sans appelant,
+ * ont été retirés le 22/09/2026.
  */
 interface Props {
   id: string;

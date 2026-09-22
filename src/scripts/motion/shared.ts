@@ -16,13 +16,11 @@ export {
 import { refuse, seuilAtteignable } from './dom';
 
 /**
- * RYTHME UNIQUE des entrées (11/09/2026, passe de sobriété) : une seule courbe, une seule gamme de durées
- * et de distances, partagées par reveal.ts, text.ts, draw.ts et scroll.ts, et reprises à
- * l'identique par le moteur léger (lite.ts) et la cascade CSS d'ouverture (global.css, --ease-out-expo).
- *  - EASE `expo.out` : le mouvement finit avant que l'œil ne lise ;
- *  - DURATION 0,6 s (titres 0,7 s), DISTANCE 20 px (titres 24 px), STAGGER 0,08 s entre éléments ;
- *  - START `top 88%` : tous les déclencheurs uniques partent au même seuil ;
- *  - SCRUB 0,6 : lissage identique de tout effet lié au défilement (parallaxe, scrub, tracé).
+ * RYTHME UNIQUE des entrées, partagé par reveal.ts, text.ts, draw.ts et scroll.ts, repris à
+ * l'identique par lite.ts et la cascade CSS (global.css, --ease-out-expo) : EASE `expo.out` (le
+ * mouvement finit avant que l'œil ne lise) ; DURATION 0,6 s (titres 0,7 s), DISTANCE 20 px (titres
+ * 24 px), STAGGER 0,08 s ; START `top 88%` pour tous les déclencheurs uniques ; SCRUB 0,6 pour tout
+ * effet lié au défilement.
  */
 export const EASE = 'expo.out';
 export const DURATION = 0.6;
@@ -36,11 +34,10 @@ export const START_RATIO = 0.88;
 export const SCRUB = 0.6;
 
 /**
- * Propriétés autorisées dans les mini-syntaxes (transform et opacity, jamais de layout).
- * `blur` (17/09/2026) : un flou en pixels, traduit en `filter: blur()` par scroll.ts. C'est la seule
- * propriété non composée du vocabulaire : un filtre se repeint à chaque image. Réservé à un objet
- * décoratif isolé, jamais à du texte ; aujourd'hui le seul usage est le logo du hero, qui triple de
- * taille et se floute pendant que le rideau le recouvre.
+ * Propriétés autorisées dans les mini-syntaxes (transform et opacity, jamais de layout). `blur`,
+ * traduit en `filter: blur()` par scroll.ts, est la seule non composée : un filtre se repeint à
+ * chaque image. Réservé à un objet décoratif isolé, jamais à du texte (le logo du hero, sous le
+ * rideau).
  */
 const SCRUB_PROPS = new Set([
   'x',
@@ -87,10 +84,8 @@ export const parseFromTo = (spec: string, el: Element, attr = 'data-scrub'): Fro
   return Object.keys(to).length ? { from, to } : null;
 };
 
-/**
- * Pose `will-change` le temps d'une animation unique (révélation, dessin) et le retire à la
- * fin avec les propriétés animées, pour rendre la main au navigateur (aucune couche résiduelle).
- */
+/** Pose `will-change` le temps d'une animation unique et le retire à la fin avec les propriétés
+    animées : aucune couche résiduelle. */
 export const onceVars = (targets: gsap.TweenTarget, props: string): gsap.TweenVars => ({
   onStart: () => gsap.set(targets, { willChange: props }),
   onComplete: () => gsap.set(targets, { clearProps: 'willChange' }),

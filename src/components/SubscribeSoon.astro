@@ -1,12 +1,10 @@
 ---
 /**
- * Fenêtre « la souscription arrive bientôt ». Rendue uniquement quand l'URL du tunnel n'est pas
- * encore configurée (Base.astro teste `site.subscribeOpen`) : le jour où la vraie URL est
- * fournie, le composant disparaît et les boutons reprennent leur navigation normale.
- *
- * Élément <dialog> natif : piège à focus, fermeture par Échap et retour du focus au bouton d'origine
- * assurés par le navigateur. Sans JavaScript, le lien conserve son comportement d'origine.
- * Contenu : src/content/fr/subscribeSoon.ts.
+ * Fenêtre « la souscription arrive bientôt », rendue uniquement tant que l'URL du tunnel n'est pas
+ * configurée (Base.astro teste `site.subscribeOpen`) : le jour où elle l'est, le composant
+ * disparaît et les boutons reprennent leur navigation normale. Élément <dialog> natif : piège à
+ * focus, Échap et retour du focus au bouton d'origine assurés par le navigateur ; sans JavaScript,
+ * le lien garde son comportement. Contenu : src/content/fr/subscribeSoon.ts.
  */
 import { subscribeSoon } from '@/content/fr/subscribeSoon';
 ---
@@ -24,11 +22,8 @@ import { subscribeSoon } from '@/content/fr/subscribeSoon';
       {subscribeSoon.body.map((p) => <p>{p}</p>)}
     </div>
     {
-      /*
-       * PLUS DE RENVOI VERS LA DOCUMENTATION depuis le 16/09/2026, demande de l'équipe. La fenêtre
-       * s'ouvrait sur deux boutons : « Voir la documentation » puis « Fermer ». Il ne reste que le
-       * second, qui devient donc le bouton principal de la fenêtre.
-       */
+      /* Un seul bouton, « Fermer », qui est donc le bouton principal : le renvoi vers la
+        documentation a été retiré le 16/09/2026 à la demande de l'équipe. */
     }
     <div class="mt-7 flex flex-wrap gap-3">
       <button
@@ -43,14 +38,11 @@ import { subscribeSoon } from '@/content/fr/subscribeSoon';
 </dialog>
 
 <style>
-  /*
-   * OUVERTURE ET FERMETURE EN FONDU (audit du 16/09/2026) : la fenêtre apparaissait d'un coup, alors que
-   * le tiroir du menu, l'autre dialogue modal du site, glisse en 420 ms. Elle se pose maintenant en
-   * montant d'un cheveu, son voile se fond, et les deux repartent de même.
-   * `@starting-style` donne l'état de départ d'un élément qui vient d'être affiché ; `display` et
-   * `overlay` en transition discrète le gardent affiché et dans la couche supérieure le temps de la
-   * sortie. Un navigateur qui ignore ces règles ouvre et ferme d'un coup, comme avant.
-   */
+  /* Ouverture et fermeture en fondu (audit du 16/09/2026) : la fenêtre apparaissait d'un coup,
+     alors que le tiroir du menu, l'autre dialogue modal du site, glisse en 420 ms.
+     `@starting-style` donne l'état de départ d'un élément qui vient d'être affiché ; `display` et
+     `overlay` en transition discrète le gardent affiché et dans la couche supérieure le temps de la
+     sortie. Un navigateur qui ignore ces règles ouvre et ferme d'un coup. */
   @media (prefers-reduced-motion: no-preference) {
     [data-subscribe-soon] {
       opacity: 0;

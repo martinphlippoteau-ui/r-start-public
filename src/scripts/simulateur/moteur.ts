@@ -1,22 +1,17 @@
 /**
- * SIMULATEUR : LE MOTEUR DE CALCUL (19/09/2026, page /simulateur). Des fonctions pures, sans DOM :
+ * SIMULATEUR : LE MOTEUR DE CALCUL (page /simulateur). Des fonctions pures, sans DOM :
  * ./page.ts les appelle à chaque modification du formulaire, tests/simulateur-moteur.spec.ts les
  * éprouve sans navigateur. Aucune valeur métier n'est écrite ici : le délai de jouissance et le barème
  * de retrait arrivent en paramètre (`Regles`), tirés de facts.ts par src/content/fr/simulator.ts.
- *
- * CE QUE LE MOTEUR SUPPOSE, et que la page affiche sous « Hypothèses de calcul » :
- *  - la valeur de la part ne bouge pas : le capital projeté n'est que la somme de ce qui a été versé
- *    et réinvesti ;
- *  - le taux de distribution choisi par le visiteur est constant, et les revenus sont mensuels ;
- *  - CHAQUE VERSEMENT EST DATÉ : versement initial, versements programmés et revenus réinvestis forment
- *    autant de lots. Un lot ne produit de revenus qu'après le délai de jouissance, et c'est aussi
- *    lot par lot que s'apprécie la commission de retrait anticipé ;
- *  - tous les montants sont bruts, avant fiscalité ; la commission de retrait est CALCULÉE mais jamais
- *    déduite des résultats : la page la signale à part.
- *
- * Inspiré du prototype fourni par Martin le 19/09/2026. Son prélèvement caché sur les revenus
- * réinvestis (20 %, jamais affiché dans l'ancien code, déjà ramené à 0 dans le prototype) n'est pas
- * repris : un paramètre que personne ne règle n'a pas sa place dans un calcul publié.
+ * CE QUE LE MOTEUR SUPPOSE, et que la page affiche sous « Hypothèses de calcul » : la valeur de la
+ * part ne bouge pas (le capital projeté est la somme du versé et du réinvesti) ; le taux choisi est
+ * constant et les revenus mensuels ; CHAQUE VERSEMENT EST DATÉ, versement initial, programmés et
+ * revenus réinvestis forment autant de lots, qui ne produisent qu'après le délai de jouissance et
+ * s'apprécient lot par lot pour la commission de retrait ; tous les montants sont bruts, avant
+ * fiscalité, et la commission de retrait est CALCULÉE mais jamais déduite des résultats, la page la
+ * signale à part. Inspiré du prototype fourni par Martin ; son prélèvement caché sur les revenus
+ * réinvestis n'est pas repris : un paramètre que personne ne règle n'a pas sa place dans un calcul
+ * publié.
  */
 
 /** Ce que le visiteur choisit. */
@@ -33,7 +28,8 @@ export interface Hypotheses {
   rate: number;
 }
 
-/** Un palier de la commission de retrait : `rate` s'applique aux parts détenues depuis moins de `before` ans. */
+/** Un palier de la commission de retrait : `rate` s'applique aux parts détenues depuis moins de
+    `before` ans. */
 export interface PalierRetrait {
   before: number;
   rate: number;

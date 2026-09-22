@@ -13,11 +13,9 @@ import {
 } from '../src/scripts/recherche/moteur';
 
 /**
- * LE MOTEUR DE LA RECHERCHE, SANS NAVIGATEUR (audit du 18/09/2026). Classement, tolérance aux fautes
- * et synonymes ne se vérifiaient qu'à travers le panneau, donc à travers l'index du jour : un test qui
- * cherche « frais » dans le site dit que le site parle de frais, pas que le moteur classe bien.
- * Ici, l'index et les synonymes sont posés par le test, et aucune page n'est ouverte.
- *
+ * LE MOTEUR DE LA RECHERCHE, SANS NAVIGATEUR. Vérifié à travers le panneau, donc à travers l'index
+ * du jour, un test qui cherche « frais » dit que le site parle de frais, pas que le moteur classe
+ * bien. Ici, l'index et les synonymes sont posés par le test, et aucune page n'est ouverte.
  * Les trois profils de Playwright exécuteraient trois fois les mêmes fonctions pures : un seul suffit.
  */
 test.beforeEach(({}, info) => {

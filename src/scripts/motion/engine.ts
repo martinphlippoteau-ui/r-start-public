@@ -22,8 +22,8 @@ export const start = (): void => {
     // Les rideaux, qui ÉPINGLENT, sont créés EN PREMIER : ScrollTrigger rafraîchit dans l'ordre de
     // création et doit connaître les pin-spacers avant de calculer les "start" des déclencheurs situés
     // plus bas dans la page. ScrollTrigger.sort() sécurise ensuite l'ordre.
-    // Ils sont réservés aux écrans larges (10/09/2026) : sur mobile, un épinglage allonge le défilement
-    // (il ajoute sa durée à la hauteur de page) là où l'écran est le plus petit.
+    // Ils sont réservés aux écrans larges : sur mobile, un épinglage allonge le défilement (il
+    // ajoute sa durée à la hauteur de page) là où l'écran est le plus petit.
     mm.add('(min-width: 64rem)', () => {
       setupCurtains();
     });

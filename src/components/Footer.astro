@@ -1,23 +1,14 @@
 ---
 /**
- * Pied de page réglementaire, REFONDU le 14/09/2026. Il empilait logos, quatre colonnes, bouton
- * cookies, mur de mentions et copyright dans une suite de blocs de même poids, sans repère ni retour
- * possible vers le haut : sur /frais, quinze écrans plus bas, la seule issue était de remonter à la
- * main. Ce qui change :
- *  - un filet de marque animé ferme la page par le haut (dégradé qui glisse lentement, arrêté en
- *    reduced-motion) ;
- *  - les logos et le RETOUR EN HAUT partagent la première ligne : le lien pointe vers #contenu, il
- *    fonctionne donc sans JavaScript, et le défilement doux vient de `scroll-behavior` ;
- *  - les colonnes passent de `text-sm` à `text-base`, sur deux colonnes dès le téléphone (elles
- *    s'empilaient une par une) et quatre dès `lg` ; chaque lien a une zone tactile d'au moins 44 px ;
- *  - les liens prennent le soulignement de survol du site (utilitaire `link-underline`) ;
- *  - révélation en cascade des colonnes à l'arrivée du pied de page (data-animate, moteur léger ;
- *    rien sans JavaScript ni en reduced-motion, tout reste visible).
- * Textes : footer.ts (qui assemble les mentions de legal.ts à l'identique). Logos R Start et
- * CORUM L'Épargne ; aucun logo AMF.
- * Plan des titres : un H2 masqué (`footer.navLabel`, « Pied de page ») chapeaute les quatre colonnes,
- * dont les titres sont des H3 ; le bloc légal garde son H2 masqué et ses H3.
- * Tailles : le bloc des mentions obligatoires (commercialNotice, documentsNotice, visa) reste en
+ * Pied de page réglementaire (refondu le 14/09/2026). Un filet de marque animé le ferme par le
+ * haut ; les logos et le RETOUR EN HAUT partagent la première ligne (lien vers #contenu, sans
+ * JavaScript, défilement doux par `scroll-behavior`) ; quatre colonnes en `text-base`, deux dès le
+ * téléphone et quatre dès `lg`, chaque lien avec une zone tactile d'au moins 44 px et le
+ * soulignement `link-underline` ; révélation en cascade des colonnes (data-animate ; tout reste
+ * visible sans JavaScript et en reduced-motion). Textes : footer.ts (qui assemble les mentions de
+ * legal.ts à l'identique). Logos R Start et CORUM L'Épargne ; aucun logo AMF. Titres : un H2 masqué
+ * (`footer.navLabel`) chapeaute les quatre colonnes en H3 ; le bloc légal garde son H2 masqué et
+ * ses H3. Le bloc des mentions obligatoires (commercialNotice, documentsNotice, visa) reste en
  * text-caption (14 px, contrôlé par scripts/check-compliance.mjs : jamais text-xs) ; les blocs
  * d'identité repliés et le copyright peuvent être en text-xs.
  */
@@ -31,16 +22,16 @@ import { withBase } from '@/lib/href';
 
 const hint = footer.externalLinkHint;
 /**
- * Plan V2 §4 : alléger le pied de page sans rien retirer. Le premier bloc légal porte les mentions
- * obligatoires et le visa AMF, il reste déplié. Les suivants (identité, RGPD, médiation, hébergeur)
- * passent dans un <details> : le texte reste dans le document, seul son affichage est replié.
+ * Alléger le pied de page sans rien retirer : le premier bloc légal (mentions obligatoires, visa
+ * AMF) reste déplié ; les suivants (identité, RGPD, médiation, hébergeur) passent dans un
+ * <details>, le texte reste dans le document, seul son affichage est replié.
  */
 const legalBlocks = footer.legalBlocks ?? [];
 const alwaysVisible = legalBlocks.slice(0, 1);
 const collapsible = legalBlocks.slice(1);
 /**
  * Retour en haut : ancre vers #contenu, la même cible que le lien d'évitement de Base.astro, écrite
- * en dur des deux côtés. Un <a> et non un <button> : sans JavaScript il fonctionne quand même, et le
+ * en dur des deux côtés. Un <a> et non un <button> : il fonctionne sans JavaScript, et le
  * défilement doux est celui de la feuille de style.
  */
 const topLabel = footer.backToTopLabel;
@@ -109,14 +100,12 @@ const topLabel = footer.backToTopLabel;
     <nav aria-labelledby="footer-nav-title" class="mt-12 border-t border-mist pt-10 lg:mt-14">
       <h2 id="footer-nav-title" class="visually-hidden">{footer.navLabel}</h2>
       {
-        /* Colonnes CSS et non grille : les quatre blocs n'ont pas le même nombre de liens (huit d'un
-          côté, deux de l'autre) et une grille laissait un trou d'un demi-écran sous le bloc court avant
-          la rangée suivante. Le flux en colonnes répartit les blocs à hauteur égale ; `break-inside`
-          interdit qu'un bloc soit coupé en deux. L'ordre du document ne change pas.
-          Dès `lg`, retour à la GRILLE, une colonne par bloc : les colonnes CSS équilibrent par la
-          hauteur, et le bloc de huit liens en remplissait une à lui seul, les trois autres se
-          tassaient dans la deuxième et la quatrième restait vide. Une grille ignore `column-count`,
-          il n'y a donc rien à annuler. */
+        /* Colonnes CSS et non grille : les quatre blocs n'ont pas le même nombre de liens (huit
+           d'un côté, deux de l'autre) et une grille laissait un trou d'un demi-écran sous le bloc
+           court. Le flux en colonnes équilibre les hauteurs, `break-inside` interdit de couper un
+           bloc, l'ordre du document ne change pas. Dès `lg`, retour à la GRILLE, une colonne par
+           bloc : les colonnes CSS équilibrent par la hauteur, et le bloc de huit liens
+           en remplissait une à lui seul, la quatrième restant vide. */
       }
       <div
         class="columns-2 gap-x-8 lg:grid lg:grid-cols-4 lg:gap-x-10 [&>div]:mb-10 [&>div]:break-inside-avoid lg:[&>div]:mb-0"
@@ -129,17 +118,13 @@ const topLabel = footer.backToTopLabel;
               <h3 class="text-eyebrow text-navy">{col.title}</h3>
               <ul class="mt-4 space-y-0.5" role="list">
                 {
-                  /*
-                   * DOCUMENTS EN ATTENTE (16/09/2026) : une entrée `soon` n'est pas un lien, elle
-                   * déplie « Document bientôt disponible ».
-                   * <details> ET NON UN BOUTON À SCRIPT : le pied de page est le dernier endroit où
-                   * l'on veut dépendre de JavaScript, et l'élément natif donne le clic, le clavier,
-                   * l'état ouvert/fermé annoncé aux lecteurs d'écran et le repli, sans une ligne de
-                   * script. Le marqueur par défaut est retiré (`list-item` neutralisé dans
-                   * global.css via .footer-soon), le titre garde donc l'allure des autres entrées.
-                   * Le <summary> n'imite PAS un lien : pas de soulignement au survol, pour ne pas
-                   * promettre un fichier qui n'arrivera pas.
-                   */
+                  /* Documents en attente : une entrée `soon` n'est pas un lien, elle déplie
+                     « Document bientôt disponible ». <details> ET NON UN BOUTON À SCRIPT : le pied
+                     de page est le dernier endroit où l'on veut dépendre de JavaScript, et
+                     l'élément natif donne clic, clavier, état annoncé et repli sans une ligne de
+                     script (marqueur retiré par .footer-soon, global.css). Le <summary> n'imite PAS
+                     un lien : pas de soulignement au survol, pour ne pas promettre un fichier qui
+                     n'arrivera pas. */
                 }
                 {col.links.map((link) =>
                   link.soon ? (
@@ -206,9 +191,9 @@ const topLabel = footer.backToTopLabel;
         ))
       }
       {
-        /* Replié par défaut : identité de l'éditeur, de la société de gestion, RGPD, médiation, hébergeur.
-          Rien n'est retiré, <details> garde le texte dans le document, lisible par les moteurs et les
-          lecteurs d'écran, et la page reste utilisable sans JavaScript. */
+        /* Replié par défaut : identité de l'éditeur et de la société de gestion, RGPD, médiation,
+           hébergeur. Rien n'est retiré, <details> garde le texte dans le document, lisible par les
+           moteurs et les lecteurs d'écran, et sans JavaScript. */
       }
       {
         collapsible.length > 0 && (
@@ -236,12 +221,9 @@ const topLabel = footer.backToTopLabel;
 </footer>
 
 <style>
-  /*
-   * Filet de marque en haut du pied de page : un dégradé deux fois plus large que l'écran, qui glisse
-   * d'une demi-longueur en boucle. `background-position` seul, aucune géométrie ne bouge, donc aucun
-   * recalcul de mise en page. Immobile en reduced-motion (l'animation n'est déclarée que dans la
-   * media query, le dégradé reste alors posé, visible et net).
-   */
+  /* Filet de marque : un dégradé deux fois plus large que l'écran, qui glisse d'une demi-longueur
+     en boucle. `background-position` seul, aucune géométrie ne bouge, donc aucun recalcul de mise
+     en page. Immobile en reduced-motion (l'animation n'est déclarée que dans la media query). */
   .footer-filet {
     position: absolute;
     inset-inline: 0;
@@ -260,10 +242,9 @@ const topLabel = footer.backToTopLabel;
     background-size: 200% 100%;
     background-position: 0% 0;
   }
-  /* EN PAUSE HORS ÉCRAN (audit du 16/09/2026) : le filet tournait sur toutes les pages, du chargement à
-     la fermeture, alors que le pied de page est hors de l'écran l'essentiel du temps, et il anime
-     `background-position`, repeinte à chaque image. `data-in-view` sur le <footer> pose `is-in-view`
-     tant qu'il traverse l'écran (motion.ts). */
+  /* En pause hors écran (audit du 16/09/2026) : le filet anime `background-position`, repeinte à
+     chaque image, alors que le pied de page est hors de l'écran l'essentiel du temps.
+     `data-in-view` sur le <footer> pose `is-in-view` tant qu'il traverse l'écran (motion.ts). */
   @media (prefers-reduced-motion: no-preference) {
     .footer-filet {
       animation: footer-filet 18s linear infinite;

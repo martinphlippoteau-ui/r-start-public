@@ -14,11 +14,10 @@ import type { CtaPosition } from '@/content/types';
  */
 
 /**
- * UN INTERRUPTEUR D'ENVIRONNEMENT SE LIT D'UNE SEULE FAÇON, ET REFUSE CE QU'IL NE COMPREND PAS (audit du
- * 18/09/2026). PUBLIC_NOINDEX était comparé strictement à 'true' : « True », « 1 » ou « true » suivi
- * d'une espace laissaient la prévisualisation d'un produit financier INDEXABLE, sans un mot, alors que
- * PUBLIC_SUBSCRIBE_OPEN acceptait ces graphies. Les deux passent ici : vrai pour true, 1 ou oui ; faux
- * pour vide, false, 0 ou non ; et toute autre valeur ARRÊTE LE BUILD plutôt que d'être lue comme « faux ».
+ * Un interrupteur d'environnement se lit d'une seule façon et refuse ce qu'il ne comprend pas
+ * (audit du 18/09/2026 : PUBLIC_NOINDEX comparé strictement à 'true' laissait « True » ou « 1 »
+ * rendre la prévisualisation INDEXABLE sans un mot). Vrai pour true, 1 ou oui ; faux pour vide,
+ * false, 0 ou non ; toute autre valeur ARRÊTE LE BUILD plutôt que d'être lue comme « faux ».
  */
 const interrupteur = (nom: string, valeur: string): boolean => {
   const v = valeur.trim();
@@ -52,11 +51,11 @@ export const site = {
 const SUBSCRIBE_SOON_PATH = '/documentation';
 
 /**
- * Destination PRÊTE À POSER d'un CTA « Souscrire ». Tant que la souscription n'est pas ouverte, elle ne
- * pointe PAS vers le tunnel : le clic est intercepté par la fenêtre « la souscription arrive bientôt »
- * (SubscribeSoon.astro), et sans JavaScript le lien mène à la documentation réglementaire plutôt qu'à
- * une URL de tunnel qui n'accueille personne. Le chemin interne est préfixé par le chemin de base ;
- * l'URL du tunnel est absolue et part telle quelle.
+ * Destination PRÊTE À POSER d'un CTA « Souscrire ». Tant que la souscription n'est pas ouverte,
+ * elle ne pointe PAS vers le tunnel : le clic est intercepté par la fenêtre « la souscription
+ * arrive bientôt » (SubscribeSoon.astro), et sans JavaScript le lien mène à la documentation
+ * réglementaire. Le chemin interne est préfixé par le chemin de base ; l'URL du tunnel est absolue
+ * et part telle quelle.
  */
 export function ctaHref(position: CtaPosition): string {
   return site.subscribeOpen ? subscribeHref(position) : withBase(SUBSCRIBE_SOON_PATH);
@@ -67,9 +66,9 @@ export function ctaHref(position: CtaPosition): string {
  * fournie n'en contient pas déjà (pour ne pas écraser un code partenaire).
  */
 export function subscribeHref(position: CtaPosition): string {
-  /* Pas de `try` : l'adresse a été validée à la construction de `site` dès que la souscription est
-     ouverte (voir plus bas). Avant, une adresse mal formée était avalée ici et publiée TELLE QUELLE sur
-     tous les boutons « Souscrire », sans un mot au build. */
+  /* Pas de `try` : l'adresse est validée à la construction de `site` dès que la souscription est
+     ouverte (voir plus bas). Avant, une adresse mal formée était publiée TELLE QUELLE sur tous les
+     boutons. */
   const url = new URL(site.subscribeUrl);
   if (!/utm_/i.test(url.search)) {
     url.searchParams.set('utm_source', 'site-r-start');
@@ -79,13 +78,11 @@ export function subscribeHref(position: CtaPosition): string {
   return url.toString();
 }
 
-/*
- * SOUSCRIPTION OUVERTE = ADRESSE DU TUNNEL VALIDE, OU LE BUILD S'ARRÊTE (audit du 18/09/2026). C'est le
- * lien le plus sensible du site, et le seul cas où le dépôt publiait du faux en silence : un schéma
- * oublié, une espace, une valeur tronquée par le « # » d'un .env (déjà arrivé, voir astro.config.mjs),
- * et tous les CTA partaient avec un href relatif cassé, sans paramètres de campagne. `https:` exigé :
- * on n'envoie personne souscrire en clair.
- */
+/* Souscription ouverte = adresse du tunnel valide, ou le build s'arrête (audit du 18/09/2026).
+   C'est le lien le plus sensible du site, et le seul cas où le dépôt publiait du faux en silence :
+   un schéma oublié, une espace, une valeur tronquée par le « # » d'un .env (déjà arrivé, voir
+   astro.config.mjs), et tous les CTA partaient avec un href relatif cassé. `https:` exigé : on
+   n'envoie personne souscrire en clair. */
 if (site.subscribeOpen) {
   let tunnel: URL;
   try {

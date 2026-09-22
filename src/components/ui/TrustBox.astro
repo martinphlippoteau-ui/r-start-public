@@ -1,28 +1,22 @@
 ---
 /**
- * TrustBox Trustpilot, widget OFFICIEL fourni par Trustpilot (code d'intégration remis par l'équipe le
- * 11/09/2026). Le contenu (logo, note, étoiles, avis) est rendu par Trustpilot dans une iframe : il n'est
- * ni composé ni sélectionné par CORUM, et il n'entre donc pas dans le périmètre du contrôle des
- * formulations du site (scripts/check-compliance.mjs ne voit que le lien de repli).
- *
- * CARROUSEL FILTRÉ depuis le 15/09/2026 : `data-stars` vaut « 4,5 », le widget ne présente donc que les
- * avis favorables. C'est un réglage de l'équipe, et il change la nature de l'intégration : ce n'est plus
- * un flux non trié. L'obligation d'information sur les avis en ligne (art. L111-7-2 du code de la
- * consommation) devait reposer sur un texte de portée et sur une note de source, tous deux réécrits le
- * même jour pour dire que le carrousel est filtré et renvoyer au profil Trustpilot pour l'ensemble
- * des avis. NI L'UN NI L'AUTRE N'A ÉTÉ AFFICHÉ, et tous deux ont quitté le code le 22/09/2026
- * (archivés hors du dépôt, .claude/audits). Ce que le visiteur voit du filtre se limite à la mention
- * que Trustpilot écrit lui-même au bas du carrousel (« Nos avis 4 et 5 étoiles »). Voir facts.ts, `trustpilot.widgets`.
- * Un réglage local qui masquait cette mention (`PUBLIC_TRUSTBOX_CROP`, 15/09/2026), jamais posé en
- * production depuis le 17/09, a été retiré le 22/09/2026 : il ne doit pas revenir, la mention est la
- * seule trace à l'écran du filtre.
- *
- * Le script d'amorçage doit être chargé UNE SEULE FOIS par page, dans le <head> :
- * components/TrustpilotScript.astro, passé à Base.astro par le slot « head ». Sans lui, le contenu du
- * <div> reste tel quel, d'où le lien de repli vers le profil public, qui garde la mention accessible.
- *
- * Identifiants : src/content/fr/facts.ts (`trust.trustpilot.widgets`). Ne jamais les inventer : ils sont
- * propres au compte Trustpilot de CORUM et viennent de son back-office.
+ * TrustBox Trustpilot, widget OFFICIEL (code d'intégration remis par l'équipe le 11/09/2026). Le
+ * contenu (logo, note, étoiles, avis) est rendu par Trustpilot dans une iframe : ni composé ni
+ * sélectionné par CORUM, il n'entre pas dans le périmètre du contrôle des formulations du site
+ * (scripts/check-compliance.mjs ne voit que le lien de repli).
+ * CE QU'IL FAUT SAVOIR CÔTÉ CONFORMITÉ. CARROUSEL FILTRÉ depuis le 15/09/2026 : `data-stars` vaut
+ * « 4,5 », le widget ne présente que les avis favorables. C'est un réglage de l'équipe, et ce n'est
+ * plus un flux non trié. L'obligation d'information sur les avis en ligne (art. L111-7-2 du code de
+ * la consommation) devait reposer sur un texte de portée et une note de source disant que le
+ * carrousel est filtré et renvoyant au profil Trustpilot ; NI L'UN NI L'AUTRE N'A ÉTÉ AFFICHÉ, et
+ * tous deux ont quitté le code le 22/09/2026 (archivés hors du dépôt, .claude/audits). La seule
+ * trace à l'écran du filtre est la mention que Trustpilot écrit lui-même au bas du carrousel (« Nos
+ * avis 4 et 5 étoiles ») : un réglage qui la masquait (`PUBLIC_TRUSTBOX_CROP`) a été retiré le
+ * 22/09/2026 et ne doit pas revenir. Voir facts.ts, `trustpilot.widgets`.
+ * Le script d'amorçage est chargé UNE SEULE FOIS par page, dans le <head>
+ * (components/TrustpilotScript.astro, slot « head » de Base.astro) ; sans lui, le <div> reste tel
+ * quel, d'où le lien de repli vers le profil public. Identifiants : src/content/fr/facts.ts
+ * (`trust.trustpilot.widgets`), propres au compte Trustpilot de CORUM, jamais inventés.
  */
 import { trust as trustFacts } from '@/content/fr/facts';
 

@@ -1,28 +1,23 @@
 ---
 /**
- * Section 6, Souscrire (id « souscrire »), sur l'accueil (trame du 11/09/2026 ; dans HOME_ORDER, entre
- * la bande 03a-Immeuble et Risques 08). Chapitre court qui raconte la souscription 100 % en ligne : H2,
- * le stepper des quatre étapes et son CTA, face au visuel de l'application et aux liens des deux
- * magasins. Pas d'introduction (retirée le 14/09/2026). Le contre-poids qui suivait la liste (rappel du
- * DIC, durée de placement, commission de retrait, rachat non garanti) a été retiré le 11/09/2026 à la
- * demande de l'équipe. Le guide de souscription et le bloc MyCORUM complet vivent sur /documentation.
- * LE RENDU COMPLET (introduction, options facultatives, rappels « lisez le DIC » et commission de
- * retrait), qu'aucune page n'affichait plus, a quitté le code le 22/09/2026 avec Pill et RiskPair ; ses
- * textes sont archivés hors du dépôt (.claude/audits).
- * Fond white.
+ * Section 6, Souscrire (id « souscrire »), sur l'accueil (HOME_ORDER, entre la bande 03a-Immeuble
+ * et Risques 08). Chapitre court qui raconte la souscription 100 % en ligne : H2, le stepper des
+ * quatre étapes et son CTA, face au visuel de l'application et aux liens des deux magasins. Fond
+ * white.
+ * SANS INTRODUCTION NI CONTRE-POIDS : le rappel du DIC, la durée de placement, la commission de
+ * retrait et le rachat non garanti ont été retirés d'ici le 11/09/2026 à la demande de l'équipe ;
+ * les risques restent portés par la section Risques, le guide de souscription et le bloc MyCORUM
+ * complet vivent sur /documentation. Le rendu complet, qu'aucune page n'affichait plus, a quitté
+ * le code le 22/09/2026 (textes archivés hors du dépôt, .claude/audits).
  * Motion (src/scripts/motion.ts) :
- *  - la ligne de progression du stepper est découpée en segments : chaque étape (sauf la dernière)
- *    porte un petit SVG vertical qui va du centre de sa pastille au centre de la suivante (hauteur
- *    100 % + espacement de la liste), tracé au fil du défilement (`data-draw` + `data-draw-scrub`, de
- *    « haut à 75 % » à « bas à 75 % » : la pointe du trait suit toujours la même hauteur d'écran et
- *    le tracé s'arrête exactement sur la dernière pastille). Dégradé continu navy → teal-700 →
- *    teal-500 réparti sur les segments : la pointe reste visible jusqu'au bout ;
- *  - chaque étape entre par `fade-up` à son arrivée dans le viewport, avec un léger décalage par rang
- *    (cascade si plusieurs entrent ensemble) : c'est le seul effet d'entrée de l'étape (sobriété du
- *    11/09/2026 : la pastille n'a plus son `scale`, un effet sur un bloc ET son contenu) ; la liste
- *    elle-même n'est pas animée : aucune révélation n'enveloppe un risque ;
- *  - en-tête : H2 mot à mot (SectionHeading `motion`) ;
- *  - le CTA, dans la liste depuis le 15/09/2026, n'a pas d'effet d'entrée propre.
+ *  - la ligne de progression du stepper est découpée en segments, un SVG par étape tracé au fil du
+ *    défilement (voir le SVG), dégradé continu navy → teal-700 → teal-500 réparti sur les
+ *    segments : la pointe reste visible jusqu'au bout ;
+ *  - chaque étape entre par `fade-up` à son arrivée dans le viewport, avec un léger décalage par
+ *    rang (cascade si plusieurs entrent ensemble) : c'est le seul effet d'entrée de l'étape ; la
+ *    liste elle-même n'est pas animée : aucune révélation n'enveloppe un risque ;
+ *  - en-tête : H2 mot à mot (SectionHeading `motion`) ; le CTA, dans la liste, n'a pas d'effet
+ *    d'entrée propre.
  * Sans JS ou en reduced-motion : ligne dessinée, tout visible, rien ne bouge.
  * Contenu : src/content/fr/subscribe.ts (dont `app`).
  */
@@ -38,15 +33,13 @@ import { resolveImage } from '@/lib/images';
 import { subscribe } from '@/content/fr/subscribe';
 
 /**
- * Accueil (11/09/2026) : la photo d'immeuble laisse la place au téléphone affichant R Start, un parcours
- * 100 % en ligne se raconte mieux avec l'écran qu'avec une terrasse.
- * Le visuel est un PNG DÉTOURÉ : il n'a pas de fond, donc ni cadre, ni masque de fondu, ni recadrage ,
- * ses bords sont la silhouette du téléphone, et un masque y mordrait.
- * Largeur bornée à 19 rem sur grand écran (11/09/2026) pour que le BAS DES BADGES tombe sur la dernière
- * étape : le visuel mesure 1,586 fois sa largeur, plus 16 px d'écart et 46 px de badges, à caler sur les
- * 559 px que couvrent les quatre étapes. Le téléphone démarre un peu plus bas que l'étape 1 : le fichier
- * porte 10,6 % de marge transparente en haut, que seule une marge négative effacerait, elle ferait
- * remonter le visuel sur l'introduction. La source ne fait de toute façon que 338 px de large.
+ * Le visuel est un PNG DÉTOURÉ du téléphone affichant R Start (un parcours 100 % en ligne se
+ * raconte mieux avec l'écran qu'avec une terrasse) : il n'a pas de fond, donc ni cadre, ni masque
+ * de fondu, ni recadrage, ses bords sont la silhouette du téléphone et un masque y mordrait.
+ * Largeur bornée à 19 rem sur grand écran pour que le BAS DES BADGES tombe sur la dernière étape :
+ * le visuel mesure 1,586 fois sa largeur, plus 16 px d'écart et 46 px de badges, à caler sur les
+ * 559 px que couvrent les quatre étapes. Le téléphone démarre un peu plus bas que l'étape 1 : le
+ * fichier porte 10,6 % de marge transparente en haut. La source ne fait que 338 px de large.
  */
 const photo = await resolveImage(media.app.src);
 /** Les deux magasins, dans l'ordre du contenu (App Store puis Google Play). */
@@ -91,9 +84,12 @@ const STEP_STAGGER = 0.06;
               data-animate="fade-up"
               data-animate-delay={String(i * STEP_STAGGER)}
             >
-              {/* Segment de la ligne de progression : du centre de cette pastille (top-6) au centre de la suivante
-                  (hauteur 100 % + espacement space-y-10 / sm:space-y-14 de la liste), tracé au scroll
-                  (stroke-dashoffset), entièrement dessiné sans JS. Absent sur la dernière étape : la ligne s'y arrête. */}
+              {/* Segment de la ligne de progression : du centre de cette pastille (top-6) au centre
+                  de la suivante (hauteur 100 % + espacement space-y-10 / sm:space-y-14 de la
+                  liste), tracé au scroll (`data-draw` + `data-draw-scrub`, de « haut à 75 % » à
+                  « bas à 75 % » : la pointe du trait suit toujours la même hauteur d'écran et
+                  s'arrête exactement sur la dernière pastille), entièrement dessiné sans JS. Absent
+                  sur la dernière étape : la ligne s'y arrête. */}
               {i < lastStep && (
                 <svg
                   aria-hidden="true"
@@ -147,14 +143,13 @@ const STEP_STAGGER = 0.06;
           ))
         }
         {
-          /* APPEL À L'ACTION APRÈS LES ÉTAPES (15/09/2026, demande de l'équipe). `primary` : celui-ci
-            mène au tunnel de souscription, contrairement aux appels secondaires des sections
-            précédentes, et il arrive au terme du parcours qu'il conclut.
-            Il porte `position` : c'est ce qui le rattache au plan de taggage, comme les autres CTA de
-            souscription, et ce qui lui fait ouvrir la fenêtre d'attente tant que le tunnel n'est pas
-            ouvert (tests/qualite.spec.ts le vérifie sur tous les CTA de souscription).
-            DANS la liste plutôt qu'après elle : la colonne de droite porte la photo en `lg:sticky`, un
-            frère de la liste se placerait sous elle et non sous les étapes. */
+          /* APPEL À L'ACTION APRÈS LES ÉTAPES (15/09/2026, demande de l'équipe). `primary` : il
+            mène au tunnel de souscription, au terme du parcours qu'il conclut. Il porte
+            `position` : c'est ce qui le rattache au plan de taggage et lui fait ouvrir la fenêtre
+            d'attente tant que le tunnel n'est pas ouvert (tests/qualite.spec.ts le vérifie sur tous
+            les CTA de souscription). DANS la liste plutôt qu'après elle : la colonne de droite
+            porte la photo en `lg:sticky`, un frère de la liste se placerait sous elle et non sous
+            les étapes. */
         }
         <li class="mt-12 list-none">
           <Button position={subscribe.cta.position} variant="primary" size="lg">
@@ -164,14 +159,8 @@ const STEP_STAGGER = 0.06;
       </ol>
 
       {
-        /* Le contre-poids des étapes (rappel du DIC, durée de placement, commission de retrait) a été
-          retiré de l'accueil le 11/09/2026 à la demande de l'équipe. Les risques restent portés par la
-          section Risques ; le rappel complet vit sur /documentation. */
-      }
-
-      {
-        /* Photo d'illustration à droite des étapes (11/09/2026, la page manquait d'images).
-          Purement décorative pour la conformité : elle ne porte aucun avantage. */
+        /* Visuel à droite des étapes, purement décoratif pour la conformité : il ne porte aucun
+          avantage. */
       }
       <figure
         class="mx-auto w-full max-w-[18rem] self-start sm:max-w-[20rem] lg:sticky lg:top-24 lg:col-span-5 lg:max-w-[19rem]"
@@ -190,9 +179,8 @@ const STEP_STAGGER = 0.06;
         />
 
         {
-          /* Les deux magasins sous le visuel : ce sont de vrais liens vers les fiches MyCORUM
-            (src/content/fr/subscribe.ts). Ils remplacent les badges incrustés dans la photo, que le
-            recadrage retire, ceux-là portaient des noms de marque erronés. */
+          /* Les deux magasins sous le visuel : de vrais liens vers les fiches MyCORUM
+            (src/content/fr/subscribe.ts), et non des badges incrustés dans la photo. */
           subscribe.app?.stores && (
             <figcaption class="mt-4">
               <span id={storeHintId} hidden>
@@ -221,10 +209,8 @@ const STEP_STAGGER = 0.06;
     </div>
 
     {
-      /* Le CTA qui fermait la section est retiré (12/09/2026, demande de l'équipe) : la pastille
-        flottante le porte désormais, et elle apparaît précisément à l'arrivée de cette section. Deux
-        boutons identiques à quelques centaines de pixels l'un de l'autre ne servaient qu'à se
-        concurrencer. */
+      /* Plus de CTA en pied de section (12/09/2026, demande de l'équipe) : la pastille flottante le
+        porte, et elle apparaît précisément à l'arrivée de cette section. */
     }
   </Container>
 </Section>

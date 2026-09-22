@@ -25,13 +25,12 @@ const maxAgeDays = consentCookie.days;
 
 window.dataLayer = window.dataLayer || [];
 /**
- * `arguments`, ET SURTOUT PAS UN TABLEAU (audit du 18/09/2026). GTM ne reconnaît une commande gtag que
- * si l'entrée du dataLayer est un objet Arguments ; un tableau, ce que donnait le paramètre de reste
- * `...args`, est lu comme un « command array » et ignoré sans un mot. Aucun signal du Consent Mode
- * n'arrivait donc au conteneur : ni le refus par défaut posé plus bas, ni l'accord, ni, surtout, le
- * RETRAIT, après lequel les tags continuaient. C'est la forme de la documentation de Google, à ne pas
- * « moderniser » : une fonction déclarée (une fléchée n'a pas d'`arguments`), et le paramètre de reste
- * n'est là que pour le typage des appels. tests/qualite.spec.ts vérifie la forme de l'entrée.
+ * `arguments`, ET SURTOUT PAS UN TABLEAU. GTM ne reconnaît une commande gtag que si l'entrée du
+ * dataLayer est un objet Arguments ; un tableau (`...args`) est ignoré sans un mot, et aucun signal
+ * du Consent Mode n'arrivait au conteneur, surtout pas le RETRAIT, après lequel les tags
+ * continuaient. Forme de la documentation de Google, à ne pas « moderniser » : une fonction
+ * déclarée (une fléchée n'a pas d'`arguments`), le paramètre de reste ne sert qu'au typage.
+ * tests/qualite.spec.ts le vérifie.
  */
 function gtag(..._commande: unknown[]): void {
   // eslint-disable-next-line prefer-rest-params
@@ -40,20 +39,17 @@ function gtag(..._commande: unknown[]): void {
 
 const readCookie = (): ConsentStatus => {
   const match = document.cookie.match(new RegExp('(?:^|; )' + cookieName + '=([^;]*)'));
-  /* SANS `decodeURIComponent` (audit du 18/09/2026) : les deux seules valeurs admises sont de l'ASCII
-     pur, et un cookie mal encodé (« % », que tout sous-domaine peut écrire) levait une URIError à
-     l'évaluation du module. Celui-ci est livré dans le même fichier que la mesure, la campagne et le
-     moteur d'animation : tout tombait avec lui, à chaque page, pendant les 180 jours de vie du cookie. */
+  /* SANS `decodeURIComponent` : les valeurs admises sont de l'ASCII pur, et un cookie mal encodé («
+     % », que tout sous-domaine peut écrire) levait une URIError à l'évaluation du module, livré
+     avec la mesure, la campagne et le moteur d'animation : tout tombait avec lui, à chaque page,
+     180 jours. */
   const value = match?.[1] ?? '';
   return value === 'granted' || value === 'denied' ? value : 'unset';
 };
 
-/**
- * Domaine du cookie : `.r-start.com` dès que le site y est servi, pour que le choix vaille AUSSI sur le
- * sous-domaine du tunnel de souscription (14/09/2026) ; sans cela le tunnel redemanderait le
- * consentement à un visiteur qui vient de le donner. Vide partout ailleurs, sur localhost comme sur la
- * prévisualisation github.io : un cookie portant un domaine étranger à l'hôte est simplement rejeté.
- */
+/** Domaine du cookie : `.r-start.com` dès que le site y est servi, pour que le choix vaille AUSSI
+    sur le sous-domaine du tunnel. Vide ailleurs (localhost, github.io) : un cookie portant un
+    domaine étranger à l'hôte est rejeté. */
 const cookieDomain = (): string => {
   const hote = location.hostname;
   return hote === 'r-start.com' || hote.endsWith('.r-start.com') ? '; Domain=.r-start.com' : '';
@@ -84,19 +80,16 @@ const loadGtm = () => {
   document.head.appendChild(s);
 };
 
-/**
- * Le choix du visiteur, envoyé au dataLayer. Indispensable pour interpréter tout le reste : sans lui on
- * ne sait pas quelle part du trafic est mesurée, et les écarts avec les journaux serveur sont
- * inexplicables. Envoyé même sur un refus : la file est rejouée si le conteneur se charge un jour, et
- * un refus qui n'arrive jamais ressemble à une visite qui n'a rien choisi.
- */
+/** Le choix du visiteur, envoyé au dataLayer : sans lui on ne sait pas quelle part du trafic est
+    mesurée. Envoyé même sur un refus, sinon la file rejouée plus tard ressemble à une visite qui
+    n'a rien choisi. */
 const pousserChoix = (
   choix: 'accepte' | 'refuse' | 'personnalise',
   origine: 'bandeau' | 'reouverture'
 ) => {
-  /* Par le canal commun (`rstart:mesure`, écouté par analytics.ts) et plus en écrivant dans le
-     dataLayer : l'événement ne recevait que `page_type`, sans `souscription_ouverte` ni la campagne
-     d'entrée que le plan de taggage promet « à chaque événement ». */
+  /* Par le canal commun (`rstart:mesure`, écouté par analytics.ts), pas en écrivant dans le
+     dataLayer : l'événement partirait sans `souscription_ouverte` ni la campagne d'entrée que le
+     plan de taggage promet « à chaque événement ». */
   document.dispatchEvent(
     new CustomEvent('rstart:mesure', { detail: { event: 'consentement', choix, origine } })
   );
@@ -105,11 +98,8 @@ const pousserChoix = (
 /** Le bandeau a-t-il été rouvert depuis le pied de page, ou est-ce le premier affichage ? */
 let rouvert = false;
 
-/**
- * Efface les cookies de Google Analytics (`_ga`, `_ga_<propriété>`) sur l'hôte et sur chacun de ses
- * domaines parents : on ne sait pas sur lequel GA4 les a posés, et un cookie ne s'efface que sur le
- * domaine exact où il a été écrit.
- */
+/** Efface les cookies de Google Analytics (`_ga`, `_ga_<propriété>`) sur l'hôte et chacun de ses
+    domaines parents : un cookie ne s'efface que sur le domaine exact où il a été écrit. */
 const effacerCookiesMesure = () => {
   const noms = document.cookie
     .split(';')
@@ -127,19 +117,16 @@ const effacerCookiesMesure = () => {
   }
 };
 
-/** Dernier choix appliqué sur cette page : il dit si un refus est un RETRAIT, et un accord un revirement. */
+/** Dernier choix appliqué sur cette page : il dit si un refus est un RETRAIT, et un accord un
+    revirement. */
 let applique: ConsentStatus = 'unset';
 
 /**
- * CE QUE « REFUSER APRÈS AVOIR ACCEPTÉ » DOIT VRAIMENT FAIRE (audit du 18/09/2026). Le signal de refus
- * était envoyé, mais les cookies `_ga` posés pendant l'accord restaient en place pour treize mois, alors
- * que la politique du site dit « plus aucune donnée n'est envoyée ». Ils sont effacés au retrait.
- *
- * ET L'INVERSE : ACCEPTER APRÈS AVOIR REFUSÉ. La file `dataLayer` garde tout ce que la page y a poussé,
- * et GTM la rejoue en entier à son chargement : les gestes faits PENDANT le refus seraient envoyés à
- * GA4 après coup. Ils sont retirés de la file avant le chargement du conteneur. La file n'est PAS
- * purgée pour un visiteur qui n'a encore rien choisi : c'est le fonctionnement voulu du plan de
- * taggage, rien n'est perdu entre l'arrivée et l'accord.
+ * REFUSER APRÈS AVOIR ACCEPTÉ : le signal ne suffit pas, les cookies `_ga` resteraient treize mois
+ * alors que la politique dit « plus aucune donnée n'est envoyée ». Ils sont effacés au retrait.
+ * ACCEPTER APRÈS AVOIR REFUSÉ : GTM rejoue la file `dataLayer` en entier à son chargement, et les
+ * gestes faits PENDANT le refus partiraient après coup. Ils sont retirés de la file avant. Rien
+ * n'est purgé pour un visiteur qui n'a encore rien choisi : c'est le plan de taggage.
  */
 const applyConsent = (status: ConsentStatus) => {
   if (status === 'granted') {
@@ -160,11 +147,8 @@ const applyConsent = (status: ConsentStatus) => {
   applique = status;
 };
 
-/**
- * LE FOCUS VA AU TITRE DU BANDEAU, pas à « Tout accepter » (audit du 18/09/2026). Les deux boutons ont
- * le même poids à l'écran, mais au clavier Entrée acceptait d'office : le choix n'était neutre que pour
- * la souris. Le titre est lu par le lecteur d'écran, et Tab mène ensuite aux boutons dans leur ordre.
- */
+/** LE FOCUS VA AU TITRE DU BANDEAU, pas à « Tout accepter » : au clavier, Entrée acceptait d'office
+    et le choix n'était neutre que pour la souris. Tab mène ensuite aux boutons dans leur ordre. */
 const show = () => {
   if (!banner) return;
   banner.hidden = false;
@@ -195,15 +179,10 @@ gtag('consent', 'default', {
 
 const current = readCookie();
 if (current === 'unset') {
-  /**
-   * Le bandeau n'est déplié qu'une fois les polices prêtes. Affiché avant, il se compose en police de
-   * repli, puis se recompose quand Plus Jakarta Sans arrive : sa hauteur change et son contenu saute.
-   * C'était l'unique source de décalage de mise en page mesurée par Lighthouse sur l'accueil
-   * (CLS 0,123 en 1440×900, imputé au bandeau, cause « Web font loaded »).
-   * `document.fonts.ready` se résout aussi lorsque le chargement échoue ; le repli couvre les
-   * navigateurs sans l'API. L'attente se compte en dizaines de millisecondes : aucun tag n'est chargé
-   * entre-temps, le consentement reste refusé par défaut.
-   */
+  /* Le bandeau n'est déplié qu'une fois les polices prêtes : affiché avant, il se recomposait à
+     l'arrivée de Plus Jakarta Sans, seule source de CLS mesurée sur l'accueil (0,123).
+     `document.fonts.ready` se résout aussi en cas d'échec ; le repli couvre les navigateurs sans
+     l'API. Aucun tag n'est chargé entre-temps. */
   if (document.fonts?.ready) void document.fonts.ready.then(show);
   else show();
 } else applyConsent(current);

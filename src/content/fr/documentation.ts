@@ -18,25 +18,13 @@ import { PENDING_DOCUMENT_KEYS } from '@/content/fr/pendingDocuments';
 import { lowerFirst, nb } from '@/lib/texte';
 
 /**
- * Page /documentation (périmètre v2, plan §12) : centre de documents de R Start.
- * Groupes (réglementaire, frais, formulaires) construits depuis facts.documents et facts.documentsExtra, poids
- * des PDF issus de media.manifest.json, guide de souscription en quatre étapes cohérent avec subscribe.ts,
- * FAQ importée de faq.ts (jamais recopiée) et mention 2 importée de legal.ts à l'identique.
- * Un groupe sans document publié n'est pas livré au composant.
- *
- * Documents en attente (voir PENDING_DOCUMENT_KEYS et README, « Points en attente ») :
- *  - statuts : PDF tronqué et illisible ;
- *  - DIC : le fichier fourni par CORUM (V7, 20/05/2026) classe R Start en 3 sur 7 ; le site affiche
- *    4 sur 7 depuis le 14/09/2026, valeur de la brochure et de CORUM (08/09/2026), et facts.risk
- *    porte l'écart. Le PDF n'est plus servi depuis le 18/09/2026 (pendingDocuments.ts). Publié dès
- *    que CORUM confirme la version du DIC en vigueur. Tant qu'il est en attente, le titre SEO,
- *    l'intro du hero, le lien corum.fr et l'intro du groupe réglementaire renvoient au DIC sur
- *    www.corum.fr ; la FAQ n'est plus filtrée sur ce point (elle donne 4 sur 7, sans l'attribuer
- *    au DIC) ;
- *  - simulation des frais ex-ante (V2, 27/03/2026) : affiche 1,12 % de frais de souscription et des montants
- *    d'épargne espérée issus des scénarios du DIC ; publiée dès livraison d'une version corrigée et validée.
- * PENDING_DOCUMENT_KEYS est la décision unique de publication : cette page la lit.
- * Aucune donnée de performance. La brochure partenaires (B2B) n'est jamais publiée.
+ * Page /documentation : centre de documents de R Start. Groupes (réglementaire, frais, formulaires)
+ * construits depuis facts.documents et facts.documentsExtra, poids des PDF issus de
+ * media.manifest.json, guide de souscription cohérent avec subscribe.ts, FAQ importée de faq.ts
+ * (jamais recopiée) et mention 2 importée de legal.ts à l'identique. Un groupe sans document publié
+ * n'est pas livré au composant. PENDING_DOCUMENT_KEYS est la décision unique de publication : cette
+ * page la lit, et les raisons de chaque attente sont au-dessus d'`isDocumentPublished`. Aucune
+ * donnée de performance. La brochure partenaires (B2B) n'est jamais publiée.
  */
 
 /** Poids (ko) des PDF indexé par chemin public, depuis le manifeste des médias (`documents[].kb`). */
@@ -64,25 +52,20 @@ const toItem = (d: {
 };
 
 /**
- * Clés de facts.documents et facts.documentsExtra exclues de la publication tant que CORUM n'a pas livré le
- * fichier attendu (voir en-tête). Retirer une clé dès réception, dans pendingDocuments.ts, et revoir en
- * même temps le seuil de liens PDF de scripts/check-compliance.mjs pour les statuts.
+ * DOCUMENTS EN ATTENTE, clés de pendingDocuments.ts (retirer la clé dès réception, et revoir alors
+ * le seuil de liens PDF de scripts/check-compliance.mjs pour les statuts) :
+ *  - statuts : PDF tronqué à la source, illisible ;
+ *  - DIC : le fichier fourni par CORUM (V7, 20/05/2026) classe R Start en 3 sur 7 et le site
+ *    affiche 4 sur 7 (valeur de l'équipe ; facts.risk porte l'écart, que l'AMF avait relevé sur la
+ *    brochure) : une communication commerciale ne peut pas contredire le document réglementaire.
+ *    Non servi depuis le 18/09/2026 tant que CORUM n'a pas confirmé la version en vigueur ; entre
+ *    temps, le titre SEO, l'intro du hero, le lien corum.fr et l'intro du groupe réglementaire
+ *    renvoient au DIC sur www.corum.fr ;
+ *  - simulation des frais ex-ante (V2, 27/03/2026) : affiche 1,12 % de frais de souscription et des
+ *    montants d'épargne espérée issus des scénarios du DIC, qui contredisent le 0 % du site et
+ *    publient une donnée de performance (interdite tant que R Start a moins de 12 mois).
+ * Un document en attente n'est ni lié ici ni copié dans public/documents (prepare-images.mjs).
  */
-// Retours AMF de la réunion produit du 10/09/2026 (voir plan §0) :
-//  - DIC : le fichier fourni (V7, 20/05/2026) classe R Start en 3 sur 7 ; le site s'y était
-//    aligné le 10/09/2026 (facts.risk.sri), une communication commerciale ne pouvant contredire
-//    le document réglementaire consultable (écart relevé par l'AMF). Il est remonté à 4 sur 7 le
-//    14/09/2026, valeur de l'équipe (facts.risk.sriLabel, qui porte l'écart) : le site contredit de
-//    nouveau le DIC. Celui-ci reste en attente, et n'est plus servi depuis le 18/09/2026, tant que
-//    CORUM n'a pas confirmé la version en vigueur (voir README, « Points en attente ») ; retirer
-//    alors la clé de pendingDocuments.ts ;
-//  - simulation des frais ex-ante (V2, 27/03/2026) : affiche 1,12 % de frais de souscription et des
-//    montants d'épargne espérée issus des scénarios du DIC, qui contredisent le 0 % affiché sur tout le
-//    site et publient une donnée de performance (interdite tant que R Start a moins de 12 mois).
-// Les statuts restent en attente pour une autre raison (PDF tronqué à la source, illisible).
-// La liste elle-même vit dans pendingDocuments.ts, un module sans import que l'outillage Node peut
-// lire : depuis le 18/09/2026 un document en attente n'est plus seulement sans lien, il n'est plus copié
-// dans public/documents (il y restait téléchargeable à son adresse directe).
 /** Un document de facts.ts est-il publié sur les pages v2 ? */
 const isDocumentPublished = (key: string): boolean => !PENDING_DOCUMENT_KEYS.includes(key);
 const isPublished = (d: { key: string }): boolean => isDocumentPublished(d.key);
@@ -94,39 +77,14 @@ const regulatoryDocuments = documentFacts.filter(isPublished);
 const feeDocuments = documentsExtra.filter((d) => d.group === 'frais').filter(isPublished);
 const formDocuments = documentsExtra.filter((d) => d.group === 'formulaire').filter(isPublished);
 
-/**
- * La question de la FAQ sur les risques n'est plus écartée depuis le 10/09/2026. Elle citait alors
- * le DIC du 20/05/2026 (3 sur 7) ; elle donne aujourd'hui 4 sur 7 (« Quel est le niveau de risque
- * de R Start ? »), sans l'attribuer au DIC. Le filtre par sujet qui la tenait hors de cette page
- * (FAQ_SUJETS_DOCUMENTAIRES) n'existe plus : la page reprend les quatre premières questions de
- * faq.ts (voir plus bas).
- */
+/* La question de la FAQ sur le niveau de risque n'est plus écartée : elle donne 4 sur 7 sans
+   l'attribuer au DIC. */
 const availableFaqItems = faq.allItems ?? faq.items;
 
 /**
- * HISTORIQUE, remplacé le 16/09/2026 par le commentaire suivant : la sélection par sujet et son
- * garde-fou décrits ici n'existent plus.
- * La page reprenait la FAQ entière de l'accueil : seize questions rendues deux fois sur le site, dont
- * les revenus, la fiscalité, la stratégie ou la zone d'investissement, qui n'ont rien à faire dans un
- * centre de documents. Elle ne garde que ce qu'un lecteur venu chercher un document a besoin de savoir :
- * comment souscrire, ce qu'il signe, quand les revenus commencent, comment sortir. Les autres questions
- * restent lisibles à un lien d'ici, par le renvoi vers la FAQ complète de l'accueil.
- *
- * La sélection porte sur le SUJET de la question, pas sur le texte de la réponse : presque toutes les
- * réponses citent la souscription, filtrer dessus ne retirait rien. Les libellés ne sont pas recopiés
- * (ils dériveraient au premier ajustement de faq.ts) : on reconnaît le sujet à un mot. Le garde-fou
- * ci-dessous fait échouer le build si une reformulation dans faq.ts vidait ou gonflait la liste, plutôt
- * que de changer la page en silence.
- */
-/**
- * QUATRE QUESTIONS depuis le 16/09/2026, demande de l'équipe : « 4 questions sur chaque page puis un CTA
- * secondaire pour aller vers la page /faq ». Cette page portait la FAQ complète depuis le 11/09 ; celle-ci
- * a désormais sa propre page, avec un champ de recherche, et /documentation redevient un centre de
- * documents avec un aperçu de questions.
- *
- * CE SONT LES QUATRE PREMIÈRES, et non une nouvelle sélection par sujet : le filtre par mot-clé qui avait
- * existé ici dérivait au premier ajustement d'un libellé dans faq.ts, ce que son propre garde-fou disait.
- * Toutes les autres restent à un lien, sur /faq.
+ * Les QUATRE PREMIÈRES questions (16/09/2026, demande de l'équipe : « 4 questions sur chaque page
+ * puis un CTA secondaire pour aller vers la page /faq »), et non une sélection par sujet : le
+ * filtre par mot-clé qui a existé ici dérivait au premier ajustement d'un libellé dans faq.ts.
  */
 const faqItems = availableFaqItems.slice(0, 4);
 const pei = subscription.options.pei;
@@ -184,10 +142,8 @@ export const documentation = {
     intro: nb(
       `Les documents de R Start, au même endroit : documents réglementaires et formulaires. Ce sont eux qui font foi. Lisez le DIC${dicPublished ? '' : ', disponible sur corum.fr,'} et la note d’information avant toute décision.`
     ),
-    /* Plus de ligne risques dans l'en-tête (14/09/2026, demande de l'équipe : « supprime les bon à
-       savoir de tous les hero sauf celui de la home », puis celui de l'accueil le même jour). Il
-       reste les mentions de risque du contenu, quand il en porte, et le pied de page, commun à tout
-       le site. */
+    /* Plus de ligne risques dans l'en-tête (14/09/2026, « supprime les bon à savoir de tous les
+       hero sauf celui de la home ») ; restent les mentions du contenu et le pied de page. */
   },
 
   groups,

@@ -1,12 +1,10 @@
 /**
  * SIMULATEUR : LA GÉOMÉTRIE DU GRAPHIQUE. Fonctions pures, sans DOM : des nombres entrent, des chemins
  * SVG et des positions sortent. ./page.ts les pose dans le squelette que Simulator.astro a rendu.
- *
- * DEUX CADRES, UN SEUL GRAPHIQUE (20/09/2026). Un SVG se réduit avec sa boîte, texte compris : dessiné
- * pour 720 unités de large et affiché dans les 316 px d'un téléphone, ses montants et ses années
- * faisaient 5 px de haut. Sous `SEUIL_ETROIT` pixels de large, le graphique est donc dessiné dans un
- * cadre de 360 unités, plus haut en proportion, où le même corps de texte se lit à peu près à sa
- * taille. `cadrePour` choisit ; ./page.ts pose le `viewBox` et replace ce qui en dépend.
+ * DEUX CADRES, UN SEUL GRAPHIQUE : un SVG se réduit avec sa boîte, texte compris, et dessiné pour
+ * 720 unités dans les 316 px d'un téléphone, ses montants faisaient 5 px de haut. Sous
+ * `SEUIL_ETROIT`, le graphique est dessiné dans un cadre de 360 unités, plus haut en proportion.
+ * `cadrePour` choisit ; ./page.ts pose le `viewBox` et replace ce qui en dépend.
  */
 export interface Cadre {
   largeur: number;

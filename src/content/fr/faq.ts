@@ -4,42 +4,24 @@ import { fees, risk, share } from '@/content/fr/facts';
 import { nb } from '@/lib/texte';
 
 /**
- * Section « FAQ » et page /faq. Les questions servent aussi de base au JSON-LD FAQPage, limité aux
- * questions visibles (src/lib/seo.ts).
- * L'ancien ordre de lecture, calé sur les dix questions SEO de seo.ts (`faqQuestions`) et les six
- * questions de pédagogie de la V2, ne correspondait plus aux questions présentes : retiré le 22/09/2026
- * avec `faqQuestions`.
+ * Section « FAQ » des pages courtes et page /faq. Les questions servent aussi de base au JSON-LD
+ * FAQPage, limité aux questions visibles (src/lib/seo.ts).
  *
- * Vocabulaire (V2, §3) : à l'affichage, on écrit « frais sur les achats d'immeubles ». Le terme
- * réglementaire « frais d'acquisition » ne subsiste que dans facts.ts.
+ * Vingt-deux questions en six rubriques, contenu fourni par l'équipe le 16/09/2026 et repris mot
+ * pour mot : les chiffres y sont écrits en toutes lettres, et le garde-fou en bas de fichier arrête
+ * le build s'ils ne correspondent plus à facts.ts. Trois tableaux à deux colonnes (barème des
+ * frais, commission sur les plus-values, commission de retrait) pour que les chiffres se lisent en
+ * colonnes et tiennent sur un téléphone. Le contenu porte ses propres réserves dans le corps des
+ * réponses (« ne peut pas être garantie », « le capital et les revenus ne sont pas garantis »).
  *
- * Règles appliquées : aucune donnée de performance ; chaque avantage cité est contrebalancé par son
- * risque dans la même réponse, dans le corps même de la réponse ; aucun « 0 % »
- * sans les frais réellement appliqués dans le même bloc ; fiscalité limitée à la nature des revenus
- * (note d'information, chapitre IV) et au prélèvement à la source du bulletin, sans conseil
- * personnalisé ; tous les chiffres et libellés réglementaires (paliers de la commission de retrait,
- * date de jouissance, chiffres du groupe) viennent de facts.ts ; l'encadré « Une innovation, pas une
- * révolution » est importé de legal.ts à l'identique.
+ * Règles : aucune donnée de performance ; aucun « 0 % » sans les frais réellement appliqués dans le
+ * même bloc ; fiscalité limitée à la nature des revenus (note d'information, chapitre IV) et au
+ * prélèvement à la source du bulletin, sans conseil personnalisé. À l'affichage, on écrit « frais
+ * sur les achats d'immeubles » ; le terme réglementaire « frais d'acquisition » reste dans
+ * facts.ts.
  */
 
 /** Questions et réponses avant application de la typographie française (voir `nb`). */
-/*
- * VINGT-DEUX QUESTIONS EN SIX RUBRIQUES, contenu fourni par l'équipe le 16/09/2026 et repris mot pour
- * mot. Il remplace les seize questions précédentes.
- *
- * TROIS TABLEAUX y sont rendus tels quels (barème des frais, commission sur les plus-values,
- * commission de retrait) : les chiffres s'y lisent en colonnes, les couler en phrases les rendrait
- * illisibles. Deux colonnes et pas davantage, pour qu'ils tiennent sur un téléphone.
- *
- * CE QUI A ÉTÉ SIGNALÉ À L'ÉQUIPE et qui n'est pas arbitré : « Nous recommandons de garder vos parts
- * au moins 10 ans » est la durée du DIC et vaut pour tout le site, mais la carte « Horizon
- * d'investissement » de l'accueil dit « 8 ans minimum », choix de l'équipe du même jour. Les deux
- * coexistent donc sur des pages différentes.
- *
- * Le contenu fourni porte ses propres réserves dans le corps des réponses (« ne peut pas être
- * garantie », « le capital et les revenus ne sont pas garantis ») : plus aucune réponse n'est coupée
- * en avantage et contre-poids.
- */
 const RUB = {
   comprendre: 'Comprendre R Start',
   frais: 'Les frais',
@@ -252,9 +234,8 @@ const rawItems: FaqContent['items'] = [
 ];
 
 /*
- * LES QUATRE QUESTIONS DES PAGES COURTES. Prises dans l'ordre du document : ce qu'est R Start, si elle
- * verse des revenus, ses frais, et le prix d'une part. Le garde-fou ci-dessous fait échouer le build si
- * un libellé change dans la liste ci-dessus, plutôt que de réduire la FAQ en silence.
+ * Les quatre questions des pages courtes, dans l'ordre du document. Le garde-fou fait échouer le
+ * build si un libellé change dans la liste ci-dessus, plutôt que de réduire la FAQ en silence.
  */
 const HOME_FAQ = [
   'Qu’est-ce que R Start ?',
@@ -269,13 +250,11 @@ if (homeItems.length !== HOME_FAQ.length) {
 }
 
 /*
- * LA FAQ NE PEUT PLUS CONTREDIRE facts.ts EN SILENCE (audit du 18/09/2026). Son contenu, fourni par
- * l'équipe le 16/09/2026, est repris mot pour mot : les chiffres y sont donc écrits en toutes lettres,
- * alors que facts.ts s'ouvre sur « aucun chiffre du site ne doit venir d'ailleurs ». Le SRI est
- * précisément la valeur en arbitrage ouvert avec CORUM : s'il changeait dans facts.ts, la carte de
- * l'accueil suivrait, et la FAQ (quatre pages, les données structurées, l'index de recherche)
- * continuerait d'afficher l'ancien. Le texte de l'équipe n'est pas réécrit : le BUILD S'ARRÊTE si l'une
- * de ces valeurs de facts.ts ne se retrouve plus dans la réponse qui la porte.
+ * LA FAQ NE PEUT PAS CONTREDIRE facts.ts EN SILENCE : ses chiffres sont écrits en toutes lettres,
+ * et le SRI est précisément la valeur en arbitrage ouvert avec CORUM. S'il changeait dans facts.ts,
+ * la carte de l'accueil suivrait et la FAQ (quatre pages, données structurées, index de recherche)
+ * garderait l'ancien. Le texte de l'équipe n'est pas réécrit : le BUILD S'ARRÊTE si l'une de ces
+ * valeurs ne se retrouve plus dans la réponse qui la porte.
  */
 {
   const texteDe = (question: string): string => {
@@ -327,27 +306,20 @@ export const faq = {
     answer: answer.map(nb),
   })),
   listLabel: 'Questions fréquentes sur R Start',
-  /*
-   * Renvoi vers la FAQ complète. Il pointait sur /documentation#faq, qui portait les seize questions ;
-   * elles ont leur propre page depuis le 16/09/2026, avec un champ de recherche.
-   */
+  /** Renvoi vers la FAQ complète, qui a sa propre page. */
   moreLink: { label: 'Voir toutes les questions', href: pages.faq.path },
   /** Champ de recherche de /faq : il filtre la liste rendue, il n'interroge rien. */
   searchLabel: 'Rechercher dans les questions',
   searchPlaceholder: 'frais, revenus, retrait, risque…',
-  /** Ce qui s'affiche sous le champ, `{n}` étant remplacé par le nombre de questions trouvées. */
-  /* Deux gabarits depuis le 18/09/2026 : « question(s) trouvée(s) » était lu tel quel, parenthèses
-     comprises, par les synthèses vocales. */
+  /* Sous le champ, `{n}` remplacé par le nombre trouvé. Deux gabarits : « question(s) trouvée(s) »
+     était lu tel quel, parenthèses comprises, par les synthèses vocales. */
   searchCount: '{n} questions trouvées',
   searchCountOne: '1 question trouvée',
   searchEmpty: 'Aucune question ne correspond. Essayez un autre mot.',
   /** En-tête de la page /faq, distinct de celui de la section courte. */
   pageTitle: 'Toutes vos questions sur la SCPI R Start.',
-  /*
-   * Meta description de /faq (22/09/2026). La page n'en avait plus depuis le 16/09/2026 : son
-   * introduction, vidée au lieu d'être retirée, servait aussi de description, et une chaîne vide passe
-   * le `??`. Même forme que les autres pages : les sujets, puis le rappel de risque.
-   */
+  /* Meta description de /faq, même forme que les autres pages : les sujets, puis le rappel de
+     risque. Obligatoire : une chaîne vide passerait le `??` de la mise en page. */
   pageDescription:
     'Toutes les réponses sur R Start, SCPI de CORUM : frais, revenus, risques, fiscalité et souscription. Risque de perte en capital, revenus non garantis.',
   cta: { label: 'Souscrire en ligne', position: 'faq' },

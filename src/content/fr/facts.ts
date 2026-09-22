@@ -1,21 +1,16 @@
 /**
- * SOURCE DE VÉRITÉ des données produit R Start.
- * Chaque valeur est tracée vers un document officiel. Aucun chiffre du site ne doit venir d'ailleurs.
- * Sources : DIC V7 (20/05/2026), Bulletin de souscription 2026.05 (CGV), Brochure partenaires 2026,
- * corum.fr/mentions-legales.
+ * SOURCE DE VÉRITÉ des données produit R Start. Chaque valeur est tracée vers un document officiel
+ * (DIC V7 du 20/05/2026, bulletin de souscription 2026.05 et ses CGV, brochure partenaires 2026,
+ * corum.fr/mentions-legales) ; aucun chiffre du site ne doit venir d'ailleurs.
  *
  * Points en attente de confirmation par CORUM (voir README) :
- *  - SRI : le site affiche 4/7 depuis le 14/09/2026 (`risk.sriLabel`, valeur de l'équipe, celle de
- *    la brochure p.3 et de CORUM le 08/09/2026). Le DIC V7 du 20/05/2026 dit 3/7 (texte extrait du
- *    PDF le 10/09/2026 : « classe de risque 3 sur 7, qui est une classe de risque moyenne ») ; il
- *    n'est plus hébergé depuis le 18/09/2026 (pendingDocuments.ts). Écart non tranché : CORUM doit
- *    soit fournir un DIC à jour, soit confirmer 3/7, et le site suivra ce document. Détail sous
- *    `risk`.
+ *  - SRI : le site affiche 4/7 (valeur de l'équipe, brochure p.3), le DIC V7 dit 3/7. Écart non
+ *    tranché, détail sous `risk`.
  *  - Minimum des versements programmés (PEI) : 50 € (adhésion PEI 04/2026) → affiché.
- *  - Cas d'exonération de la commission de retrait : confirmés par la note d'information ch. III
- *    § 6 (libellé exact à confirmer) → affichés nulle part depuis le 14/09/2026 ; la phrase qui les
- *    énumérait a quitté le code le 22/09/2026 avec les anciens blocs de /frais.
- *  - Chiffres groupe : corum.fr consulté le 08/09/2026 ; date de référence officielle à fournir par CORUM.
+ *  - Cas d'exonération de la commission de retrait : note d'information ch. III § 6, libellé exact
+ *    à confirmer ; affichés nulle part depuis le 14/09/2026.
+ *  - Chiffres groupe : corum.fr consulté le 08/09/2026 ; date d'arrêté officielle à fournir par
+ *    CORUM.
  */
 
 export const product = {
@@ -24,11 +19,10 @@ export const product = {
   type: 'SCPI de rendement à capital variable',
   tagline: 'La SCPI nouvelle génération', // brochure partenaires 2026, p.1, accroche rétablie par la réunion produit du 10/09/2026
   /*
-   * L'allégation de rang bornée de la brochure (p. 4 et 6), « La première SCPI du groupe CORUM sans
-   * frais d'entrée ni frais sur les achats d'immeubles », et son périmètre (les cinq SCPI du
-   * groupe) ont quitté l'écran le 15/09/2026 et le code le 22/09/2026 (archivés hors du dépôt,
-   * .claude/audits). La version marché, sans le groupe CORUM, reste celle de l'accroche du hero,
-   * que scripts/check-compliance.mjs signale.
+   * L'allégation de rang bornée de la brochure (p. 4 et 6, « la première SCPI du groupe CORUM sans
+   * frais d'entrée ni frais sur les achats d'immeubles ») a quitté l'écran le 15/09/2026 et le code
+   * le 22/09/2026 (archivée hors du dépôt, .claude/audits). La version marché, sans le groupe
+   * CORUM, reste celle de l'accroche du hero, que scripts/check-compliance.mjs signale.
    */
   visa: { number: '26-06', date: '4 mars 2026' }, // bulletin, brochure p.8
   creationDate: { label: '19 janvier 2026', iso: '2026-01-19' }, // bulletin CGV
@@ -66,9 +60,8 @@ export const fees = {
   /** Commission sur les cessions d'immeubles, par paliers de plus-value */
   disposal: {
     /**
-     * Fourchette et non liste de paliers (12/09/2026, demande de l'équipe) : « de 0 % à 12 % » se lit,
-     * « 0 / 6 / 12 % » se déchiffre. Les trois paliers restent dans `tiers`, affichés sous la valeur
-     * partout où la place le permet.
+     * Fourchette et non liste de paliers (12/09/2026, demande de l'équipe) : « de 0 % à 12 % » se
+     * lit, « 0 / 6 / 12 % » se déchiffre. Les trois paliers restent dans `tiers`.
      */
     label: 'de 0 % à 12 %',
     base: 'prélevés sur le montant HT de la vente',
@@ -84,10 +77,10 @@ export const fees = {
   withdrawal: {
     base: 'prélevés sur la valeur de retrait',
     /**
-     * `until` : durée de détention, en années, JUSQU'À laquelle le palier s'applique (borne exclue).
-     * « au cours de la 5e ou de la 6e année » couvre donc [4 ans, 6 ans[. Le dernier palier n'a pas de
-     * borne : il vaut au-delà de `zeroAfterYears`. Sans ces bornes, un calcul devrait déduire la durée
-     * d'une phrase, et se tromperait à la première reformulation.
+     * `until` : durée de détention, en années, JUSQU'À laquelle le palier s'applique (borne
+     * exclue) ; « 5e ou 6e année » couvre [4, 6[. Le dernier palier vaut au-delà de
+     * `zeroAfterYears`. Sans ces bornes, un calcul devrait déduire la durée d'une phrase et se
+     * tromperait à la reformulation.
      */
     steps: [
       { period: 'Retrait avant 4 ans de détention', short: '< 4 ans', rate: '10 %', until: 4 },
@@ -125,11 +118,10 @@ export const fees = {
 } as const;
 
 /**
- * Les neuf SCPI du panel de la brochure partenaires 2026 (page 6, moyennes de marché des SCPI « sans
- * frais de souscription et avec frais d'acquisition »). La bascule pédagogique qui les comparait à
- * R Start a quitté /frais le 11/09/2026, et ses moyennes le code le 22/09/2026 (archivées hors du
- * dépôt, .claude/audits). Seul le panel reste : scripts/check-compliance.mjs le lit pour contrôler ce
- * que /frais nomme. Le comparateur qui a remplacé la bascule (comparator.ts) nomme, lui, ses SCPI.
+ * Les neuf SCPI du panel de la brochure partenaires 2026 (p. 6, moyennes de marché des SCPI « sans
+ * frais de souscription et avec frais d'acquisition »). Les moyennes ont quitté le code le
+ * 22/09/2026 (archivées hors du dépôt, .claude/audits) ; le panel reste pour
+ * scripts/check-compliance.mjs, qui contrôle ce que /frais nomme.
  */
 export const marketComparison = {
   panel: [
@@ -146,15 +138,12 @@ export const marketComparison = {
 } as const;
 
 /**
- * REPÈRE DE MARCHÉ DU SIMULATEUR (19/09/2026, /simulateur). Le taux de distribution moyen des SCPI en
- * 2025, toutes catégories confondues, PONDÉRÉ PAR LA CAPITALISATION : 4,91 %, en hausse de 0,19 point
- * sur 2024. Source : communiqué ASPIM-IEIF de février 2026, « Collecte et performance des fonds
- * immobiliers grand public en 2025 », relu le 19/09/2026.
- * CE N'EST PAS UN CHIFFRE DE R START, qui n'a pas d'historique : le simulateur le propose comme point
- * de comparaison, jamais comme hypothèse par défaut. Le second repère, la moyenne des SCPI CORUM,
- * n'est pas saisi ici : src/content/fr/simulator.ts le CALCULE depuis les taux 2025 de corumRange.ts,
- * pour qu'il ne puisse pas diverger de ceux que /a-propos affiche.
- * À REMPLACER chaque année, à la publication des chiffres de l'exercice suivant.
+ * REPÈRE DE MARCHÉ DU SIMULATEUR : taux de distribution moyen des SCPI en 2025, toutes catégories,
+ * PONDÉRÉ PAR LA CAPITALISATION (communiqué ASPIM-IEIF de février 2026, relu le 19/09/2026). CE
+ * N'EST PAS UN CHIFFRE DE R START, qui n'a pas d'historique : point de comparaison, jamais
+ * hypothèse par défaut. Le second repère, la moyenne des SCPI CORUM, est CALCULÉ par simulator.ts
+ * depuis les taux 2025 de corumRange.ts, pour ne pas diverger de /a-propos. À REMPLACER chaque
+ * année.
  */
 export const marketBenchmarks = {
   aspim: {
@@ -179,19 +168,16 @@ export const income = {
 } as const;
 
 export const risk = {
-  // VALEUR DE L'ÉQUIPE, 4 sur 7 (14/09/2026, demande explicite de respecter son document à la lettre).
-  // Elle revient sur l'arbitrage du 10/09/2026, qui suivait le DIC.
-  //
-  // ÉCART À CONNAÎTRE, il n'est pas résolu : le DIC V7 fourni par CORUM (20/05/2026, p.2 ; le PDF
-  // n'est PLUS hébergé ici depuis le 18/09/2026, il répondait à son adresse directe alors qu'il était
-  // « en attente », voir pendingDocuments.ts) dit « Nous avons classé ce produit dans la
-  // classe de risque 3 sur 7, qui est une classe de risque moyenne » (texte extrait du PDF le
-  // 10/09/2026). La brochure p.3 et CORUM (08/09/2026) disent 4 sur 7. L'AMF avait relevé cet écart
-  // sur la brochure. Tant que le PDF était servi, un visiteur y lisait 3 là où la page affiche 4.
-  // À trancher avec CORUM : soit le DIC V7 fourni n'est pas la bonne version, soit la valeur
-  // affichée doit redescendre à 3. En attendant, AUCUNE phrase du site n'attribue plus cette valeur
-  // au DIC, elle est attribuée à CORUM : le site ne peut pas faire dire au DIC autre chose que ce
-  // qu'il contient.
+  // VALEUR DE L'ÉQUIPE, 4 sur 7 (14/09/2026, demande explicite de respecter son document à la
+  // lettre), qui revient sur l'arbitrage du 10/09/2026, lequel suivait le DIC.
+  // ÉCART À CONNAÎTRE, NON RÉSOLU : le DIC V7 fourni par CORUM (20/05/2026, p.2, texte extrait du
+  // PDF le 10/09/2026) dit « Nous avons classé ce produit dans la classe de risque 3 sur 7, qui est
+  // une classe de risque moyenne » ; la brochure p.3 et CORUM (08/09/2026) disent 4 sur 7, écart
+  // que l'AMF avait relevé sur la brochure. Le PDF n'est plus hébergé depuis le 18/09/2026
+  // (pendingDocuments.ts). À trancher avec CORUM : soit ce DIC V7 n'est pas la bonne version, soit
+  // la valeur affichée doit redescendre à 3. En attendant, AUCUNE phrase du site n'attribue cette
+  // valeur au DIC, elle est attribuée à CORUM : le site ne peut pas faire dire au DIC autre chose
+  // que ce qu'il contient.
   sri: 4,
   sriMax: 7,
   sriLabel: '4 sur 7',
@@ -202,16 +188,12 @@ export const risk = {
 } as const;
 
 export const strategy = {
-  // LIBELLÉ D'AFFICHAGE, « Monde » (14/09/2026, demande de l'équipe). EN VEILLE, plus aucun
-  // lecteur : la section Zone de /strategie ne le prend plus pour titre depuis le 14/09/2026, et le
-  // kit média, son dernier lecteur, a été supprimé le 22/09/2026. /strategie écrit « partout dans
-  // le monde » en toutes lettres (strategy.ts) ; ce champ garde la trace de la décision de
-  // l'équipe.
-  // ÉCART À CONNAÎTRE : `zoneDetail` juste en dessous garde la zone du DIC. Seule une note légale
-  // le cite (highlights.ts, `points-forts-zone`), et aucune note n'est affichée depuis le
-  // 14/09/2026 : l'écran dit « partout dans le monde » sans écrire nulle part la zone réelle du
-  // document réglementaire. Un site ne peut pas faire dire au DIC autre chose que ce qu'il
-  // contient : la note reste la référence, le libellé est la formulation de l'équipe.
+  // LIBELLÉ D'AFFICHAGE « Monde » (14/09/2026, demande de l'équipe), sans plus aucun lecteur depuis
+  // le 22/09/2026 : il garde la trace de la décision. ÉCART À CONNAÎTRE : `zoneDetail` garde la
+  // zone du DIC, que plus rien ne lit ni n'affiche ; /strategie écrit « partout dans le monde » en
+  // toutes lettres (strategy.ts) sans écrire nulle part la zone réelle du document réglementaire.
+  // Un site ne peut pas faire dire au DIC autre chose que ce qu'il contient : `zoneDetail` reste la
+  // référence, le libellé est la formulation de l'équipe.
   zoneLabel: 'Monde',
   zoneDetail: "Pays du Conseil de l'Europe (en zone euro et hors zone euro) et Canada", // DIC p.1
   approach:
@@ -266,10 +248,9 @@ export const subscription = {
 
 export const corumGroup = {
   /**
-   * Chiffres groupe : corum.fr (« Qui sommes-nous »), consulté le 08/09/2026 ; recoupés avec la brochure 2026.
-   * Aucune date d'arrêté officielle (« données au … ») n'existe dans le dépôt ni dans les documents cités :
-   * `statsDate` reste une date de consultation, pas d'arrêté. Dès que CORUM communique la date
-   * d'arrêté, l'écrire ici (« données au … »).
+   * Chiffres groupe : corum.fr (« Qui sommes-nous »), consulté le 08/09/2026, recoupés avec la
+   * brochure 2026. Aucune date d'arrêté officielle n'existe dans les documents cités : `statsDate`
+   * est une date de consultation. Dès que CORUM communique la date d'arrêté, l'écrire ici.
    */
   stats: [
     {
@@ -285,10 +266,10 @@ export const corumGroup = {
   /** Date de consultation de corum.fr, pas date d'arrêté des chiffres. */
   statsDate: { label: '8 septembre 2026' },
   /**
-   * Ancienneté du groupe CORUM dans l'immobilier d'entreprise : brochure partenaires 2026, p.7
-   * (« 15 ans d'expertise »), cohérente avec l'agrément AMF du 14 avril 2011. Décrit une durée
-   * d'activité. La formule « objectifs tenus » de la brochure est reprise dans le libellé du chiffre
-   * (trust.ts, document de l'équipe du 14/09/2026) : c'est une allégation, signalée par le contrôle.
+   * Ancienneté du groupe dans l'immobilier d'entreprise : brochure partenaires 2026, p.7 (« 15 ans
+   * d'expertise »), cohérente avec l'agrément AMF du 14 avril 2011. La formule « objectifs tenus »
+   * de la brochure est reprise dans le libellé du chiffre (trust.ts, document de l'équipe du
+   * 14/09/2026) : c'est une allégation, signalée par le contrôle.
    */
   experienceLabel: '15 ans',
   scpiSince: 2012,
@@ -299,22 +280,13 @@ export const corumGroup = {
 } as const;
 
 /**
- * ANNÉE DE CRÉATION DE CHAQUE SCPI de la gamme (16/09/2026, demande de l'équipe : « la date de
- * création de chaque SCPI sous les SCPI », page /a-propos).
- *
- * SOURCE À FAIRE CONFIRMER PAR CORUM. Une seule de ces cinq dates est adossée à une pièce du dossier :
- * celle de R Start, dont la note d'information porte le visa SCPI n° 26-06 du 4 mars 2026. Les quatre
- * autres sont les années d'ouverture publiquement connues de chaque SCPI ; aucun document fourni pour
- * ce site ne les porte. À vérifier auprès de la société de gestion avant la mise en ligne publique,
- * comme la date d'arrêté des chiffres du groupe.
- *
- * CORUM Origin a été créée sous le nom CORUM Convictions et renommée en 2019 : l'année retenue est
- * celle de la CRÉATION, que la demande vise, et non celle du changement de nom.
- *
- * Cohérent avec `corumGroup.scpiSince` (2012) et avec les « 15 ans d'expertise » de la brochure p. 7.
- *
- * Objet indexé par le nom plutôt que tableau parallèle à `scpiNames` : deux listes alignées par
- * position se désalignent au premier ajout, et la gamme en attend d'autres.
+ * Année de création de chaque SCPI de la gamme (16/09/2026, demande de l'équipe, page /a-propos).
+ * SOURCE À FAIRE CONFIRMER PAR CORUM : seule la date de R Start est adossée à une pièce du dossier
+ * (visa SCPI n° 26-06 du 4 mars 2026) ; les quatre autres sont les années d'ouverture publiquement
+ * connues, qu'aucun document fourni ne porte. CORUM Origin est née CORUM Convictions (renommée en
+ * 2019) : l'année retenue est celle de la création. Cohérent avec `corumGroup.scpiSince` et les
+ * « 15 ans d'expertise » de la brochure p. 7. Objet indexé par le nom plutôt que tableau parallèle
+ * à `scpiNames` : deux listes alignées par position se désalignent au premier ajout.
  */
 export const scpiCreated: Record<string, string> = {
   'CORUM Origin': '2012',
@@ -387,21 +359,14 @@ export const trust = {
     company: "CORUM L'Épargne",
     url: 'https://fr.trustpilot.com/review/www.corum.fr', // profil visé par les codes d'intégration Trustpilot
     /**
-     * Identifiants des TrustBox officiels, remis par l'équipe depuis le back-office Trustpilot de CORUM.
-     * Ils ne se devinent pas : toute modification vient de ce back-office.
-     *
-     * CARROUSEL FILTRÉ SUR 4 ET 5 ÉTOILES depuis le 15/09/2026, avec un nouveau token, code
-     * d'intégration fourni par l'équipe. Il diffusait jusque-là TOUTES les notes, de une à cinq.
-     *
-     * CE QUE CE RÉGLAGE CHANGE, ET QUI DOIT ÊTRE SU. Le site n'affiche plus que des avis favorables :
-     * c'est une SÉLECTION, faite par le paramétrage du widget, et non plus un flux non trié. Les textes
-     * qui l'accompagnaient ont donc été réécrits le même jour (portée des avis et note
-     * `confiance-trustpilot`, tous deux retirés de l'écran, la portée l'étant aussi du code le
-     * 22/09/2026) : ils affirmaient « toutes les notes, de une à cinq étoiles, avis négatifs
-     * compris », ce qui serait devenu faux. L'article L111-7-2 du code de la consommation impose
-     * d'informer sur les modalités de publication et de traitement des avis ; dire que le carrousel est
-     * filtré est le minimum, et l'opportunité du filtre lui-même est une décision de l'équipe, à faire
-     * valider par la Conformité.
+     * Identifiants des TrustBox officiels, remis par l'équipe depuis le back-office Trustpilot de
+     * CORUM ; ils ne se devinent pas. CARROUSEL FILTRÉ SUR 4 ET 5 ÉTOILES depuis le 15/09/2026
+     * (code d'intégration fourni par l'équipe) : le site n'affiche plus que des avis favorables,
+     * une SÉLECTION faite par le paramétrage du widget et non un flux non trié. Les textes qui
+     * disaient « toutes les notes, de une à cinq étoiles, avis négatifs compris » ont été retirés
+     * le même jour. L'article L111-7-2 du code de la consommation impose d'informer sur les
+     * modalités de publication et de traitement des avis ; dire que le carrousel est filtré est le
+     * minimum, et le filtre lui-même est une décision de l'équipe, à faire valider.
      */
     widgets: {
       locale: 'fr-FR',
@@ -427,11 +392,9 @@ export const trust = {
 } as const;
 
 /**
- * Espace presse (périmètre v2). Contacts relevés sur corum.fr/conseillers#presse le 08/09/2026 ;
- * e-mails à confirmer.
- * AGENCE CORRIGÉE le 14/09/2026 par l'équipe : Hugues de Tournemire est chez Rud Pedersen France, et
- * non chez Bien Commun Advisory comme l'indiquait la page consultée le 08/09/2026. C'est le nom donné
- * par l'équipe qui fait foi, pas le relevé.
+ * Espace presse. Contacts relevés sur corum.fr/conseillers#presse le 08/09/2026, agence corrigée
+ * par l'équipe le 14/09/2026 (Rud Pedersen France, et non Bien Commun Advisory) : le nom donné par
+ * l'équipe fait foi, pas le relevé.
  */
 export const press = {
   contacts: [
@@ -451,21 +414,16 @@ export const press = {
     },
   ],
   /**
-   * Revue de presse « La presse en parle » : onze articles. Les neuf premiers sont la sélection livrée
-   * par CORUM le 10/09/2026, dans l'ordre de la sélection ; les deux derniers ont été ajoutés par
-   * l'équipe le 14/09/2026. Titres et dates reproduits tels que fournis ou relevés sur la page ; ce
-   * sont des citations de tiers, jamais des formulations du site. L'avertissement qui les couvrait a
-   * été retiré le 16/09/2026 (voir press.ts).
-   * `url` n'est renseignée QUE POUR LES ADRESSES OUVERTES ET VÉRIFIÉES, titre de page à l'appui. Un
-   * article sans adresse s'affichait avec son média et sa date, sans lien (arbitrage du
-   * 10/09/2026) ; depuis le 14/09/2026 il n'est plus repris du tout (filtre de press.ts), et
-   * revient avec son `url`.
-   * Une adresse fausse sur un site financier réglementé coûte plus cher qu'un lien manquant, donc rien
-   * n'est écrit ici sur la foi d'un résultat de recherche.
-   * Apport du 14/09/2026 : l'équipe a transmis une liste d'adresses, toutes TRONQUÉES au collage. Les
-   * quatre qui ont pu être reconstituées ont été rouvertes une à une ; deux répondent en 200 avec le
-   * bon titre et sont écrites ci-dessous, deux renvoient un 403 anti-robot (Les Echos, Business Immo)
-   * et attendent une confirmation au navigateur, leur adresse candidate étant notée sur place.
+   * Revue de presse : onze articles, les neuf premiers dans l'ordre de la sélection livrée par
+   * CORUM le 10/09/2026, les deux derniers ajoutés par l'équipe le 14/09/2026. Titres et dates
+   * reproduits tels que fournis ou relevés : ce sont des citations de tiers, jamais des
+   * formulations du site. `url` n'est renseignée QUE POUR LES ADRESSES OUVERTES ET VÉRIFIÉES, titre
+   * de page à l'appui ; un article sans adresse n'est pas repris (filtre de press.ts) et revient
+   * avec son `url`. Une adresse fausse sur un site financier réglementé coûte plus cher qu'un lien
+   * manquant, donc rien n'est écrit ici sur la foi d'un résultat de recherche. Les adresses
+   * transmises par l'équipe le 14/09/2026 étaient tronquées ; deux ont pu être vérifiées, deux (Les
+   * Echos, Business Immo) répondent 403 anti-robot et attendent une confirmation au navigateur,
+   * adresse candidate notée sur place.
    */
   coverage: [
     {
@@ -475,8 +433,7 @@ export const press = {
       date: { label: 'Mai 2026', iso: '2026-05' },
       /* ADRESSE CANDIDATE, NON VÉRIFIÉE (14/09/2026), à ouvrir au navigateur avant de la coller ici :
          https://www.lesechos.fr/patrimoine/immobilier/immobilier-corum-le-geant-des-scpi-joue-a-son-tour-la-carte-du-sans-frais-dentree-2232391
-         lesechos.fr renvoie un 403 anti-robot, la capture d'archive du 21/05/2026 est elle-même une page
-         « Access Denied » : le chemin est cohérent, le contenu n'est pas confirmé. */
+         403 anti-robot, capture d'archive elle-même « Access Denied » : plausible, pas confirmé. */
       url: '',
     },
     {
@@ -498,8 +455,7 @@ export const press = {
       date: { label: '21 mai 2026', iso: '2026-05-21' },
       /* ADRESSE CANDIDATE, NON VÉRIFIÉE (14/09/2026), à ouvrir au navigateur avant de la coller ici :
          https://www.businessimmo.com/actualites/article/1776557328/quand-corum-innove-sur-le-marche-des-scpi
-         403 anti-robot, aucune capture d'archive. Deux index concordants seulement (businessimmo.com et
-         son miroir CoStar, même identifiant d'article, même titre) : plausible, pas prouvé. */
+         403 anti-robot, aucune capture d'archive, deux index concordants : plausible, pas sûr. */
       url: '',
     },
     {
@@ -537,9 +493,8 @@ export const press = {
       url: 'https://www.cfnewsimmo.net/L-actualite/Levee-de-fonds/Vehicule/La-nouvelle-proposition-de-valeur-que-formule-R-Start-aux-epargnants-500106',
     },
     /*
-     * DEUX AJOUTS DE L'ÉQUIPE le 14/09/2026, hors de la sélection livrée par CORUM le 10/09/2026 et
-     * arbitrés ce jour-là. Placés EN FIN DE LISTE, pas à leur rang chronologique : les neuf premiers
-     * gardent l'ordre exact de la sélection, qui est une décision éditoriale de CORUM, et le composant
+     * Deux ajouts de l'équipe (14/09/2026), placés EN FIN DE LISTE et non à leur rang
+     * chronologique : les neuf premiers gardent l'ordre de la sélection de CORUM, et le composant
      * n'applique aucun tri. Adresses et dates relevées sur les pages elles-mêmes.
      */
     {
@@ -559,9 +514,8 @@ export const press = {
     },
   ],
   /**
-   * Trois citations mises en avant, livrées par CORUM le 10/09/2026 avec leur média et leur date.
-   * Reproduites mot pour mot : ce sont des propos de tiers. L'avertissement qui les couvrait a été
-   * retiré le 16/09/2026 : seule la mention du pied de page les accompagne.
+   * Trois citations livrées par CORUM le 10/09/2026, reproduites mot pour mot : des propos de
+   * tiers, que seule la mention du pied de page accompagne (avertissement retiré le 16/09/2026).
    */
   quotes: [
     {

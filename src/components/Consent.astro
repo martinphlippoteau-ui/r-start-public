@@ -1,15 +1,13 @@
 ---
 /**
- * Bandeau de consentement cookies (CNIL) : deux boutons de même poids « Tout accepter » /
- * « Tout refuser », « Personnaliser » en lien, lien vers /cookies. Sous « sm », la carte est compacte
- * (titre en visually-hidden, il reste annoncé par aria-labelledby ,, texte court consent.bodyShort,
- * trois boutons sur une seule ligne, marges réduites) : le bandeau
- * doit rester sous la ligne risques du hero au premier chargement, sur un écran de 393 × 727 comme
- * sur un 375 × 812 ; à partir de « sm », elle reste assez basse (max-w-4xl, p-6) pour ne pas rogner
- * les CTA du hero à 1440×900. À partir de « lg », la carte devient une barre horizontale (texte à
- * gauche, boutons à droite) : sa hauteur tombe sous 130 px et la ligne risques du hero reste
- * découverte au premier chargement, sur 1440×900 comme sur 393×727. Toutes les cibles tactiles font au
- * moins 40 px de haut. Textes : src/content/fr/consent.ts ; logique : src/scripts/consent.ts.
+ * Bandeau de consentement cookies (CNIL) : deux boutons de même poids « Tout accepter » / « Tout
+ * refuser », « Personnaliser » en lien, lien vers /cookies. Sous « sm », la carte est compacte
+ * (titre en visually-hidden mais annoncé par aria-labelledby, texte court consent.bodyShort, trois
+ * boutons sur une ligne) pour rester sous le hero au premier chargement sur 393 × 727 comme sur 375
+ * × 812 ; à partir de « sm », assez basse (max-w-4xl, p-6) pour ne pas rogner les CTA du hero à
+ * 1440×900 ; à partir de « lg », une barre horizontale de moins de 130 px. Toutes les cibles
+ * tactiles font au moins 40 px de haut. Textes : src/content/fr/consent.ts ; logique :
+ * src/scripts/consent.ts.
  */
 import { site } from '@/config/site';
 import { consent } from '@/content/fr/consent';

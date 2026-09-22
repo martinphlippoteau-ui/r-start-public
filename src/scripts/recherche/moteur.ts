@@ -1,30 +1,17 @@
 /**
  * RECHERCHE DU SITE : LE MOTEUR. Des fonctions pures, sans DOM ni réseau : ce qu'une recherche trouve,
  * dans quel ordre, et quoi surligner. Le panneau (./panneau.ts) les appelle ; tests/moteur.spec.ts les
- * éprouve sans navigateur, ce qui était impossible tant qu'elles vivaient, non exportées, dans le même
- * fichier que le panneau (audit du 18/09/2026) : le classement, la tolérance aux fautes et les
- * synonymes ne se vérifiaient qu'à travers Playwright.
- *
- * LA COMPARAISON est insensible aux accents, à la casse et aux ligatures (src/lib/texte.ts) et tolère
- * les fautes de frappe :
- *  - un mot tapé trouve les mots qui COMMENCENT par lui (la recherche suit la frappe : « jouis » trouve
- *    « jouissance ») ;
- *  - à partir de quatre lettres, une faute est admise, deux à partir de huit (distance de Damerau-
- *    Levenshtein : lettre en trop, en moins, remplacée, ou deux lettres inversées), y compris sur le
- *    début d'un mot plus long, pendant qu'on le tape ;
- *  - un mot ou une expression d'un groupe de synonymes (src/content/fr/search.ts) trouve aussi les
- *    autres membres du groupe, tels quels ou au pluriel seulement : une faute ou un début de mot sur un
- *    synonyme rapprocherait des mots qui n'ont plus rien à voir ;
- *  - les mots vides (« le », « de », « quels »…) sont ignorés, sauf si la recherche ne contient qu'eux.
- * Tous les mots de la recherche doivent être trouvés ; à défaut, les documents qui en trouvent le plus
- * sont proposés, pour qu'une recherche de plusieurs mots ne tombe pas à vide pour un seul.
- *
- * LE CLASSEMENT pèse un mot trouvé dans le titre trois fois plus que dans le texte, ajoute un peu pour
- * les occurrences répétées et pour l'expression entière trouvée d'un bloc, et départage à égalité par
- * l'ordre de l'index, qui est celui du menu.
- *
- * LES SYNONYMES SONT UN PARAMÈTRE (`grouper`), pas un import : le moteur ne connaît pas le contenu du
- * site, et ses tests posent les leurs.
+ * éprouve sans navigateur, ce qui exige qu'elles restent exportées et hors du panneau.
+ * LA COMPARAISON est insensible aux accents, à la casse et aux ligatures (src/lib/texte.ts) : un
+ * mot tapé trouve les mots qui COMMENCENT par lui (« jouis » trouve « jouissance ») ; à partir de
+ * quatre lettres une faute est admise, deux à partir de huit (Damerau-Levenshtein, début de mot
+ * compris) ; un membre d'un groupe de synonymes (src/content/fr/search.ts) trouve les autres, tels
+ * quels ou au pluriel seulement (une faute sur un synonyme rapprocherait des mots sans rapport) ;
+ * les mots vides sont ignorés, sauf si la recherche ne contient qu'eux. Tous les mots doivent être
+ * trouvés ; à défaut, les documents qui en trouvent le plus sont proposés.
+ * LE CLASSEMENT pèse un mot du titre trois fois plus qu'un mot du texte, ajoute un peu pour les
+ * répétitions et l'expression entière, et départage par l'ordre de l'index, celui du menu.
+ * LES SYNONYMES SONT UN PARAMÈTRE (`grouper`), pas un import : les tests posent les leurs.
  */
 import { plier } from '@/lib/texte';
 
@@ -107,9 +94,8 @@ export const grouper = (synonymes: readonly (readonly string[])[]): Groupes =>
 
 /**
  * Distance de Damerau-Levenshtein restreinte, abandonnée dès qu'elle dépasse `max` (elle vaut alors
- * `max + 1`, quelle que soit la distance réelle).
- * Les `!` : trois lignes de `b.length + 1` cases, lues à des indices que les boucles bornent. La ligne
- * `avant` n'est lue qu'à partir de i = 2, après avoir reçu la ligne i - 2.
+ * `max + 1`). Les `!` : trois lignes de `b.length + 1` cases, lues à des indices que les boucles
+ * bornent ; `avant` n'est lue qu'à partir de i = 2.
  */
 export const distance = (a: string, b: string, max: number): number => {
   if (Math.abs(a.length - b.length) > max) return max + 1;
@@ -149,9 +135,8 @@ const comparer = (tape: string, mot: string, flou: boolean): number => {
 
 /**
  * Qualité de la rencontre entre un mot tapé et un mot du document, de 0 (rien) à 1 (identique).
- * Mémorisée le temps d'une recherche (`classer` la vide en commençant) : les mêmes mots reviennent de
- * document en document, et une recherche se relit une seconde fois pour surligner les résultats
- * affichés. La clé est sûre : un mot ne contient que des lettres et des chiffres, jamais de « | ».
+ * Mémorisée le temps d'une recherche (`classer` la vide) : les mêmes mots reviennent de document en
+ * document, puis pour le surlignage. La clé est sûre, un mot ne contient jamais de « | ».
  */
 const memoire = new Map<string, number>();
 const qualite = (tape: string, mot: string, flou: boolean): number => {
@@ -272,11 +257,8 @@ const evaluer = (p: Prepare, liste: Concept[], expression: string[]): Trouve => 
   return { p, score, concepts: trouves };
 };
 
-/**
- * Les documents que la recherche `q` trouve, classés, en deux rubriques plafonnées à `max` chacune.
- * `liste` est le résultat de `concepts(q, …)` : le panneau l'a déjà en main, il s'en sert aussi pour
- * surligner.
- */
+/** Les documents que la recherche `q` trouve, classés, en deux rubriques plafonnées à `max`.
+    `liste` est le résultat de `concepts(q, …)`, que le panneau a déjà en main pour surligner. */
 export const classer = (
   index: Prepare[],
   liste: Concept[],

@@ -63,28 +63,26 @@
   --shadow-card: 0 1px 2px rgb(2 75 103 / 0.06), 0 12px 32px -12px rgb(2 75 103 / 0.18);
   --shadow-float: 0 24px 64px -24px rgb(2 75 103 / 0.35);
 
-  /* Rythme vertical des sections (py-section, pt-section-sm, gap-chapter…). Minimum abaissé le 10/09/2026 :
-     à 390 px, 80 px en haut ET en bas par section coûtaient deux écrans de défilement sur l'accueil. */
+  /* Rythme vertical des sections (py-section, pt-section-sm, gap-chapter…). Plancher bas : à 390
+     px, 80 px en haut et en bas par section coûtaient deux écrans de défilement sur l'accueil. */
   --spacing-section: clamp(3.5rem, 10vw, 9rem);
   --spacing-section-sm: clamp(2.5rem, 6vw, 5.5rem);
   --spacing-chapter: clamp(2rem, 4vw, 3.5rem)
-    /* ex `--spacing-block`, renommé le 10/09/2026 : Tailwind v4 en dérivait `.inline-block { inline-size: … }`, en collision avec `display: inline-block` */;
+    /* Pas `--spacing-block` : Tailwind v4 en dériverait `.inline-block`, pris par `display` */;
   --spacing-subnav: 3.5rem;
-  /* Navigation flottante (11/09/2026) : la barre se décolle du haut et des bords, elle n'est plus un
-     bandeau plein. `--spacing-nav-gap` est cet écart ; il entre dans scroll-padding-top et dans le
-     calage de la barre d'ancres de /documentation. */
+  /* Navigation flottante : la barre se décolle du haut et des bords. `--spacing-nav-gap` est cet
+     écart ; il entre dans scroll-padding-top et dans le calage de la barre d'ancres de
+     /documentation. */
   --spacing-nav-gap: 0.75rem;
   /* Hauteur totale de la navigation flottante : elle RECOUVRE le contenu (marge basse négative sur le
-     <nav>), si bien que les en-têtes sombres passent derrière elle. C'est la condition pour qu'un verre
-     clair et un bouton Menu blanc se lisent : posée sur le fond clair de la page, la pastille était
-     invisible (constat du 11/09/2026). Les en-têtes réservent cette hauteur en padding haut. */
+     <nav>), les en-têtes sombres passent derrière elle et réservent cette hauteur en padding haut.
+     Posée sur le fond clair de la page, la pastille de verre était invisible. */
   --spacing-nav-total: calc(var(--spacing-subnav) + var(--spacing-nav-gap));
   --radius-nav: 1.75rem;
 
-  /* COURBE ET DURÉE PAR DÉFAUT DES UTILITAIRES `transition-*` DE TAILWIND (audit du 16/09/2026) : une
-     quarantaine de survols (liens de la barre, boutons « i », badges, chevrons…) tombaient sur la courbe
-     de Tailwind, cubic-bezier(0.4, 0, 0.2, 1), absente de nos jetons : deux vocabulaires de courbe dans
-     le même site. Ils prennent maintenant l'expo.out du site, en 180 ms, comme `btn-motion`. */
+  /* Courbe et durée par défaut des utilitaires `transition-*` de Tailwind : sans elles, une
+     quarantaine de survols tombaient sur cubic-bezier(0.4, 0, 0.2, 1), absente de nos jetons. Ils
+     prennent l'expo.out du site, en 180 ms, comme `btn-motion`. */
   --default-transition-duration: 180ms;
   --default-transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -125,7 +123,7 @@
     border-radius: 0.25rem;
   }
   /* Une cible de focus posée par script (`tabindex="-1"`, section d'arrivée du hero) n'est pas une
-     commande : l'anneau autour de toute une section ne signalerait rien d'activable (17/09/2026). */
+     commande : l'anneau autour de toute une section ne signalerait rien d'activable. */
   [tabindex='-1']:focus {
     outline: none;
     box-shadow: none;
@@ -144,9 +142,9 @@
   strong {
     font-weight: 600;
   }
-  /* Liens : soulignement fin décalé sous les jambages, transition douce ; les composants (boutons,
-     nav) le retirent. L'écart était de 0,2 em, le trait passait dans les jambages des « p », « g »
-     et « q » : le soulignement se lisait comme une rature (14/09/2026). */
+  /* Liens : soulignement fin décalé sous les jambages ; les composants (boutons, nav) le retirent.
+     À 0,2 em, le trait passait dans les jambages des « p », « g », « q » et se lisait comme une
+     rature. */
   a {
     color: inherit;
     text-decoration-thickness: 1px;
@@ -174,48 +172,15 @@
   }
 }
 
-/* Typographie fluide façon page produit.
-   RECALIBRÉE LE 12/09/2026, pour le téléphone. Les paliers étaient écrits `clamp(plancher, Nvw, plafond)`
-   sans terme constant : le terme en `vw` ne rattrapait le plancher que vers 730 px de large, si bien que
-   TOUT téléphone recevait la même taille qu'une tablette. Un H2 restait figé à 40 px sur 390 px d'écran,
-   soit trois lignes pour « Pourquoi gagnant-gagnant ? » et un tiers de la hauteur utile.
-   La forme est maintenant `clamp(plancher, constante + Nvw, plafond)` : la droite passe par la taille
-   voulue à 390 px ET par celle que le grand écran avait DÉJÀ à 1440 px. Rien ne change donc au-dessus,
-   c'est le téléphone et la tablette qui descendent.
-
-   Les INTERLIGNES suivent. Un interligne de 1 ne tient que sur un titre d'une seule ligne, ce qui est le
-   cas sur grand écran et jamais sur téléphone, où les jambages de la ligne du dessus touchaient les
-   capitales de la suivante. */
-/*
- * ÉCHELLE CALÉE SUR REVOLUT le 15/09/2026, à la demande de l'équipe. Les valeurs ci-dessous ne sont
- * pas estimées : la page d'accueil revolut.com/fr-FR refuse les robots (Cloudflare, 403), elle a donc
- * été relevée depuis la capture archivée du 04/08/2026, rendue dans un vrai navigateur, et les tailles
- * calculées lues à huit largeurs. Ce qu'on y mesure, de 390 à 1440 px :
- *   H1     48 → 88 px      interligne 1      interlettrage -2 %
- *   H2     36 → 52 px      interligne 1      interlettrage -1 %
- *   H3     18 px fixe      interligne 1,33   interlettrage normal
- *   corps  18 px fixe
- *
- * DEUX ENSEIGNEMENTS, et le second est le vrai. Leur échelle est plus PLATE que la nôtre : un H2 y
- * gagne 44 % du téléphone au grand écran quand le nôtre en gagnait 129 %. Et leur H3 ne se distingue
- * pas du corps par la taille mais par la graisse. C'est ce qui fait tenir leurs pages : deux niveaux
- * qui crient, le reste qui parle normalement.
- *
- * CE QU'ON REPREND, et ce qu'on adapte :
- *   display-lg  28 →  64 px  devient  36 → 52 px   (les H1 et les H2 de chapitre)
- *   display-md  24 →  46 px  devient  28 → 36 px   (les H2 de section)
- *   display-sm  20 →  30 px  devient  20 → 24 px   (les H3)
- * Grand écran : tout descend encore, de 19 à 22 %. Téléphone : les deux premiers paliers REMONTENT,
- * parce que c'est là que Revolut est plus gros que nous et que c'est ce qui donne la tenue.
- *
- * L'INTERLIGNE DE 1 N'EST PAS REPRIS TEL QUEL. Il tient chez eux parce que leurs accroches font trois
- * mots (« Bien plus qu'une banque »). Les nôtres sont des phrases qui passent à la ligne, et le français
- * y ajoute des accents sur capitales : à 1, le É de la seconde ligne touche les jambages de la première.
- * On garde donc 1,05 et 1,1, le minimum qui laisse passer un É.
- *
- * Les bornes restent calées sur 390 et 1440 px, et la pente est recalculée pour les atteindre
- * exactement là : c'est ce qui garde la progression régulière entre les deux.
- */
+/* Typographie fluide façon page produit, calée sur deux bornes, 390 et 1440 px. Chaque palier
+   s'écrit `clamp(plancher, constante + Nvw, plafond)`, jamais sans terme constant : le `vw` seul ne
+   rattrape le plancher que vers 730 px et tout téléphone reçoit la taille d'une tablette.
+   ÉCHELLE CALÉE SUR REVOLUT (15/09/2026, demande de l'équipe), relevée sur la capture archivée du
+   04/08/2026 de revolut.com/fr-FR, de 390 à 1440 px : H1 48 → 88 px, H2 36 → 52 px, H3 18 px fixe,
+   corps 18 px, interligne 1 sur les titres. On en reprend l'échelle plus PLATE et un H3 qui se
+   distingue du corps par la graisse, pas par la taille. L'INTERLIGNE DE 1 N'EST PAS REPRIS : nos
+   accroches passent à la ligne et le français met des accents sur les capitales ; à 1, le É de la
+   seconde ligne touche les jambages de la première. */
 @utility text-display-lg {
   /* 36 px à 390, 52 px à 1440. */
   font-size: clamp(2.25rem, 1.879rem + 1.52vw, 3.25rem);
@@ -243,11 +208,9 @@
   line-height: 1.5;
   font-weight: 400;
 }
-/* Lien d'évitement. Caché AU-DESSUS de l'écran par une translation (deux fois sa hauteur), et non par
-   `top: -100 %` animé : `top` est une propriété de mise en page, `transform` se compose (audit du
-   16/09/2026). Rien n'est animé en mouvement réduit, le lien apparaît d'un coup au focus.
-   SA PEAU EST CELLE DU RÔLE PRINCIPAL (`btn btn-primary btn-md`, posés dans Base.astro ; décision F8 du
-   17/09/2026) : ici, seulement sa mécanique d'apparition. */
+/* Lien d'évitement, caché AU-DESSUS de l'écran par une translation et non par `top` animé : `top`
+   est une propriété de mise en page, `transform` se compose. Sa peau est celle du rôle principal
+   (Base.astro) : ici, seulement sa mécanique d'apparition. */
 @utility skip-link {
   position: absolute;
   left: 1rem;
@@ -290,17 +253,12 @@
   content: ' −';
 }
 
-/* Verre liquide de la navigation flottante (11/09/2026, demande de l'équipe : barre décollée du haut,
-   gros rayon, matière « liquid glass »). Trois couches : le flou coloré du fond, une nappe spéculaire en
-   dégradé posée derrière le contenu (::before, z-index négatif dans un contexte d'empilement isolé) et
-   un liseré clair en ombre interne qui dessine l'arête. L'opacité du blanc ne descend pas sous 0,72 :
-   composée sur le hero ink, elle garde un rapport de contraste de 5,3:1 avec le texte navy (AA).
-   Au défilement (`data-stuck`), le blanc se densifie et l'ombre se creuse : la barre se détache du
-   contenu qui passe dessous.
-   `--nav-glass-on` (0 → 1) règle la PRÉSENCE de la matière d'un seul geste : blanc, flou, liseré, ombre
-   et nappe en dépendent tous. Il vaut 1 partout depuis le 12/09/2026, la barre étant identique sur tout
-   le site ; la variable reste, elle garde ce réglage en un seul point si l'équipe veut un jour le
-   rejouer. */
+/* Verre liquide de la navigation flottante (11/09/2026, demande de l'équipe : « liquid glass »).
+   Trois couches : le flou coloré du fond, une nappe spéculaire (::before) et une arête en dégradé
+   (::after), derrière le contenu dans un contexte isolé. Le blanc ne descend pas sous 0,72 :
+   composé sur le hero ink, il garde 5,3:1 avec le texte navy (AA). `--nav-glass-on` (0 → 1) règle
+   la PRÉSENCE de la matière d'un seul geste ; il vaut 1 partout, seule la recherche le met à 0
+   sous son panneau. */
 @utility nav-glass {
   --nav-glass-tint: 0.72;
   --nav-glass-on: 1;
@@ -308,19 +266,16 @@
   isolation: isolate;
   border-radius: var(--radius-nav);
   background-color: rgb(255 255 255 / calc(var(--nav-glass-tint) * var(--nav-glass-on)));
-  /* La SATURATION suit `--nav-glass-on` elle aussi (11/09/2026) : à 0, seul le flou était annulé et le
-     `saturate(185%)` continuait de sursaturer l'en-tête derrière la pastille, elle se dessinait en clair
-     alors que son fond était transparent. À 0 le filtre vaut saturate(100%) blur(0), c'est-à-dire rien. */
+  /* La SATURATION suit `--nav-glass-on` elle aussi : un `saturate(185%)` resté fixe sursaturait
+     l'en-tête derrière une pastille pourtant transparente. À 0 le filtre vaut saturate(100%)
+     blur(0), c'est-à-dire rien. */
   -webkit-backdrop-filter: saturate(calc(100% + 85% * var(--nav-glass-on)))
     blur(calc(24px * var(--nav-glass-on)));
   backdrop-filter: saturate(calc(100% + 85% * var(--nav-glass-on)))
     blur(calc(24px * var(--nav-glass-on)));
-  /* Épaisseur du verre, de haut en bas : arête supérieure claire, arête inférieure sombre, diffusion
-     interne, puis deux ombres portées, une serrée pour le décollement et une très diffuse pour la
-     profondeur. Le liseré blanc uniforme sur les quatre côtés a disparu : c'est l'arête en dégradé
-     (::after) qui le remplace, plus claire en haut à gauche, éteinte au milieu.
-     Les ombres portées sont en navy et non en noir : sur ce site, une ombre noire grise les fonds
-     `paper` au lieu de les creuser. */
+  /* Épaisseur du verre, de haut en bas : arête claire, arête sombre, diffusion interne, puis deux
+     ombres portées (décollement, profondeur), en navy et non en noir : sur ce site, une ombre noire
+     grise les fonds `paper` au lieu de les creuser. */
   box-shadow:
     inset 0 1px 0 rgb(255 255 255 / calc(0.55 * var(--nav-glass-on))),
     inset 0 -1px 0 rgb(2 75 103 / calc(0.06 * var(--nav-glass-on))),
@@ -328,14 +283,11 @@
     0 1px 2px rgb(2 75 103 / calc(0.06 * var(--nav-glass-on))),
     0 8px 32px -8px rgb(2 75 103 / calc(0.14 * var(--nav-glass-on)));
 
-  /* REFLET SPÉCULAIRE : la lumière prise par la moitié haute de la capsule, comme sur une vraie arête
-     de verre. Posé DERRIÈRE le contenu (z-index négatif dans le contexte isolé) : il éclaire la matière,
-     jamais le texte.
-     Sa boîte couvre TOUTE la pastille et c'est le dégradé qui s'éteint à mi-hauteur, jamais l'inverse.
-     Bornée à la moitié haute (`inset: 0 0 50% 0`), elle mesurait 28 px pour un rayon hérité de 28 : le
-     navigateur plafonne alors l'arrondi à la moitié de la hauteur, ses coins devenaient donc moins
-     ronds que ceux de la pastille et DÉPASSAIENT au-delà. Posée derrière le fond, elle ne se voyait
-     qu'à cet endroit, et dessinait un halo gris au-dessus des deux extrémités. */
+  /* REFLET SPÉCULAIRE sur la moitié haute, DERRIÈRE le contenu : il éclaire la matière, jamais le
+     texte. Sa boîte couvre TOUTE la pastille et c'est le dégradé qui s'éteint à mi-hauteur : bornée
+     à la moitié (`inset: 0 0 50% 0`), une boîte de 28 px pour un rayon de 28 voit son arrondi
+     plafonné, ses coins dépassaient ceux de la pastille et dessinaient un halo gris aux deux
+     extrémités. */
   &::before {
     content: '';
     position: absolute;
@@ -352,11 +304,8 @@
     pointer-events: none;
   }
 
-  /* ARÊTE EN DÉGRADÉ : un trait d'un pixel plus lumineux en haut à gauche et en bas à droite, éteint au
-     milieu, comme la tranche d'une lentille prise en lumière rasante. Un dégradé ne peut pas être une
-     bordure : on peint donc le rectangle entier et l'on EXCLUT son intérieur au masque, il ne reste que
-     le pourtour d'un pixel. Ce masque remplace l'ancien liseré en ombre interne, qui était de la même
-     clarté sur les quatre côtés et n'évoquait aucune épaisseur. */
+  /* ARÊTE EN DÉGRADÉ : un trait d'un pixel, lumineux aux coins, éteint au milieu. Un dégradé ne
+     peut pas être une bordure : on peint le rectangle entier et le masque en EXCLUT l'intérieur. */
   &::after {
     content: '';
     position: absolute;
@@ -386,9 +335,9 @@
   &[data-stuck] {
     --nav-glass-tint: 0.84;
     /* Contraction au défilement : par TRANSFORM seul, jamais par la hauteur. `--spacing-subnav` sert de
-       repère à tout ce qui se colle sous la barre (le sommet des sections, l'en-tête du comparateur de
-       frais) ; la changer décalerait la moitié du site d'un demi-centimètre à chaque défilement. La
-       barre paraît passer de 56 à 53 px, sa boîte n'a pas bougé d'un pixel. */
+       repère à tout ce qui se colle sous la barre (sommet des sections, en-tête du comparateur) ;
+       la changer décalerait la moitié du site à chaque défilement. La barre paraît passer de 56 à
+       53 px, sa boîte n'a pas bougé d'un pixel. */
     @media (prefers-reduced-motion: no-preference) {
       transform: scale(0.95);
     }
@@ -416,32 +365,19 @@
   }
 }
 
-/* La barre est IDENTIQUE SUR TOUT LE SITE (12/09/2026, demande de l'équipe). Il y avait ici un voile
-   propre à l'accueil : avant le premier défilement, la pastille n'avait aucune matière et seul le bouton
-   Menu s'y voyait, en blanc, puis le verre se posait au défilement en même temps que le logo du hero
-   venait s'y ranger. C'était une coupure d'expérience avec les huit sous-pages, où la barre était pleine
-   d'emblée. Tout est retiré : logo, entrées et CTA sont là dès le premier pixel, partout.
-   L'ouverture du HERO, elle, est intacte (`html.intro [data-intro]`, plus bas).
-   LA BARRE SE DÉROULE À NOUVEAU sur l'accueil depuis le 14/09/2026 (demande de l'équipe), mais elle ne
-   change plus d'apparence : elle est pleine dès le premier pixel, elle s'OUVRE simplement, du centre
-   vers ses deux bords, comme une pastille d'appel qui se déplie. Voir plus bas, `html.intro
-   [data-sitenav-bar]` : c'est une entrée, pas un état propre à l'accueil. */
+/* La barre est IDENTIQUE SUR TOUT LE SITE (12/09/2026, demande de l'équipe) : aucun voile propre à
+   l'accueil, logo, entrées et CTA sont là dès le premier pixel, partout. L'accueil n'a que son
+   ENTRÉE, ci-dessous ; l'ouverture du hero est plus bas (`html.intro [data-intro]`). */
 
-/* La barre de navigation : ELLE ARRIVE EN DERNIER, D'UN BLOC (17/09/2026, demande de l'équipe : « au
-   chargement ça ne rend pas bien du tout, j'aimerais voir le logo R Start en gros en premier puis les
-   éléments suivants »). Jusque-là elle jouait le geste de la pastille d'appel : un rond de verre NU se
-   posait à 0 ms, puis se déroulait à 300 ms. Sur téléphone, le premier rendu ne montrait donc qu'un rond
-   gris sans contenu sur un fond vide, le logo n'arrivant qu'à 200 ms, minuscule.
-   Elle descend maintenant de 10 px en se découvrant, pleine dès son premier pixel, à 700 ms : le logo,
-   le surtitre et l'accroche sont déjà là. `clip-path` et non opacité : la barre porte du texte, et un
-   contrôle d'accessibilité ne doit jamais lire un texte à mi-fondu (voir « LE TEXTE NE SE FOND PAS »,
-   plus bas). Le rayon suit celui de la barre, sans quoi ses bouts seraient coupés au carré.
-   `:has(#apercu)` EST INDISPENSABLE : contrairement à ce que laisse croire son nom, la classe `intro`
-   est rendue sur TOUTES les pages, et seul l'accueil charge le script qui la retire
-   (public/intro-once.js). Sans cette condition, la barre rejouerait son entrée à chaque chargement de
-   chaque sous-page, et pour toujours. Repéré par le test « la barre ne bouge pas d'une page à
-   l'autre ». Les règles voisines n'ont pas ce défaut : elles sont préfixées de `#apercu`, qui n'existe
-   que sur l'accueil. */
+/* L'entrée de la barre sur l'accueil : ELLE ARRIVE EN DERNIER, D'UN BLOC (17/09/2026, demande de
+   l'équipe : « voir le logo R Start en gros en premier puis les éléments suivants »), à 700 ms, en
+   descendant de 10 px. `clip-path` et non opacité : la barre porte du texte, et un contrôle
+   d'accessibilité ne doit jamais lire un texte à mi-fondu (« LE TEXTE NE SE FOND PAS », plus bas).
+   Le rayon suit celui de la barre, sans quoi ses bouts seraient coupés au carré.
+   `:has(#apercu)` EST INDISPENSABLE : la classe `intro` est rendue sur TOUTES les pages et seul
+   l'accueil charge le script qui la retire (public/intro-once.js) ; sans elle, la barre rejouerait
+   son entrée à chaque chargement de chaque sous-page. Les règles voisines sont préfixées de
+   `#apercu`. */
 @media (prefers-reduced-motion: no-preference) {
   html.intro:has(#apercu) [data-sitenav-bar] {
     animation: intro-nav-entree 500ms var(--ease-out-expo) 700ms backwards;
@@ -461,18 +397,12 @@
   }
 }
 
-/* Pastille d'appel flottante (components/StickyCta.astro, réécrite le 12/09/2026).
-   Trois temps, portés par le seul attribut `data-on` :
-    1. absente : effacée et réduite, hors du parcours au clavier (`visibility`, pas seulement l'opacité) ;
-    2. posée : un ROND de 4 rem portant le chevron, qui arrive en grandissant ;
-    3. dépliée : la pastille s'ouvre vers ses deux côtés et découvre son libellé.
-   Le temps 3 suit le temps 2 par un simple RETARD de transition, sans minuterie en JavaScript : rien à
-   annuler si le visiteur défile vite. À la fermeture les retards s'inversent, la pastille se replie
-   d'abord, le rond s'efface ensuite.
-   La largeur du libellé passe de 0fr à 1fr : `width: auto` ne se transite pas, une colonne de grille si.
-   En mouvement réduit, le pliage n'existe pas : la pastille est simplement là, dépliée. Plier n'aurait
-   aucun sens sans l'animation qui le raconte. Elle s'efface aussi tant que le bandeau cookies est
-   déplié : il occupe la même place. */
+/* Pastille d'appel flottante (components/StickyCta.astro). Trois temps portés par `data-on` :
+   absente (hors du parcours au clavier : `visibility`, pas seulement l'opacité), posée (un ROND de
+   4 rem), dépliée (le libellé se découvre). Le temps 3 suit le temps 2 par un simple RETARD de
+   transition, sans minuterie JavaScript : rien à annuler si le visiteur défile vite. Le libellé
+   passe de 0fr à 1fr : `width: auto` ne se transite pas, une colonne de grille si. Elle s'efface
+   tant que le bandeau cookies, qui occupe la même place, est déplié. */
 [data-sticky-cta] {
   opacity: 0;
   visibility: hidden;
@@ -502,11 +432,9 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  /*
-   * REPLIÉE : il ne reste que le rond. La pastille se vide de sa matière, contour et ombre compris, et
-   * ses marges tombent aux 8 px qui entourent le rond. Sa boîte mesure alors 4 rem sur 4 rem, le rond
-   * en occupe 3 au centre : on ne voit qu'un cercle.
-   */
+  /* REPLIÉE : il ne reste que le rond. La pastille se vide de sa matière, contour et ombre compris,
+     et ses marges tombent aux 8 px qui entourent le rond : une boîte de 4 rem, le rond en occupe
+     3. */
   [data-sticky-cta]:not([data-on]) [data-sticky-link] {
     gap: 0;
     padding-inline: 0.5rem;
@@ -570,10 +498,8 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   }
 }
 
-/* Valeur mise en avant dans le comparateur : le taux le plus bas d'une ligne.
-   PASTILLE PLEINE DEPUIS LE 15/09/2026 (« pas assez mis en avant, en couleur secondaire sur fond bleu ») :
-   c'était un halo en dégradé radial à 18 % d'opacité, qui se voyait à peine sur le blanc du tableau.
-   Le sable sur le navy, soit la couleur secondaire de la marque sur son bleu.
+/* Valeur mise en avant dans le comparateur : le taux le plus bas d'une ligne, en pastille pleine,
+   sable sur navy (15/09/2026, « pas assez mis en avant, en couleur secondaire sur fond bleu »).
    CE QUI NE CHANGE PAS, et qui est une exigence AMF : la TAILLE. Le fond est posé en ::before derrière
    le texte, dans un contexte isolé, et la boîte reste celle du chiffre. Aucun frais n'est donc affiché
    plus grand ni plus petit que ses voisins, seule la couleur les distingue. */
@@ -593,12 +519,10 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   }
 }
 
-/*
- * LA BASCULE DU GAGNANT SE FOND AU LIEU DE SAUTER (audit du 16/09/2026). Au changement de SCPI, la
- * pastille et la couleur du chiffre changeaient d'un coup. Les deux cases portent en permanence une
- * pastille INVISIBLE, que `fee-gagnant` révèle : une pseudo-boîte qui n'existerait qu'avec la classe ne
- * pourrait pas se transitionner. Géométrie et couleur identiques à l'utilitaire ci-dessus.
- */
+/* LA BASCULE DU GAGNANT SE FOND AU LIEU DE SAUTER au changement de SCPI. Les deux cases portent en
+   permanence une pastille INVISIBLE, que `fee-gagnant` révèle : une pseudo-boîte qui n'existerait
+   qu'avec la classe ne pourrait pas se transitionner. Géométrie et couleur de l'utilitaire
+   ci-dessus. */
 [data-comparator] [data-fee-value],
 [data-comparator] [data-comparator-cell] {
   position: relative;
@@ -649,22 +573,16 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
 [data-menu-panel][data-open] [data-menu-scrim] {
   opacity: 1;
 }
-/* Le tiroir est un dialogue modal (`aria-modal`) : rien ne doit passer devant, le bandeau de
-   consentement compris, qui recouvrait son bouton « Souscrire en ligne ». Poser un `z-index` sur le
-   panneau ne suffisait pas : il vit dans le contexte d'empilement de la barre, collante et `z-40`, donc
-   tout entière SOUS le bandeau (`z-50`). C'est la barre qui passe devant, le temps de l'ouverture.
-
-   L'accroche est `:not([hidden])` et non `[data-open]` : `hidden` ne revient qu'à la fin de la sortie,
-   la barre ne redescend donc pas d'un cran pendant que le tiroir glisse encore. */
+/* Le tiroir est modal : rien ne doit passer devant, le bandeau de consentement (`z-50`) compris. Un
+   `z-index` sur le panneau ne suffit pas, il vit dans le contexte d'empilement de la barre
+   (`z-40`), c'est elle qui passe devant. `:not([hidden])` et non `[data-open]` : `hidden` ne
+   revient qu'à la fin de la sortie, la barre ne redescend pas pendant le glissement. */
 [data-sitenav]:has([data-menu-panel]:not([hidden])) {
   z-index: 60;
 }
 
-/* Sous 40 rem le tiroir occupe tout l'écran. Le verre dépoli n'a alors plus rien à laisser voir, et il
-   coûtait la lisibilité : le texte blanc passait devant ce qui défilait dessous, clair ou sombre selon
-   la section traversée, et la couture entre deux sections se lisait en travers du menu. Fond plein,
-   contraste constant. Au-dessus de 40 rem le tiroir ne couvre qu'une partie de la page, le verre garde
-   son sens. */
+/* Sous 40 rem le tiroir occupe tout l'écran : le verre dépoli n'a plus rien à laisser voir et
+   coûtait la lisibilité (texte blanc devant une section claire ou sombre). Fond plein. */
 @media (width < 40rem) {
   [data-menu-drawer] {
     background-color: var(--color-ink);
@@ -682,13 +600,11 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   }
 }
 
-/* ===========================================================================================
-   RECHERCHE DU SITE (SiteNav.astro, SiteSearch.astro, src/scripts/recherche/ ; 17/09/2026)
-   ===========================================================================================
+/* ===== RECHERCHE DU SITE (SiteNav.astro, SiteSearch.astro, src/scripts/recherche/) =====
    La loupe n'est affichée que si les scripts s'exécutent : sans eux, elle n'ouvrirait rien. Par la
    requête média et non par un `hidden` retiré au chargement, pour que la barre ne change pas d'un
-   pixel entre le premier rendu et l'exécution du script (et d'une page à l'autre, en transition de
-   vue). Un navigateur qui ne connaît pas `scripting` ne l'affiche pas : c'est le repli sûr. */
+   pixel entre le premier rendu et le script. Sans `scripting` connu, pas de loupe : le repli
+   sûr. */
 .recherche-loupe {
   display: none;
 }
@@ -722,21 +638,13 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   transform: none;
 }
 
-/* LA PASTILLE S'ALLONGE. Le panneau est `fixed` et le script le cale sur la boîte de la barre, dont les
-   marges ne sont donc pas recopiées ici : `absolute` dans l'enveloppe `sticky` de la barre, il faisait
-   déplacer la page par Chromium à chaque frappe (SiteSearch.astro dit pourquoi).
-   Il est posé sous la barre, à ses coordonnées, dans la MÊME MATIÈRE :
-   même teinte, même flou, même arête, même ombre, même contraction au défilement (`data-stuck`, recopié
-   par le script à l'ouverture). Fermé, il a exactement la hauteur de la barre, et il est masqué.
-   À l'ouverture, il apparaît sous elle, la barre éteint son verre D'UN COUP, et lui grandit jusqu'à sa
-   hauteur ouverte, posée en style par le script : celle du panneau vide, ses liens rapides visibles,
-   quoi qu'on tape ensuite (les résultats sont rognés pour y tenir). À la fermeture, l'inverse : il
-   redescend à la hauteur de la barre puis, le mouvement fini, il est masqué et la barre rallume son
-   verre, d'un coup aussi. Les deux verres ne sont jamais allumés ensemble, et ils sont identiques au
-   pixel à l'instant du relais : rien ne clignote.
-   `height` et non `clip-path` (version du matin du 17/09/2026, jugée « pas fluide ») : l'ombre suit le
-   bord réel du panneau à chaque image, alors qu'un découpage la coupait ; et la barre s'éteignait alors
-   en fondu de 320 ms sur un panneau plus dense (0,9), les deux se superposaient un instant. */
+/* LA PASTILLE S'ALLONGE. Le panneau est `fixed` et le script le cale sur la boîte de la barre :
+   `absolute` dans son enveloppe `sticky`, il faisait déplacer la page par Chromium à chaque frappe
+   (SiteSearch.astro dit pourquoi). Même matière que la barre, `data-stuck` compris. Fermé, il a la
+   hauteur de la barre, masqué ; à l'ouverture la barre éteint son verre D'UN COUP et lui grandit
+   jusqu'à la hauteur posée par le script (celle du panneau vide, les résultats sont rognés pour y
+   tenir). Les deux verres ne sont jamais allumés ensemble et sont identiques au pixel au relais.
+   `height` et non `clip-path` : l'ombre suit le bord réel du panneau, un découpage la coupait. */
 .recherche-panneau {
   height: var(--spacing-subnav);
   max-height: calc(100vh - 2 * var(--spacing-nav-gap));
@@ -749,10 +657,9 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   background-size: 100% var(--spacing-subnav);
   background-repeat: no-repeat;
 }
-/* Le verre de la barre est éteint tant que le panneau est présent, sortie comprise, et il s'éteint et se
-   rallume SANS TRANSITION : c'est le panneau qui porte la matière pendant ce temps. Au retour, le script
-   pose `data-sans-transition` le temps d'une image, sans quoi le verre reviendrait en fondu de 320 ms
-   sur une barre déjà nue. */
+/* Le verre de la barre est éteint tant que le panneau est présent, sortie comprise, SANS TRANSITION
+   : le panneau porte la matière. Au retour, le script pose `data-sans-transition` le temps d'une
+   image, sans quoi le verre reviendrait en fondu de 320 ms sur une barre déjà nue. */
 [data-sitenav]:has([data-recherche-panneau]:not([hidden])) [data-sitenav-bar] {
   --nav-glass-on: 0;
   transition: none;
@@ -777,12 +684,10 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   opacity: 1;
 }
 
-/* LA ZONE DES RÉSULTATS NE DÉFILE QU'À L'ARRÊT. Pendant que le panneau grandit ou se referme, elle est
-   plus courte que son contenu : en `overflow: auto`, une barre de défilement classique (Windows, souris
-   sur Mac) y apparaissait le temps du mouvement, puis disparaissait à la dernière image, et le contenu
-   sautait de 7 px vers la droite (signalé par Martin le 17/09/2026). Elle ne devient défilante que
-   lorsque le script pose `data-recherche-etabli`, à la fin du mouvement d'ouverture ; les résultats sont
-   de toute façon rognés pour tenir, seul un très petit écran a besoin de défiler. */
+/* LA ZONE DES RÉSULTATS NE DÉFILE QU'À L'ARRÊT : en `overflow: auto` pendant le mouvement, une
+   barre de défilement classique (Windows, souris sur Mac) apparaissait et le contenu sautait de 7
+   px (signalé par Martin). Elle ne défile que sous `data-recherche-etabli`, posé à la fin de
+   l'ouverture. */
 .recherche-defilement {
   /* `clip` et non `hidden` : un conteneur de défilement, même verrouillé, fait déplacer la page au
      navigateur pour révéler ce qui a le focus dedans (voir SiteSearch.astro). */
@@ -853,10 +758,9 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   }
 }
 
-/* ARRIVÉE SUR LE PASSAGE : le titre de la section ou la question visée s'éclaire puis s'éteint. Un
-   anneau et un voile teal très léger, sans toucher à la couleur du texte : le titre reste lisible sur
-   les sections claires comme sur les sombres. En mouvement réduit, l'anneau est fixe et disparaît
-   d'un coup (src/scripts/recherche/panneau.ts). */
+/* ARRIVÉE SUR LE PASSAGE : le titre visé s'éclaire puis s'éteint, par un anneau et un voile teal
+   léger, sans toucher à la couleur du texte (lisible sur les sections claires comme sombres). En
+   mouvement réduit, l'anneau est fixe et disparaît d'un coup (src/scripts/recherche/panneau.ts). */
 [data-recherche-cible] {
   border-radius: 0.75rem;
 }
@@ -902,37 +806,17 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
 
 /* Halo de marque (hero) : deux lueurs teal et une touche sable sur fond ink. À poser sur un parent
    `relative overflow-hidden` ; le contenu doit être `relative` pour passer devant. */
-/*
- * AURORE DU HERO (15/09/2026, demande de l'équipe : « d'autres couleurs et du mouvement »), d'après la
- * planche fournie : #E7CCA5 sable, #1499B0 turquoise, #03242E fond profond.
- *
- * QUATRE FOYERS INDÉPENDANTS plutôt qu'une seule couche qui dérive. Chacun a sa couleur, sa taille, sa
- * position, sa durée et son sens : leurs périodes sont premières entre elles (23, 31, 37, 43 s), si
- * bien que la composition ne se répète qu'au bout de plusieurs heures. C'est ce qui distingue une
- * aurore d'une animation en boucle : à une seule période, l'œil reconnaît le cycle en trente secondes.
- *
- * LE SABLE EST TENU À L'ÉCART DU TEXTE. C'est la seule teinte claire de la planche, et le hero porte un
- * titre, un logo et une ligne d'appel en blanc : un foyer sable qui passerait derrière eux ferait
- * tomber le contraste. Il est donc ancré dans le coin haut droit, de petit rayon, à faible opacité, et
- * son amplitude de dérive est la plus courte des quatre. Les contrastes ont été mesurés sur le rendu, à
- * cinq instants de l'animation, pas estimés.
- *
- * COÛT. Chaque foyer est un dégradé radial sur son propre élément, animé en `transform` seul : c'est
- * composité par le GPU, sans recalcul de mise en page ni de peinture. Rien ne tourne en mouvement réduit.
- *
- * SANS JAMAIS S'ARRÊTER (16/09/2026 au soir, demande de l'équipe : « je veux que ces mouvements ne
- * s'arrêtent pas en arrière-plan »). Deux choses s'arrêtaient :
- *  - chaque foyer marquait un temps mort à chaque demi-tour : une seule animation en aller-retour sur
- *    `ease-in-out`, dont la vitesse tombe à zéro aux deux bouts. La dérive est maintenant portée par DEUX
- *    HORLOGES : le span glisse à l'horizontale sur `--duree`, son pseudo-élément glisse à la verticale
- *    sur `--duree` × 1,618 (le nombre d'or, pour que les deux ne se retrouvent presque jamais en phase),
- *    et la respiration d'échelle est partagée entre les deux. Quand l'un fait demi-tour, l'autre est en
- *    pleine course : le foyer n'est jamais immobile ;
- *  - l'aurore était mise en pause dès que le hero quittait l'écran, pour ne rien coûter pendant la
- *    lecture du reste de la page. Elle tourne désormais en continu : on veut la retrouver ailleurs
- *    quand on remonte, pas figée là où on l'a laissée. Les couches sont hors champ, le navigateur ne les
- *    dessine pas ; il ne reste que le tic de l'animation.
- */
+/* AURORE DU HERO (15/09/2026, demande de l'équipe : « d'autres couleurs et du mouvement »), d'après
+   la planche fournie : #E7CCA5 sable, #1499B0 turquoise, #03242E fond profond. QUATRE FOYERS
+   INDÉPENDANTS, de périodes premières entre elles (23, 31, 37, 43 s) : à une seule période, l'œil
+   reconnaît le cycle en trente secondes. LE SABLE EST TENU À L'ÉCART DU TEXTE : seule teinte
+   claire, il ferait tomber le contraste du titre et de l'appel en blanc ; il est ancré en haut à
+   droite, petit, à faible opacité. Contrastes mesurés sur le rendu, à cinq instants. COÛT : un
+   dégradé radial par foyer, animé en `transform` seul. Rien en mouvement réduit.
+   SANS JAMAIS S'ARRÊTER (16/09/2026, demande de l'équipe) : DEUX HORLOGES, le span à l'horizontale
+   sur `--duree`, son pseudo-élément à la verticale sur `--duree` × 1,618 (nombre d'or, presque
+   jamais en phase) ; quand l'un fait demi-tour, l'autre est en pleine course. Pas de pause hors
+   écran : les couches hors champ ne sont pas dessinées, il ne reste que le tic de l'animation. */
 [data-aurora] {
   position: absolute;
   inset: 0;
@@ -940,15 +824,11 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   pointer-events: none;
 }
 
-/*
- * NEUF FOIS MOINS DE PIXELS À FLOUTER (audit du 16/09/2026). Chaque foyer est DESSINÉ TROIS FOIS PLUS
- * PETIT (`--zoom`) : côté, flou et amplitude de dérive divisés par trois, puis le tout est agrandi par
- * `scale(3)` dans le `transform` déjà animé. Le rendu est le même, un dégradé flou n'a pas de détail à
- * perdre ; mais un foyer de 64 rem flouté à 80 px, c'est un million de pixels à recalculer chaque fois
- * que son échelle change, et l'animation la change en continu. À un tiers de côté, c'est neuf fois
- * moins. C'était la première cause d'images longues mesurées sur le premier écran.
- * `--taille`, `--flou` et `--amp` restent écrits en vraie grandeur dans 01-Hero.astro.
- */
+/* NEUF FOIS MOINS DE PIXELS À FLOUTER : chaque foyer est DESSINÉ TROIS FOIS PLUS PETIT (`--zoom`)
+   puis agrandi par `scale(3)` dans le `transform` déjà animé. Un dégradé flou n'a pas de détail à
+   perdre, mais un foyer de 64 rem flouté à 80 px, c'est un million de pixels recalculés à chaque
+   changement d'échelle : la première cause d'images longues sur le premier écran. `--taille`,
+   `--flou` et `--amp` restent en vraie grandeur dans 01-Hero.astro. */
 [data-aurora] > span {
   --zoom: 3;
   position: absolute;
@@ -961,13 +841,12 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   opacity: var(--opacite);
   /* État de repos (mouvement réduit, hors animation) : agrandi à sa vraie taille. */
   transform: scale(var(--zoom));
-  /* Pas de `will-change` permanent (audit du 16/09/2026) : l'animation crée sa couche le temps de
-     tourner ; des couches GPU maintenues en mouvement réduit ne serviraient à rien. */
+  /* Pas de `will-change` permanent : l'animation crée sa couche le temps de tourner ; des couches
+     GPU maintenues en mouvement réduit ne serviraient à rien. */
 }
-/* Le dégradé et son flou vivent sur le pseudo-élément : c'est lui qui porte la dérive verticale, le span
-   porte l'horizontale (voir le bandeau ci-dessus, deux horloges). Sa translation est un pour-cent de sa
-   propre boîte, trois fois plus petite, mais le span l'agrandit d'autant : la course en pixels est la
-   bonne sans multiplier par `--zoom`. */
+/* Le dégradé et son flou vivent sur le pseudo-élément, qui porte la dérive verticale (le span porte
+   l'horizontale). Sa translation est un pour-cent de sa propre boîte, trois fois plus petite, mais
+   le span l'agrandit d'autant : la course en pixels est la bonne sans multiplier par `--zoom`. */
 [data-aurora] > span::before {
   content: '';
   position: absolute;
@@ -988,12 +867,9 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   }
 }
 
-/* Dérive horizontale du span, amplitude donnée par foyer (`--amp`) : les quatre partagent la courbe, pas
-   la course. `--amp` est un pour-cent de la boîte du span, trois fois plus petite que le foyer visible :
-   multiplié par `--zoom` pour que la course en pixels soit la bonne, et l'échelle l'est aussi.
-   RESPIRATION ÉLARGIE le 16/09/2026 (« pas assez visible ») : 0,86 à 1,16 en tout, partagée entre les
-   deux horloges (0,90 à 1,10 ici, 0,94 à 1,06 sur le pseudo-élément), un foyer grossit et rétrécit d'un
-   tiers, ce qui se lit même sans suivre sa dérive. */
+/* Dérive horizontale du span, amplitude par foyer (`--amp`, un pour-cent de la boîte du span, donc
+   multiplié par `--zoom`). Respiration d'échelle de 0,86 à 1,16 en tout, partagée entre les deux
+   horloges (0,90 à 1,10 ici, 0,94 à 1,06 sur le pseudo-élément). */
 @keyframes aurore-x {
   from {
     transform: translate3d(calc(var(--amp) * var(--zoom) * -1), 0, 0) scale(calc(var(--zoom) * 0.9));
@@ -1019,32 +895,24 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
     inset: 0;
     pointer-events: none;
     background-image:
-      /* Opacités abaissées le 11/09/2026 : sans la photo et son voile, le halo passait sous le texte du hero
-         et faisait tomber le contraste de la ligne risques sous 4,5:1 sur petit écran (axe). */
+      /* Opacités basses : sans la photo et son voile, le halo passait sous le texte du hero et
+         faisait tomber le contraste de la ligne risques sous 4,5:1 sur petit écran (axe). */
       radial-gradient(55% 45% at 18% 8%, rgb(20 164 186 / 0.38) 0%, transparent 65%),
       radial-gradient(45% 40% at 88% 22%, rgb(17 152 175 / 0.24) 0%, transparent 65%),
       radial-gradient(40% 30% at 50% 100%, rgb(243 230 207 / 0.09) 0%, transparent 70%);
   }
 }
 
-/* Fond vivant du hero (12/09/2026, demande de l'équipe : « du mouvement, un peu dynamique »).
-   Le halo dérivait déjà, mais d'un seul bloc : le mouvement se lisait comme une translation unique.
-   Deux lueurs supplémentaires dérivent maintenant SÉPARÉMENT, sur des trajets et des durées premiers
-   entre eux (29 s et 41 s) : la composition ne se répète qu'au bout de vingt minutes, donc l'œil ne
-   voit pas de boucle.
-   Ce sont des dégradés radiaux, pas des formes floutées : un `filter: blur()` sur un élément de cette
-   taille coûte une passe de rendu à chaque image, le dégradé ne coûte rien. Transform seul, comme tout
-   le reste du décor.
-   Opacités volontairement basses. Le halo a déjà été abaissé une fois parce qu'il faisait tomber le
-   contraste de la ligne risques sous le seuil : ces couches s'ajoutent à la luminance du fond, elles
-   restent donc discrètes et le contraste est vérifié après coup. */
+/* Fond vivant du hero (12/09/2026, demande de l'équipe : « du mouvement, un peu dynamique ») : deux
+   lueurs qui dérivent SÉPARÉMENT, sur des durées premières entre elles (29 s et 41 s). Des dégradés
+   radiaux, pas des formes floutées : un `filter: blur()` de cette taille coûte une passe de rendu
+   par image. Opacités basses : ces couches s'ajoutent à la luminance du fond sous le texte. */
 .halo-blob {
   position: absolute;
   pointer-events: none;
   opacity: 0;
 }
-/* Les lueurs tournent en continu, comme l'aurore (16/09/2026 au soir : « ces mouvements ne s'arrêtent
-   pas en arrière-plan ») ; leur opacité, elle, suit `is-in-view`. */
+/* Les lueurs tournent en continu, comme l'aurore ; leur opacité, elle, suit `is-in-view`. */
 @media (prefers-reduced-motion: no-preference) {
   .is-in-view > .halo-blob {
     opacity: 1;
@@ -1103,10 +971,9 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   }
 }
 
-/* --- Photo de téléphone (AppMyCorum.astro) ---
-   Le visuel est un PNG DÉTOURÉ qui porte déjà sa perspective et son ombre (11/09/2026) : la pose 3D et
-   l'ombre rectangulaire qu'ajoutait la CSS penchaient le téléphone deux fois et le faisaient déborder
-   de sa carte. Il ne reste que la hauteur automatique. */
+/* Photo de téléphone (AppMyCorum.astro) : un PNG DÉTOURÉ qui porte déjà sa perspective et son
+   ombre, aucune pose 3D en CSS (elle penchait le téléphone deux fois et le faisait déborder de
+   sa carte). */
 .phone-shot {
   height: auto;
 }
@@ -1206,19 +1073,11 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   }
 }
 
-/*
- * Lien de contenu : le soulignement APPARAÎT au survol et au focus, en fondu, posé sous les jambages.
- *
- * Remplace `hover:underline` (14/09/2026, demande de l'équipe : « le trait est sur le texte »). Trois
- * défauts cumulés :
- *  - l'écart de 0,2 em plaçait le trait dans les jambages des « p », « g », « q » ;
- *  - le trait apparaissait d'un coup, sans transition, `text-decoration` n'étant pas animable ;
- *  - là où la classe accompagnait `nav-link`, DEUX traits se dessinaient, celui du pseudo-élément et
- *    celui du navigateur.
- * `text-decoration-color` est animable, lui : le trait existe toujours, il passe de transparent à la
- * couleur du texte. Il suit donc les retours à la ligne, ce qu'un trait dessiné en fond ne fait pas,
- * et `skip-ink` lui fait contourner ce qui dépasse.
- */
+/* Lien de contenu : le soulignement APPARAÎT au survol et au focus, en fondu, sous les jambages
+   (14/09/2026, demande de l'équipe : « le trait est sur le texte »). `text-decoration-color` est
+   animable, là où `text-decoration` ne l'est pas : le trait existe toujours et passe de transparent
+   à la couleur du texte ; il suit les retours à la ligne, ce qu'un trait dessiné en fond ne fait
+   pas. */
 @utility link-underline {
   text-decoration-line: underline;
   text-decoration-color: transparent;
@@ -1237,29 +1096,17 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   }
 }
 
-/* Verre liquide d'un appel flottant (components/StickyCta.astro) : la même matière que la barre de
-   navigation, posée sur une pastille. Le contour et la couleur du texte viennent de la DA du bouton
-   secondaire, appliqués dans le composant ; ici, seulement la matière et l'ombre portée.
-   Repli sans `backdrop-filter` : un blanc presque plein, sans quoi le texte navy passerait sur ce qui
-   défile dessous. */
-/*
- * Appel flottant (components/StickyCta.astro), en deux temps qui suivent le pliage.
- *
- * REPLIÉ, on ne voit que le ROND du chevron, bleu plein, chevron blanc : la pastille qui l'entoure est
- * transparente, sans matière, et mesure exactement le rond plus ses huit pixels de marge.
- * DÉPLIÉ, elle s'ouvre et prend la MATIÈRE DE LA BARRE DE NAVIGATION, libellé navy, le rond inchangé.
- *
- * La matière n'est pas réécrite ici : la pastille porte l'utilitaire `nav-glass`, celui de la barre. Une
- * copie approchante aurait dérivé au premier réglage ; en partageant l'utilitaire, les deux restent
- * raccord par construction. Cette règle ne pose que ce qui DIFFÈRE : le rayon, plein rond au lieu du
- * rayon de la barre, la couleur du texte, et l'état replié.
- */
+/* Appel flottant (components/StickyCta.astro). REPLIÉ, on ne voit que le ROND du chevron, bleu
+   plein, dans une pastille transparente ; DÉPLIÉ, la pastille s'ouvre, libellé navy, le rond
+   inchangé. La pastille porte l'utilitaire `nav-glass` de la barre (une copie approchante aurait
+   dérivé au premier réglage) et cette règle ne pose que ce qui DIFFÈRE : le rayon, plein rond, la
+   couleur du texte, le fond et l'état replié. */
 @utility sticky-skin {
   border-radius: 9999px;
   color: var(--color-navy);
-  /* PAS DE VERRE (12/09/2026, demande de l'équipe) : blanc plein. La barre de navigation en porte, la
-     pastille non. Elle passe au ras du texte courant, et translucide, les lignes du dessous se lisaient
-     à travers elle ; un blanc plein en fait un objet posé sur la page. Le libellé navy y tient 9,7:1. */
+  /* PAS DE VERRE (12/09/2026, demande de l'équipe) : blanc plein. Translucide au ras du texte
+     courant, les lignes du dessous se lisaient à travers elle ; un blanc plein en fait un objet
+     posé sur la page. Le libellé navy y tient 9,7:1. */
   background-color: #fff;
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
@@ -1273,10 +1120,8 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
     display: none;
   }
 
-  /* L'ANNEAU DE FOCUS GARDE SON LISERÉ BLANC (audit du 18/09/2026). L'anneau du site est double, contour
-     navy et liseré blanc en `box-shadow` ; cet utilitaire redéfinit `box-shadow` pour son ombre portée,
-     et il ne restait que le contour navy. Au-dessus d'une section sombre (repères de l'accueil,
-     risques), navy sur ink donne 1,49:1 : le focus était invisible. Le liseré revient, l'ombre avec. */
+  /* L'ANNEAU DE FOCUS GARDE SON LISERÉ BLANC : cet utilitaire redéfinit `box-shadow`, qui porte le
+     liseré, et sans cette règle il ne reste que le contour navy, 1,49:1 sur une section ink. */
   &:focus-visible {
     outline: 3px solid var(--color-navy);
     outline-offset: 3px;
@@ -1346,22 +1191,16 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   }
 }
 
-/*
- * LES QUATRE RÔLES DE BOUTON (17/09/2026, décisions de l'équipe sur l'inventaire de /test) : le site
- * comptait vingt-deux familles de boutons et de liens pour cent soixante-sept éléments. Il en reste
- * quatre rôles, chacun sur fond clair et sur fond sombre, en trois tailles, plus six composants à un seul
- * exemplaire (pastille flottante, « i », accordéon, carte cliquable, badge de magasin, champ).
- *  - PRINCIPAL : `btn-primary` sur fond clair, `btn-light` sur fond sombre. Souscrire, et les actions
- *    qu'une fenêtre attend (Fermer, Tout accepter, Tout refuser, Aller au contenu).
- *  - SECONDAIRE : `btn-secondary` sur fond clair, `btn-outline-light` sur fond sombre. Un contour ; au
- *    survol, le contour se renforce et un fond translucide se pose (décision F3 : « ajoute un fond, une
- *    opacité comme outline-light »), le texte ne change pas de couleur. Remplace les six écritures de
- *    pilule contour navy (pied de page, 404, cookies) et les deux boutons des cartes de /strategie.
- *  - LIEN DE CONTENU : `link-underline`, plus bas. LIEN DE NAVIGATION : `nav-link`, plus bas.
- * UNE SEULE SOURCE : ces utilitaires portent la peau ; ui/Button.astro les compose (`btn btn-motion
- * btn-<rôle> btn-<taille>`), et un <button> écrit à la main les reprend tels quels au lieu de recopier
- * des classes. Les hauteurs (bordure comprise) : sm 40 px, md 48 px, lg 62 px.
- */
+/* LES QUATRE RÔLES DE BOUTON (17/09/2026, décisions de l'équipe sur l'inventaire de /test), chacun
+   sur fond clair et sur fond sombre, en trois tailles (sm 40 px, md 48 px, lg 62 px, bordure
+   comprise) :
+    - PRINCIPAL : `btn-primary` sur fond clair, `btn-light` sur fond sombre. Souscrire, et les
+      actions qu'une fenêtre attend (Fermer, Tout accepter, Tout refuser, Aller au contenu) ;
+    - SECONDAIRE : `btn-secondary` sur fond clair, `btn-outline-light` sur fond sombre. Un contour,
+      qui se renforce au survol sur un fond translucide, le texte ne change pas de couleur ;
+    - LIEN DE CONTENU : `link-underline`. LIEN DE NAVIGATION : `nav-link`.
+   UNE SEULE SOURCE : ces utilitaires portent la peau ; ui/Button.astro les compose (`btn btn-motion
+   btn-<rôle> btn-<taille>`), et un <button> écrit à la main les reprend tels quels. */
 @utility btn {
   display: inline-flex;
   align-items: center;
@@ -1424,15 +1263,13 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   }
 }
 
-/*
- * LE BOUTON « i » (17/09/2026, décision F17 : gardé, en un seul utilitaire). Rond de 20 px, filet et
- * lettre en retrait, qui se renforcent au survol ; `info-bouton-sombre` pour un fond ink.
- */
+/* LE BOUTON « i » : rond de 20 px, filet et lettre en retrait, qui se renforcent au survol ;
+   `info-bouton-sombre` pour un fond ink. */
 @utility info-bouton {
   display: inline-flex;
-  /* CIBLE DE 44 PX SANS TOUCHER AU DESSIN (audit du 18/09/2026) : le rond fait 20 px, c'était la plus
-     petite commande du site, treize fois sur téléphone (repères de l'accueil, lignes du comparateur).
-     Un pseudo-élément invisible élargit la zone de 12 px de chaque côté. */
+  /* CIBLE DE 44 PX SANS TOUCHER AU DESSIN : le rond de 20 px était la plus petite commande du site,
+     treize fois sur téléphone. Un pseudo-élément invisible élargit la zone de 12 px de chaque
+     côté. */
   position: relative;
   &::after {
     content: '';
@@ -1487,11 +1324,9 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   }
 }
 
-/* Navigation unique (SiteNav.astro) : pastille derrière la page courante, elle glisse (transform) et
-   se « morphe » à la largeur du lien (width, élément absolu vide : coût nul ; hauteur et position
-   verticale posées sans transition), et CTA compacté après 40 % du défilement du document par
-   transform seul (scale 0.92, origine à droite : aucune propriété de mise en page animée, aucun
-   relayout). `data-compact` est posé par le script inline de SiteNav, sans GSAP, sur toutes les pages. */
+/* Navigation (SiteNav.astro) : pastille derrière la page courante, qui glisse (transform) et se
+   « morphe » à la largeur du lien (width sur un élément absolu vide : coût nul) ; CTA compacté
+   après 40 % du défilement par transform seul (`data-compact`, script inline de SiteNav). */
 @utility subnav-pill {
   position: absolute;
   left: 0;
@@ -1513,14 +1348,10 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   }
 }
 
-/* Peau de l'indicateur : un verre plus dense que celui de la barre, avec sa propre arête claire. Elle
-   ne porte que l'ÉTIREMENT, jamais le déplacement, qui est à l'enveloppe (SiteNav.astro).
-   SA TEINTE NE SUIT PLUS `--nav-glass-on` (17/09/2026). Elle en héritait depuis l'époque du voile de
-   l'accueil, pour s'effacer avec la barre transparente ; la variable vaut 1 partout depuis le 12/09,
-   sauf pendant la recherche, où la barre éteint son verre au profit du panneau : la pastille
-   disparaissait alors d'un coup à l'ouverture et revenait à la fermeture, un scintillement de dix
-   niveaux de gris mesuré image par image, signalé par Martin. Elle reste au-dessus du panneau et
-   garde sa teinte. */
+/* Peau de l'indicateur : un verre plus dense que la barre, qui ne porte que l'ÉTIREMENT, jamais le
+   déplacement (à l'enveloppe, SiteNav.astro). SA TEINTE NE SUIT PAS `--nav-glass-on` : la recherche
+   met la barre à 0 et la pastille disparaissait d'un coup à l'ouverture (scintillement signalé par
+   Martin). Elle reste au-dessus du panneau et garde sa teinte. */
 @utility subnav-pill-skin {
   display: block;
   width: 100%;
@@ -1567,22 +1398,16 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   }
 }
 
-/* Explication dépliable des repères de l'accueil (15/09/2026, « R Start en un clin d'œil »).
-   LA HAUTEUR S'ANIME PAR `grid-template-rows`, de 0fr à 1fr : c'est la seule façon d'ouvrir sur une
-   hauteur INCONNUE sans la mesurer en JavaScript ni la figer en dur. `min-height: 0` sur l'enfant est
-   obligatoire, sans quoi la grille refuse de le comprimer sous sa hauteur de contenu.
-   ÉTAT PAR DÉFAUT : OUVERT. Le panneau est écrit ouvert dans le HTML et c'est le script qui le referme
-   au chargement, en même temps qu'il révèle le bouton. Sans JavaScript, on lit donc les explications,
-   et aucun bouton mort ne traîne. */
-/* REPLIÉ VEUT DIRE MASQUÉ, pas seulement écrasé (audit du 18/09/2026). Le panneau replié ramenait sa
-   rangée à 0fr, mais son texte restait dans l'arbre d'accessibilité et dans la recherche du
-   navigateur, alors que le bouton annonçait `aria-expanded="false"`. Dans le comparateur, il vit dans
-   l'en-tête de ligne : chaque taux était annoncé avec deux phrases d'explication, repliées ou non.
-   `visibility: hidden` le sort de l'arbre ; il tombe APRÈS le pliage (retard de 260 ms) et revient
-   AVANT le dépliage, l'animation est la même.
-   `data-sans-transition` : posé par infoToggle.ts au chargement, le temps d'une image. Les panneaux
-   sont écrits ouverts dans le HTML (lisibles sans script) et le script les replie : sans cela ils se
-   refermaient sous les yeux du visiteur, en 260 ms, comparateur de /frais compris. */
+/* Explication dépliable des repères de l'accueil et des lignes du comparateur. LA HAUTEUR S'ANIME
+   PAR `grid-template-rows`, de 0fr à 1fr : la seule façon d'ouvrir sur une hauteur INCONNUE sans la
+   mesurer ; `min-height: 0` sur l'enfant est obligatoire, sans quoi la grille refuse de le
+   comprimer. OUVERT PAR DÉFAUT dans le HTML, replié par infoToggle.ts au chargement sous
+   `data-sans-transition` (sinon les panneaux se refermaient sous les yeux du visiteur) : sans
+   JavaScript on lit les explications, aucun bouton mort ne traîne. REPLIÉ VEUT DIRE MASQUÉ : à 0fr,
+   le texte restait dans l'arbre d'accessibilité alors que le bouton annonçait
+   `aria-expanded="false"`, et chaque taux du comparateur était annoncé avec ses deux phrases.
+   `visibility: hidden` le sort de l'arbre, APRÈS le pliage (retard de 260 ms) et AVANT le
+   dépliage. */
 @utility info-panneau {
   display: grid;
   grid-template-rows: 1fr;
@@ -1615,12 +1440,9 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   }
 }
 
-/*
- * ENTRÉES « DOCUMENT BIENTÔT DISPONIBLE » du pied de page (16/09/2026). Le marqueur natif du <summary>
- * est retiré des deux façons qu'il faut : `list-style` pour la plupart des navigateurs, le
- * pseudo-élément `::-webkit-details-marker` pour Safari, qui ignore la première.
- * Le curseur et la zone de clic restent ceux d'une entrée de pied de page.
- */
+/* Entrées « document bientôt disponible » du pied de page : le marqueur natif du <summary> est
+   retiré des deux façons qu'il faut, `list-style` pour la plupart des navigateurs et
+   `::-webkit-details-marker` pour Safari, qui ignore la première. */
 .footer-soon > summary {
   list-style: none;
 }
@@ -1629,8 +1451,8 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
 }
 
 /* Les boutons des cartes de /strategie prennent le rôle SECONDAIRE sur fond sombre (`btn btn-motion
-   btn-outline-light btn-sm`, décision F18 du 17/09/2026) ; il ne reste ici que la flèche d'« En savoir
-   plus », qui avance de trois millimètres au survol. */
+   btn-outline-light btn-sm`) ; il ne reste ici que la flèche d'« En savoir plus », qui avance au
+   survol. */
 @utility carte-savoir {
   & .carte-savoir-fleche {
     width: 1rem;
@@ -1647,24 +1469,13 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   }
 }
 
-/*
- * LUEURS SABLE DES CARTES (17/09/2026, demande de l'équipe : « adoucir les cards avec des ombres sable
- * comme la hero de la home »). Les cinq cartes de /strategie étaient des aplats ink ; elles reprennent
- * la lumière de l'aurore du hero : le même sable (#E7CCA5), posé comme lui DANS LE COIN HAUT DROIT, là
- * où la carte ne porte rien, et un second foyer, plus faible, dans le coin bas gauche.
- *
- * LOIN DU TEXTE, COMME DANS LE HERO. Le titre est en sable et à gauche : un foyer de la même teinte
- * derrière lui l'effacerait. Le grand foyer s'arrête avant la colonne du titre ; le petit passe sous le
- * bouton, dont le texte blanc garde un contraste très au-dessus de 4,5:1 (tests/qualite.spec.ts).
- *
- * FIXES. L'aurore du hero dérive ; ici le dessin de la carte est déjà en mouvement, et un fond qui
- * bougerait dessous lui ferait concurrence. Dégradés radiaux sans `filter` : rien à recalculer.
- *
- * SUR UN PSEUDO-ÉLÉMENT, sous le contenu (`z-index: -1` dans le contexte isolé de la carte), et non en
- * `background-image` sur la carte : les contrôles de contraste remontent les fonds des ancêtres et
- * sautent tout élément à image de fond, les boutons des cartes n'y auraient plus été mesurés.
- * Posée sur les DEUX faces, recto et dos : une carte retournée ne doit pas redevenir un aplat.
- */
+/* LUEURS SABLE DES CARTES (17/09/2026, demande de l'équipe : « adoucir les cards avec des ombres
+   sable comme la hero de la home ») : le sable de l'aurore en haut à droite, là où la carte ne
+   porte rien, et un foyer plus faible en bas à gauche. LOIN DU TEXTE : le titre est en sable et à
+   gauche, un foyer de la même teinte l'effacerait ; le bouton garde bien plus de 4,5:1
+   (tests/qualite.spec.ts). FIXES, sans `filter`. SUR UN PSEUDO-ÉLÉMENT sous le contenu et non en
+   `background-image` sur la carte : les contrôles de contraste sautent tout élément à image de
+   fond. Sur les DEUX faces. */
 @utility carte-lueur {
   --lueur-haut: 0.3;
   --lueur-bas: 0.14;
@@ -1682,22 +1493,11 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   }
 }
 
-/*
- * LA CARTE SE RETOURNE (16/09/2026, demande de l'équipe). Le retournement est joué par
- * src/scripts/carteRetournee.ts (Web Animations API, 460 ms) ; il ouvrait d'abord une <dialog>, qui a
- * disparu le jour même au profit d'un dos de carte.
- */
-/*
- * LA CARTE A DEUX FACES depuis le 16/09/2026 (« les cards retournées doivent rester visibles en fond
- * avec un logo R de R Start »). Elle disparaissait au quart de tour, et la fenêtre ouverte flottait
- * au-dessus d'un trou dans la page.
- *
- * `transform-style: preserve-3d` sur l'enveloppe, `backface-visibility: hidden` sur CHAQUE FACE : sans
- * la première, le dos serait aplati sur le recto et les deux se superposeraient ; sans la seconde, on
- * lirait le recto en miroir à travers le dos.
- * C'est l'ENVELOPPE qui tourne, pas l'article : `overflow: hidden` sur l'élément en `preserve-3d`
- * forcerait son aplatissement, et l'article en a besoin pour ses coins arrondis.
- */
+/* LA CARTE A DEUX FACES (16/09/2026, demande de l'équipe), retournée par
+   src/scripts/carteRetournee.ts. `preserve-3d` sur l'enveloppe, `backface-visibility: hidden` sur
+   CHAQUE FACE : sans la première le dos serait aplati sur le recto, sans la seconde on lirait le
+   recto en miroir. C'est l'ENVELOPPE qui tourne : `overflow: hidden` sur l'élément en `preserve-3d`
+   forcerait son aplatissement, et l'article en a besoin pour ses coins arrondis. */
 @utility carte-face {
   display: grid;
   transform-origin: center;
@@ -1707,27 +1507,18 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
 .carte-verso {
   backface-visibility: hidden;
 }
-/*
- * LA FACE CACHÉE NE DOIT PAS CAPTER LES CLICS. `inert` l'empêche d'être activée, mais elle reste la
- * boîte la plus haute sous le pointeur : le bouton du dos était atteignable au clavier et inatteignable
- * à la souris, le recto récupérant le clic sans rien en faire. Constaté, puis corrigé ici.
- * Le sélecteur suit `inert`, posé par le script : un seul état à tenir, pas deux.
- */
+/* LA FACE CACHÉE NE DOIT PAS CAPTER LES CLICS. `inert` l'empêche d'être activée, mais elle reste la
+   boîte la plus haute sous le pointeur : le bouton du dos était atteignable au clavier et
+   inatteignable à la souris, le recto récupérant le clic sans rien en faire. Le sélecteur suit
+   `inert`, posé par le script : un seul état à tenir, pas deux. */
 .carte-recto[inert],
 .carte-verso[inert] {
   pointer-events: none;
 }
-/*
- * LES DEUX FACES SONT EMPILÉES EN GRILLE, dans la même cellule, et non posées l'une sur l'autre en
- * absolu. C'est ce qui change tout depuis que le dos porte le TEXTE : en absolu, le dos ne comptait
- * pas dans la hauteur et un texte plus long que le recto se serait fait couper. Dans une cellule
- * partagée, l'enveloppe prend la hauteur de la PLUS GRANDE des deux.
- *
- * ET `h-full` SUR L'ENVELOPPE, posé dans le balisage (16/09/2026, « les 3 volets doivent avoir la même
- * taille en hauteur ») : sans lui, chaque carte se réglait sur SON propre dos, et les trois volets,
- * dont les textes sont de longueurs différentes, tombaient à trois hauteurs. La rangée de la grille les
- * étire maintenant toutes sur la plus haute.
- */
+/* LES DEUX FACES SONT EMPILÉES EN GRILLE, dans la même cellule, et non en absolu, où le dos ne
+   compte pas dans la hauteur et un texte plus long que le recto se fait couper. Et `h-full` sur
+   l'enveloppe (« les 3 volets doivent avoir la même taille en hauteur »), sinon chaque carte se
+   règle sur SON dos. */
 .carte-recto,
 .carte-verso {
   grid-area: 1 / 1;
@@ -1740,10 +1531,9 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   border-radius: 1.5rem;
   background: var(--color-ink);
   padding: 1.5rem;
-  /* ESPACE MINIMUM ENTRE LE TEXTE ET LE BOUTON (16/09/2026, « ne pas coller le contenu avec le CTA
-     Fermer ») : le `margin-top: auto` du bouton le pousse en bas quand il reste de la place, mais il
-     tombe à zéro dès que le texte remplit la carte, et les deux se touchaient. Le `gap` de la colonne
-     est un plancher, il s'ajoute à ce que `auto` laisse. */
+  /* ESPACE MINIMUM ENTRE LE TEXTE ET LE BOUTON (« ne pas coller le contenu avec le CTA Fermer ») :
+     le `margin-top: auto` du bouton tombe à zéro dès que le texte remplit la carte. Le `gap` de la
+     colonne est un plancher, il s'ajoute à ce que `auto` laisse. */
   gap: 1.5rem;
   transform: rotateY(180deg);
   /* Garde-fou : si un texte dépassait malgré la grille, il défile au lieu d'être coupé. */
@@ -1769,19 +1559,14 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   pointer-events: none;
 }
 
-/*
- * LE RETOUR. Il ferme la carte, et il est le dernier élément du dos : au clavier, on descend le texte
- * puis on tombe dessus, ce qui est l'ordre attendu. `mt-auto` le colle en bas quand le texte est court.
- */
-/* Sa peau est celle du rôle secondaire sur fond sombre, posée par carteRetournee.ts ; ici, son
-   placement seulement : en bas du dos, au bord gauche. */
+/* LE RETOUR ferme la carte et il est le dernier élément du dos : au clavier, on descend le texte
+   puis on tombe dessus. Sa peau (rôle secondaire sur fond sombre) est posée par carteRetournee.ts ;
+   ici, son placement seulement : en bas du dos, au bord gauche. */
 .carte-retour {
   margin-top: auto;
   align-self: flex-start;
 }
 
-/* La main n'apparaît que si le script a tourné : sans lui, la carte n'ouvre rien et promettre un clic
-   serait un mensonge. Le bouton, lui, garde son propre curseur. */
 /* Exposant des ordinaux (« 1ᵉʳ jour du 6ᵉ mois »). `line-height: 0` et `vertical-align` explicites :
    sans eux, un <sup> creuse l'interligne de la ligne qui le porte, et deux cartes voisines cessent de
    s'aligner. La taille suit celle du texte, elle n'est pas écrite en pixels. */
@@ -1791,24 +1576,18 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   vertical-align: 0.42em;
 }
 
+/* La main n'apparaît que si le script a tourné (il pose l'attribut) : sans lui, la carte n'ouvre
+   rien et promettre un clic serait un mensonge. Le bouton, lui, garde son propre curseur. */
 [data-carte-cliquable] {
   cursor: pointer;
 }
 
-/*
- * ILLUSTRATIONS DES CARTES (16/09/2026) : les cinq dessins animés de /strategie (EngineRent, EngineGain,
- * StrategySelect, StrategyDiversify, StrategyTiming ; grammaire commune décrite en tête de
- * StrategySelect.astro) sont EN PAUSE HORS ÉCRAN et DERRIÈRE UNE CARTE RETOURNÉE.
- * `data-in-view="illus-en-vue"` sur la figure : motion.ts pose la classe tant qu'elle traverse le
- * viewport (marge 10 %). Un dessin commence donc son histoire quand on le voit, pas au chargement, et
- * cinq boucles ne tournent pas pendant qu'on lit le reste de la page.
- * SEULEMENT SI UN SCRIPT TOURNE (`scripting: enabled`) : sans lui, personne ne poserait jamais la classe
- * et les dessins resteraient figés sur leur première image ; ils tournent alors librement, et un
- * navigateur qui ignore cette requête média fait de même. Sous `reduce`, rien n'est animé de toute façon.
- * `[inert]` est posé par carteRetournee.ts sur la face cachée : ce qu'on ne voit pas ne bouge pas.
- * L'attribut est répété pour PESER PLUS que les sélecteurs des composants, qui portent une classe et
- * l'attribut de portée d'Astro : sans cela, l'ordre des feuilles déciderait.
- */
+/* ILLUSTRATIONS DES CARTES de /strategie (grammaire en tête de StrategySelect.astro) : EN PAUSE
+   HORS ÉCRAN (`data-in-view="illus-en-vue"`, classe posée par motion.ts) et DERRIÈRE UNE CARTE
+   RETOURNÉE (`[inert]`, posé par carteRetournee.ts). SEULEMENT SI UN SCRIPT TOURNE : sans lui,
+   personne ne poserait la classe et les dessins resteraient figés. L'attribut est répété pour PESER
+   PLUS que les sélecteurs des composants (classe + attribut de portée d'Astro), sinon l'ordre des
+   feuilles déciderait. */
 @media (prefers-reduced-motion: no-preference) and (scripting: enabled) {
   [data-in-view='illus-en-vue'][data-in-view]:not(.illus-en-vue) *,
   .carte-recto[inert] [data-in-view='illus-en-vue'] * {
@@ -1818,14 +1597,11 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
 
 
 
-/* --- Hero (fond ink + halo de marque + grain ; plus d'image de fond depuis le 11/09/2026) --- */
+/* --- Hero (fond ink + halo de marque + grain, sans image de fond) --- */
 
-/* Halo de marque animé : dérive lente (20 s, transform uniquement) des lueurs, coupée en reduced-motion.
-   En pause tant que le hero n'est pas à l'écran (classe `is-in-view` posée par `data-in-view`) : aucune
-   couche animée pendant la lecture du reste de la page. Pas de will-change permanent (l'animation crée
-   déjà sa couche le temps de tourner). */
-/* Plus de pause hors écran depuis le 16/09/2026 au soir (« ces mouvements ne s'arrêtent pas en
-   arrière-plan ») : le halo dérive en continu, comme l'aurore. */
+/* Halo de marque animé : dérive lente (20 s, transform uniquement), coupée en mouvement réduit, en
+   continu même hors écran, comme l'aurore. Pas de will-change permanent : l'animation crée déjà sa
+   couche le temps de tourner. */
 @utility brand-halo-drift {
   @media (prefers-reduced-motion: no-preference) {
     &::before {
@@ -1862,17 +1638,11 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
 }
 
 /* --- Accordéons (FAQ de l'accueil, /faq, /strategie et /documentation) ---
-   Ouverture / fermeture de la réponse : transition de hauteur en CSS pur (aucun JS), sur le pseudo-élément
-   ::details-content qui enveloppe le contenu hors summary. Grille à une rangée 0fr → 1fr (la hauteur
-   « auto » n'est pas interpolable sans interpolate-size) ; `content-visibility` en transition discrète pour
-   que le contenu reste peint pendant la fermeture. `overflow-y: clip` (pas un conteneur de défilement,
-   l'axe horizontal reste visible : anneaux de focus intacts sur les côtés). L'élément de grille
-   (.faq-answer) a `min-height: 0` et ne porte aucun padding ni marge (l'espacement est sur son enfant) :
-   la rangée 0fr descend jusqu'à 0 px, la fermeture est continue, sans plateau ni saut final. Aucune
-   opacité ni transform : le texte de la réponse reste à opacité 1 à tout instant, et rien ne bouge
-   une fois la réponse ouverte. Sans ::details-content ou en reduced-motion : ouverture instantanée native.
-   ICI ET NON DANS 10-Faq.astro depuis le 16/09/2026 : la FAQ de /documentation, qui n'avait qu'un
-   glissement sans hauteur animée, joue maintenant le même geste. */
+   Ouverture / fermeture en CSS pur sur ::details-content : grille 0fr → 1fr (« auto » n'est pas
+   interpolable sans interpolate-size), `content-visibility` en transition discrète pour que le
+   contenu reste peint pendant la fermeture, `overflow-y: clip` (pas un conteneur de défilement).
+   `.faq-answer` a `min-height: 0` et ni padding ni marge : la rangée descend jusqu'à 0 px, sans
+   saut final. Aucune opacité ni transform : le texte reste à opacité 1 à tout instant. */
 @media (prefers-reduced-motion: no-preference) {
   @supports selector(::details-content) {
     .faq-item::details-content {
@@ -1907,36 +1677,19 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   display: inline-block;
 }
 
-/* --- Cascade d'entrée (data-intro) : CSS pur, jouée au premier rendu ---
+/* --- Cascade d'entrée du hero (data-intro) : CSS pur, jouée au premier rendu ---
    La classe `intro` est rendue côté serveur sur <html> (Base.astro) : la décision est prise avant tout
-   rendu, sans script, donc sans flash quel que soit le réseau ou le CPU (la CSP interdit l'inline).
-   Seul le hero en porte : la cascade générique qui précédait (un fondu par rang, 70 ms par rang,
-   variante `data-intro-move` par transform seul) était entièrement recouverte par les règles du hero
-   ci-dessous et a été retirée le 22/09/2026.
-   Ouverture de l'accueil, RÉÉCRITE le 14/09/2026 (cadence donnée par l'équipe), puis RECADENCÉE le
-   17/09/2026 : « au chargement ça ne rend pas bien du tout, j'aimerais voir le logo R Start en gros en
-   premier puis les éléments suivants ». Le premier rendu, sur téléphone, était un fond vide avec un
-   rond de verre en haut ; le logo n'arrivait qu'à 200 ms, à 20 % de sa taille.
-   Six temps, en millisecondes depuis le premier rendu :
-     0    LE LOGO, EN GROS ET EN PREMIER : il est là dès la première image, un peu plus grand que sa
-          taille, et s'y pose ;
-     350  le surtitre paraît en resserrant son interlettrage ;
-     500  l'accroche, mot à mot, 70 ms d'écart ;
-     750  les boutons (la ligne risques, qui les accompagnait, est partie le 14/09/2026) ;
-     700  la barre de navigation descend et se découvre, d'un bloc ;
-     900  les avis et la flèche, en fondu ; la flèche enchaîne sur son oscillation, en boucle.
-   Trois principes hérités et conservés :
-    - la classe `intro` est posée côté serveur sur <html> (Base.astro) : la décision est prise avant
-      tout rendu, sans script, donc sans flash quel que soit le réseau (la CSP interdit l'inline) ;
-    - `backwards` : l'état de départ ne vaut que pendant le délai, aucune valeur résiduelle ensuite ;
-    - rien de tout cela en `prefers-reduced-motion`.
-   LE TEXTE NE SE FOND PAS. Les fondus demandés sont rendus par `clip-path` partout où il y a du texte :
-   un contrôle d'accessibilité mesure les contrastes et lisait des textes à mi-opacité, à 1,19:1. Le
-   découpage ne change aucune couleur. L'opacité reste admise là où il n'y a pas de texte à mesurer :
-   le logo (image décorative), le cadre d'avis Trustpilot et la flèche. */
+   rendu, sans script, donc sans flash quel que soit le réseau (la CSP interdit l'inline). Cadence
+   fixée le 17/09/2026 à la demande de l'équipe (« le logo R Start en gros en premier puis les
+   éléments suivants »), en millisecondes : 0 le logo ; 350 le surtitre ; 500 l'accroche, mot à mot,
+   70 ms d'écart ; 700 la barre de navigation ; 750 les boutons ; 900 les avis et la flèche, en
+   fondu. `backwards` : l'état de départ ne vaut que pendant le délai. Rien en
+   `prefers-reduced-motion`. LE TEXTE NE SE FOND PAS. Les fondus sont rendus par `clip-path` partout
+   où il y a du texte : un contrôle d'accessibilité mesure les contrastes et lisait des textes à
+   mi-opacité, à 1,19:1. L'opacité reste admise sans texte à mesurer : le logo (image
+   décorative), le cadre Trustpilot, la flèche. */
 @media (prefers-reduced-motion: no-preference) {
-  /* `backwards` : état de départ pendant le délai seulement, aucune valeur résiduelle ensuite (pas de
-     couche conservée). Chaque rang fixe son nom, son délai et sa durée. */
+  /* Chaque rang fixe son nom, son délai et sa durée. */
   html.intro #apercu [data-intro] {
     animation-duration: var(--intro-dur, 700ms);
     animation-delay: var(--intro-delay, 0ms);
@@ -1944,24 +1697,18 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
     animation-fill-mode: backwards;
   }
 
-  /* 100 ms, le surtitre : fondu et resserrement de l'interlettrage.
-     L'effet ne tient que sur un texte déjà très espacé, ce qui est le cas ici. Il part de 0,42 em et
-     revient à la valeur de repos, 0,14 em, qui ne change pas : c'est le geste qui est ajouté, pas une
-     nouvelle typographie. `letter-spacing` ne se compose pas, il ne peut pas vivre dans un `transform` :
-     il est animé directement, et coûte une remise en page par image. Admis sur une ligne courte, isolée,
-     pendant une demi-seconde. */
+  /* 350 ms, le surtitre : découverte et resserrement de l'interlettrage, de 0,42 em à 0,14 em.
+     `letter-spacing` ne se compose pas : animé directement, il coûte une remise en page par image,
+     admis sur une ligne courte, isolée, pendant une demi-seconde. */
   html.intro #apercu [data-intro='2'] {
     animation-name: intro-hero-eyebrow;
     --intro-delay: 350ms;
     --intro-dur: 700ms;
   }
 
-  /* 0 ms, LE LOGO, EN GROS ET EN PREMIER (17/09/2026, demande de l'équipe). Il est là dès la première
-     image, à 118 % de sa taille et déjà presque plein, et se pose à sa taille en 900 ms : c'est la
-     première chose qu'on voit, et elle est grande. L'apparition « façon PowerPoint » du 14/09/2026, qui
-     partait de 20 % après 200 ms d'attente, laissait l'écran vide puis un point qui grossit.
-     Le dévoilement du mot-symbole par masque reste écarté : un découpage sur une image qui change
-     d'échelle se lit mal. Le logo entre d'un bloc. */
+  /* 0 ms, LE LOGO, EN GROS ET EN PREMIER : là dès la première image, à 118 % de sa taille et déjà
+     presque plein, il se pose à sa taille en 900 ms. Le dévoilement par masque est écarté : un
+     découpage sur une image qui change d'échelle se lit mal. */
   html.intro #apercu [data-intro='1'] {
     animation-name: intro-hero-brand;
     transform-origin: 50% 50%;
@@ -1977,10 +1724,9 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
     animation: intro-hero-mot 700ms var(--ease-out-expo) backwards;
     animation-delay: calc(500ms + var(--mot, 0) * 70ms);
   }
-  /* ET LE PARAGRAPHE LUI-MÊME NE JOUE RIEN (audit du 16/09/2026) : ses mots portent la cascade, lui
-     n'a pas de nom d'animation. Deux animations sur le même texte donnaient un texte à mi-opacité, ce
-     que le bandeau ci-dessus interdit ; l'accroche, plus grand texte du premier écran, entrait de
-     surcroît dans le LCP avec 700 ms de retard. */
+  /* ET LE PARAGRAPHE LUI-MÊME NE JOUE RIEN : ses mots portent la cascade. Deux animations sur le
+     même texte donnaient un texte à mi-opacité, ce que le bandeau ci-dessus interdit ; et
+     l'accroche, plus grand texte du premier écran, entrait dans le LCP avec 700 ms de retard. */
   html.intro #apercu [data-intro='3'] {
     animation: none;
   }
@@ -2002,12 +1748,8 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   }
 }
 
-/* Le logo : là dès la première image, un peu plus grand que sa taille (118 %), et il s'y pose.
-   L'opacité est admise ici, elle l'est partout où il n'y a pas de texte à mesurer : c'est une image
-   décorative (aria-hidden, alt vide). Le fondu est BREF, pleine opacité à 18 % de la durée, soit 160 ms,
-   parce que c'est le plus grand élément affiché, donc le candidat LCP, et qu'un élément à opacité nulle
-   n'est pas peint. Le recul d'échelle, lui, va jusqu'au bout des 900 ms sur la courbe expo.out : vif
-   au départ, posé à la fin. */
+/* Le logo : l'opacité est admise (image décorative). Le fondu est BREF, pleine opacité à 18 % de
+   la durée, soit 160 ms : c'est le candidat LCP, et un élément à opacité nulle n'est pas peint. */
 @keyframes intro-hero-brand {
   from {
     opacity: 0;
@@ -2076,21 +1818,15 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
     opacity: 1;
   }
 }
-/* Invitation à descendre, au bas du hero (01-Hero.astro). Elle respire lentement : un objet posé qui
-   attend, plutôt qu'un pictogramme figé, la respiration est sur le CHEVRON, pas sur le lien, dont la
-   transform est déjà prise par le scrub de défilement. Rien en mouvement réduit.
-   Elle s'efface tant que le bandeau cookies est déplié : il la recouvrirait. `visibility` et non
-   `opacity`, parce que le scrub pose une opacité en ligne qui l'emporterait, et parce que cela la
-   retire aussi du parcours au clavier.
-   DEUX SECONDES et un départ RETARDÉ depuis le 14/09/2026 (cadence donnée par l'équipe) : la flèche
-   paraît d'abord en fondu au rang 7, à 900 ms, puis enchaîne sur son oscillation. Le retard couvre
-   l'entrée, 900 ms de délai et 700 ms de durée. Au retour depuis une autre page, l'ouverture ne se
-   rejoue pas et la flèche attend simplement ce même temps avant de respirer. */
+/* Invitation à descendre (01-Hero.astro) : la respiration est sur le CHEVRON, la transform du lien
+   étant prise par le scrub. Effacée sous le bandeau cookies par `visibility` et non `opacity` : le
+   scrub pose une opacité en ligne qui l'emporterait, et cela la retire du parcours au clavier. Le
+   départ est retardé de 1600 ms, le temps de l'entrée en fondu (900 ms de délai, 700 de durée). */
 @media (prefers-reduced-motion: no-preference) {
   [data-hero-scroll-hint] svg {
     animation: hint-bob 2s var(--ease-in-out-quart) 1600ms infinite;
-    /* En pause dès que la flèche quitte l'écran (`data-in-view` sur le lien, audit du 16/09/2026) :
-       elle battait jusqu'au bas de la page. */
+    /* En pause dès que la flèche quitte l'écran (`data-in-view` sur le lien) : elle battait
+       jusqu'au bas de la page. */
     animation-play-state: paused;
   }
   [data-hero-scroll-hint].is-in-view svg {
@@ -2110,17 +1846,15 @@ body:has(#consent-banner:not([hidden])) [data-hero-scroll-hint] {
   visibility: hidden;
 }
 
-/* Bandeau cookies déplié : il occupe le bas du premier écran et recouvrait la ligne risques du hero
-   (− 7 px de marge en 1440 × 900) ; la règle garde aujourd'hui les boutons bien au-dessus de lui. Tant qu'il est là, la copie remonte ; comme elle est centrée par
-   `justify-content: center`, une marge basse de 4 rem la décale de la moitié, soit 32 px. Le bandeau passe
-   en `hidden` dès que le choix est fait (scripts/consent.ts) : la règle cesse alors de s'appliquer et le
-   hero retrouve son centrage exact. Bornée aux écrans où le hero est centré (voir 01-Hero.astro). */
+/* Bandeau cookies déplié : les boutons du hero restent au-dessus de lui. La copie étant centrée,
+   une marge basse la décale de la moitié ; `hidden` posé (scripts/consent.ts), le centrage
+   revient. */
 @media (width >= 64rem) {
   body:has(#consent-banner:not([hidden])) [data-hero-copy] {
     margin-bottom: 2.5rem;
   }
-  /* La copie redescend en douceur quand le bandeau s'en va, au lieu de sauter de 32 à 40 px : une
-     transition de mise en page, mais jouée une seule fois par visite (audit du 16/09/2026). */
+  /* La copie redescend en douceur quand le bandeau s'en va : une transition de mise en page, mais
+     jouée une seule fois par visite. */
   @media (prefers-reduced-motion: no-preference) {
     [data-hero-copy] {
       transition: margin-bottom 420ms var(--ease-out-expo);
@@ -2128,13 +1862,10 @@ body:has(#consent-banner:not([hidden])) [data-hero-scroll-hint] {
   }
 }
 
-/*
- * LE BANDEAU COOKIES ENTRE ET SORT EN GLISSANT (audit du 16/09/2026) : il apparaissait et disparaissait
- * par bascule de `hidden`, d'un coup, alors qu'il occupe le bas de l'écran. Le script ne change pas
- * (scripts/consent.ts pose et retire `hidden`) : `@starting-style` donne l'état de départ à l'arrivée,
- * et `display` en transition discrète garde le bandeau affiché le temps de sa sortie. Le panneau
- * « Personnaliser » se déplie de la même façon. Un navigateur qui ignore ces règles fait comme avant.
- */
+/* LE BANDEAU COOKIES ENTRE ET SORT EN GLISSANT, sans que le script change (scripts/consent.ts pose
+   et retire `hidden`) : `@starting-style` donne l'état de départ à l'arrivée, et `display` en
+   transition discrète garde le bandeau affiché le temps de sa sortie. Le panneau « Personnaliser »
+   se déplie de la même façon. Un navigateur qui ignore ces règles bascule d'un coup. */
 @media (prefers-reduced-motion: no-preference) {
   #consent-banner {
     transition:
@@ -2179,10 +1910,8 @@ body:has(#consent-banner:not([hidden])) [data-hero-scroll-hint] {
    Le H1 réserve la place du logo en CSS : aucun décalage de page au chargement de l'image. */
 .hero-logo-wrap {
   display: block;
-  /* RÉDUIT D'UN HUITIÈME le 17/09/2026 (« réduis un peu la taille du logo du hero ») : l'accroche, passée
-     à 48 px et en blanc le même jour, porte désormais le premier écran avec lui ; 13,5, 26 et 24 rem
-     deviennent 12, 23 et 21 rem. Les deux boutons restent au-dessus du bandeau cookies au premier
-     chargement (tests/conformite.spec.ts : Pixel 5, iPhone 13, 1440 × 900). */
+  /* Taille réduite d'un huitième le 17/09/2026 (« réduis un peu la taille du logo du hero »). Les
+     deux boutons restent au-dessus du bandeau cookies au premier chargement (tests/conformite). */
   width: min(46vw, 12rem);
   margin-inline: auto;
   aspect-ratio: 290 / 89;
@@ -2212,17 +1941,10 @@ body:has(#consent-banner:not([hidden])) [data-hero-scroll-hint] {
   height: auto;
 }
 
-/* Comparateur de frais sous 48 rem (12/09/2026) : sept lignes sur trois colonnes ne tiennent pas sur un
-   téléphone. Avant, le tableau débordait dans une enveloppe à défilement horizontal et la colonne de la
-   SCPI comparée, sa liste déroulante comprise, restait hors de l'écran : le visiteur ne voyait que la
-   colonne R Start et rien ne l'invitait à pousser de côté.
-
-   Chaque ligne devient donc une carte : l'intitulé du frais en pleine largeur, les deux taux côte à côte
-   en dessous. Les deux en-têtes restent collés sous la barre de navigation, la liste déroulante reste
-   donc atteignable à tout moment. Plus aucun défilement horizontal.
-
-   Le tableau garde ses balises et ses rôles ARIA explicites (posés dans FeeComparator.astro) : `display:
-   block` efface la sémantique de tableau, les rôles la rendent. */
+/* Comparateur de frais sous 48 rem : en défilement horizontal, la colonne de la SCPI comparée
+   restait hors de l'écran, liste déroulante comprise. Chaque ligne devient une carte. Le tableau
+   garde ses rôles ARIA explicites (FeeComparator.astro) : `display: block` efface la sémantique de
+   tableau, les rôles la rendent. */
 @media (width < 48rem) {
   [data-comparator],
   [data-comparator] thead,
@@ -2233,17 +1955,13 @@ body:has(#consent-banner:not([hidden])) [data-hero-scroll-hint] {
     display: block;
   }
 
-  /* En-tête : les deux prétendants côte à côte, collés sous la barre de navigation.
-
-     Le collant est porté par le `thead`, PAS par le `tr` : un élément collant ne se décolle jamais de son
-     bloc conteneur, et celui du `tr` est le `thead`, haut de sa seule ligne. Posé là, il n'avait donc
-     aucune course à parcourir et ne collait à rien. Sur le `thead`, le bloc conteneur est le tableau
-     entier : l'en-tête suit les sept lignes. */
+  /* En-tête collé sous la barre, porté par le `thead`, PAS par le `tr` : un élément collant ne se
+     décolle jamais de son bloc conteneur, et celui du `tr` est le `thead`, haut de sa seule
+     ligne. */
   [data-comparator] thead {
     position: sticky;
-    /* Collé PILE sous la barre de navigation, comme sur grand écran depuis le 12/09/2026, et l'écart est
-       repris en marge intérieure. Posé plus bas, il laissait une bande par laquelle les lignes du
-       tableau défilaient à découvert, entre le bas de la barre et le haut de l'en-tête. */
+    /* Collé PILE sous la barre, l'écart repris en marge intérieure : posé plus bas, il laissait une
+       bande par laquelle les lignes du tableau défilaient à découvert. */
     top: var(--spacing-nav-total);
     z-index: 10;
     padding-top: 0.5rem;
@@ -2264,12 +1982,9 @@ body:has(#consent-banner:not([hidden])) [data-hero-scroll-hint] {
     column-gap: 0.75rem;
   }
 
-  /* MASQUÉ À L'ŒIL, PAS AU LECTEUR D'ÉCRAN (audit du 18/09/2026). En `display: none`, l'en-tête
-     « Frais » sortait de l'arbre d'accessibilité : la ligne d'en-tête n'avait plus que deux cellules
-     quand chaque ligne de frais en garde trois, et le taux de R Start était annoncé sous l'en-tête de
-     la SCPI concurrente. Sur un comparatif qui nomme des concurrents, les frais étaient attribués à
-     la mauvaise SCPI. Hors flux (position absolue), il ne prend pas de place dans la grille à deux
-     colonnes. */
+  /* MASQUÉ À L'ŒIL, PAS AU LECTEUR D'ÉCRAN : en `display: none`, l'en-tête « Frais » sortait de
+     l'arbre d'accessibilité et le taux de R Start était annoncé sous l'en-tête de la SCPI
+     concurrente. Hors flux, il ne prend pas de place dans la grille. */
   [data-comparator] thead th:first-child {
     position: absolute;
     width: 1px;
@@ -2309,21 +2024,13 @@ body:has(#consent-banner:not([hidden])) [data-hero-scroll-hint] {
   }
 }
 
-/* ===========================================================================================
-   TRANSITIONS DE PAGE (12/09/2026, demande de l'équipe)
-   ===========================================================================================
-   Le site est multipage. `@view-transition { navigation: auto }` suffit : le navigateur fige la page
-   qu'on quitte, charge la suivante et fond l'une dans l'autre. Aucun JavaScript, aucun routeur client,
-   donc aucun des scripts en ligne du site n'a besoin d'être rejoué : ils repartent avec leur page.
-   Le navigateur qui ne connaît pas la règle navigue comme avant, sans transition : c'est le repli.
-
-   La BARRE et sa pastille portent un `view-transition-name` : le navigateur les extrait des deux
-   captures et les anime SÉPARÉMENT du reste. Aux mêmes coordonnées d'une page à l'autre, la barre ne
-   bouge donc pas d'un pixel et ne clignote pas ; la pastille, elle, glisse du lien quitté vers le
-   nouveau, puisque ses coordonnées changent.
-   Le nom est posé sur la PASTILLE de verre (`[data-sitenav-bar]`), pas sur le `<nav>` : celui-ci
-   contient aussi le tiroir en `position: fixed`, et un élément capturé devient le bloc conteneur de ses
-   descendants fixes, le tiroir se calerait alors sur la barre au lieu de l'écran. */
+/* ===== TRANSITIONS DE PAGE (12/09/2026, demande de l'équipe) =====
+   Le site est multipage : `@view-transition { navigation: auto }` suffit, sans JavaScript ni
+   routeur client, les scripts repartent avec leur page ; un navigateur qui ignore la règle navigue
+   sans transition. La BARRE et sa pastille portent un `view-transition-name` : animées SÉPARÉMENT,
+   la barre ne bouge pas d'un pixel et la pastille glisse vers le nouveau lien. Le nom est sur la
+   PASTILLE de verre (`[data-sitenav-bar]`), pas sur le `<nav>` : un élément capturé devient le bloc
+   conteneur de ses descendants fixes, et le tiroir se calerait sur la barre au lieu de l'écran. */
 @supports not (animation-timing-function: linear(0, 1)) {
   :root {
     --ease-spring-nav: cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -2336,15 +2043,10 @@ body:has(#consent-banner:not([hidden])) [data-hero-scroll-hint] {
 
 @media (prefers-reduced-motion: no-preference) {
   /* Contenu : la nouvelle page arrive EN FONDU ET LÉGÈRE MONTÉE PAR-DESSUS L'ANCIENNE, qui reste en
-     place, pleine, jusqu'au bout. 350 ms, la durée au-delà de laquelle une navigation se met à paraître
-     lente.
-     L'ANCIENNE NE S'EFFACE PLUS (17/09/2026). Elle sortait en 140 ms pendant que la nouvelle n'arrivait
-     qu'en 350 : entre les deux, les captures ne couvraient plus l'écran et le fond clair du document
-     transparaissait sur toute la page, un éclair de lumière à chaque navigation, mesuré à +13 de
-     luminosité à travers la barre et bien davantage sur les en-têtes sombres. Le fondu croisé natif du
-     navigateur évite ce creux par `plus-lighter` et deux courbes complémentaires ; avec deux durées
-     différentes, il faut couvrir autrement : l'ancienne reste opaque dessous, la nouvelle se pose
-     dessus en `normal`. La couverture ne descend jamais sous 100 %. */
+     place, pleine (350 ms : au-delà, une navigation paraît lente). L'ANCIENNE NE S'EFFACE PAS :
+     sortie plus vite que la nouvelle n'arrive, les captures ne couvraient plus l'écran, un éclair
+     clair à chaque navigation. Le fondu croisé natif évite ce creux par `plus-lighter` ; avec deux
+     durées, il faut l'ancienne opaque dessous et la nouvelle en `normal` dessus. */
   ::view-transition-old(root) {
     animation: none;
     mix-blend-mode: normal;
@@ -2355,28 +2057,19 @@ body:has(#consent-banner:not([hidden])) [data-hero-scroll-hint] {
   }
 
   /* La barre ne participe à rien : aucune animation sur son groupe, elle est simplement là, continue.
-     UNE SEULE CAPTURE À LA FOIS (17/09/2026, « la barre est blanche puis la transparence s'applique »,
-     Martin). Sans fondu croisé (`animation: none`), l'ancienne et la nouvelle capture restaient toutes
-     deux affichées, empilées et opaques : deux blancs à 72 % font 92 %, et la barre virait au blanc
-     pendant les 550 ms de la transition, mesuré à 231 de luminosité contre 197 au repos, avant de
-     retrouver son verre d'un coup. L'ancienne capture est masquée, seule la nouvelle est là.
-     PAS DE FLOU D'ARRIÈRE-PLAN SUR LA CAPTURE. Une capture est une image, elle ne floute rien, et l'idée
-     de poser le filtre de la barre sur le conteneur des captures (image-pair) a été essayée puis
-     retirée le soir même : ce pseudo-élément n'honore pas `border-radius`, le `saturate(185%)`
-     s'appliquait à sa boîte rectangulaire et dessinait des bords carrés autour de la pastille sur les
-     en-têtes teal (« quand je clique sur le logo ça fait apparaître des bords », Martin). La capture
-     plate à 72 % a la même luminosité moyenne que le verre vivant, seule la texture diffère, sous des
-     dégradés où cela ne se voit pas. */
+     UNE SEULE CAPTURE À LA FOIS (« la barre est blanche puis la transparence s'applique », Martin)
+     : sans fondu croisé, l'ancienne et la nouvelle capture restaient empilées et opaques, deux
+     blancs à 72 % font 92 %. L'ancienne est masquée. PAS DE FLOU D'ARRIÈRE-PLAN SUR LA CAPTURE :
+     une capture est une image, et le conteneur des captures (image-pair) n'honore pas
+     `border-radius`. La capture plate à 72 % a la même luminosité moyenne que le verre vivant,
+     seule la texture diffère. */
   ::view-transition-group(barre-nav) {
     animation-duration: 0s;
-    /* LE FILTRE D'ARRIÈRE-PLAN DE LA BARRE EST RECOPIÉ ICI PAR LE NAVIGATEUR (la spécification copie
-       `backdrop-filter` sur le groupe), mais pas son rayon : pendant la transition, le
-       `saturate(185%) blur(24px)` s'appliquait à la boîte RECTANGULAIRE du groupe, et un rectangle
-       teal plus clair, à angles droits, débordait des bouts arrondis de la pastille. Vers l'accueil
-       c'était pire : la barre y naît clippée par son entrée (`intro-nav-entree`), sa capture est vide,
-       et il ne restait que le rectangle (« quand je clique sur le logo ça fait apparaître des bords »,
-       Martin, 17/09/2026). Le filtre est annulé sur le groupe ; la capture plate à 72 % a la même
-       luminosité que le verre vivant. */
+    /* LE NAVIGATEUR RECOPIE `backdrop-filter` SUR LE GROUPE, mais pas son rayon : le filtre
+       s'appliquait à la boîte RECTANGULAIRE du groupe, et un rectangle teal à angles droits
+       débordait des bouts arrondis de la pastille (« quand je clique sur le logo ça fait apparaître
+       des bords », Martin). Vers l'accueil c'est pire : la barre y naît clippée par
+       `intro-nav-entree`, sa capture est vide. */
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
   }
@@ -2406,15 +2099,11 @@ body:has(#consent-banner:not([hidden])) [data-hero-scroll-hint] {
   }
 }
 
-/*
- * FILTRE DE LA FAQ (audit du 16/09/2026). scripts/faqSearch.ts joue chaque filtrage dans une transition
- * de vue DU MÊME DOCUMENT : chaque question porte un nom, le navigateur suit donc chacune d'elles d'un
- * état à l'autre. Celles qui restent glissent à leur nouvelle place, celles qui partent s'effacent,
- * celles qui reviennent paraissent en fondu. La page entière, elle, ne doit ni se fondre ni monter
- * comme entre deux pages : `vt-filtre`, posé sur <html> le temps de la transition, neutralise le
- * fondu de la racine. `mix-blend-mode: normal` : sans lui, ancienne et nouvelle image de la page
- * s'additionnent en `plus-lighter` et l'écran s'éclaircit le temps du geste.
- */
+/* FILTRE DE LA FAQ. scripts/faqSearch.ts joue chaque filtrage dans une transition de vue DU MÊME
+   DOCUMENT, chaque question portant un nom. La page entière ne doit ni se fondre ni monter :
+   `vt-filtre`, posé sur <html> le temps de la transition, neutralise le fondu de la racine.
+   `mix-blend-mode: normal` : sinon les deux images s'additionnent en `plus-lighter`, l'écran
+   s'éclaircit. */
 @media (prefers-reduced-motion: no-preference) {
   html.vt-filtre::view-transition-old(root),
   html.vt-filtre::view-transition-new(root) {
@@ -2444,17 +2133,12 @@ body:has(#consent-banner:not([hidden])) [data-hero-scroll-hint] {
   }
 }
 
-/* ===========================================================================================
-   SIMULATEUR (/simulateur, src/components/pages/simulateur/Simulator.astro ; 19/09/2026)
-   ===========================================================================================
-   LES CURSEURS. Piste et poignée redessinées pour deux raisons : les repères de marché posés au-dessus
-   de la piste doivent tomber EXACTEMENT sous le centre de la poignée, ce que l'apparence native ne
-   garantit pas d'un navigateur à l'autre, et la piste se remplit jusqu'à la poignée (`--p`, posée par
-   src/scripts/simulateur/page.ts) dans la couleur du site.
-   `--simu-poignee` vaut 22 px : la même valeur est écrite dans Simulator.astro et page.ts (POIGNEE),
-   qui en tirent l'abscisse des repères et du remplissage. Le centre de la poignée ne parcourt pas
-   toute la piste, il s'arrête à une demi-poignée de chaque bord : d'où le `calc()` des deux côtés.
-   La hauteur de l'élément, 2,75 rem, donne la cible de 44 px que le site s'impose ailleurs. */
+/* ===== SIMULATEUR (/simulateur, src/components/pages/simulateur/Simulator.astro) =====
+   LES CURSEURS, redessinés : les repères de marché doivent tomber EXACTEMENT sous le centre de la
+   poignée, ce que l'apparence native ne garantit pas, et la piste se remplit jusqu'à la poignée
+   (`--p`, posée par page.ts). `--simu-poignee` vaut 22 px, valeur répétée dans Simulator.astro et
+   page.ts (POIGNEE) ; le centre de la poignée s'arrête à une demi-poignée de chaque bord, d'où les
+   `calc()`. 2,75 rem de haut : la cible de 44 px du site. */
 @utility simu-curseur {
   --simu-poignee: 22px;
   appearance: none;
@@ -2525,9 +2209,9 @@ body:has(#consent-banner:not([hidden])) [data-hero-scroll-hint] {
   background: currentColor;
 }
 
-/* Grand écran : la colonne de droite, « Vos hypothèses » puis « Commencer ma souscription », reste
-   collée sous la barre, pendant le parcours comme devant les résultats. Elle est courte (cinq réglages
-   repliés, un seul ouvert), elle ne défile jamais en elle-même. */
+/* Grand écran : la colonne de droite (« Vos hypothèses », puis la souscription) reste collée sous
+   la barre. Elle est courte (cinq réglages repliés, un seul ouvert), elle ne défile jamais en
+   elle-même. */
 @media (min-width: 64rem) {
   .simu-panneau {
     position: sticky;
@@ -2535,11 +2219,9 @@ body:has(#consent-banner:not([hidden])) [data-hero-scroll-hint] {
   }
 }
 
-/* SUR TÉLÉPHONE, LE BOUTON PRINCIPAL DU PARCOURS RESTE SOUS LE POUCE : le pied de la carte (« Retour »,
-   « Continuer ») colle au bas de l'écran tant que la carte y est. À la question du taux la carte fait
-   près de 900 px de haut, et « Voir ma simulation » tombait deux cents pixels sous le pli. Le dégradé
-   blanc laisse deviner qu'il y a du contenu derrière ; la marge basse est celle de la zone sûre des
-   téléphones à encoche. Dès « lg », la carte tient à l'écran : le pied reste à sa place. */
+/* SUR TÉLÉPHONE, LE BOUTON PRINCIPAL DU PARCOURS RESTE SOUS LE POUCE : le pied de la carte colle au
+   bas de l'écran (à la question du taux, « Voir ma simulation » tombait deux cents pixels sous le
+   pli). La marge basse est celle de la zone sûre des téléphones à encoche. */
 @media (max-width: 63.999rem) {
   .simu-pied {
     position: sticky;
@@ -2569,15 +2251,9 @@ body:has(#consent-banner:not([hidden])) [data-hero-scroll-hint] {
   }
 }
 
-/* LA FENÊTRE D'ACCÈS AU PREMIER PLAN PENDANT LA TRANSITION ENTRE PAGES (21/09/2026). La barre et sa
-   pastille portent un nom : le navigateur les peint dans la couche de transition, au-dessus de la
-   page qui arrive, fenêtre comprise. En arrivant par le menu, la barre recouvrait donc le haut de la
-   fenêtre (sur téléphone, son surtitre et son titre), puis passait d'un coup dessous à la fin de la
-   transition. Nommée à son tour, la fenêtre est extraite elle aussi, et les groupes s'empilent dans
-   l'ordre de peinture : à `z-70`, elle passe devant la barre (`z-40`). Son image n'est pas animée à
-   l'entrée : elle est là dès la première image de la transition, et la page change sous son voile.
-   En sortant par « Revenir à l'accueil », elle s'efface avec le fondu par défaut du navigateur.
-   Une fois « J'ai compris » pressé, elle est `hidden` et le nom ne compte plus. */
+/* LA FENÊTRE D'ACCÈS AU PREMIER PLAN PENDANT LA TRANSITION ENTRE PAGES : la barre, nommée, est
+   peinte dans la couche de transition et recouvrait le haut de la fenêtre. Nommée à son tour, la
+   fenêtre est extraite aussi et, à `z-70`, passe devant la barre (`z-40`) dès la première image. */
 .simu-acces-voile {
   view-transition-name: simu-acces;
 }
@@ -2585,12 +2261,10 @@ body:has(#consent-banner:not([hidden])) [data-hero-scroll-hint] {
   animation: none;
 }
 
-/* LE GLISSEMENT DES QUESTIONS NE DÉBORDE PAS DE LA PAGE. Une question entre par la droite, de trois
-   rem : sur un téléphone, deux pixels sortaient du cadre le temps de l'animation, et un défilement
-   horizontal parasite apparaissait (relevé par tests/qualite.spec.ts le 21/09/2026).
-   `clip` ET NON `hidden` : `hidden` ferait de ce conteneur une boîte de défilement, et le pied collant
-   de la carte (« Retour », « Continuer ») se calerait sur elle au lieu de l'écran. Même raison qu'au
-   panneau de recherche. `overflow-y: visible` reste : rien ne doit être coupé en hauteur. */
+/* LE GLISSEMENT DES QUESTIONS NE DÉBORDE PAS DE LA PAGE (deux pixels sortaient du cadre sur
+   téléphone, défilement horizontal parasite). `clip` ET NON `hidden`, qui ferait de ce conteneur
+   une boîte de défilement sur laquelle le pied collant de la carte se calerait au lieu de
+   l'écran. */
 [data-simu-questions] {
   overflow-x: clip;
   overflow-y: visible;
@@ -2620,17 +2294,12 @@ body:has(#consent-banner:not([hidden])) [data-hero-scroll-hint] {
   background: var(--color-navy);
 }
 
-/* LE MOUVEMENT DU SIMULATEUR (20/09/2026, demande de Martin : « beaucoup d'animations », dans l'esprit
-   des interfaces d'Apple, « que ce soit dynamique »). C'est une EXCEPTION à la sobriété du reste du
-   site (une entrée par bloc, expo.out, 180 ms), bornée à cet outil, où le mouvement sert à suivre ce
-   qui change : la question qui part, celle qui arrive, la ligne qui s'ajoute à « Vos hypothèses ».
-   TOUT EST UN RESSORT : `--simu-ressort` dépasse un peu sa cible puis s'y pose, ce qu'aucune courbe de
-   Bézier ne fait. `linear()` est ignoré des navigateurs anciens, qui gardent alors `ease`.
-   DEUX LIMITES. Rien en mouvement réduit : tout le bloc est sous `no-preference`, et les défilements
-   de chiffres du script regardent le même réglage. L'AVERTISSEMENT DES RÉSULTATS N'EST JAMAIS ANIMÉ
-   (`[data-simu-avertissement]`), règle du site pour toute mention de risque : il est là, entier, à la
-   première image.
-   Les entrées se déclenchent seules : une animation CSS repart quand un élément quitte `hidden`. */
+/* LE MOUVEMENT DU SIMULATEUR (20/09/2026, demande de Martin : « beaucoup d'animations », « que ce
+   soit dynamique »), EXCEPTION à la sobriété du site, bornée à cet outil. TOUT EST UN RESSORT :
+   `--simu-ressort` dépasse sa cible puis s'y pose ; `linear()` inconnu donne `ease`. DEUX LIMITES :
+   rien en mouvement réduit, et L'AVERTISSEMENT DES RÉSULTATS N'EST JAMAIS ANIMÉ
+   (`[data-simu-avertissement]`), règle du site pour toute mention de risque. Une animation CSS
+   repart quand un élément quitte `hidden` : les entrées se déclenchent seules. */
 @media (prefers-reduced-motion: no-preference) {
   [data-simulateur],
   .simu-acces {
@@ -2730,20 +2399,12 @@ body:has(#consent-banner:not([hidden])) [data-hero-scroll-hint] {
     }
   }
 
-  /* D'UN ÉCRAN À L'AUTRE : la carte des questions et le panneau portent un nom, le navigateur les suit
-     donc d'un état au suivant (src/scripts/simulateur/page.ts, `changer`). À la deuxième question, la
-     carte glisse du centre vers la gauche et le panneau se pose à côté. La page, elle, ne se fond
-     pas : `vt-simu`, posé sur <html> le temps de la transition, neutralise le fondu de la racine,
-     même motif que `vt-filtre` pour la FAQ. La courbe du groupe ne dépasse pas sa cible : un cadre
-     qui rebondit en changeant de taille se lit comme un défaut.
-     LES NOMS N'EXISTENT QUE LE TEMPS DE CETTE TRANSITION, sous `vt-simu` (21/09/2026, « le chargement
-     de cette page n'est toujours pas ok », Martin). Portés en permanence, ils servaient aussi à la
-     transition ENTRE PAGES du site : en arrivant par le menu, le navigateur extrayait la carte de la
-     première question et la peignait dans la couche de transition, AU-DESSUS de toute la page, fenêtre
-     d'accès comprise. Filmé : « Continuer » paraissait avant même la page, puis la carte recouvrait la
-     fenêtre pendant plus d'une demi-seconde. `vt-simu` est posé avant la capture de l'état de départ
-     et retiré à la fin (page.ts, `changer`) : les deux captures portent les noms, la page au repos
-     n'en porte aucun. */
+  /* D'UN ÉCRAN À L'AUTRE : carte et panneau portent un nom, le navigateur les suit (page.ts,
+     `changer`) ; `vt-simu` neutralise le fondu de la racine, comme `vt-filtre`. La courbe ne
+     dépasse pas sa cible : un cadre qui rebondit se lit comme un défaut. LES NOMS N'EXISTENT QUE
+     SOUS `vt-simu` (« le chargement de cette page n'est toujours pas ok », Martin) : permanents,
+     ils servaient aussi à la transition ENTRE PAGES et la carte était peinte AU-DESSUS de la
+     fenêtre d'accès. `vt-simu` est posé avant la capture de départ et retiré à la fin. */
   html.vt-simu [data-simu-scene] {
     view-transition-name: simu-scene;
   }
@@ -2795,19 +2456,12 @@ body:has(#consent-banner:not([hidden])) [data-hero-scroll-hint] {
     transform: scale(1.18);
   }
 
-  /*
-   * La fenêtre d'accès se pose au ressort, D'UN SEUL TENANT. Une ANIMATION, et non une transition :
-   * elle est rendue par le serveur, présente au premier rendu, et il n'y a donc pas d'état d'avant à
-   * quitter. C'est aussi ce qui la rend indépendante du script.
-   * SES TROIS POINTS N'ENTRENT PLUS À LA SUITE (21/09/2026) : décalés de 140 à 300 ms et partis de
-   * l'opacité zéro, ils laissaient la fenêtre vide en son milieu pendant un quart de seconde, un
-   * chargement inachevé à l'œil. Elle arrive entière, et c'est elle qui bouge.
-   * NI LE VOILE NI LA FENÊTRE NE PARTENT DE L'OPACITÉ ZÉRO (21/09/2026, « il y a toujours un effet
-   * flick, l'étape 1 s'affiche avant la popup », Martin). Le voile entrait en fondu (260 ms) et la
-   * fenêtre avec lui : mesuré image par image, à 109 ms la question était à 58 % d'opacité, la
-   * fenêtre à 28 %. Présente dans le DOM dès le premier rendu, elle ne se VOYAIT pas encore. Le voile
-   * est donc plein dès la première image, et la fenêtre ne garde de son entrée que le mouvement.
-   */
+  /* La fenêtre d'accès se pose au ressort, D'UN SEUL TENANT (des points décalés la laissaient vide
+     un quart de seconde). Une ANIMATION, et non une transition : rendue par le serveur, elle n'a
+     pas d'état d'avant à quitter. NI LE VOILE NI LA FENÊTRE NE PARTENT DE L'OPACITÉ ZÉRO (« il y a
+     toujours un effet flick, l'étape 1 s'affiche avant la popup », Martin) : en fondu, à 109 ms la
+     question était à 58 % d'opacité et la fenêtre à 28 %. Le voile est plein dès la première
+     image. */
   .simu-acces {
     animation: simu-pose 560ms var(--simu-ressort, ease) both;
   }
@@ -2851,25 +2505,16 @@ body:has(#consent-banner:not([hidden])) .simu-barre {
   display: none;
 }
 
-/* ===========================================================================================
-   SANS JAVASCRIPT, SOUS « lg » : LA LISTE DES PAGES REVIENT DANS LA BARRE (audit du 18/09/2026)
-   ===========================================================================================
-   Sous « lg », la liste des pages est masquée et le menu passe par le tiroir, que seul le script ouvre.
-   Sans script (désactivé, fichier en échec, erreur d'exécution), un visiteur sur téléphone voyait un
-   bouton « Menu » qui ne faisait rien, et il ne lui restait que les liens du pied de page. Le site
-   applique pourtant partout la règle « aucun bouton mort » : la loupe, les boutons « i » et « En savoir
-   plus » n'apparaissent que si le script tourne.
-   Même mécanique que la loupe, en miroir : sans script, le bouton disparaît et la liste s'affiche. Elle
-   était déjà prévue pour cela (défilement horizontal sans barre, fondu latéral quand elle déborde).
-   Hors de toute couche : une règle sans couche l'emporte sur l'utilitaire `hidden` de Tailwind. Un
-   navigateur qui ignore `scripting` garde le comportement d'avant. */
-/* SANS SCRIPT, LE DÉTAIL DES CARTES DE /strategie SE LIT (audit du 18/09/2026). Il est écrit dans le
-   flux, sous sa carte, et le script le déplace au dos, sur fond sombre : ses couleurs sont donc celles
-   du dos (sable, blanc, teal clair). Sans script il restait sous la carte, sur le fond CLAIR de la
-   section : sable sur paper, 1,17:1, invisible à l'œil, et lu normalement par un lecteur d'écran, ce
-   qui cachait le défaut aux contrôles automatiques. L'hôte prend alors le fond du dos. Sous
-   `scripting: none` seulement : avec script, il est vidé puis masqué, et un fond sombre clignoterait
-   sous chaque carte le temps que le script s'exécute. */
+/* ===== SANS JAVASCRIPT, SOUS « lg » : LA LISTE DES PAGES REVIENT DANS LA BARRE =====
+   Le tiroir n'est ouvert que par le script : sans lui, un bouton « Menu » mort, contraire à la
+   règle du site. Le bouton disparaît et la liste s'affiche, déjà prévue pour cela. Hors de toute
+   couche, pour l'emporter sur l'utilitaire `hidden` de Tailwind. Sans `scripting` connu, le
+   tiroir reste. */
+/* SANS SCRIPT, LE DÉTAIL DES CARTES DE /strategie SE LIT. Écrit dans le flux avec les couleurs du
+   dos, il restait sur le fond CLAIR de la section : 1,17:1, invisible à l'œil et lu normalement par
+   un lecteur d'écran, ce qui cachait le défaut aux contrôles automatiques. L'hôte prend le fond du
+   dos sous `scripting: none` seulement : avec script, un fond sombre clignoterait sous chaque
+   carte. */
 @media (scripting: none) {
   [data-carte-detail-hote] {
     margin-top: 1.25rem;
@@ -2885,16 +2530,10 @@ body:has(#consent-banner:not([hidden])) .simu-barre {
   }
 }
 
-/* ===========================================================================================
-   IMPRESSION ET « ENREGISTRER EN PDF » (audit du 18/09/2026)
-   ===========================================================================================
-   Le site n'avait aucune règle d'impression. Or les deux moteurs d'animation posent `opacity: 0` en
-   style en ligne sur tout ce qui attend sous l'écran : qui imprimait /frais ou l'accueil sans avoir
-   défilé jusqu'en bas obtenait des blocs blancs à la place des contenus, avec la barre collante, la
-   pastille d'appel et le bandeau de consentement posés sur le texte. On imprime volontiers les frais et
-   les risques d'un produit d'épargne : tout ce qui est écrit doit sortir sur le papier.
-   `!important` : il faut passer devant des styles en ligne. Les réponses de FAQ repliées restent
-   repliées, comme à l'écran ; celles qui sont ouvertes s'impriment. */
+/* ===== IMPRESSION ET « ENREGISTRER EN PDF » =====
+   Les moteurs d'animation posent `opacity: 0` en style en ligne sur ce qui attend sous l'écran :
+   qui imprimait /frais sans avoir défilé obtenait des blocs blancs. On imprime volontiers les frais
+   et les risques d'un produit d'épargne. `!important`, pour passer devant des styles en ligne. */
 @media print {
   [data-animate],
   [data-animate] > *,

@@ -1,41 +1,28 @@
 ---
 /**
  * Section 10, FAQ (id « faq »). Sur l'accueil, une sélection courte (faq.items, liste HOME_FAQ de
- * faq.ts) ; la FAQ complète a sa page, /faq, atteinte par `faq.moreLink`. AUCUN NOMBRE DE QUESTIONS
- * N'EST ÉCRIT DANS CES COMMENTAIRES : ils en donnaient quatre différents, tous périmés (audit du
- * 18/09/2026). Le compte est celui de faq.ts. Fond paper (après Risques, ink) ;
- * DERNIÈRE SECTION de l'accueil depuis le retrait du bloc « Notes et sources » (14/09/2026).
- * Deux colonnes sur grand écran : en-tête collant (surtitre, H2 en text-display-md : la FAQ clôt la page, un
- * cran sous les chapitres) face à la liste des questions en accordéons natifs <details name="faq"> (un
- * seul ouvert à la fois), chevron animé en CSS, questions en text-xl (text-display-sm dès sm : une question
- * longue tient sur deux lignes à 375 px), réponse en paragraphes text-lead. Le découpage des réponses
- * en avantage et contre-poids (`riskFrom`), que plus aucune question ne portait, a quitté le code le
- * 22/09/2026. Le CTA tunnel ferme la colonne des questions. Le JSON-LD FAQPage est émis par la
- * page (src/lib/seo.ts), pas ici.
- *
- * L'en-tête est rendu ici (et non par SectionHeading) pour poser les attributs motion sur le H2 ; le
- * surtitre est en teal-700 (AA sur paper).
- *
- * Motion (src/scripts/motion.ts, attributs seulement), même signature que 02-Highlights :
- *  - en-tête, dans son enveloppe collante (les attributs sont sur les enfants, jamais sur l'élément
- *    sticky) : H2 mot à mot (data-reveal-text, titre court) ;
- *  - questions : statiques (sobriété du 11/09/2026 : les <summary> entrant un à un formaient une cascade
- *    de plus de quatre éléments). Le mouvement de la FAQ est celui de l'accordéon (CSS ci-dessous) ;
- *  - chevron : rotation 180° et inversion des couleurs en CSS à l'ouverture (transform, couleurs) ;
- *  - ouverture / fermeture d'une réponse : transition de hauteur en CSS pur, sans JS, sur le pseudo-élément
- *    `::details-content` (grille `grid-template-rows` 0fr → 1fr sous `@supports selector(::details-content)`,
- *    `content-visibility` en transition discrète pour rester peint pendant la fermeture). L'enfant direct
- *    de <details> (.faq-answer, l'élément de grille) ne porte NI padding NI marge : avec `min-height: 0`,
- *    la rangée 0fr vaut alors exactement 0 px (un padding sur l'élément de grille lui donnait un plancher
- *    de 32-40 px : plateau puis saut de 40 px à la fin de chaque fermeture). L'espacement (pb, pl, space-y)
- *    est porté par un enfant intérieur. Aucune opacité ni transform sur la réponse : son texte est à
- *    opacité 1 à tout instant et, une fois la réponse ouverte, plus rien ne bouge. Navigateurs sans
- *    `::details-content` : ouverture instantanée native. Rien de tout cela en reduced-motion (@media).
- * Le <summary> a pour unique enfant un H3 (modèle de contenu de summary) : le numéro d'ordre et le
- * chevron y sont des spans décoratifs (aria-hidden). <summary> a un rôle interactif implicite : aucun
- * lien n'y est jamais imbriqué (violation d'accessibilité « nested-interactive », HTML invalide de
- * surcroît).
- * Contenu : src/content/fr/faq.ts.
+ * src/content/fr/faq.ts) ; la FAQ complète a sa page, /faq, qui rend toutes les questions avec un
+ * champ de recherche et des rubriques (props ci-dessous). AUCUN NOMBRE DE QUESTIONS N'EST ÉCRIT
+ * DANS CES COMMENTAIRES : le compte est celui de faq.ts. Fond paper (après Risques, ink), dernière
+ * section de l'accueil. Le JSON-LD FAQPage est émis par la page (src/lib/seo.ts), pas ici.
+ * En-tête pleine largeur (H2 rendu ici pour porter ses attributs motion), puis la liste des
+ * questions en accordéons natifs <details name="faq"> (un seul ouvert à la fois), chevron animé en
+ * CSS, questions en text-xl (text-display-sm dès sm : une question longue tient sur deux lignes à
+ * 375 px), réponse en paragraphes text-lead, puis puces, tableau et conclusion. Le renvoi vers /faq
+ * ferme la liste.
+ * Motion (src/scripts/motion.ts, attributs seulement) : H2 mot à mot (data-reveal-text, accueil
+ * seulement, voir `revealTitle`) ; questions statiques (les <summary> entrant un à un formaient une
+ * cascade de plus de quatre éléments). Le mouvement de la FAQ est celui de l'accordéon : transition
+ * de hauteur en CSS pur sur `::details-content` (global.css, « Accordéons » : grille
+ * `grid-template-rows` 0fr → 1fr, `content-visibility` en transition discrète pour rester peint
+ * pendant la fermeture). L'enfant direct de <details> (.faq-answer, l'élément de grille) ne porte
+ * NI padding NI marge : avec `min-height: 0`, la rangée 0fr vaut exactement 0 px (un padding lui
+ * donnait un plancher de 32-40 px, plateau puis saut à la fin de chaque fermeture) ; l'espacement
+ * est porté par un enfant intérieur. Aucune opacité ni transform sur la réponse. Navigateurs sans
+ * `::details-content` : ouverture instantanée native. Rien de tout cela en reduced-motion.
+ * Le <summary> a pour unique enfant un H3 (modèle de contenu de summary) : numéro et chevron y sont
+ * des spans décoratifs (aria-hidden). <summary> a un rôle interactif implicite : aucun lien n'y est
+ * jamais imbriqué (violation « nested-interactive », HTML invalide de surcroît).
  */
 import { ancreQuestion } from '@/lib/ancre';
 import { withBase } from '@/lib/href';
@@ -45,10 +32,9 @@ import { sections } from '@/config/sections';
 import { faq } from '@/content/fr/faq';
 
 /*
- * PARAMÉTRÉ LE 16/09/2026 pour servir aussi la page /faq, qui rend toutes les questions avec un champ
- * de recherche. Le composant lisait `faq.items` en dur. Le rendre paramétrable plutôt que le recopier :
- * l'accordéon et ses transitions `::details-content` sont écrits une fois, et les deux surfaces ne
- * peuvent pas diverger.
+ * Paramétré (16/09/2026) pour servir aussi la page /faq plutôt que d'être recopié : l'accordéon et
+ * ses transitions `::details-content` sont écrits une fois, les deux surfaces ne peuvent pas
+ * diverger.
  */
 interface Props {
   /** Questions à rendre. Par défaut la sélection courte de l'accueil (faq.items). */
@@ -57,7 +43,7 @@ interface Props {
   showMoreLink?: boolean;
   /** Champ de recherche : seulement là où il y a assez de questions pour qu'il serve. */
   search?: boolean;
-  /** Titre, remplaçable par la page hôte. Pas d'introduction depuis le 16/09/2026. */
+  /** Titre, remplaçable par la page hôte. Pas d'introduction. */
   title?: string;
   tone?: 'paper' | 'white';
   /**
@@ -81,11 +67,11 @@ const id = sections.faq.id;
 /** id du H2, référencé par aria-labelledby sur la section (convention de Section / SectionHeading). */
 const titleId = id + '-title';
 /*
- * RUBRIQUES (16/09/2026) : sur /faq, les questions sont groupées par rubrique. Le repère est posé
- * sur la PREMIÈRE question de chaque rubrique, dans son propre <li>, et non dans un sous-titre entre
- * deux listes : une liste coupée en morceaux casserait le comptage annoncé aux lecteurs d'écran, et le
- * filtre de recherche masque des <li>, pas des sections.
- * Les sélections courtes des autres pages ne les rendent pas : une poignée de questions n'a pas de plan.
+ * RUBRIQUES : sur /faq, les questions sont groupées par rubrique. Le repère est posé sur la
+ * PREMIÈRE question de chaque rubrique, dans son propre <li>, et non dans un sous-titre entre deux
+ * listes : une liste coupée en morceaux casserait le comptage annoncé aux lecteurs d'écran, et le
+ * filtre de recherche masque des <li>, pas des sections. Les sélections courtes n'en ont pas : une
+ * poignée de questions n'a pas de plan.
  */
 let rubriquePrecedente: string | undefined;
 const items = rendus.map((item) => {
@@ -103,9 +89,9 @@ const items = rendus.map((item) => {
 <Section id={id} tone={tone}>
   <Container size="wide">
     {
-      /* En-tête PLEINE LARGEUR depuis le 11/09/2026 : dans sa colonne de cinq douzièmes, le titre ne
-        pouvait pas prendre la taille commune aux autres sections sans se couper en quatre lignes. Il sort
-        donc de la grille, comme partout ailleurs, et les questions occupent le reste. */
+      /* En-tête PLEINE LARGEUR, hors de la grille : dans une colonne de cinq douzièmes, le titre ne
+        pouvait pas prendre la taille commune aux autres sections sans se couper en quatre lignes.
+        */
     }
     <header>
       <h2 id={titleId} class="text-display-lg text-balance" data-reveal-text={revealTitle || undefined}>
@@ -117,10 +103,10 @@ const items = rendus.map((item) => {
       {/* Questions */}
       <div class="lg:col-span-8 lg:col-start-3">
         {
-          /* CHAMP DE RECHERCHE (16/09/2026, page /faq). `type="search"` et non `text` : le navigateur
-            y pose sa croix d'effacement et les lecteurs d'écran l'annoncent comme une recherche.
-            Il FILTRE une liste déjà rendue, il n'interroge rien : toutes les questions sont dans le
-            HTML, la page marche donc sans script, champ masqué comme les boutons « i ». */
+          /* CHAMP DE RECHERCHE (page /faq). `type="search"` et non `text` : le navigateur y pose sa
+            croix d'effacement et les lecteurs d'écran l'annoncent comme une recherche. Il FILTRE
+            une liste déjà rendue, il n'interroge rien : toutes les questions sont dans le HTML, la
+            page marche donc sans script, champ masqué comme les boutons « i ». */
         }
         {search && (
           <div class="mb-8" data-faq-recherche hidden>
@@ -148,13 +134,12 @@ const items = rendus.map((item) => {
           {
             items.map((item, i) => (
               <li class="border-b border-navy/15" data-rubrique={item.categorie}>
-                {/* LE LIBELLÉ DE RUBRIQUE EST DANS CHAQUE <li>, masqué sauf sur la première question de la
-                rubrique (audit du 18/09/2026). Il n'était que dans celle-ci, et le filtre masque des <li>
-                entiers : dès que la première question d'une rubrique ne correspondait pas à la recherche,
-                son libellé partait avec elle, et les suivantes s'affichaient sous l'intitulé de la
-                rubrique PRÉCÉDENTE. Une réponse sur les frais rangée sous « Comprendre R Start ». Le
-                script (faqSearch.ts) montre le libellé sur la première question VISIBLE de chaque
-                rubrique. Sans script, le rendu ne change pas. */}
+                {/* LE LIBELLÉ DE RUBRIQUE EST DANS CHAQUE <li>, masqué sauf sur la première
+                question de la rubrique (audit du 18/09/2026) : le filtre masque des <li> entiers,
+                et quand il n'était que dans la première, une recherche qui l'écartait rangeait les
+                suivantes sous l'intitulé de la rubrique PRÉCÉDENTE. Le script (faqSearch.ts) montre
+                le libellé sur la première question VISIBLE de chaque rubrique. Sans script, le
+                rendu ne change pas. */}
                 {item.categorie && (
                   <p
                     class="text-eyebrow mt-10 mb-2 text-teal-700 first:mt-0"
@@ -277,11 +262,9 @@ const items = rendus.map((item) => {
         </ul>
 
         {
-          /* Le CTA de souscription qui fermait la FAQ est retiré (12/09/2026, demande de l'équipe) :
-            la pastille flottante le porte désormais, de « Souscrire en 4 étapes » jusqu'au bas de la
-            page, et il faisait doublon avec elle à quelques centaines de pixels d'intervalle.
-            Le renvoi vers toutes les questions (/faq) reste, en LIEN et non en bouton : pas un appel à
-            l'action, c'est la suite de la lecture. */
+          /* Plus de CTA de souscription ici (12/09/2026, demande de l'équipe) : la pastille
+            flottante le porte. Le renvoi vers toutes les questions (/faq) est un LIEN et non un
+            bouton : pas un appel à l'action, c'est la suite de la lecture. */
         }
         {
           showMoreLink && faq.moreLink && (
@@ -302,9 +285,8 @@ const items = rendus.map((item) => {
 </Section>
 
 {
-  /* L'ouverture animée de la réponse (`.faq-item::details-content`) vit dans global.css depuis le
-    16/09/2026, sous « Accordéons » : la FAQ de /documentation (DocumentationFaq.astro) l'a en partage,
-    au lieu d'un simple glissement sans hauteur animée. */
+  /* L'ouverture animée de la réponse vit dans global.css, « Accordéons » (voir l'en-tête), en
+    partage avec la FAQ de /documentation (DocumentationFaq.astro). */
 }
 
 <script>

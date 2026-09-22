@@ -3,26 +3,22 @@ import { product } from '@/content/fr/facts';
 import { lowerFirst } from '@/lib/texte';
 
 /**
- * SEO de l'accueil (FR) : titre, description, texte de l'image Open Graph et requêtes cibles. Les
- * sous-pages portent les leurs dans leur propre fichier de contenu (`seo`).
+ * SEO de l'accueil : titre, description, texte de l'image Open Graph et requêtes cibles
+ * (`keywords`). Les sous-pages portent les leurs dans leur propre fichier de contenu (`seo`).
  *
- * « sans frais » n'apparaît jamais : l'intention « SCPI sans frais de souscription » est servie par la
- * formulation conforme « 0 % de frais de souscription » (scripts/check-compliance.mjs). Aucune donnée
- * de performance dans une balise ; chaque avantage cité y est contrebalancé.
+ * « sans frais » n'apparaît jamais : l'intention « SCPI sans frais de souscription » est servie par
+ * la formulation conforme « 0 % de frais de souscription » (scripts/check-compliance.mjs). Aucune
+ * donnée de performance dans une balise ; chaque avantage cité y est contrebalancé.
  *
  * JSON-LD (src/lib/seo.ts, généré depuis content/fr, jamais en dur) : Organization, WebPage (about
- * InvestmentFund, keywords = `seo.keywords`) et FAQPage, strictement les questions visibles de faq.ts.
- * Interdits : Product, Offer, AggregateRating (signaux marchands trompeurs sur un produit financier).
- *
- * NETTOYÉ LE 22/09/2026 : `seoH2` (un H2 proposé par section) et `faqQuestions` (dix questions visées)
- * étaient deux références éditoriales sans lecteur, et périmées : elles visaient des sections et des
- * questions qui n'existent plus. Les requêtes cibles vivent dans `keywords`.
+ * InvestmentFund, keywords = `seo.keywords`) et FAQPage, strictement les questions visibles de
+ * faq.ts. Interdits : Product, Offer, AggregateRating (signaux marchands trompeurs sur un produit
+ * financier).
  */
 
 export const seo = {
-  /** ≤ 60 caractères. Contient « R Start » et « CORUM ». « Frais d’entrée » : vocabulaire du DIC (« coûts d’entrée », 0 %). */
-  // La variante « … 0 % de frais d’entrée, capital non garanti » (audit du 10/09/2026) fait 64 caractères :
-  // écartée ; le 0 % reste contrebalancé ici par les 15 % de gestion et, dans la description, par le risque.
+  /** ≤ 60 caractères, « R Start » et « CORUM » compris. « Frais d’entrée » : vocabulaire du DIC. Le
+      0 % est contrebalancé ici par les 15 % de gestion et, dans la description, par le risque. */
   title: 'R Start, SCPI CORUM : 0 % de frais d’entrée, 15 % de gestion',
   /**
    * 140 à 155 caractères, avec rappel de risque. Le « 0 % » y est toujours accompagné des 15 % de gestion

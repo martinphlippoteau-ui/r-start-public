@@ -9,28 +9,20 @@
  *                        StrategyDiversify, StrategyTiming) et son détail au dos de la carte. Une
  *                        canalisation les relie aux deux moteurs sur grand écran.
  *
- * D'OÙ ELLE VIENT. Le 14/09/2026 l'équipe a fourni le texte exact de la page, « ni plus ni moins » :
- * quatre sections alors (moteurs, quoi, où, comment), avec trois photos d'immeubles et un globe en
- * rotation. Le 16/09/2026 les trois dernières ont fusionné en trois tuiles à détail, les photos et le
- * globe ont cédé la place aux dessins. Étaient déjà partis le 14/09 : le mot d'ordre en scène épinglée,
- * les piliers et leurs pictos, la CARTE (elle montrait le Conseil de l'Europe et le Canada quand la
- * page dit « partout dans le monde »), les pastilles de types d'actifs, l'effet de levier et les
- * appels de note.
+ * Texte fourni par l'équipe le 14/09/2026, « ni plus ni moins » ; le 16/09/2026 les trois derniers
+ * chapitres ont fusionné en tuiles à détail, photos, globe et carte ont cédé la place aux dessins.
  *
- * FONDS. Les deux sections sont claires. L'en-tête de la page est déjà sombre : une première section
- * ink enchaînerait deux pavés sombres sans coupure, et un test l'interdit sur toutes les sous-pages.
- * Le sombre est porté par les trois tuiles, puis par le bloc des risques que la page rend ensuite.
+ * FONDS. Les deux sections sont claires : l'en-tête de la page est déjà sombre, une première
+ * section ink enchaînerait deux pavés sombres sans coupure, et un test l'interdit sur toutes les
+ * sous-pages. Le sombre est porté par les tuiles, puis par le bloc Risques que la page rend
+ * ensuite. Ce bloc porte aussi les risques : AUCUNE MENTION DE RISQUE DANS CES DEUX SECTIONS
+ * (retirée de l'écran le 16/09/2026, du code le 22/09/2026 avec le composant NoteConformite).
  *
- * AUCUNE MENTION DE RISQUE DANS CES DEUX SECTIONS : les risques sont portés par le bloc Risques que la
- * page rend ensuite. La mention placée sous les deux moteurs le 14/09/2026 a quitté l'écran le
- * 16/09/2026, puis le code le 22/09/2026 avec le composant qui la rendait (NoteConformite).
- *
- * Motion (src/scripts/motion.ts, tout par attributs) : aucun rideau ici, la section suit directement
- * l'en-tête ; H2 du premier chapitre mot à mot (data-reveal-text), celui des volets en fade-up court ;
- * les trois tuiles entrent en cascade, en bascule (`data-animate-child="tilt"`) ; la canalisation ne
- * s'anime qu'à l'écran (`data-in-view`). Ni tracé `data-draw` ni parallaxe : relevé sur dist le
- * 19/09/2026. Les dessins s'animent dans leurs propres composants.
- * Contenu : src/content/fr/strategy.ts. Plus aucune photo depuis le 16/09/2026. Aucune prop.
+ * Motion (src/scripts/motion.ts, tout par attributs) : aucun rideau ici, la section suit
+ * directement l'en-tête ; H2 du premier chapitre mot à mot (data-reveal-text), celui des volets en
+ * fade-up court ; les trois tuiles entrent en cascade, en bascule (`data-animate-child="tilt"`) ;
+ * la canalisation ne s'anime qu'à l'écran (`data-in-view`). Ni `data-draw` ni parallaxe. Les
+ * dessins s'animent dans leurs composants. Contenu : src/content/fr/strategy.ts. Aucune prop.
  */
 import Container from '@/components/ui/Container.astro';
 import MarqueR from '@/components/ui/MarqueR.astro';
@@ -52,28 +44,22 @@ const ids = { what: 'quoi', where: 'ou', how: 'comment' };
 const QUIET_TITLE_Y = 12;
 
 /*
- * LA CANALISATION (16/09/2026, demande de l'équipe) : « une sorte de canalisation qui va des 3 volets
- * vers les deux moteurs pour montrer que les 3 volets alimentent les moteurs », discrète et subtile.
- *
- * DEUX TRACÉS, PAS UN, et c'est la décision qui porte tout le reste. Entre le bas des cartes moteurs
- * et le haut des tuiles, le titre « Une approche en 3 volets pour les alimenter » est planté au
- * milieu : un trait d'un seul tenant lui passerait forcément dessus. On dessine donc de part et
- * d'autre, et rien derrière lui. L'œil recolle les deux, et c'est le titre lui-même qui dit ce que la
- * coupure laisse entendre.
- *
+ * LA CANALISATION (16/09/2026, demande de l'équipe : « une sorte de canalisation qui va des 3
+ * volets vers les deux moteurs pour montrer que les 3 volets alimentent les moteurs »).
+ * DEUX TRACÉS, PAS UN : le titre « Une approche en 3 volets pour les alimenter » est planté entre
+ * les cartes moteurs et les tuiles, un trait d'un seul tenant lui passerait dessus. On dessine de
+ * part et d'autre, rien derrière lui, et l'œil recolle les deux.
  * LES ABSCISSES SONT CALCULÉES, JAMAIS MESURÉES. Les deux listes vivent dans le même
  * <Container size="wide"> : même boîte de contenu, donc un seul repère horizontal, exprimé en pour
  * mille dans un viewBox de 1000 de large. Un observateur de redimensionnement coûterait un reflow à
  * chaque poignée de pixels pour gagner les deux que les gouttières en pixels font dériver sous 1280.
- *
- * LES HAUTEURS NE SONT PAS ÉCRITES EN DUR NON PLUS : du bas des cartes au haut du titre il y a
- * exactement deux fois `--spacing-section` (la marge basse d'une section plus la marge haute de la
- * suivante), et du bas du titre au haut des tuiles exactement `--spacing-chapter`, le `mt-chapter` de
- * la liste. Le CSS reprend ces variables. Un titre qui passe d'une à deux lignes ne déplace donc rien :
- * tout est ancré sur des BORDS.
- *
- * NE JAMAIS POSER `overflow-hidden` SUR LA SECTION DES VOLETS : c'est son débordement vers le haut qui
- * va chercher les cartes moteurs.
+ * LES HAUTEURS NE SONT PAS ÉCRITES EN DUR NON PLUS : du bas des cartes au haut du titre il y a la
+ * marge basse de la section des moteurs plus la marge haute de celle des volets
+ * (`--spacing-section` et `--spacing-section-sm`), et du bas du titre au haut des tuiles exactement
+ * `--spacing-chapter`, le `mt-chapter` de la liste. Le CSS reprend ces variables : tout est ancré
+ * sur des BORDS, un titre qui passe d'une à deux lignes ne déplace rien.
+ * NE JAMAIS POSER `overflow-hidden` SUR LA SECTION DES VOLETS : c'est son débordement vers le haut
+ * qui va chercher les cartes moteurs.
  */
 const LARGEUR_REF = 1216; // max-w-7xl (1280 px) moins deux fois sm:px-8
 const centreColonne = (i: number, n: number, gouttiere: number): number => {
@@ -91,13 +77,11 @@ const NOEUD_X = 500;
 const NOEUD_Y = 150;
 
 /*
- * Tous les chemins sont écrits du BAS vers le HAUT : le sens du tracé est le sens du flux, et c'est lui
- * que suit l'impulsion. Les trois volets rejoignent un nœud unique, d'où repartent deux conduites vers
- * les deux moteurs. Un nœud plutôt que cinq brins appariés : apparier dirait « ce volet-là alimente ce
- * moteur-là », ce que personne n'a écrit. Le nœud dit ce qui a été demandé, les trois ensemble
- * alimentent les deux.
- * Les deux derniers points de contrôle d'une conduite partagent l'abscisse de son moteur : elle y
- * arrive à la verticale, jamais en biais.
+ * Tous les chemins sont écrits du BAS vers le HAUT : le sens du tracé est le sens du flux, que suit
+ * l'impulsion. Les trois volets rejoignent un nœud unique, d'où repartent deux conduites vers les
+ * deux moteurs ; un nœud plutôt que cinq brins appariés, apparier dirait « ce volet-là alimente ce
+ * moteur-là », ce que personne n'a écrit. Les deux derniers points de contrôle d'une conduite
+ * partagent l'abscisse de son moteur : elle y arrive à la verticale, jamais en biais.
  */
 const montees = [
   { d: `M${VOLET_G} 300C${VOLET_G} 250 ${NOEUD_X} 210 ${NOEUD_X} ${NOEUD_Y}`, rang: 0 },
@@ -129,24 +113,10 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
       data-animate-stagger="0.12"
     >
       {
-        /*
-         * CARTES ILLUSTRÉES depuis le 15/09/2026 (« créer des cards différentes avec des illustrations
-         * pour illustrer »). Avant : un filet, un numéro, deux lignes de texte, à même le fond.
-         * DESSINS ANIMÉS depuis le 16/09/2026, à la place des deux photos d'illustration : une photo de
-         * rue commerçante montrait un décor, le dessin montre le MÉCANISME, et la différence entre les
-         * deux moteurs se lit alors sans passer par les textes.
-         *
-         * MÊME DIRECTION ARTISTIQUE QUE LES TROIS VOLETS depuis le 16/09/2026, demande de l'équipe.
-         * Les moteurs étaient des cartes BLANCHES à ombre et filet, avec un bandeau sombre en haut et
-         * le numéro en pastille posée dessus ; les volets, plus bas, étaient des tuiles ink sans ombre.
-         * Deux grammaires pour deux rangées qui se lisent l'une après l'autre.
-         * Les cinq cartes partagent maintenant la même : fond ink, coins arrondis, surtitre en
-         * teal-200, titre en sable, dessin au trait centré, texte en blanc à 80 %. Le numéro redevient
-         * un surtitre au lieu d'une pastille flottante, à la place exacte qu'occupe « SÉLECTIVE » sur
-         * les volets.
-         * Le sens de lecture est conservé : ombre et filet ne portaient rien que le fond ink ne porte
-         * mieux, puisque c'est lui qui détache la carte du fond paper de la section.
-         */
+        /* Dessins animés à la place des photos (16/09/2026) : une photo montre un décor, le dessin
+          montre le MÉCANISME, et la différence entre les deux moteurs se lit sans passer par les
+          textes. Même grammaire que les trois volets (16/09/2026, demande de l'équipe) : le numéro
+          est un surtitre, à la place exacte qu'occupe « SÉLECTIVE » sur les volets. */
       }
       {
         strategy.engines.items.map((item, i) => {
@@ -162,10 +132,8 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
                 <p class="text-eyebrow text-teal-200 tabular-nums" aria-hidden="true">{numero}</p>
                 <p class="text-display-sm mt-3 text-sand">{item.lead}</p>
                 {
-                  /* CE QUE LE MOTEUR APPORTE, sous le titre (17/09/2026, demande de l'équipe). Petit
-                    texte en blanc à 80 %, la couleur des textes des cartes : le titre reste le repère,
-                    cette ligne le traduit pour l'épargnant. Recto seulement : le dos porte déjà
-                    l'explication complète. */
+                  /* Ce que le moteur apporte, sous le titre (17/09/2026, demande de l'équipe).
+                    Recto seulement : le dos porte déjà l'explication complète. */
                 }
                 {item.benefit && (
                   <p class="mt-2 text-base leading-snug text-pretty text-white/80">
@@ -174,13 +142,12 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
                 )}
 
                 {
-                  /* L'ILLUSTRATION REMPLIT LA CARTE (16/09/2026 au soir, « je veux que les animations
-                    prennent une bonne partie de la carte pour la remplir ») : pleine largeur, et
-                    centrée dans tout l'espace qui reste entre le titre et le bouton (`flex-1`). Elle
-                    était bornée à 24 rem et posée sous le titre, le bas de la carte restait vide.
-                    `--illus-decalage` : le dessin de la seconde carte part un tiers de seconde après
-                    le premier ; deux dessins voisins qui battraient à l'unisson auraient l'air d'un
-                    seul mécanisme (grammaire commune en tête de StrategySelect.astro). */
+                  /* L'illustration remplit la carte (16/09/2026, « je veux que les animations
+                    prennent une bonne partie de la carte ») : pleine largeur, centrée dans tout
+                    l'espace qui reste entre le titre et le bouton (`flex-1`). `--illus-decalage` :
+                    le second dessin part un tiers de seconde après le premier, deux dessins voisins
+                    qui battraient à l'unisson auraient l'air d'un seul mécanisme (grammaire en tête
+                    de StrategySelect.astro). */
                 }
                 <div class="flex w-full flex-1 items-center py-6" style={`--illus-decalage:${i * 0.35}s`}>
                   {i === 0 && <EngineRent />}
@@ -203,9 +170,9 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
                 </button>
               </article>
               {
-                /* LE DOS PORTE LE CONTENU depuis le 16/09/2026 (« je veux que le contenu soit au dos
-                  des cards en fait, pas de zoom ni de popup »). Il arrive vide : c'est le script qui y
-                  déplace le texte écrit plus bas dans le flux, pour que la page se lise entière sans
+                /* LE DOS PORTE LE CONTENU (16/09/2026, « je veux que le contenu soit au dos des
+                  cards en fait, pas de zoom ni de popup »). Il arrive vide : le script y déplace le
+                  texte écrit plus bas dans le flux, pour que la page se lise entière sans
                   JavaScript. La marque reste, petite et en coin, hors du chemin du texte. */
               }
               <div class="carte-verso carte-lueur">
@@ -214,9 +181,8 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
             </div>
 
               {
-                /* Le texte du moteur passe DERRIÈRE la carte, comme celui des volets : sans script il
-                  reste lu dans le flux, juste sous sa carte. Aucun mot n'est ajouté ni retiré, il
-                  change seulement de place. */
+                /* Hôte du détail : sans script le texte reste lu dans le flux, sous sa carte ;
+                  aucun mot ajouté ni retiré, il change seulement de place. */
               }
               <div data-carte-detail-hote>
                 <div id={cible} data-carte-detail class="mt-5 space-y-4">
@@ -236,36 +202,22 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
 {/* 2. Les trois volets : Sélective, Diversifiée, Opportuniste (ex-Quoi, Où, Comment) */}
 {
   /*
-   * TUILES À FENÊTRE (16/09/2026, demande de l'équipe : « j'aime bien le format de card sur le site
-   * d'Apple qui ouvre une popup pour le contenu »). Elles remplacent trois cartes qui déroulaient tout
-   * leur contenu : la page s'ouvre maintenant sur trois tuiles qui se lisent d'un coup d'œil, et le
-   * détail vient à la demande.
-   *
-   * AUCUN TEXTE N'EST AJOUTÉ NI RETIRÉ par la fusion, la répartition change seulement : la tuile porte
-   * le surtitre et le titre, son dos l'introduction, la phrase d'annonce, la liste et la chute
-   * (plus de fenêtre depuis le même jour, voir src/scripts/carteRetournee.ts).
-   * Les trois titres étaient des H2 ; ils sont passés en H3 le 16/09/2026, quand l'équipe a demandé un
-   * titre commun au-dessus des trois volets (« Une approche en 3 volets pour les alimenter »), qui
-   * prend le rang H2. C'est le seul texte ajouté à ce bloc depuis la fusion.
-   *
+   * TUILES À DÉTAIL (16/09/2026, demande de l'équipe : « j'aime bien le format de card sur le site
+   * d'Apple qui ouvre une popup pour le contenu ») : trois tuiles qui se lisent d'un coup d'œil, le
+   * détail au dos, à la demande (src/scripts/carteRetournee.ts), sans un mot ajouté ni retiré.
    * SANS JAVASCRIPT, TOUT RESTE LISIBLE : le détail est écrit dans le flux, sous sa tuile, et le
-   * bouton d'ouverture arrive `hidden`. Le script le déplace au DOS de la carte et révèle le bouton
-   * (src/scripts/carteRetournee.ts). C'est la seule façon de cacher un texte derrière un mouvement sans
-   * le perdre pour qui n'exécute pas de script.
-   *
-   * FOND INK sur les trois. Le globe était sur blanc depuis la fusion et s'y lisait mal : dessin au
-   * trait clair, il lui fallait un fond sombre, celui qu'il avait avant ; les dessins qui l'ont
-   * remplacé sont au trait clair eux aussi. Les tuiles sombres sur la section claire donnent au
-   * passage le contraste que trois cartes blanches sur blanc n'avaient pas.
+   * bouton d'ouverture arrive `hidden`. Le script le déplace au DOS de la carte et révèle le
+   * bouton : la seule façon de cacher un texte derrière un mouvement sans le perdre pour qui
+   * n'exécute pas de script.
+   * FOND INK sur les trois : dessins au trait clair, il leur faut un fond sombre, et les tuiles
+   * sombres sur la section claire donnent le contraste que trois cartes blanches n'avaient pas.
    */
 }
 {
-  /* MARGE HAUTE RÉDUITE le 16/09/2026 (« rapproche un peu le titre et les blocs du dessus ») :
-    `pt-section-sm` à la place du `py-section` de la section, soit environ un tiers de moins. La marge
-    basse ne bouge pas, c'est elle qui sépare les volets du bloc des risques.
-    ATTENTION : la hauteur de la canalisation se calcule sur ces deux marges. Elle lit la même paire de
-    variables, plus bas dans ce fichier (`--pont-bande`) ; changer l'une sans l'autre décollerait le
-    tracé du bas des cartes. */
+  /* `pt-section-sm` à la place du `py-section` de la section (16/09/2026, « rapproche un peu le
+    titre et les blocs du dessus ») ; la marge basse ne bouge pas, c'est elle qui sépare les volets
+    des risques. ATTENTION : la hauteur de la canalisation se calcule sur ces deux marges
+    (`--pont-bande`, plus bas) ; changer l'une sans l'autre décolle le tracé du bas des cartes. */
 }
 <Section id={ids.what} tone="paper" labelledBy="volets-title" class="pt-section-sm">
   <Container size="wide">
@@ -298,21 +250,12 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
     </div>
 
     {
-      /*
-       * EN-TÊTE DU BLOC (16/09/2026, demande de l'équipe). Les trois tuiles n'en avaient pas : la
-       * section empruntait son nom au premier volet, dont le H2 portait l'identifiant attendu par
-       * <Section>. Elle a maintenant son titre, et `labelledBy` le désigne explicitement.
-       * LES TROIS TITRES DE VOLET PASSENT DONC EN H3 : sous un H2 qui les annonce, trois H2 de même
-       * rang auraient fait quatre sections de même niveau dans le plan du document. Leurs
-       * identifiants ne bougent pas, ce sont eux qui servent d'ancres.
-       */
-    }
-    {
-      /* PLEINE LARGEUR, et non `max-w-5xl` comme les autres en-têtes (16/09/2026, « sans retour à la
-        ligne ») : à 1024 px de colonne, ce titre-là se coupait en deux. Il tient sur une ligne dès que
-        la boîte de contenu fait sa largeur pleine, soit 1216 px à partir de 1280 px d'écran. En
-        dessous, il se coupe encore, et c'est la seule issue : on ne va pas réduire la taille commune
-        des titres de la page pour un seul d'entre eux. */
+      /* En-tête propre au bloc, désigné par `labelledBy` ; les titres de volet sont des H3, trois
+        H2 sous un H2 qui les annonce feraient quatre sections de même niveau dans le plan du
+        document. Leurs identifiants ne bougent pas, ce sont les ancres. PLEINE LARGEUR, et non
+        `max-w-5xl` comme les autres en-têtes (16/09/2026, « sans retour à la ligne ») : ce titre
+        tient sur une ligne dès 1280 px d'écran ; en dessous il se coupe, on ne réduit pas la taille
+        commune des titres pour un seul d'entre eux. */
     }
     <header>
       <h2
@@ -340,18 +283,12 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
     </div>
 
     {
-      /*
-       * ENTRÉE DES TUILES, reprise le 16/09/2026 (« j'aimerais que ce soit plus spectaculaire »).
-       * Elles montaient de 20 px en fondu, décalées d'un dixième de seconde : à trois tuiles côte à
-       * côte, l'effet se voyait à peine.
-       * `tilt` les fait maintenant basculer en perspective ; la distance passe à 44 px et le décalage
-       * à 0,16 s, assez pour que les trois arrivent l'une après l'autre au lieu d'ensemble.
-       * CETTE PAGE EST SERVIE PAR LE MOTEUR GSAP, pas par le moteur léger : ses titres mot à mot et le
-       * rideau des Risques l'exigent (tests/performance.spec.ts la sort de la liste des pages sans
-       * GSAP). Ce commentaire disait l'inverse jusqu'au 18/09/2026, et `data-animate-child` n'était lu
-       * que par le moteur léger : la bascule n'a donc jamais été jouée ici. Les deux moteurs le lisent
-       * maintenant. `prefers-reduced-motion` coupe tout dans le moteur lui-même.
-       */
+      /* Entrée en bascule (`tilt`), 0,16 s de décalage (16/09/2026, « j'aimerais que ce soit plus
+        spectaculaire ») : les trois arrivent l'une après l'autre. CETTE PAGE EST SERVIE PAR LE
+        MOTEUR GSAP, pas par le moteur léger : ses titres mot à mot et le rideau des Risques
+        l'exigent (tests/performance.spec.ts la sort de la liste des pages sans GSAP) ; les deux
+        moteurs lisent `data-animate-child` depuis le 18/09/2026, avant la bascule n'était jamais
+        jouée ici. `prefers-reduced-motion` coupe tout dans le moteur lui-même. */
     }
     <ul
       role="list"
@@ -370,12 +307,9 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
           return (
             <li class="[perspective:1400px]">
               {
-                /* Hauteurs relevées le 16/09/2026 : 20 → 24 rem, 24 → 28 rem. Le dessin et le bouton
-                  se serraient contre le titre, et la carte n'avait plus de respiration.
-                  L'ENVELOPPE `.carte-face` EST CE QUI TOURNE, et non plus l'article : depuis le
-                  16/09/2026 la carte a un DOS, qui reste à l'écran derrière la fenêtre ouverte. Il faut
-                  donc deux faces dans un même élément en `preserve-3d`, chacune masquée quand elle
-                  présente son envers. */
+                /* L'ENVELOPPE `.carte-face` EST CE QUI TOURNE, et non l'article : la carte a un
+                  DOS, il faut deux faces dans un même élément en `preserve-3d`, chacune masquée
+                  quand elle présente son envers. */
               }
             <div class="carte-face relative h-full">
               <article class="carte-recto carte-lueur relative flex min-h-[24rem] flex-col overflow-hidden rounded-3xl bg-ink p-6 text-white sm:min-h-[28rem] sm:p-8">
@@ -385,17 +319,12 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
                 </h3>
 
                 {
-                  /* UNE ILLUSTRATION PAR TUILE (16/09/2026). Le globe n'en avait plus qu'une sur trois,
-                    les deux autres restaient nues. Les trois sont maintenant dans la même grammaire
-                    (en tête de StrategySelect.astro) : dessin au trait clair sur fond ink, en boucle
-                    lente, en pause hors écran, complet en `prefers-reduced-motion`.
-                    Les trois sont des SVG. Le globe en canvas a été retiré le 16/09/2026 : il ne
-                    montrait que la moitié du propos de sa tuile, qui parle de secteurs autant que de
-                    géographie. Son fichier a été supprimé le 19/09/2026 ; le globe filaire de
-                    StrategyDiversify, lui, porte un secteur sur chaque épingle.
-                    PLEINE LARGEUR ET AU FORMAT PAYSAGE (160 × 120) depuis le 16/09/2026 au soir, pour
-                    remplir la tuile ; `flex-1` centre le dessin dans tout l'espace qui reste. Elles
-                    étaient carrées et bornées à 11 rem, la moitié basse de la tuile restait vide. */
+                  /* Une illustration par tuile, même grammaire (en tête de StrategySelect.astro) :
+                    SVG au trait clair sur fond ink, en boucle lente, en pause hors écran, complet
+                    en `prefers-reduced-motion`. Le globe en canvas est parti le 16/09/2026 (il ne
+                    montrait que la géographie, la tuile parle aussi de secteurs ; fichier supprimé
+                    le 19/09/2026). Format paysage (160 × 120) pleine largeur, `flex-1` centre le
+                    dessin dans tout l'espace qui reste. */
                 }
                 <div class="flex w-full flex-1 items-center py-5" style={`--illus-decalage:${z * 0.35}s`}>
                   {z === 0 && <StrategySelect />}
@@ -404,15 +333,10 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
                 </div>
 
                 {
-                  /*
-                   * « EN SAVOIR PLUS » EN TOUTES LETTRES depuis le 16/09/2026, demande de l'équipe.
-                   * C'était un « + » rond : le libellé n'existait que pour les lecteurs d'écran, et un
-                   * visiteur voyant devait deviner qu'il y avait quelque chose derrière.
-                   * Le titre de la tuile reste lu, mais hors écran : à l'écran les trois boutons
-                   * portent le même texte, ce qui est juste puisqu'on lit la tuile au-dessus ; pour un
-                   * lecteur d'écran qui parcourt les boutons hors contexte, trois « En savoir plus »
-                   * identiques seraient indiscernables.
-                   */
+                  /* « En savoir plus » en toutes lettres (16/09/2026, demande de l'équipe) : un
+                    « + » rond n'avait de libellé que pour les lecteurs d'écran. Le titre de la
+                    tuile reste lu hors écran : pour un lecteur d'écran qui parcourt les boutons
+                    hors contexte, trois « En savoir plus » identiques seraient indiscernables. */
                 }
                 <button
                   type="button"
@@ -429,21 +353,13 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
                   </svg>
                 </button>
               </article>
-              {
-                /* LE DOS PORTE LE CONTENU depuis le 16/09/2026 (« je veux que le contenu soit au dos
-                  des cards en fait, pas de zoom ni de popup »). Il arrive vide : c'est le script qui y
-                  déplace le texte écrit plus bas dans le flux, pour que la page se lise entière sans
-                  JavaScript. La marque reste, petite et en coin, hors du chemin du texte. */
-              }
+              {/* Dos de la carte : même mécanique que les moteurs, voir plus haut. */}
               <div class="carte-verso carte-lueur">
                 <MarqueR class="carte-verso-marque w-12 text-white/10" />
               </div>
             </div>
 
-              {
-                /* Hôte du détail : visible dans le flux tant que le script n'a pas déplacé son contenu
-                  au dos de la carte. Il est alors vidé, et le script le masque. */
-              }
+              {/* Hôte du détail : lu dans le flux sans script, vidé puis masqué par le script. */}
               <div data-carte-detail-hote>
                 <div id={'detail-' + ancre} data-carte-detail class="mt-5 space-y-4">
                   <p class="text-eyebrow text-teal-200">{zone.eyebrow}</p>
@@ -501,12 +417,10 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
       position: relative;
       --pont-cycle: 8s;
       /*
-       * HAUTEUR DE LA BANDE, écrite UNE SEULE FOIS parce que trois règles en dépendent : le tracé, le
-       * nœud à mi-hauteur et les chevrons tout en haut. C'est la marge basse de la section des moteurs
-       * plus la marge haute de celle des volets, moins un rem pour dégager l'ombre portée des cartes,
-       * qui descend sous leur bord.
-       * Les deux marges sont DIFFÉRENTES depuis le 16/09/2026 : la section des volets est passée en
-       * `pt-section-sm` pour rapprocher son titre des cartes.
+       * HAUTEUR DE LA BANDE, écrite UNE SEULE FOIS parce que trois règles en dépendent : le tracé,
+       * le nœud à mi-hauteur et les chevrons tout en haut. C'est la marge basse de la section des
+       * moteurs plus la marge haute (`pt-section-sm`) de celle des volets, moins un rem pour
+       * dégager l'ombre portée des cartes, qui descend sous leur bord.
        */
       --pont-bande: calc(var(--spacing-section) + var(--spacing-section-sm) - 1rem);
     }
@@ -582,10 +496,10 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
   }
 
   /*
-   * LES ANIMATIONS SONT POSÉES SEULEMENT SI LE MOUVEMENT EST ACCEPTÉ, au lieu d'être annulées ensuite :
-   * en `reduce`, rien n'est déclaré, donc rien à défaire. Il reste alors le dessin complet — trois
-   * amorces, trois montées, un nœud, deux conduites, deux pointes vers le haut — et le sens est porté
-   * par la forme, pas par le mouvement.
+   * LES ANIMATIONS SONT POSÉES SEULEMENT SI LE MOUVEMENT EST ACCEPTÉ, au lieu d'être annulées
+   * ensuite : en `reduce`, rien n'est déclaré, donc rien à défaire. Il reste alors le dessin
+   * complet (trois amorces, trois montées, un nœud, deux conduites, deux pointes vers le haut) et
+   * le sens est porté par la forme, pas par le mouvement.
    */
   @media (min-width: 64rem) and (prefers-reduced-motion: no-preference) {
     .pont-flux {
@@ -627,10 +541,8 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
   }
 
   /*
-   * UN SEUL CYCLE DE HUIT SECONDES, celui des cinq dessins des cartes, pour que la page n'ait pas deux
-   * pouls (six secondes jusqu'au 16/09/2026, quand les dessins ont été alignés sur un tempo unique ;
-   * les pour-cent ci-dessous n'ont pas bougé, l'impulsion est seulement un quart moins rapide).
-   * Les proportions suivent les distances réelles, environ 110 px par seconde partout :
+   * UN SEUL CYCLE DE HUIT SECONDES, celui des cinq dessins des cartes, pour que la page n'ait pas
+   * deux pouls. Les proportions suivent les distances réelles, environ 110 px par seconde partout :
    *   0 à 6 %    l'amorce, de la tuile au bas du titre ;
    *   6 à 16 %   le temps de passer derrière le titre, où rien n'est dessiné ;
    *   16 à 40 %  la montée, du haut du titre au nœud ;

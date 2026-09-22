@@ -3,16 +3,12 @@ import { test, expect } from '@playwright/test';
 /**
  * Poids embarqué par page. Le moteur d'animation GSAP (motion/engine.ts, ≈ 45 Ko gzip avec
  * ScrollTrigger) n'a de raison d'être que sur les pages qui déclarent des effets qui en dépendent
- * (rideaux, parallaxe, scrub, tracé, texte mot à mot). La navigation n'en fait pas partie : plus de
- * vol de la marque ni de barre de progression depuis le 10/09/2026, le CTA compact est géré par le
- * script inline de SiteNav. Les sous-pages ne déclarent que des révélations `data-animate`, rendues par
- * le moteur léger (motion/lite.ts). Ce test empêche un attribut ajouté par inadvertance de ramener GSAP
- * partout.
- */
-/**
+ * (rideaux, parallaxe, scrub, tracé, texte mot à mot). La navigation n'en fait pas partie, le CTA
+ * compact est géré par le script inline de SiteNav. Les sous-pages ne déclarent que des révélations
+ * `data-animate`, rendues par le moteur léger (motion/lite.ts). Ce test empêche un attribut ajouté
+ * par inadvertance de ramener GSAP partout.
  * /strategie n'y figure pas : elle déclare des effets qui exigent GSAP, texte mot à mot et rideau
- * du bloc Risques ; ni tracé ni parallaxe, relevé sur dist du 19/09/2026 (04-Strategy.astro). La
- * scène épinglée du mot d'ordre, elle, est partie avec son texte le 14/09/2026.
+ * du bloc Risques (04-Strategy.astro).
  */
 const SOUS_PAGES = [
   '/frais/',
@@ -44,11 +40,9 @@ test.describe('Performance', () => {
     });
   }
 
-  /*
-   * L'ACCUEIL NE CHARGE PAS LA FEUILLE DE /strategie (audit du 18/09/2026). Son `import.meta.glob`
-   * prenait toutes les sections, et Astro rattache à une page la CSS de tout module importé : 20 Ko de
-   * feuille bloquante, dont aucun sélecteur n'existe sur l'accueil.
-   */
+  /* L'ACCUEIL NE CHARGE PAS LA FEUILLE DE /strategie. Un `import.meta.glob` qui prenait toutes les
+     sections, et Astro rattache à une page la CSS de tout module importé : 20 Ko de feuille
+     bloquante dont aucun sélecteur n'existe sur l'accueil. */
   test('l’accueil ne charge pas la feuille de style de /strategie', async ({ page }) => {
     await page.goto('/');
     const feuilles = await page

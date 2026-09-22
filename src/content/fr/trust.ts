@@ -18,23 +18,16 @@ const savings = groupStat('épargne gérée');
 const savers = groupStat('épargnants');
 
 /**
- * Les quatre chiffres de la zone 4 (brochure partenaires 2026, p. 7), dans l'ordre de la trame :
- * ancienneté, épargne gérée, épargnants, SCPI gérées depuis 2012, plus les bureaux depuis le
- * 14/09/2026 (voir plus bas). Espaces insécables appliquées.
- * Le « + » devant le nombre d'épargnants vient de
- * facts.corumGroup.stats (savers.prefix), sourcé de la brochure p. 7. Partenaires et collaborateurs
- * (facts.corumGroup.stats) ne sont pas repris : hors trame. Lus par `trust.stats` seulement
- * (corum.ts ne les reprend plus depuis le 22/09/2026), et rendus par 07-Trust.astro sur l'accueil
- * et par CorumRange.astro sur /a-propos.
+ * Les chiffres du groupe (brochure partenaires 2026, p. 7), dans l'ordre de la trame : ancienneté,
+ * épargne gérée, épargnants, SCPI gérées depuis 2012, bureaux. Le « + » devant les épargnants vient
+ * de facts.corumGroup.stats (savers.prefix). Partenaires et collaborateurs ne sont pas repris :
+ * hors trame. Rendus par 07-Trust.astro sur l'accueil et par CorumRange.astro sur /a-propos.
  */
 export const experienceStats: StatItem[] = [
   {
     value: nb(corumGroup.experienceLabel),
-    /**
-     * Libellé du document de l'équipe (14/09/2026), « objectifs tenus » compris. C'est une allégation
-     * de performance : le contrôle de conformité ne la bloque plus mais la signale à chaque exécution,
-     * pour l'arbitrage de la compliance.
-     */
+    /** Libellé du document de l'équipe (14/09/2026), « objectifs tenus » compris : une allégation
+        de performance, que le contrôle signale à chaque exécution sans la bloquer. */
     label: 'd’expertise et d’objectifs tenus',
   },
   {
@@ -49,11 +42,7 @@ export const experienceStats: StatItem[] = [
     value: String(corumGroup.scpiCount),
     label: `SCPI gérées depuis ${corumGroup.scpiSince}`,
   },
-  /*
-   * CINQUIÈME CHIFFRE ajouté le 14/09/2026, document de l'équipe pour /a-propos. Il vivait jusque-là
-   * dans le texte de la gamme (« 5 SCPI, avec 7 bureaux »), pas dans la bande. Source inchangée :
-   * brochure partenaires 2026, p. 7, comme les quatre autres.
-   */
+  /* Cinquième chiffre, ajouté le 14/09/2026 (document de l'équipe pour /a-propos), même source. */
   {
     value: String(corumGroup.offices),
     label: 'bureaux dans le monde',
@@ -92,24 +81,17 @@ export const trust = {
     ],
     disclaimer: trustFacts.amf.disclaimer,
     /*
-     * PASTILLE DU HERO (15/09/2026), posée à côté des avis Trustpilot.
-     *
-     * LOGO AMF ET SUPPRESSION DU NUMÉRO : demande de l'équipe, réitérée après mise en garde. Ce qui
-     * avait été signalé, et qui reste vrai, pour que la conformité l'ait sous les yeux :
-     *  - le logo de l'AMF n'est pas concédé aux communications commerciales ; le fichier vient de
-     *    Wikipédia France, où il est hébergé au titre d'un usage non libre, pas de Wikimedia Commons ;
-     *  - posé près d'une note Trustpilot, un logo d'autorité se lit comme une caution, ce que la
-     *    mention standard du pied de page dit explicitement ne pas être le cas.
-     * Ce qui a été tenu malgré tout : le TEXTE. Il dit « société de gestion agréée », pas « R Start
-     * agréé ». R Start n'est pas agréé, il est VISÉ (visa SCPI n° 26-06 du 4 mars 2026). La formulation
-     * est celle que l'AMF a demandée dans ses retours sur la brochure (09/2026), mot pour mot.
-     *
-     * LE NUMÉRO D'AGRÉMENT EST RETIRÉ de la pastille (« supprime le code technique »). Il n'est pas
-     * perdu : sur toutes les pages, l'accueil compris, le pied de page le donne dans la mention
-     * légale de la société de gestion (legal.managementCompany.amfApproval, bloc « Société de
-     * gestion », replié mais présent dans le HTML) ; c'est elle qui satisfait check-compliance.mjs,
-     * qui exige « GP-11000012 » sur l'accueil. `amf.items` le porte aussi, mais seulement sur
-     * /documentation (RegulatoryFrame.astro), et sa note légale n'y est plus affichée.
+     * PASTILLE DU HERO, à côté des avis Trustpilot (15/09/2026, demande de l'équipe, en
+     * connaissance de cause). Le TEXTE dit « société de gestion agréée », jamais « R Start
+     * agréé » : R Start n'est pas agréé, il est VISÉ (visa SCPI n° 26-06 du 4 mars 2026),
+     * formulation demandée par l'AMF dans ses retours sur la brochure (09/2026). Le logo de l'AMF
+     * n'est pas concédé aux communications commerciales (fichier venu de Wikipédia France, usage
+     * non libre) et, posé près d'une note Trustpilot, se lit comme une caution, ce que la mention
+     * du pied de page dit ne pas être le cas : sur l'accueil l'écusson est dessiné (Picto.astro,
+     * `institution`), le logo ne reste que sur /a-propos (CorumRange.astro). Le NUMÉRO D'AGRÉMENT
+     * est retiré de la pastille (« supprime le code technique ») : le pied de page le donne sur
+     * toutes les pages (legal.managementCompany.amfApproval), et c'est lui qui satisfait
+     * check-compliance.mjs, qui exige « GP-11000012 » sur l'accueil.
      */
     heroBadge: {
       label: 'Société de gestion agréée par l’AMF',

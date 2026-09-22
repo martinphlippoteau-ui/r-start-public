@@ -1,13 +1,11 @@
 ---
 /**
- * Page « La presse en parle », la revue de presse (id « revue-de-presse », fond white). Refonte du
- * 13/09/2026 : la revue faisait 2 909 px sur téléphone, pour neuf articles ; les cartes sont
- * désormais de simples lignes séparées d'un filet sous `sm` (média, titre, date), et ne reprennent
- * leur forme de carte qu'à partir de deux colonnes.
- * INTRODUCTION ET AVERTISSEMENT RETIRÉS LE 16/09/2026, demande de l'équipe. L'introduction rappelait,
- * dans le même bloc, que R Start n'est pas une SCPI sans frais ; l'avertissement fermait la page dans
- * sa propre bande sombre (id « avertissement-presse »). Leur gabarit et leurs textes ont quitté le
- * code le 22/09/2026 (archivés hors du dépôt, .claude/audits).
+ * Page « La presse en parle », la revue de presse (id « revue-de-presse », fond white). Sous `sm`,
+ * une ligne par article, séparée d'un filet (média, titre, date) ; la forme de carte revient à
+ * partir de deux colonnes.
+ * INTRODUCTION ET AVERTISSEMENT RETIRÉS LE 16/09/2026, demande de l'équipe : l'introduction
+ * rappelait que R Start n'est pas une SCPI sans frais, l'avertissement fermait la page dans sa
+ * propre bande sombre. Textes archivés hors du dépôt (.claude/audits).
  * Chaque article a une adresse vérifiée (press.ts écarte les autres) : le titre est un lien externe
  * (nouvel onglet, rel noopener noreferrer, mention « nouvelle fenêtre » portée par aria-describedby
  * vers un span caché commun), étendu à toute la ligne par ::after.
@@ -46,8 +44,8 @@ const linkHintId = `${id}-link-hint`;
     }
 
     {
-      /* Sous `sm` : une ligne par article, séparée d'un filet (neuf cartes empilées faisaient presque
-        deux écrans à elles seules). Dès `sm` : la grille de cartes d'origine. */
+      /* Sous `sm` : une ligne par article, séparée d'un filet (des cartes empilées faisaient
+        presque deux écrans à elles seules). Dès `sm` : la grille de cartes. */
     }
     <ul
       role="list"

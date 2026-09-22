@@ -1,11 +1,11 @@
 ---
 /**
  * Contacts presse de /presse, zone 4 (id « contacts-presse »). Fond réglable par la prop `tone`
- * (alternance des sections). NÉ POUR LA SALLE DE PRESSE, qui a été mise en veille le 15/09/2026 puis
- * supprimée le 22/09/2026 : c'est aujourd'hui le seul endroit du site où un journaliste trouve un contact.
+ * (alternance des sections). Seul endroit du site où un journaliste trouve un contact depuis la
+ * suppression de la salle de presse (22/09/2026).
  * Une carte par contact : organisation (surtitre), nom (H3), rôle, puis une liste de définitions
- * téléphone (lien tel: sans espaces dans le href, numéro insécable) et e-mail (lien mailto:, ligne rendue
- * seulement si le contenu porte un e-mail confirmé).
+ * téléphone (lien tel: sans espaces dans le href, numéro insécable) et e-mail (lien mailto:, ligne
+ * rendue seulement si le contenu porte un e-mail confirmé).
  * Animation : révélation en cascade des cartes.
  * Contenu : src/content/fr/press.ts (`contacts`, `labels`).
  */
@@ -32,8 +32,8 @@ const telHref = (phone: string) => 'tel:' + phone.replace(/[^\d+]/g, '');
     <header class="max-w-4xl">
       <h2 id={id + '-title'} class="text-display-md text-ink">{contacts.title}</h2>
       {
-        /* Phrase d'appel entre le titre et la liste (16/09/2026). Rendue seulement si elle existe :
-          la zone n'en a pas toujours eu, et un paragraphe vide laisserait sa marge. */
+        /* Phrase d'appel entre le titre et la liste, rendue seulement si elle existe : un
+          paragraphe vide laisserait sa marge. */
       }
       {contacts.intro && <p class="text-lead mt-5 max-w-3xl text-slate-700">{contacts.intro}</p>}
     </header>
@@ -92,10 +92,9 @@ const telHref = (phone: string) => 'tel:' + phone.replace(/[^\d+]/g, '');
     </ul>
 
     {
-      /* LIGNE DE SOURCE RETIRÉE le 14/09/2026 (« enlève les notes et les sources de tout le site sauf du
-        tableau de la page frais ») : elle disait d'où venaient les contacts et à quelle date ils
-        avaient été relevés. C'était la dernière mention de source du site hors comparateur de /frais ;
-        son texte a quitté le code le 22/09/2026. */
+      /* LIGNE DE SOURCE RETIRÉE le 14/09/2026 (« enlève les notes et les sources de tout le site
+        sauf du tableau de la page frais ») : elle disait d'où venaient les contacts et à quelle
+        date. C'était la dernière mention de source du site hors comparateur de /frais. */
     }
   </Container>
 </Section>

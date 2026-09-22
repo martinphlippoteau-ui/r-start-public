@@ -1,51 +1,27 @@
 ---
 /**
  * Section 1, Hero (id « apercu »). Référence visuelle des autres sections.
- * Fond ink + couche de halo de marque (`brand-halo`, dérive lente `brand-halo-drift` jouée seulement quand la
- * section est à l'écran via `data-in-view`) + grain. La photo plein cadre du 10/09 et son voile sont
- * retirés (11/09/2026, jugés datés) : l'effet « waou » est la séquence d'ouverture du hero.
- * La section est `isolate` ; sa hauteur minimale est le premier écran moins la barre (3,5 rem, dans le
- * flux) : le hero remplit exactement la première vue.
- * H1 porté par le logo R Start (texte du titre en visually-hidden ; image décorative, aria-hidden). Le
- * bloc du logo réserve sa place en CSS (.hero-logo-wrap) : aucun décalage de mise en page. Puis
- * surtitre, accroche, deux CTA, les avis et la mention AMF (la pastille « Nouveau » est retirée depuis
- * le 11/09/2026).
+ * Fond ink + halo de marque (`brand-halo`, dérive `brand-halo-drift` jouée seulement à l'écran via
+ * `data-in-view`) + grain ; plus de photo depuis le 11/09/2026, l'effet « waou » est la séquence
+ * d'ouverture. La section est `isolate` ; sa hauteur minimale est le premier écran moins la barre
+ * (3,5 rem, dans le flux) : le hero remplit exactement la première vue.
+ * H1 en visually-hidden ; le logo (image décorative, aria-hidden) réserve sa place en CSS
+ * (.hero-logo-wrap) : aucun décalage de mise en page. Puis surtitre, accroche, deux CTA, les avis
+ * et la mention AMF.
  * PLUS DE LIGNE RISQUES depuis le 14/09/2026 (retrait de tous les « Bon à savoir », demande de
- * l'équipe) : le premier écran ne porte aucune mention de risque. Son emplacement, sous les CTA, a
- * quitté le code le 22/09/2026 ; les règles de mise en page ci-dessous qui la protégeaient valent
- * aujourd'hui pour les CTA.
- * Le VOL DE LA MARQUE vers la barre est retiré le 12/09/2026 : la barre est désormais identique sur tout
- * le site, pleine dès le premier pixel, il n'y a plus de place vide où poser le logo.
- * LCP : le logo (eager) ou l'accroche. Aucun texte n'entre par l'opacité, ni les CTA, depuis le
- * 11/09/2026 (transform ou `clip-path`, voir global.css ; l'accroche se découvre mot à mot) :
- * un contrôle d'accessibilité qui mesure la page pendant la cascade voyait le bouton à 30 % d'opacité, donc
- * un contraste de 1,19:1 (axe, reproductible). Le logo, image décorative, entre au rang 1 de la
- * cascade avec un fondu bref, admis parce qu'il n'y a pas de texte à mesurer (global.css) ; plus
- * d'image à précharger. Un futur visuel du hero devra n'avoir qu'UNE définition (largeurs, format,
- * `sizes`), reprise par la balise <Image> et par le <link rel="preload"> d'index.astro : c'était le
- * rôle de src/lib/hero-image.ts, resté vide du 11/09 au 19/09/2026 puis supprimé.
- * Motion (src/scripts/motion.ts), orchestration d'ouverture (11/09/2026, reprise depuis) :
- *  - cascade `data-intro` en CSS pur, réglée dans global.css (`html.intro #apercu`) : logo (1),
- *    surtitre (2), accroche mot à mot (3), CTA (4), avis et mention AMF (6), invitation à défiler
- *    (7) ; le rang 5 était la ligne risques. Le H1, masqué, n'est jamais animé ;
- *  - second temps, au défilement (sur les 30 premiers % d'un écran, repère `html`, `flightScrub`
- *    plus bas) : surtitre et accroche montent, CTA, avis et flèche descendent, chacun avec son
- *    amplitude, en s'effaçant (enveloppes `data-scrub`, transform/opacity, réversibles) ; le logo
- *    grandit et se floute ensuite.
- * Sous « sm », le contenu n'est PAS centré, il est calé en haut : centré, il chasserait les CTA sous la
- * ligne de flottaison d'un petit écran. Il reçoit donc une respiration explicite
- * de 2,5 rem sous la barre (12/09/2026) : sans elle le surtitre démarrait exactement au bas de la barre,
- * collé à elle. L'espace vient du bas, où l'invitation à défiler laissait une centaine de pixels vides.
- * Sous « sm » (11/09/2026) : CTA en taille md (16 px), toujours visibles sans défiler et au-dessus du
- * bandeau cookies (Pixel 5, iPhone 13, tests/conformite.spec.ts). À partir de « sm », CTA en taille lg.
- * CENTRAGE VERTICAL (11/09/2026) : à partir de 64 rem de large ET 56 rem de
- * haut, la copie est exactement centrée dans la section (paddings haut et bas égaux) ; elle ne remonte que
- * TANT QUE LE BANDEAU COOKIES EST DÉPLIÉ, par une règle de global.css accrochée à
- * `#consent-banner:not([hidden])`. Une fois le choix fait, l'état d'une visite normale, le hero est
- * centré. Sous 56 rem de haut (écran de 800 px), le bandeau prend jusqu'à 190 px en permanence au premier
- * écran : la copie y reste calée haut, seule façon de garder les CTA découverts. iPhone SE
- * (320 × 568) reste hors de portée : le bandeau y couvre un tiers de l'écran.
- * Contenu : src/content/fr/hero.ts.
+ * l'équipe) : le premier écran ne porte aucune mention de risque. Les règles de mise en page qui la
+ * protégeaient valent aujourd'hui pour les CTA.
+ * LCP : le logo (eager) ou l'accroche. AUCUN TEXTE N'ENTRE PAR L'OPACITÉ, ni les CTA (transform ou
+ * `clip-path`, global.css) : un contrôle d'accessibilité qui mesure la page pendant la cascade
+ * voyait le bouton à 30 % d'opacité, donc un contraste de 1,19:1 (axe, reproductible). Le logo
+ * entre au rang 1 avec un fondu bref, admis parce qu'il n'y a pas de texte à mesurer. Un futur
+ * visuel du hero devra n'avoir qu'UNE définition (largeurs, format, `sizes`), reprise par <Image>
+ * et par le <link rel="preload"> d'index.astro.
+ * Motion (src/scripts/motion.ts) : cascade `data-intro` en CSS pur (global.css, `html.intro
+ * #apercu`), rangs 1 logo, 2 surtitre, 3 accroche mot à mot, 4 CTA, 6 avis et mention AMF, 7
+ * invitation à défiler (le 5 était la ligne risques) ; le H1, masqué, n'est jamais animé. Sortie au
+ * défilement : `flightScrub` plus bas. Mise en page sous « sm » et centrage vertical : voir le
+ * <Container>. Contenu : src/content/fr/hero.ts.
  */
 import { Image } from 'astro:assets';
 import brandLogo from '@/assets/logos/r-start-blanc.svg';
@@ -61,19 +37,15 @@ import { trust } from '@/content/fr/trust';
 const titleId = sections.hero.id + '-title';
 /** Surtitre informatif court (hero.ts) : affiché dès qu'il n'est pas vide. */
 const showEyebrow = hero.eyebrow.trim() !== '';
-/**
- * Transition d'ouverture (11/09/2026, mécanique observée sur revolut.com) : le hero est épinglé par le rideau
- * de la section suivante (01b-Difference, data-curtain) qui glisse par-dessus ; pendant ce temps
- * les textes montent et s'effacent vite, sur les 30 premiers % d'un écran de défilement (repère
- * `html`, `top top`), et le halo se pose (dézoom, couche de fond ci-dessous).
- */
 /*
- * Sortie du hero au défilement : chaque élément part avec SON amplitude, jamais la même (idée reprise de
- * charmling.app, qui multiplie un même mouvement par une inertie propre à chaque objet). Le surtitre, le
- * plus léger, monte le plus loin en s'effaçant ; l'accroche suit ; les CTA, les avis et la flèche
- * descendent d'un cran en s'effaçant. Le bloc se disperse par couches, jamais d'une seule pièce.
- * Le scrub se pose toujours sur une ENVELOPPE et l'entrée (data-intro) sur son enfant : GSAP réécrit la
- * transform en ligne, une animation CSS sur le même élément se battrait avec elle.
+ * Sortie du hero au défilement (mécanique observée sur revolut.com) : le hero est épinglé par le
+ * rideau de la section suivante (01b-Difference, data-curtain) qui glisse par-dessus ; pendant ce
+ * temps les textes montent et s'effacent sur les 30 premiers % d'un écran (repère `html`,
+ * `top top`), et le halo se pose (dézoom, couche de fond ci-dessous). Chaque élément part avec SON
+ * amplitude, jamais la même (idée reprise de charmling.app) : le surtitre, le plus léger, monte le
+ * plus loin ; l'accroche suit ; les CTA, les avis et la flèche descendent d'un cran.
+ * Le scrub se pose toujours sur une ENVELOPPE et l'entrée (data-intro) sur son enfant : GSAP
+ * réécrit la transform en ligne, une animation CSS sur le même élément se battrait avec elle.
  */
 const flightScrub = {
   'data-scrub-trigger': 'html',
@@ -89,11 +61,9 @@ const copyScrubUp = { 'data-scrub': 'y:0,-48|opacity:1,0', ...flightScrub };
  * scrub le relève (axe, reproductible une fois sur cinq). Seule l'accroche, en grand, garde le fondu.
  */
 const copyScrubFar = { 'data-scrub': 'y:0,-72|opacity:1,0', ...flightScrub };
-/** CTA : recul et EFFACEMENT (11/09/2026), celui de la barre prenant le relais à l'écran.
- *  Le fondu avait été retiré parce qu'un contrôle d'accessibilité surprenait le bouton à mi-opacité, avec
- *  un contraste sous 4,5:1 ; la cause réelle était la cascade d'entrée, corrigée depuis (plus aucun
- *  texte n'y entre par l'opacité). Le fondu du défilement est donc rétabli, et le contrôle est rejoué
- *  en série. */
+/** CTA : recul et EFFACEMENT, celui de la barre prenant le relais à l'écran. Le fondu est admis :
+ *  le contraste sous 4,5:1 relevé jadis à mi-opacité venait de la cascade d'entrée, corrigée
+ *  (voir l'en-tête), et le contrôle est rejoué en série. */
 const copyScrubDown = { 'data-scrub': 'y:0,24|opacity:1,0', ...flightScrub };
 /** CTA : taille md sous « sm ». */
 const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
@@ -107,9 +77,10 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
   class="isolate flex min-h-svh flex-col overflow-hidden"
 >
   {
-    /* Couche de fond : halo de marque (dérive lente jouée à l'écran via data-in-view) + grain, isolée du
-      contenu pour pouvoir être scrubée sans toucher au texte : dézoom d'installation 1,04 → 1 sur les
-      40 premiers % d'écran de défilement, comme le décor de revolut.com qui « se pose » sous le contenu. */
+    /* Couche de fond : halo de marque (dérive jouée à l'écran via data-in-view) + grain, isolée du
+      contenu pour être scrubée sans toucher au texte : dézoom d'installation 1,04 → 1 sur les 40
+      premiers % d'écran de défilement, comme le décor de revolut.com qui « se pose » sous le
+      contenu. */
   }
   <div
     aria-hidden="true"
@@ -123,29 +94,19 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
   >
     {
       /*
-       * AURORE (15/09/2026), d'après la planche fournie par l'équipe : quatre foyers de couleur qui
-       * dérivent chacun à sa vitesse. Les durées sont premières entre elles (13, 17, 19, 23 s) : la
-       * composition ne se répète qu'au bout de vingt-six heures, là où une période unique se reconnaît
-       * en trente secondes.
+       * AURORE (15/09/2026, d'après la planche fournie par l'équipe) : quatre foyers de couleur qui
+       * dérivent chacun à sa vitesse. Les périodes sont quatre nombres premiers distincts (11, 13,
+       * 17, 19 s) : la composition ne se répète qu'au bout de leur produit, là où une période
+       * unique se reconnaît en trente secondes. Périodes et amplitudes ont été relevées deux fois
+       * (15 et 16/09/2026, « pas assez visible ») : un foyer flouté à 80 px qui glisse de 90 px en
+       * six secondes ne se voit pas. La respiration d'échelle est dans global.css.
        *
-       * ACCÉLÉRÉES LE 15/09/2026 (« un peu plus vite pour être plus visible ») : c'étaient 23, 31, 37
-       * et 43 s, le mouvement était là mais trop lent pour se voir le temps d'un premier écran. Chaque
-       * période est divisée par 1,8 environ, et le quatuor reste premier entre lui : quatre nombres
-       * premiers distincts, donc un cycle commun de 13 × 17 × 19 × 23 secondes. Les retards de phase
-       * suivent la même réduction, pour que les foyers restent décalés dans les mêmes proportions.
-       *
-       * AMPLIFIÉES LE 16/09/2026 (« le mouvement du hero n'est pas assez visible ») : un foyer flouté à
-       * 80 px qui glisse de 90 px en six secondes ne se voit pas. Les amplitudes sont DOUBLÉES (4, 18,
-       * 16 et 12 %), les périodes raccourcies d'un quart (11, 13, 17, 19 s, toujours quatre nombres
-       * premiers distincts), les deux turquoises un peu plus denses (0,55 et 0,42), et la respiration
-       * d'échelle élargie dans global.css (0,86 à 1,16 au lieu de 0,92 à 1,08). Le sable garde la plus
-       * petite amplitude et son opacité : il ne doit jamais passer sous le texte.
-       *
-       * L'ORDRE COMPTE : le sable, seule teinte claire, est posé EN PREMIER et reste dans le coin haut
-       * droit, à faible opacité et avec la plus petite amplitude. Le titre, le logo et les appels sont
-       * en blanc au centre : un foyer clair qui passerait derrière eux ferait tomber le contraste.
-       * Les deux turquoises occupent la gauche et le bas, le foyer profond creuse le coin bas droit.
-       * Décoratif, sous un parent aria-hidden. Voir global.css, [data-aurora].
+       * L'ORDRE COMPTE : le sable, seule teinte claire, est posé EN PREMIER et reste dans le coin
+       * haut droit, à faible opacité et avec la plus petite amplitude. Le titre, le logo et les
+       * appels sont en blanc au centre : un foyer clair qui passerait derrière eux ferait tomber le
+       * contraste, le sable ne doit jamais passer sous le texte. Les deux turquoises occupent la
+       * gauche et le bas, le foyer profond creuse le coin bas droit. Décoratif, sous un parent
+       * aria-hidden. Voir global.css, [data-aurora].
        */
     }
     <div data-aurora>
@@ -169,6 +130,16 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
     <span class="halo-blob halo-blob-a"></span>
     <span class="halo-blob halo-blob-b"></span>
   </div>
+  {
+    /* Sous « sm », le contenu n'est PAS centré, il est calé en haut : centré, il chasserait les CTA
+      sous la ligne de flottaison d'un petit écran ; 2,5 rem de respiration sous la barre, sinon le
+      surtitre démarrait collé à elle. CTA en taille md sous « sm », visibles sans défiler et
+      au-dessus du bandeau cookies (Pixel 5, iPhone 13, tests/conformite.spec.ts) ; lg ensuite.
+      CENTRAGE VERTICAL dès 64 rem de large ET 56 rem de haut ; la copie ne remonte que TANT QUE LE
+      BANDEAU COOKIES EST DÉPLIÉ (global.css, `#consent-banner:not([hidden])`). Sous 56 rem de
+      haut, le bandeau prend jusqu'à 190 px au premier écran : la copie reste calée haut, seule
+      façon de garder les CTA découverts ; iPhone SE (320 × 568) reste hors de portée. */
+  }
   <Container
     size="wide"
     class="pt-nav-total relative flex flex-1 flex-col pb-12 max-sm:pt-[calc(var(--spacing-nav-total)+2.5rem)] sm:justify-center sm:pb-20 lg:pb-44 [@media(min-height:56rem)]:lg:pb-nav-total"
@@ -187,29 +158,26 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
         )
       }
       {
-        /* L'enveloppe `relative` prend exactement la largeur réservée au logo (.hero-logo-wrap).
-          Elle a été posée le 11/09/2026 pour la pastille « Nouveau », accrochée à l'angle du logo
-          et retirée le même jour ; le vol de la marque, avec lequel elle s'effaçait, est parti le
-          12/09/2026. */
+        /* L'enveloppe `relative` prend exactement la largeur réservée au logo (.hero-logo-wrap) ;
+          posée pour la pastille « Nouveau » (11/09/2026), partie le même jour. */
       }
       <div class="relative mx-auto w-fit max-sm:order-2">
         {
-          /* LE H1 NE PORTE PLUS QUE SON TEXTE (17/09/2026). Le logo vivait dedans ; il en sort pour pouvoir
-            être animé au défilement, le moteur refusant tout effet sur un H1 et sur ce qu'il contient
-            (motion/dom.ts, PROTECTED). Le titre reste le nom accessible de la section (`titleId`), et
-            la place du logo est toujours réservée en CSS par .hero-logo-wrap, désormais sur le bloc
-            décoratif qui suit. */
+          /* LE H1 NE PORTE QUE SON TEXTE (17/09/2026) : le logo en est sorti pour pouvoir être
+            animé au défilement, le moteur refusant tout effet sur un H1 et son contenu
+            (motion/dom.ts, PROTECTED). Le titre reste le nom accessible de la section (`titleId`) ;
+            la place du logo est réservée en CSS par .hero-logo-wrap, sur le bloc décoratif qui
+            suit. */
         }
         <h1 id={titleId} class="visually-hidden">{hero.title}</h1>
         {
-          /* LE LOGO S'EFFACE EN GRANDISSANT ET EN SE FLOUTANT (17/09/2026, demande de l'équipe : « au
-            scroll, quand tous les autres éléments sont partis, tu peux le flouter et l'agrandir à
-            fond »). Les autres éléments partent sur les 30 premiers % d'un écran de défilement
-            (flightScrub) ; le logo, lui, ne bouge pas avant, puis triple de taille et se floute sur les
-            50 % suivants, pendant que le rideau le recouvre. `blur` est une extension du vocabulaire de
-            data-scrub réservée à cet usage (motion/scroll.ts) : un seul élément, jamais du texte.
-            Le scrub est sur l'ENVELOPPE, l'entrée (data-intro) sur l'enfant : GSAP réécrit la transform
-            en ligne, une animation CSS sur le même élément se battrait avec elle. */
+          /* LE LOGO S'EFFACE EN GRANDISSANT ET EN SE FLOUTANT (17/09/2026, demande de l'équipe :
+            « au scroll, quand tous les autres éléments sont partis, tu peux le flouter et
+            l'agrandir à fond ») : il ne bouge pas pendant les 30 premiers % (flightScrub), puis
+            triple de taille et se floute sur les 50 % suivants, pendant que le rideau le recouvre.
+            `blur` est une extension du vocabulaire de data-scrub réservée à cet usage
+            (motion/scroll.ts) : un seul élément, jamais du texte. Scrub sur l'enveloppe, entrée sur
+            l'enfant (voir flightScrub). */
         }
         <div
           class="hero-logo-wrap"
@@ -234,22 +202,16 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
         </div>
         <div {...copyScrubUp} class="flex flex-col items-center max-sm:order-3">
           {
-            /*
-             * Accroche découpée EN MOTS (14/09/2026, demande de l'équipe) : chaque mot monte de 20 px et
-             * se dévoile, 70 ms après le précédent. Par mots et non par lettres : sur une accroche de
-             * deux mots, le lettre par lettre ferait gadget.
-             * L'attribut data-intro reste sur le paragraphe, la cascade se joue sur les mots (`--mot`).
-             * L'espace entre les mots est rendu HORS des spans, sinon il disparaît avec le découpage.
-             */
-          }
-          {
-            /* DEUX FOIS PLUS GRANDE, BLANCHE ET PLUS GRASSE (17/09/2026, demande de l'équipe). Elle était
-              en sable, 20 px à 390 et 24 px à 1440, semi-grasse, sur 42 rem. Elle passe à 40 et 48 px
-              dès « sm » (le double, `clamp` calé sur les mêmes bornes que les titres), en blanc, en gras,
-              sur 56 rem pour tenir en deux lignes à 48 px. Sur téléphone, 32 px et non 40 : à 40 px elle
-              prenait cinq lignes et poussait les CTA sous le bandeau cookies (tests/conformite.spec.ts,
-              iPhone 13). C'est maintenant le plus grand texte du premier écran,
-              donc le candidat LCP : ses mots se découvrent par `clip-path`, jamais par l'opacité. */
+            /* Accroche découpée EN MOTS (14/09/2026, demande de l'équipe) : chaque mot monte de
+              20 px et se dévoile, 70 ms après le précédent ; par mots et non par lettres, sur deux
+              mots le lettre par lettre ferait gadget. `data-intro` reste sur le paragraphe, la
+              cascade se joue sur les mots (`--mot`). L'espace entre les mots est rendu HORS des
+              spans, sinon il disparaît avec le découpage.
+              Blanche, grasse, `clamp` calé sur les bornes des titres, sur 56 rem pour tenir en deux
+              lignes (17/09/2026, demande de l'équipe). Sur téléphone, 32 px et non 40 : à 40 px
+              elle poussait les CTA sous le bandeau cookies (tests/conformite.spec.ts, iPhone 13).
+              Plus grand texte du premier écran, donc candidat LCP : ses mots se découvrent par
+              `clip-path`, jamais par l'opacité. */
           }
           <p
             data-intro="3"
@@ -270,10 +232,10 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
         <div {...copyScrubDown} class="mt-6 w-full max-sm:order-4 sm:mt-12 sm:w-auto">
           {
             /* `data-hero-cta` : repère stable pour la mesure et pour le test « les CTA du hero sont
-            visibles sans scroller », il ne dépend pas du rang dans la cascade d'entrée.
-            `sm:justify-center` (11/09/2026) : l'enveloppe commune au logo, à l'accroche et aux CTA prend
-            la largeur du plus large. Sans cette règle, la rangée de boutons se collait à son bord gauche
-            au lieu de rester centrée sous l'accroche. */
+              visibles sans scroller », il ne dépend pas du rang dans la cascade d'entrée.
+              `sm:justify-center` : l'enveloppe commune au logo, à l'accroche et aux CTA prend la
+              largeur du plus large ; sans cette règle, la rangée de boutons se collait à son bord
+              gauche au lieu de rester centrée sous l'accroche. */
           }
           <div
             data-hero-cta
@@ -284,9 +246,9 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
               >{hero.primaryCta.label}</Button
             >
             {
-              /* Sous « sm », le bouton secondaire (lien vers la page /frais) cède la place : les
-              CTA doivent rester au-dessus du bandeau cookies (tests/conformite.spec.ts). Le comparateur de frais reste atteignable en
-              défilant : il est affiché sur l'accueil (section 03). */
+              /* Sous « sm », le bouton secondaire (lien vers /frais) cède la place : les CTA
+                doivent rester au-dessus du bandeau cookies (tests/conformite.spec.ts). Le
+                comparateur reste atteignable en défilant, il est affiché sur l'accueil (03). */
             }
             <Button
               href={hero.secondaryCta.href}
@@ -299,21 +261,15 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
           </div>
         </div>
         {
-          /* TrustBox officiel (11/09/2026, code d'intégration fourni par l'équipe) : la réassurance sur le
-            distributeur arrive au premier écran, sous les CTA. Il est
-            dans une enveloppe animée (`copyScrubDown`, recul au défilement) et entre au rang 6 de
-            l'ouverture ; seule l'invitation à défiler (rang 7) vient après. Sa portée (les avis
+          /* TrustBox officiel (code d'intégration fourni par l'équipe) : réassurance sur le
+            distributeur au premier écran, sous les CTA, rang 6 de l'ouverture. Sa portée (les avis
             parlent de CORUM L'Épargne, pas de R Start) n'est plus dite à l'écran depuis le retrait
-            de la légende, le 15/09/2026 (voir plus bas). */
-        }
-        {
-          /* La PASTILLE AMF rejoint les avis le 15/09/2026. Les deux réassurances sont mises côte à côte
-            à partir de `sm`, empilées en dessous : à 390 px, une rangée de deux les rendrait illisibles
-            toutes les deux. L'enveloppe passe de max-w-md à max-w-3xl pour loger la paire, et la colonne
-            des avis garde sa largeur propre (max-w-md) pour que le widget ne s'étire pas.
-            Ce qu'elle dit et ce qu'elle ne dit pas est argumenté dans trust.ts (`amf.heroBadge`) :
-            l'agrément est celui de la société de gestion, pas de R Start, et l'écusson est dessiné, ce
-            n'est pas le logo de l'AMF. */
+            de la légende (15/09/2026, voir plus bas). La PASTILLE AMF est à côté des avis : côte à
+            côte à partir de `sm`, empilées en dessous (à 390 px, une rangée de deux les rendrait
+            illisibles) ; l'enveloppe est en max-w-3xl pour loger la paire, la colonne des avis
+            garde max-w-md pour que le widget ne s'étire pas. Ce que la pastille dit et ne dit pas
+            est argumenté dans trust.ts (`amf.heroBadge`) : l'agrément est celui de la société de
+            gestion, pas de R Start, et l'écusson est dessiné, ce n'est pas le logo de l'AMF. */
         }
         <div {...copyScrubDown} class="mx-auto mt-6 w-full max-w-4xl sm:mt-10">
           <div
@@ -323,52 +279,37 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
             <div class="w-full max-w-md">
               <TrustBox template="horizontal" theme="dark" label={trust.trustpilot.widgetLabel!} />
               {
-                /* LÉGENDE RETIRÉE LE 15/09/2026, demande de l'équipe (« Enlever disclaimer »). Elle
-                  disait « Avis sur CORUM L'Épargne, distributeur de R Start. », c'est-à-dire la portée
-                  des avis : ils concernent le distributeur, pas la SCPI. Elle a quitté le code le
-                  22/09/2026 avec sa version longue (archivées hors du dépôt, .claude/audits). */
+                /* Légende retirée le 15/09/2026 (demande de l'équipe, « Enlever disclaimer ») :
+                  elle disait la portée des avis, « Avis sur CORUM L'Épargne, distributeur de R
+                  Start. », le distributeur et non la SCPI. Sortie du code le 22/09/2026, archivée
+                  hors du dépôt (.claude/audits). */
               }
             </div>
             {
-              /* PLUS DE LOGO NI DE PLAQUE BLANCHE ici depuis le 15/09/2026 (voir plus bas). La
-                plaque n'était pas une coquetterie : le logo de l'AMF est en #003867 et #DB002E sur
-                fond transparent, or le hero est en #03242e, où son bleu marine se confondait
-                presque entièrement avec le fond. Logo et plaque ont reparu ensemble le 16/09/2026
-                sur /a-propos (CorumRange.astro).
-                Le numéro d'agrément a été retiré de la pastille le 15/09/2026 ; sur cette page, il
-                reste dans la mention légale du pied de page (bloc « Société de gestion »), et le
-                cadre réglementaire de /documentation le donne aussi. */
-            }
-            {
-              /* ALIGNEMENT CENTRÉ depuis le 15/09/2026 : la colonne des avis fait 28 px, la mention
-                une seule ligne. Alignées par le haut elles ne se répondaient pas ; centrées, si.
-                GOUTTIÈRE RAMENÉE DE 12 À 8 le 16/09/2026 : la mention était trop à droite. C'est la
-                gouttière qu'on resserre et non une marge posée sur elle, sinon la paire cesserait
-                d'être centrée dans la colonne et se décalerait à chaque largeur d'écran. */
+              /* Plus de logo de l'AMF ni de plaque blanche ici depuis le 15/09/2026 (voir la
+                mention ci-dessous) ; ils sont sur /a-propos (CorumRange.astro). Le numéro
+                d'agrément a quitté la pastille le même jour ; il reste dans la mention légale du
+                pied de page (bloc « Société de gestion ») et dans le cadre réglementaire de
+                /documentation. Colonne des avis (28 px) et mention d'une ligne alignées au centre,
+                pas par le haut ; gouttière 8 et non 12, resserrée plutôt qu'une marge sur la
+                mention, sinon la paire cesserait d'être centrée dans la colonne. */
             }
             {
               /*
-               * MENTION DE RÉASSURANCE, à côté des avis. Elle a porté le LOGO DE L'AMF quelques heures
-               * le 15/09/2026, avant que l'équipe demande de revenir à la mention seule : l'AMF ne
-               * concède pas son logo aux communications commerciales, et le fichier venait de Wikipédia
-               * France au titre d'un usage non libre. Le retrait règle les deux points ici. Le
-               * fichier, src/assets/logos/amf.svg, sert depuis le 16/09/2026 à l'écusson de
-               * /a-propos (CorumRange.astro), où l'équipe l'a voulu en connaissance de cause.
-               *
-               * LE PICTO EST LE NÔTRE, dessiné au trait (ui/Picto.astro), donc sans marque déposée.
-               * FRONTON À COLONNES, EN SABLE, 24 px, PLEINE OPACITÉ : choix de l'équipe du 16/09/2026,
-               * fait sur /test parmi six candidats rendus au libellé et à la taille réelle. Le premier
-               * essai était un document validé, discret, à 45 % d'opacité ; la demande était d'en faire
-               * « un élément de réassurance fort ».
-               * LA RÉSERVE EST CONSIGNÉE DANS ui/Picto.astro, clé `institution`, et elle était affichée
-               * à côté du picto au moment du choix : ce dessin représente l'institution, donc l'AMF, ce
-               * qui est la lecture qu'on avait écartée en retirant le logo la veille. Décision prise en
-               * connaissance de cause. Le libellé, lui, n'a pas bougé.
-               * Ce composant n'était plus importé nulle part depuis le 14/09/2026.
-               *
+               * MENTION DE RÉASSURANCE, à côté des avis. Elle a porté le LOGO DE L'AMF quelques
+               * heures le 15/09/2026, avant que l'équipe demande de revenir à la mention seule :
+               * l'AMF ne concède pas son logo aux communications commerciales, et le fichier venait
+               * de Wikipédia au titre d'un usage non libre. Le fichier (src/assets/logos/amf.svg)
+               * sert depuis le 16/09/2026 à l'écusson de /a-propos (CorumRange.astro), voulu là en
+               * connaissance de cause.
+               * LE PICTO EST LE NÔTRE, dessiné au trait (ui/Picto.astro), donc sans marque
+               * déposée : fronton à colonnes, en sable, 24 px, pleine opacité, choisi par l'équipe
+               * le 16/09/2026 (« un élément de réassurance fort »). LA RÉSERVE EST CONSIGNÉE DANS
+               * ui/Picto.astro, clé `institution` : ce dessin représente l'institution, donc l'AMF,
+               * la lecture qu'on avait écartée en retirant le logo la veille. Décision prise en
+               * connaissance de cause.
                * LE LIBELLÉ NE CHANGE PAS : « société de gestion agréée », jamais « R Start agréé ».
                * R Start est VISÉ et non agréé, la distinction est argumentée dans trust.ts.
-               *
                * `shrink-0` : la colonne des avis est en `w-full`, elle réclame toute la rangée et
                * comprimait cette mention jusqu'à casser son libellé en plusieurs lignes.
                */
@@ -386,14 +327,13 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
     </div>
 
     {
-      /* Invitation à descendre (11/09/2026) : posée dans le vide au bas du hero, en ABSOLU, la copie est
-        centrée par `justify-content`, un frère dans le flux en décalerait l'axe. Lien d'ancre réel : il
-        fonctionne sans script, et `scroll-padding-top` (global.css) empêche la section d'arriver sous la
-        barre. Elle s'efface au défilement comme les CTA, et disparaît tant que le bandeau cookies est
-        déplié : elle serait dessous.
-        Plus de cercle depuis le 11/09/2026 (demande de l'équipe) : le libellé « Découvrir R Start » et le
-        chevron, rien d'autre. Le libellé est VISIBLE, il nomme donc le lien pour tout le monde, plus
-        d'aria-label, qui ferait doublon, et il donne au passage une cible large au doigt. */
+      /* Invitation à descendre : posée dans le vide au bas du hero, en ABSOLU, la copie est centrée
+        par `justify-content`, un frère dans le flux en décalerait l'axe. Lien d'ancre réel : il
+        fonctionne sans script, et `scroll-padding-top` (global.css) empêche la section d'arriver
+        sous la barre. Elle s'efface au défilement comme les CTA, et disparaît tant que le bandeau
+        cookies est déplié : elle serait dessous. Libellé VISIBLE et chevron, rien d'autre
+        (11/09/2026, demande de l'équipe) : il nomme le lien pour tout le monde, sans aria-label qui
+        ferait doublon, et donne une cible large au doigt. */
     }
     {
       hero.scrollHint && (
@@ -429,8 +369,7 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
 </Section>
 
 {
-  /* LE HERO DÉFILE COMME LE RESTE DE LA PAGE. Le passage automatique au contenu, d'un seul geste
-    (src/scripts/heroAvance.ts, du 17 au 19/09/2026), a été retiré à la demande de Martin le 19/09/2026 :
-    plus aucun script ne touche à la molette, au doigt ni aux touches ici. L'invitation à défiler reste
-    un lien d'ancre ordinaire, que le navigateur suit seul. Le script est dans l'historique git. */
+  /* LE HERO DÉFILE COMME LE RESTE DE LA PAGE : le passage automatique au contenu (heroAvance.ts) a
+    été retiré à la demande de Martin le 19/09/2026, plus aucun script ne touche à la molette, au
+    doigt ni aux touches ici. L'invitation à défiler est un lien d'ancre ordinaire. */
 }

@@ -1,32 +1,20 @@
 /**
- * MOTEUR LÉGER, révélations `data-animate` sans GSAP (IntersectionObserver + transitions CSS).
- *
- * Pourquoi : les sous-pages (/frais, /simulateur, /a-propos, /documentation, /presse, /faq, pages
- * légales) ne déclarent que des `data-animate`. Leur faire télécharger GSAP + ScrollTrigger
- * (≈ 45 Ko gzip) pour quelques fondus est disproportionné. `src/scripts/motion.ts` ne charge le
- * moteur GSAP que si la page déclare un effet qui en a besoin (rideau, parallaxe, scrub, tracé,
- * texte mot à mot) ; sinon il charge ce module.
- *
- * Un seul des deux modules tourne par page : sur une page à moteur, `reveal.ts` garde la main et
- * `lite.ts` n'est jamais importé. Aucune double animation possible.
- *
- * Équivalences avec `reveal.ts` (mêmes types, même rythme unique : 0,6 s / 20 px, titres 0,7 s / 24 px,
- * pas de cascade 0,08 s, constantes reprises à la main de shared.ts, qui importe gsap) :
+ * MOTEUR LÉGER, révélations `data-animate` sans GSAP (IntersectionObserver + transitions CSS) : les
+ * sous-pages ne déclarent que cela, et télécharger GSAP + ScrollTrigger (≈ 45 Ko gzip) pour
+ * quelques fondus est disproportionné. `src/scripts/motion.ts` choisit ; un seul des deux moteurs
+ * tourne par page, `lite.ts` n'est jamais importé sur une page à moteur.
+ * Équivalences avec `reveal.ts` (mêmes types, même rythme : 0,6 s / 20 px, titres 0,7 s / 24 px,
+ * cascade 0,08 s, constantes reprises à la main de shared.ts, qui importe gsap) :
  *   fade-up (défaut) · clip (médias seulement) · stagger
  *   data-animate-delay (s) · data-animate-stagger (s) · data-animate-y (px)
- * La bascule des enfants d'un `stagger` (`data-animate-child="tilt"`) n'existe que côté GSAP : son
- * seul emploi, les tuiles de /strategie, est sur une page servie par le moteur. Les types « fade »,
- * « scale » et « tilt » isolés, jamais employés, ont été retirés le 22/09/2026.
- * La courbe est l'équivalent CSS de `expo.out`, la seule employée côté moteur (--ease-out-expo).
- *
- * GARDE-FOUS, identiques à ceux du moteur (src/scripts/motion.ts) :
- *  - refusé sur un H1, sur un [data-no-motion] et sur tout élément qui en contient ;
- *  - `stagger` : seuls les enfants sans élément protégé cascadent, les autres restent visibles d'emblée ;
- *  - un élément déjà à l'écran à l'initialisation n'est pas touché (pas de flash, pas de LCP retardé) ;
- *  - `prefers-reduced-motion: reduce` : rien n'est créé, ce module n'est même pas importé ;
- *  - transform et opacity uniquement ; `will-change` posé le temps de l'animation puis retiré ;
- *  - aucun état initial en CSS : l'état de départ est posé en JavaScript, donc sans JavaScript tout
- *    reste visible et stable (anti-CLS).
+ * `data-animate-child="tilt"` n'existe que côté GSAP : son seul emploi est sur une page à moteur.
+ * La courbe est l'équivalent CSS de `expo.out` (--ease-out-expo).
+ * GARDE-FOUS, identiques à ceux du moteur (src/scripts/motion.ts) : refusé sur un H1, un
+ * [data-no-motion] et tout élément qui en contient ; `stagger` ne cascade que les enfants sans
+ * élément protégé ; un élément déjà à l'écran n'est pas touché (pas de flash, pas de LCP retardé) ;
+ * rien en mouvement réduit (module non importé) ; transform et opacity uniquement, `will-change` le
+ * temps de l'animation ; aucun état initial en CSS, sans JavaScript tout reste visible et stable
+ * (anti-CLS).
  */
 import { all, allowed, containsProtected, isProtected, num, refuse, seuilAtteignable } from './dom';
 

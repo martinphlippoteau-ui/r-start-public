@@ -1,45 +1,25 @@
 ---
 /**
- * Illustration du moteur 02, « Les plus-values réalisées sur les ventes d'immeuble » (16/09/2026).
- *
- * MÊME GRAMMAIRE QUE LES QUATRE AUTRES DESSINS DES CARTES (StrategySelect.astro la décrit en tête) :
- * trait clair sur fond ink, boucle lente, en pause hors écran, complet et immobile en
- * `prefers-reduced-motion`. Format 236 × 100, pleine largeur de la carte.
- *
- * QUATRIÈME VERSION, ET C'EST L'ÉQUIPE QUI A CHOISI LA FORME (16/09/2026 au soir : « utilise une
- * courbe de prix € qui monte »). Avant : un échange immeuble/prix sans hausse ; une étiquette sur une
- * pente ; une étiquette qui montait le long de la façade puis filait vers la marque, en miroir du
- * moteur 01, jugée « pas terrible du tout ».
- *
- * CINQUIÈME VERSION (17/09/2026, demande de l'équipe : « un petit logo avec le R de R Start qui monte
- * et qui se transforme en € à la fin ; fais monter la courbe un peu plus vite »). Ce qui menait la
- * courbe était un point lumineux ; c'est maintenant LA MARQUE R START, la goutte au R évidé du moteur
- * 01, portée par le même chemin. Au sommet, elle SE RETOURNE COMME UNE PIÈCE : sa largeur se referme
- * sur son axe, et c'est la pastille « € » qui s'ouvre à la même place, sur l'autre face. Deux moitiés
- * de 0,32 s, la première qui accélère, la seconde qui freine : une seule rotation, lue d'un trait.
- * Et la montée prend 2,56 s au lieu de 3,68 (10 à 42 % du cycle, contre 10 à 56 %) : « un peu lent ».
- * Le temps gagné va à la lecture de l'image finale.
- *
- * CE QU'ELLE MONTRE : l'immeuble à gauche, celui du moteur 01 ; à sa droite, un point d'achat, puis UNE
- * COURBE DE PRIX QUI MONTE, révélée de gauche à droite avec la surface qu'elle couvre, la marque à son
- * extrémité ; au sommet, la marque devient « € » : la vente, et la plus-value réalisée. Puis tout
- * s'efface, un temps de silence, et un autre immeuble.
- *
- * SES LIMITES, tenues à la lettre : AUCUN CHIFFRE, aucun axe gradué, aucune échelle, aucune date,
- * aucune durée. La courbe monte sans à-coup ni creux : elle nomme le mécanisme que le texte de la
- * carte décrit, la recherche de plus-values à la vente, elle ne dessine ni un historique ni une
- * promesse. Le bloc Risques de la page porte l'avertissement correspondant. Le signe « € » est un
- * symbole, pas un montant.
- *
- * LA RÉVÉLATION EST FAITE PAR UN DÉCOUPAGE (`clip-path: inset`) qui avance à vitesse constante de
- * gauche à droite, sur la courbe ET sur sa surface ensemble : les deux ont donc toujours exactement
- * le même bord. La marque, elle, est portée le long de la courbe par `offset-path`, dont la vitesse
- * est celle du CHEMIN, pas celle de l'abscisse : pour qu'elle reste au bord du découpage, sa courbe
- * de temps est une fonction `linear()` CALCULÉE ci-dessous à partir de la géométrie, abscisse par
- * abscisse. Un navigateur sans `linear()` la remplace par une progression uniforme : la marque
- * dérive alors de quelques unités au plus, toujours sur la courbe.
- *
- * Décorative (aria-hidden) : le texte de la carte porte le sens.
+ * Illustration du moteur 02, « Les plus-values réalisées sur les ventes d'immeuble ». Même
+ * grammaire que les quatre autres dessins des cartes (StrategySelect.astro la décrit en tête) ;
+ * format 236 × 100, pleine largeur de la carte ; décorative (aria-hidden). Forme choisie par
+ * l'équipe après trois versions écartées (16 et 17/09/2026 : « utilise une courbe de prix € qui
+ * monte », puis « un petit logo avec le R de R Start qui monte et qui se transforme en € à la
+ * fin »).
+ * CE QU'ELLE MONTRE : l'immeuble du moteur 01 ; à sa droite un point d'achat, puis une courbe de
+ * prix qui monte, révélée de gauche à droite avec la surface qu'elle couvre, la marque R Start à
+ * son extrémité ; au sommet, la marque se retourne comme une pièce et la pastille « € » s'ouvre sur
+ * l'autre face : la vente. SES LIMITES, tenues à la lettre : AUCUN CHIFFRE, aucun axe gradué,
+ * aucune échelle, aucune date, aucune durée. La courbe monte sans à-coup ni creux : elle nomme le
+ * mécanisme que le texte de la carte décrit, elle ne dessine ni un historique ni une promesse. Le
+ * bloc Risques de la page porte l'avertissement correspondant. Le signe « € » est un symbole, pas
+ * un montant.
+ * LA RÉVÉLATION EST UN DÉCOUPAGE (`clip-path: inset`) qui avance à vitesse constante, sur la courbe
+ * ET sa surface ensemble : les deux ont toujours le même bord. La marque est portée par
+ * `offset-path`, dont la vitesse est celle du CHEMIN, pas de l'abscisse : pour rester au bord du
+ * découpage, sa courbe de temps est une fonction `linear()` CALCULÉE ci-dessous à partir de la
+ * géométrie. Un navigateur sans `linear()` la remplace par une progression uniforme : la marque
+ * dérive de quelques unités au plus, toujours sur la courbe.
  */
 import { fenetres } from '@/lib/immeuble';
 
@@ -48,11 +28,8 @@ const CADRE = { x: 18, y: 30, w: 48, h: 54 };
 const FENETRES = fenetres(CADRE, { colonnes: 3, rangees: 4, taille: 7, ecart: 4 });
 const SOL = 84;
 
-/*
- * LA COURBE, quatre cubiques raccordées tangentes à tangentes (les tangentes entrante et sortante de
- * chaque nœud sont colinéaires : aucun angle). Elle part du point d'achat et monte jusqu'au sommet,
- * sans creux, sa pente variant juste assez pour ne pas être une droite.
- */
+/* La courbe : quatre cubiques raccordées tangentes à tangentes (aucun angle), du point d'achat au
+   sommet, sans creux, la pente variant juste assez pour ne pas être une droite. */
 type Pt = [number, number];
 const SEGMENTS: [Pt, Pt, Pt, Pt][] = [
   [[84, 76], [96, 75], [104, 71], [116, 66]],
@@ -67,11 +44,9 @@ const COURBE =
   SEGMENTS.map(([, p1, p2, p3]) => `C${p1[0]} ${p1[1]} ${p2[0]} ${p2[1]} ${p3[0]} ${p3[1]}`).join('');
 const SURFACE = `${COURBE}V${SOL}H${DEPART[0]}Z`;
 
-/*
- * ÉCHANTILLONNAGE de la courbe : pour chaque abscisse (32 pas uniformes entre le départ et le sommet),
- * la fraction de LONGUEUR de chemin déjà parcourue. C'est la courbe de temps de la marque : quand le
- * découpage est à u % de la largeur, la marque doit être à s(u) % du chemin.
- */
+/* Échantillonnage de la courbe : pour chaque abscisse (32 pas uniformes du départ au sommet), la
+   fraction de LONGUEUR de chemin parcourue. C'est la courbe de temps de la marque : découpage à u %
+   de la largeur, marque à s(u) % du chemin. */
 const bezier = ([p0, p1, p2, p3]: [Pt, Pt, Pt, Pt], t: number): Pt => {
   const u = 1 - t;
   return [
@@ -98,21 +73,17 @@ const fractions = Array.from({ length: PAS + 1 }, (_, k) => {
 });
 const TEMPS_POINTE = `linear(${fractions.join(', ')})`;
 
-/*
- * LA MARQUE QUI MONTE : le tracé de src/assets/logos/r-start-blanc.svg, sa première forme, la goutte
- * au R évidé, le même que reçoit les versements du moteur 01 (EngineRent.astro) et que porte le dos
- * des cartes (ui/MarqueR.astro). Boîte mesurée 94,08 × 88,98 ; dessinée ici à 16 unités de large,
- * centrée sur (0, 0), l'ancre que le chemin déplace. À peu près le diamètre de la pastille « € »
- * (18) : une pièce qui se retourne garde sa taille.
- */
+/* La marque qui monte : le tracé de src/assets/logos/r-start-blanc.svg, la goutte au R évidé, le
+   même qu'EngineRent.astro et ui/MarqueR.astro. Boîte mesurée 94,08 × 88,98 ; dessinée ici à 16
+   unités de large, centrée sur (0, 0), l'ancre que le chemin déplace. À peu près le diamètre de la
+   pastille « € » (18) : une pièce qui se retourne garde sa taille. */
 const MARQUE =
   'M68.21.17C36.7,3.24,5.47,23.07,2.44,29.88c-11.59,26.1,21.48,52.52,27.22,55.34,21.52,10.59,48.04-1.99,59.51-27.5C93.5,48.09,104.2-3.34,68.21.17ZM64.76,69.76c-1.25,0-2.36-.57-3.09-1.47l-2.84-3.52c-4.06-4.98-10.05-12.1-12.26-13.54-1.92-1.22-4.48-1.84-7.59-1.84l-7.96.02c-2.02,0-3.66-1.64-3.66-3.66s1.64-3.66,3.66-3.66h18.33c3.05-.01,5.54-2.14,5.54-4.76s-2.49-4.74-5.54-4.74h-18.34c-2.02,0-3.66-1.63-3.66-3.65s1.64-3.66,3.66-3.66h18.34c7.58,0,13.73,5.4,13.73,12.05,0,4.74-3.2,9.03-8.07,10.97,3.22,3.36,7.64,8.61,11.3,13.08l1.52,1.86c.57.69.91,1.57.91,2.54,0,2.2-1.79,3.99-3.99,3.99Z';
-/* LE R EN COULEUR PLEINE, PAS EN TROU (17/09/2026, demande de l'équipe : « pas de transparence dans
-   le R du logo, sinon ça fait moche », puis « en bleu foncé plutôt »). Le R est évidé dans le tracé :
-   on voyait le fond de la carte au travers, et la courbe qui passait dessous. Un second tracé, la
-   seule silhouette de la goutte (le premier sous-chemin, sans l'évidement), est posé EN NAVY sous la
-   goutte sable : le R s'ouvre sur lui. Même contour au pixel près, rien ne dépasse. Navy et non ink,
-   la teinte de la carte : un R de la couleur du fond redeviendrait un trou. */
+/* Le R en couleur pleine, pas en trou (17/09/2026, demande de l'équipe : « pas de transparence dans
+   le R du logo »). Le R est évidé dans le tracé : on voyait la courbe au travers. Un second tracé,
+   la seule silhouette de la goutte (le premier sous-chemin), est posé EN NAVY sous la goutte sable,
+   même contour au pixel près. Navy et non ink, la teinte de la carte : un R de la couleur du fond
+   redeviendrait un trou. */
 const MARQUE_FOND = MARQUE.slice(0, MARQUE.indexOf('Z') + 1);
 const MARQUE_L = 16;
 const MARQUE_H = Math.round((MARQUE_L * 88.98) / 94.08 * 100) / 100;
@@ -135,10 +106,10 @@ const MARQUE_H = Math.round((MARQUE_L * 88.98) / 94.08 * 100) / 100;
     <circle cx={DEPART[0]} cy={DEPART[1]} r="3" class="gain-achat" />
 
     {
-      /* La marque qui mène la courbe, dessinée autour de (0, 0) : le groupe extérieur est porté par le
-        chemin, le groupe intérieur (« jeton ») est ce qui se retourne au sommet. Deux éléments, parce
-        que `offset-path` et `transform` se composent sur un même élément dans un ordre qu'on ne
-        choisit pas : séparés, chacun fait une seule chose. */
+      /* La marque qui mène la courbe, dessinée autour de (0, 0) : le groupe extérieur est porté par
+        le chemin, le groupe intérieur (« jeton ») se retourne au sommet. Deux éléments, parce que
+        `offset-path` et `transform` se composent sur un même élément dans un ordre qu'on ne
+        choisit pas. */
     }
     <g class="gain-pointe">
       <g class="gain-jeton">
@@ -211,10 +182,9 @@ const MARQUE_H = Math.round((MARQUE_L * 88.98) / 94.08 * 100) / 100;
     fill: var(--color-teal-400);
     opacity: 0.3;
   }
-  /* EN SABLE (17/09/2026, demande de l'équipe : « mets-le en sable pour qu'il ressorte »). En
-     teal-200 comme la marque du moteur 01, la goutte se fondait dans la courbe, du même bleu ; le
-     sable est la seule teinte chaude du dessin, et celle des titres des cartes : la marque est le
-     premier objet que l'œil attrape. La pastille « € » reste en bleu : c'est l'autre face. */
+  /* En sable (17/09/2026, demande de l'équipe : « mets-le en sable pour qu'il ressorte ») : en
+     teal-200, la goutte se fondait dans la courbe ; le sable est la seule teinte chaude du dessin,
+     celle des titres des cartes. La pastille « € » reste en bleu : c'est l'autre face. */
   .gain-marque {
     fill: var(--color-sand);
     overflow: visible;
@@ -240,10 +210,8 @@ const MARQUE_H = Math.round((MARQUE_L * 88.98) / 94.08 * 100) / 100;
     dominant-baseline: central;
   }
 
-  /*
-   * ÉTAT DE REPOS = IMAGE COMPLÈTE (`prefers-reduced-motion`, navigateurs sans animation) : la courbe
-   * et sa surface entières, le point d'achat, la pastille au sommet ; ni marque en route ni onde.
-   */
+  /* État de repos = image complète : la courbe et sa surface entières, le point d'achat, la
+     pastille au sommet ; ni marque en route ni onde. */
   .gain-courbe {
     clip-path: inset(0 0 0 0);
     opacity: 1;
@@ -274,15 +242,11 @@ const MARQUE_H = Math.round((MARQUE_L * 88.98) / 94.08 * 100) / 100;
 
   /*
    * LE CYCLE, 8 s comme les quatre autres dessins :
-   *    0 –  5 %  silence : l'immeuble, le sol, rien d'autre ;
-   *    5 – 10 %  le point d'achat se pose ;
-   *   10 – 42 %  la courbe se révèle de gauche à droite, à vitesse constante, la marque à son bord
-   *              (2,56 s ; c'était 10 à 56 %, 3,68 s, « un peu lent ») ;
-   *   42 – 46 %  au sommet, la marque se retourne sur son axe, en accélérant ;
-   *   46 – 50 %  … et c'est la pastille « € » qui s'ouvre à sa place, en freinant ; l'onde s'élargit ;
-   *   50 – 78 %  on lit ;
-   *   78 – 88 %  tout s'efface ;
-   *   88 – 100 % silence.
+   *    0 – 10 %  silence (l'immeuble, le sol), puis le point d'achat se pose ;
+   *   10 – 42 %  la courbe se révèle de gauche à droite à vitesse constante, la marque à son bord ;
+   *   42 – 50 %  au sommet, la marque se retourne sur son axe en accélérant, et la pastille « € »
+   *              s'ouvre à sa place en freinant ; l'onde s'élargit ;
+   *   50 – 78 %  on lit ; 78 – 88 % tout s'efface ; 88 – 100 % silence.
    */
   @media (prefers-reduced-motion: no-preference) {
     .gain-courbe,
@@ -304,11 +268,11 @@ const MARQUE_H = Math.round((MARQUE_L * 88.98) / 94.08 * 100) / 100;
     }
     .gain-pointe {
       animation-name: gain-pointe;
-      /* LA COURBE DE TEMPS CALCULÉE EST POSÉE ICI, SUR L'ÉLÉMENT, et non dans l'image-clé : une
+      /* La courbe de temps calculée est posée ICI, SUR L'ÉLÉMENT, et non dans l'image-clé : une
          règle `@keyframes` est analysée sans élément, `var()` n'y est pas résolu pour
-         `animation-timing-function`, et la marque retombait sur `ease`, loin devant le bord (constaté
-         le 16/09/2026). Sur l'élément, elle vaut pour tout segment qui n'en déclare pas une autre :
-         le parcours, donc. Les autres segments écrivent la leur dans l'image-clé. */
+         `animation-timing-function`, et la marque retombait sur `ease`, loin devant le bord
+         (16/09/2026). Sur l'élément, elle vaut pour tout segment qui n'en déclare pas une autre :
+         le parcours. Les autres segments écrivent la leur dans l'image-clé. */
       animation-timing-function: var(--tempsPointe);
     }
     .gain-jeton {
@@ -368,8 +332,8 @@ const MARQUE_H = Math.round((MARQUE_L * 88.98) / 94.08 * 100) / 100;
     }
   }
   /* Mêmes bornes que le découpage ; la courbe de temps de l'élément tient la marque à son bord.
-     Après le retournement, le jeton est fermé (largeur nulle) : le groupe s'éteint d'un coup,
-     personne ne le voit, et il est prêt pour le prochain départ. */
+     Après le retournement, le jeton est fermé (largeur nulle) : le groupe s'éteint d'un coup, sans
+     que personne le voie, prêt pour le prochain départ. */
   @keyframes gain-pointe {
     0%,
     10% {
@@ -425,7 +389,7 @@ const MARQUE_H = Math.round((MARQUE_L * 88.98) / 94.08 * 100) / 100;
       transform: scale(1.8);
     }
   }
-  /* Seconde moitié : l'autre face s'ouvre, en freinant. L'opacité passe à 1 dans les tout premiers
+  /* Seconde moitié : l'autre face s'ouvre, en freinant. L'opacité passe à 1 dès les premiers
      instants, quand la largeur est encore presque nulle : aucun fondu ne se voit, la face apparaît
      bien par rotation. */
   @keyframes gain-vente {

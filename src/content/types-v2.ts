@@ -1,8 +1,5 @@
-/**
- * Types du périmètre v2 (08/09/2026) : blocs de confiance, page Frais, page Documentation, page Presse.
- * Fichier séparé de types.ts, à l'origine pour ne pas interférer avec le lot design. La fusion annoncée
- * alors n'a pas été faite : les deux fichiers coexistent, celui-ci n'importe de l'autre que des types.
- */
+/** Types des blocs de confiance et des pages Frais, Documentation et Presse. Fichier distinct de
+    types.ts, dont il n'importe que des types ; la fusion des deux n'a jamais été faite. */
 import type { Cta, DocumentItem, FaqItem, StatItem, StepItem } from '@/content/types';
 
 export interface PageSeo {
@@ -15,16 +12,10 @@ export interface PageSeo {
 export interface PageHero {
   /** H1 unique de la page. */
   title: string;
-  /**
-   * Facultative depuis le 14/09/2026 : /strategie ouvre directement sur son premier chapitre.
-   * Un TABLEAU rend plusieurs paragraphes, quand le texte fourni en compte plusieurs (/a-propos).
-   */
+  /** Facultative (/strategie s'en passe). Un TABLEAU rend plusieurs paragraphes (/a-propos). */
   intro?: string | string[];
-  /**
-   * Phrase-clé sous l'introduction, en gras (14/09/2026, /frais). Elle reste dans le MÊME corps de
-   * texte que l'introduction : le gras marque l'insistance, jamais une taille plus grande, ce que
-   * l'AMF a déjà reproché à la brochure.
-   */
+  /** Phrase-clé sous l'introduction, en gras et dans le MÊME corps de texte : le gras marque
+      l'insistance, jamais une taille plus grande, ce que l'AMF a déjà reproché à la brochure. */
   punchline?: string;
 }
 
@@ -38,12 +29,8 @@ export interface TrustContent {
     }[];
     /** Phrase standard : le visa n'implique ni approbation ni authentification. */
     disclaimer: string;
-    /**
-     * Pastille de réassurance du hero, à côté des avis Trustpilot (15/09/2026). Elle porte l'agrément
-     * de la SOCIÉTÉ DE GESTION, jamais celui de R Start, qui n'est pas agréé mais visé : le détail de
-     * cette distinction, et la raison pour laquelle l'écusson n'est pas le logo de l'AMF, sont dans
-     * trust.ts au-dessus du champ.
-     */
+    /** Pastille de réassurance du hero. Elle porte l'agrément de la SOCIÉTÉ DE GESTION, jamais
+        celui de R Start, qui n'est pas agréé mais visé (détail dans trust.ts, `heroBadge`). */
     heroBadge: {
       label: string;
       /** Ce que les lecteurs d'écran entendent à la place du logo. */
@@ -66,11 +53,9 @@ export interface TrustContent {
 }
 
 /**
- * Section « Ce qui change vraiment » (zone 2 de l'accueil, brochure partenaires 2026 p.4 et p.6).
- * Explique quand la société de gestion se rémunère : les deux situations où des frais sont prélevés
- * (loyers encaissés, plus-value réalisée à la vente), puis la démonstration de l'équipe. Les cartes
- * des deux moteurs et le mécanisme de réserve en cas de moins-value l'ont quittée le 11/09/2026, et
- * le contre-poids chiffré l'a suivie (voir `counterweight`).
+ * Section « Ce qui change vraiment » de l'accueil (brochure partenaires 2026 p.4 et p.6) : quand la
+ * société de gestion se rémunère, les deux situations où des frais sont prélevés (loyers encaissés,
+ * plus-value réalisée à la vente), puis la démonstration de l'équipe.
  */
 export interface DifferenceContent {
   title: string;
@@ -80,18 +65,15 @@ export interface DifferenceContent {
   /** Les deux situations où des frais sont prélevés. `strong` est le mot mis en valeur dans `text`. */
   situations?: { text: string; strong?: string }[];
   /**
-   * Conclusion de l'équipe, sous les deux situations (« nous, on ne touche rien tant que vous n'avez
-   * pas gagné d'argent »). Son contre-poids chiffré (frais de gestion prélevés sur les loyers même
-   * quand la valeur des parts baisse, commission sur les cessions, commission de retrait) a quitté
+   * Conclusion de l'équipe, sous les deux situations (« nous, on ne touche rien tant que vous
+   * n'avez pas gagné d'argent »). Son contre-poids chiffré (frais de gestion prélevés sur les
+   * loyers même quand la valeur des parts baisse, commissions de cession et de retrait) a quitté
    * l'écran le 11/09/2026 et le code le 22/09/2026, comme l'allégation de rang qui ouvrait le bloc.
    */
   counterweight: { pedagogy?: string[] };
   /** Lien interne vers la page Frais : ce n'est pas un CTA de souscription, il ne porte pas de `position`. */
   cta: { label: string; href: string };
-  /**
-   * Appel à l'action rendu DANS le bloc, sous la démonstration (15/09/2026). Distinct de `cta`
-   * ci-dessus, qui alimente la pastille flottante de la page.
-   */
+  /** Appel rendu DANS le bloc, sous la démonstration ; `cta` alimente la pastille flottante. */
   secondaryCta?: { label: string; href: string };
 }
 
@@ -116,10 +98,8 @@ export interface DocumentationLabels {
   anchorsLabel?: string;
   /** Décompte d'un groupe dans le sommaire de l'en-tête. `{n}` : nombre ; `{s}` : marque du pluriel. */
   anchorsCountLabel?: string;
-  /**
-   * Nom du sommaire rendu dans l'en-tête. Distinct de `anchorsLabel` (la barre d'ancres collante) :
-   * deux repères de navigation d'une même page ne peuvent pas porter le même nom accessible.
-   */
+  /** Nom du sommaire rendu dans l'en-tête. Distinct de `anchorsLabel` (la barre d'ancres collante)
+      : deux repères de navigation d'une même page ne peuvent pas porter le même nom accessible. */
   anchorsAsideLabel?: string;
   /** aria-label de la liste des étapes (ex. « Les quatre étapes de la souscription »). */
   stepsLabel?: string;
@@ -137,12 +117,8 @@ export interface DocumentationContent {
   groups: { key: DocumentGroupKey; title: string; intro: string; items: DocumentItem[] }[];
   /** Guide de souscription. */
   howTo: { title: string; intro: string; steps: StepItem[] };
-  /**
-   * FAQ de la page : seulement les questions dont le sujet est un document ou la souscription (la
-   * sélection est faite dans documentation.ts). `fullFaqLink` renvoie vers la foire aux questions
-   * complète (/faq depuis le 16/09/2026), où les autres questions restent lisibles, elles ne sont
-   * plus dupliquées.
-   */
+  /** FAQ de la page : seulement les questions dont le sujet est un document ou la souscription
+      (sélection dans documentation.ts). `fullFaqLink` renvoie vers /faq pour les autres. */
   faq: {
     title: string;
     items: FaqItem[];
@@ -154,12 +130,8 @@ export interface DocumentationContent {
   labels?: DocumentationLabels;
 }
 
-/**
- * Article de presse tiers. Le titre est une citation : il est reproduit tel qu'il a été publié, jamais
- * réécrit, et il est couvert par l'avertissement de fin de page. `url` est vide tant que l'adresse de
- * l'article n'a pas été vérifiée : l'article s'affiche alors avec son média et sa date, sans lien.
- */
-/** Article de la revue de presse : toujours relié à sa publication (press.ts écarte les autres). */
+/** Article de presse tiers. Le titre est une citation, reproduit tel que publié, jamais réécrit.
+    `url` est vide tant que l'adresse n'a pas été vérifiée, et press.ts écarte alors l'article. */
 export interface PressArticle {
   media: string;
   title: string;
@@ -197,12 +169,8 @@ export interface PressLabels {
   emailLabel?: string;
 }
 
-/**
- * Page /presse « La presse en parle » (grand public) : trois citations mises en avant, la revue des
- * articles et l'avertissement de fin. Aucun logo de média (aucune licence), les noms sont en
- * typographie. Les contacts presse sont en zone 4 ; la salle de presse (communiqués, kit média) a été
- * supprimée le 22/09/2026.
- */
+/** Page /presse « La presse en parle » : trois citations mises en avant, la revue des articles, les
+    contacts. Aucun logo de média (aucune licence), les noms sont en typographie. */
 export interface PressContent {
   seo: PageSeo;
   hero: PageHero;

@@ -1,23 +1,17 @@
 /**
  * MOTEUR D'ANIMATION DÉCLARATIF (GSAP 3 + ScrollTrigger), référence pour toutes les sections.
  * Tout se pilote par attributs dans le HTML ; aucune section n'écrit de code GSAP.
- *
  * Ce fichier est le point d'entrée LÉGER (sans GSAP, dans le chunk principal avec consent/analytics) :
- * classe d'état (data-in-view), puis chargement d'un moteur en chunk séparé via
- * `import()`, au premier temps d'inactivité (requestIdleCallback, 1 s maximum), jamais en
- * `prefers-reduced-motion: reduce` (rien n'est alors téléchargé).
- * DEUX MOTEURS, un seul par page, choisi d'après ce que la page déclare :
- *  - motion/engine.ts (GSAP + ScrollTrigger, ≈ 45 Ko gzip + 4 Ko) dès qu'un effet de la liste
- *    BESOIN_GSAP est présent : rideau, défilement lié, tracé, texte mot à mot.
- *    Aujourd'hui : l'accueil et /strategie ;
- *  - motion/lite.ts (≈ 1 Ko, IntersectionObserver + transitions CSS) sinon : il rend les révélations
- *    `data-animate` avec les mêmes types, les mêmes durées et LES MÊMES GARDE-FOUS. Les sous-pages ne
- *    déclarent que cela : elles ne téléchargent plus GSAP.
- * Les deux ne cohabitent jamais : aucune double animation possible.
- *
- * RETIRÉS LE 22/09/2026, après trois jours en sommeil sans qu'aucune page ne les porte : `data-on-load`
- * (loaded.ts), `data-counter` (counter.ts, et le compteur de ui/Stat.astro), `data-fill` (draw.ts),
- * `data-scene` (scene.ts) et `data-pin` (scroll.ts). L'historique git les garde.
+ * classe d'état (data-in-view), puis chargement d'un moteur en chunk séparé via `import()`, au
+ * premier temps d'inactivité (requestIdleCallback, 1 s maximum), jamais en `prefers-reduced-motion:
+ * reduce`. DEUX MOTEURS, un seul par page, choisi d'après ce que la page déclare, jamais les deux
+ * ensemble :
+ *  - motion/engine.ts (GSAP + ScrollTrigger, ≈ 45 Ko gzip + 4 Ko) dès qu'un effet de BESOIN_GSAP
+ *    est présent : rideau, défilement lié, tracé, texte mot à mot (l'accueil et /strategie) ;
+ *  - motion/lite.ts (≈ 1 Ko, IntersectionObserver + transitions CSS) sinon : les révélations
+ *    `data-animate` avec les mêmes types, les mêmes durées et LES MÊMES GARDE-FOUS.
+ * Les effets qu'aucune page ne portait (`data-on-load`, `data-counter`, `data-fill`, `data-scene`,
+ * `data-pin`) ont été retirés le 22/09/2026 ; l'historique git les garde.
  *
  * ┌ VOCABULAIRE ─────────────────────────────────────────────────────────────────────────────────┐
  * │ Chargement (CSS pur, sans GSAP)                                                               │
@@ -48,31 +42,26 @@
  * │  data-no-motion               l'élément et ses descendants sont exclus de tout effet          │
  * └───────────────────────────────────────────────────────────────────────────────────────────────┘
  *
- * SOBRIÉTÉ (passe du 11/09/2026, niveau page produit) : au plus UN effet d'entrée par bloc de contenu
- * (carte, liste, titre), jamais sur un conteneur ET son contenu ; surtitres statiques ; H2 de chapitre mot à
- * mot, introduction en fade-up ; dans une carte, seul le titre (ou le picto) entre, la description est
- * en place ; AUCUNE scène épinglée sur le site depuis le 14/09/2026 (celle du mot d'ordre de la
- * stratégie est partie avec son texte), et deux rideaux sur l'accueil : 01b-Différence sur le hero,
- * 08-Risques sur Souscrire. /strategie porte le troisième, le même bloc Risques sur ses volets.
- *
+ * SOBRIÉTÉ (niveau page produit) : au plus UN effet d'entrée par bloc de contenu (carte, liste,
+ * titre), jamais sur un conteneur ET son contenu ; surtitres statiques ; H2 de chapitre mot à mot,
+ * introduction en fade-up ; dans une carte, seul le titre (ou le picto) entre. Aucune scène
+ * épinglée sur le site ; trois rideaux : 01b-Différence sur le hero, 08-Risques sur Souscrire, et
+ * le même bloc Risques sur les volets de /strategie.
  * GARDE-FOUS (appliqués par le moteur, contrôlés par scripts/check-compliance.mjs et tests/) :
  *  - Jamais d'effet sur le H1 ni sur un [data-no-motion], ni directement, ni PAR UN ANCÊTRE : tout
- *    attribut est refusé sur un élément qui en contient un (révélation, scrub, parallaxe, intro,
- *    reveal-text) ; les enfants d'un `stagger` qui en contiennent restent visibles ; le recul du
- *    rideau est supprimé si la section précédente en contient un. Les mentions du footer ne portent
- *    aucun attribut d'animation. Les contre-poids risque, protégés de la même façon par
- *    `[data-risk]`, ont quitté le site le 14/09/2026 et le moteur le 22/09/2026.
+ *    attribut est refusé sur un élément qui en contient un ; les enfants d'un `stagger` qui en
+ *    contiennent restent visibles ; le recul du rideau est supprimé si la section précédente en
+ *    contient un. Les mentions du footer ne portent aucun attribut d'animation.
  *  - Jamais de data-intro (opacité) ni de data-animate sur un candidat LCP : un élément à opacité 0
  *    est ignoré par le LCP.
  *  - prefers-reduced-motion: reduce → rien n'est créé (GSAP non chargé, gsap.matchMedia ensuite) :
  *    contenu visible et stable ; cascade CSS et transitions coupées par @media.
  *  - Transform et opacity uniquement (mini-syntaxe filtrée, `clip` limité aux médias) ; `will-change`
- *    posé le temps de l'animation ; rideaux avec anticipatePin/fastScrollEnd ;
- *    scrub ≤ 1 ; pas de scroll hijacking, SANS EXCEPTION : celle du hero de l'accueil, franchi d'un
- *    seul geste du 17 au 19/09/2026, a été retirée à la demande de Martin. Le défilement est partout
- *    celui du navigateur.
+ *    posé le temps de l'animation ; rideaux avec anticipatePin/fastScrollEnd ; scrub ≤ 1 ; pas de
+ *    scroll hijacking, SANS EXCEPTION (celle du hero a été retirée le 19/09/2026 à la demande de
+ *    Martin) : le défilement est partout celui du navigateur.
  *  - Jamais d'état initial invisible en CSS : c'est GSAP qui pose l'état de départ (anti-CLS, no-JS) ;
- *    la cascade d'entrée CSS se résout seule (animation-fill-mode: backwards, 850 ms au plus).
+ *    la cascade d'entrée CSS se résout seule (animation-fill-mode: backwards).
  *  - Les valeurs finales (textes, tracés) sont dans le HTML : sans JS, tout est exact.
  */
 import { all, allowed } from './motion/dom';
@@ -81,11 +70,11 @@ import { setupInView } from './motion/inview';
 const IDLE_TIMEOUT = 1000;
 
 /**
- * Effets qui exigent GSAP + ScrollTrigger : rideau, défilement lié, tracé, découpe de texte. Une page qui n'en déclare aucun n'a besoin que des révélations `data-animate`, rendues par
- * le moteur léger (motion/lite.ts) : elle ne télécharge pas les 45 Ko gzip de la bibliothèque.
- * La navigation (src/components/SiteNav.astro) ne dépend d'aucun moteur : ni barre de progression, ni
- * vol de la marque (retiré le 12/09/2026, la barre est identique sur tout le site), et le CTA compact
- * est géré par son script en ligne.
+ * Effets qui exigent GSAP + ScrollTrigger : rideau, défilement lié, tracé, découpe de texte. Une
+ * page qui n'en déclare aucun n'a besoin que des révélations `data-animate`, rendues par le moteur
+ * léger (motion/lite.ts) : elle ne télécharge pas les 45 Ko gzip de la bibliothèque. La navigation
+ * (src/components/SiteNav.astro) ne dépend d'aucun moteur : le CTA compact est géré par son script
+ * en ligne.
  */
 const BESOIN_GSAP = [
   '[data-curtain]',

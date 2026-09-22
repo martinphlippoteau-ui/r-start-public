@@ -2,15 +2,12 @@ import { test, expect, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
 /**
- * RECHERCHE DU SITE (17/09/2026) : la loupe de la barre, le panneau qui s'allonge sous elle, l'index
- * tiré du HTML au build (scripts/search-index.mjs) et l'arrivée sur le passage
- * (src/scripts/recherche/arrivee.ts, src/scripts/faqAncre.ts). Le moteur lui-même, classement et
- * tolérance aux fautes, est éprouvé sans navigateur dans tests/moteur.spec.ts.
- *
- * Ce que ces tests tiennent : il n'y a PAS de page de résultats, les résultats se rangent en « Pages »
- * puis « Questions », les fautes de frappe et les synonymes sont tolérés, un résultat mène au passage
- * exact, l'index n'est pas téléchargé par une visite qui ne cherche rien, et les recherches partent
- * dans le plan de taggage.
+ * RECHERCHE DU SITE : la loupe, le panneau qui s'allonge sous la barre, l'index tiré du HTML au
+ * build (scripts/search-index.mjs) et l'arrivée sur le passage (src/scripts/recherche/arrivee.ts,
+ * faqAncre.ts) ; le moteur est éprouvé sans navigateur dans tests/moteur.spec.ts. Ce que ces tests
+ * tiennent : PAS de page de résultats, « Pages » puis « Questions », fautes et synonymes tolérés,
+ * un résultat mène au passage exact, l'index n'est pas téléchargé sans recherche, mesure dans le
+ * plan.
  */
 
 const ouvrir = async (page: Page) => {
@@ -86,10 +83,8 @@ test.describe('Recherche du site', () => {
       .toContain('Comment sont imposés les revenus de R Start ?');
   });
 
-  /*
-   * LA HAUTEUR NE BOUGE PAS (17/09/2026, demande de Martin) : le panneau ouvert a la hauteur du panneau
-   * vide, et les résultats sont rognés pour y tenir, sans défilement. Le verre est celui de la barre.
-   */
+  /* LA HAUTEUR NE BOUGE PAS (demande de Martin) : le panneau ouvert a la hauteur du panneau vide,
+     les résultats sont rognés pour y tenir. Le verre est celui de la barre. */
   test('le panneau garde la hauteur du panneau vide et le verre de la barre', async ({ page }) => {
     await page.goto('/frais/');
     const barre = page.locator('[data-sitenav-bar]');
@@ -131,12 +126,8 @@ test.describe('Recherche du site', () => {
     expect(await barre.evaluate((b) => getComputedStyle(b).backgroundColor)).toBe(verreBarre);
   });
 
-  /*
-   * La page ne défile pas sous le panneau, SANS `overflow: hidden` : ce verrou retirait la barre de
-   * défilement et recentrait la page, ou laissait une gouttière vide. Ce sont les gestes qui sont
-   * neutralisés (src/scripts/verrou.ts, partagé avec le tiroir du menu). Et la fermeture rend le
-   * défilement.
-   */
+  /* La page ne défile pas sous le panneau, SANS `overflow: hidden` (src/scripts/verrou.ts dit
+     pourquoi) : ce sont les gestes qui sont neutralisés. Et la fermeture rend le défilement. */
   test('la page ne défile pas sous le panneau, et redéfile après', async ({ page, isMobile }) => {
     /* Bureau seulement : au doigt, c'est `touchmove` qui est neutralisé, et Playwright n'a pas de geste
        de défilement tactile ; sa molette en émulation mobile contourne l'événement `wheel` de la page. */
@@ -175,11 +166,9 @@ test.describe('Recherche du site', () => {
       .toBeGreaterThan(200);
   });
 
-  /*
-   * TAPER NE DÉPLACE PAS LA PAGE (18/09/2026). Le panneau était `absolute` dans l'enveloppe `sticky` de
-   * la barre : Chromium déplaçait la page de quatre pixels à chaque frappe pour « révéler » le champ,
-   * dont il calculait la position statique. Vingt pixels perdus en tapant « frais », sans retour.
-   */
+  /* TAPER NE DÉPLACE PAS LA PAGE : un panneau `absolute` dans l'enveloppe `sticky` de la barre
+     faisait déplacer la page par Chromium de quatre pixels à chaque frappe, pour « révéler » le
+     champ. */
   test('taper dans le champ ne déplace pas la page', async ({ page }) => {
     await page.goto('/presse/');
     await page.locator('[data-consent-refuse]').click();
@@ -266,16 +255,9 @@ test.describe('Recherche du site', () => {
     expect(serious.map((v) => `${v.id}: ${v.help} (${v.nodes.length})`)).toEqual([]);
   });
 
-  /*
-   * AUDIT DU 18/09/2026 : sept défauts relevés dans la recherche et le verrou de page, écrits la veille.
-   * Chacun a ici le test qui l'aurait attrapé.
-   */
-  /*
-   * SOUS UNE SURFACE MODALE, LA PAGE EST INERTE (audit du 18/09/2026). `aria-modal` et le piège à
-   * tabulation n'arrêtent ni le curseur virtuel d'un lecteur d'écran ni le balayage tactile : plusieurs
-   * technologies d'assistance laissaient lire la page recouverte par le voile. La barre reste active
-   * pendant la recherche, c'est voulu.
-   */
+  /* SOUS UNE SURFACE MODALE, LA PAGE EST INERTE : `aria-modal` et le piège à tabulation n'arrêtent
+     ni le curseur virtuel d'un lecteur d'écran ni le balayage tactile. La barre reste active
+     pendant la recherche, c'est voulu. */
   test('la page est inerte sous la recherche, et ne l’est plus après', async ({ page }) => {
     await page.goto('/frais/');
     const inertes = () =>
@@ -306,9 +288,8 @@ test.describe('Recherche du site', () => {
         return e.defaultPrevented;
       }, ctrlKey);
 
-    /* Les écouteurs RÉELLEMENT posés sur `document`, lus par le protocole du navigateur : un écouteur
-       `wheel` non passif oblige le défilement à attendre le script, il ne doit exister que le temps du
-       verrou. Une molette synthétique ne le prouverait pas, le gestionnaire sort sans rien faire. */
+    /* Les écouteurs RÉELLEMENT posés sur `document`, lus par le protocole du navigateur : un
+       `wheel` non passif fait attendre le défilement, il ne doit exister que le temps du verrou. */
     const cdp = await page.context().newCDPSession(page);
     const bloquants = async () => {
       const { result } = await cdp.send('Runtime.evaluate', { expression: 'document' });
@@ -406,12 +387,8 @@ test.describe('Recherche du site', () => {
     await expect(page.locator('[data-recherche-vide]')).toBeHidden();
   });
 
-  /*
-   * LE FILTRE DE /faq GARDE CHAQUE QUESTION SOUS SA RUBRIQUE (audit du 18/09/2026). Le libellé vivait
-   * dans la première question de la rubrique et partait avec elle : « démembrement » ne retient que la
-   * deuxième question de « Souscrire et accéder à R Start », qui s'affichait sans intitulé, ou sous
-   * celui de la rubrique précédente.
-   */
+  /* LE FILTRE DE /faq GARDE CHAQUE QUESTION SOUS SA RUBRIQUE : un libellé porté par la première
+     question partait avec elle, et « démembrement » affichait la deuxième sans intitulé. */
   test('le filtre de la FAQ affiche la rubrique de la première question retenue', async ({
     page,
   }) => {

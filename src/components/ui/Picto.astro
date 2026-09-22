@@ -1,20 +1,15 @@
 ---
 /**
- * Pictogrammes R Start. Trois appelants : la mention AMF du hero (01-Hero, `institution`), les puces
- * de la stratégie (04-Strategy, champ `icon` de strategy.ts) et la fenêtre d'accès du simulateur.
- *
- * Pictogrammes R Start : dessins au TRAIT PLAT, vus de face, sans support ni volume (la tuile de verre et
- * l'isométrie ont été abandonnées le 11/09/2026 : illisibles à petite taille, et le support jurait avec le
- * trait). Grille 24 × 24, trait de 1,5 pour la forme et 1,25 à 55 % d'opacité pour les détails (fenêtres,
- * lignes, jours) : ce second niveau évite l'effet « gros trait » d'une épaisseur unique. `currentColor` :
- * la couleur vient de la classe reçue, contraste tenu sur fond clair comme sur fond sombre.
- * Formes volontairement archi-connues (fronton, billet, calendrier, immeubles, globe, loupe) : un
- * pictogramme se reconnaît, il ne s'interprète pas.
- * Clés : institution (fronton à colonnes), argent, calendrier, equipe (deux immeubles et flèche
- * montante), exploration (globe et repère), analyse (immeuble et loupe). `alerte` et
- * `document-valide`, jamais employés, ont été retirés le 22/09/2026.
- * Accessibilité : toujours décoratif (aria-hidden), le texte voisin porte le sens.
- * Aucun attribut motion ici : l'animation se pose sur l'enveloppe.
+ * Pictogrammes R Start, dessins au TRAIT PLAT, vus de face, sans support ni volume (la tuile de
+ * verre et l'isométrie ont été abandonnées le 11/09/2026 : illisibles à petite taille). Trois
+ * appelants : la mention AMF du hero (01-Hero, `institution`), les puces de la stratégie
+ * (04-Strategy, champ `icon` de strategy.ts) et la fenêtre d'accès du simulateur. Grille 24 × 24,
+ * trait de 1,5 pour la forme et 1,25 à 55 % d'opacité pour les détails : ce second niveau évite
+ * l'effet « gros trait » d'une épaisseur unique. `currentColor` : la couleur vient de la classe
+ * reçue. Formes archi-connues (fronton, billet, calendrier, immeubles, globe, loupe) : un
+ * pictogramme se reconnaît, il ne s'interprète pas. Clés : institution, argent, calendrier, equipe,
+ * exploration, analyse. Toujours décoratif (aria-hidden), le texte voisin porte le sens ; aucun
+ * attribut motion ici, l'animation se pose sur l'enveloppe.
  */
 export const PICTO_KEYS = [
   'institution',
@@ -29,10 +24,9 @@ export type PictoKey = (typeof PICTO_KEYS)[number];
 interface Props {
   name: PictoKey;
   /**
-   * Taille ET couleur : classes Tailwind (`size-14 text-teal-700`).
-   * NE PAS Y METTRE `shrink-0` : le composant le pose déjà lui-même, et html-validate refuse une
-   * classe répétée dans un même attribut (no-dup-class). L'oubli a fait échouer la validation deux
-   * fois, le 15 et le 16/09/2026.
+   * Taille ET couleur : classes Tailwind (`size-14 text-teal-700`). NE PAS Y METTRE `shrink-0` : le
+   * composant le pose déjà, et html-validate refuse une classe répétée dans un même attribut
+   * (no-dup-class) ; l'oubli a fait échouer la validation deux fois.
    */
   class?: string;
 }
@@ -40,24 +34,18 @@ const { name, class: className } = Astro.props as Props;
 
 /**
  * Dessins sur une grille 24 × 24, en DEUX niveaux : `trait` porte la forme principale, `detail` les
- * éléments secondaires (fenêtres, lignes de texte, jours) rendus plus fins et à 55 % d'opacité. C'est ce
- * second niveau qui évite l'effet « gros trait » d'un pictogramme tout en épaisseur unique.
+ * éléments secondaires (fenêtres, lignes de texte, jours), plus fins et à 55 % d'opacité.
  */
 const glyphs: Record<PictoKey, { trait: string; detail?: string }> = {
-  /*
-   * Fronton à colonnes : le bâtiment d'une autorité. AJOUTÉ LE 16/09/2026 pour la mention AMF du hero,
-   * choisi par l'équipe parmi six candidats présentés sur /test.
-   *
-   * IL Y AVAIT UNE RÉSERVE, elle était affichée à côté du picto au moment du choix et elle est
-   * consignée ici pour la Conformité : ce dessin REPRÉSENTE L'INSTITUTION, donc l'AMF. Posé près d'une
-   * note Trustpilot, il peut se lire comme une caution de l'autorité, ce que la mention standard du
-   * pied de page dit explicitement ne pas être le cas, et c'est la raison pour laquelle le logo de
-   * l'AMF a été retiré la veille. L'équipe a tranché en connaissance de cause.
-   * Le libellé, lui, n'a jamais bougé : « société de gestion agréée », jamais « R Start agréé ».
-   *
-   * Le toit est tracé en deux segments ouverts plutôt qu'en triangle fermé : à 24 px, un tympan plein
-   * se referme en tache. Les quatre colonnes sont le second niveau, plus fines et atténuées.
-   */
+  /* Fronton à colonnes : le bâtiment d'une autorité, choisi par l'équipe le 16/09/2026 pour la
+     mention AMF du hero parmi six candidats présentés sur /test. IL Y AVAIT UNE RÉSERVE, affichée
+     au moment du choix et consignée ici pour la Conformité : ce dessin REPRÉSENTE L'INSTITUTION,
+     donc l'AMF ; posé près d'une note Trustpilot, il peut se lire comme une caution de l'autorité,
+     ce que la mention du pied de page dit explicitement ne pas être le cas, et c'est la raison pour
+     laquelle le logo de l'AMF a été retiré la veille. L'équipe a tranché en connaissance de cause.
+     Le libellé n'a jamais bougé : « société de gestion agréée », jamais « R Start agréé ». Le toit
+     est tracé en deux segments ouverts plutôt qu'en triangle fermé : à 24 px, un tympan plein se
+     referme en tache. */
   institution: {
     trait: [
       '<path d="M3.6 9.4 12 4.2l8.4 5.2"/>',

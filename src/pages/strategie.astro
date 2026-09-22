@@ -1,13 +1,12 @@
 ---
 /**
- * Page /strategie, « Stratégie d'investissement » (menu, décision du 10/09/2026 : la stratégie quitte
- * l'accueil, qui n'en garde plus de chapitre depuis le 11/09/2026). SiteNav → main#contenu :
- * PageHero (fil d'Ariane, H1, chute, CTA souscrire, SANS ligne risques depuis le 14/09/2026) → les
- * trois sections de la stratégie (04-Strategy.astro : #strategie, #quoi, #ou, #comment, contenu
- * strategy.ts) → #risques (08-Risks.astro, le bloc de l'accueil) → FAQ courte (10-Faq.astro,
- * 16/09/2026) → Footer. Plus de bloc « Notes » depuis le 14/09/2026 : le texte fourni par l'équipe
- * ne porte aucun appel de note, et le bloc affichait un « Sources et précisions (0) » à déplier sur
- * rien. Métadonnées et JSON-LD (Organization, WebPage, BreadcrumbList) depuis strategyPage.ts, config/pages.ts et src/lib/seo.ts.
+ * Page /strategie, « Stratégie d'investissement » (la stratégie a quitté l'accueil le 10/09/2026).
+ * SiteNav → main#contenu : PageHero (fil d'Ariane, H1, chute, CTA souscrire, SANS ligne risques) →
+ * les trois sections de la stratégie (04-Strategy.astro : #strategie, #quoi, #ou, #comment, contenu
+ * strategy.ts) → #risques (08-Risks.astro, le bloc de l'accueil) → FAQ courte (10-Faq.astro) →
+ * Footer. Plus de bloc « Notes » (14/09/2026) : le texte de l'équipe ne porte aucun appel de note.
+ * Métadonnées et JSON-LD (Organization, WebPage, BreadcrumbList) depuis strategyPage.ts,
+ * config/pages.ts et src/lib/seo.ts.
  */
 import Base from '@/layouts/Base.astro';
 import SiteNav from '@/components/SiteNav.astro';
@@ -45,32 +44,27 @@ const jsonLd = [
     <Strategy />
 
     {
-      /* Bloc des risques de l'accueil, rendu TEL QUEL en fin de page (14/09/2026, demande de l'équipe :
-        « ajoute le même bloc de risques à la fin que sur la homepage »). Même composant, même contenu,
-        mêmes risques (quatre depuis le 16/09/2026) : c'est la seule façon qu'ils ne divergent
-        jamais d'une page à l'autre.
-        Il porte son rideau de chapitre : la section qui le précède ici est « Comment », sur fond clair,
+      /* Bloc des risques de l'accueil, rendu TEL QUEL en fin de page (14/09/2026, demande de
+        l'équipe : « ajoute le même bloc de risques à la fin que sur la homepage ») : même
+        composant, même contenu, la seule façon qu'ils ne divergent jamais d'une page à l'autre. Il
+        porte son rideau de chapitre : la section qui le précède, « Comment », est sur fond clair,
         et le bloc sombre monte par-dessus, comme sur l'accueil. */
     }
     <Risks />
     {
-      /*
-       * FAQ COURTE EN FIN DE PAGE (16/09/2026) : quatre questions, comme sur l'accueil et
-       * /documentation, avec le renvoi vers /faq. Elle vient APRÈS les risques, jamais avant : le
-       * contre-poids doit être lu avant qu'on reparte vers d'autres réponses.
-       * `revealTitle` reste à sa valeur par défaut : /strategie charge déjà GSAP, pour ses titres mot à
-       * mot (`data-reveal-text`) et le rideau des Risques (`data-curtain`), et ne figure pas dans les
-       * sous-pages que tests/performance.spec.ts en protège.
-       */
+      /* FAQ courte en fin de page (16/09/2026) : quatre questions, comme sur l'accueil et
+        /documentation, avec le renvoi vers /faq. Elle vient APRÈS les risques, jamais avant : le
+        contre-poids doit être lu avant qu'on reparte vers d'autres réponses. `revealTitle` reste à
+        sa valeur par défaut : /strategie charge déjà GSAP (titres mot à mot, rideau des Risques)
+        et ne figure pas dans les sous-pages que tests/performance.spec.ts en protège. */
     }
     <Faq tone="paper" />
   </main>
 
   {
-    /* Pastille d'appel : elle prend le RELAIS du CTA de l'en-tête, dès que celui-ci n'est plus à
-      l'écran, et reste jusqu'au bas de page. Accrochée à la première section de contenu, elle
-      s'affichait alors que le CTA de l'en-tête était encore visible : deux appels identiques à
-      quelques centimètres l'un de l'autre. Rendue au niveau de la page, jamais dans une section. */
+    /* Pastille d'appel (au niveau de la page, voir StickyCta.astro) : relais du CTA de l'en-tête
+      dès qu'il n'est plus à l'écran, jusqu'au bas de page. Accrochée à la première section, elle
+      doublait un CTA encore visible. */
   }
   <StickyCta
     label={strategyPage.cta.label}

@@ -1,19 +1,13 @@
 /**
- * Cartes à retournement de la page /strategie.
- *
- * HISTOIRE COURTE, ET ELLE EXPLIQUE LA FORME DU FICHIER. Ces cartes ont d'abord ouvert une <dialog>
- * modale (« le format de card sur le site d'Apple qui ouvre une popup »), puis un retournement suivi
- * d'un zoom. L'équipe a tranché le 16/09/2026 : « je veux que le contenu soit au dos des cards en fait,
- * pas de zoom ni de popup ». Il ne reste donc qu'un mouvement, la carte tourne et montre son dos.
- * Plus de fenêtre, plus de voile, plus de couche supérieure, plus de piège à focus à entretenir.
- *
- * AMÉLIORATION PROGRESSIVE, inchangée et c'est tout le point. Le HTML arrive avec le contenu de chaque
- * carte VISIBLE dans le flux, sous elle, et le bouton caché. Ce script déplace ce contenu au dos, puis
+ * Cartes à retournement de la page /strategie : un seul mouvement, la carte tourne et montre son
+ * dos (16/09/2026, l'équipe : « je veux que le contenu soit au dos des cards en fait, pas de zoom
+ * ni de popup »). Ni fenêtre, ni voile, ni piège à focus.
+ * AMÉLIORATION PROGRESSIVE, et c'est tout le point. Le HTML arrive avec le contenu de chaque carte
+ * VISIBLE dans le flux, sous elle, et le bouton caché. Ce script déplace ce contenu au dos, puis
  * révèle le bouton. Sans lui, la page se lit entière et aucun bouton ne reste sans effet.
- *
- * CE QUE LE RETOURNEMENT OBLIGE À FAIRE À LA MAIN. Une face cachée par `backface-visibility` reste
- * dans l'arbre d'accessibilité et sous le clavier : on la rend donc `inert`, et on déplace le focus
- * d'une face à l'autre. C'est ce que la <dialog> donnait gratuitement et qu'il faut maintenant écrire.
+ * CE QUE LE RETOURNEMENT OBLIGE À FAIRE À LA MAIN : une face cachée par `backface-visibility` reste
+ * dans l'arbre d'accessibilité et sous le clavier, on la rend donc `inert` et on déplace le focus
+ * d'une face à l'autre, ce qu'une <dialog> donnerait gratuitement.
  */
 
 /** Le demi-tour, dans les deux sens. */
@@ -36,11 +30,9 @@ const tourner = (carte: HTMLElement, de: number, vers: number): void => {
     ],
     { duration: TOUR, easing: COURBE, fill: 'forwards' }
   );
-  /*
-   * L'animation est REMPLACÉE par un style en dur une fois finie. Sans cela, chaque aller-retour
-   * empilerait une animation en `fill: forwards` de plus sur la carte, et la dernière posée gagnerait
-   * sur la position réelle. Une seule propriété écrite, pas de pile qui grandit.
-   */
+  /* L'animation est REMPLACÉE par un style en dur une fois finie : sinon chaque aller-retour
+     empilerait une animation en `fill: forwards` de plus, et la dernière posée gagnerait sur la
+     position réelle. */
   void a.finished.catch(() => undefined).then(() => {
     carte.style.transform = `perspective(${FUITE}px) rotateY(${vers}deg)`;
     a.cancel();
@@ -69,8 +61,8 @@ const init = (): void => {
 
     const fermer = document.createElement('button');
     fermer.type = 'button';
-    /* Le rôle Secondaire sur fond sombre, comme « En savoir plus » au recto (décision F18 du 17/09/2026) ;
-       `carte-retour` ne porte que son placement. */
+    /* Le rôle Secondaire sur fond sombre, comme « En savoir plus » au recto ; `carte-retour` ne
+       porte que son placement. */
     fermer.className = 'carte-retour btn btn-motion btn-outline-light btn-sm';
     fermer.textContent = libelleFermer;
     verso.append(fermer);
@@ -79,10 +71,8 @@ const init = (): void => {
     bouton.dataset.carteLiee = '1';
     carte.dataset.carteCliquable = '1';
 
-    /*
-     * `inert` retire la face cachée du clavier, du pointeur et de l'arbre d'accessibilité d'un coup.
-     * Sans lui, on tabule dans un dos invisible, et un lecteur d'écran lit les deux faces à la suite.
-     */
+    /* `inert` retire la face cachée du clavier, du pointeur et de l'arbre d'accessibilité d'un coup
+       : sans lui, on tabule dans un dos invisible et un lecteur d'écran lit les deux faces. */
     let retournee = false;
     verso.inert = true;
 
@@ -99,18 +89,16 @@ const init = (): void => {
     bouton.addEventListener('click', () => basculer(true));
     fermer.addEventListener('click', () => basculer(false));
 
-    /*
-     * TOUTE LA FACE AVANT EST CLIQUABLE. Le dos, non : on y lit un texte, et un clic pour sélectionner
-     * un mot ne doit pas refermer la carte. Seul son bouton la referme.
-     * Le bouton du recto est ignoré ici, sinon le clic compterait deux fois.
-     */
+    /* TOUTE LA FACE AVANT EST CLIQUABLE. Le dos, non : un clic pour sélectionner un mot ne doit pas
+       refermer la carte, seul son bouton la referme. Le bouton du recto est ignoré ici, sinon le
+       clic compterait deux fois. */
     recto.addEventListener('click', (e) => {
       const cible = e.target as HTMLElement | null;
       if (cible?.closest('a, button')) return;
       basculer(true);
     });
 
-    /* Échap referme la carte retournée, comme il refermait la fenêtre. */
+    /* Échap referme la carte retournée. */
     carte.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && retournee) {
         e.stopPropagation();

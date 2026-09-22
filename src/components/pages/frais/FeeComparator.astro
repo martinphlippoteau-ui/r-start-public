@@ -12,14 +12,13 @@
  * Conformité :
  *  - chaque taux porte `data-fee-value` dans un même `data-fee-block` : le contrôle vérifie qu'aucun
  *    frais n'est affiché plus petit que ses voisins (retour AMF sur la brochure) ;
- *  - une case sans valeur n'est jamais marquée « taux le plus bas ». L'avertissement prévu
- *    au-dessus du tableau quand des taux manquent n'a jamais eu à s'afficher (les dix-neuf SCPI ont
- *    une source) ; il a quitté le code le 22/09/2026 ;
+ *  - une case sans valeur n'est jamais marquée « taux le plus bas » (les dix-neuf SCPI ont une
+ *    source ; l'avertissement prévu quand des taux manquent a quitté le code le 22/09/2026) ;
  *  - les sources sont sous le tableau, celle de R Start et celle de la SCPI choisie ;
  *  - nommer une autre SCPI engage : scripts/check-compliance.mjs n'exige plus sur /frais que la
  *    source (data-comparator-source). Le périmètre et l'encadré « Une innovation, pas une
- *    révolution », retirés de l'écran le 14/09/2026, ne le sont plus ; leurs textes restent en
- *    veille dans comparator.ts.
+ *    révolution », retirés de l'écran le 14/09/2026, ne sont plus contrôlés ; textes archivés hors
+ *    du dépôt (.claude/audits).
  * Contenu : src/content/fr/comparator.ts. Les taux de R Start viennent de facts.fees.
  */
 import { Image } from 'astro:assets';
@@ -32,9 +31,9 @@ import { jsonScript } from '@/lib/jsonScript';
 interface Props {
   id: string;
   /**
-   * Titre VISIBLE, et introduction sous lui (16/09/2026). Absents : le titre reste hors écran, comme
-   * sur /frais, dont l'en-tête dit déjà de quoi il s'agit. L'accueil, lui, arrive sans contexte sur un
-   * tableau de chiffres et a besoin des deux.
+   * Titre VISIBLE, et introduction sous lui. Absents : le titre reste hors écran, comme sur /frais,
+   * dont l'en-tête dit déjà de quoi il s'agit. L'accueil, lui, arrive sans contexte sur un tableau
+   * de chiffres et a besoin des deux.
    */
   heading?: string;
   intro?: string;
@@ -61,22 +60,13 @@ const data = scpis.map((s) => ({
 <Section id={id} tone="white" labelledBy={titleId} class="pt-8 sm:pt-10 lg:pt-14">
   <Container size="wide">
     {
-      /* Titre de nouveau VISIBLE (14/09/2026, texte fourni par l'équipe). Il était masqué depuis le
-        12/09/2026 pour que la page arrive directement sur le tableau ; la phrase fournie est une
-        promesse, pas un intitulé de rubrique, elle se lit. L'accroche qui suit invite à comparer.
-        L'hypothèse des huit ans n'est toujours pas rappelée ici : chaque taux de retrait porte sa
-        condition juste en dessous, « au-delà de 6 ans ; avant, 6,00 % TTC du capital retiré ».
-        L'information est au plus près du chiffre. */
-    }
-    {
-      /* Le titre est HORS ÉCRAN depuis le 16/09/2026 : la page arrive directement sur le tableau, son
-        en-tête portant déjà « Comparateur de frais SCPI ». Il reste dans le HTML parce qu'il nomme la
-        section et le tableau, et il est descriptif, pas promotionnel (voir comparator.ts). */
-    }
-    {
-      /* Un seul H2 dans les deux cas : c'est le même titre de section, il est seulement visible ou non.
-        Quand il est visible, c'est le texte de l'appelant qui s'affiche, et `comparator.title`, plus
-        descriptif, reste la légende du tableau. */
+      /* Un seul H2 : le même titre de section, visible ou non. Avec `heading`, c'est le texte de
+        l'appelant qui s'affiche et `comparator.title`, plus descriptif, reste la légende du
+        tableau. Sans lui, le titre reste dans le HTML hors écran (il nomme la section et le
+        tableau, et il est descriptif, pas promotionnel) : la page arrive directement sur le
+        tableau, son en-tête portant déjà « Comparateur de frais SCPI ». L'hypothèse de durée n'est
+        pas rappelée ici : chaque taux de retrait porte sa condition juste en dessous, au plus près
+        du chiffre. */
     }
     {heading ? (
       <header class="max-w-4xl">
@@ -93,15 +83,13 @@ const data = scpis.map((s) => ({
     )}
 
     {
-      /* AUCUNE enveloppe à défilement (12/09/2026). Il y en avait une sous « sm » et elle coûtait cher :
-        sur un téléphone, la colonne de la SCPI comparée et sa liste déroulante tombaient hors de l'écran,
-        le comparateur ne comparait plus rien. Sous 48 rem le tableau se lit maintenant en cartes (règles
-        dans global.css), au-dessus il tient en entier dans le conteneur. Au passage, `overflow-x: auto`
-        aurait de toute façon empêché les en-têtes de se coller à l'écran : un conteneur de défilement
-        retient ses enfants collants.
-
-        Les RÔLES sont posés à la main : `display: block` efface la sémantique de tableau, et sans elle le
-        lecteur d'écran énoncerait quatorze taux sans jamais dire de quelle SCPI ils viennent. */
+      /* AUCUNE enveloppe à défilement : sous « sm », elle envoyait la colonne de la SCPI comparée
+        et sa liste déroulante hors de l'écran, le comparateur ne comparait plus rien. Sous 48 rem
+        le tableau se lit en cartes (règles dans global.css), au-dessus il tient en entier dans le
+        conteneur. `overflow-x: auto` aurait de toute façon empêché les en-têtes de se coller à
+        l'écran : un conteneur de défilement retient ses enfants collants. Les RÔLES sont posés à la
+        main : `display: block` efface la sémantique de tableau, et sans elle le lecteur d'écran
+        énoncerait quatorze taux sans jamais dire de quelle SCPI ils viennent. */
     }
     <div class="mt-6 sm:mt-10">
       <table role="table" data-comparator data-fee-block="comparateur-frais" class="w-full">
@@ -167,10 +155,10 @@ const data = scpis.map((s) => ({
                   class="py-5 pr-3 text-left align-top font-medium text-ink sm:pr-5"
                 >
                   {
-                    /* EXPLICATION DÉPLIABLE (16/09/2026) : `basis` ne dit que l'assiette de calcul,
+                    /* EXPLICATION DÉPLIABLE : `basis` ne dit que l'assiette de calcul,
                       l'explication dit ce que le frais recouvre et qui le paie. Repliée derrière un
-                      bouton, le tableau se lit d'abord en chiffres. Même mécanique que les repères de
-                      l'accueil, même module (src/scripts/infoToggle.ts). */
+                      bouton, le tableau se lit d'abord en chiffres. Même module que les repères de
+                      l'accueil (src/scripts/infoToggle.ts). */
                   }
                   <span class="flex items-start gap-2">
                     <span>{row.label}</span>
@@ -218,15 +206,11 @@ const data = scpis.map((s) => ({
                     {comparator.bestLabel}
                   </span>
                   {
-                    /* `mt-3` et non `mt-1` : la pastille du gagnant déborde de 0,3 em SOUS la ligne de
-                      base du chiffre, et le détail venait s'y coller. Les quatre pixels d'origine
-                      suffisaient sous un halo diffus, plus sous un fond plein. */
-                  }
-                  {
-                    /* Un barème se lit UNE LIGNE PAR PALIER (16/09/2026) : une vraie liste, et non des
-                      retours forcés dans un texte, pour qu'un lecteur d'écran annonce « cinq éléments »
-                      et les énumère un par un. `role="list"` rétablit la sémantique que la remise à
-                      zéro des puces efface. */
+                    /* `mt-3` et non `mt-1` : la pastille du gagnant déborde de 0,3 em SOUS la ligne
+                      de base du chiffre, et le détail venait s'y coller. Un barème se lit UNE LIGNE
+                      PAR PALIER : une vraie liste, et non des retours forcés dans un texte, pour
+                      qu'un lecteur d'écran annonce « cinq éléments » et les énumère un par un.
+                      `role="list"` rétablit la sémantique que la remise à zéro des puces efface. */
                   }
                   {Array.isArray(row.rstartDetail) ? (
                     <ul role="list" class="text-caption mt-3 space-y-1 text-slate-700">
@@ -261,14 +245,14 @@ const data = scpis.map((s) => ({
     </div>
 
     {
-      /* RETIRÉS le 14/09/2026 (texte de la page fourni par l'équipe, « je veux ce contenu là ») : le
-        paragraphe de périmètre (« Ce tableau compare les taux affichés… »), les deux avertissements
-        courts (frais non publié, base HT/TTC) et l'encadré « Une innovation, pas une révolution ».
-        Ce dernier était le seul endroit du site à écrire que R Start n'est pas une SCPI sans frais, ni
-        moins chère qu'une SCPI traditionnelle, et que le coût total n'est pas connu à la souscription.
-        Les textes ont quitté le code le 22/09/2026 (archivés hors du dépôt, .claude/audits).
-        LES SOURCES RESTENT, juste en dessous : nommer dix-sept sociétés de gestion et afficher leurs
-        taux sans dire d'où ils sortent ni à quelle date serait une comparaison invérifiable. */
+      /* RETIRÉS le 14/09/2026 (texte de la page fourni par l'équipe, « je veux ce contenu là ») :
+        le paragraphe de périmètre, les deux avertissements courts (frais non publié, base HT/TTC)
+        et l'encadré « Une innovation, pas une révolution », seul endroit du site à écrire que R
+        Start n'est pas une SCPI sans frais, ni moins chère qu'une SCPI traditionnelle, et que le
+        coût total n'est pas connu à la souscription. Sortis du code le 22/09/2026, archivés hors du
+        dépôt (.claude/audits). LES SOURCES RESTENT, juste en dessous : nommer des sociétés de
+        gestion et afficher leurs taux sans dire d'où ils sortent ni à quelle date serait une
+        comparaison invérifiable. */
     }
 
     {
@@ -366,15 +350,11 @@ const data = scpis.map((s) => ({
       /*
        * Taux le plus bas de la ligne. Il faut que LES DEUX cases donnent un pourcentage unique : un
        * barème à paliers ne se compare pas à un taux unique. Une case peut fournir ce nombre par
-       * `data-fee-compare` quand ce qu'elle affiche est une fourchette (ligne du retrait).
-       *
-       * LA RÈGLE, arrêtée le 16/09/2026 : EST MARQUÉ TOUT TAUX À 0 %, ET SINON LE PLUS BAS DES DEUX.
-       * Elle s'est faite en deux temps. Le 15/09, seule la colonne R Start était marquée à égalité sur
-       * 0 %, la droite ne l'étant que si elle était strictement inférieure. L'équipe a corrigé le
-       * lendemain : « si un concurrent est à 0 % aussi il faut le mettre en valeur. »
-       * C'est le bon arbitrage, et pas seulement parce qu'il vient d'elle : le libellé lu par les
-       * lecteurs d'écran dit « taux le plus bas de la ligne », et il était inexact de le réserver à une
-       * colonne quand les deux portaient le même zéro.
+       * `data-fee-compare` quand ce qu'elle affiche est une fourchette (ligne du retrait). LA RÈGLE
+       * (16/09/2026, l'équipe : « si un concurrent est à 0 % aussi il faut le mettre en valeur ») :
+       * EST MARQUÉ TOUT TAUX À 0 %, ET SINON LE PLUS BAS DES DEUX. Le libellé lu par les lecteurs
+       * d'écran dit « taux le plus bas de la ligne », il serait inexact de le réserver à une
+       * colonne quand les deux portent le même zéro.
        */
       const seul = (t: string | null | undefined) => {
         if (!t) return null;
@@ -395,13 +375,11 @@ const data = scpis.map((s) => ({
         if (ligne.marqueGauche) ligne.marqueGauche.hidden = !gagneGauche;
         if (ligne.marqueDroite) ligne.marqueDroite.hidden = !gagneDroite;
         /*
-         * Mise en avant par la COULEUR et la GRAISSE seulement : la taille reste identique d'une case à
-         * l'autre, sans quoi un frais serait affiché plus petit que son voisin, ce que l'AMF refuse.
-         * Le perdant est atténué, jamais effacé : il reste parfaitement lisible.
-         * Depuis le 15/09/2026 le gagnant porte une PASTILLE PLEINE (`fee-gagnant`), et non plus un
-         * halo à 18 % d'opacité qui se voyait à peine sur le blanc du tableau. Texte BLANC sur le navy,
-         * relevé à 9,52:1, après un essai en sable qui tenait déjà largement (7,72:1) mais rendait le
-         * chiffre moins net que son voisin en navy plein.
+         * Mise en avant par la COULEUR et la GRAISSE seulement : la taille reste identique d'une
+         * case à l'autre, sans quoi un frais serait affiché plus petit que son voisin, ce que l'AMF
+         * refuse. Le perdant est atténué, jamais effacé : il reste parfaitement lisible. Le gagnant
+         * porte une PASTILLE PLEINE (`fee-gagnant`), texte blanc sur navy, contraste relevé à
+         * 9,52:1.
          */
         const peindre = (cell: Element | null | undefined, gagne: boolean, perd: boolean) => {
           if (!cell) return;
@@ -413,13 +391,13 @@ const data = scpis.map((s) => ({
         };
         peindre(ligne.gauche, gagneGauche, gagneDroite);
         /*
-         * LA CASE DE DROITE EST REPEINTE À CHAQUE FOIS, VIDE OU NON (audit du 18/09/2026). Elle ne l'était
-         * que si la SCPI choisie avait une valeur sur la ligne : en passant d'une SCPI qui GAGNAIT la
-         * ligne à une SCPI sans valeur, la case gardait la pastille pleine du gagnant autour de « non
-         * publié ». Un faux « taux le plus bas », sur un comparatif qui nomme des concurrents. Latent
-         * tant que les dix-neuf SCPI ont leurs sept valeurs ; le code prévoit pourtant la case vide.
-         * Sans valeur, `comparable` est faux : les deux drapeaux aussi, la pastille tombe. Une case vide
-         * reprend ensuite l'ardoise que lui a donnée la boucle du dessus, `peindre` la rendrait navy.
+         * LA CASE DE DROITE EST REPEINTE À CHAQUE FOIS, VIDE OU NON (audit du 18/09/2026) : sinon,
+         * en passant d'une SCPI qui GAGNAIT la ligne à une SCPI sans valeur, la case gardait la
+         * pastille du gagnant autour de « non publié », un faux « taux le plus bas » sur un
+         * comparatif qui nomme des concurrents. Latent tant que les dix-neuf SCPI ont leurs sept
+         * valeurs. Sans valeur, `comparable` est faux, les deux drapeaux aussi, la pastille tombe ;
+         * la case vide reprend ensuite l'ardoise de la boucle du dessus, `peindre` la rendrait
+         * navy.
          */
         const droite = cells[i];
         peindre(droite, gagneDroite, gagneGauche);

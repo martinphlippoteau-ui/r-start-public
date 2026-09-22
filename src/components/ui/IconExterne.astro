@@ -1,15 +1,10 @@
 ---
 /**
- * Flèche en diagonale des liens qui SORTENT DU SITE (16/09/2026).
- *
- * EXTRAITE parce que deux dessins coexistaient : le pied de page traçait « M6 3h7v7M13 3 4 12 » à
- * 1,5 d'épaisseur, le bloc Trustpilot « M4 12 12 4M6 4h6v6 » à 1,8. Même forme, deux tracés, deux
- * épaisseurs : un signe qui veut dire « on quitte le site » doit être le même partout, sans quoi il
- * cesse d'être un signe.
- *
- * Toujours DÉCORATIVE (aria-hidden). Ce qui informe les technologies d'assistance, c'est la mention
- * de nouvelle fenêtre que l'appelant pose en `visually-hidden` à côté du libellé.
- *
+ * Flèche en diagonale des liens qui SORTENT DU SITE. Extraite (16/09/2026) parce que deux dessins
+ * coexistaient, au pied de page et dans le bloc Trustpilot, à deux épaisseurs : un signe qui veut
+ * dire « on quitte le site » doit être le même partout, sans quoi il cesse d'être un signe.
+ * Toujours DÉCORATIVE (aria-hidden) : ce qui informe les technologies d'assistance, c'est la
+ * mention de nouvelle fenêtre que l'appelant pose en `visually-hidden` à côté du libellé.
  * L'épaisseur suit la taille : à 14 px, 1,8 empâte le trait et referme la pointe.
  */
 interface Props {

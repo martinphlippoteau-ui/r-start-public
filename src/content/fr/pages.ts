@@ -13,10 +13,9 @@ import {
 import { consentCookie } from '@/content/fr/consent';
 
 /**
- * Pages secondaires : /mentions-legales, /politique-de-confidentialite, /cookies.
- * Les faits légaux (identités, agréments, DPO, médiation, hébergeur) viennent de legal.ts ;
- * les paramètres du consentement reprennent src/config/site.ts (cookie `rstart_consent`, 180 jours)
- * sans l'importer, pour que ce contenu reste lisible hors d'Astro (export des textes pour la Conformité).
+ * Pages secondaires : /mentions-legales, /politique-de-confidentialite, /cookies. Les faits légaux
+ * (identités, agréments, DPO, médiation, hébergeur) viennent de legal.ts, le nom et la durée du
+ * cookie de consentement de consent.ts : rien n'est recopié.
  */
 
 export interface LegalPage {
@@ -128,8 +127,8 @@ export const legalPages: LegalPage[] = [
       {
         title: 'Ce que ce site collecte',
         paragraphs: [
-          /* Réécrit le 20/09/2026 avec le simulateur : « il ne comporte aucun formulaire » n'était plus
-             vrai, et les montants saisis peuvent désormais accompagner le lien vers la souscription. */
+          /* Le simulateur est un formulaire, et ses montants peuvent accompagner le lien vers la
+             souscription (20/09/2026). */
           'Ce site est un site de présentation : il ne collecte ni votre nom, ni votre adresse e-mail, ni aucune donnée de souscription. Le simulateur calcule dans votre navigateur. Les montants que vous y saisissez ne sont ni enregistrés ni transmis, sauf si vous cliquez sur « Commencer ma souscription » : ils accompagnent alors le lien vers la souscription en ligne, pour en préremplir la première étape.',
           'La souscription se déroule sur le tunnel de souscription en ligne de CORUM, qui applique sa propre politique de protection des données, disponible sur www.corum.fr.',
           'Avec votre accord uniquement, des données de navigation sont collectées à des fins de mesure d’audience. Il s’agit des pages consultées, de la durée et du parcours de visite, ainsi que des mots saisis dans la recherche du site. S’y ajoutent le type d’appareil, de navigateur et de système, une localisation approximative (pays, ville) et un identifiant de cookie. L’adresse IP sert à la localisation approximative et n’est pas enregistrée par Google Analytics 4.',
@@ -158,8 +157,7 @@ export const legalPages: LegalPage[] = [
         paragraphs: [
           'Les données de mesure d’audience sont traitées par Google Ireland Limited (Gordon House, Barrow Street, Dublin 4, Irlande), en qualité de sous-traitant, via Google Analytics 4 et Google Tag Manager.',
           'Elles peuvent être transférées vers les États-Unis. Ces transferts s’appuient sur les mécanismes prévus par le RGPD : la décision d’adéquation UE–États-Unis (Data Privacy Framework) et les clauses contractuelles types de la Commission européenne.',
-          /* Ajouté le 18/09/2026 : la politique cookies décrivait déjà ce traitement, la politique de
-             confidentialité ne citait que Google parmi les destinataires. */
+          /* Trustpilot est un destinataire au même titre que Google (18/09/2026). */
           'Les avis affichés sur l’accueil et sur la page À propos sont servis directement par Trustpilot : leur affichage suppose une connexion à ses serveurs, qui reçoivent alors votre adresse IP et les informations techniques transmises par votre navigateur. Trustpilot est responsable de ce traitement ; le détail figure dans la politique cookies.',
           `${publisher.name} ne vend ni ne cède vos données de navigation à des tiers à des fins commerciales.`,
         ],
@@ -203,8 +201,8 @@ export const legalPages: LegalPage[] = [
         ],
       },
       {
-        /* Déclaré le 11/09/2026 avec l'intégration des TrustBox officiels : sans cette section, la
-          politique affirmerait à tort que le site ne charge aucun contenu tiers. */
+        /* Sans cette section, la politique affirmerait à tort que le site ne charge aucun contenu
+           tiers (TrustBox officiels). */
         title: 'Les contenus tiers : les avis Trustpilot',
         paragraphs: [
           'L’accueil et la page À propos affichent les avis publiés sur Trustpilot au sujet de CORUM L’Épargne, distributeur de R Start. Ces avis sont servis directement par Trustpilot : le composant est chargé depuis widget.trustpilot.com, et son contenu est publié et modéré par Trustpilot, pas par CORUM.',
@@ -213,8 +211,8 @@ export const legalPages: LegalPage[] = [
         ],
       },
       {
-        /* Ajouté le 18/09/2026 : le site écrit dans le stockage de session (campagne d'entrée, passage
-           visé par la recherche), et aucune des deux politiques n'en parlait. */
+        /* Le site écrit dans le stockage de session (campagne d'entrée, passage visé par la
+           recherche) : la politique doit le dire. */
         title: 'Le stockage de session de votre navigateur',
         paragraphs: [
           'Le site utilise aussi le stockage de session de votre navigateur, qui s’efface à la fermeture de l’onglet. Il y retient la campagne par laquelle vous êtes arrivé (les paramètres « utm » de l’adresse) et, quand vous utilisez la recherche du site, le passage sur lequel vous avez cliqué, pour vous y conduire.',

@@ -1,40 +1,29 @@
 ---
 /**
- * Illustration de la tuile « Diversifiée » (16/09/2026) : un globe, des épingles, un secteur par
- * épingle.
- *
- * MÊME GRAMMAIRE QUE LES QUATRE AUTRES DESSINS DES CARTES (StrategySelect.astro la décrit en tête).
- *
- * TROISIÈME FORME. Le globe en rotation (StrategyGlobe.astro, un canvas, supprimé le 19/09/2026 et
- * gardé par l'historique git) a été écarté le 16/09/2026 :
- * « on diversifie dans les secteurs d'activité et géographique », or il ne montrait que la géographie.
- * Le plan à deux axes qui l'a remplacé montrait les deux, mais abstraitement, quatre glyphes et quatre
- * gouttes le long d'une grille ; l'équipe n'en était pas convaincue (16/09/2026 au soir).
- * CELLE-CI RÉUNIT LES DEUX SUJETS DANS UNE SEULE IMAGE : un globe filaire, et des épingles qui s'y
- * plantent une à une, PARTOUT (le monde) ; la tête de chaque épingle porte un pictogramme de secteur,
- * bureaux, commerces, logistique, santé (tous les secteurs). Une épingle dit donc « ici » et « dans
- * quoi » d'un seul geste.
- *
- * CE QU'ELLE NE DIT PAS : ni où précisément, ni combien. Le globe est filaire, sans côtes ni frontières,
- * les positions ne désignent aucun pays : R Start n'a pas encore de patrimoine. L'image montre une
- * INTENTION de répartition, ce que le texte dit en toutes lettres (« R Start diversifiera »).
- *
- * LE GLOBE NE SE VIDE JAMAIS D'UN COUP : chaque épingle vit le même temps puis se retire, dans l'ordre
- * où elle est arrivée, pendant que les suivantes reviennent. Entre deux et six épingles à tout
- * instant, jamais zéro : un patrimoine qui tourne, pas un GIF qui repart de zéro.
- *
- * Décorative (aria-hidden) : le texte de la tuile porte le sens.
+ * Illustration de la tuile « Diversifiée » : un globe filaire et des épingles qui s'y plantent une
+ * à une, PARTOUT (le monde), la tête de chacune portant un pictogramme de secteur, bureaux,
+ * commerces, logistique, santé (tous les secteurs) : une épingle dit « ici » et « dans quoi » d'un
+ * seul geste. Même grammaire que les quatre autres dessins des cartes (StrategySelect.astro la
+ * décrit en tête) ; décorative (aria-hidden). Troisième forme, retenue le 16/09/2026 : l'équipe a
+ * écarté le globe en rotation (« on diversifie dans les secteurs d'activité et géographique », il
+ * ne montrait que la géographie ; StrategyGlobe.astro, supprimé le 19/09/2026, reste dans
+ * l'historique git) puis le plan à deux axes, trop abstrait.
+ * CE QU'ELLE NE DIT PAS : ni où précisément, ni combien. Le globe est filaire, sans côtes ni
+ * frontières, les positions ne désignent aucun pays : R Start n'a pas encore de patrimoine. L'image
+ * montre une INTENTION de répartition, ce que le texte dit en toutes lettres (« R Start
+ * diversifiera »). LE GLOBE NE SE VIDE JAMAIS D'UN COUP : chaque épingle vit le même temps puis se
+ * retire, dans l'ordre où elle est arrivée, pendant que les suivantes reviennent ; entre deux et
+ * six épingles à tout instant, jamais zéro, un patrimoine qui tourne, pas un GIF qui repart de
+ * zéro.
  */
 
 /** Le globe : centre et rayon dans un cadre de 160 × 120. */
 const CX = 80;
 const CY = 62;
 const R = 50;
-/*
- * Parallèles et méridiens vus de face, légèrement inclinés : un parallèle est une ellipse aplatie,
- * un méridien une ellipse verticale. Les rayons des parallèles hors équateur suivent la sphère :
- * à 25 unités du centre, la sphère fait 43,3 de demi-largeur.
- */
+/* Parallèles et méridiens vus de face, légèrement inclinés : un parallèle est une ellipse aplatie,
+   un méridien une ellipse verticale. Les rayons des parallèles hors équateur suivent la sphère : à
+   25 unités du centre, la sphère fait 43,3 de demi-largeur. */
 const PARALLELES = [
   { cy: CY, rx: R, ry: 11 },
   { cy: CY - 25, rx: 43.3, ry: 9.5 },
@@ -42,11 +31,9 @@ const PARALLELES = [
 ];
 const MERIDIENS = [20, 40];
 
-/*
- * Six épingles, la pointe posée sur la sphère, réparties sur tout le disque : les quatre secteurs
- * tournent, deux reviennent. L'ordre du tableau est celui de l'apparition, d'un bord à l'autre et
- * jamais deux voisines de suite.
- */
+/* Six épingles, la pointe posée sur la sphère, réparties sur tout le disque : les quatre secteurs
+   tournent, deux reviennent. L'ordre du tableau est celui de l'apparition, d'un bord à l'autre et
+   jamais deux voisines de suite. */
 type Secteur = 'bureaux' | 'commerces' | 'logistique' | 'sante';
 const EPINGLES: { x: number; y: number; secteur: Secteur }[] = [
   { x: 60, y: 44, secteur: 'bureaux' },
@@ -63,8 +50,8 @@ const goutte = (x: number, y: number): string =>
 
 /**
  * Les quatre pictogrammes, dessinés dans la tête (centre hx, hy, 7 unités de côté) : deux fenêtres
- * sur deux pour les bureaux, un auvent pour les commerces, un hangar à toit plat et large porte pour
- * la logistique (un toit en pente ferait une maison), une croix pour la santé. Les mêmes signes que sur la version précédente, ils se lisaient à 14 px.
+ * sur deux (bureaux), un auvent (commerces), un hangar à toit plat et large porte (logistique ; un
+ * toit en pente ferait une maison), une croix (santé). Ils se lisent à 14 px.
  */
 const picto = (secteur: Secteur, hx: number, hy: number): string => {
   switch (secteur) {
@@ -155,10 +142,7 @@ const picto = (secteur: Secteur, hx: number, hy: number): string => {
     stroke-width: 1.6;
   }
 
-  /*
-   * ÉTAT DE REPOS = IMAGE COMPLÈTE (`prefers-reduced-motion`, navigateurs sans animation) : les six
-   * épingles plantées, le globe couvert, aucune onde.
-   */
+  /* État de repos = image complète : les six épingles plantées, le globe couvert, aucune onde. */
   .div-epingle {
     opacity: 1;
   }
@@ -175,12 +159,9 @@ const picto = (secteur: Secteur, hx: number, hy: number): string => {
 
   /*
    * LE CYCLE, 8 s, par épingle (chacune décalée de son rang × 0,5 s, à partir de 0,4 s) :
-   *    0 –  7 %  elle tombe et se plante : elle descend de douze unités, dépasse d'un cheveu, se
-   *              pose ; son onde s'élargit au sol et s'éteint ;
-   *    7 – 64 %  elle est là ;
-   *   64 – 70 %  elle se retire, en remontant d'un cran.
-   * Chaque épingle vit donc 5,6 s. La première revient 2,9 s après le départ de la dernière : le globe
-   * garde toujours deux ou trois épingles, jamais zéro.
+   *    0 –  7 %  elle tombe et se plante (douze unités, dépasse d'un cheveu, se pose), son onde
+   *              s'élargit au sol et s'éteint ;  7 – 64 % elle est là ;  64 – 70 % elle se retire.
+   * Chaque épingle vit donc 5,6 s ; la première revient 2,9 s après le départ de la dernière.
    */
   @media (prefers-reduced-motion: no-preference) {
     .div-epingle,

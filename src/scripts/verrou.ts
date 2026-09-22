@@ -1,38 +1,22 @@
 /**
- * VERROU DE PAGE (18/09/2026) : la page ne défile plus derrière ce qui la recouvre. Deux surfaces s'en
- * servent, le tiroir du menu (SiteNav.astro) et le panneau de recherche (src/scripts/recherche/panneau.ts).
- *
- * PAS `overflow: hidden` SUR <html>, le verrou classique. Il retire la barre de défilement : avec une
- * barre classique (Windows, souris branchée sur Mac), la page se recentre de 7 px à chaque ouverture,
- * la pastille de navigation avec elle ; et réserver sa place (`scrollbar-gutter: stable`) laisse une
- * colonne vide de 15 px qu'aucun voile ne couvre, « un carré » (Martin, 17/09/2026). Les deux essais
- * sont dans l'historique.
- * La barre de défilement reste donc en place, et ce sont les GESTES qui sont neutralisés : molette,
- * doigt, et les touches qui font défiler. La surface ouverte garde son propre défilement, à la
- * condition qu'elle en ait besoin : une liste qui tient dans sa hauteur ne défile pas davantage que
- * la page. Un glissé de la barre de défilement elle-même passe encore, et c'est très bien : le geste
- * est délibéré, la page bouge alors sous le voile.
- *
- * `data-verrou` SUR <html> EST LE REPÈRE UNIQUE de cet état : un script qui aurait à savoir si une
- * surface recouvre la page n'a que lui à lire, au lieu d'une détection par surface. Son seul lecteur,
- * le passage automatique du hero, a été retiré le 19/09/2026 ; les tests le lisent toujours.
- *
- * LE ZOOM N'EST JAMAIS NEUTRALISÉ (audit du 18/09/2026) : ni le pincement à deux doigts, ni Ctrl +
- * molette. La première version annulait tout `wheel` et tout `touchmove` : menu ou recherche ouverts,
- * un visiteur malvoyant ne pouvait plus agrandir la page.
- *
- * LA PAGE EST AUSSI RENDUE INERTE (audit du 18/09/2026). Le tiroir et la recherche se déclarent
- * `aria-modal` et piègent la tabulation, mais ni l'un ni l'autre n'arrête le curseur virtuel d'un
- * lecteur d'écran ou le balayage tactile : TalkBack, là où le tiroir sert, et plusieurs versions de
- * VoiceOver n'honorent pas `aria-modal`, et l'utilisateur partait lire la page recouverte par le voile.
- * `inert` est posé sur tous les enfants de <body> qui ne contiennent pas la surface (le contenu, le pied
- * de page, le bandeau de consentement, les pastilles), plus les éléments que l'appelant désigne (la
- * barre, sous le tiroir). Seuls les éléments rendus inertes ICI sont rétablis à la fin.
- *
- * Plusieurs propriétaires sont admis : le verrou ne tombe qu'au dernier rendu. LES ÉCOUTEURS SONT
- * RETIRÉS AVEC LUI : `wheel` et `touchmove` sont posés en `passive: false`, et un écouteur non passif
- * oblige le navigateur à attendre le script avant chaque défilement. Gardés « pour la suite », ils
- * ralentissaient le défilement de toute la page, jusqu'au rechargement, dès le premier usage du menu.
+ * VERROU DE PAGE : la page ne défile plus derrière ce qui la recouvre. Trois surfaces s'en servent,
+ * le tiroir du menu (SiteNav.astro), le panneau de recherche (recherche/panneau.ts) et la fenêtre
+ * d'accès du simulateur (simulateur/page.ts).
+ * PAS `overflow: hidden` SUR <html> : il retire la barre de défilement, et avec une barre classique
+ * (Windows, souris sur Mac) la page se recentre de 7 px à chaque ouverture ; `scrollbar-gutter:
+ * stable` laisse une colonne vide qu'aucun voile ne couvre (« un carré », Martin). La barre reste
+ * en place et ce sont les GESTES qui sont neutralisés : molette, doigt, touches. La surface ouverte
+ * garde son propre défilement ; un glissé de la barre de défilement passe encore, le geste est
+ * délibéré. `data-verrou` SUR <html> EST LE REPÈRE UNIQUE de cet état, lu par les tests.
+ * LE ZOOM N'EST JAMAIS NEUTRALISÉ (pincement, Ctrl + molette) : annuler tout `wheel` et `touchmove`
+ * empêchait un visiteur malvoyant d'agrandir la page, menu ouvert.
+ * LA PAGE EST AUSSI RENDUE INERTE : `aria-modal` et le piège à tabulation n'arrêtent ni le curseur
+ * virtuel d'un lecteur d'écran (TalkBack, VoiceOver) ni le balayage tactile. `inert` est posé sur
+ * les enfants de <body> qui ne contiennent pas la surface, plus ceux que l'appelant désigne ; seuls
+ * les éléments rendus inertes ICI sont rétablis. Plusieurs propriétaires sont admis, le verrou ne
+ * tombe qu'au dernier rendu. LES ÉCOUTEURS SONT RETIRÉS AVEC LUI : `wheel` et `touchmove` non
+ * passifs font attendre le navigateur avant chaque défilement ; gardés, ils ralentissaient toute la
+ * page.
  */
 
 /** Propriétaire → sa zone défilante, s'il en a une. */
@@ -57,8 +41,8 @@ const dansUneZone = (cible: EventTarget | null): boolean => {
 
 const bloquerGeste = (e: Event): void => {
   if (!proprietaires.size || dansUneZone(e.target)) return;
-  /* Agrandir la page reste permis : Ctrl + molette (c'est aussi le pincement d'un trackpad, que le
-     navigateur traduit ainsi) et le pincement à deux doigts sur un écran tactile. */
+  /* Agrandir la page reste permis : Ctrl + molette (le pincement d'un trackpad, aussi) et le
+     pincement à deux doigts. */
   if (e instanceof WheelEvent && e.ctrlKey) return;
   if (typeof TouchEvent !== 'undefined' && e instanceof TouchEvent && e.touches.length > 1) return;
   e.preventDefault();

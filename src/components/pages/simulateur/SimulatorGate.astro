@@ -10,7 +10,7 @@
  * Martin : « la première étape du simulateur se charge en effet flicker avant la popup »). C'était un
  * <dialog> ouvert par `showModal()` : un dialogue fermé n'existe pas à l'écran, et le script qui
  * l'ouvre est un module, donc différé. Entre le premier rendu et son exécution, le formulaire
- * s'affichait NU — un demi-seconde sur un réseau lent, mesuré. Ce n'est plus un <dialog> mais une
+ * s'affichait NU, une demi-seconde sur un réseau lent, mesurée. Ce n'est plus un <dialog> mais une
  * surface ordinaire, rendue par le serveur, visible sans que rien ne s'exécute.
  * ET VISIBLE, PAS SEULEMENT PRÉSENTE (21/09/2026, « il y a toujours un effet flick », Martin) : son
  * voile entrait en fondu depuis l'opacité zéro, et la question se voyait avant elle pendant les
@@ -18,7 +18,7 @@
  * entrer (global.css, « Le mouvement du simulateur »).
  * CE QUE LE <dialog> APPORTAIT est repris par src/scripts/verrou.ts, le verrou de page du site, déjà
  * partagé par le tiroir du menu et la recherche : page inerte (donc tabulation piégée) et gestes de
- * défilement neutralisés. Le panneau de recherche est bâti ainsi depuis le 17/09/2026.
+ * défilement neutralisés.
  *
  * RENDUE HORS DE <main>, en fin de page (src/pages/simulateur.astro) : `verrou.ts` rend inertes les
  * enfants de <body> qui ne contiennent pas la surface, et une fenêtre posée dans <main> aurait laissé

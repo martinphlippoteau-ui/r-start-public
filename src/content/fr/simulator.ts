@@ -46,10 +46,9 @@ if (!dernierPalier) throw new Error('simulator.ts : barème de retrait vide dans
 /* ── Repères de marché ────────────────────────────────────────────────────────────────────────── */
 
 /**
- * MOYENNE DES SCPI CORUM, CALCULÉE et non saisie (arbitrage de Martin du 19/09/2026) : moyenne SIMPLE
- * des taux de distribution que corumRange.ts publie sur /a-propos, soit 6,31 % pour 2025. Le prototype
- * portait 6,30 %, « chiffre non vérifié ». Elle ne peut pas diverger de /a-propos, et le build
- * s'arrête si une SCPI de la gamme n'a plus de taux ou si les millésimes ne concordent plus.
+ * MOYENNE DES SCPI CORUM, CALCULÉE et non saisie (arbitrage de Martin du 19/09/2026) : moyenne
+ * SIMPLE des taux de distribution que corumRange.ts publie sur /a-propos, dont elle ne peut pas
+ * diverger. Le build s'arrête si une SCPI n'a plus de taux ou si les millésimes ne concordent plus.
  */
 const tauxCorum = corumRange.items.map((scpi) => {
   const mesure = scpi.autres.find((m) => m.unit === '%' && /^Rendement \d{4}$/.test(m.label));
@@ -115,10 +114,10 @@ export const simulator = {
   } satisfies PageSeo,
 
   /**
-   * L'EN-TÊTE D'UN PRÉ-TUNNEL (21/09/2026, demande de Martin) : un titre, rien d'autre. Ni surtitre,
-   * que le fil d'Ariane double, ni bouton « Souscrire en ligne » (src/pages/simulateur.astro dit
-   * pourquoi). PAS D'INTRODUCTION (20/09/2026) : ce qu'elle disait, aucun taux proposé par défaut
-   * faute d'historique, est dit à la question du taux, là où on en a besoin.
+   * L'en-tête d'un pré-tunnel (21/09/2026, demande de Martin) : un titre, rien d'autre. Ni
+   * surtitre, que le fil d'Ariane double, ni bouton « Souscrire en ligne »
+   * (src/pages/simulateur.astro dit pourquoi), ni introduction : « aucun taux par défaut » se dit à
+   * la question du taux.
    */
   hero: {
     title: 'Projetez votre investissement',
@@ -157,15 +156,12 @@ export const simulator = {
   markers,
 
   /**
-   * LA FENÊTRE D'ACCÈS (20/09/2026, demande de Martin) : elle s'ouvre à l'arrivée, et le simulateur
-   * reste inerte tant qu'on n'a pas répondu « J'ai compris ». Les simulateurs des autres SCPI du groupe
-   * en ont une, faite de trois paragraphes pleins ; celle-ci dit la même chose en TROIS POINTS qui se
-   * lisent d'un regard, et garde le texte complet à un clic (`full`).
-   * CE QUE LE TEXTE COMPLET REPREND : `bulletinWarning`, l'avertissement du bulletin de souscription de
-   * R Start, mot pour mot (legal.ts) ; le paragraphe sur l'illustration graphique, qui ne nomme aucun
-   * produit, tel qu'il figure sur les autres simulateurs ; et un troisième paragraphe RÉÉCRIT pour
-   * R Start, parce que celui des autres SCPI décrit des frais de souscription et une fiscalité déduite
-   * que cette simulation n'a pas : elle est brute, et R Start ne prélève pas de frais de souscription.
+   * LA FENÊTRE D'ACCÈS (20/09/2026, demande de Martin) : le simulateur reste inerte tant qu'on n'a
+   * pas répondu « J'ai compris ». Comme sur les simulateurs des autres SCPI du groupe, en TROIS
+   * POINTS lisibles d'un regard, texte complet à un clic (`full`) : `bulletinWarning` mot pour mot
+   * (legal.ts), le paragraphe sur l'illustration graphique des autres simulateurs, et un troisième
+   * paragraphe RÉÉCRIT pour R Start, la simulation étant brute (ni frais de souscription, ni
+   * fiscalité déduite).
    */
   gate: {
     eyebrow: 'Avant de commencer',
@@ -363,12 +359,10 @@ export const simulator = {
   },
 
   /**
-   * LA SUITE (20/09/2026, demande de Martin) : « Commencer ma souscription », sous les résultats. Le
-   * bouton mène au tunnel avec les choix du visiteur en paramètres, pour préremplir sa première étape
-   * (src/scripts/simulateur/souscription.ts dit ce qui part et ce qui ne part pas).
-   * `params` EST UN CONTRAT AVEC LE TUNNEL : ce sont les noms qu'il doit lire. Tant que la
-   * souscription n'est pas ouverte (PUBLIC_SUBSCRIBE_OPEN), le bouton ouvre la fenêtre « la
-   * souscription ouvre bientôt », comme tous les autres, et rien n'est transmis.
+   * « Commencer ma souscription » (20/09/2026, demande de Martin) mène au tunnel avec les choix du
+   * visiteur en paramètres (src/scripts/simulateur/souscription.ts dit ce qui part). `params` EST
+   * UN CONTRAT AVEC LE TUNNEL : ce sont les noms qu'il doit lire. Souscription fermée
+   * (PUBLIC_SUBSCRIBE_OPEN), le bouton ouvre la fenêtre « ouvre bientôt » et rien n'est transmis.
    */
   next: {
     title: 'Ce projet vous ressemble ?',

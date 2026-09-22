@@ -1,22 +1,16 @@
 ---
 /**
- * PAGE D'ESSAI TYPOGRAPHIQUE, /test. Demande de l'équipe du 15/09/2026 : mettre « R Start » en avant
- * dans les titres avec une seconde typographie, et pouvoir choisir sur pièces plutôt que sur avis.
- *
- * Elle rend les NEUF TITRES DU SITE qui contiennent « R Start », relevés dans le HTML construit, aux
- * tailles réelles des paliers (H1 en display-lg, H2 en display-md), avec des réglages qu'on manipule en
- * direct : la fonte, la graisse, la compensation de corps, l'italique et les petites capitales.
- *
- * DEUX CANDIDATES SEULEMENT, et ce n'est pas un choix de goût. Adobe Caslon, FreightBig Pro et Kepler
- * sont des fontes Adobe : leur licence web passe par Adobe Fonts, qui interdit l'hébergement sur son
- * propre serveur et impose un script depuis use.typekit.net. Or la politique de sécurité du contenu du
- * site (src/layouts/Base.astro) n'autorise que `'self'`, googletagmanager et trustpilot pour les
- * scripts, et `'self'` pour les feuilles de style : ces trois-là ne peuvent pas être essayées sans une
- * décision d'infrastructure préalable. Source Serif 4 et EB Garamond sont sous licence libre (SIL OFL),
- * variables, et s'hébergent comme Plus Jakarta Sans.
- *
- * HORS MENU, hors plan du site, et `noindex` comme tout le reste de la prévisualisation. À SUPPRIMER
- * une fois le choix fait, avec la fonte non retenue.
+ * Page d'essai typographique, /test (demande de l'équipe du 15/09/2026 : mettre « R Start » en
+ * avant dans les titres avec une seconde typographie, et choisir sur pièces) : les neuf titres du
+ * site qui contiennent « R Start », aux tailles réelles des paliers (H1 en display-lg, H2 en
+ * display-md), avec des réglages manipulés en direct (fonte, graisse, compensation de corps,
+ * italique, petites capitales). DEUX CANDIDATES SEULEMENT, et ce n'est pas un choix de goût : Adobe
+ * Caslon, FreightBig Pro et Kepler passent par Adobe Fonts, qui interdit l'auto-hébergement et
+ * impose un script depuis use.typekit.net, or la politique de sécurité du contenu
+ * (src/layouts/Base.astro) n'autorise que `'self'`, googletagmanager et trustpilot pour les
+ * scripts, et `'self'` pour les styles. Source Serif 4 et EB Garamond sont sous licence libre (SIL
+ * OFL), variables, hébergées comme Plus Jakarta Sans. HORS MENU, hors plan du site, `noindex`. À
+ * SUPPRIMER une fois le choix fait, avec la fonte non retenue.
  */
 import '@fontsource-variable/source-serif-4';
 import '@fontsource-variable/eb-garamond';
@@ -27,13 +21,12 @@ import Button from '@/components/ui/Button.astro';
 import IconExterne from '@/components/ui/IconExterne.astro';
 
 /**
- * PICTOGRAMMES CANDIDATS pour la mention « Société de gestion agréée par l'AMF » du hero (16/09/2026).
- * Le logo de l'AMF a été retiré la veille : l'AMF ne le concède pas aux communications commerciales, et
- * un signe qui figure l'autorité, près d'une note Trustpilot, se lit comme une caution de cette
- * autorité. Ces six-là sont les nôtres, dessinés au trait, ils ne se confondent avec aucune marque.
- * Grille 24 × 24, trait 1,5, `currentColor` : la convention de ui/Picto.astro.
- * DEUX SONT SIGNALÉS COMME À ÉVITER, et ce n'est pas un avis de goût : le fronton et la balance
- * représentent l'institution et sa fonction, donc l'AMF, ce qui ramène la lecture qu'on vient d'écarter.
+ * Pictogrammes candidats pour la mention « Société de gestion agréée par l'AMF » du hero
+ * (16/09/2026), au trait, grille 24 × 24, trait 1,5, `currentColor` (convention de ui/Picto.astro).
+ * Le logo de l'AMF a été retiré la veille : l'AMF ne le concède pas aux communications
+ * commerciales, et un signe qui figure l'autorité, près d'une note Trustpilot, se lit comme une
+ * caution de cette autorité. Deux sont À ÉVITER pour la même raison, et ce n'est pas un avis de
+ * goût : le fronton et la balance représentent l'institution, donc l'AMF.
  */
 const PICTOS: { id: string; nom: string; note: string; eviter?: true; d: string }[] = [
   {
@@ -77,10 +70,9 @@ const PICTOS: { id: string; nom: string; note: string; eviter?: true; d: string 
 ];
 
 /**
- * LE SYSTÈME DE BOUTONS RETENU (17/09/2026). Le matin, cette page rendait l'inventaire des 22 familles de
- * boutons et de liens du site (167 éléments), pour trier ; l'équipe a tranché sur un artefact de
- * décision, et le site a été ramené à quatre rôles (global.css, « Les quatre rôles de bouton ») et six
- * composants à part. La page montre ce qui reste, rendu avec les vrais utilitaires.
+ * Le système de boutons retenu (17/09/2026, tranché par l'équipe) : quatre rôles (global.css, « Les
+ * quatre rôles de bouton ») et six composants à part. La page montre ce qui reste, rendu avec les
+ * vrais utilitaires.
  */
 
 /** Le libellé exact du hero, pour juger sur pièce et non sur une phrase d'exemple. */
@@ -209,11 +201,10 @@ const TITRES: { niveau: 1 | 2; avant: string; apres: string }[] = [
         <h2 id="titres-title" class="visually-hidden">Les titres, sur fond clair</h2>
         <div class="flex flex-col gap-12 lg:gap-16" data-titres>
           {
-            /*
-             * `set:html` plutôt que du JSX : entre `{t.avant}` et le <span>, Prettier réintroduit un
-             * retour à la ligne, donc une espace, et « R Start . » se lisait avec une espace avant le
-             * point. Les trois morceaux sont des littéraux de ce fichier, rien ne vient de l'extérieur.
-             */
+            /* `set:html` plutôt que du JSX : entre `{t.avant}` et le <span>, Prettier réintroduit
+               un retour à la ligne, donc une espace, et « R Start . » se lisait avec une espace
+               avant le point. Les trois morceaux sont des littéraux de ce fichier, rien ne vient de
+               l'extérieur. */
             TITRES.map((t) => (
               <p
                 class={t.niveau === 1 ? 'text-display-lg text-ink' : 'text-display-md text-ink'}
@@ -438,8 +429,8 @@ const TITRES: { niveau: 1 | 2; avant: string; apres: string }[] = [
 <script>
   /**
    * Les réglages écrivent des propriétés personnalisées sur <html> : aucun rendu n'est recalculé en
-   * JavaScript, c'est la cascade qui fait le travail. Le choix est gardé d'une visite à l'autre, sans
-   * quoi on reperd son réglage à chaque rechargement.
+   * JavaScript, c'est la cascade qui fait le travail. Le choix est gardé d'une visite à l'autre
+   * (localStorage).
    */
   const FONTES: Record<string, string> = {
     pjs: 'inherit',
@@ -501,12 +492,12 @@ const TITRES: { niveau: 1 | 2; avant: string; apres: string }[] = [
 
 <script>
   /**
-   * Réglages des pictogrammes candidats (16/09/2026) : taille, opacité et teinte, appliqués aux six en
- * même temps. LES NOMS SONT PRÉFIXÉS `picto-` : l'essai typographique, plus haut dans la MÊME page,
- * a déjà une commande nommée « teinte », et deux groupes de même nom dans un document sont une
- * erreur html-validate (form-dup-name), en plus d'être ambigus pour les technologies d'assistance.
-   * même temps pour qu'ils se comparent à conditions égales. Rien n'est écrit dans le HTML des SVG, on
-   * ne touche qu'à trois propriétés d'un style en ligne.
+   * Réglages des pictogrammes candidats : taille, opacité et teinte, appliqués aux six en même
+   * temps pour qu'ils se comparent à conditions égales (trois propriétés d'un style en ligne, rien
+   * dans le HTML des SVG). LES NOMS SONT PRÉFIXÉS `picto-` : l'essai typographique, plus haut dans
+   * la MÊME page, a déjà une commande nommée « teinte », et deux groupes de même nom dans un
+   * document sont une erreur html-validate (form-dup-name), ambiguë pour les technologies
+   * d'assistance.
    */
   const initPicto = (): void => {
     const form = document.querySelector<HTMLElement>('[data-reglages-picto]');

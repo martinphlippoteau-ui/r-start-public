@@ -1,26 +1,17 @@
 /**
  * Effets pilotés par la position de défilement (lissage unique SCRUB 0,6, transform/opacity uniquement).
- *
  *  - data-parallax="0.15" : translateY de 0 à −0,15 × hauteur du viewport pendant la traversée du
- *    déclencheur (valeur négative : l'élément « traîne », effet d'arrière-plan).
- *    Option : data-parallax-trigger (sélecteur ou `parent`) ; traversée de `top bottom` à `bottom top`.
+ *    déclencheur (valeur négative : l'élément « traîne »). Option : data-parallax-trigger.
  *  - data-scrub="scale:1,1.08|opacity:1,0" : interpolation from,to par propriété (x, y, xPercent,
- *    yPercent, scale, scaleX, scaleY, rotate, opacity) sur la traversée du viewport.
- *    Options : data-scrub-trigger, data-scrub-start (défaut `top bottom`), data-scrub-end (`bottom top`),
- *    data-scrub-ease (défaut `none`).
- *  - data-curtain : la section recouvre la précédente. Règle d'emploi (11/09/2026) : seulement quand la
- *    section précédente ne contient AUCUN épinglage et quand le contraste le justifie (fond clair → ink).
- *    Trois rideaux au 14/09/2026 : sur l'accueil 01b-Différence sur le hero et 08-Risques sur Souscrire,
- *    sur /strategie le même bloc Risques sur « Comment ». Plus aucune scène épinglée nulle part.
- *    La section précédente est épinglée (sans
- *    espace réservé) quand son bas touche le bas du viewport pendant que la section rideau monte
- *    par-dessus (z-index, coins arrondis et ombre posés par la CSS `[data-curtain]`). Le recul
- *    (scale 0.96 + opacity 0.6) n'est appliqué QUE si la section précédente ne contient aucun
- *    élément protégé (le H1 du hero, en pratique). Sinon, pin + recouvrement seuls (avertissement en
- *    développement). Après le passage, la précédente reste décalée derrière le rideau (comportement
- *    ScrollTrigger sans espace réservé) : la section rideau doit donc mesurer au moins la hauteur du
- *    viewport.
- *
+ *    yPercent, scale, scaleX, scaleY, rotate, opacity) sur la traversée du viewport. Options :
+ *    data-scrub-trigger, data-scrub-start (`top bottom`), data-scrub-end (`bottom top`),
+ *    data-scrub-ease.
+ *  - data-curtain : la section recouvre la précédente, épinglée sans espace réservé quand son bas
+ *    touche le bas du viewport (z-index, coins et ombre par la CSS `[data-curtain]`). Seulement
+ *    quand la précédente ne contient AUCUN épinglage et que le contraste le justifie (clair → ink).
+ *    Le recul (scale 0.96 + opacity 0.6) n'est appliqué QUE si la précédente ne contient aucun
+ *    élément protégé (le H1 du hero). Après le passage, la précédente reste décalée derrière le
+ *    rideau : la section rideau doit mesurer au moins la hauteur du viewport.
  * Refusés sur le H1 et [data-no-motion] ; parallaxe et scrub refusés aussi sur un conteneur qui en
  * contient (ces effets ne rendent jamais l'état final : le contenu y resterait altéré).
  */
@@ -101,15 +92,10 @@ export const setupCurtains = (): void => {
     const prev = section.previousElementSibling as HTMLElement | null;
     if (!prev || prev.matches('nav, header')) return;
     if (!allowed(prev, 'data-curtain (section précédente)')) return;
-    /*
-     * Point de déclenchement RÉGLABLE par la valeur de `data-curtain` (14/09/2026), pour les cas où la
-     * section précédente dépasse la hauteur du viewport. Par défaut `bottom bottom` : l'épinglage part
-     * dès que son bas touche le bas de l'écran, ce qui suppose qu'on l'a lue en entier à ce moment-là,
-     * vrai seulement si elle tient dans un écran. Une section plus haute se fige alors qu'on vient d'y
-     * entrer, et le rideau la recouvre aussitôt. `data-curtain="bottom center"` repousse l'épinglage
-     * jusqu'à ce que son bas atteigne le milieu de l'écran : elle défile normalement d'abord, et le
-     * recouvrement ne dure plus qu'un demi-écran.
-     */
+    /* Point de déclenchement RÉGLABLE par la valeur de `data-curtain` : par défaut `bottom bottom`,
+       ce qui suppose la section précédente lue en entier, vrai seulement si elle tient dans un
+       écran ; `bottom center` repousse l'épinglage d'une section plus haute, sinon figée à peine
+       entrée. */
     const start = section.getAttribute('data-curtain')?.trim() || 'bottom bottom';
     ScrollTrigger.create({
       trigger: prev,

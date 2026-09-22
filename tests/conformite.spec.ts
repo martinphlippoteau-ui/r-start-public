@@ -3,11 +3,9 @@ import { test, expect } from '@playwright/test';
 /** Règles AMF vérifiées dans le DOM rendu (complète scripts/check-compliance.mjs). */
 test.describe('Conformité', () => {
   /**
-   * Audit UX : le hero portait cinq blocs de texte avant ses boutons, qui tombaient sous le bandeau
-   * cookies au premier chargement, le lecteur voyait le produit mais pas comment y souscrire. Les deux
-   * phrases pédagogiques sont descendues dans « Ce qui change vraiment » ; ce test empêche le hero de
-   * regrossir. Les deux tests qui vérifiaient la ligne risques du hero (visible sans défiler, jamais
-   * sous le bandeau cookies) sont partis le 22/09/2026 avec elle.
+   * Le hero a porté cinq blocs de texte avant ses boutons, qui tombaient sous le bandeau cookies au
+   * premier chargement : le lecteur voyait le produit mais pas comment y souscrire. Ce test empêche
+   * le hero de regrossir.
    */
   test('les CTA du hero sont visibles sans scroller', async ({ page }) => {
     await page.goto('/');
@@ -41,9 +39,9 @@ test.describe('Conformité', () => {
    * exposent des frais.
    */
   /**
-   * `requis` : la page DOIT exposer des valeurs de frais. L'accueil ne le fait plus depuis le 11/09/2026
-   * (la section Frais vit sur /frais, atteinte par le CTA « Découvrir les frais ») ; la règle de taille y
-   * reste vérifiée si des valeurs réapparaissent un jour, sans exiger qu'il y en ait.
+   * `requis` : la page DOIT exposer des valeurs de frais. L'accueil n'en expose pas (la section
+   * Frais vit sur /frais) ; la règle de taille y reste vérifiée si des valeurs réapparaissent un
+   * jour.
    */
   for (const { path, requis } of [
     { path: '/', requis: false },
@@ -82,24 +80,15 @@ test.describe('Conformité', () => {
     });
   }
 
-  /*
-   * LE COMPTE EST VÉRIFIÉ SUR /documentation, PLUS SUR L'ACCUEIL, depuis le 16/09/2026.
-   *
-   * L'accueil n'offrait plus aucun PDF : la colonne Documents du pied de page annonce les cinq
-   * documents réglementaires en « bientôt disponible » et le lien vers /documentation a été retiré de
-   * la colonne R Start, à la demande de l'équipe (« dans tous les cas ne rends rien dispo là »).
-   * Le test échouait donc pour une décision, pas pour un défaut.
-   *
-   * CE QU'IL GARANTIT TOUJOURS, et c'est l'essentiel : les documents réglementaires restent servis
-   * quelque part sur le site, et aucun lien PDF du site ne pointe dans le vide. Le seuil de deux est
-   * inchangé, il est seulement demandé à la page qui les sert. L'accueil, lui, n'est plus contraint
-   * d'en porter, mais ses éventuels liens PDF sont toujours vérifiés.
-   *
-   * 2 tant que deux des quatre documents sont retenus dans src/content/fr/documentation.ts
-   * (PENDING_DOCUMENT_KEYS) : les statuts, dont le PDF fourni est tronqué, et le DIC hébergé, qui
-   * classe R Start en 3 sur 7 quand le site affiche 4 sur 7. Remonter ce seuil à chaque document
-   * republié : 3 à la réception du DIC en vigueur, 4 avec les statuts complets.
-   */
+  /* LE COMPTE EST VÉRIFIÉ SUR /documentation, PAS SUR L'ACCUEIL : l'accueil n'offre aucun PDF, à la
+     demande de l'équipe (« dans tous les cas ne rends rien dispo là »), la colonne Documents
+     annonce les cinq documents en « bientôt disponible ».
+     CE QUI EST GARANTI : les documents réglementaires restent servis quelque part sur le site, et
+     aucun lien PDF du site ne pointe dans le vide, ceux de l'accueil compris.
+     Seuil de 2 tant que deux des quatre documents sont retenus dans src/content/fr/documentation.ts
+     (PENDING_DOCUMENT_KEYS) : les statuts, dont le PDF fourni est tronqué, et le DIC hébergé, qui
+     classe R Start en 3 sur 7 quand le site affiche 4 sur 7. Remonter ce seuil à chaque document
+     republié : 3 à la réception du DIC en vigueur, 4 avec les statuts complets. */
   test('les documents réglementaires répondent', async ({ page, request }) => {
     const liens = async (chemin: string): Promise<string[]> => {
       await page.goto(chemin);

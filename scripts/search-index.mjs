@@ -1,28 +1,19 @@
 /**
- * RECHERCHE DU SITE : L'INDEX (17/09/2026). Intégration Astro, déclarée dans astro.config.mjs.
- *
+ * RECHERCHE DU SITE : L'INDEX. Intégration Astro, déclarée dans astro.config.mjs.
  * L'INDEX EST TIRÉ DU HTML PUBLIÉ, pas des fichiers de contenu : c'est ce que le visiteur lit qu'il
- * cherche, et une section ajoutée, déplacée ou renommée entre dans l'index au build suivant sans que
- * personne n'ait à tenir une table de correspondance entre pages et contenus.
- *
- * CE QUI EST INDEXÉ (arbitrage de Martin du 17/09/2026) : les pages du menu (src/config/pages.ts,
- * `menuPages`) et les questions de /faq. Ni /documentation, ni les PDF, ni les pages légales.
- *  - rubrique « Pages » : pour chaque page, son en-tête (le h1 et son introduction, lien vers la page),
- *    puis chacune de ses sections titrées (`<section id>` portant un h2, lien vers la section) ;
- *  - rubrique « Questions » : chaque question de /faq, lien vers son ancre (src/lib/ancre.ts).
- * Les sections FAQ courtes des autres pages sont écartées : leurs questions sont déjà dans la rubrique
- * « Questions ». Une section présente sur plusieurs pages (les risques, les chiffres du groupe) n'est
- * gardée qu'une fois, sur la sous-page plutôt que sur l'accueil : le détail vit sur les sous-pages.
- *
- * CE QUI N'EST PAS LU dans une section : scripts, styles, images, boutons et liens-boutons (« Souscrire
- * en ligne » n'apprend rien), fils d'Ariane et autres <nav>, contenus masqués (`hidden`,
- * `aria-hidden="true"`, `sr-only`).
- * Les segments répétés dans une même section (recto et verso d'une carte retournée) ne comptent qu'une
- * fois.
- *
- * SORTIE : dist/recherche.json, chargé par le panneau à la première ouverture seulement
- * (src/scripts/recherche/panneau.ts). En développement, le même index est construit à la volée à partir des
- * pages servies par le serveur de dev.
+ * cherche, et une section ajoutée ou renommée entre dans l'index au build suivant sans table de
+ * correspondance à tenir.
+ * CE QUI EST INDEXÉ (arbitrage de Martin) : les pages du menu (src/config/pages.ts, `menuPages`) et
+ * les questions de /faq ; ni /documentation, ni les PDF, ni les pages légales. Rubrique « Pages » :
+ * l'en-tête de chaque page (h1 et introduction), puis chaque `<section id>` portant un h2 ;
+ * rubrique « Questions » : chaque question de /faq, avec son ancre (src/lib/ancre.ts). Les sections
+ * FAQ des autres pages sont écartées (déjà dans « Questions »), et une section présente sur
+ * plusieurs pages n'est gardée qu'une fois, sur la sous-page plutôt que sur l'accueil.
+ * CE QUI N'EST PAS LU : scripts, styles, images, boutons et liens-boutons, <nav>, contenus masqués
+ * (`hidden`, `aria-hidden="true"`, `sr-only`). Les segments répétés dans une même section (recto et
+ * verso d'une carte) ne comptent qu'une fois.
+ * SORTIE : dist/recherche.json, chargé par le panneau à la première ouverture seulement. En
+ * développement, le même index est construit à la volée à partir des pages servies par le dev.
  */
 import { promises as fs } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -88,11 +79,9 @@ const ignore = (n, { titre = false } = {}) => {
   );
 };
 
-/**
- * Texte lisible d'un nœud, en segments : un segment par bloc. Les segments identiques ne sont gardés
- * qu'une fois, et ceux qui ne finissent pas une phrase (libellé de chiffre, titre de carte) sont joints
- * par un point médian, pour que l'extrait affiché reste lisible.
- */
+/** Texte lisible d'un nœud, un segment par bloc : les doublons ne sont gardés qu'une fois, et les
+    segments qui ne finissent pas une phrase sont joints par un point médian, pour un extrait
+    lisible. */
 const texte = (racine, { sauf, titre = false } = {}) => {
   const segments = [];
   let courant = '';
@@ -187,8 +176,8 @@ export const construireIndex = (rendus, avecBase) => {
       let rubrique = '';
       for (const li of liste?.children ?? []) {
         if (li.type !== ELEMENT_NODE) continue;
-        /* Sur l'attribut du <li>, et non plus sur le <p> : chaque question porte son libellé depuis le
-           18/09/2026, masqué sauf sur la première de la rubrique, et `texte()` ignore ce qui est masqué. */
+        /* Sur l'attribut du <li>, pas sur le <p> : chaque question porte son libellé, masqué sauf
+           sur la première de la rubrique, et `texte()` ignore ce qui est masqué. */
         if (li.attributes?.['data-rubrique']) rubrique = decoder(li.attributes['data-rubrique']);
         const details = querySelector(li, 'details[data-faq]');
         if (!details?.attributes.id) continue;

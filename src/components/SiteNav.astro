@@ -1,74 +1,27 @@
 ---
 /**
- * Navigation unique du site (plan V2 §1) : une seule barre, collée en haut de page, qui remplace
- * l'ancien couple Header + SubNav. UN SEUL landmark pour la navigation du site (`<nav aria-label>`),
- * qui contient la barre et le panneau plein écran des petits écrans. Une page peut en porter
- * d'autres, chacun nommé : fil d'Ariane, sommaires de /documentation, pied de page.
- *
- * Forme (11/09/2026, demande de l'équipe) : ce n'est plus un bandeau pleine largeur mais une PASTILLE
- * FLOTTANTE, décollée du haut et des bords de `--spacing-nav-gap`, gros rayon (`--radius-nav`),
- * matière « liquid glass » (@utility nav-glass). Elle RECOUVRE le contenu au lieu de le pousser vers le
- * bas (marge basse négative de `--spacing-nav-total`) : l'en-tête sombre de chaque page passe derrière
- * elle. Sans ce recouvrement, la pastille claire était posée sur le fond clair du document, donc
- * invisible, et un bouton Menu blanc l'aurait été aussi (constat du 11/09/2026). Les en-têtes réservent
- * cette hauteur en padding haut. L'écart entre dans `scroll-padding-top` (global.css) et
- * dans le calage de la barre d'ancres de /documentation, pour qu'aucune ancre ne passe dessous.
- * Sur téléphone, le libellé « Menu » est désormais visible à côté du chevron (il était en `sr-only`) :
- * au premier écran de l'accueil, le logo et le CTA sont encore à opacité 0, ils arrivent par le vol
- * d'ouverture, et la barre paraissait vide.
- * SOUS 26 REM, IL REPASSE EN `sr-only` depuis le 17/09/2026 : la loupe de la recherche prend sa place.
- * Logo, loupe, Souscrire et « Menu » en toutes lettres demandaient 380 px sur un Pixel 5 qui en offre
- * 369, et le mot sortait de la pastille. L'icône seule suffit, comme sur apple.com, et la barre n'est
- * plus vide : logo, loupe et CTA arrivent ensemble. Souscrire y perd aussi 8 px de chaque côté, sans
- * quoi rien ne tenait à 360 px.
- *
- * Entrées : uniquement les pages du menu (src/config/pages.ts, `menuPages`), l'accueil excepté, sur
- * toutes les pages, jamais d'ancre de section (décision du 10/09/2026). Aucun libellé en dur :
- * src/config/pages.ts et src/content/fr/nav.ts.
- *
- * Reprise de l'ancienne sous-navigation :
- *  - sur grand écran, la barre passe en grille de trois colonnes (1fr / auto / 1fr) : les entrées sont
- *    CENTRÉES dans la pastille, quelles que soient les largeurs du logo à gauche et du CTA à droite ;
- *    LES DEUX COLONNES LATÉRALES NE DESCENDENT JAMAIS SOUS LEUR CONTENU, et c'est la colonne centrale qui
- *    cède (`minmax(0, auto)`) : depuis le 19/09/2026 la barre porte six entrées, qui ne tiennent pas
- *    entre 1024 et 1180 px. En `1fr / auto / 1fr`, la liste gardait toute sa largeur et ÉCRASAIT le logo
- *    (36 px de large à 1024) avant de buter sur la loupe. Elle défile maintenant avec son fondu, comme
- *    elle était prévue pour le faire, et le logo, la loupe et le CTA restent entiers. `lg:max-w-[calc(100%+1rem)]`
- *    (la colonne, plus les deux marges négatives de 0,5 rem que la liste porte) va avec : centrée dans sa colonne (`justify-self-center`), elle prend la largeur de son
- *    contenu et non celle de la colonne, et débordait encore sans cette borne ;
- *  - liste des pages visible à partir de « lg » seulement (sous ce seuil, un seul menu : le panneau ; la barre
- *    ne garde que le logo, le CTA et le bouton Menu), à défilement horizontal sans barre visible (`scrollbar-none`), avec fondu latéral
- *    (`scroll-fade-x`) posé par le script dès que la liste déborde réellement ;
- *  - pastille glissante (`data-subnav-pill`, transform + width, aucune propriété de mise en page
- *    animée) posée sur la page courante (aria-current="page") ; plus aucun état actif de section
- *    (IntersectionObserver retiré le 10/09/2026 avec les ancres) ;
- *  - CTA compacté au-delà de 40 % du défilement du document (`data-compact-at="0.4"` sur le <nav> →
- *    attribut `data-compact` → CSS `.subnav-cta`, scale 0.92). Géré ici, par le script inline, sans
- *    GSAP : le comportement est le même sur l'accueil et sur les sous-pages (ex-motion/progress.ts).
- * Reprise de l'ancien en-tête :
- *  - logo et CTA (le suffixe « par CORUM L'Épargne » est retiré de la barre depuis le 10/09/2026, à la
- *    demande de l'équipe) ;
- *  - un TIROIR qui entre par la droite (aria-expanded / aria-controls, Échap, piège à focus, retour du
- *    focus sur le bouton, voile cliquable) et liste les mêmes entrées à la verticale. Il ne s'ouvre que
- *    SOUS « lg » : au-delà, les pages sont dans la barre et le bouton Menu est masqué (`lg:hidden`).
- *    Sous 26 rem, le bouton ne montre que ses trois barres, le mot « Menu » reste pour les lecteurs
- *    d'écran.
- *
- * Matière : la barre est PLEINE dès le premier pixel, sur toutes les pages du site (12/09/2026, demande
- * de l'équipe). Elle portait jusque-là un voile propre à l'accueil, transparent au premier écran, le
- * temps que le logo du hero vienne s'y poser ; c'était une coupure d'expérience avec les huit
- * sous-pages, où elle était pleine d'emblée. Rien ne distingue plus une page d'une autre : mêmes
- * entrées, même CTA, même verre, même hauteur.
- * L'ombre n'apparaît qu'une fois la page défilée (`data-stuck` sur la barre).
- *
- * RECHERCHE DU SITE (17/09/2026) : une loupe à gauche de Souscrire, à toutes les largeurs. Elle ouvre
- * le panneau de SiteSearch.astro, posé sous la barre dans la même enveloppe : la pastille s'allonge
- * vers le bas, dans la même matière. La barre passe devant le panneau (`z-20`) et éteint son verre,
- * d'un coup, tant que le panneau est présent (global.css, « Recherche du site ») : un seul verre à la
- * fois, identiques au pixel à l'instant du relais. Le script recopie `data-stuck` sur le panneau.
- * La barre est `sticky` sans filtre : le panneau `fixed` reste bien calé sur le viewport (un
- * `backdrop-filter` sur un ancêtre en ferait le bloc conteneur), d'où la surface vitrée posée sur
- * l'enfant `[data-sitenav-bar]`.
+ * Navigation unique du site : une barre collée en haut, un seul landmark (`<nav aria-label>`) qui
+ * contient la barre et le tiroir plein écran des petits écrans. Pastille flottante
+ * (`--spacing-nav-gap`, `--radius-nav`, @utility nav-glass), pleine dès le premier pixel sur toutes
+ * les pages (12/09/2026, demande de l'équipe), ombre au défilement (`data-stuck`). Elle RECOUVRE le
+ * contenu (marge basse négative `--spacing-nav-total`) et les en-têtes de page réservent cette
+ * hauteur en padding haut : posée sur le fond clair du document, elle était invisible (11/09/2026).
+ * L'écart entre aussi dans `scroll-padding-top` (global.css) et dans la barre d'ancres de
+ * /documentation.
+ * Entrées : les pages du menu (`menuPages`, src/config/pages.ts), l'accueil excepté, jamais d'ancre
+ * de section (10/09/2026) ; aucun libellé en dur (src/content/fr/nav.ts). À partir de « lg », liste
+ * centrée dans une grille `minmax(max-content,1fr) / minmax(0,auto) / minmax(max-content,1fr)` :
+ * les colonnes du logo et du CTA ne cèdent jamais, c'est la liste qui défile (`scrollbar-none`)
+ * sous son fondu (`scroll-fade-x`) ; en `1fr / auto / 1fr`, les six entrées (19/09/2026) écrasaient
+ * le logo entre 1024 et 1180 px, et `lg:max-w-[calc(100%+1rem)]` compense les marges négatives de
+ * la liste. Sous « lg », un tiroir entre par la droite ; sous 26 rem, « Menu » repasse en `sr-only`
+ * et la loupe prend sa place : logo, loupe, Souscrire et le mot demandaient 380 px sur un Pixel 5
+ * qui en offre 369 (17/09/2026).
+ * Recherche (17/09/2026) : la loupe ouvre SiteSearch.astro, posé sous la barre dans la même
+ * enveloppe. La barre passe devant (`z-20`) et éteint son verre tant que le panneau est présent
+ * (global.css, « Recherche du site ») : un seul verre à la fois. Le verre est sur
+ * `[data-sitenav-bar]` et non sur le <nav> `sticky` : un `backdrop-filter` sur un ancêtre ferait de
+ * lui le bloc conteneur du panneau `fixed`.
  */
 import { Image } from 'astro:assets';
 import brandLogo from '@/assets/logos/r-start-couleur.svg';
@@ -94,11 +47,9 @@ interface Entry {
 }
 
 /**
- * Le menu ne contient que des pages (décision du 10/09/2026), jamais d'ancre de section.
- * L'ACCUEIL en est retiré (12/09/2026, demande de l'équipe) : le logo de la barre y mène déjà, une
- * entrée de plus ferait doublon et volerait une place aux quatre autres. Le filtre est ICI et non dans
- * `menuPages` : le pied de page et la page 404 construisent leur liste à partir de la même source et
- * n'ont, eux, pas de logo cliquable, ils gardent donc leur lien vers l'accueil.
+ * L'accueil est retiré ICI et non dans `menuPages` (12/09/2026, demande de l'équipe) : le logo de
+ * la barre y mène déjà, alors que le pied de page et la page 404, bâtis sur la même source, n'ont
+ * pas de logo cliquable et gardent leur lien vers l'accueil.
  */
 const entries: Entry[] = menuPages
   .filter((p) => p.key !== 'home')
@@ -118,11 +69,9 @@ const closeLabel = nav.closeLabel ?? menuLabel;
 const menuAriaLabel = nav.menuAriaLabel ?? nav.brand;
 const homeLinkLabel = nav.homeLinkLabel ?? nav.brand;
 const ctaLabel = nav.subnavCtaLabel ?? nav.cta.label;
-/* 16 px depuis le 15/09/2026, ex-`text-lg` (18 px) : quatre entrées plus le bouton tenaient à l'étroit
-   dans la barre, et les liens pesaient autant que le corps de texte des pages. Les liens du TIROIR
-   suivent, eux qui étaient en `text-display-sm` (20 à 24 px) : un seul corps pour le même menu.
-   Leur cible tactile ne bouge pas, `py-2.5` plus une interligne de 24 px font exactement les 44 px
-   exigés. */
+/* 16 px (15/09/2026), ex-`text-lg` : quatre entrées plus le bouton tenaient à l'étroit, et les
+   liens pesaient autant que le corps de texte des pages. Les liens du TIROIR suivent, un seul corps
+   pour le même menu ; leur cible tactile reste à 44 px (`py-2.5` plus une interligne de 24 px). */
 const linkClass =
   'block rounded-full px-2.5 py-1.5 text-base font-medium whitespace-nowrap text-slate-700 no-underline transition-colors hover:text-navy aria-[current]:font-semibold aria-[current]:text-navy sm:px-3.5';
 ---
@@ -136,11 +85,11 @@ const linkClass =
   <div class="mx-auto w-full max-w-7xl px-3 sm:px-5">
     {
       /* `view-transition-name` : le navigateur extrait cette pastille des deux captures de page et
-        l'anime à part. Aux mêmes coordonnées d'une page à l'autre, elle ne bouge donc pas et ne
-        clignote pas. Le nom est ici et non sur le <nav>, qui porte aussi le tiroir en `position: fixed`
-        (un élément capturé devient le bloc conteneur de ses descendants fixes). */
+        l'anime à part, donc immobile d'une page à l'autre. Le nom est ici et non sur le <nav>, qui
+        porte aussi le tiroir `fixed` (un élément capturé devient le bloc conteneur de ses
+        descendants fixes). */
     }
-    {/* Enveloppe de la barre et du panneau de recherche, qui se pose dessous (SiteSearch.astro). */}
+    {/* Enveloppe de la barre et du panneau de recherche, posé dessous (SiteSearch.astro). */}
     <div class="relative">
     <div
       data-sitenav-bar
@@ -170,11 +119,11 @@ const linkClass =
         role="list"
       >
         {
-          /* Deux éléments et non un : l'enveloppe porte le DÉPLACEMENT (translateX, posé en ligne par
-            le script), la peau porte l'ÉTIREMENT (scaleX, une animation). Sur un seul élément les deux
-            se disputeraient la propriété `transform`, et la dernière écrirait par-dessus l'autre.
-            `view-transition-name` sur l'enveloppe : d'une page à l'autre, le navigateur interpole
-            lui-même ses coordonnées, la pastille glisse du lien quitté vers le nouveau. */
+          /* Deux éléments et non un : l'enveloppe porte le DÉPLACEMENT (translateX, posé en ligne
+            par le script), la peau porte l'ÉTIREMENT (scaleX, une animation) ; sur un seul
+            élément, les deux se disputeraient `transform`. `view-transition-name` sur
+            l'enveloppe : d'une page à l'autre, le navigateur interpole lui-même ses coordonnées,
+            la pastille glisse du lien quitté vers le nouveau. */
         }
         <li
           aria-hidden="true"
@@ -200,13 +149,11 @@ const linkClass =
         }
       </ul>
 
-      {
-        /* Sous « lg », la liste est masquée : un seul menu (le panneau), le CTA reste visible et pousse à droite. */
-      }
+      {/* Sous « lg », la liste est masquée : loupe et CTA restent visibles, poussés à droite. */}
       <div class="ml-auto flex shrink-0 items-center gap-1 lg:ml-0 lg:justify-self-end">
-        {/* LOUPE (17/09/2026) : ouvre la recherche du site. Affichée seulement si les scripts
-          s'exécutent (`recherche-loupe`, global.css), sans rien à retirer au chargement. L'icône passe
-          de la loupe à la croix quand le panneau est ouvert. */}
+        {/* Loupe : ouvre la recherche du site. Affichée seulement si les scripts s'exécutent
+          (`recherche-loupe`, global.css) ; l'icône passe à la croix quand le panneau est
+          ouvert. */}
         <button
           type="button"
           data-recherche-ouvrir
@@ -240,15 +187,11 @@ const linkClass =
             <path d="M5 5l10 10M15 5 5 15"></path>
           </svg>
         </button>
-        {/* AGRANDI LE 15/09/2026 : `sm` (40 px de haut) devient `md` (48 px). La barre en fait 56,
-          il reste donc 4 px de part et d'autre, et la contraction au défilement (scale 0.92,
-          utilitaire `subnav-cta`) le ramène à 44 px, toujours au-dessus des 44 px de cible tactile.
-          RETRAIT DROIT ÉGALISÉ (15/09/2026) : la barre porte `lg:pr-[3px]`, soit exactement les 3 px
-          qu'on relève en haut et en bas. Trois et non quatre : le bouton mesure 50 px et non 48, il
-          porte un filet d'un pixel, et (56 - 50) / 2 fait 3. et le bouton se pose dans la barre comme une pastille dans une pastille,
-          les deux étant à rayon plein. Le resserrement ne vaut QU'À PARTIR DE `lg` : en dessous, ce
-          n'est pas le CTA qui borde la barre à droite mais le bouton du menu, plus petit (40 px), qui
-          demande son propre retrait. */}
+        {/* Taille `md` (48 px) dans une barre de 56 : 4 px de part et d'autre, et la contraction au
+          défilement (scale 0.92, `subnav-cta`) le ramène à 44 px, la cible tactile minimale.
+          `lg:pr-[3px]` sur la barre égalise le retrait droit : le bouton mesure 50 px avec son
+          filet, (56 - 50) / 2 fait 3. À partir de `lg` seulement : en dessous, c'est le bouton
+          Menu (40 px) qui borde la barre, avec son propre retrait. */}
         <Button position={nav.cta.position} variant="primary" size="md" class="subnav-cta px-7 max-[26rem]:px-5">{ctaLabel}</Button>
       </div>
 
@@ -358,11 +301,7 @@ const linkClass =
 </nav>
 
 <script>
-  /*
-   * Barre unique : pastille sur la page courante, fondu de débordement, ombre au défilement, CTA
-   * compact au-delà de 40 % du document, panneau plein écran sous « lg ». Aucune dépendance au moteur
-   * d'animation : identique sur toutes les pages.
-   */
+  /* Aucune dépendance au moteur d'animation : la barre se comporte de même sur toutes les pages. */
   import { deverrouiller, verrouiller } from '@/scripts/verrou';
 
   const root = document.querySelector<HTMLElement>('[data-sitenav]');
@@ -373,11 +312,8 @@ const linkClass =
     /* La pastille marque la page courante (le menu ne contient que des pages). */
     const currentLink = list?.querySelector<HTMLAnchorElement>('a[aria-current="page"]') ?? null;
 
-    /*
-     * Pastille : position et taille d'un lien (lectures groupées, puis écritures).
-     * Sans argument, elle se cale sur la page courante ; avec, sur le lien visé, ce qui sert au retour
-     * visuel immédiat du clic.
-     */
+    /* Pastille : position et taille d'un lien (lectures groupées, puis écritures). Sans argument,
+       la page courante ; avec, le lien visé, pour le retour visuel immédiat du clic. */
     const placePill = (cible: HTMLAnchorElement | null = currentLink) => {
       if (!pill) return;
       if (!cible) {
@@ -404,15 +340,11 @@ const linkClass =
       }
     };
 
-    /*
-     * Retour visuel AU CLIC, avant même que la page suivante réponde : la pastille part vers le lien
-     * visé et s'étire dans le sens du trajet. La transition de vue reprend ensuite le mouvement là où
-     * il en est, les deux visent le même point, le glissement se lit d'une seule pièce.
-     *
-     * Clics rapides à la suite : l'étirement est relancé en le RETIRANT puis en le reposant après un
-     * reflow forcé, sans quoi le navigateur ignore une animation déjà en cours. Rien ne s'empile : le
-     * déplacement est une transition, elle repart toujours de la position réelle du moment.
-     */
+    /* Retour visuel AU CLIC, avant que la page suivante réponde : la pastille part vers le lien
+       visé et s'étire dans le sens du trajet ; la transition de vue reprend le mouvement là où il
+       en est. Clics rapides : l'étirement est relancé en le RETIRANT puis en le reposant après un
+       reflow forcé, sans quoi le navigateur ignore une animation déjà en cours ; le déplacement,
+       lui, est une transition et repart toujours de la position réelle. */
     const skin = pill?.querySelector<HTMLElement>('[data-subnav-pill-skin]') ?? null;
     let etirement = 0;
     const glisserVers = (lien: HTMLAnchorElement) => {
@@ -434,10 +366,8 @@ const linkClass =
       glisserVers(lien);
     });
 
-    /*
-     * Retour arrière du navigateur : la page revient du cache (bfcache) avec son indicateur là où il
-     * était au départ. `pageshow` le remet sur le lien courant de CETTE page.
-     */
+    /* Retour arrière : la page revient du bfcache avec l'indicateur là où il était au départ ;
+       `pageshow` le remet sur le lien courant de CETTE page. */
     window.addEventListener('pageshow', () => placePill());
 
     /* Fondu latéral : uniquement quand la liste déborde réellement. */
@@ -445,11 +375,9 @@ const linkClass =
       if (list) list.toggleAttribute('data-overflow', list.scrollWidth - list.clientWidth > 1);
     };
 
-    /*
-     * Ombre portée dès que la page est défilée (la barre est collée en haut dès le premier écran) et
-     * CTA compact une fois passé le seuil `data-compact-at` (part du défilement total du document,
-     * 0,4 par défaut ; l'attribut est retiré en remontant). Une seule lecture de scroll par frame.
-     */
+    /* Ombre dès que la page est défilée, CTA compact passé le seuil `data-compact-at` (part du
+       défilement total du document, 0,4 par défaut ; l'attribut est retiré en remontant). Une seule
+       lecture de scroll par frame. */
     const compactAt = Math.min(1, Math.max(0, parseFloat(root.dataset.compactAt ?? '') || 0.4));
 
     let scrollFrame = 0;
@@ -499,14 +427,12 @@ const linkClass =
           )
         ).filter((el) => !el.hidden && el.offsetParent !== null);
 
-      /*
-       * Tiroir (11/09/2026) : le panneau entre par la DROITE. `hidden` le retire de l'arbre quand il est
-       * fermé, c'est ce qui le sort du parcours au clavier, mais il doit être présent AVANT que le
-       * glissement commence : on l'affiche, on force un calcul de mise en page pour que le navigateur
-       * enregistre la position fermée, puis on pose `data-open`. À la fermeture, l'inverse : on retire
-       * `data-open`, on laisse glisser, on masque à la fin. L'état ouvert se lit sur `data-open`, jamais
-       * sur `hidden`, qui reste faux pendant toute la sortie.
-       */
+      /* Tiroir : le panneau entre par la DROITE. `hidden` le sort du parcours clavier quand il est
+         fermé, mais il doit être présent AVANT que le glissement commence : on l'affiche, on force
+         un calcul de mise en page pour que le navigateur enregistre la position fermée, puis on
+         pose `data-open`. À la fermeture, l'inverse : on retire `data-open`, on laisse glisser, on
+         masque à la fin. L'état ouvert se lit sur `data-open`, jamais sur `hidden`, qui reste faux
+         pendant toute la sortie. */
       const CLOSE_MS = 420;
       let hideTimer = 0;
       const isOpen = () => panel.dataset.open !== undefined;
@@ -521,9 +447,9 @@ const linkClass =
         void panel.offsetWidth;
         panel.dataset.open = '';
         opener.setAttribute('aria-expanded', 'true');
-        /* La page ne défile plus derrière le tiroir, mais elle garde sa barre de défilement : le tiroir,
-           lui, garde la sienne (voir src/scripts/verrou.ts, et le « carré » du 17/09/2026). */
-        /* Troisième argument : la barre devient inerte elle aussi, le tiroir la recouvre. */
+        /* La page ne défile plus derrière le tiroir mais garde sa barre de défilement
+           (src/scripts/verrou.ts) ; troisième argument : la barre devient inerte elle aussi, le
+           tiroir la recouvre. */
         verrouiller(panel, panel.querySelector<HTMLElement>('[data-menu-drawer]'), [bar]);
         /* Le bouton « Fermer », pas le voile : `[data-menu-close]:not(a)` attrapait le <div> du voile,
            qui n'est pas focalisable. Le focus restait alors sur le bouton Menu, donc hors du dialogue,
@@ -536,10 +462,10 @@ const linkClass =
         delete panel.dataset.open;
         opener.setAttribute('aria-expanded', 'false');
         deverrouiller(panel);
-        /* `preventScroll` : le bouton Menu vit dans la barre COLLANTE, et rendre le focus à un élément
-           collant fait défiler la page jusqu'à sa position statique, c'est-à-dire tout en haut. Sur une
-           page défilée, fermer le tiroir par Échap ramenait donc le visiteur au sommet (repéré le
-           18/09/2026 par le nouveau test du tiroir ; le défaut précède la recherche). */
+        /* `preventScroll` : le bouton Menu vit dans la barre COLLANTE, et rendre le focus à un
+           élément collant fait défiler la page jusqu'à sa position statique, tout en haut : fermer
+           le tiroir par Échap ramenait le visiteur au sommet (repéré le 18/09/2026 par le test du
+           tiroir). */
         if (restoreFocus) opener.focus({ preventScroll: true });
         window.clearTimeout(hideTimer);
         hideTimer = window.setTimeout(() => {
@@ -553,8 +479,8 @@ const linkClass =
         const target = e.target as HTMLElement | null;
         /* « Souscrire en ligne » du tiroir, tunnel fermé : la fenêtre « bientôt » va s'ouvrir
            (SubscribeSoon.astro, écouteur sur `document`, donc après celui-ci). Le tiroir se ferme
-           d'abord et rend le focus au bouton Menu : c'est là que le navigateur le rendra quand la
-           fenêtre se fermera, au lieu de le perdre sur un lien du tiroir masqué. */
+           d'abord et rend le focus au bouton Menu, où le navigateur le rendra à la fermeture de la
+           fenêtre. */
         if (
           target?.closest('[data-cta="souscrire"]') &&
           document.body.dataset.souscriptionOuverte !== 'oui'
@@ -593,9 +519,9 @@ const linkClass =
         }
       });
 
-      /* AUCUNE FERMETURE FORCÉE AU CHANGEMENT DE LARGEUR. Le tiroir ne s'ouvre que sous « lg » (le
-         bouton Menu porte `lg:hidden`), mais ouvert sur une tablette qu'on fait pivoter il reste ouvert
-         et entier : il se ferme comme partout, par son bouton, le voile ou Échap. */
+      /* Aucune fermeture forcée au changement de largeur : ouvert sur une tablette qu'on fait
+         pivoter, le tiroir reste ouvert et entier ; il se ferme comme partout, par son bouton, le
+         voile ou Échap. */
     }
   }
 </script>

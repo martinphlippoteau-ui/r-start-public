@@ -8,49 +8,29 @@ import {
 } from '@/content/fr/legal';
 
 /**
- * Section « Risques » (id : risques).
- * Contre-poids global de la page : même poids visuel que les sections avantages (fond ink, même
- * typographie). Quatre risques depuis le 16/09/2026 (voir `items`). L'avertissement du bulletin in
- * extenso, celui du DIC et les trois puces de la commission d'arbitrage, reproduits à l'identique
- * depuis legal.ts, sont aussi dans ce contenu, mais la section ne les rend plus depuis le
- * 11/09/2026 : c'est MandatoryWarnings.astro qui les lit ici, sur /documentation.
+ * Section « Risques » (id : risques), contre-poids global de l'accueil : même poids visuel que les
+ * sections avantages (fond ink, même typographie), et c'est cette égalité qui est contrôlée. Quatre
+ * risques repris de corum.fr (voir `items`). L'avertissement du bulletin in extenso, celui du DIC
+ * et les trois puces de la commission d'arbitrage, importés de legal.ts à l'identique, sont aussi
+ * dans ce contenu : la section ne les rend pas, MandatoryWarnings.astro les lit sur /documentation.
  */
 
 /*
- * Type DÉCLARÉ et non `satisfies` depuis le 15/09/2026 : `intro` est devenue facultative et absente
- * de ce contenu. Avec `satisfies`, le type déduit est celui du littéral, et le composant qui lit
- * `risks.intro` ne compilait plus. L'annotation garde le contrôle du littéral et expose le champ.
+ * Type DÉCLARÉ et non `satisfies` : `intro` est facultative et absente d'ici ; avec `satisfies`, le
+ * type déduit est celui du littéral, et le composant qui lit `risks.intro` ne compilait plus.
  */
 export const risks: RisksContent = {
   /** « R Start » en espace insécable : le nom de marque ne se coupe jamais dans le H2 (mobile 375 px). */
   title: 'Investir dans R Start comporte des risques.',
-  /*
-   * INTRODUCTION RETIRÉE LE 15/09/2026, demande de l'équipe. Elle disait :
-   * « Ces risques ont le même poids que les avantages présentés sur cette page. Ils s'appliquent à tout
-   * investissement dans R Start, quel que soit le montant. Prenez le temps de les lire avant de
-   * souscrire. »
-   * Aucun contrôle ne l'exigeait, ni check-compliance.mjs ni conformite.spec.ts : elle disait en mots ce
-   * que la page fait déjà en structure, les six risques étant rendus au même poids typographique que les
-   * avantages. Ce qui est contrôlé, c'est cette égalité-là, et elle ne bouge pas.
-   * Pour la rétablir : remettre le champ `intro` ici, il reste facultatif dans le type.
-   */
+  /* Introduction retirée le 15/09/2026, demande de l'équipe : elle disait en mots ce que la page
+     fait en structure. Le champ `intro` reste facultatif dans le type. */
 
   /*
-   * LES QUATRE PREMIERS RISQUES SONT REPRIS DE corum.fr (16/09/2026, demande de l'équipe). La source est
-   * la page de CORUM XL, et non celle de CORUM USA que l'équipe avait d'abord transmise : XL est la
-   * seule SCPI du groupe dont le profil correspond à celui de R Start, un patrimoine européen qui sort
-   * de la zone euro, donc les quatre mêmes rubriques dont le risque de devise. La page de CORUM USA
-   * parle d'« exposition majoritaire au marché américain » et du « cours du dollar », que R Start n'a
-   * ni l'un ni l'autre : son DIC la situe dans les pays du Conseil de l'Europe et au Canada.
-   *
-   * CE QUI EST REPRIS : les intitulés et la construction des phrases, mot pour mot quand le sens le
-   * permet. CE QUI EST ADAPTÉ : le nom de la SCPI, et la géographie, qui est celle du DIC de R Start.
-   *
-   * LES DEUX DERNIERS RISQUES NE VIENNENT PAS DE corum.fr et sont PROPRES À R START : l'effet de levier
-   * et l'absence d'historique (souscriptions ouvertes le 20 mai 2026). Les SCPI de corum.fr sont
-   * établies depuis des années, elles n'ont pas le second, et c'est précisément ce qui distingue
-   * R Start d'elles. Ils avaient donc été gardés ; l'équipe a choisi le même jour de s'en tenir aux
-   * quatre de corum.fr, et ils ont été retirés (voir en fin de liste).
+   * Les quatre risques sont repris de corum.fr (16/09/2026, demande de l'équipe), de la page de
+   * CORUM XL et non de CORUM USA d'abord transmise : XL est la seule SCPI du groupe au profil de R
+   * Start, un patrimoine européen qui sort de la zone euro, donc les mêmes rubriques dont le risque
+   * de devise. Intitulés et phrases repris mot pour mot quand le sens le permet ; le nom de la SCPI
+   * et la géographie sont ceux du DIC de R Start.
    */
   items: [
     {
@@ -73,24 +53,12 @@ export const risks: RisksContent = {
         'La variation du cours des devises implique un risque de perte en capital et des fluctuations potentielles dans les revenus distribués. R Start peut investir hors zone euro, notamment au Canada, et n’aura pas recours à une couverture systématique du risque de change.',
     },
     /*
-     * EFFET DE LEVIER ET ABSENCE D'HISTORIQUE RETIRÉS le 16/09/2026, demande de l'équipe. La section
-     * s'en tient donc aux quatre rubriques de corum.fr. Ils disaient :
-     *  - « Effet de levier : R Start peut emprunter jusqu'à [risk.maxLeverage] de la valeur d'expertise
-     *    de ses immeubles. L'endettement amplifie les variations de valeur, à la hausse comme à la
-     *    baisse, et accroît le risque de perte. » ;
-     *  - « Absence d'historique : R Start a ouvert ses souscriptions le [openingDate]. Elle n'a pas
-     *    encore d'historique propre. Les résultats passés des autres SCPI CORUM ne préjugent pas de ses
-     *    résultats futurs. »
-     *
-     * CE QUE LE SECOND EMPORTE, et la Conformité doit le savoir : c'était la SEULE occurrence de
-     * « ne préjugent pas » sur l'accueil. scripts/check-compliance.mjs y signale une allégation de
-     * performance passée sur des SCPI tierces « sans la mention que les performances passées ne
-     * préjugent pas des performances futures » : l'avertissement portait déjà. Sur l'accueil, la
-     * mention ne subsiste que dans l'explication dépliable de la carte « Horizon d'investissement »
-     * (highlights.ts, texte de l'équipe du même jour), repliée par défaut mais présente dans le
-     * HTML. Ailleurs, elle reste sur /a-propos, sous la gamme en chiffres ; elle a quitté /presse
-     * avec l'avertissement de la revue (16/09/2026), et /strategie ne la porte pas.
-     * Les deux textes sont ci-dessus, une minute pour les rétablir.
+     * EFFET DE LEVIER ET ABSENCE D'HISTORIQUE, propres à R Start, RETIRÉS le 16/09/2026 à la
+     * demande de l'équipe, qui s'en tient aux quatre de corum.fr. Le second était la SEULE
+     * occurrence de « ne préjugent pas » sur l'accueil, où scripts/check-compliance.mjs signale une
+     * allégation de performance passée sur des SCPI tierces sans cette mention ; elle ne subsiste
+     * que dans l'explication dépliable de la carte « Horizon d'investissement » (highlights.ts),
+     * repliée par défaut mais présente dans le HTML, et sur /a-propos sous la gamme en chiffres.
      */
   ],
 

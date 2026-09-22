@@ -1,11 +1,10 @@
 ---
 /**
- * Page d'accueil : SiteNav collée en haut → main#contenu (sections de la trame, voir HOME_ORDER ;
- * plus de Notes depuis le 14/09/2026) → Footer. Les sections viennent de
- * src/components/sections/NN-Nom.astro ; l'ordre est celui de HOME_ORDER, qui fait foi
- * (src/config/sections.ts ne donne plus que les ancres). Métadonnées et JSON-LD depuis seo.ts,
- * legal.ts, facts.ts et faq.ts via src/lib/seo.ts (rien en dur).
- * Plus d'image de fond dans le hero depuis le 11/09/2026 : aucun préchargement d'image (le LCP est le logo ou l'accroche).
+ * Page d'accueil : SiteNav collée en haut → main#contenu (sections de la trame, HOME_ORDER) →
+ * Footer. Les sections viennent de src/components/sections/NN-Nom.astro ; l'ordre est celui de
+ * HOME_ORDER, qui fait foi (src/config/sections.ts ne donne que les ancres). Métadonnées et JSON-LD
+ * depuis seo.ts, legal.ts, facts.ts et faq.ts via src/lib/seo.ts (rien en dur). Aucun préchargement
+ * d'image : le hero n'a pas d'image de fond, le LCP est le logo ou l'accroche.
  */
 import Base from '@/layouts/Base.astro';
 import TrustpilotScript from '@/components/TrustpilotScript.astro';
@@ -30,20 +29,12 @@ const all = Object.entries(modules)
   .sort(([a], [b]) => a.localeCompare(b))
   .map(([path, mod]) => ({ path, Component: mod.default }));
 /**
- * Trame de l'accueil, par préfixe de fichier. HOME_ORDER ci-dessous fait foi, dans cet ordre exact :
- * 01 Hero → 01b Qui a envie de payer avant de gagner ? → 02 R Start en un clin d'œil
- * → 03 Comparateur de frais → 07 Le groupe CORUM en quelques chiffres → 03a Immeuble
- * (illustration pleine largeur) → 06 Souscrire (chapitre court) → 08 Risques → 10 FAQ.
- *
- * PLUS AUCUNE SECTION N'EXISTE SANS ÊTRE RENDUE : 05 Revenus, 08b La presse en parle et 09
- * Documents, restées hors de HOME_ORDER, ont été supprimées le 15/09/2026 (commit deec83a), avec
- * l'ancienne 03-Fees ; 03 Frais est revenue le même jour sous la forme de 03-Frais.astro.
- * 04 Stratégie, seul fichier du dossier absent de HOME_ORDER, est importée directement par
- * /strategie.
+ * Trame de l'accueil, par préfixe de fichier ; HOME_ORDER fait foi, dans cet ordre exact : 01 Hero
+ * → 01b Qui a envie de payer avant de gagner ? → 02 R Start en un clin d'œil → 03 Comparateur de
+ * frais (revenu le 15/09/2026 juste après 02, les tons s'enchaînant ink, white, white) → 07 Le
+ * groupe CORUM en quelques chiffres → 03a Immeuble → 06 Souscrire → 08 Risques → 10 FAQ. Aucune
+ * section n'existe sans être rendue, sauf 04 Stratégie, importée directement par /strategie.
  */
-/* « 03- » réinséré le 15/09/2026, JUSTE APRÈS « 02- » (« R Start en un clin d'œil ») : le
-   comparateur de frais revient sur l'accueil. Les tons s'enchaînent ink puis white puis white,
-   aucune rupture. */
 const HOME_ORDER = ['01-', '01b-', '02-', '03-', '07-', '03a-', '06-', '08-', '10-'];
 const byPrefix = (prefix: string) => all.find((s) => s.path.includes('/sections/' + prefix));
 const hero = byPrefix('01-');
@@ -72,8 +63,7 @@ const jsonLd = [
 >
   {
     /* Script d'amorçage des TrustBox Trustpilot : une seule fois, dans le <head> (consigne de
-      Trustpilot). Les pages qui portent un widget le chargent, l'accueil et /a-propos (le carrousel
-      d'avis y vit depuis le 15/09/2026) ; les autres non. */
+      Trustpilot). Seules les pages qui portent un widget le chargent, l'accueil et /a-propos. */
   }
   <TrustpilotScript slot="head" />
   {
@@ -86,16 +76,16 @@ const jsonLd = [
     {hero && <hero.Component />}
     {rest.map(({ Component }) => <Component />)}
     {
-      /* PLUS DE SECTION « Notes et sources » NI D'APPELS DE NOTE (14/09/2026, demande de l'équipe) ;
-        les notes elles-mêmes ont quitté le code le 22/09/2026 (archivées hors du dépôt, .claude/audits). */
+      /* Plus de section « Notes et sources » ni d'appels de note (14/09/2026, demande de l'équipe ;
+        archivés hors du dépôt, .claude/audits). */
     }
   </main>
   {
-    /* Pastille d'appel flottante : au niveau de la page, jamais dans une section, les sections de
-      l'accueil sont épinglées au défilement, et un ancêtre transformé capturerait un enfant `fixed`. */
+    /* Pastilles d'appel flottantes : au niveau de la page, jamais dans une section (les sections de
+      l'accueil sont épinglées au défilement, un ancêtre transformé capturerait un enfant `fixed`).
+      `href` SANS `withBase` : StickyCta le pose lui-même, et l'appliquer des deux côtés doublait
+      le préfixe en production (voir src/lib/href.ts). */
   }
-  {/* `href` SANS `withBase` : StickyCta le pose lui-même, et l'appliquer des deux côtés doublait le
-    préfixe en production (« /r-start-public/r-start-public/frais »). Voir src/lib/href.ts. */}
   <StickyCta
     label={difference.cta.label}
     href={difference.cta.href}

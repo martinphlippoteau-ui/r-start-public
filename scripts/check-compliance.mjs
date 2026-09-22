@@ -31,10 +31,9 @@ const norm = (s) =>
     .replace(/\s+/g, ' ')
     .trim();
 /**
- * Retire les citations de tiers (titres d'articles, extraits) avant le contrôle des formulations
- * interdites : ce sont des propos rapportés, marqués `data-press-quote` dans le HTML (plan §5).
- * L'avertissement de la page « La presse en parle » qui les couvrait a été retiré le 16/09/2026 ;
- * son absence est signalée à chaque exécution. Tout le reste de la page reste contrôlé.
+ * Retire les citations de tiers (propos rapportés, marqués `data-press-quote`) avant le contrôle
+ * des formulations interdites. L'avertissement qui les couvrait n'existe plus ; son absence est
+ * signalée à chaque exécution. Tout le reste de la page reste contrôlé.
  */
 const stripPressQuotes = (html) =>
   html.replace(/<([a-z]+)[^>]*\sdata-press-quote[^>]*>[\s\S]*?<\/\1>/gi, ' ');
@@ -65,14 +64,9 @@ const FORBIDDEN = [
     // croire qu'il n'y a aucun frais.
     allow:
       /n'est pas une scpi sans frais|frais de souscription|sans frais d['’](entrée|acquisition)/i,
-    /*
-     * Forme RAPPORTÉE : « … dites « sans frais » ». Le mot « dites » et les guillemets nomment une
-     * catégorie employée par le marché, ils n'affirment rien. C'est la formulation de la brochure pour
-     * désigner les SCPI sans commission de souscription.
-     * L'exemption est étroite à dessein : elle ne vaut que collée à « dites », et seulement si la page
-     * explique ailleurs ce que la catégorie recouvre (`requires`). Sans cette explication, l'exemption
-     * tombe et l'occurrence redevient une erreur, car plus rien ne protégerait le lecteur.
-     */
+    /* Forme RAPPORTÉE : « … dites « sans frais » » nomme une catégorie du marché (formulation de la
+       brochure), sans rien affirmer. Exemption étroite à dessein : collée à « dites », et seulement
+       si la page explique ailleurs ce que la catégorie recouvre (`requires`) ; sinon, erreur. */
     reported: /\bdites\s*[«"“]\s*$/i,
     requires: /ne prélève pas de frais de souscription/i,
   },
@@ -80,11 +74,9 @@ const FORBIDDEN = [
   {
     re: /\bgaranti(e|s|es)?\b/gi,
     label: '« garanti »',
-    /*
-     * « ne peut pas être garantie » ajouté le 16/09/2026 : la règle vise les PROMESSES de garantie, et
-     * cette tournure en est la négation, mais aucune des formes admises ne la couvrait (« pas garanti »
-     * suppose les deux mots accolés, ici « être » s'intercale). Faux positif, pas un assouplissement.
-     */
+    /* « ne peut pas être garantie » est admis : la règle vise les PROMESSES de garantie, et « pas
+       garanti » ne couvrait pas cette négation (« être » s'intercale). Faux positif, pas un
+       assouplissement. */
     allow:
       /(non|pas|aucune|ni)\s+(de\s+)?garanti|ne (sont|est) pas garanti|ne (peut|peuvent) pas être garanti|ne garantit pas|aucune garantie|sans garantie|n'offrent aucune garantie|ne présagent|garantie en capital/i,
   },
@@ -97,30 +89,16 @@ const FORBIDDEN = [
   { re: /meilleures? scpi/gi, label: '« meilleure SCPI »' },
   { re: /en toute confiance/gi, label: '« en toute confiance »' },
   {
-    /*
-     * INDICATEURS DE PERFORMANCE. La règle existe parce que R Start N'EN A AUCUN : la SCPI n'a pas
-     * d'historique, et une communication commerciale ne peut pas en laisser espérer un.
-     *
-     * EXEMPTION DE /a-propos, posée le 16/09/2026 avec le carrousel de la gamme (contenu fourni par
-     * l'équipe). Cette page, et elle seule, publie les chiffres des QUATRE AUTRES SCPI DU GROUPE :
-     * TRI depuis la création, objectif de TRI pour CORUM USA, taux de distribution 2025, indicateur de
-     * risque, minimum d'investissement. Ce sont des performances réalisées par d'autres produits,
-     * chacune accompagnée de sa définition intégrale et précédée de la mention réglementaire sur les
-     * performances passées (src/content/fr/corumRange.ts).
-     *
-     * L'EXEMPTION VAUT POUR LA PAGE, PAS POUR R START. Aucun de ces chiffres ne porte sur R Start, et
-     * la page ne doit jamais lui en attribuer un : c'est le point à surveiller à chaque relecture,
-     * puisque la règle ne le verra plus. Toutes les autres pages restent couvertes.
-     *
-     * SECONDE EXEMPTION, /simulateur, posée le 19/09/2026 avec la page (demande de Martin). Le
-     * simulateur ne peut pas se passer du mot : son curseur EST un taux de distribution, celui que le
-     * visiteur choisit de tester. La règle ne tombe pas pour autant, elle change de forme :
-     * `checkSimulateur`, plus bas, exige ce qui rend la page défendable. Une fenêtre d'avertissement
-     * avant tout accès, qui reproduit l'avertissement du bulletin ; aucun taux présélectionné,
-     * aucun résultat à l'arrivée (la page s'ouvre sur la première question du parcours),
-     * l'avertissement dans le bloc des résultats, la mention sur les performances passées, et des
-     * repères de marché qui portent leur année et leur source.
-     */
+    /* INDICATEURS DE PERFORMANCE. La règle existe parce que R Start N'EN A AUCUN : sans historique,
+       une communication commerciale ne peut pas en laisser espérer un.
+       EXEMPTION DE /a-propos (16/09/2026, contenu fourni par l'équipe) : seule page à publier les
+       chiffres des QUATRE AUTRES SCPI DU GROUPE, chacun avec sa définition et la mention sur les
+       performances passées (src/content/fr/corumRange.ts). ELLE VAUT POUR LA PAGE, PAS POUR R START
+       : la page ne doit jamais lui attribuer un chiffre, à surveiller à chaque relecture puisque la
+       règle ne le verra plus.
+       EXEMPTION DE /simulateur (19/09/2026, demande de Martin) : son curseur EST un taux de
+       distribution, celui que le visiteur choisit de tester. La règle change de forme :
+       `checkSimulateur` exige ce qui rend la page défendable. */
     except: ['a-propos', 'simulateur'],
     re: /taux de distribution|\bTRI\b|rendement (cible|garanti|attendu|estimé|annuel)|objectif de rendement/g,
     label: 'indicateur de performance',
@@ -130,40 +108,23 @@ const FORBIDDEN = [
     re: /\d+(?:[,.]\d+)?\s?%\s?(?:de\s)?(?:rendement|performance|par an|annuel)/gi,
     label: 'pourcentage de performance',
   },
-  /*
-   * MENTION DU CRÉDIT. La règle bloque le mot, parce que présenter l'achat de parts à crédit oblige à
-   * avertir que le souscripteur reste tenu de rembourser son prêt même si le placement perd de la
-   * valeur, et qu'il ne doit pas compter sur les revenus du placement pour y parvenir.
-   *
-   * EXEMPTION POSÉE LE 16/09/2026 pour la question « Peut-on financer R Start à crédit ? », dont le
-   * texte a été fourni par l'équipe. Sa PREMIÈRE phrase est une négation (« Le financement à crédit
-   * n'est pas proposé à ce jour par CORUM pour R Start »), elle ne promeut rien.
-   *
-   * CE QUI N'EST PAS RÉGLÉ, et qu'il faut lire comme une dette : la SECONDE phrase de la réponse,
-   * « rien n'empêche un épargnant de financer son investissement par ses propres moyens, par exemple
-   * via un crédit obtenu auprès de sa banque », SUGGÈRE de souscrire à crédit sans porter
-   * l'avertissement ci-dessus. C'est précisément ce que cette règle existe pour attraper.
-   *
-   * L'ÉQUIPE A TRANCHÉ LE 16/09/2026, en connaissance de cause, entre trois issues : ne garder que la
-   * première phrase, garder le texte entier en lui adjoignant l'avertissement, ou garder le texte et
-   * lever la règle. C'est la troisième qui a été retenue. Le site part donc avec une mention du crédit
-   * sans son avertissement, et c'est un point à faire arbitrer par la Conformité avant toute
-   * ouverture au public.
-   *
-   * POUR RÉTABLIR LE CONTRÔLE : retirer `via un crédit obtenu` de `allow`. La règle redeviendra
-   * bloquante sur cette réponse, et il faudra alors choisir l'une des deux autres issues.
-   */
+  /* MENTION DU CRÉDIT. Présenter l'achat de parts à crédit oblige à avertir que le souscripteur
+     reste tenu de rembourser son prêt même si le placement perd de la valeur, sans compter sur ses
+     revenus. EXEMPTION (16/09/2026, texte fourni par l'équipe) pour la question « Peut-on financer
+     R Start à crédit ? », dont la PREMIÈRE phrase est une négation. CE QUI N'EST PAS RÉGLÉ, une
+     dette : la SECONDE phrase (« … par exemple via un crédit obtenu auprès de sa banque ») SUGGÈRE
+     de souscrire à crédit sans cet avertissement, ce que la règle existe pour attraper. L'équipe a
+     tranché en connaissance de cause : garder le texte et lever la règle, point à faire arbitrer
+     avant toute ouverture au public. Pour rétablir le contrôle : retirer `via un crédit obtenu` de
+     `allow`. */
   {
     re: /\bcrédit\b/gi,
     label: 'mention du crédit',
     allow: /financement à crédit n'est pas proposé|via un crédit obtenu|carte de crédit/i,
   },
-  // NOTE (11/09/2026, complétée le 14/09/2026) : quatre formulations ne sont plus BLOQUÉES mais
-  // SIGNALÉES EN AVERTISSEMENT plus bas, l'équipe les ayant reprises mot pour mot dans son document.
-  // La formule d'alignement (« on ne touche rien tant que vous n'avez pas gagné d'argent ») et
-  // l'allégation de rang sans périmètre depuis le 11/09 ; « objectifs tenus » et « diversifié » depuis
-  // le 14/09, demande explicite de l'équipe de respecter son document à la lettre. Elles restent
-  // tracées à chaque exécution, pour l'arbitrage de la compliance.
+  // Quatre formulations ne sont pas BLOQUÉES mais SIGNALÉES EN AVERTISSEMENT (checkHeroClaims),
+  // l'équipe ayant demandé le 14/09/2026 que son document soit respecté à la lettre : formule
+  // d'alignement, allégation de rang sans périmètre, « objectifs tenus », « diversifié ».
 ];
 
 function checkForbidden(text, file) {
@@ -182,26 +143,20 @@ function checkForbidden(text, file) {
   }
 }
 
-/**
- * Le paragraphe qui porte le début de la mention 1 (caractère commercial) ne doit pas être en text-xs,
- * directement ni par un ancêtre (la régression du 10/09/2026 tenait à la classe posée sur la <section>
- * du bloc légal). Petit parcours de la pile des balises ouvertes sur le HTML de la page, sans parseur.
- */
+/** Pour checkNoticeSize, qui parcourt la pile des balises ouvertes du HTML, sans parseur : la
+    mention 1 ne doit pas être en text-xs, ni directement ni par un ancêtre (une <section> l'a
+    portée). */
 const VOID_TAGS = /^(area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr)$/i;
 /**
- * Formulations « à défendre en compliance » : signalées en AVERTISSEMENT, pour rester traçables jusqu'à
- * l'arbitrage, jamais bloquantes.
- *
- * APPELÉE SUR TOUTES LES PAGES depuis le 14/09/2026. Elle ne l'était que sur l'accueil, et le jour où
- * l'accroche « la seule SCPI… c'est gagnant-gagnant » est passée dans l'en-tête de /frais, le contrôle
- * est devenu muet sur les deux formulations qu'il existait précisément pour suivre. Une règle qui ne
- * regarde qu'une page ne protège qu'une page.
+ * Formulations « à défendre en compliance » : signalées en AVERTISSEMENT, traçables jusqu'à
+ * l'arbitrage, jamais bloquantes. APPELÉE SUR TOUTES LES PAGES : limitée à l'accueil, elle est
+ * devenue muette le jour où l'accroche « la seule SCPI… gagnant-gagnant » est passée dans l'en-tête
+ * de /frais.
  */
 function checkHeroClaims(text, file) {
-  // (règles historiquement écrites pour l'accroche de l'accueil du 11/09/2026, prise en connaissance du risque) : signalée en
-  // AVERTISSEMENT pour rester traçable jusqu'à l'arbitrage de la compliance. « la seule » est une allégation
-  // d'exclusivité sur tout le marché, sans périmètre ni preuve ; « gagnant-gagnant » suggère un gain, alors
-  // que le capital n'est pas garanti. À passer en erreur si la compliance la refuse.
+  // « la seule » : exclusivité sur tout le marché, sans périmètre ni preuve ; « gagnant-gagnant »
+  // suggère un gain, capital non garanti. Publiée en connaissance du risque ; à passer en erreur si
+  // la compliance la refuse.
   for (const [re_, quoi] of [
     [
       /\bla seule\s+SCPI/gi,
@@ -217,14 +172,8 @@ function checkHeroClaims(text, file) {
       'allégation de rang « première SCPI » sans périmètre de marché (le périmètre est en note)',
     ],
     [/objectifs? tenus?/gi, '« objectifs tenus » (allégation de performance)'],
-    /*
-     * Ajoutée le 16/09/2026 avec le texte du moteur « Les plus-values » de /strategie : « R Start vise
-     * à dégager des plus-values sur vente d'immeubles de façon plus systématique que d'autres SCPI ».
-     * C'est une comparaison avec le reste du marché, comme « la seule SCPI » et « première SCPI », et
-     * elle n'a ni périmètre ni source : elle est donc suivie ici comme les deux autres, en
-     * avertissement, jusqu'à ce que CORUM fournisse la base de la comparaison ou que la compliance
-     * tranche. Le motif vise la COMPARAISON, pas le mot « systématique » seul.
-     */
+    /* /strategie : « … plus systématique que d'autres SCPI », comparaison sans périmètre ni source,
+       suivie comme « la seule SCPI ». Le motif vise la COMPARAISON, pas « systématique » seul. */
     [
       /(plus|davantage|moins)\s+(syst[ée]matique|souvent|fr[ée]quemment)[^.]{0,40}\bque\s+d['’]autres\s+SCPI/gi,
       'comparaison avec les autres SCPI (« plus systématique que d’autres SCPI ») sans périmètre ni source',
@@ -295,22 +244,14 @@ async function checkIndex() {
     file
   );
   requirePhrase(text, 'visa S.C.P.I. n° 26-06 en date du 4 mars 2026', 'visa AMF', file);
-  /*
-   * PLUS AUCUN CONTRÔLE DE CONTRE-POIDS depuis le 22/09/2026 : la ligne risques du hero, l'équilibre
-   * entre avantages et risques et l'interdiction d'animer un risque visaient les « Bon à savoir »,
-   * retirés de l'écran le 14/09/2026 (« supprime tous les bon à savoir du site ») puis du code. Le
-   * site ne porte plus de contre-poids à côté de ses avantages ; restent la section Risques et les
-   * mentions du pied de page, exigées ici.
-   */
+  /* PLUS AUCUN CONTRÔLE DE CONTRE-POIDS : ils visaient les « Bon à savoir », retirés le 14/09/2026
+     à la demande de l'équipe (« supprime tous les bon à savoir du site »). Le site ne porte plus de
+     contre-poids à côté de ses avantages ; restent la section Risques et le pied de page, exigés
+     ici. */
   requirePhrase(text, legal.gdpr.dpoEmail, 'e-mail DPO', file);
-  /*
-   * PLUS DE CONTRÔLE DU PÉRIMÈTRE DE L'ALLÉGATION DE RANG depuis le 15/09/2026 (demande de l'équipe :
-   * « Supprimer dernière phrase : la première SCPI… »). La phrase bornée, « La première SCPI du groupe
-   * CORUM sans frais d'entrée ni frais sur les achats d'immeubles », était la SEULE occurrence du
-   * périmètre « du groupe CORUM » sur l'accueil ; elle a quitté le code le 22/09/2026. L'accueil ne
-   * porte plus qu'une allégation de rang NON BORNÉE, celle de l'accroche du hero (« La première SCPI
-   * sans frais de souscription ni frais d'acquisition »), signalée par ailleurs en avertissement.
-   */
+  /* PLUS DE CONTRÔLE DU PÉRIMÈTRE DE L'ALLÉGATION DE RANG : la phrase bornée « du groupe CORUM » a
+     été retirée le 15/09/2026 à la demande de l'équipe. L'accueil ne porte plus qu'une allégation
+     de rang NON BORNÉE, celle du hero, signalée en avertissement. */
   requirePhrase(text, 'GP-11000012', 'agrément AMF de la société de gestion', file);
   requirePhrase(text, legal.publisher.rcs, "RCS de l'éditeur", file);
   requirePhrase(text, '15 %', 'frais de gestion 15 %', file);
@@ -353,23 +294,13 @@ async function checkIndex() {
 
   // Documents PDF
   const pdfLinks = [...new Set([...html.matchAll(/href="([^"]+\.pdf)"/gi)].map((m) => m[1]))];
-  /*
-   * AVERTISSEMENT ET NON PLUS ERREUR depuis le 16/09/2026, arbitrage de l'équipe (« dans tous les cas
-   * ne rends rien dispo là, on verra plus tard »).
-   *
-   * LA RÈGLE ATTENDAIT DEUX PDF servis depuis la page : la note d'information et le bulletin, les deux
-   * documents publiables (les statuts sont tronqués à la source et le DIC hébergé classe R Start en
-   * 3 sur 7 quand le site affiche 4 sur 7, retour AMF du 10/09/2026). Le pied de page les servait.
-   *
-   * IL N'EN SERT PLUS AUCUN : la colonne Documents annonce les cinq documents réglementaires en
-   * « bientôt disponible », et le lien vers /documentation a été retiré de la colonne R Start. Plus
-   * aucun fichier n'est donc atteignable depuis l'accueil.
-   *
-   * CE QUI RESTE, ET QUI EST LA RAISON POUR LAQUELLE CE N'EST PLUS UNE ERREUR : la mention obligatoire
-   * du pied de page invite toujours à consulter la note d'information et le DIC, et dit où ils se
-   * trouvent (www.corum.fr). L'accès aux documents réglementaires n'est donc pas supprimé, il est
-   * renvoyé hors du site. À rebasculer en erreur le jour où les documents sont publiés ici.
-   */
+  /* AVERTISSEMENT ET NON PLUS ERREUR (16/09/2026, arbitrage de l'équipe : « ne rends rien dispo là,
+     on verra plus tard »). La règle attendait la note d'information et le bulletin, seuls documents
+     publiables (statuts tronqués à la source, DIC hébergé à 3 sur 7 quand le site affiche 4 sur 7,
+     retour AMF du 10/09/2026) ; le pied de page n'en sert plus aucun. Ce n'est plus une erreur
+     parce que la mention obligatoire renvoie toujours vers ces documents sur www.corum.fr : l'accès
+     est renvoyé hors du site, pas supprimé. À rebasculer en erreur le jour où les documents sont
+     publiés ici. */
   if (pdfLinks.length < 2)
     warnings.push(
       `${file} : ${pdfLinks.length} lien(s) PDF (attendu : ≥ 2) — aucun document servi depuis la page, la mention obligatoire renvoie à corum.fr`
@@ -397,10 +328,10 @@ async function checkIndex() {
 }
 
 /**
- * /SIMULATEUR : LES CONDITIONS DE SON EXEMPTION (19/09/2026). La page est la seule, avec /a-propos, à
- * pouvoir écrire « taux de distribution » ; en échange, le build vérifie ce qui la rend défendable pour
- * une SCPI sans historique. Tout se lit dans le HTML publié : src/content/fr/simulator.ts importe par
- * l'alias `@/`, que ce script ne résout pas.
+ * /SIMULATEUR : LES CONDITIONS DE SON EXEMPTION. Seule page, avec /a-propos, à pouvoir écrire «
+ * taux de distribution », le build vérifie ce qui la rend défendable pour une SCPI sans historique.
+ * Tout se lit dans le HTML publié : src/content/fr/simulator.ts importe par l'alias `@/`, que ce
+ * script ne résout pas.
  */
 async function checkSimulateur() {
   const file = 'simulateur/index.html';
@@ -414,10 +345,10 @@ async function checkSimulateur() {
   const balise = (motif) => html.match(motif)?.[0] ?? '';
 
   /* LA FENÊTRE D'ACCÈS : le simulateur arrive inerte, derrière une fenêtre qui reproduit l'avertissement
-     du bulletin de souscription de R Start, mot pour mot. ELLE EST RENDUE PAR LE SERVEUR ET VISIBLE
-     SANS SCRIPT : c'est ce qui garantit qu'aucun formulaire ne s'affiche nu avant elle (21/09/2026 ;
-     ouverte par `showModal()`, elle n'apparaissait qu'à l'exécution d'un module différé). Le <dialog>
-     est donc refusé ici, comme l'est un `hidden` qu'il faudrait retirer. */
+     du bulletin mot pour mot. RENDUE PAR LE SERVEUR ET VISIBLE SANS SCRIPT : c'est ce qui garantit
+     qu'aucun formulaire ne s'affiche nu avant elle (un <dialog> ouvert par `showModal()`
+     n'apparaissait qu'à l'exécution d'un module différé). Le <dialog> et un `hidden` à retirer
+     sont donc refusés. */
   const voile =
     html.match(/<div\b[^>]*data-simu-acces-voile[\s\S]*?data-simu-accepter[\s\S]*?<\/div>/i)?.[0] ??
     '';
@@ -500,10 +431,7 @@ async function checkSimulateur() {
   });
 }
 
-/**
- * Sous-pages produit : mêmes interdits, mentions obligatoires, structure. La ligne risques de
- * l'en-tête n'y est plus exigée depuis le 14/09/2026 (voir plus bas).
- */
+/** Sous-pages produit : mêmes interdits, mentions obligatoires, structure. */
 async function checkSubPages() {
   for (const p of [
     'frais',
@@ -523,20 +451,15 @@ async function checkSubPages() {
       continue;
     }
     const text = toText(html);
-    // Sur « La presse en parle », les citations de tiers sont exclues du contrôle des formulations
-    // interdites (elles portent data-press-quote). L'avertissement qui les couvrait n'est plus
-    // exigé depuis le 16/09/2026 : son absence est signalée plus bas, en avertissement.
+    // Sur « La presse en parle », les citations de tiers (data-press-quote) sont exclues du
+    // contrôle des formulations interdites ; voir stripPressQuotes.
     checkForbidden(p === 'presse' ? toText(stripPressQuotes(html)) : text, p);
     checkHeroClaims(text, p);
-    /*
-     * LA LIGNE RISQUES N'EST PLUS EXIGÉE SUR LES SOUS-PAGES depuis le 14/09/2026, demande expresse
-     * de l'équipe (« supprime les bon à savoir de tous les hero »). Elle ne figure plus que dans les
-     * mentions légales. CE QUE CELA CHANGE, ET QUI DOIT ÊTRE SU : une sous-page peut être publiée
-     * sans aucune mention de risque dans son en-tête. Ce qui protège encore ces pages, c'est leur
-     * texte quand il en porte (les avertissements réglementaires de /documentation, exigés plus bas)
-     * et le pied de page, présent partout : mention de caractère commercial et visa AMF, tous deux
-     * exigés juste en dessous.
-     */
+    /* LA LIGNE RISQUES N'EST PLUS EXIGÉE SUR LES SOUS-PAGES (14/09/2026, demande expresse de
+       l'équipe : « supprime les bon à savoir de tous les hero »). CE QUE CELA CHANGE, ET QUI DOIT
+       ÊTRE SU : une sous-page peut être publiée sans aucune mention de risque dans son en-tête.
+       Restent son texte (les avertissements de /documentation, exigés plus bas) et le pied de page
+       : mention de caractère commercial et visa AMF, exigés juste en dessous. */
     requirePhrase(text, legal.commercialNotice, 'mention 1 (caractère commercial)', file);
     requirePhrase(text, 'visa S.C.P.I. n° 26-06 en date du 4 mars 2026', 'visa AMF', file);
     const h1 = html.match(/<h1\b[^>]*>/gi) || [];
@@ -546,9 +469,9 @@ async function checkSubPages() {
       errors.push(file + ' : frais de gestion 15 % absents');
     if (p === 'frais' && /data-comparator\b/.test(html)) {
       // Comparateur de frais : tant qu'une SCPI proposée n'a pas ses sept taux, la page montrerait les
-      // zéros de R Start face à des cases vides. C'est une comparaison trompeuse : elle ne doit pas être
-      // mise en ligne. Avertissement tant que le comparateur est en construction ; à passer en erreur le
-      // jour où la page part en production.
+      // zéros de R Start face à des cases vides, une comparaison trompeuse qui ne doit pas être
+      // mise en ligne. Avertissement tant que le comparateur est en construction ; à passer en
+      // erreur le jour où la page part en production.
       const scpis = (html.match(/<option value="\d+"/g) || []).length;
       const nonDocumentees = comparator.scpis.filter((s) => !s.unavailable && !s.source);
       if (nonDocumentees.length)
@@ -560,34 +483,20 @@ async function checkSubPages() {
       if (!/Sources/.test(text)) errors.push(file + ' : comparateur sans ligne de sources');
     }
     if (p === 'documentation') {
-      /*
-       * Avertissements reproduits in extenso, descendus de l'accueil le 11/09/2026. Ils étaient rendus
-       * par le composant des « Bon à savoir » sur les fiches de documents, et sont partis avec eux le
-       * 14/09/2026. CE SONT DEUX TEXTES RÉGLEMENTAIRES, pas des contre-poids rédigés : depuis le
-       * 18/09/2026 la page les rend en paragraphes directs (MandatoryWarnings.astro), et les deux
-       * exigences sont de nouveau actives.
-       */
+      /* Avertissements reproduits in extenso (MandatoryWarnings.astro) : DEUX TEXTES
+         RÉGLEMENTAIRES, pas des contre-poids rédigés, ils n'ont pas suivi les « Bon à savoir ». */
       requirePhrase(text, legal.bulletinWarning.slice(0, 120), 'avertissement du bulletin', file);
       requirePhrase(text, legal.dicWarning, 'avertissement du DIC', file);
       for (const b of legal.arbitrageWarningBullets)
         requirePhrase(text, b.slice(0, 100), "puce commission d'arbitrage", file);
     }
     if (p === 'presse') {
-      /*
-       * AVERTISSEMENT ET NON PLUS ERREUR depuis le 16/09/2026, arbitrage de l'équipe.
-       *
-       * LA RÈGLE EXIGEAIT l'avertissement de la revue de presse, parce que les titres et les citations
-       * sont reproduits mot pour mot : certains emploient « sans frais », et c'est ce bloc qui les
-       * qualifiait. Il disait que les articles sont des publications indépendantes, qu'ils n'engagent
-       * pas la société de gestion, qu'ils ne valent pas conseil, et que l'investissement comporte un
-       * risque de perte en capital.
-       *
-       * L'ÉQUIPE L'A RETIRÉ, avec l'introduction de la revue qui portait le contre-poids sur les frais.
-       * Il ne reste, autour des citations, que la mention obligatoire du pied de page. La règle est
-       * donc levée en connaissance de cause, et le rapport le redit à chaque exécution. Le texte a
-       * quitté le code le 22/09/2026 (archivé hors du dépôt, .claude/audits) : s'il revient, repasser
-       * ce contrôle en erreur.
-       */
+      /* AVERTISSEMENT ET NON PLUS ERREUR (16/09/2026, arbitrage de l'équipe). La règle exigeait
+         l'avertissement de la revue de presse (publications indépendantes, n'engageant pas la
+         société de gestion, ne valant pas conseil, risque de perte en capital), qui qualifiait des
+         citations reproduites mot pour mot, certaines avec « sans frais ». Il ne reste autour
+         d'elles que le pied de page. Texte archivé hors du dépôt (.claude/audits) : s'il revient,
+         repasser en erreur. */
       warnings.push(
         file +
           ' : avertissement de la revue de presse absent — les titres et citations de tiers ne sont plus qualifiés que par le pied de page'
@@ -597,25 +506,18 @@ async function checkSubPages() {
         errors.push(file + ' : aucune citation marquée data-press-quote (contrôle inopérant)');
     }
     if (p === 'frais') {
-      // SCPI nommées sur /frais : le comparateur nomme des SCPI du panel. Nommer une autre SCPI
-      // obligeait à trois choses : dire ce que la comparaison compare, d'où viennent les chiffres,
-      // et rappeler que R Start n'est pas une SCPI sans frais. Le contrôle n'exige plus que la
-      // source. LES DEUX AUTRES EXIGENCES SONT PARTIES avec leurs textes : le périmètre du
-      // comparatif (des taux affichés, pas des coûts réels ; les seules SCPI de la liste, pas le
-      // marché) et l'encadré « Une innovation, pas une révolution » (R Start n'est pas une SCPI sans
-      // frais, n'est pas moins chère, coût total inconnu à la souscription) ont quitté l'écran le
-      // 14/09/2026 (« je veux ce contenu là ») et le code le 22/09/2026. Le tableau nomme dix-neuf
-      // sociétés de gestion sans plus rien dire de tout cela.
+      // SCPI nommées sur /frais : nommer une autre SCPI obligeait à dire ce que la comparaison
+      // compare, d'où viennent les chiffres, et que R Start n'est pas une SCPI sans frais. Le
+      // contrôle n'exige plus que la source : LES DEUX AUTRES EXIGENCES SONT PARTIES avec leurs
+      // textes (14/09/2026, « je veux ce contenu là »), périmètre du comparatif (taux affichés, pas
+      // coûts réels ; la liste, pas le marché) et encadré « pas une SCPI sans frais, pas moins
+      // chère, coût total inconnu ».
       const lower = text.toLowerCase();
       const named = marketComparison.panel.filter((n) => lower.includes(norm(n).toLowerCase()));
       if (named.length) {
-        /*
-         * Sources du comparatif : contrôle RESSERRÉ le 14/09/2026. Il cherchait la chaîne « Sources : »
-         * n'importe où dans la page, et c'était le bloc « Notes et sources », en bas, qui la fournissait,
-         * pas le comparateur. Les notes sont parties ce jour-là, et le contrôle est tombé alors que les
-         * sources du tableau, elles, sont toujours là. Il vise désormais le bloc du
-         * comparateur lui-même, par l'attribut que porte chaque source de colonne.
-         */
+        /* Sources du comparatif : le contrôle vise le bloc du comparateur lui-même, par l'attribut
+           de chaque source de colonne ; « Sources : » n'importe où dans la page ne prouvait
+           rien. */
         if (!/data-comparator-source\b/.test(html))
           errors.push(file + ' : mention absente, sources du comparatif');
       }
@@ -643,8 +545,8 @@ async function checkOtherPages() {
         break;
       } catch {}
     }
-    /* ERREUR et non plus avertissement (audit du 18/09/2026) : un site publié sans ses mentions légales
-       ou sa politique de confidentialité passait le contrôle avec « 0 erreur ». */
+    /* ERREUR et non avertissement : un site publié sans ses mentions légales ou sa politique de
+       confidentialité passait le contrôle avec « 0 erreur ». */
     if (!html) {
       errors.push(`page /${p} absente de dist`);
       continue;
@@ -670,27 +572,19 @@ async function checkNoSourceFiles() {
 }
 
 /**
- * CONTRÔLES SUR TOUT LE SITE CONSTRUIT (audit du 18/09/2026), et non sur une liste de pages : ils
- * parcourent chaque fichier HTML de dist, une page ajoutée demain y entre sans que personne y pense.
- *
- * 1. AUCUN DOCUMENT ORPHELIN. Tout fichier de dist/documents doit être lié par au moins une page. Les
- *    trois PDF « en attente » (DIC, statuts, simulation des frais) n'étaient liés nulle part et
- *    répondaient pourtant 200 à leur adresse directe : retirer un lien ne retire pas un fichier. Un
- *    document sans lien est soit un oubli de publication, soit un document qui ne devrait pas être là ;
- *    dans les deux cas le build s'arrête. Voir src/content/fr/pendingDocuments.ts.
- *
- * 2. AUCUN LIEN INTERNE SANS LE PRÉFIXE DU SITE. Sous un sous-chemin (PUBLIC_BASE_PATH, GitHub Pages de
- *    projet), un `href="/faq"` sort du site et tombe en 404. Invisible en local, où la base vaut « / » :
- *    la règle ne mord donc que là où le défaut existe, c'est-à-dire sur la forge. Elle a été écrite pour
- *    le renvoi « Voir toutes les questions » de /documentation, seul lien du site posé sans withBase,
- *    cassé en ligne depuis sa création.
+ * CONTRÔLES SUR TOUT LE SITE CONSTRUIT (checkWholeSite), et non sur une liste de pages : une page
+ * ajoutée demain y entre sans que personne y pense.
+ * 1. AUCUN DOCUMENT ORPHELIN : retirer un lien ne retire pas un fichier, et les PDF « en attente »
+ *    répondaient 200 à leur adresse directe. Oubli de publication ou document indu, le build
+ *    s'arrête (src/content/fr/pendingDocuments.ts).
+ * 2. AUCUN LIEN INTERNE SANS LE PRÉFIXE DU SITE : sous un sous-chemin (PUBLIC_BASE_PATH), un
+ *    `href="/faq"` tombe en 404. Invisible en local, la règle ne mord que sur la forge.
  */
 /**
- * CE QUI SE LIT HORS DU CORPS DE LA PAGE (audit du 18/09/2026). `toText` retire les <script> et toutes
- * les balises avec leurs attributs : la meta description, les balises Open Graph et Twitter, les
- * `alt`, `aria-label` et `title`, et les données structurées échappaient donc aux formulations
- * interdites. Ce sont pourtant les textes les plus diffusés HORS du site : l'extrait affiché par
- * Google, l'aperçu partagé sur les réseaux, la réponse reprise par un assistant.
+ * CE QUI SE LIT HORS DU CORPS DE LA PAGE : meta description, Open Graph et Twitter, `alt`,
+ * `aria-label`, `title` et données structurées, que `toText` retire avec les balises. Ce sont les
+ * textes les plus diffusés HORS du site : l'extrait de Google, l'aperçu partagé, la réponse d'un
+ * assistant.
  */
 function texteHorsCorps(html) {
   const morceaux = [];
@@ -729,9 +623,8 @@ const PAGES_DEJA_CONTROLEES = new Set([
 
 /**
  * L'IMAGE OPEN GRAPH AFFICHE-T-ELLE LES CHIFFRES DU SITE ? Un JPEG ne se relit pas : on compare les
- * lignes que scripts/make-og.mjs a consignées à sa dernière génération avec celles que facts.ts et
- * legal.ts donnent aujourd'hui (scripts/og-lignes.mjs). Un écart veut dire que l'aperçu partagé sur les
- * réseaux affiche une ancienne valeur.
+ * lignes consignées par scripts/make-og.mjs à celles que les sources donnent aujourd'hui
+ * (scripts/og-lignes.mjs). Un écart : l'aperçu partagé affiche une ancienne valeur.
  */
 async function checkOgImage() {
   let consignees;
@@ -765,9 +658,8 @@ async function checkWholeSite() {
   for (const file of pages) {
     const html = await readHtml(file);
 
-    /* 3. TOUTES LES PAGES, pas une liste : une page ajoutée dans src/pages partait en production sans
-       aucun contrôle de formulation, et le script affichait « 0 erreur » (/test et 404.html y
-       échappaient). Celles qui ont déjà leur contrôle dédié ne sont pas relues deux fois. */
+    /* 3. TOUTES LES PAGES, pas une liste (/test et 404.html échappaient à tout contrôle). Celles
+       qui ont leur contrôle dédié ne sont pas relues deux fois. */
     if (!PAGES_DEJA_CONTROLEES.has(file)) {
       const texte = toText(html);
       checkForbidden(texte, file);
@@ -777,10 +669,9 @@ async function checkWholeSite() {
        citations de presse sont retirées avant, comme pour le corps de /presse. */
     checkForbidden(texteHorsCorps(stripPressQuotes(html)), `${file} (meta, attributs, JSON-LD)`);
 
-    /* 5. ON NE BALISE QUE CE QUE LE VISITEUR PEUT LIRE. Chaque question d'un FAQPage doit figurer dans
-       le texte de la même page : /frais a publié pendant quatre jours les quatre questions d'une
-       section retirée, réponses chiffrées comprises, que personne ne pouvait lire ni relire. C'est la
-       règle écrite de src/lib/seo.ts, et celle des moteurs de recherche. */
+    /* 5. ON NE BALISE QUE CE QUE LE VISITEUR PEUT LIRE : chaque question d'un FAQPage doit figurer
+       dans le texte de la page (/frais a publié quatre jours les questions d'une section retirée).
+       Règle de src/lib/seo.ts, et celle des moteurs de recherche. */
     const visible = toText(html).toLowerCase();
     for (const [, corps] of html.matchAll(/<script type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/gi)) {
       let blocs;
@@ -795,10 +686,9 @@ async function checkWholeSite() {
             errors.push(`${file} : question balisée en FAQPage mais absente de la page, « ${q.name} »`);
     }
 
-    /* 6. UNE DESCRIPTION SUR CHAQUE PAGE (22/09/2026). /faq a publié pendant six jours une meta
-       description vide : son introduction, vidée au lieu d'être retirée, lui servait de description.
-       Le contrôle ne regardait que la présence de la balise, et sur l'accueil seulement. Le titre de
-       l'accueil garde sa borne de 20 à 70 caractères (reprise d'un test de qualite.spec.ts, doublon). */
+    /* 6. UNE DESCRIPTION SUR CHAQUE PAGE : /faq a publié six jours une meta description vide, et le
+       contrôle ne regardait que la présence de la balise. Titre de l'accueil : 20 à 70
+       caractères. */
     const description = html.match(/<meta\s+name="description"\s+content="([^"]*)"/i)?.[1] ?? '';
     if (!description.trim()) errors.push(`${file} : meta description vide ou absente`);
     if (file === 'index.html') {

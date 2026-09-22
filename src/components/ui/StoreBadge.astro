@@ -1,17 +1,14 @@
 ---
 /**
- * Badge de magasin d'applications (App Store, Google Play), dessiné en SVG inline : cartouche noir à
- * coins arrondis, liseré clair, logo de la plateforme et libellé sur deux lignes, aux proportions des
- * badges officiels (ratio 10:3, hauteur de référence 40 px).
- *
- * ATTENTION MARQUES : Apple et Google imposent l'emploi de LEURS fichiers officiels et de leurs chartes
- * (« Télécharger dans l'App Store », « Disponible sur Google Play », zones de protection, tailles
- * minimales). Ce composant est une reproduction fidèle destinée à la maquette : avant mise en ligne,
- * remplacer les deux dessins par les badges officiels téléchargés sur les ressources marketing d'Apple
- * et de Google, en conservant l'enveloppe <a> et ses attributs d'accessibilité.
- *
- * Accessibilité : le SVG est décoratif (aria-hidden), le nom du lien vient du texte masqué `label`, et
- * `hintId` permet d'y accoler la mention « nouvelle fenêtre » commune au bloc.
+ * Badge de magasin d'applications (App Store, Google Play) en SVG inline : cartouche noir à coins
+ * arrondis, liseré clair, logo de la plateforme et libellé sur deux lignes, aux proportions des
+ * badges officiels (ratio 10:3, hauteur de référence 40 px). ATTENTION MARQUES : Apple et Google
+ * imposent l'emploi de LEURS fichiers officiels et de leurs chartes (libellés, zones de protection,
+ * tailles minimales). Ce composant est une reproduction fidèle destinée à la maquette : avant mise
+ * en ligne, remplacer les deux dessins par les badges officiels téléchargés sur les ressources
+ * marketing d'Apple et de Google, en conservant l'enveloppe <a> et ses attributs d'accessibilité.
+ * Le SVG est décoratif (aria-hidden), le nom du lien vient du texte masqué `label`, et `hintId`
+ * permet d'y accoler la mention « nouvelle fenêtre » commune au bloc.
  */
 interface Props {
   store: 'apple' | 'google';
@@ -30,10 +27,10 @@ const copy = {
 }[store];
 
 /**
- * Largeur du cartouche, par magasin (11/09/2026) : « Google Play » court jusqu'à 132,8 unités et frôlait
- * le bord d'un cartouche de 135, ce qui se lisait comme un logo coupé. Chaque badge prend donc la largeur
- * de son texte plus la même retombée de 11 unités qu'à gauche, c'est aussi le cas des badges officiels,
- * où celui de Google est plus large que celui d'Apple.
+ * Largeur du cartouche, par magasin : « Google Play » court jusqu'à 132,8 unités et frôlait le bord
+ * d'un cartouche de 135, ce qui se lisait comme un logo coupé. Chaque badge prend la largeur de son
+ * texte plus la même retombée de 11 unités qu'à gauche, comme les badges officiels, où celui de
+ * Google est plus large.
  */
 const width = store === 'apple' ? 135 : 146;
 ---

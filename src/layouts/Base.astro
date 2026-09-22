@@ -7,9 +7,9 @@ import { site } from '@/config/site';
 import JsonLd from '@/components/JsonLd.astro';
 import { nav } from '@/content/fr/nav';
 import { withBase } from '@/lib/href';
-// Sous-ensemble latin de la police variable (le seul utilisé par le contenu français) : préchargé pour que
-// le premier rendu du texte n'attende pas la découverte du @font-face dans la feuille de style. Même fichier
-// que celui référencé par le CSS de @fontsource-variable/plus-jakarta-sans (global.css), donc un seul
+// Sous-ensemble latin de la police variable (le seul utilisé par le contenu français), préchargé
+// pour que le premier rendu du texte n'attende pas la découverte du @font-face. Même fichier que
+// celui du CSS de @fontsource-variable/plus-jakarta-sans (global.css), donc un seul
 // téléchargement ; `?url` passe par le pipeline d'assets de Vite, comme l'url() du CSS.
 import plusJakartaLatinUrl from '@fontsource-variable/plus-jakarta-sans/files/plus-jakarta-sans-latin-wght-normal.woff2?url';
 
@@ -32,13 +32,11 @@ const {
 } = Astro.props;
 
 /**
- * Type de page, joint à chaque événement de mesure (plan de taggage du 14/09/2026). Déduit du chemin
- * plutôt que passé en prop : une page qui oublierait la prop serait comptée « inconnu » sans que
- * personne ne le voie, alors que le chemin, lui, est toujours juste.
- * `souscriptionOuverte` accompagne chaque événement pour la même raison : tant que le tunnel n'est pas
- * ouvert, tous les appels à souscrire aboutissent à une fenêtre d'attente. Sans ce repère, les taux de
- * la période d'attente seraient comparés à ceux d'après l'ouverture, et la comparaison n'aurait
- * aucun sens.
+ * Type de page, joint à chaque événement de mesure (plan de taggage du 14/09/2026). Déduit du
+ * chemin plutôt que passé en prop : une page qui oublierait la prop serait comptée « inconnu » sans
+ * que personne le voie. `souscriptionOuverte` accompagne chaque événement pour la même raison :
+ * tant que le tunnel n'est pas ouvert, tous les appels à souscrire aboutissent à une fenêtre
+ * d'attente, et comparer les taux de cette période à ceux d'après l'ouverture n'aurait aucun sens.
  */
 const chemin = (path ?? Astro.url.pathname).replace(/^\/+|\/+$/g, '');
 const typeDePage = !chemin
@@ -55,19 +53,14 @@ const typeDePage = !chemin
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     {
-      /*
-       * Défenses posées en BALISE, faute de pouvoir poser des en-têtes (14/09/2026). GitHub Pages ne
-       * sert aucun en-tête personnalisé et ignore deploy/azure/staticwebapp.config.json : sans ces deux
-       * balises, le site n'avait aucune politique de sécurité du contenu et aucune politique de
-       * référent. La balise couvre la CSP et le référent ; elle ne peut PAS porter `frame-ancestors`,
-       * `report-uri` ni `X-Frame-Options`, que les navigateurs n'acceptent qu'en en-tête. La protection
-       * contre l'encadrement arrivera donc avec Azure, voir deploy/azure/README.md.
-       *
-       * La politique est celle du fichier Azure, à deux exceptions près, imposées par la balise :
-       * `frame-ancestors` retiré, et `style-src 'unsafe-inline'` conservé (Astro pose des styles de
-       * portée sur les éléments). Elle est APPLIQUÉE, pas en observation : aucun script exécutable en
-       * ligne ne subsiste depuis la conversion des outils et du comparateur en blocs de données.
-       */
+      /* Défenses posées en BALISE, faute de pouvoir poser des en-têtes (14/09/2026) : GitHub Pages
+         ne sert aucun en-tête personnalisé et ignore deploy/azure/staticwebapp.config.json. La
+         balise couvre la CSP et le référent ; elle ne peut PAS porter `frame-ancestors`,
+         `report-uri` ni `X-Frame-Options`, acceptés seulement en en-tête : la protection contre
+         l'encadrement arrivera avec Azure (deploy/azure/README.md). La politique est celle du
+         fichier Azure, `frame-ancestors` en moins et `style-src 'unsafe-inline'` en plus (Astro
+         pose des styles de portée sur les éléments) ; elle est APPLIQUÉE, pas en observation :
+         aucun script exécutable en ligne ne subsiste. */
     }
     <meta
       http-equiv="Content-Security-Policy"

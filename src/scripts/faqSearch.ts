@@ -1,20 +1,13 @@
 /**
- * Recherche interne de /faq (16/09/2026). Elle FILTRE une liste déjà rendue, elle n'interroge rien :
- * toutes les questions sont dans le HTML, la page se lit donc entière sans script, et le champ
- * n'apparaît que si celui-ci s'exécute (il arrive `hidden`, comme les boutons « i »).
- *
- * LA COMPARAISON EST INSENSIBLE AUX ACCENTS ET À LA CASSE : on cherche « frais » et on veut trouver
- * « Frais d'entrée », on tape « interet » et on veut « intérêt ». Le pliage est celui de tout le site
- * (src/lib/texte.ts), le même que la recherche de la barre : « oeuvre » trouve « œuvre » ici aussi.
- *
- * ON CHERCHE DANS LA QUESTION ET DANS LA RÉPONSE. Chercher dans la seule question passerait à côté de
- * « retrait », qui n'est dans aucun intitulé mais dans trois réponses.
- *
- * LE FILTRAGE SE JOUE EN TRANSITION DE VUE (audit du 16/09/2026) : les questions masquées disparaissaient
- * d'un coup et les suivantes sautaient à leur place. Chaque question porte un nom de transition de vue
- * unique ; le navigateur suit alors chacune d'elles d'un état à l'autre, et c'est lui qui fait glisser
- * celles qui restent, s'effacer celles qui partent, paraître celles qui reviennent. La page, elle, ne
- * bouge pas (global.css, `vt-filtre`). Sans l'API, ou en mouvement réduit : filtrage instantané.
+ * Recherche interne de /faq. Elle FILTRE une liste déjà rendue, elle n'interroge rien : toutes les
+ * questions sont dans le HTML, la page se lit entière sans script, et le champ n'apparaît que si
+ * celui-ci s'exécute (il arrive `hidden`, comme les boutons « i »).
+ * LA COMPARAISON EST INSENSIBLE AUX ACCENTS ET À LA CASSE, par le pliage de tout le site
+ * (src/lib/texte.ts). ON CHERCHE DANS LA QUESTION ET DANS LA RÉPONSE : « retrait » n'est dans aucun
+ * intitulé mais dans trois réponses. LE FILTRAGE SE JOUE EN TRANSITION DE VUE : chaque question
+ * porte un nom unique, le navigateur fait glisser celles qui restent au lieu d'un saut ; la page,
+ * elle, ne bouge pas (global.css, `vt-filtre`). Sans l'API, ou en mouvement réduit : filtrage
+ * instantané.
  */
 import { plier } from '@/lib/texte';
 
@@ -66,9 +59,9 @@ const init = (): void => {
       if (rubrique) rubriqueVisible = rubrique;
     });
     if (!compte) return;
-    /* LE DÉCOMPTE EST ÉCRIT À LA FIN DE LA FRAPPE, pas à chaque lettre (audit du 18/09/2026) : c'est
-       une zone `aria-live`, et taper « retrait » déclenchait sept annonces qui se chevauchaient avec
-       l'écho des touches. Même délai que la recherche du site. Un champ vidé efface tout de suite. */
+    /* LE DÉCOMPTE EST ÉCRIT À LA FIN DE LA FRAPPE, pas à chaque lettre : c'est une zone
+       `aria-live`, et taper « retrait » déclenchait sept annonces qui se chevauchaient avec l'écho
+       des touches. Même délai que la recherche du site. Un champ vidé efface tout de suite. */
     window.clearTimeout(annonce);
     if (q === '') {
       compte.textContent = '';
@@ -107,7 +100,6 @@ const init = (): void => {
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
 else init();
 
-/* `export {}` : sans import ni export, TypeScript traite le fichier comme un script et non comme
-   un module, et ses déclarations tombent dans l'espace global. Deux fichiers y déclaraient un
-   `init`, d'où un conflit de noms que le build refusait. */
+/* `export {}` : sans import ni export, TypeScript traite le fichier comme un script et ses
+   déclarations tombent dans l'espace global, où deux `init` entraient en conflit. */
 export {};

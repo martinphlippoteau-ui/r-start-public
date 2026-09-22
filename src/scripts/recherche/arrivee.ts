@@ -1,15 +1,11 @@
 /**
- * RECHERCHE DU SITE : L'ARRIVÉE SUR LE PASSAGE. Sans rapport avec le panneau, et exécuté sur toutes les
- * pages : c'est la page d'ARRIVÉE qui joue ce module, pas celle où l'on a cherché.
- *
- * Au clic sur un résultat, le panneau note la cible en `sessionStorage` (`noterArrivee`) ; la page
- * d'arrivée la reconnaît, éclaire brièvement le titre de la section ou la question
- * (`data-recherche-cible`, global.css), et se recale une fois la page chargée : les sections épinglées
- * de l'accueil changent la hauteur du document après le premier défilement vers l'ancre. L'ouverture de
- * la question elle-même est l'affaire de src/scripts/faqAncre.ts.
- *
- * Une arrivée par un lien ordinaire, un favori ou un retour arrière n'éclaire rien : la note n'existe
- * que si le visiteur vient de choisir ce résultat, et elle est effacée à la lecture.
+ * RECHERCHE DU SITE : L'ARRIVÉE SUR LE PASSAGE, jouée par la page d'ARRIVÉE, pas par celle où l'on
+ * a cherché. Au clic sur un résultat, le panneau note la cible en `sessionStorage` (`noterArrivee`)
+ * ; la page d'arrivée la reconnaît, éclaire le titre visé (`data-recherche-cible`, global.css) et
+ * se recale une fois chargée : les sections épinglées de l'accueil changent la hauteur du document
+ * après le premier défilement. L'ouverture de la question est l'affaire de src/scripts/faqAncre.ts.
+ * La note est effacée à la lecture : un lien ordinaire, un favori ou un retour arrière n'éclairent
+ * rien.
  */
 const CLE_ARRIVEE = 'rstart:recherche:arrivee';
 

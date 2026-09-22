@@ -1,19 +1,13 @@
 ---
 /**
- * Page /faq, créée le 16/09/2026 : LES DIX-HUIT QUESTIONS, avec un champ de recherche.
- *
- * Les autres pages n'en rendent plus que quatre et renvoient ici (faq.moreLink). La FAQ complète vivait
- * jusque-là sous /documentation#faq, où elle était noyée dans une page de documents.
- *
+ * Page /faq (16/09/2026) : LES DIX-HUIT QUESTIONS, avec un champ de recherche. Les autres pages
+ * n'en rendent que quatre et renvoient ici (faq.moreLink). Hors menu, comme /documentation.
  * ELLE RÉUTILISE LA SECTION DE L'ACCUEIL, paramétrée : l'accordéon, ses transitions
  * `::details-content` et le découpage avantage / contre-poids sont écrits une seule fois, les deux
  * surfaces ne peuvent donc pas diverger. Le renvoi est masqué ici, la page EST la destination.
- *
- * LA RECHERCHE N'INTERROGE RIEN : les questions sont toutes dans le HTML et le script se contente de
- * masquer celles qui ne correspondent pas. La page se lit donc entière sans JavaScript, et le champ
- * n'apparaît que si le script s'exécute.
- *
- * Hors menu, comme /documentation : la barre ne porte que les quatre pages du parcours.
+ * LA RECHERCHE N'INTERROGE RIEN : les questions sont toutes dans le HTML et le script se contente
+ * de masquer celles qui ne correspondent pas. La page se lit donc entière sans JavaScript, et le
+ * champ n'apparaît que si le script s'exécute.
  */
 import Base from '@/layouts/Base.astro';
 import SiteNav from '@/components/SiteNav.astro';

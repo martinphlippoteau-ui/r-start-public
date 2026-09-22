@@ -1,62 +1,34 @@
 ---
 /**
- * Illustration de la tuile « Sélective » (16/09/2026) : douze immeubles, un seul retenu.
- *
- * ┌ GRAMMAIRE COMMUNE AUX CINQ DESSINS DES CARTES DE /strategie ───────────────────────────────────┐
- * │ (EngineRent, EngineGain, StrategySelect, StrategyDiversify, StrategyTiming ; reprise le         │
- * │ 16/09/2026, demande de l'équipe : « 10/10 en fluidité, design, élégance, haut de gamme »,       │
- * │ « parfaitement adaptées à chaque card », « qu'elles prennent une bonne partie de la carte »)    │
- * │                                                                                                 │
- * │  - PLEINE LARGEUR DE LA CARTE, dans l'espace qui reste entre le titre et le bouton : format     │
- * │    paysage 160 × 120 pour les trois volets, 236 × 100 pour les deux moteurs. Le dessin remplit  │
- * │    la carte au lieu d'y flotter.                                                                │
- * │  - DES IMMEUBLES QUI RESSEMBLENT À DES IMMEUBLES : un cadre et une grille de fenêtres            │
- * │    (src/lib/immeuble.ts), jamais trois traits dans un carré.                                    │
- * │  - UN SEUL TEMPO : cycle de 8 s partout, le même que la canalisation entre les deux rangées      │
- * │    (04-Strategy.astro, --pont-cycle).                                                           │
- * │  - UNE HISTOIRE PAR DESSIN, celle du texte de sa carte, en quatre temps : silence, mise en       │
- * │    place, lecture, effacement. Jamais de réinitialisation brutale : ce qui disparaît s'efface   │
- * │    en fondu, un temps de silence sépare deux cycles, et ce qui boucle sans fin (les versements   │
- * │    des loyers) boucle sans couture.                                                             │
- * │  - LES COURBES DU SITE : arrivées sur `--ease-out-expo`, départs sur son miroir                 │
- * │    cubic-bezier(0.7, 0, 0.84, 0), déplacements longs en cubic-bezier(0.65, 0, 0.35, 1). Jamais   │
- * │    `ease` ni `linear` par défaut, `linear` seulement quand la régularité est le sujet.           │
- * │  - CAUSALITÉ : un élément réagit à un autre (la marque s'éclaire quand un versement arrive,     │
- * │    l'immeuble s'allume quand le viseur se referme). Rien ne bat à sa propre horloge.            │
- * │  - ÉCHELLE DEPUIS LE CENTRE : `transform-box: fill-box` + `transform-origin: center` sur tout ce  │
- * │    qui grandit. Sans cela, un élément SVG grandit depuis le coin haut gauche du dessin.          │
- * │  - ÉTAT DE REPOS = IMAGE COMPLÈTE, écrit dans les styles de base : c'est ce que voient           │
- * │    `prefers-reduced-motion` et tout navigateur qui n'anime pas. Les animations ne sont déclarées │
- * │    que sous `no-preference` et partent de leur propre première image ; rien n'est à annuler.     │
- * │  - EN PAUSE HORS ÉCRAN ET DERRIÈRE UNE CARTE RETOURNÉE : `data-in-view="illus-en-vue"` sur la    │
- * │    figure (motion.ts pose la classe tant qu'elle est à l'écran), règle commune dans global.css   │
- * │    (« Illustrations des cartes »). Un dessin commence donc son histoire quand on le voit, pas    │
- * │    au chargement, et ne coûte rien pendant qu'on lit le reste.                                   │
- * │  - `--illus-decalage`, posé par la section sur chaque carte : les dessins voisins entrent en      │
- * │    vague, pas à l'unisson.                                                                      │
- * │  - `animation-fill-mode: both` sur tout ce qui est retardé : pendant le retard, c'est la première │
- * │    image qui s'affiche, jamais l'image de repos. Sans lui, l'image complète clignotait un tiers   │
- * │    de seconde avant que l'histoire commence (constaté le 16/09/2026 sur les cartes décalées).    │
- * │  - `transform`, `opacity`, le tiret des tracés et `offset-distance` seulement ; aucun filtre,    │
- * │    aucun masque.                                                                                │
- * └─────────────────────────────────────────────────────────────────────────────────────────────────┘
- *
- * CE QU'ELLE DIT : on regarde beaucoup d'immeubles, on en garde un. C'est le propos de la tuile
- * (« Tout commence par le choix des immeubles »), pas une décoration. Douze immeubles de trois
- * gabarits, sur trois rues ; le regard passe sur chacun, l'un après l'autre ; le viseur se pose et se
- * referme sur l'un d'eux ; c'est À CET INSTANT que ses fenêtres s'allument et que les onze autres
- * s'effacent d'un cran. Le retenu est de GABARIT INTERMÉDIAIRE, comme le texte de la tuile
- * (« principalement des immeubles de taille intermédiaire »).
- *
- * Décorative (aria-hidden) : le texte de la tuile porte le sens, l'image ne l'ajoute pas.
+ * Illustration de la tuile « Sélective » (décorative, aria-hidden) : douze immeubles de trois
+ * gabarits sur trois rues, le regard passe sur chacun, le viseur se referme sur l'un d'eux et, À
+ * CET INSTANT, ses fenêtres s'allument, les onze autres s'effacent d'un cran. C'est le propos de la
+ * tuile (« Tout commence par le choix des immeubles ») ; le retenu est de gabarit intermédiaire.
+ * GRAMMAIRE COMMUNE AUX CINQ DESSINS DES CARTES DE /strategie (Engine*.astro, Strategy*.astro ;
+ * 16/09/2026, demande de l'équipe : « 10/10 en fluidité, design, élégance, haut de gamme »). Pleine
+ * largeur de la carte : 160 × 120 pour les trois volets, 236 × 100 pour les deux moteurs. Immeubles
+ * à cadre et grille de fenêtres (src/lib/immeuble.ts). Un seul tempo, 8 s, celui de la canalisation
+ * entre les rangées (04-Strategy.astro, --pont-cycle). Une histoire par dessin, celle du texte de
+ * sa carte : silence, mise en place, lecture, effacement en fondu, jamais de réinitialisation
+ * brutale. Causalité : un élément réagit à un autre, rien ne bat seul.
+ * Courbes du site : arrivées sur `--ease-out-expo`, départs sur son miroir cubic-bezier(0.7, 0,
+ * 0.84, 0), déplacements longs en cubic-bezier(0.65, 0, 0.35, 1) ; jamais `ease`, `linear`
+ * seulement quand la régularité est le sujet. `transform`, `opacity`, le tiret des tracés et
+ * `offset-distance` seulement ; ni filtre ni masque. `transform-box: fill-box` + `transform-origin:
+ * center` sur tout ce qui grandit, sans quoi il grandit depuis le coin haut gauche du dessin.
+ * État de repos = image complète, dans les styles de base (`prefers-reduced-motion`, navigateurs
+ * sans animation) ; les animations ne sont déclarées que sous `no-preference` et partent de leur
+ * première image. `animation-fill-mode: both` sur tout ce qui est retardé : sans lui, l'image
+ * complète clignotait un tiers de seconde avant l'histoire (16/09/2026). En pause hors écran et
+ * derrière une carte retournée : `data-in-view="illus-en-vue"` sur la figure (motion.ts pose la
+ * classe ; global.css, « Illustrations des cartes »). `--illus-decalage`, posé par la section : les
+ * voisins entrent en vague.
  */
 import { fenetres } from '@/lib/immeuble';
 
-/*
- * Trois rues de quatre cases de 30, gouttière de 8, marges de 8 et 7 : la grille fait 152 × 113 dans
- * un cadre de 160 × 120, centrée. Chaque immeuble est POSÉ AU SOL de sa case (aligné en bas), et une
- * ligne de rue court sous chaque rangée : c'est une ville, pas un tableau.
- */
+/* Trois rues de quatre cases de 30, gouttière de 8, marges de 8 et 7 : la grille fait 152 × 113
+   dans un cadre de 160 × 120, centrée. Chaque immeuble est POSÉ AU SOL de sa case (aligné en bas),
+   une ligne de rue court sous chaque rangée : une ville, pas un tableau. */
 const CASE = 30;
 const PAS = 38;
 const MARGE_X = 8;
@@ -117,13 +89,10 @@ const retenu = immeubles[RETENU]!;
     </g>
 
     {
-      /*
-       * LE VISEUR qui se pose sur l'immeuble retenu, une fois le regard passé (16/09/2026 : c'était
-       * un cercle en pointillé, l'équipe a demandé un viseur). Quatre équerres aux angles et une
-       * croix au centre : les deux signes qui font lire un viseur, au trait, comme le reste.
-       * Dessiné autour de (0, 0) puis translaté sur la case retenue : le corps se referme en `scale`
-       * sans que son centre dérive. La croix vient après les équerres, une fois le point fait.
-       */
+      /* Le viseur qui se pose sur l'immeuble retenu (16/09/2026 : c'était un cercle en pointillé,
+        l'équipe a demandé un viseur) : quatre équerres aux angles et une croix au centre, au trait
+        comme le reste. Dessiné autour de (0, 0) puis translaté sur la case retenue : le corps se
+        referme en `scale` sans que son centre dérive. */
     }
     <g class="select-viseur" style={`--cx:${retenu.centre.x}px; --cy:${retenu.centre.y}px`}>
       <g class="select-viseur-corps">
@@ -162,10 +131,8 @@ const retenu = immeubles[RETENU]!;
     fill: rgb(169 221 230 / 0.42);
   }
 
-  /*
-   * ÉTAT DE REPOS = IMAGE COMPLÈTE (`prefers-reduced-motion`, navigateurs sans animation) : les onze
-   * écartés en retrait, le retenu allumé sous sa lueur, le viseur refermé, croix comprise.
-   */
+  /* État de repos = image complète : les onze écartés en retrait, le retenu allumé sous sa lueur,
+     le viseur refermé, croix comprise. */
   .select-parc {
     opacity: 0.6;
   }
@@ -215,9 +182,7 @@ const retenu = immeubles[RETENU]!;
    *              chacun s'éclaire vite et retombe lentement ;
    *   30 – 43 %  le viseur arrive large et se referme, mise au point avec un cheveu de sous-tension ;
    *   37 – 47 %  l'immeuble s'allume sous lui, les onze autres s'effacent d'un cran, puis la croix ;
-   *   47 – 80 %  on lit ;
-   *   80 – 90 %  le viseur s'ouvre et s'efface, l'immeuble s'éteint, les autres reviennent ;
-   *   90 – 100 % silence.
+   *   47 – 80 %  on lit ; 80 – 90 % tout s'efface et les autres reviennent ; 90 – 100 % silence.
    */
   @media (prefers-reduced-motion: no-preference) {
     .select-bloc {

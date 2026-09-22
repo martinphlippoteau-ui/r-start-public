@@ -1,21 +1,17 @@
 ---
 /**
  * Page /simulateur (19/09/2026, demande de Martin) : l'en-tête, puis le simulateur. Rien d'autre.
- *
- * CE QUE LA PAGE NE FAIT PAS, et c'est ce qui la rend publiable : elle ne suppose AUCUN taux à R Start,
- * qui n'a pas d'historique. Le visiteur fixe lui-même l'hypothèse qu'il teste ; deux repères de marché,
- * sourcés et datés, l'aident à la situer, et l'avertissement accompagne chaque résultat. Le détail est
- * dans src/content/fr/simulator.ts, et scripts/check-compliance.mjs tient ces conditions au build.
- *
- * UN EN-TÊTE DE PRÉ-TUNNEL, PAS UN HERO (21/09/2026, Martin : « j'aimerais que le hero soit beaucoup
- * plus discret, c'est une sorte de pré-tunnel »). Plus de bandeau sombre, plus de bouton « Souscrire
- * en ligne » : sur fond clair, le fil d'Ariane et un titre de taille moyenne, comme les pages légales,
- * et la première question juste dessous. On ne propose pas de souscrire avant d'avoir simulé ; le
- * bouton « Souscrire » de la barre reste à l'écran, et le résultat mène à la souscription.
- *
- * PAS DE PASTILLE FLOTTANTE ICI, contrairement aux autres sous-pages : le bas de l'écran est occupé,
- * sur téléphone, par la barre de synthèse du simulateur.
- * Contenu : src/content/fr/simulator.ts (aucun texte en dur).
+ * CE QUE LA PAGE NE FAIT PAS, et c'est ce qui la rend publiable : elle ne suppose AUCUN taux à R
+ * Start, qui n'a pas d'historique. Le visiteur fixe lui-même l'hypothèse qu'il teste ; deux repères
+ * de marché, sourcés et datés, l'aident à la situer, et l'avertissement accompagne chaque résultat
+ * (src/content/fr/simulator.ts ; scripts/check-compliance.mjs tient ces conditions au build).
+ * UN EN-TÊTE DE PRÉ-TUNNEL, PAS UN HERO (21/09/2026, Martin : « j'aimerais que le hero soit
+ * beaucoup plus discret, c'est une sorte de pré-tunnel ») : fond clair, fil d'Ariane, titre de
+ * taille moyenne comme les pages légales, la première question juste dessous, et pas de bouton
+ * « Souscrire en ligne » : on ne propose pas de souscrire avant d'avoir simulé, le bouton de la
+ * barre reste à l'écran et le résultat mène à la souscription. PAS DE PASTILLE FLOTTANTE ICI : sur
+ * téléphone, le bas de l'écran est occupé par la barre de synthèse du simulateur. Aucun texte en
+ * dur.
  */
 import Base from '@/layouts/Base.astro';
 import SiteNav from '@/components/SiteNav.astro';

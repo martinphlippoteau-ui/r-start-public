@@ -5,22 +5,17 @@ import { withBase } from '@/lib/href';
 import type { CtaPosition } from '@/content/types';
 
 /**
- * Bouton / lien. Sans `href`, c'est un CTA de souscription : data-cta pour l'analytics, ouverture dans
- * le même onglet. Tant que `site.subscribeOpen` est faux (le cas aujourd'hui), il n'emmène PAS vers le
- * tunnel : le clic ouvre la fenêtre « la souscription arrive bientôt » (SubscribeSoon.astro), et sans
- * JavaScript il mène à la documentation réglementaire. Le jour où la souscription ouvre, l'URL du
- * tunnel revient sans rien changer ici (config/site.ts, ctaHref).
- * Variantes, les deux rôles du site sur leurs deux fonds (17/09/2026, décisions de l'équipe) :
- * primary (Principal, navy plein) et light (Principal sur fond sombre, blanc plein) ; secondary
- * (Secondaire, contour navy) et outline-light (Secondaire sur fond sombre, contour blanc). La variante
- * `ghost` est retirée (décision F5 : plus aucun usage).
- * LA PEAU N'EST PAS ICI : elle vit dans global.css, utilitaires `btn`, `btn-<variante>` et
- * `btn-<taille>` (« Les quatre rôles de bouton »), que ce composant compose et qu'un <button> écrit à
- * la main reprend tels quels (bandeau cookies, fenêtre souscription, cartes de /strategie).
- * Tailles : sm (40 px de haut, cible tactile minimale), md (48 px), lg (62 px), bordure comprise : les
- * variantes pleines portent une bordure transparente pour mesurer exactement comme les contours.
- * Micro-interactions (utilitaire `btn-motion`, global.css) : légère élévation + halo doux au survol,
- * scale 0.98 à l'appui, 150-200 ms ; halo coloré par variante (`--btn-halo`) ; rien en reduced-motion.
+ * Bouton / lien. Sans `href`, c'est un CTA de souscription : data-cta pour l'analytics, même
+ * onglet, et tant que `site.subscribeOpen` est faux il n'emmène PAS vers le tunnel : le clic ouvre
+ * la fenêtre « la souscription arrive bientôt » (SubscribeSoon.astro), et sans JavaScript il mène à
+ * la documentation réglementaire (config/site.ts, ctaHref). Variantes, les deux rôles du site sur
+ * leurs deux fonds (17/09/2026, décisions de l'équipe) : primary (navy plein) et light (blanc plein
+ * sur fond sombre) ; secondary (contour navy) et outline-light (contour blanc). LA PEAU N'EST PAS
+ * ICI : elle vit dans global.css, utilitaires `btn`, `btn-<variante>` et `btn-<taille>` (« Les
+ * quatre rôles de bouton »), qu'un <button> écrit à la main reprend tels quels. Tailles : sm
+ * (40 px, cible tactile minimale), md (48 px), lg (62 px), bordure comprise, les variantes pleines
+ * portant une bordure transparente pour mesurer comme les contours. Micro-interactions :
+ * `btn-motion` (global.css), rien en reduced-motion.
  */
 interface Props {
   href?: string;
@@ -29,15 +24,12 @@ interface Props {
   size?: 'sm' | 'md' | 'lg';
   class?: string;
   /**
-   * Ouverture dans un nouvel onglet, pour les liens qui SORTENT DU SITE (16/09/2026). `rel` suit
-   * automatiquement : `noopener noreferrer` est obligatoire avec `_blank`, la page ouverte pouvant
-   * sinon manipuler celle qui l'a ouverte via `window.opener`.
-   * Ce n'est jamais posé sur un CTA de souscription : celui-ci gère déjà sa propre cible.
-   *
-   * UNE FLÈCHE EN DIAGONALE est ajoutée automatiquement au libellé (16/09/2026) : elle prévient qu'on
-   * quitte le site. Le même dessin que sur les liens Trustpilot et ceux du pied de page, pour qu'il
-   * veuille dire la même chose partout. Décorative (aria-hidden), l'information étant déjà portée par
-   * la mention de nouvelle fenêtre que l'appelant place en `visually-hidden`.
+   * Ouverture dans un nouvel onglet, pour les liens qui SORTENT DU SITE ; `rel` suit (`noopener
+   * noreferrer`, obligatoire avec `_blank` : la page ouverte pourrait sinon manipuler celle qui l'a
+   * ouverte via `window.opener`). Jamais posé sur un CTA de souscription. Une flèche en diagonale
+   * est ajoutée au libellé, le même dessin que sur les liens Trustpilot et du pied de page : elle
+   * prévient qu'on quitte le site. Décorative (aria-hidden), l'information étant portée par la
+   * mention de nouvelle fenêtre que l'appelant place en `visually-hidden`.
    */
   target?: '_blank';
 }
@@ -49,13 +41,11 @@ const {
   class: className = '',
   target,
 } = Astro.props;
-/*
- * CLASSES ÉCRITES EN TOUTES LETTRES (17/09/2026). Tailwind ne génère un utilitaire que s'il en trouve le
- * nom tel quel dans les sources ; `btn-${variant}` ne lui montre que « btn- ». Le 17/09, `btn-light` et
- * `btn-lg`, qu'aucun autre fichier n'écrivait, manquaient au CSS : le « Souscrire en ligne » du hero,
- * du tiroir et des blocs sombres s'affichait en texte nu, sans fond ni rembourrage. Toute nouvelle
- * variante ou taille s'ajoute ici, en entier.
- */
+/* CLASSES ÉCRITES EN TOUTES LETTRES (17/09/2026) : Tailwind ne génère un utilitaire que s'il en
+   trouve le nom tel quel dans les sources, et `btn-${variant}` ne lui montre que « btn- ».
+   `btn-light` et `btn-lg`, qu'aucun autre fichier n'écrivait, manquaient au CSS : le « Souscrire en
+   ligne » du hero s'affichait en texte nu. Toute nouvelle variante ou taille s'ajoute ici, en
+   entier. */
 const VARIANTES = {
   primary: 'btn-primary',
   secondary: 'btn-secondary',

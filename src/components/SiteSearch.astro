@@ -1,47 +1,27 @@
 ---
 /**
- * PANNEAU DE RECHERCHE DU SITE (17/09/2026, demande de Martin : « même mécanique que celle
- * d'apple.com », sans page de résultats). Rendu par SiteNav.astro, juste après la barre, dans la même
- * enveloppe : la loupe de la barre l'ouvre.
- *
- * POSITION FIXE, CALÉE SUR LA BARRE (18/09/2026). Le panneau était `absolute` dans l'enveloppe de la
- * barre, donc dans un élément `sticky` : Chromium déplaçait alors la page de quatre pixels à chaque
- * frappe, en calculant la position STATIQUE du champ pour le « révéler ». Vingt pixels perdus en tapant
- * « frais ». Il est donc `fixed`, et le script le cale sur la boîte réelle de la barre à l'ouverture
- * (et à chaque redimensionnement) : les marges de la barre ne sont pas recopiées ici, elles restent
- * définies à un seul endroit.
- *
- * LA PASTILLE S'ALLONGE. Le panneau est posé SOUS la barre, à ses coordonnées exactes, et porte la
- * même matière qu'elle (`nav-glass`, même teinte, même ombre, `data-stuck` recopié). Fermé, il a la
- * hauteur de la barre et il est masqué ; à l'ouverture, la barre éteint son verre d'un coup et le
- * panneau grandit en hauteur jusqu'à celle du PANNEAU VIDE, ses liens rapides visibles, puis garde
- * cette hauteur quoi qu'on tape (demande de Martin du 17/09/2026 : le bloc ouvert garde le style de la
- * barre, et sa hauteur ne bouge pas). Mécanique dans global.css, « Recherche du site », et dans le
- * script. La barre reste au-dessus : logo, pages et Souscrire restent visibles et cliquables pendant
- * la recherche. Derrière, un voile floute la page. Le texte n'est jamais fondu : il se découvre avec
- * la hauteur (règle « le texte ne se fond pas »).
- *
- * CONTENU. Le champ reste en tête ; dessous :
- *  - panneau vide : les liens rapides (src/content/fr/search.ts) ;
- *  - recherche : deux rubriques, « Pages » puis « Questions », construites par le script à partir des
- *    deux gabarits ci-dessous. La mise en forme reste donc ici, le script ne pose aucune classe. Un
- *    résultat tient sur DEUX LIGNES, son titre puis sa page ou sa rubrique et un extrait sur une seule
- *    ligne : c'est ce qui laisse trois ou quatre résultats dans la hauteur du panneau vide. Le script
- *    retire les derniers résultats, en alternant entre les deux rubriques, jusqu'à ce que tout tienne ;
- *  - aucun résultat : un message et un renvoi vers toutes les questions.
- *
- * CONTRASTE. Les libellés (« Liens rapides », titres de rubrique, texte d'invite du champ) sont en
- * `slate-700` et non en `slate` : ouvert en haut d'une page à en-tête sombre, le verre à 72 % laisse
- * passer le fond, et `slate` tombait à 3,8:1 (audit du 18/09/2026). `slate-700` tient 5,5:1 dans le pire
- * cas. Le champ est borné à 80 caractères : c'est aussi la longueur transmise à la mesure d'audience.
- *
- * ACCESSIBILITÉ. Dialogue modal (`aria-modal`), focus sur le champ à l'ouverture, piège à tabulation,
- * Échap, retour du focus sur la loupe. Flèches haut et bas d'un résultat à l'autre, Entrée ouvre le
- * premier. Le nombre de résultats est annoncé. Un bouton Fermer, visible au focus seulement, reste
- * atteignable au lecteur d'écran sur téléphone, où la loupe de la barre est hors du dialogue.
- *
- * SANS JAVASCRIPT, la loupe n'est pas affichée (`@media (scripting: enabled)`, global.css) : aucun
- * saut dans la barre au chargement, contrairement à un `hidden` retiré par script.
+ * Panneau de recherche du site (17/09/2026, demande de Martin : « même mécanique que celle
+ * d'apple.com », sans page de résultats). Rendu par SiteNav.astro juste après la barre, dans la
+ * même enveloppe ; la loupe de la barre l'ouvre. Sans JavaScript, la loupe n'est pas affichée
+ * (`@media (scripting: enabled)`, global.css) : aucun saut dans la barre au chargement.
+ * POSITION `fixed`, CALÉE SUR LA BARRE par le script à l'ouverture et au redimensionnement
+ * (18/09/2026) : en `absolute` dans l'enveloppe `sticky`, Chromium déplaçait la page de quatre
+ * pixels à chaque frappe pour « révéler » la position STATIQUE du champ.
+ * LA PASTILLE S'ALLONGE : posé SOUS la barre, à ses coordonnées, dans la même matière (`nav-glass`,
+ * `data-stuck` recopié). Fermé, il a la hauteur de la barre et il est masqué ; à l'ouverture, la
+ * barre éteint son verre d'un coup et le panneau grandit jusqu'à la hauteur du PANNEAU VIDE, qu'il
+ * garde quoi qu'on tape (demande de Martin du 17/09/2026 ; global.css, « Recherche du site », et
+ * src/scripts/recherche/panneau.ts). La barre reste au-dessus, cliquable ; un voile floute la page.
+ * Le texte n'est jamais fondu, il se découvre avec la hauteur. Contenu : le champ, puis les liens
+ * rapides (src/content/fr/search.ts) ou les rubriques « Pages » et « Questions » construites par le
+ * script à partir des gabarits ci-dessous.
+ * CONTRASTE : libellés en `slate-700` et non `slate`, qui tombait à 3,8:1 sur le verre à 72 %
+ * devant un en-tête sombre (audit du 18/09/2026) ; `slate-700` tient 5,5:1 au pire. Champ borné à
+ * 80 caractères, la longueur transmise à la mesure d'audience.
+ * ACCESSIBILITÉ : dialogue modal, focus sur le champ à l'ouverture, piège à tabulation, Échap,
+ * retour du focus sur la loupe, flèches d'un résultat à l'autre, Entrée ouvre le premier, nombre de
+ * résultats annoncé. Le bouton Fermer, visible au focus seulement, reste atteignable au lecteur
+ * d'écran sur téléphone, où la loupe est hors du dialogue.
  */
 import { pages } from '@/config/pages';
 import { faq } from '@/content/fr/faq';
@@ -98,10 +78,10 @@ const lienClass =
   hidden
 >
   {
-    /* `overflow-clip` ET NON `overflow-hidden` (18/09/2026) : `hidden` fait du panneau un conteneur de
-      défilement, et Chromium déplaçait alors la page de quatre pixels à CHAQUE FRAPPE pour « révéler »
-      le champ qu'il croyait rogné — vingt pixels perdus en tapant « frais », et la page ne revenait
-      pas. `clip` rogne de la même façon, coins arrondis compris, sans rien rendre défilable. */
+    /* `overflow-clip` ET NON `overflow-hidden` (18/09/2026) : `hidden` fait du panneau un conteneur
+      de défilement, et Chromium déplaçait la page de quatre pixels à chaque frappe pour
+      « révéler » le champ qu'il croyait rogné. `clip` rogne de la même façon, coins arrondis
+      compris, sans rien rendre défilable. */
   }
   {/* La barre se pose ici, par-dessus le panneau. */}
   <div class="h-subnav shrink-0"></div>
@@ -153,10 +133,10 @@ const lienClass =
   </div>
 
   {
-    /* `recherche-defilement` (global.css) : la zone ne devient défilante qu'une fois le panneau arrivé
-      à sa hauteur. Pendant le mouvement, elle est plus courte que son contenu ; avec des barres de
-      défilement classiques, une barre y apparaissait puis disparaissait, et les liens rapides se
-      décalaient de 7 px à la dernière image (signalé par Martin le 17/09/2026). */
+    /* `recherche-defilement` (global.css) : la zone ne devient défilante qu'une fois le panneau
+      arrivé à sa hauteur. Pendant le mouvement, elle est plus courte que son contenu ; avec des
+      barres de défilement classiques, une barre y apparaissait puis disparaissait, et les liens
+      rapides se décalaient de 7 px à la dernière image (signalé par Martin le 17/09/2026). */
   }
   <div
     id={id + '-resultats'}
@@ -224,7 +204,8 @@ const lienClass =
   </div>
 
   {
-    /* Gabarits clonés par src/scripts/recherche/panneau.ts : toute la mise en forme reste dans ce fichier. */
+    /* Gabarits clonés par src/scripts/recherche/panneau.ts : la mise en forme reste ici, le script
+      ne pose aucune classe. */
   }
   <template data-recherche-gabarit-rubrique>
     <div class="mt-4 first:mt-0" data-rubrique-bloc>
@@ -233,8 +214,10 @@ const lienClass =
     </div>
   </template>
   {
-    /* Les deux <span> de la seconde ligne se touchent à dessein : une espace entre eux serait rendue
-      avant l'extrait. */
+    /* Un résultat tient sur DEUX LIGNES, son titre puis sa page ou sa rubrique et un extrait
+      tronqué : trois ou quatre résultats dans la hauteur du panneau vide, le script retirant les
+      derniers, en alternant les rubriques, jusqu'à ce que tout tienne. Les deux <span> de la
+      seconde ligne se touchent à dessein : une espace entre eux serait rendue avant l'extrait. */
   }
   <template data-recherche-gabarit-resultat>
     <li>

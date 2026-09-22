@@ -1,14 +1,10 @@
 /**
- * Outils DOM du moteur d'animation, SANS GSAP : partagés par le point d'entrée léger (motion.ts, chargé
- * avec la page) et par le moteur GSAP (motion/engine.ts, chunk séparé chargé ensuite). Ne rien importer
- * de `gsap` ici : ce fichier doit rester dans le chunk principal sans y entraîner la bibliothèque.
- * Référence complète du vocabulaire : src/scripts/motion.ts.
+ * Outils DOM du moteur d'animation, SANS GSAP : partagés par le point d'entrée léger (motion.ts) et
+ * le moteur GSAP (motion/engine.ts). Ne rien importer de `gsap` ici : ce fichier doit rester dans
+ * le chunk principal sans y entraîner la bibliothèque. Vocabulaire : src/scripts/motion.ts.
  */
 
-/**
- * Éléments qui ne s'animent jamais, ni eux-mêmes ni par un ancêtre animé. `[data-risk]`, qui
- * protégeait les contre-poids risque, a quitté la liste le 22/09/2026 avec le dernier d'entre eux.
- */
+/** Éléments qui ne s'animent jamais, ni eux-mêmes ni par un ancêtre animé. */
 export const PROTECTED = 'h1, [data-no-motion]';
 
 /** Vrai si l'élément est lui-même protégé ou se trouve dans un élément protégé. */
@@ -23,11 +19,8 @@ export const refuse = (el: Element, attr: string, why: string): false => {
   return false;
 };
 
-/**
- * Filtre standard : l'élément lui-même n'est pas protégé et, si `deep`, n'en contient pas. Tous les
- * effets qui altèrent l'apparence d'un conteneur (révélation, scrub, parallaxe, rideau, intro)
- * passent par `deep = true` : un conteneur ne s'anime jamais avec l'élément protégé qu'il contient.
- */
+/** Filtre standard : l'élément n'est pas protégé et, si `deep`, n'en contient pas. Tout effet qui
+    altère l'apparence d'un conteneur passe par `deep = true`. */
 export const allowed = (el: Element, attr: string, deep = false): boolean => {
   if (isProtected(el)) return refuse(el, attr, 'H1 ou [data-no-motion]');
   if (deep && containsProtected(el)) {
@@ -54,23 +47,18 @@ export const all = (selector: string, root: ParentNode = document): HTMLElement[
 export const classList = (value: string | undefined): string[] =>
   (value || '').split(/\s+/).filter(Boolean);
 
-/**
- * UN SEUIL INATTEIGNABLE NE DOIT PAS LAISSER UN ÉLÉMENT INVISIBLE (audit du 16/09/2026). Les révélations
- * partent quand le haut de l'élément passe 88 % de l'écran ; un élément logé dans les derniers 12 % du
- * document n'y arrive jamais, la page ne défile pas assez loin, et il reste à opacité zéro. Constaté
- * sur téléphone : les colonnes du pied de page de l'accueil. Pour ceux-là, l'entrée dans l'écran suffit.
- * `ratio` : la part de l'écran que le haut de l'élément doit franchir (0,88 pour « top 88% »).
- */
+/** UN SEUIL INATTEIGNABLE NE DOIT PAS LAISSER UN ÉLÉMENT INVISIBLE : un élément logé dans les
+    derniers 12 % du document ne passe jamais 88 % de l'écran et restait à opacité zéro (le pied de
+    page, sur téléphone). Pour ceux-là, l'entrée dans l'écran suffit. `ratio` : la part à
+    franchir (0,88). */
 export const seuilAtteignable = (el: Element, ratio: number): boolean => {
   const haut = el.getBoundingClientRect().top + window.scrollY;
   const defilementMax = document.documentElement.scrollHeight - window.innerHeight;
   return haut <= defilementMax + window.innerHeight * ratio;
 };
 
-/**
- * Élément déclencheur d'un effet au scroll : `data-*-trigger` accepte un sélecteur CSS (cherché
- * d'abord parmi les ancêtres, puis dans le document) ou le mot-clé `parent`. Sans valeur : l'élément.
- */
+/** Déclencheur d'un effet au scroll : `data-*-trigger` accepte un sélecteur CSS (ancêtres d'abord,
+    puis document) ou `parent`. Sans valeur : l'élément. */
 export const resolveTrigger = (el: HTMLElement, selector: string | undefined): Element => {
   if (!selector) return el;
   if (selector === 'parent') return el.parentElement ?? el;

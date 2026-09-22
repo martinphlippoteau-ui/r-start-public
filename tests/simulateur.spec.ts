@@ -2,14 +2,11 @@ import { test, expect, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
 /**
- * SIMULATEUR (/simulateur, 19-21/09/2026). Trois choses tiennent la page, et chacune a ses tests :
- *  - la FENÊTRE D'ACCÈS : elle est là dès le premier pixel, et on ne touche pas au simulateur avant
- *    d'avoir lu l'avertissement ;
- *  - AUCUN TAUX SUPPOSÉ À R START : rien n'est présélectionné, et le parcours ne se termine pas sans
- *    que le visiteur ait choisi lui-même un taux. Le contrôle de conformité du build vérifie le HTML
- *    d'arrivée ; ce qui se joue ensuite ne se lit que dans un navigateur, donc ici ;
- *  - le PARCOURS : une question à la fois, « Vos hypothèses » qui se remplit à partir de la deuxième.
- * Le calcul lui-même est éprouvé sans navigateur dans tests/simulateur-moteur.spec.ts.
+ * SIMULATEUR (/simulateur). Trois choses tiennent la page : la FENÊTRE D'ACCÈS, là dès le premier
+ * pixel ; AUCUN TAUX SUPPOSÉ À R START, rien n'est présélectionné et le parcours ne se termine pas
+ * sans que le visiteur ait choisi un taux (le build vérifie le HTML d'arrivée, la suite ne se lit
+ * que dans un navigateur) ; le PARCOURS, une question à la fois. Le calcul est éprouvé sans
+ * navigateur dans tests/simulateur-moteur.spec.ts.
  */
 
 const texte = (page: Page, selecteur: string) =>
@@ -25,7 +22,7 @@ const entrer = async (page: Page) => {
   await page.locator('[data-consent-refuse]').click();
 };
 const continuer = (page: Page) => page.locator('[data-simu-suivant]').click();
-/** Le montant part de zéro (22/09/2026) : on le pose par une suggestion. */
+/** Le montant part de zéro : on le pose par une suggestion. */
 const montant = (page: Page, euros = 20_000) =>
   page.locator(`[data-simu-puce="initial"][data-v="${euros}"]`).click();
 /** L'écran change dans une transition de vue, une image après le clic : l'étape se lit en attendant. */
@@ -47,18 +44,13 @@ const simuler = async (page: Page, { mensuel = 0, reinvestir = false } = {}) => 
 };
 
 test.describe('Simulateur : la fenêtre d’accès', () => {
-  /*
-   * ELLE EST LÀ AVANT TOUT SCRIPT (21/09/2026, signalé par Martin : « la première étape du simulateur
-   * se charge en effet flicker avant la popup »). Elle était ouverte par `showModal()`, donc seulement
-   * à l'exécution d'un module différé : le formulaire s'affichait nu en attendant, un demi-seconde sur
-   * un réseau lent. Le test retarde tous les scripts d'une demi-seconde et regarde la page pendant ce
-   * temps.
-   * ET ON LA VOIT, IMAGE PAR IMAGE (21/09/2026, « il y a toujours un effet flick », Martin). La
-   * première version de ce test lisait le DOM : la fenêtre y était, et le test passait, alors que son
-   * voile entrait en fondu depuis l'opacité zéro et que la question se voyait avant elle. Le relevé
-   * est donc pris à CHAQUE IMAGE dès la première, et porte sur l'opacité effective, celle de l'élément
-   * multipliée par celles de ses ancêtres : ce qui est réellement peint.
-   */
+  /* ELLE EST LÀ AVANT TOUT SCRIPT (« la première étape du simulateur se charge en effet flicker
+     avant la popup », Martin) : ouverte par `showModal()`, elle n'apparaissait qu'à l'exécution
+     d'un module différé. Le test retarde tous les scripts d'une demi-seconde et regarde la page
+     pendant ce temps. ET ON LA VOIT, IMAGE PAR IMAGE (« il y a toujours un effet flick ») : lire le
+     DOM ne suffit pas, la fenêtre y était alors que son voile entrait en fondu. Le relevé porte sur
+     l'opacité effective, celle de l'élément multipliée par celles de ses ancêtres : ce qui est
+     réellement peint. */
   test('elle est affichée avant que le moindre script ne s’exécute', async ({ page }) => {
     await page.addInitScript(() => {
       const opacite = (el: Element | null): number => {
@@ -100,19 +92,12 @@ test.describe('Simulateur : la fenêtre d’accès', () => {
     ).toEqual([]);
   });
 
-  /*
-   * RIEN NE PASSE AU-DESSUS D'ELLE EN ARRIVANT PAR LE MENU (21/09/2026, « le chargement de cette page
-   * n'est toujours pas ok », Martin). La transition entre pages extrait de la page tout élément qui
-   * porte un `view-transition-name` et le peint dans sa propre couche, au-dessus du reste. La carte
-   * du simulateur en portait un en permanence (pour le passage d'une question à l'autre) : elle
-   * recouvrait la fenêtre d'accès, « Continuer » compris, le temps de la transition. Les deux tests
-   * d'arrivée directe ne pouvaient pas le voir, il n'y a pas de transition sans page de départ.
-   * La barre, elle, est extraite à dessein, et passait donc aussi devant la fenêtre : la fenêtre est
-   * extraite à son tour, et les groupes s'empilant dans l'ordre de peinture, elle doit y venir
-   * APRÈS la barre, c'est-à-dire sur un plan plus haut.
-   * Relevé au moment où la page se révèle (`pagereveal`) : la barre, sa pastille, la fenêtre, rien
-   * d'autre.
-   */
+  /* RIEN NE PASSE AU-DESSUS D'ELLE EN ARRIVANT PAR LE MENU (« le chargement de cette page n'est
+     toujours pas ok », Martin). La transition entre pages peint tout élément nommé dans sa propre
+     couche, au-dessus du reste : la carte du simulateur et la barre recouvraient la fenêtre
+     d'accès, ce qu'une arrivée directe ne peut pas voir. La fenêtre est extraite à son tour et doit
+     venir APRÈS la barre. Relevé à `pagereveal` : la barre, sa pastille, la fenêtre, rien
+     d'autre. */
   test('en arrivant par le menu, rien du simulateur ne passe devant la fenêtre', async ({
     page,
   }) => {
@@ -171,8 +156,7 @@ test.describe('Simulateur : la fenêtre d’accès', () => {
     await page.keyboard.press('Escape');
     await page.mouse.click(5, 5);
     await expect(fenetre).toBeVisible();
-    /* La page derrière est inerte : la tabulation ne peut pas en sortir. C'est ce que le <dialog>
-       natif assurait ; le verrou de page du site (src/scripts/verrou.ts) le fait désormais. */
+    /* La page derrière est inerte (src/scripts/verrou.ts) : la tabulation ne peut pas en sortir. */
     const dehors: string[] = [];
     for (let i = 0; i < 12; i += 1) {
       await page.keyboard.press('Tab');
@@ -309,10 +293,8 @@ test.describe('Simulateur : aucun taux n’est supposé à R Start', () => {
     );
   });
 
-  /*
-   * LE REPÈRE « SCPI CORUM » NE PEUT PAS DIVERGER DE /a-propos : il est calculé depuis les quatre taux
-   * que cette page publie. Le test refait la moyenne à partir de ce qu'un visiteur y lit.
-   */
+  /* LE REPÈRE « SCPI CORUM » NE PEUT PAS DIVERGER DE /a-propos : le test refait la moyenne à partir
+     des quatre taux qu'un visiteur y lit. */
   test('le repère CORUM est la moyenne des taux publiés sur /a-propos', async ({ page }) => {
     await page.goto('/a-propos/');
     const taux = await page.evaluate(() =>
@@ -402,11 +384,8 @@ test.describe('Simulateur : le parcours', () => {
     await etape(page, 3);
   });
 
-  /*
-   * L'ÉTAPE 1 PART DE ZÉRO ET PARLE EN PARTS (22/09/2026, demande de Martin) : champ vide, aucune
-   * erreur à l'arrivée, quatre suggestions en parts entières ; un montant qui tombe entre deux parts
-   * propose d'ajouter ce qui manque pour la suivante.
-   */
+  /* L'ÉTAPE 1 PART DE ZÉRO ET PARLE EN PARTS (demande de Martin) : champ vide, aucune erreur à
+     l'arrivée, suggestions en parts entières, complément proposé entre deux parts. */
   test('le montant part de zéro, se lit en parts et se complète à la part entière', async ({
     page,
   }) => {
@@ -503,9 +482,8 @@ test.describe('Simulateur : le résultat', () => {
 
   test('une hypothèse se modifie sur place, et le résultat suit', async ({ page, isMobile }) => {
     await simuler(page);
-    /* Rien n'est ouvert d'emblée : le bloc reste court. Sur grand écran, où il est collé à côté des
-       résultats, « Commencer ma souscription » est donc à l'écran sans défiler ; sur téléphone il
-       ferme le bloc, sous les résultats. Une seule ligne s'ouvre à la fois. */
+    /* Rien n'est ouvert d'emblée et une seule ligne s'ouvre à la fois : le bloc reste court, et
+       « Commencer ma souscription » est à l'écran sans défiler sur grand écran. */
     await expect(page.locator('[data-simu-resume][aria-expanded="true"]')).toHaveCount(0);
     const souscrire = page.locator('[data-simu-panneau] [data-simu-suite] a[data-cta]');
     await expect(souscrire).toBeVisible();
@@ -527,12 +505,8 @@ test.describe('Simulateur : le résultat', () => {
     await expect(page.locator('[data-n="monthlyNow"]')).toHaveText('164 €');
   });
 
-  /*
-   * « COMMENCER MA SOUSCRIPTION » (20/09/2026). Tant que la souscription n'est pas ouverte, le bouton
-   * se comporte comme tous les CTA du site : il ouvre la fenêtre « bientôt », et RIEN N'EST TRANSMIS,
-   * son adresse ne porte aucun montant. La fabrication de l'adresse, tunnel ouvert, est éprouvée dans
-   * tests/simulateur-moteur.spec.ts.
-   */
+  /* « COMMENCER MA SOUSCRIPTION », tunnel fermé : la fenêtre « bientôt », et RIEN N'EST TRANSMIS,
+     son adresse ne porte aucun montant. Tunnel ouvert : tests/simulateur-moteur.spec.ts. */
   test('« Commencer ma souscription » : tunnel fermé, la fenêtre « bientôt », et aucun montant transmis', async ({
     page,
   }) => {
@@ -560,12 +534,9 @@ test.describe('Simulateur : le résultat', () => {
     await expect(bulle.locator('[data-bulle-titre]')).toHaveText('Année 1');
   });
 
-  /*
-   * LA BULLE GARDE SA FORME JUSQU'AU BORD DROIT (21/09/2026, signalé par Martin). Sur les dernières
-   * années elle se resserrait et chaque ligne se cassait en trois : une boîte en position absolue ne
-   * dispose que de la largeur qui reste jusqu'au bord, et `text-wrap: pretty`, posé sur tout <p> par
-   * global.css, annulait son `nowrap`. Elle doit avoir partout la hauteur qu'elle a au milieu.
-   */
+  /* LA BULLE GARDE SA FORME JUSQU'AU BORD DROIT (signalé par Martin) : une boîte absolue ne dispose
+     que de la largeur qui reste jusqu'au bord, et `text-wrap: pretty`, posé sur tout <p> par
+     global.css, annulait son `nowrap`. Elle doit avoir partout la hauteur qu'elle a au milieu. */
   test('la bulle du graphique ne se resserre pas sur les dernières années', async ({
     page,
     isMobile,
@@ -602,12 +573,9 @@ test.describe('Simulateur : le résultat', () => {
     }
   });
 
-  /*
-   * LE GRAPHIQUE PARLE DANS LES COULEURS DE LA MARQUE (21/09/2026, « ces couleurs-là ne sont pas les
-   * couleurs R Start », Martin). Les revenus réinvestis étaient en corail, qui est sur ce site la
-   * couleur des mentions de risque. Les couches ne prennent que le marine et les turquoises, et vont
-   * du plus sombre au plus clair pour rester distinctes.
-   */
+  /* LE GRAPHIQUE PARLE DANS LES COULEURS DE LA MARQUE (« ces couleurs-là ne sont pas les couleurs
+     R Start », Martin) : pas de corail, couleur des mentions de risque ; marine et turquoises, du
+     plus sombre au plus clair. */
   test('les couches du graphique n’emploient que le marine et les turquoises de la marque', async ({
     page,
   }) => {
@@ -643,11 +611,8 @@ test.describe('Simulateur : le résultat', () => {
     expect(new Set(releve.couches).size, 'trois couches, trois couleurs distinctes').toBe(3);
   });
 
-  /*
-   * L'AVERTISSEMENT N'EST JAMAIS ANIMÉ : règle du site pour toute mention de risque. Tout le reste du
-   * simulateur bouge (demande de Martin du 20/09/2026), lui est là, entier, à la première image.
-   * Et rien ne bouge en mouvement réduit.
-   */
+  /* L'AVERTISSEMENT N'EST JAMAIS ANIMÉ, règle du site pour toute mention de risque : il est là,
+     entier, à la première image. Et rien ne bouge en mouvement réduit. */
   test('l’avertissement n’est pas animé ; en mouvement réduit, rien ne l’est', async ({
     page,
     browser,

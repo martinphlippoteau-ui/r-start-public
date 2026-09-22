@@ -1,26 +1,22 @@
 ---
 /**
- * Section 2, « R Start en un clin d'œil » (id « points-forts »). Fond ink depuis le 14/09/2026
- * (voir plus bas), entre « Qui a envie de payer avant de gagner ? » (01b, paper) et le comparateur
- * de frais (03), dans l'ordre de HOME_ORDER (index.astro).
- * En-tête aligné à gauche, puis six cartes, le bloc « Souscription et options disponibles » et le
- * bouton vers /strategie. L'en-tête est rendu ici (et non par SectionHeading) pour poser les
- * attributs motion sur le H2.
- * La valeur est l'image : les pictos 3D de banque ont été retirés, la valeur de chaque carte (« 200 € »,
- * « 4 sur 7 », « Mensuels »…) est l'élément visuel principal, en sable (text-display-sm), même
- * utilitaire pour les six cartes (chiffres et valeurs en toutes lettres : aucune hiérarchie de
- * taille entre elles). Le libellé est AU-DESSUS de la valeur et, sur trois cartes, un bouton « i »
- * déplie une explication. Ni description ni contre-poids par carte.
- * Motion (src/scripts/motion.ts), passe de sobriété du 11/09/2026 (un seul effet d'entrée par
- * bloc) :
- *  - en-tête : H2 mot à mot (data-reveal-text ; H1 interdit, H2 autorisé). Ni surtitre ni
- *    introduction : le contenu n'en porte plus ;
- *  - chaque carte (li) entre d'un bloc en fade-up. Chaque
- *    carte ayant son propre déclencheur, le délai alterne 0 / 0,08 s selon `i % COLUMNS`, pas selon
- *    l'index : une carte qui entre seule n'attend pas la cascade des précédentes ;
- *  - valeurs : statiques et exactes (plus de compteur, « 200 € », « 4 sur 7 », « 1er jour du 6e
- *    mois » sont des caractéristiques réglementaires, ni mot à mot, réservé aux H2 de chapitre).
- *    Retirés le 11/09/2026 : tilt du H3, fade-up de la description.
+ * Section 2, « R Start en un clin d'œil » (id « points-forts »). Fond ink (voir plus bas), entre
+ * « Qui a envie de payer avant de gagner ? » (01b, paper) et le comparateur de frais (03), dans
+ * l'ordre de HOME_ORDER (index.astro).
+ * En-tête aligné à gauche (H2 rendu ici pour porter ses attributs motion), puis six cartes, le bloc
+ * « Souscription et options disponibles » et le bouton vers /strategie.
+ * La valeur est l'image : la valeur de chaque carte (« 200 € », « 4 sur 7 », « Mensuels »…) est
+ * l'élément visuel principal, en sable (text-display-sm), même utilitaire pour les six (chiffres et
+ * valeurs en toutes lettres : aucune hiérarchie de taille entre elles). Le libellé est AU-DESSUS de
+ * la valeur et, sur trois cartes, un bouton « i » déplie une explication. Ni pictogramme, ni
+ * description, ni contre-poids par carte.
+ * Motion (src/scripts/motion.ts), un seul effet d'entrée par bloc :
+ *  - en-tête : H2 mot à mot (data-reveal-text ; H1 interdit, H2 autorisé) ;
+ *  - chaque carte (li) entre d'un bloc en fade-up. Chaque carte ayant son propre déclencheur, le
+ *    délai alterne 0 / 0,08 s selon `i % COLUMNS`, pas selon l'index : une carte qui entre seule
+ *    n'attend pas la cascade des précédentes ;
+ *  - valeurs : statiques et exactes (pas de compteur : « 200 € », « 4 sur 7 », « 1er jour du 6e
+ *    mois » sont des caractéristiques réglementaires ; ni mot à mot, réservé aux H2 de chapitre).
  * Sans JS / reduced-motion : HTML complet et statique, valeurs exactes.
  * Contenu : src/content/fr/highlights.ts.
  */
@@ -39,18 +35,15 @@ const COLUMNS = 2;
 const titleId = sections.highlights.id + '-title';
 
 /*
- * ORDINAUX EN EXPOSANT (16/09/2026, demande de l'équipe : « 1er jour du 6ème mois, mettre en exposant »).
- *
- * LE CONTENU RESTE DU TEXTE. Écrire « 1<sup>er</sup> » dans highlights.ts obligerait à rendre ces
- * valeurs en `set:html`, et à faire confiance à une chaîne pour du balisage ; d'autres pages lisent la
- * même donnée et y afficheraient les balises. La découpe se fait donc ici, au rendu.
- *
+ * ORDINAUX EN EXPOSANT (16/09/2026, demande de l'équipe : « 1er jour du 6ème mois, mettre en
+ * exposant »). LE CONTENU RESTE DU TEXTE : écrire « 1<sup>er</sup> » dans highlights.ts obligerait
+ * à rendre ces valeurs en `set:html`, et à faire confiance à une chaîne pour du balisage ; d'autres
+ * pages lisent la même donnée et y afficheraient les balises. La découpe se fait ici, au rendu.
  * Le motif ne reconnaît qu'un NOMBRE SUIVI DE SON SUFFIXE ORDINAL en fin de mot : « 1er », « 6e »,
- * « 2de ». Les autres valeurs des cartes passent au travers sans être touchées — « 8 ans minimum » n'a
- * pas de suffixe collé au chiffre, « 10 € » non plus.
- *
- * LE RENDU TIENT SUR UNE SEULE LIGNE, et ce n'est pas une coquetterie : un retour à la ligne entre deux
- * expressions JSX produit une espace dans le HTML, et on lisait « 1 er jour du 6 e mois ».
+ * « 2de ». Les autres valeurs passent au travers sans être touchées (« 8 ans minimum » n'a pas de
+ * suffixe collé au chiffre, « 10 € » non plus).
+ * LE RENDU TIENT SUR UNE SEULE LIGNE, et ce n'est pas une coquetterie : un retour à la ligne entre
+ * deux expressions JSX produit une espace dans le HTML, et on lisait « 1 er jour du 6 e mois ».
  */
 const enExposant = (
   valeur: string
@@ -63,22 +56,15 @@ const enExposant = (
 ---
 
 {
-  /*
-   * FOND SOMBRE depuis le 14/09/2026 (demande de l'équipe) : le tableau prend l'ink, et « L'expérience
-   * derrière R Start » prend le blanc en échange. C'est ce qui règle le rendu du carrousel Trustpilot,
-   * qui pose ses propres cartes blanches et s'accommodait mal d'un fond bleu.
-   * Les repères passent donc en verre clair sur l'ink, valeurs en sand.
-   */
+  /* FOND SOMBRE (14/09/2026, demande de l'équipe), échangé avec la section CORUM, passée en blanc
+    pour le carrousel Trustpilot qu'elle portait alors. Repères en verre clair sur l'ink, valeurs en
+    sable. */
 }
 <Section id={sections.highlights.id} tone="ink">
   <Container size="wide">
-    {
-      /* Aligné à gauche comme tous les autres titres de section depuis le 11/09/2026 : c'était le seul
-        en-tête centré de la page. */
-    }
     <header>
-      {/* Titre en sable depuis le 16/09/2026, comme celui de la section Risques : les deux blocs
-        sur fond ink partagent la même couleur de titre. */}
+      {/* Titre en sable, comme celui de la section Risques : les deux blocs sur fond ink partagent
+        la même couleur de titre. */}
       <h2 id={titleId} class="text-display-lg text-balance text-sand" data-reveal-text>
         {highlights.title}
       </h2>
@@ -96,9 +82,8 @@ const enExposant = (
     </header>
 
     {
-      /* Six blocs simples en 3 × 2 (11/09/2026) : un libellé, une valeur. Ni pictogramme, ni
-        description, ni contre-poids par bloc. Le contre-poids de la section, qui
-        les remplaçait sous la grille, a été retiré du contenu le 14/09/2026 (voir highlights.ts). */
+      /* Six blocs simples en 3 × 2 : un libellé, une valeur. Le contre-poids de la section, sous la
+        grille, a été retiré du contenu le 14/09/2026 (voir highlights.ts). */
     }
     <ul role="list" class="mt-chapter grid gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6">
       {
@@ -143,16 +128,15 @@ const enExposant = (
     </ul>
 
     {
-      /* Bloc À PART (11/09/2026) : comment on souscrit et ce qu'on peut automatiser. Un filet et un titre
-        le détachent des six repères, et il est rendu sans encadré, ce ne sont pas des caractéristiques
-        du produit, mais des modalités. */
+      /* Bloc À PART : comment on souscrit et ce qu'on peut automatiser. Un filet et un titre le
+        détachent des six repères, et il est rendu sans encadré : ce ne sont pas des
+        caractéristiques du produit, mais des modalités. */
       highlights.subscriptionItems && highlights.subscriptionItems.length > 0 && (
         <div class="mt-chapter border-t border-white/20 pt-8 sm:pt-10">
           {
-            /* Le TITRE du bloc passe en sable le 16/09/2026, pas ses libellés : ceux-ci restent en
-              blanc atténué, comme les libellés des six cartes au-dessus (« Niveau de risque »,
-              « Approche »…). Un libellé nomme, il ne porte pas l'information : le sable est réservé à
-              ce qu'on doit lire, la valeur. Les mettre en sable les faisait rivaliser avec elle. */
+            /* Le TITRE du bloc est en sable, pas ses libellés, en blanc atténué comme ceux des six
+              cartes : un libellé nomme, il ne porte pas l'information, le sable est réservé à ce
+              qu'on doit lire, la valeur. */
           }
           {highlights.subscriptionTitle && (
             <h3 class="text-display-sm text-sand">{highlights.subscriptionTitle}</h3>
@@ -172,8 +156,8 @@ const enExposant = (
     }
 
     {
-      /* APPEL À L'ACTION DE LA SECTION (15/09/2026). `outline-light` et non `light` : le fond est ink,
-        et un bouton blanc plein aurait le poids d'un CTA de souscription, alors que celui-ci mène à une
+      /* APPEL À L'ACTION DE LA SECTION. `outline-light` et non `light` : le fond est ink, et un
+        bouton blanc plein aurait le poids d'un CTA de souscription, alors que celui-ci mène à une
         page du site. La hiérarchie de l'accueil reste celle du hero. */
       highlights.secondaryCta && (
         <p class="mt-chapter">
@@ -187,7 +171,7 @@ const enExposant = (
 </Section>
 
 <script>
-  /* Le dépliage vit dans un module partagé depuis le 16/09/2026 : le comparateur de frais s'en sert
-     aussi, et les deux composants coexistent sur l'accueil. Voir src/scripts/infoToggle.ts. */
+  /* Dépliage des explications « i » : module partagé avec le comparateur de frais, les deux
+     composants coexistent sur l'accueil (src/scripts/infoToggle.ts). */
   import '@/scripts/infoToggle';
 </script>

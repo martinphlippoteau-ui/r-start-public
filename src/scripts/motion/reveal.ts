@@ -1,7 +1,7 @@
 /**
  * data-animate, révélation unique à l'entrée dans le viewport (88 %), interruptible (once).
- * Rythme unique (shared.ts, 11/09/2026) : 0,6 s, 20 px, expo.out ; les grands titres (h2, h3,
- * text-display-*) 0,7 s / 24 px, même courbe. Le mouvement finit avant que l'œil ne lise.
+ * Rythme unique (shared.ts) : 0,6 s, 20 px, expo.out ; les grands titres (h2, h3, text-display-*)
+ * 0,7 s / 24 px, même courbe. Le mouvement finit avant que l'œil ne lise.
  *  - "fade-up" (défaut) : opacity 0 → 1, y 20 → 0
  *  - "clip"             : clip-path inset bas → 0. Réservé aux médias (img, picture, svg, video,
  *                         figure) : la propriété n'est pas composée sur le GPU. Sur tout autre
@@ -10,18 +10,12 @@
  *                         `data-animate-child="tilt"` les fait entrer en bascule (rotationX 6° → 0,
  *                         perspective 900 px, y 24 → 0) : les trois tuiles de /strategie.
  * Options : data-animate-delay="0.1" (s), data-animate-stagger="0.08" (s), data-animate-y="20" (px).
- * Les types « fade », « scale » et « tilt » isolés, jamais employés, ont été retirés le 22/09/2026.
- *
- * Règle de sobriété (11/09/2026) : au plus UN effet d'entrée par bloc de contenu (une carte, une liste,
- * un titre), jamais sur un conteneur ET son contenu ; une cascade de plus de quatre éléments est un seul
- * `stagger` sur le parent.
- *
- * Garde-fous :
- *  - refusé sur le H1, sur un [data-no-motion] et sur tout élément qui en contient ;
- *  - "stagger" : seuls les enfants sans élément protégé cascadent, les autres restent visibles d'emblée ;
- *  - un élément déjà dans le viewport à l'initialisation (arrivée par une ancre, moteur chargé après
- *    le premier rendu) reste tel quel : l'éteindre pour le rallumer serait un flash et retarderait
- *    le LCP. Pour une entrée au chargement, utiliser data-intro (CSS).
+ * Sobriété : au plus UN effet d'entrée par bloc de contenu, jamais sur un conteneur ET son contenu
+ * ; une cascade de plus de quatre éléments est un seul `stagger` sur le parent.
+ * Garde-fous : refusé sur le H1, un [data-no-motion] et tout élément qui en contient ; "stagger" ne
+ * cascade que les enfants sans élément protégé ; un élément déjà dans le viewport à
+ * l'initialisation (ancre, moteur chargé après le premier rendu) reste tel quel, l'éteindre serait
+ * un flash et retarderait le LCP. Pour une entrée au chargement, data-intro (CSS).
  */
 import { gsap } from 'gsap';
 import {
@@ -91,12 +85,9 @@ export const setupReveals = (): void => {
         break;
       case 'stagger': {
         if (!(targets as Element[]).length) return;
-        /*
-         * `data-animate-child` EST LU ICI AUSSI (audit du 18/09/2026). Seul le moteur léger le lisait,
-         * alors que son unique emploi, les trois tuiles de /strategie (`tilt`, « plus spectaculaire »,
-         * demande de l'équipe du 16/09/2026), vit sur une page servie par CE moteur : l'effet demandé
-         * n'a jamais été joué en production, la cascade retombait sur son `fade-up`.
-         */
+        /* `data-animate-child` EST LU ICI AUSSI : son unique emploi, les tuiles de /strategie
+           (`tilt`, demande de l'équipe), vit sur une page servie par CE moteur, et l'effet
+           retombait en fade-up. */
         const bascule = el.dataset.animateChild === 'tilt';
         const distance = num(el.dataset.animateY, DISTANCE);
         gsap.from(targets, {

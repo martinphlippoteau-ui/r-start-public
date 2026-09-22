@@ -1,26 +1,22 @@
 ---
 /**
  * Section 8, Risques (id « risques »). Contre-poids global de la page : section pleine sur fond ink
- * avec le même poids typographique que les sections avantages (H2 text-display-lg ; plus d'intro
- * depuis le 15/09/2026). Rendue sur l'accueil, sur /strategie et, sans rideau, sur /a-propos.
- * Quatre risques en grille depuis le 16/09/2026 (titre text-display-sm, description text-base
- * depuis le 15/09/2026). Les avertissements reproduits in extenso (bulletin de souscription, DIC,
- * commission d'arbitrage) ont quitté cette section le
- * 11/09/2026 à la demande de l'équipe : ils sont désormais sur /documentation, à côté des documents
- * dont ils sont extraits (components/pages/documentation/MandatoryWarnings.astro).
+ * avec le même poids typographique que les sections avantages (H2 text-display-lg, sans intro ni
+ * surtitre), tout en sable. Rendue sur l'accueil, sur /strategie et, sans rideau, sur /a-propos.
+ * Quatre risques en grille (titre text-display-sm, description text-base). Les avertissements
+ * reproduits in extenso (bulletin de souscription, DIC, commission d'arbitrage) ont quitté cette
+ * section le 11/09/2026 à la demande de l'équipe : ils sont sur /documentation, à côté des
+ * documents dont ils sont extraits (components/pages/documentation/MandatoryWarnings.astro).
  * Motion (src/scripts/motion.ts) :
- *  - transition de chapitre en rideau (`data-curtain` sur la section) : la section précédente, sur
- *    l'accueil « Souscrire » (06) depuis que « La presse en parle » (08b) a quitté HOME_ORDER, et sur
- *    /strategie « Comment » (04-Strategy), est épinglée quand son bas atteint le milieu de l'écran
- *    (`bottom center` depuis le 14/09/2026, voir plus bas) pendant que cette section monte
+ *  - transition de chapitre en rideau (`data-curtain` sur la section) : la section précédente
+ *    (« Souscrire » sur l'accueil, 04-Strategy sur /strategie) est épinglée quand son bas atteint
+ *    le milieu de l'écran (`bottom center`, voir plus bas) pendant que cette section monte
  *    par-dessus (coins arrondis et ombre posés par la CSS `[data-curtain]`). La section recouverte
  *    recule (scale 0,96, opacité 0,6) : elle ne contient aucun élément protégé ;
- *  - rien d'autre ne bouge (sobriété du 11/09/2026 : les intitulés n'entrent plus en fade-up, le
- *    contre-poids global de la page est en place d'emblée) : ni le H2, ni les quatre risques.
+ *  - rien d'autre ne bouge, ni le H2 ni les quatre risques : le contre-poids global de la page est
+ *    en place d'emblée.
  * Sans JS ou en reduced-motion : aucun pin, aucun rideau, tout est visible et stable.
  * Contenu : src/content/fr/risks.ts (textes réglementaires reproduits à l'identique depuis legal.ts).
- * Plus de surtitre : le bloc n'en rend aucun. Le titre est en sable, par la classe passée à
- * SectionHeading.
  */
 import Container from '@/components/ui/Container.astro';
 import Section from '@/components/ui/Section.astro';
@@ -30,11 +26,10 @@ import { risks } from '@/content/fr/risks';
 
 const id = sections.risks.id;
 /*
- * LE RIDEAU EST FACULTATIF depuis le 16/09/2026. `data-curtain` est un attribut du moteur GSAP, et
- * tests/performance.spec.ts interdit GSAP sur cinq sous-pages, dont /a-propos, où ce bloc vient d'être
- * ajouté : la page se mettait à télécharger 45 Ko pour une seule transition.
- * Le rideau reste par défaut, donc l'accueil et /strategie ne changent pas. Une page qui doit rester
- * sans GSAP passe `rideau={false}` : elle perd la transition de chapitre, pas une ligne de contenu.
+ * LE RIDEAU EST FACULTATIF : `data-curtain` est un attribut du moteur GSAP, et
+ * tests/performance.spec.ts interdit GSAP sur cinq sous-pages, dont /a-propos (45 Ko pour une seule
+ * transition). Une page qui doit rester sans GSAP passe `rideau={false}` : elle perd la transition
+ * de chapitre, pas une ligne de contenu.
  */
 interface Props {
   rideau?: boolean;
@@ -45,28 +40,24 @@ const { rideau = true } = Astro.props as Props;
 
 {
   /*
-   * RIDEAU DÉCLENCHÉ PLUS TARD (14/09/2026) : « le bloc des risques apparaît trop tôt au scroll ».
-   *
-   * La règle d'emploi du rideau (src/scripts/motion/scroll.ts) le prévoyait POSÉ SUR 08b-Presse. Or
-   * 08b-Presse a quitté HOME_ORDER : la section qui précède est maintenant 06-Souscrire, et le moteur
-   * épingle simplement `previousElementSibling`. Avec le déclenchement par défaut, `bottom bottom`,
-   * l'épinglage part dès que le bas de Souscrire touche le bas de l'écran, ce qui suppose qu'on l'a
-   * lue en entier à ce moment-là : vrai pour une section qui tient dans un écran, faux ici. Mesuré sur
-   * 1440 × 900, Souscrire fait 1 110 px, soit 1,23 écran ; son bas atteignait le bas du viewport après
-   * 250 px de défilement, et les Risques montaient par-dessus dans la foulée.
-   *
-   * `bottom center` repousse l'épinglage jusqu'à ce que le bas de Souscrire atteigne le milieu de
-   * l'écran : elle défile normalement d'abord, le rideau ne couvre plus qu'un demi-écran, et la
-   * transition de chapitre reste. Si 08b-Presse revenait juste avant, la valeur par défaut suffirait.
+   * RIDEAU DÉCLENCHÉ PLUS TARD (14/09/2026, « le bloc des risques apparaît trop tôt au scroll »).
+   * Le moteur épingle `previousElementSibling`, soit 06-Souscrire sur l'accueil, qui fait plus d'un
+   * écran (1 110 px sur 1440 × 900). Avec le déclenchement par défaut, `bottom bottom`, l'épinglage
+   * part dès que le bas de Souscrire touche le bas de l'écran, ce qui suppose qu'on l'a lue en
+   * entier : vrai pour une section qui tient dans un écran, faux ici, les Risques montaient après
+   * 250 px de défilement. `bottom center` repousse l'épinglage jusqu'à ce que le bas de Souscrire
+   * atteigne le milieu de l'écran : elle défile normalement d'abord, le rideau ne couvre plus qu'un
+   * demi-écran. Une section précédente qui tient dans un écran se contenterait de la valeur par
+   * défaut.
    */
 }
 <Section id={id} tone="ink" data-curtain={rideau ? 'bottom center' : undefined}>
   <Container size="wide" class="relative">
     {
-      /* TOUT LE BLOC EN SABLE depuis le 16/09/2026 (demande de l'équipe) : le titre par la classe
-        passée à SectionHeading, dont le H2 hérite faute de couleur propre, les intitulés et les
-        descriptions par leurs classes ci-dessous. Relevé à 11,54:1 sur le fond ink, contre 14,23
-        pour le blanc : très au-dessus des 4,5 exigés. */
+      /* TOUT LE BLOC EN SABLE (16/09/2026, demande de l'équipe) : le titre par la classe passée à
+        SectionHeading, dont le H2 hérite faute de couleur propre, les intitulés et les descriptions
+        par leurs classes ci-dessous. Relevé à 11,54:1 sur le fond ink, contre 14,23 pour le blanc :
+        très au-dessus des 4,5 exigés. */
     }
     <SectionHeading id={id} title={risks.title} intro={risks.intro} class="text-sand" />
 
@@ -79,17 +70,13 @@ const { rideau = true } = Astro.props as Props;
           <li class="border-t border-white/25 pt-6 sm:pt-8">
             <h3 class="text-display-sm text-sand">{item.title}</h3>
             {
-              /* 16 PX FIXES ET INTERLIGNE RESSERRÉ depuis le 15/09/2026 (demande de l'équipe).
-                `text-lead` montait de 18 à 24 px avec la largeur d'écran et portait un interligne
-                de 1,5 : six descriptions de risque à ce corps prenaient deux écrans. `text-base`
-                les fixe à 16 px, `leading-snug` resserre à 1,375.
-                SABLE DEPUIS LE 16/09/2026 (demande de l'équipe), ex-blanc plein. Relevé à 11,54:1
-                sur le fond ink, contre 14,23 pour le blanc : très au-dessus des 4,5 exigés, et la
-                teinte tient le contraste de loin.
+              /* 16 PX FIXES ET INTERLIGNE RESSERRÉ (15/09/2026, demande de l'équipe) : en
+                `text-lead`, les descriptions de risque prenaient deux écrans ; `text-base` les fixe
+                à 16 px, `leading-snug` resserre à 1,375. Sable : contraste, voir plus haut.
                 CE QUI NE CHANGE PAS : le titre du risque reste en `text-display-sm`, et les
-                descriptions gardent le MÊME corps entre elles. Un risque affiché plus petit que
-                ses voisins, ou plus petit que l'avantage qu'il contrebalance, est ce que l'AMF
-                refuse ; ici aucun avantage ne partage cette section. */
+                descriptions gardent le MÊME corps entre elles. Un risque affiché plus petit que ses
+                voisins, ou plus petit que l'avantage qu'il contrebalance, est ce que l'AMF refuse ;
+                ici aucun avantage ne partage cette section. */
             }
             <p class="mt-3 text-base leading-snug text-sand">{item.description}</p>
           </li>

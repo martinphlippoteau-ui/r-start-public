@@ -1,45 +1,25 @@
 /**
  * SIMULATEUR : LA PAGE. Mène le parcours de Simulator.astro, puis relie ses réglages au moteur
  * (./moteur.ts) et au graphique (./graphique.ts).
- *
- * LA FENÊTRE D'ACCÈS D'ABORD : le simulateur arrive `inert`, et ne l'est plus qu'une fois « J'ai
- * compris » pressé. Ni Échap ni le voile ne la referment.
- *
+ * LA FENÊTRE D'ACCÈS D'ABORD : le simulateur arrive `inert` jusqu'à « J'ai compris ».
  * DEUX MODES, portés par `data-mode` sur la racine (arbitrage de Martin du 20/09/2026) :
- *  - `parcours` : quatre questions, une à l'écran, dans la carte de gauche. « Continuer » valide la
- *    question en cours avant d'avancer ; la dernière, le taux, ne se franchit pas sans qu'un taux ait
- *    été CHOISI. À droite, « Vos hypothèses » se remplit ligne à ligne, et un clic sur une ligne
- *    ramène à sa question ;
- *  - `resultat` : les chiffres et le graphique à gauche, et à droite les mêmes réglages repliés sur
- *    leur valeur, « Commencer ma souscription » dessous. Un seul réglage s'ouvre à la fois, aucun
- *    d'emblée : le bloc reste court, et le bouton à l'écran.
- * Les champs ne sont pas dupliqués : le CORPS de chaque réglage (sa question, ses commandes) est un
- * seul élément, que ce script range dans la carte pendant le parcours, puis sous sa ligne.
- *
- * LE MOUVEMENT (demande de Martin du 20/09/2026). Les entrées sont en CSS (global.css, « Le mouvement
- * du simulateur ») et se déclenchent seules quand un élément quitte `hidden`. Ce script ajoute ce que
- * la CSS ne sait pas faire : les chiffres qui défilent jusqu'à leur valeur, le graphique qui se déforme
- * d'un état à l'autre, la valeur d'une ligne qui tressaute quand elle change. Rien de tout cela en
- * mouvement réduit.
- *
- * AUCUN TAUX N'EST CHOISI À L'ARRIVÉE, et c'est la règle qui porte la page : R Start n'a pas
- * d'historique, le site ne lui suppose donc aucun taux. `tauxChoisi` ne devient vrai que si le visiteur
- * déplace le curseur ou applique un repère. « Recommencer » le remet à faux.
- *
- * CE SCRIPT N'ÉCRIT AUCUN TEXTE À LUI. Les libellés sont dans le HTML, rendus depuis
- * src/content/fr/simulator.ts ; les phrases qui portent un nombre y sont des gabarits (`data-gabarit`,
- * avec des marques `{nom}`), qu'il remplit. Il ne pose aucune classe : il bascule `hidden`,
- * `aria-pressed`, `aria-expanded`, `data-invalide`, `data-etat`, et écrit des attributs SVG.
- *
- * Une fois sur l'écran de résultat, chaque modification recalcule tout : cinquante ans de projection,
- * c'est six cents tours de boucle, rien qui mérite d'être différé. LES MONTANTS SE SAISISSENT
- * LIBREMENT : pas de reformatage pendant la frappe (le curseur du champ sauterait), la mise en forme
- * « 20 000 » arrive à la sortie du champ.
- *
- * LE MONTANT DE DÉPART EST À ZÉRO (22/09/2026) : le champ arrive vide, et son erreur (« le minimum
- * est de 200 € ») n'apparaît qu'au premier « Continuer ». L'afficher dès l'arrivée accueillait la
- * première question par un message d'erreur ; l'afficher à la sortie du champ décalait le bouton
- * « Continuer » entre l'appui et le relâchement, et le clic se perdait.
+ * `parcours`, quatre questions une à une dans la carte de gauche (« Continuer » valide la question
+ * en cours ; la dernière, le taux, ne se franchit pas sans qu'un taux ait été CHOISI), « Vos
+ * hypothèses » se remplissant à droite ligne à ligne ; `resultat`, chiffres et graphique à gauche,
+ * les mêmes réglages repliés à droite, un seul ouvert à la fois. Le CORPS de chaque réglage est un
+ * seul élément, rangé dans la carte pendant le parcours, puis sous sa ligne. Chaque modification
+ * recalcule tout. AUCUN TAUX N'EST CHOISI À L'ARRIVÉE, et c'est la règle qui porte la page : R
+ * Start n'a pas d'historique, le site ne lui suppose aucun taux. `tauxChoisi` ne devient vrai que
+ * si le visiteur déplace le curseur ou applique un repère ; « Recommencer » le remet à faux.
+ * CE SCRIPT N'ÉCRIT AUCUN TEXTE À LUI : les libellés sont dans le HTML
+ * (src/content/fr/simulator.ts), les phrases à nombre sont des gabarits `data-gabarit` qu'il
+ * remplit. Il ne pose aucune classe, il bascule `hidden`, `aria-pressed`, `aria-expanded`,
+ * `data-invalide`, `data-etat` et des attributs SVG. LE MOUVEMENT (demande de Martin) : les entrées
+ * sont en CSS ; ce script ajoute les chiffres qui défilent, le graphique qui se déforme, la valeur
+ * d'une ligne qui tressaute. Rien en mouvement réduit. LES MONTANTS SE SAISISSENT LIBREMENT : pas
+ * de reformatage pendant la frappe (le curseur sauterait). Le champ arrive vide et son erreur
+ * n'attend que le premier « Continuer » : affichée à la sortie du champ, elle décalait le bouton
+ * entre l'appui et le relâchement, et le clic se perdait.
  */
 import {
   CADRE_ETROIT,
@@ -107,7 +87,8 @@ interface Etat {
   vue: Vue;
 }
 
-/** Largeur de la poignée des curseurs, en pixels : `--simu-poignee` (global.css), POIGNEE (Simulator.astro). */
+/** Largeur de la poignée des curseurs, en pixels : `--simu-poignee` (global.css), POIGNEE
+    (Simulator.astro). */
 const POIGNEE = 22;
 const COUCHES_CAPITAL: CleCouche[] = ['initial', 'programmes', 'reinvestis'];
 
@@ -162,8 +143,7 @@ const init = (): void => {
     maximumFractionDigits: 1,
   });
   /* `Intl` sépare les milliers français par une espace FINE insécable (U+202F), que la police du site
-     dessine sans largeur : « 207116 € ». L'espace insécable ordinaire, celle de tout le contenu du
-     site, la remplace. */
+     dessine sans largeur : « 207116 € ». L'espace insécable ordinaire la remplace. */
   const lisible = (s: string): string => s.replace(/\u202f/g, '\u00a0');
   const euros = (n: number): string => lisible(nfEuros.format(Number.isFinite(n) ? n : 0));
   const eurosCourt = (n: number): string =>
@@ -175,7 +155,8 @@ const init = (): void => {
   /** « 25,75 » : un nombre de parts, fractions comprises. */
   const enParts = (n: number): string => lisible(nfParts.format(n));
 
-  /** Remplit un gabarit « … {nom} … ». Fonction et non chaîne : `replace` interprète « $& » dans une chaîne de remplacement. */
+  /** Remplit un gabarit « … {nom} … ». Fonction et non chaîne : `replace` interprète « $& » dans
+      une chaîne de remplacement. */
   const remplir = (gabarit: string, valeurs: Record<string, string>): string =>
     gabarit.replace(/\{(\w+)\}/g, (marque, nom: string) => valeurs[nom] ?? marque);
   const ecrire = (nom: string, valeurs: Record<string, string>, attribut = 'gabarit'): void => {
@@ -187,12 +168,10 @@ const init = (): void => {
   const sobre = window.matchMedia('(prefers-reduced-motion: reduce)');
   const sortie = (t: number): number => 1 - (1 - t) ** 3;
   /**
-   * Joue `image(avance)` de 0 à 1 sur `duree` ms, et rend de quoi l'interrompre. En mouvement réduit :
-   * d'un coup.
-   * LA DERNIÈRE IMAGE EST GARANTIE par une minuterie, pas seulement par `requestAnimationFrame` : le
-   * navigateur cesse de dessiner un onglet passé à l'arrière-plan, ou une page sous forte charge, et
-   * un montant restait alors figé à mi-course (« 155 € » au lieu de « 164 € », vu en test le
-   * 20/09/2026). Un chiffre affiché doit toujours finir exact.
+   * Joue `image(avance)` de 0 à 1 sur `duree` ms, et rend de quoi l'interrompre ; d'un coup en
+   * mouvement réduit. LA DERNIÈRE IMAGE EST GARANTIE par une minuterie, pas seulement par
+   * `requestAnimationFrame` : un onglet à l'arrière-plan ou une page sous forte charge n'est plus
+   * dessiné, et un montant restait figé à mi-course. Un chiffre affiché doit toujours finir exact.
    */
   const jouer = (duree: number, image: (avance: number) => void): (() => void) => {
     if (sobre.matches) {
@@ -730,7 +709,7 @@ const init = (): void => {
     const enCours = ETAPES[etat.etape - 1];
     racine.dataset.mode = etat.mode;
     /* « Vos hypothèses » n'a rien à montrer à la première question : il arrive avec la deuxième, et
-       ne porte que les réponses DÉJÀ données (demande de Martin du 20/09/2026). */
+       ne porte que les réponses DÉJÀ données (demande de Martin). */
     const panneauMontre = !parcours || etat.etape > 1;
     racine.dataset.panneau = panneauMontre ? 'oui' : 'non';
     const montrer = (selecteur: string, visible: boolean): void => {
@@ -906,14 +885,12 @@ const init = (): void => {
 
   /* ── Parcours ─────────────────────────────────────────────────────────────────────────────── */
   /**
-   * CHANGER D'ÉCRAN. Là où le navigateur sait faire une transition de vue du même document, la carte
-   * glisse de sa place à la suivante (seule et centrée à la première question, à gauche ensuite) et
-   * le panneau se pose à côté : le navigateur interpole les deux, global.css (`vt-simu`) donne la
-   * courbe, ET LES NOMS : carte et panneau n'en portent que sous `vt-simu`, sans quoi la transition
-   * d'une page à l'autre les peignait par-dessus la fenêtre d'accès. La classe est donc posée AVANT
-   * `startViewTransition`, pour que la capture de départ les porte déjà. Ailleurs, et en mouvement
-   * réduit, l'écran change d'un coup ; les entrées CSS jouent quand même. Le focus va au titre de ce
-   * qui vient d'apparaître : un lecteur d'écran l'annonce.
+   * CHANGER D'ÉCRAN, en transition de vue du même document quand le navigateur sait : la carte
+   * glisse et le panneau se pose à côté, global.css (`vt-simu`) donne la courbe ET LES NOMS, que
+   * carte et panneau ne portent que sous `vt-simu` (sinon la transition entre pages les peignait
+   * par-dessus la fenêtre d'accès). La classe est posée AVANT `startViewTransition`, pour la
+   * capture de départ. Ailleurs, et en mouvement réduit, l'écran change d'un coup. Le focus va au
+   * titre qui apparaît.
    */
   const changer = (
     sens: 'avant' | 'arriere',
@@ -925,9 +902,9 @@ const init = (): void => {
       maj();
       actualiser();
       const cible = viser();
-      /* La page ne bouge que s'il le faut : sur grand écran la carte est déjà sous les yeux, et un
-         recalage à chaque question la faisait sauter pour rien. Sur téléphone, en revanche, on vient de
-         presser un bouton en bas d'écran : le titre suivant est au-dessus, hors de vue. */
+      /* La page ne bouge que s'il le faut : sur grand écran un recalage à chaque question la
+         faisait sauter pour rien ; sur téléphone, le titre suivant est au-dessus du bouton
+         pressé, hors de vue. */
       const bloc =
         cible?.closest<HTMLElement>('[data-simu-carte], [data-simu-resultats]') ?? racine;
       const haut = (cible ?? bloc).getBoundingClientRect().top;
@@ -944,10 +921,9 @@ const init = (): void => {
     const html = document.documentElement;
     html.classList.add('vt-simu');
     const transition = doc.startViewTransition(appliquer);
-    /* Le navigateur ABANDONNE une transition quand la fenêtre change de taille en cours de route (la
-       barre d'adresse d'un téléphone qui se replie, une rotation) : l'écran a changé quand même, seule
-       l'animation saute. Ses deux promesses sont alors rejetées ; sans ces `catch`, c'était une
-       exception non rattrapée à chaque question sur téléphone. */
+    /* Le navigateur ABANDONNE une transition quand la fenêtre change de taille (barre d'adresse
+       d'un téléphone qui se replie) et rejette ses deux promesses : sans ces `catch`, une exception
+       non rattrapée à chaque question sur téléphone. L'écran a changé quand même. */
     transition.ready.catch(() => undefined);
     void transition.finished.catch(() => undefined).then(() => html.classList.remove('vt-simu'));
   };
@@ -1070,9 +1046,8 @@ const init = (): void => {
       },
       { threshold: 0.15 }
     ).observe(zoneResultats);
-    /* Le pied de page ne chasse la barre qu'une fois monté à mi-écran (`rootMargin`). Sur téléphone il
-       suit de près « Vos hypothèses » : au premier pixel, la barre disparaissait pendant qu'on réglait
-       la durée, dernier réglage du panneau, c'est-à-dire au moment où elle sert. */
+    /* Le pied de page ne chasse la barre qu'une fois monté à mi-écran (`rootMargin`) : au premier
+       pixel, elle disparaissait pendant qu'on réglait la durée, au moment où elle sert. */
     const pied = document.querySelector('footer');
     if (pied)
       new IntersectionObserver(
@@ -1087,14 +1062,10 @@ const init = (): void => {
   actualiser();
 
   /* ── Fenêtre d'accès ──────────────────────────────────────────────────────────────────────── */
-  /*
-   * ELLE EST DÉJÀ À L'ÉCRAN quand ce script s'exécute : le serveur la rend, elle ne dépend de rien
-   * (SimulatorGate.astro dit pourquoi). Il ne reste ici qu'à fermer la page derrière elle, puis à la
-   * retirer quand on a répondu.
-   * Le verrou est celui du site (src/scripts/verrou.ts), partagé avec le tiroir du menu et la
-   * recherche : il rend inertes les enfants de <body> qui ne portent pas la fenêtre — la tabulation ne
-   * peut donc pas en sortir — et neutralise les gestes de défilement, sans jamais empêcher le zoom.
-   */
+  /* ELLE EST DÉJÀ À L'ÉCRAN quand ce script s'exécute : le serveur la rend (SimulatorGate.astro dit
+     pourquoi). Il ne reste qu'à fermer la page derrière elle par le verrou du site
+     (src/scripts/verrou.ts : page inerte, gestes de défilement neutralisés, jamais le zoom), puis à
+     la retirer quand on a répondu. */
   const voile = document.querySelector<HTMLElement>('[data-simu-acces-voile]');
   const acces = voile?.querySelector<HTMLElement>('[data-simu-acces]');
   const liberer = (): void => {

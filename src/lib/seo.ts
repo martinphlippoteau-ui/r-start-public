@@ -91,11 +91,10 @@ export function faqJsonLd(items: FaqItem[]): JsonLd {
       '@type': 'Question',
       name: item.question,
       /* TOUT ce que la page affiche, dans le même ordre : paragraphes, puces, tableau, conclusion.
-         Seul `answer` était repris : « Quels sont les frais de R Start ? » perdait son tableau (les
-         15 % de gestion, le 0 / 6 / 12 %, les frais de retrait) et ne disait plus que « aucun frais
-         quand vous investissez » ; « Quel est le niveau de risque » s'arrêtait sur « Pourquoi un peu
-         plus élevé ? », sans les raisons ni « le capital et les revenus ne sont pas garantis ». C'est
-         la version que les moteurs et les assistants citent hors contexte (audit du 18/09/2026). */
+         Seul `answer` était repris : « Quels sont les frais de R Start ? » perdait son tableau et
+         « Quel est le niveau de risque » s'arrêtait avant « le capital et les revenus ne sont pas
+         garantis ». C'est la version que les moteurs et les assistants citent hors contexte (audit
+         du 18/09/2026). */
       acceptedAnswer: {
         '@type': 'Answer',
         text: [

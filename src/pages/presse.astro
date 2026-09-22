@@ -1,14 +1,13 @@
 ---
 /**
  * Page /presse, « La presse en parle » (grand public) : SiteNav collée en haut → main#contenu
- * (PageHero avec le fil d'Ariane dans son slot et le CTA, sans ligne risques depuis le 14/09/2026 →
- * citations mises en avant → revue de presse → contacts presse, zone 4) → Footer. Plus de notes
- * légales : retirées de l'écran le 14/09/2026, du code le 22/09/2026. L'avertissement de la revue, dans sa bande
- * sombre, a été retiré le 16/09/2026 (voir press.ts).
- * La salle de presse, qui portait les communiqués et le kit média (arbitrage du 10/09/2026), a été
- * désactivée le 15/09/2026 puis supprimée le 22/09/2026 ; ses contacts sont rendus ici.
- * Métadonnées (title, description, canonical) depuis press.seo, chemin depuis src/config/pages.ts ;
- * JSON-LD Organization + WebPage + BreadcrumbList via src/lib/seo.ts. Aucun texte en dur.
+ * (PageHero avec le fil d'Ariane dans son slot et le CTA, sans ligne risques → citations mises en
+ * avant → revue de presse → contacts presse, zone 4) → Footer. Les notes légales et la salle de
+ * presse (communiqués, kit média) ont quitté l'écran le 14 et le 15/09/2026 à la demande de
+ * l'équipe, puis le code le 22/09/2026 ; seuls les contacts presse sont rendus ici. L'avertissement
+ * de la revue a quitté sa bande sombre le 16/09/2026 (voir press.ts). Métadonnées (title,
+ * description, canonical) depuis press.seo, chemin depuis src/config/pages.ts ; JSON-LD
+ * Organization + WebPage + BreadcrumbList via src/lib/seo.ts. Aucun texte en dur.
  */
 import Base from '@/layouts/Base.astro';
 import SiteNav from '@/components/SiteNav.astro';
@@ -41,31 +40,27 @@ const jsonLd = [
         {press.cta.label}
       </Button>
       {
-        /* LE TABLEAU DES MÉDIAS EST RETIRÉ de l'en-tête le 16/09/2026, demande de l'équipe. Il listait
-          les trois médias cités et leur date dans la moitié droite. Les mêmes médias et les mêmes
-          dates restent lisibles juste en dessous, sur chaque citation : l'information n'est pas perdue,
-          elle n'est plus annoncée deux fois.
-          `press.labels.quotesListLabel` reste lu : c'est le nom accessible de la liste des
-          citations (Quotes.astro). */
+        /* Plus de tableau des médias dans l'en-tête (16/09/2026, demande de l'équipe) : les mêmes
+          médias et les mêmes dates restent lisibles sur chaque citation, l'information n'est plus
+          annoncée deux fois. `press.labels.quotesListLabel` reste lu : c'est le nom accessible de
+          la liste des citations (Quotes.astro). */
       }
     </PageHero>
     <Quotes />
     <Coverage />
 
     {
-      /* ZONE 4 (15/09/2026). Cette place portait un renvoi vers /salle-de-presse. L'équipe a demandé de
-        ne pas encore ouvrir cette page aux journalistes, faute de communiqués à y mettre : la route
-        a été désactivée ce jour-là, puis la salle de presse supprimée le 22/09/2026. Les contacts
-        sont servis ici, par le composant écrit pour elle, déplacé sous components/pages/presse/. */
+      /* Zone 4 : les contacts presse, servis par le composant écrit pour la salle de presse
+        (components/pages/presse/). L'équipe a demandé de ne pas ouvrir cette page aux journalistes
+        faute de communiqués (15/09/2026) ; elle a été supprimée le 22/09/2026. */
     }
     <Contacts tone="paper" />
   </main>
 
-  {/* Pastille d'appel : rendue au niveau de la page, jamais dans une section. */}
   {
-    /* Pastille d'appel : elle prend le RELAIS du CTA de l'en-tête, dès que celui-ci n'est plus à
-      l'écran, et reste jusqu'au bas de page. Accrochée à une section, elle laissait un trou pendant
-      lequel la page ne portait plus aucun appel. */
+    /* Pastille d'appel (au niveau de la page, voir StickyCta.astro) : relais du CTA de l'en-tête
+      dès qu'il n'est plus à l'écran, jusqu'au bas de page. Accrochée à une section, elle laissait
+      un trou pendant lequel la page ne portait plus aucun appel. */
   }
   <StickyCta
     label={press.cta.label}
