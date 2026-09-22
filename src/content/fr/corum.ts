@@ -17,7 +17,7 @@ import { externalLinks } from '@/content/fr/facts';
 export const corum = {
   /* Titre du 15/09/2026 : il dit ce que la section montre, le bandeau des chiffres du groupe. */
   title: 'Le groupe CORUM en quelques chiffres',
-  /** Bouton vers /a-propos, de la même forme que « Découvrir notre approche » (15/09/2026). */
+  /** Bouton vers /a-propos, de la même forme que l'appel secondaire des repères (15/09/2026). */
   aboutLink: 'Découvrir le groupe CORUM',
   /* Appel sous les chiffres du groupe, sur /a-propos. Il sort du site, vers corum.fr, seul appel du
      site à le faire depuis le corps d'une page : d'où la mention de nouvelle fenêtre. */

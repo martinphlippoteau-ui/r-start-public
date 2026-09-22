@@ -27,9 +27,9 @@ import { nb } from '@/lib/texte';
  * type déduit est celui du littéral, et le composant qui lit `highlights.intro` ne compilait plus.
  */
 export const highlights: HighlightsContent = {
-  /* Vers la page Stratégie (15/09/2026, demande de l'équipe) : le libellé reprend l'intitulé du
-     menu, « Notre approche », pour que le visiteur retrouve le mot exact dans la barre. */
-  secondaryCta: { label: 'Découvrir notre approche', href: pages.strategy.path },
+  /* Vers /documentation depuis le 22/09/2026 (demande de Martin), ex-« Découvrir notre approche »
+     vers /strategie : après les repères, on renvoie aux documents qui les fondent. */
+  secondaryCta: { label: 'Consultez la documentation', href: pages.documentation.path },
   /* Le bouton « i » ne montre qu'une lettre : ce libellé est ce que les lecteurs d'écran annoncent,
      complété par celui de la carte (« Expliquer : Approche »). */
   labels: { info: 'Expliquer' },
