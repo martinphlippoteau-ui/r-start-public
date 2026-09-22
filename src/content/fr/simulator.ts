@@ -153,6 +153,8 @@ export const simulator = {
 
   /** Ce que le script reçoit : les règles du moteur et les bornes du formulaire. */
   rules: {
+    /** Prix d'une part : le script en déduit le nombre de parts du montant saisi. */
+    sharePrice: share.price,
     minInitial,
     maxInitial: 5_000_000,
     minMonthly,
@@ -169,8 +171,13 @@ export const simulator = {
     },
     rate,
     reinvest: { min: 5, max: 100, step: 5 },
-    defaults: { initial: 20_000, monthly: 0 },
-    initialChips: [5_000, 20_000, 50_000, 100_000],
+    /*
+     * LE MONTANT PART DE ZÉRO (22/09/2026, demande de Martin) : le champ arrive vide, « 0 » en
+     * filigrane, et c'est le visiteur qui pose son montant. Les suggestions sont toutes des multiples
+     * du prix de la part, donc des parts entières (10, 25, 50 et 100 parts à 200 €).
+     */
+    defaults: { initial: 0, monthly: 0 },
+    initialChips: [2_000, 5_000, 10_000, 20_000],
     monthlyChips: [0, 100, 250, 500],
   },
 
@@ -269,6 +276,11 @@ export const simulator = {
     edit: 'Modifier',
     close: 'Fermer',
     restart: 'Recommencer',
+    /** La ligne « Investissement initial » : le montant et son nombre de parts. */
+    initialValue: {
+      one: '{amount}\u00A0· {n}\u00A0part',
+      many: '{amount}\u00A0· {n}\u00A0parts',
+    },
     monthlyNone: 'Aucun',
     incomePaid: 'Chaque mois',
     incomeReinvested: nb('{n} % réinvestis'),
@@ -282,6 +294,20 @@ export const simulator = {
       unit: '€',
       chipsLabel: 'Montants suggérés',
       errorMin: nb(`Le minimum est de {min}, soit une part de ${product.name}.`),
+      /**
+       * Le montant traduit en parts, sous le champ (22/09/2026, demande de Martin). Le bulletin admet
+       * les fractions de part : 5 150 € font 25,75 parts. Singulier sous deux parts, comme le veut la
+       * règle française (« 1,5 part »).
+       */
+      shares: {
+        one: nb(`Soit {n}\u00A0part, à ${share.priceLabel} la part.`),
+        many: nb(`Soit {n}\u00A0parts, à ${share.priceLabel} la part.`),
+      },
+      /** Le bouton qui ajoute ce qui manque pour atteindre la part entière suivante. */
+      complete: {
+        one: '+\u00A0{delta} pour 1\u00A0part entière',
+        many: '+\u00A0{delta} pour {n}\u00A0parts entières',
+      },
     },
     monthly: {
       label: 'Versement programmé',

@@ -25,6 +25,9 @@ const entrer = async (page: Page) => {
   await page.locator('[data-consent-refuse]').click();
 };
 const continuer = (page: Page) => page.locator('[data-simu-suivant]').click();
+/** Le montant part de zéro (22/09/2026) : on le pose par une suggestion. */
+const montant = (page: Page, euros = 20_000) =>
+  page.locator(`[data-simu-puce="initial"][data-v="${euros}"]`).click();
 /** L'écran change dans une transition de vue, une image après le clic : l'étape se lit en attendant. */
 const etape = (page: Page, n: number) =>
   expect(page.locator('[data-simu-etape-libelle]')).toHaveText(new RegExp(`${n} sur 4`));
@@ -32,6 +35,7 @@ const etape = (page: Page, n: number) =>
 /** Va jusqu'à l'écran de résultat : 20 000 €, versement et revenus au choix, repère de marché. */
 const simuler = async (page: Page, { mensuel = 0, reinvestir = false } = {}) => {
   await entrer(page);
+  await montant(page);
   await continuer(page);
   if (mensuel) await page.locator(`[data-simu-puce="monthly"][data-v="${mensuel}"]`).click();
   await continuer(page);
@@ -204,6 +208,7 @@ test.describe('Simulateur : la fenêtre d’accès', () => {
     page,
   }) => {
     await entrer(page);
+    await montant(page);
     await page.evaluate(() => {
       const doc = document as Document & { startViewTransition?: (f: () => void) => unknown };
       const origine = doc.startViewTransition?.bind(document);
@@ -276,6 +281,7 @@ test.describe('Simulateur : aucun taux n’est supposé à R Start', () => {
 
   test('la dernière question ne se franchit pas sans avoir choisi un taux', async ({ page }) => {
     await entrer(page);
+    await montant(page);
     await continuer(page);
     await continuer(page);
     await continuer(page);
@@ -331,6 +337,7 @@ test.describe('Simulateur : le parcours', () => {
     page,
   }) => {
     await entrer(page);
+    await montant(page);
     const panneau = page.locator('[data-simu-panneau]');
     await etape(page, 1);
     await expect(panneau).toBeHidden();
@@ -340,7 +347,7 @@ test.describe('Simulateur : le parcours', () => {
     await etape(page, 2);
     await expect(panneau).toBeVisible();
     expect(await texte(page, '[data-simu-champ]:not([hidden]) [data-simu-resume-valeur]')).toEqual([
-      '20 000 €',
+      '20 000 € · 100 parts',
     ]);
     await expect(page.locator('[data-simu-corps="monthly"] [data-simu-question]')).toBeFocused();
 
@@ -350,7 +357,7 @@ test.describe('Simulateur : le parcours', () => {
     await continuer(page);
     await etape(page, 4);
     expect(await texte(page, '[data-simu-champ]:not([hidden]) [data-simu-resume-valeur]')).toEqual([
-      '20 000 €',
+      '20 000 € · 100 parts',
       '250 € / mois',
       '100 % réinvestis',
     ]);
@@ -360,6 +367,7 @@ test.describe('Simulateur : le parcours', () => {
     page,
   }) => {
     await entrer(page);
+    await montant(page);
     await continuer(page);
     await continuer(page);
     await etape(page, 3);
@@ -393,6 +401,54 @@ test.describe('Simulateur : le parcours', () => {
     await continuer(page);
     await etape(page, 3);
   });
+
+  /*
+   * L'ÉTAPE 1 PART DE ZÉRO ET PARLE EN PARTS (22/09/2026, demande de Martin) : champ vide, aucune
+   * erreur à l'arrivée, quatre suggestions en parts entières ; un montant qui tombe entre deux parts
+   * propose d'ajouter ce qui manque pour la suivante.
+   */
+  test('le montant part de zéro, se lit en parts et se complète à la part entière', async ({
+    page,
+  }) => {
+    await entrer(page);
+    const champ = page.locator('[data-simu-initial]');
+    const ligne = page.locator('[data-simu-parts]');
+    const completer = page.locator('[data-simu-completer]');
+    await expect(champ).toHaveValue('');
+    await expect(champ).toHaveAttribute('placeholder', '0');
+    await expect(page.locator('[data-simu-erreur="initial"]')).toBeHidden();
+    await expect(page.locator('[data-simu-parts-zone]')).toBeHidden();
+    expect(await texte(page, '[data-simu-puce="initial"]')).toEqual([
+      '2 000 €',
+      '5 000 €',
+      '10 000 €',
+      '20 000 €',
+    ]);
+    /* Rien de saisi : l'erreur attend qu'on veuille continuer. */
+    await continuer(page);
+    await etape(page, 1);
+    await expect(page.locator('[data-simu-erreur="initial"]')).toBeVisible();
+    await expect(champ).toBeFocused();
+
+    await champ.fill('150');
+    await expect(ligne).toHaveText('Soit 0,75 part, à 200 € la part.');
+    await expect(completer).toHaveText('+ 50 € pour 1 part entière');
+    await champ.fill('5150');
+    await expect(ligne).toHaveText('Soit 25,75 parts, à 200 € la part.');
+    await expect(completer).toHaveText('+ 50 € pour 26 parts entières');
+    await completer.click();
+    await expect(champ).toHaveValue(/^5\s200$/);
+    await expect(ligne).toHaveText('Soit 26 parts, à 200 € la part.');
+    await expect(ligne).toBeFocused();
+    await expect(completer).toBeHidden();
+    await expect(page.locator('[data-simu-erreur="initial"]')).toBeHidden();
+
+    await continuer(page);
+    await etape(page, 2);
+    expect(await texte(page, '[data-simu-champ]:not([hidden]) [data-simu-resume-valeur]')).toEqual([
+      '5 200 € · 26 parts',
+    ]);
+  });
 });
 
 test.describe('Simulateur : le résultat', () => {
@@ -414,7 +470,7 @@ test.describe('Simulateur : le résultat', () => {
     await page.locator('details:has([data-simu-table]) summary').click();
     await expect(page.locator('[data-simu-table="revenus"] tbody tr')).toHaveCount(26);
     expect(await texte(page, '[data-simu-champ]:not([hidden]) [data-simu-resume-valeur]')).toEqual([
-      '20 000 €',
+      '20 000 € · 100 parts',
       'Aucun',
       'Chaque mois',
       '4,91 %',

@@ -35,6 +35,11 @@
  * c'est six cents tours de boucle, rien qui mérite d'être différé. LES MONTANTS SE SAISISSENT
  * LIBREMENT : pas de reformatage pendant la frappe (le curseur du champ sauterait), la mise en forme
  * « 20 000 » arrive à la sortie du champ.
+ *
+ * LE MONTANT DE DÉPART EST À ZÉRO (22/09/2026) : le champ arrive vide, et son erreur (« le minimum
+ * est de 200 € ») n'apparaît qu'au premier « Continuer ». L'afficher dès l'arrivée accueillait la
+ * première question par un message d'erreur ; l'afficher à la sortie du champ décalait le bouton
+ * « Continuer » entre l'appui et le relâchement, et le clic se perdait.
  */
 import {
   CADRE_ETROIT,
@@ -54,6 +59,7 @@ import { deverrouiller, verrouiller } from '@/scripts/verrou';
 
 interface Reglages {
   rules: {
+    sharePrice: number;
     minInitial: number;
     maxInitial: number;
     minMonthly: number;
@@ -67,6 +73,7 @@ interface Reglages {
   };
   next: { params: NomsParametres; origin: string };
   texts: {
+    initialValue: { one: string; many: string };
     monthlyNone: string;
     monthlyUnit: string;
     incomePaid: string;
@@ -87,6 +94,8 @@ interface Etat {
   /** Réglage ouvert sur l'écran de résultat. */
   ouvert: Reglage | null;
   initial: number;
+  /** Vrai dès le premier « Continuer » : l'erreur du montant peut s'afficher. */
+  initialTouche: boolean;
   monthly: number;
   reinvestir: boolean;
   /** De 0 à 1. */
@@ -146,6 +155,8 @@ const init = (): void => {
     maximumFractionDigits: 0,
   });
   const nfEntier = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 });
+  /** Les parts se fractionnent jusqu'au dix-millième (bulletin de souscription). */
+  const nfParts = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 4 });
   const nfCompact = new Intl.NumberFormat('fr-FR', {
     notation: 'compact',
     maximumFractionDigits: 1,
@@ -161,6 +172,8 @@ const init = (): void => {
     `${(fraction * 100).toFixed(decimales).replace('.', ',')}\u00a0%`;
   const signe = (n: number): string => (n >= 0 ? '+' : '') + euros(n);
   const chiffres = (saisie: string): number => parseInt(saisie.replace(/[^0-9]/g, ''), 10) || 0;
+  /** « 25,75 » : un nombre de parts, fractions comprises. */
+  const enParts = (n: number): string => lisible(nfParts.format(n));
 
   /** Remplit un gabarit « … {nom} … ». Fonction et non chaîne : `replace` interprète « $& » dans une chaîne de remplacement. */
   const remplir = (gabarit: string, valeurs: Record<string, string>): string =>
@@ -242,6 +255,7 @@ const init = (): void => {
     etape: 1,
     ouvert: null,
     initial: rules.defaults.initial,
+    initialTouche: false,
     monthly: rules.defaults.monthly,
     reinvestir: false,
     part: 1,
@@ -691,7 +705,14 @@ const init = (): void => {
 
   /* ── Présentation : quelle question, quels réglages ───────────────────────────────────────── */
   const enClair = (cle: Reglage): string => {
-    if (cle === 'initial') return euros(etat.initial);
+    if (cle === 'initial') {
+      if (etat.initial <= 0) return euros(0);
+      const parts = etat.initial / rules.sharePrice;
+      return remplir(parts < 2 ? texts.initialValue.one : texts.initialValue.many, {
+        amount: euros(etat.initial),
+        n: enParts(parts),
+      });
+    }
     if (cle === 'monthly')
       return etat.monthly > 0
         ? `${lisible(nfEntier.format(etat.monthly))}\u00a0${texts.monthlyUnit}`
@@ -787,6 +808,34 @@ const init = (): void => {
     );
   };
 
+  /**
+   * LE MONTANT EN PARTS, sous le champ : « Soit 25,75 parts ». Quand il tombe entre deux parts, un
+   * bouton propose d'ajouter ce qui manque pour la suivante (« + 50 € pour 26 parts entières »).
+   * Rien tant qu'aucun montant n'est posé.
+   */
+  const montrerParts = (): void => {
+    const zone = un<HTMLElement>('[data-simu-parts-zone]', racine);
+    const ligne = un<HTMLElement>('[data-simu-parts]', racine);
+    const completer = un<HTMLButtonElement>('[data-simu-completer]', racine);
+    if (!zone || !ligne || !completer) return;
+    zone.hidden = etat.initial <= 0;
+    if (zone.hidden) return;
+    const prix = rules.sharePrice;
+    const parts = etat.initial / prix;
+    ligne.textContent = remplir((parts < 2 ? ligne.dataset.un : ligne.dataset.plusieurs) ?? '', {
+      n: enParts(parts),
+    });
+    const entieres = Math.ceil(parts);
+    const cible = entieres * prix;
+    completer.hidden = cible === etat.initial || cible > rules.maxInitial;
+    if (completer.hidden) return;
+    completer.dataset.v = String(cible);
+    completer.textContent = remplir(
+      (entieres < 2 ? completer.dataset.un : completer.dataset.plusieurs) ?? '',
+      { delta: euros(cible - etat.initial), n: lisible(nfEntier.format(entieres)) }
+    );
+  };
+
   const accorder = (source?: HTMLInputElement): void => {
     if (source !== champInitial)
       champInitial.value = etat.initial ? lisible(nfEntier.format(etat.initial)) : '';
@@ -820,11 +869,13 @@ const init = (): void => {
     const panneauPart = un<HTMLElement>('[data-simu-panneau-part]', racine);
     if (panneauPart) panneauPart.hidden = !etat.reinvestir;
 
+    montrerParts();
+
     const erreur = defaut();
     (['initial', 'monthly'] as const).forEach((champ) => {
       const message = un<HTMLElement>(`[data-simu-erreur="${champ}"]`, racine);
       const boite = un<HTMLElement>(`[data-simu-boite="${champ}"]`, racine);
-      const fautif = erreur?.champ === champ;
+      const fautif = erreur?.champ === champ && (champ !== 'initial' || etat.initialTouche);
       if (message) {
         message.textContent = fautif ? erreur.message : '';
         message.hidden = !fautif;
@@ -915,9 +966,11 @@ const init = (): void => {
   };
 
   const avancer = (): void => {
+    etat.initialTouche = true;
     const erreur = defaut();
     const cle = ETAPES[etat.etape - 1];
     if (erreur && erreur.champ === cle) {
+      accorder();
       (cle === 'initial' ? champInitial : champMensuel).focus();
       return;
     }
@@ -988,6 +1041,13 @@ const init = (): void => {
       /* Pendant le parcours, une ligne de « Vos hypothèses » ramène à sa question. */
       if (etat.mode === 'parcours') return allerA(ETAPES.indexOf(cle) + 1);
       etat.ouvert = etat.ouvert === cle ? null : cle;
+    } else if (donnees.simuCompleter !== undefined) {
+      /* Le bouton disparaît avec le reste à compléter : le focus va à la ligne des parts, qui dit le
+         nouveau compte. Pas au champ, qui ouvrirait le clavier d'un téléphone. */
+      etat.initial = Number(donnees.v);
+      actualiser();
+      un<HTMLElement>('[data-simu-parts]', racine)?.focus({ preventScroll: true });
+      return;
     } else if (donnees.simuPuce) {
       etat[donnees.simuPuce as 'initial' | 'monthly' | 'years'] = Number(donnees.v);
     } else if (donnees.simuReinvestir) {
