@@ -228,10 +228,11 @@ const QUIET_TITLE_Y = 12;
         LES NOTES SONT NUMÉROTÉES comme leurs renvois sur les cartes, « (1) » à « (5) », chacune
         avec l'ancre que le renvoi vise, et en text-base et non plus en caption (22/09/2026,
         « augmente la taille des disclaimers sous les cards »). Le numéro est écrit dans la ligne
-        et non par `list-style` : il doit s'écrire « (1) », comme sur la carte. */
+        et non par `list-style` : il doit s'écrire « (1) », comme sur la carte. Marges et
+        interlignes serrés (« réduire l'espace vertical des disclaimers, pas la police »). */
     }
-    <p class="mt-10 text-base leading-relaxed text-ink">{corumRange.pastPerformance}</p>
-    <ol role="list" class="mt-5 space-y-3 text-base leading-snug text-slate-700">
+    <p class="mt-8 text-base leading-snug text-ink">{corumRange.pastPerformance}</p>
+    <ol role="list" class="mt-4 space-y-2 text-base leading-snug text-slate-700">
       {
         corumRange.notes.map((note, n) => (
           <li id={`gamme-note-${n + 1}`} class="flex gap-2">
