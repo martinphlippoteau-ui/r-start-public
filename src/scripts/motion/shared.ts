@@ -36,8 +36,9 @@ export const SCRUB = 0.6;
 /**
  * Propriétés autorisées dans les mini-syntaxes (transform et opacity, jamais de layout). `blur`,
  * traduit en `filter: blur()` par scroll.ts, est la seule non composée : un filtre se repeint à
- * chaque image. Réservé à un objet décoratif isolé, jamais à du texte (le logo du hero, sous le
- * rideau).
+ * chaque image. Réservé à UN SEUL bloc : le logo du hero et son accroche (un seul bloc depuis le
+ * 22/09/2026, demande de Martin), sous le rideau, une fois le premier écran quitté ; nulle part
+ * ailleurs, et jamais sur un texte qu'on est en train de lire.
  */
 const SCRUB_PROPS = new Set([
   'x',

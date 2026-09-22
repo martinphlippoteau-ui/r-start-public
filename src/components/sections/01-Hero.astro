@@ -6,8 +6,9 @@
  * d'ouverture. La section est `isolate` ; sa hauteur minimale est le premier écran moins la barre
  * (3,5 rem, dans le flux) : le hero remplit exactement la première vue.
  * H1 en visually-hidden ; le logo (image décorative, aria-hidden) réserve sa place en CSS
- * (.hero-logo-wrap) : aucun décalage de mise en page. Puis surtitre, accroche, deux CTA et les
- * avis Trustpilot, centrés (la mention AMF qui les accompagnait est partie le 22/09/2026).
+ * (.hero-logo-wrap) : aucun décalage de mise en page. Puis surtitre, accroche (dans le bloc du
+ * logo), deux CTA et les avis Trustpilot, centrés (la mention AMF qui les accompagnait est partie
+ * le 22/09/2026).
  * PLUS DE LIGNE RISQUES depuis le 14/09/2026 (retrait de tous les « Bon à savoir », demande de
  * l'équipe) : le premier écran ne porte aucune mention de risque. Les règles de mise en page qui la
  * protégeaient valent aujourd'hui pour les CTA.
@@ -18,10 +19,11 @@
  * visuel du hero devra n'avoir qu'UNE définition (largeurs, format, `sizes`), reprise par <Image>
  * et par le <link rel="preload"> d'index.astro.
  * Motion (src/scripts/motion.ts) : cascade `data-intro` en CSS pur (global.css, `html.intro
- * #apercu`), rangs 1 logo, 2 surtitre, 3 accroche mot à mot, 4 CTA, 6 avis, 7 invitation à
- * défiler (le 5 était la ligne risques) ; le H1, masqué, n'est jamais animé. Sortie au
- * défilement : `flightScrub` plus bas. Mise en page sous « sm » et centrage vertical : voir le
- * <Container>. Contenu : src/content/fr/hero.ts.
+ * #apercu`), rangs 1 logo et accroche (un seul bloc, `hero-marque`, depuis le 22/09/2026), 2
+ * surtitre, 4 CTA, 6 avis, 7 invitation à défiler (le 3 était l'accroche mot à mot, le 5 la ligne
+ * risques) ; le H1, masqué, n'est jamais animé. Sortie au défilement : `flightScrub` plus bas, et
+ * le bloc logo-accroche qui grandit et se floute sous le rideau. Mise en page sous « sm » et
+ * centrage vertical : voir le <Container>. Contenu : src/content/fr/hero.ts.
  */
 import { Image } from 'astro:assets';
 import brandLogo from '@/assets/logos/r-start-blanc.svg';
@@ -52,12 +54,10 @@ const flightScrub = {
   'data-scrub-end': '+=30%',
   'data-scrub-ease': 'power1.out',
 };
-/** Accroche : montée franche et disparition (comme le titre de Revolut). */
-const copyScrubUp = { 'data-scrub': 'y:0,-48|opacity:1,0', ...flightScrub };
 /**
- * Surtitre et claim : même montée, SANS fondu. Ce sont de petits textes (11 à 14 px) : à mi-fondu leur
- * contraste tombe sous 4,5:1, et un contrôle d'accessibilité qui mesure la page pendant le lissage du
- * scrub le relève (axe, reproductible une fois sur cinq). Seule l'accroche, en grand, garde le fondu.
+ * Surtitre : montée franche (l'accroche, elle, reste avec le logo depuis le 22/09/2026, voir le
+ * bloc `hero-marque`). Le fondu est admis : le contraste sous 4,5:1 relevé jadis à mi-opacité
+ * venait de la cascade d'entrée, corrigée (voir l'en-tête), et le contrôle est rejoué en série.
  */
 const copyScrubFar = { 'data-scrub': 'y:0,-72|opacity:1,0', ...flightScrub };
 /** CTA : recul et EFFACEMENT, celui de la barre prenant le relais à l'écran. Le fondu est admis :
@@ -170,63 +170,54 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
         }
         <h1 id={titleId} class="visually-hidden">{hero.title}</h1>
         {
-          /* LE LOGO S'EFFACE EN GRANDISSANT ET EN SE FLOUTANT (17/09/2026, demande de l'équipe :
-            « au scroll, quand tous les autres éléments sont partis, tu peux le flouter et
-            l'agrandir à fond ») : il ne bouge pas pendant les 30 premiers % (flightScrub), puis
-            triple de taille et se floute sur les 50 % suivants, pendant que le rideau le recouvre.
-            `blur` est une extension du vocabulaire de data-scrub réservée à cet usage
-            (motion/scroll.ts) : un seul élément, jamais du texte. Scrub sur l'enveloppe, entrée sur
-            l'enfant (voir flightScrub). */
+          /* LOGO ET ACCROCHE, UN SEUL BLOC (22/09/2026, demande de Martin : « la même animation
+            que le logo, comme s'ils étaient liés ») :
+             - à l'ouverture, rang 1 : le bloc entier se pose de 118 % à sa taille en 900 ms ; seul
+               le LOGO se fond brièvement (image décorative), jamais le texte (global.css,
+               `intro-hero-marque` et `intro-hero-logo`) ; l'accroche n'est plus révélée mot à mot ;
+             - au défilement : le bloc ne bouge pas pendant les 30 premiers % (pendant que
+               surtitre, boutons et avis s'en vont, flightScrub), puis TRIPLE DE TAILLE ET SE
+               FLOUTE sur les 50 % suivants, pendant que le rideau le recouvre (17/09/2026, demande
+               de l'équipe : « au scroll, quand tous les autres éléments sont partis, tu peux le
+               flouter et l'agrandir à fond »). `blur` est une extension du vocabulaire de
+               data-scrub réservée à ce bloc (motion/scroll.ts, shared.ts) : il porte l'accroche,
+               seul texte du site à se flouter, sous le rideau et une fois le premier écran quitté.
+            Scrub sur l'enveloppe, entrée sur l'enfant (voir flightScrub). */
         }
         <div
-          class="hero-logo-wrap"
-          aria-hidden="true"
+          class="hero-marque max-sm:order-3"
           data-scrub="scale:1,3|blur:0,10"
           data-scrub-trigger="html"
           data-scrub-start="top top-=30%"
           data-scrub-end="+=50%"
           data-scrub-ease="power1.in"
         >
-          {/* Rang 1 de l'ouverture : le logo entre par déplacement seul (candidat LCP, jamais d'opacité). */}
-          <span class="hero-logo-stack" data-intro="1">
-            <Image
-              src={brandLogo}
-              alt=""
-              width={290}
-              height={89}
-              loading="eager"
-              decoding="async"
-            />
-          </span>
-        </div>
-        <div {...copyScrubUp} class="flex flex-col items-center max-sm:order-3">
-          {
-            /* Accroche découpée EN MOTS (14/09/2026, demande de l'équipe) : chaque mot monte de
-              20 px et se dévoile, 70 ms après le précédent ; par mots et non par lettres, sur deux
-              mots le lettre par lettre ferait gadget. `data-intro` reste sur le paragraphe, la
-              cascade se joue sur les mots (`--mot`). L'espace entre les mots est rendu HORS des
-              spans, sinon il disparaît avec le découpage.
-              Blanche, grasse, `clamp` calé sur les bornes des titres, sur 56 rem pour tenir en deux
-              lignes (17/09/2026, demande de l'équipe). Sur téléphone, 32 px et non 40 : à 40 px
-              elle poussait les CTA sous le bandeau cookies (tests/conformite.spec.ts, iPhone 13).
-              Plus grand texte du premier écran, donc candidat LCP : ses mots se découvrent par
-              `clip-path`, jamais par l'opacité. */
-          }
-          <p
-            data-intro="3"
-            class="mt-6 max-w-4xl text-[2rem] leading-[1.12] font-bold tracking-[-0.01em] text-balance text-white sm:mt-8 sm:text-[clamp(2.5rem,2.07rem+1.53vw,3rem)]"
-          >
+          <div data-intro="1" class="flex flex-col items-center">
+            <div class="hero-logo-wrap" aria-hidden="true">
+              <span class="hero-logo-stack">
+                <Image
+                  src={brandLogo}
+                  alt=""
+                  width={290}
+                  height={89}
+                  loading="eager"
+                  decoding="async"
+                />
+              </span>
+            </div>
             {
-              hero.tagline.split(' ').map((mot, i) => (
-                <>
-                  {i > 0 && ' '}
-                  <span data-intro-mot style={`--mot:${i}`}>
-                    {mot}
-                  </span>
-                </>
-              ))
+              /* Accroche blanche, grasse, `clamp` calé sur les bornes des titres, sur 56 rem pour
+                tenir en deux lignes (17/09/2026, demande de l'équipe). Sur téléphone, 32 px et non
+                40 : à 40 px elle poussait les CTA sous le bandeau cookies (tests/conformite.spec.ts,
+                iPhone 13). Plus grand texte du premier écran, donc candidat LCP : elle entre par
+                déplacement seul, avec le bloc, jamais par l'opacité. */
             }
-          </p>
+            <p
+              class="mt-6 max-w-4xl text-[2rem] leading-[1.12] font-bold tracking-[-0.01em] text-balance text-white sm:mt-8 sm:text-[clamp(2.5rem,2.07rem+1.53vw,3rem)]"
+            >
+              {hero.tagline}
+            </p>
+          </div>
         </div>
         <div {...copyScrubDown} class="mt-6 w-full max-sm:order-4 sm:mt-12 sm:w-auto">
           {

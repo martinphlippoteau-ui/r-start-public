@@ -1710,9 +1710,10 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
    La classe `intro` est rendue côté serveur sur <html> (Base.astro) : la décision est prise avant tout
    rendu, sans script, donc sans flash quel que soit le réseau (la CSP interdit l'inline). Cadence
    fixée le 17/09/2026 à la demande de l'équipe (« le logo R Start en gros en premier puis les
-   éléments suivants »), en millisecondes : 0 le logo ; 350 le surtitre ; 500 l'accroche, mot à mot,
-   70 ms d'écart ; 700 la barre de navigation ; 750 les boutons ; 900 les avis et la flèche, en
-   fondu. `backwards` : l'état de départ ne vaut que pendant le délai. Rien en
+   éléments suivants »), en millisecondes : 0 le logo et l'accroche, un seul bloc (22/09/2026,
+   demande de Martin : « la même animation que le logo, comme s'ils étaient liés » ; l'accroche
+   entrait mot à mot à 500 ms) ; 350 le surtitre ; 700 la barre de navigation ; 750 les boutons ;
+   900 les avis et la flèche, en fondu. `backwards` : l'état de départ ne vaut que pendant le délai. Rien en
    `prefers-reduced-motion`. LE TEXTE NE SE FOND PAS. Les fondus sont rendus par `clip-path` partout
    où il y a du texte : un contrôle d'accessibilité mesure les contrastes et lisait des textes à
    mi-opacité, à 1,19:1. L'opacité reste admise sans texte à mesurer : le logo (image
@@ -1735,29 +1736,20 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
     --intro-dur: 700ms;
   }
 
-  /* 0 ms, LE LOGO, EN GROS ET EN PREMIER : là dès la première image, à 118 % de sa taille et déjà
-     presque plein, il se pose à sa taille en 900 ms. Le dévoilement par masque est écarté : un
-     découpage sur une image qui change d'échelle se lit mal. */
+  /* 0 ms, LE LOGO ET L'ACCROCHE, EN GROS ET EN PREMIER : là dès la première image, à 118 % de leur
+     taille, ils se posent à leur taille en 900 ms, d'un seul bloc (01-Hero.astro, `hero-marque`).
+     Le bloc ne joue que l'échelle : il porte du texte. Le dévoilement par masque est écarté : un
+     découpage sur un bloc qui change d'échelle se lit mal. */
   html.intro #apercu [data-intro='1'] {
-    animation-name: intro-hero-brand;
+    animation-name: intro-hero-marque;
     transform-origin: 50% 50%;
     --intro-delay: 0ms;
     --intro-dur: 900ms;
   }
-
-  /* 500 ms, l'accroche mot à mot. Le paragraphe ne porte plus d'animation, ses mots en portent une
-     chacun, décalée de 70 ms (`--mot`, posé dans 01-Hero.astro). `inline-block` : un span en ligne
-     ignore `transform`. */
-  html.intro #apercu [data-intro='3'] [data-intro-mot] {
-    display: inline-block;
-    animation: intro-hero-mot 700ms var(--ease-out-expo) backwards;
-    animation-delay: calc(500ms + var(--mot, 0) * 70ms);
-  }
-  /* ET LE PARAGRAPHE LUI-MÊME NE JOUE RIEN : ses mots portent la cascade. Deux animations sur le
-     même texte donnaient un texte à mi-opacité, ce que le bandeau ci-dessus interdit ; et
-     l'accroche, plus grand texte du premier écran, entrait dans le LCP avec 700 ms de retard. */
-  html.intro #apercu [data-intro='3'] {
-    animation: none;
+  /* Le LOGO SEUL se fond en plus, brièvement (image décorative, voir intro-hero-logo) ; l'accroche,
+     à côté, n'entre que par le déplacement du bloc. */
+  html.intro #apercu [data-intro='1'] .hero-logo-stack img {
+    animation: intro-hero-logo 900ms var(--ease-out-expo) backwards;
   }
 
   /* 750 ms, les boutons : ils montent de 12 px. */
@@ -1777,19 +1769,26 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   }
 }
 
+/* Le bloc logo + accroche se pose de 118 % à sa taille, sans opacité : il porte du texte. */
+@keyframes intro-hero-marque {
+  from {
+    transform: scale(1.18);
+  }
+  to {
+    transform: scale(1);
+  }
+}
 /* Le logo : l'opacité est admise (image décorative). Le fondu est BREF, pleine opacité à 18 % de
-   la durée, soit 160 ms : c'est le candidat LCP, et un élément à opacité nulle n'est pas peint. */
-@keyframes intro-hero-brand {
+   la durée, soit 160 ms : c'est un candidat LCP, et un élément à opacité nulle n'est pas peint. */
+@keyframes intro-hero-logo {
   from {
     opacity: 0;
-    transform: scale(1.18);
   }
   18% {
     opacity: 1;
   }
   to {
     opacity: 1;
-    transform: scale(1);
   }
 }
 
@@ -1808,20 +1807,6 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   }
 }
 
-/* Un mot de l'accroche : il monte de 20 px en se découvrant. */
-@keyframes intro-hero-mot {
-  from {
-    transform: translate3d(0, 20px, 0);
-    clip-path: inset(0 0 100% 0);
-  }
-  65% {
-    clip-path: inset(0 0 0 0);
-  }
-  to {
-    transform: translate3d(0, 0, 0);
-    clip-path: inset(0 0 0 0);
-  }
-}
 
 /* Les boutons : la rangée arrive d'un bloc, de 12 px plus bas. */
 @keyframes intro-hero-cta {
@@ -1944,7 +1929,9 @@ body:has(#consent-banner:not([hidden])) [data-hero-scroll-hint] {
   width: min(46vw, 12rem);
   margin-inline: auto;
   aspect-ratio: 290 / 89;
-  /* Le bloc grandit et se floute au défilement (data-scrub, 01-Hero.astro) : depuis son centre. */
+}
+/* Bloc logo + accroche (01-Hero.astro) : il grandit et se floute au défilement depuis son centre. */
+.hero-marque {
   transform-origin: 50% 50%;
 }
 @media (width >= 40rem) {
