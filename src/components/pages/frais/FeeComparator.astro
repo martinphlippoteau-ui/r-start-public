@@ -3,8 +3,7 @@
  * Comparateur de frais (11/09/2026) : R Start à gauche, une SCPI choisie dans une liste à droite,
  * sept lignes de frais. Le choix se fait sans rechargement : les valeurs de toutes les SCPI
  * voyagent dans le HTML, en bloc de données, et le script remplit la colonne demandée. SANS SCRIPT,
- * la colonne de droite reste à « À compléter » sur chaque ligne et sa source au texte de repli
- * (`sourceOthers`) : seule la colonne R Start se lit.
+ * la colonne de droite reste à « À compléter » sur chaque ligne : seule la colonne R Start se lit.
  *
  * C'est un VRAI TABLEAU (<table>, en-têtes de colonne et de ligne) : une comparaison de frais se lit
  * aussi au lecteur d'écran, et la liste déroulante vit dans l'en-tête de la colonne qu'elle change.
@@ -14,7 +13,7 @@
  *    frais n'est affiché plus petit que ses voisins (retour AMF sur la brochure) ;
  *  - une case sans valeur n'est jamais marquée « taux le plus bas » (les dix-neuf SCPI ont une
  *    source ; l'avertissement prévu quand des taux manquent a quitté le code le 22/09/2026) ;
- *  - les sources sont sous le tableau, celle de R Start et celle de la SCPI choisie ;
+ *  - les sources sont sous le tableau, en un paragraphe, R Start puis les autres SCPI ;
  *  - nommer une autre SCPI engage : scripts/check-compliance.mjs n'exige plus sur /frais que la
  *    source (data-comparator-source). Le périmètre et l'encadré « Une innovation, pas une
  *    révolution », retirés de l'écran le 14/09/2026, ne sont plus contrôlés ; textes archivés hors
@@ -24,9 +23,12 @@
 import { Image } from 'astro:assets';
 import brandLogo from '@/assets/logos/r-start-couleur.svg';
 import Container from '@/components/ui/Container.astro';
+import EssentialsBand from '@/components/ui/EssentialsBand.astro';
 import Section from '@/components/ui/Section.astro';
 import { comparator, comparatorScpis } from '@/content/fr/comparator';
+import { arbitrageWarningBullets, arbitrageWarningTitle } from '@/content/fr/legal';
 import { jsonScript } from '@/lib/jsonScript';
+import { nb } from '@/lib/texte';
 
 interface Props {
   id: string;
@@ -49,9 +51,10 @@ const scpis = comparatorScpis;
 const data = scpis.map((s) => ({
   name: s.name,
   manager: s.manager,
-  values: rows.map((r) => s.values?.[r.key] ?? null),
-  details: rows.map((r) => s.details?.[r.key] ?? null),
-  source: s.source ?? null,
+  /* `nb` : espace insécable avant « % » et « ans », sinon le signe passe seul à la ligne sur
+     téléphone (« si la plus-value dépasse 5 / % »). */
+  values: rows.map((r) => (s.values?.[r.key] ? nb(s.values[r.key] as string) : null)),
+  details: rows.map((r) => (s.details?.[r.key] ? nb(s.details[r.key] as string) : null)),
   /** Source consultée : une case vide veut alors dire « non publié », et non « pas encore relevé ». */
   documentee: Boolean(s.source),
 }));
@@ -189,53 +192,74 @@ const data = scpis.map((s) => ({
                 </th>
                 <td role="cell" class="px-3 py-5 text-center align-top sm:px-5">
                   {
-                    /* `data-fee-compare` : ce qu'il faut COMPARER quand ce n'est pas ce qui est AFFICHÉ.
-                      La ligne du retrait montre une fourchette (« de 0 % à 10 % ») mais se compare sur
-                      le taux au-delà de la durée retenue, l'hypothèse de lecture du tableau. Sans lui,
-                      la case cesserait d'être comparable : un intervalle ne se départage pas d'un taux
-                      unique. Les autres lignes n'en portent pas, affiché et comparé s'y confondent. */
+                    /* Un taux unique, ou un BARÈME À PALIERS (22/09/2026, à la présentation de la
+                      brochure, la même pour la vente d'immeubles et la sortie anticipée) : un palier
+                      par ligne, en deux colonnes alignées, le taux à gauche et sa condition à côté
+                      (une grille : sur téléphone, la condition ne passe pas sous le taux). `data-fee-value` enveloppe le
+                      barème entier : c'est l'élément dont le contrôle de taille lit le corps
+                      (text-display-sm, le même que les autres taux), et son texte n'est pas un taux
+                      unique, donc jamais comparé (voir le script). */
                   }
-                  <span
-                    data-fee-value
-                    data-fee-compare={row.rstartCompare}
-                    class="text-display-sm text-navy"
-                  >
-                    {row.rstart}
-                  </span>
+                  {row.rstartTiers ? (
+                    <span data-fee-value class="text-display-sm w-full text-navy">
+                      {/* La grille est DANS l'élément `data-fee-value` : global.css force celui-ci en
+                        `inline-block` pour la pastille du gagnant, une grille posée dessus était
+                        écrasée. Deux colonnes, les taux alignés à gauche entre eux ; la grille a une
+                        largeur FIXE, centrée dans la colonne, pour que les taux des deux barèmes
+                        (vente, sortie) tombent sur le même axe d'une ligne à l'autre. */}
+                      <span class="mx-auto grid w-[18rem] max-w-full grid-cols-[auto_1fr] items-baseline gap-x-2 gap-y-1 text-left">
+                        {row.rstartTiers.map((tier) => (
+                          <>
+                            <span>{tier.rate}</span>
+                            <span class="text-caption font-normal text-slate-700">{tier.when}</span>
+                          </>
+                        ))}
+                      </span>
+                    </span>
+                  ) : (
+                    <span data-fee-value class="text-display-sm text-navy">
+                      {row.rstart}
+                    </span>
+                  )}
                   <span data-comparator-best="left" class="visually-hidden" hidden>
                     {comparator.bestLabel}
                   </span>
-                  {
-                    /* `mt-3` et non `mt-1` : la pastille du gagnant déborde de 0,3 em SOUS la ligne
-                      de base du chiffre, et le détail venait s'y coller. Un barème se lit UNE LIGNE
-                      PAR PALIER : une vraie liste, et non des retours forcés dans un texte, pour
-                      qu'un lecteur d'écran annonce « cinq éléments » et les énumère un par un.
-                      `role="list"` rétablit la sémantique que la remise à zéro des puces efface. */
-                  }
-                  {Array.isArray(row.rstartDetail) ? (
-                    <ul role="list" class="text-caption mt-3 space-y-1 text-slate-700">
-                      {row.rstartDetail.map((ligne) => (
-                        <li>{ligne}</li>
-                      ))}
-                    </ul>
-                  ) : (
-                    row.rstartDetail && (
-                      <span class="text-caption mt-3 block text-slate-700">{row.rstartDetail}</span>
-                    )
-                  )}
                 </td>
                 <td role="cell" class="px-3 py-5 text-center align-top sm:px-5">
-                  <span data-comparator-cell={String(i)} class="text-display-sm text-slate-700">
-                    {comparator.pendingLabel}
-                  </span>
-                  <span data-comparator-best="right" class="visually-hidden" hidden>
-                    {comparator.bestLabel}
-                  </span>
-                  {/* Même écart qu'à gauche, pour la même raison : la pastille peut être de ce côté. */}
-                  <span
-                    data-comparator-detail={String(i)}
-                    class="text-caption mt-3 block text-slate-700"
-                  />
+                  {row.rstartTiers ? (
+                    <>
+                      {/* MÊME PRÉSENTATION QUE R START sur les lignes à paliers (22/09/2026, « comme
+                        ça on a une harmonisation ») : la même grille de largeur fixe, le taux à
+                        gauche et sa précision à côté. Le script remplit les deux cases par leur
+                        index, comme ailleurs. */}
+                      <span class="mx-auto grid w-[18rem] max-w-full grid-cols-[auto_1fr] items-baseline gap-x-2 text-left">
+                        <span data-comparator-cell={String(i)} class="text-display-sm text-slate-700">
+                          {comparator.pendingLabel}
+                        </span>
+                        <span
+                          data-comparator-detail={String(i)}
+                          class="text-caption text-slate-700"
+                        />
+                      </span>
+                      <span data-comparator-best="right" class="visually-hidden" hidden>
+                        {comparator.bestLabel}
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <span data-comparator-cell={String(i)} class="text-display-sm text-slate-700">
+                        {comparator.pendingLabel}
+                      </span>
+                      <span data-comparator-best="right" class="visually-hidden" hidden>
+                        {comparator.bestLabel}
+                      </span>
+                      {/* Même écart qu'à gauche, pour la même raison : la pastille peut être de ce côté. */}
+                      <span
+                        data-comparator-detail={String(i)}
+                        class="text-caption mt-3 block text-slate-700"
+                      />
+                    </>
+                  )}
                 </td>
               </tr>
             ))
@@ -256,27 +280,48 @@ const data = scpis.map((s) => ({
     }
 
     {
-      /* Sources, une par colonne du tableau, côte à côte comme les colonnes qu'elles documentent. Celle
-        de droite suit la SCPI choisie : chaque relevé a sa page et sa date, parce qu'un taux change et
-        que la date fait foi. */
+      /* SOUS LE TABLEAU (22/09/2026, textes de Martin) : la base HT de tous les taux, puis les sources
+        en un paragraphe, R Start d'abord, les autres SCPI ensuite. La source des autres SCPI est la
+        même pour les dix-neuf, le paragraphe ne change donc pas avec la SCPI choisie ; il porte
+        `data-comparator-source`, que scripts/check-compliance.mjs exige dès qu'une SCPI du panel est
+        nommée. */
     }
-    <div class="mt-6 border-t border-navy/12 pt-5">
-      <h3 class="text-base font-semibold text-ink">{comparator.sourceLabel}</h3>
-      <dl class="text-caption mt-3 grid gap-3 text-slate-700 md:grid-cols-2 md:gap-8">
-        <div>
-          <dt class="font-semibold">
-            {comparator.leftLabel} ,{' '}{comparator.sourceRStartLabel} :
-          </dt>
-          <dd class="mt-0.5">{comparator.sourceRStart}</dd>
-        </div>
-        <div>
-          <dt data-comparator-source-name class="font-semibold">{scpis[0]?.name} :</dt>
-          <dd data-comparator-source class="mt-0.5">{comparator.sourceOthers}</dd>
-        </div>
-      </dl>
+    <div class="text-caption mt-4 space-y-3 text-slate-700">
+      <p>{comparator.htNote}</p>
+      <p data-comparator-source>
+        <strong class="font-semibold text-ink">{comparator.sourceLabel} :</strong>{' '}
+        {comparator.sourceText}
+      </p>
     </div>
+
   </Container>
 </Section>
+
+{
+  /* POINTS ESSENTIELS À CONNAÎTRE (22/09/2026, demande de Martin) : l'avertissement sur la
+    commission d'arbitrage, texte réglementaire reproduit à l'identique depuis legal.ts (le même que
+    sur /documentation), puis le mécanisme de réserve en cas de moins-value (texte de Martin), dans
+    le bandeau pleine largeur commun avec l'accueil. Son ancre suit celle du comparateur : la page
+    d'accueil porte déjà un bandeau du même nom. */
+}
+<EssentialsBand id={id + '-essentiels'} title={comparator.essentialsTitle}>
+  <p>{arbitrageWarningTitle}</p>
+  <ul role="list" class="mt-2 space-y-1">
+    {
+      arbitrageWarningBullets.map((puce) => (
+        <li class="flex gap-3">
+          <span aria-hidden="true">•</span>
+          <span>{puce}</span>
+        </li>
+      ))
+    }
+  </ul>
+  <p class="mt-4">
+    <strong class="font-semibold">{comparator.lossNote.title}</strong>
+    <br />
+    {comparator.lossNote.text}
+  </p>
+</EssentialsBand>
 
 {
   /* Réglages dans un bloc de DONNÉES, non exécutable : la politique de sécurité du contenu
@@ -310,7 +355,6 @@ const data = scpis.map((s) => ({
         manager: string;
         values: (string | null)[];
         details: (string | null)[];
-        source: string | null;
         documentee: boolean;
       }[];
       pendingLabel: string;
@@ -322,8 +366,6 @@ const data = scpis.map((s) => ({
     const table = document.querySelector('[data-comparator]');
     const select = document.querySelector<HTMLSelectElement>('[data-comparator-select]');
     if (!table || !select) return;
-    const source = document.querySelector('[data-comparator-source]');
-    const sourceName = document.querySelector('[data-comparator-source-name]');
     const cells = [...table.querySelectorAll<HTMLElement>('[data-comparator-cell]')];
     const details = [...table.querySelectorAll('[data-comparator-detail]')];
     const lignes = [...table.querySelectorAll('tbody tr')].map((tr) => ({
@@ -331,7 +373,6 @@ const data = scpis.map((s) => ({
       marqueGauche: tr.querySelector<HTMLElement>('[data-comparator-best="left"]'),
       marqueDroite: tr.querySelector<HTMLElement>('[data-comparator-best="right"]'),
     }));
-    const sourceFallback = source ? source.textContent : '';
 
     const render = () => {
       const scpi = data[Number(select.value)] || data[0];
@@ -344,13 +385,11 @@ const data = scpis.map((s) => ({
         const detail = details[i];
         if (detail) detail.textContent = (value && scpi.details[i]) || '';
       });
-      if (sourceName) sourceName.textContent = scpi.name + ' :';
-      if (source) source.textContent = scpi.source || sourceFallback;
 
       /*
        * Taux le plus bas de la ligne. Il faut que LES DEUX cases donnent un pourcentage unique : un
-       * barème à paliers ne se compare pas à un taux unique. Une case peut fournir ce nombre par
-       * `data-fee-compare` quand ce qu'elle affiche est une fourchette (ligne du retrait). LA RÈGLE
+       * barème à paliers (vente d'immeubles, sortie anticipée) ne se compare jamais (22/09/2026,
+       * demande de Martin), son texte n'étant pas un taux unique. LA RÈGLE
        * (16/09/2026, l'équipe : « si un concurrent est à 0 % aussi il faut le mettre en valeur ») :
        * EST MARQUÉ TOUT TAUX À 0 %, ET SINON LE PLUS BAS DES DEUX. Le libellé lu par les lecteurs
        * d'écran dit « taux le plus bas de la ligne », il serait inexact de le réserver à une
@@ -367,7 +406,7 @@ const data = scpis.map((s) => ({
         return m?.[1] ? parseFloat(m[1].replace(',', '.')) : null;
       };
       lignes.forEach((ligne, i) => {
-        const g = seul(ligne.gauche?.dataset.feeCompare || ligne.gauche?.textContent);
+        const g = seul(ligne.gauche?.textContent);
         const d = seul(scpi.values[i]);
         const comparable = g !== null && d !== null;
         const gagneGauche = comparable && (g < d || g === 0);

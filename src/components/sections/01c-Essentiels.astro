@@ -2,24 +2,15 @@
 /**
  * Section 1c, bandeau « Points essentiels à connaître » (id « points-essentiels »), sur l'accueil
  * entre « Qui a envie de payer avant de gagner ? » (01b, paper) et « R Start en un clin d'œil »
- * (02, white). Ajouté le 22/09/2026 (demande de Martin, « un bandeau simple ») : la mention de
- * CORUM L'Épargne, telle qu'elle se présente sur corum.fr : bande sombre compacte, titre en petites
- * capitales turquoise (text-eyebrow), paragraphe en blanc. Rien d'autre.
- * Motion : rien ne bouge, c'est une mention de risque et elle se lit en place ; pas de rideau, la
- * section précédente en porte déjà un sur le hero.
+ * (02, paper). Ajouté le 22/09/2026 (demande de Martin) : la mention de CORUM L'Épargne, dans le
+ * bandeau commun (ui/EssentialsBand.astro). Rien d'autre.
  * Contenu : src/content/fr/essentials.ts.
  */
-import Container from '@/components/ui/Container.astro';
-import Section from '@/components/ui/Section.astro';
+import EssentialsBand from '@/components/ui/EssentialsBand.astro';
 import { sections } from '@/config/sections';
 import { essentials } from '@/content/fr/essentials';
-
-const id = sections.essentials.id;
 ---
 
-<Section id={id} tone="ink" spacing="compact">
-  <Container size="wide">
-    <h2 id={id + '-title'} class="text-eyebrow text-teal-200">{essentials.title}</h2>
-    <p class="mt-4 max-w-4xl text-base leading-relaxed text-white sm:text-lg">{essentials.text}</p>
-  </Container>
-</Section>
+<EssentialsBand id={sections.essentials.id} title={essentials.title}>
+  <p>{essentials.text}</p>
+</EssentialsBand>

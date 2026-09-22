@@ -3,6 +3,7 @@
  * avec node, qui ne connaît pas l'alias « @/ » du projet. facts.ts et legal.ts sont dans le même cas.
  */
 import { fees, product } from './facts.ts';
+import { nb } from '../../lib/texte.ts';
 
 /**
  * Comparateur de frais de /frais et de l'accueil : R Start à gauche, une SCPI choisie dans une
@@ -14,8 +15,7 @@ import { fees, product } from './facts.ts';
  * par SCPI, le document réglementaire et sa date d'arrêté : un lecteur ne peut pas remonter un taux
  * jusqu'à la note d'information ou au DIC dont il sort, et un taux qui change ne se vérifie pas. Le
  * tableau nomme dix-neuf sociétés de gestion sans plus rien dire de son périmètre (voir la note
- * après `sourceOthers`), et il repose sur une hypothèse de lecture que l'écran ne dit pas (voir
- * avant `range`).
+ * après `sourceText`).
  */
 
 /** Une SCPI du comparateur. `values` vide = données à relever ; la ligne s'affiche « à compléter ». */
@@ -38,9 +38,9 @@ export interface ComparedScpi {
 }
 
 /**
- * Une ligne du comparateur. DÉCLARÉE, et non déduite du tableau : le jour où plus aucune ligne n'a
- * porté `rstartDetail` (16/09/2026), TypeScript a conclu que la propriété n'existait pas et le
- * composant qui la lit ne compilait plus. Le type dit ce qu'une ligne PEUT avoir.
+ * Une ligne du comparateur. DÉCLARÉE, et non déduite du tableau : une propriété que plus aucune
+ * ligne ne porterait disparaîtrait du type déduit, et le composant qui la lit ne compilerait plus.
+ * Le type dit ce qu'une ligne PEUT avoir.
  */
 export interface ComparatorRow {
   key: ComparatorRowKey;
@@ -49,71 +49,61 @@ export interface ComparatorRow {
   label: string;
   /** Assiette du taux, sous le libellé. */
   basis: string;
-  /** Taux de R Start, ou fourchette. */
-  rstart: string;
-  /** Taux réellement comparé quand la case affiche une fourchette. */
-  rstartCompare?: string;
+  /** Taux unique de R Start ; absent quand la ligne est un barème à paliers (`rstartTiers`). */
+  rstart?: string;
   /**
-   * Précision sous le taux de R Start. Absente : la case n'affiche que le taux. Une LISTE pour les
-   * barèmes à paliers (cessions, retrait) : une ligne par palier, taux en tête.
+   * Barème à paliers de R Start, un palier par ligne, le taux en tête et sa condition à côté (à la
+   * présentation de la brochure, même forme pour la vente d'immeubles et la sortie anticipée).
+   * Une ligne à paliers n'est jamais comparée à l'autre colonne.
    */
-  rstartDetail?: string | readonly string[];
+  rstartTiers?: readonly { rate: string; when: string }[];
 }
 
 export type ComparatorRowKey =
   'subscription' | 'acquisition' | 'broker' | 'management' | 'works' | 'disposal' | 'withdrawal';
 
 /**
- * HYPOTHÈSE DE LECTURE DU TABLEAU, JAMAIS DITE À L'ÉCRAN (12/09/2026, demande de l'équipe) : le
- * souscripteur garde ses parts au moins huit ans (facts.fees.withdrawal.zeroAfterYears), durée
- * au-delà de laquelle R Start ne prélève plus de commission de retrait. Le retrait de R Start se
- * compare donc sur `rstartCompare` (0 %) et peut être marqué « taux le plus bas de la ligne » sans
- * que l'hypothèse soit énoncée. La phrase qui devait la dire a quitté le code le 22/09/2026
- * (archivée hors du dépôt, .claude/audits) ; l'écart, lui, demeure.
+ * BARÈMES À PALIERS (22/09/2026, demande de Martin, à la présentation de la brochure) : la vente
+ * d'immeubles et la sortie anticipée affichent leurs paliers, taux et condition, au lieu d'une
+ * fourchette. Taux et bornes viennent de facts.ts ; seule la tournure est écrite ici. ET AUCUNE
+ * COMPARAISON sur ces lignes (« pour les frais où il y a des fourchettes ne mets pas de
+ * comparaison ») : la sortie anticipée se comparait sur le taux au-delà de huit ans (0 %) sous une
+ * hypothèse de détention jamais affichée, et pouvait être marquée « taux le plus bas » ; elle ne
+ * l'est plus.
  */
-
-/** Fourchette d'un barème à paliers : « de 0 % à 12 % » se lit mieux que « 0 / 6 / 12 % ». */
-const range = (rates: readonly string[]): string => {
-  const nums = rates.map((r) => parseFloat(r.replace(',', '.')));
-  const min = Math.min(...nums);
-  const max = Math.max(...nums);
-  return min === max ? `${min} %` : `de ${min} % à ${max} %`;
-};
-
-/** Taux de retrait de R Start au-delà de la durée retenue : le dernier palier du barème. */
-const lastWithdrawalStep = fees.withdrawal.steps.at(-1);
-if (!lastWithdrawalStep)
-  throw new Error('comparator.ts : le barème de retrait de facts.ts est vide');
-const withdrawalAfterHolding = lastWithdrawalStep.rate;
+const zeroAfter = fees.withdrawal.zeroAfterYears;
+/**
+ * « Si sortie > 8 ans » … « Si sortie < 4 ans », d'après la borne de chaque palier (`until`), du
+ * taux le plus bas au plus haut comme la vente d'immeubles (22/09/2026, « inverse l'ordre »).
+ */
+const withdrawalTiers = fees.withdrawal.steps
+  .map((step) => ({
+    rate: nb(step.rate),
+    when:
+      step.until === null
+        ? `Si sortie >\u00A0${zeroAfter}\u00A0ans`
+        : `Si sortie <\u00A0${step.until}\u00A0ans`,
+  }))
+  .reverse();
+/** « Si plus-value < 7 % », « Si 7 % < plus-value < 13 % », « Si plus-value > 13 % » (`from`). */
+const disposalTiers = fees.disposal.tiers.map((tier, i, tiers) => {
+  const next = tiers[i + 1];
+  const when =
+    i === 0 && next
+      ? `Si plus-value <\u00A0${next.from}\u00A0%`
+      : next
+        ? `Si ${tier.from}\u00A0% <\u00A0plus-value <\u00A0${next.from}\u00A0%`
+        : `Si plus-value >\u00A0${tier.from}\u00A0%`;
+  return { rate: nb(tier.rate), when };
+});
 
 /*
- * Conditions du barème de retrait (texte de l'équipe, 16/09/2026), une par palier, dans l'ordre de
- * facts.fees.withdrawal.steps d'où viennent les taux. Le garde-fou arrête la compilation si un
- * palier est ajouté dans facts.ts sans sa condition, au lieu de laisser un taux sans phrase.
- */
-const WITHDRAWAL_CONDITIONS = [
-  'en cas de sortie avant 4 ans de détention',
-  'en cas de sortie la 5e ou la 6e année',
-  'en cas de sortie la 7e année',
-  'en cas de sortie la 8e année',
-  'au-delà de 8 ans de détention',
-] as const;
-if (WITHDRAWAL_CONDITIONS.length !== fees.withdrawal.steps.length) {
-  throw new Error(
-    `comparator.ts : ${WITHDRAWAL_CONDITIONS.length} conditions de retrait pour ${fees.withdrawal.steps.length} paliers dans facts.fees.withdrawal.steps`
-  );
-}
-const withdrawalSchedule = fees.withdrawal.steps.map(
-  (step, i) => `${step.rate} ${WITHDRAWAL_CONDITIONS[i]}`
-);
-
-/*
- * Source commune des dix-neuf SCPI (texte de l'équipe, 16/09/2026), tout en HT. Elle nomme l'étude
- * mais reste unique et globale, sans référence documentaire par SCPI : voir l'en-tête. La mention
- * est honnête sur ce point plutôt que de laisser croire à une référence par société de gestion.
+ * Source commune des dix-neuf SCPI (texte de Martin, 22/09/2026 ; ex-« étude comparative réalisée
+ * par CORUM au 15 septembre 2026… »). Unique et globale, sans référence documentaire ni date
+ * d'arrêté par SCPI : voir l'en-tête. La base HT est dite sous le tableau (`htNote`).
  */
 const SOURCE_EQUIPE =
-  'étude comparative réalisée par CORUM au 15 septembre 2026, à partir des notes d’information publiées par chaque société de gestion concernée. Taux exprimés hors taxes.';
+  'sur la base des notes d’information et documents de souscription publics des SCPI mentionnées.';
 
 const ROWS: ComparatorRow[] = [
     /*
@@ -123,14 +113,16 @@ const ROWS: ComparatorRow[] = [
     {
       key: 'subscription' as const,
       info: 'L’épargnant paie ces frais au moment de son investissement. Ils rémunèrent la société de gestion et les intermédiaires avant que l’épargnant perçoive tout revenu. Ils réduisent d’autant le montant réellement investi.',
-      label: 'Frais de souscription',
+      /* Libellés à la brochure depuis le 22/09/2026 (demande de Martin) : « Frais d'entrée », « Frais
+         sur achat d'immeubles », « Frais sur vente d'immeubles », « Frais de sortie anticipée ». */
+      label: 'Frais d’entrée',
       basis: 'en % du montant investi',
       rstart: fees.subscription.label,
     },
     {
       key: 'acquisition' as const,
       info: 'L’épargnant paie ces frais à chaque fois que la SCPI achète un immeuble. Ils rémunèrent la recherche et l’acquisition du bien. Ces frais créent un écart entre le montant souscrit et le montant réellement investi par la SCPI. Ils sont prélevés même si la SCPI ne verse aucun revenu à l’épargnant.',
-      label: 'Frais d’acquisition',
+      label: 'Frais sur achat d’immeubles',
       basis: 'en % du prix d’achat',
       rstart: fees.acquisition.label,
     },
@@ -160,27 +152,16 @@ const ROWS: ComparatorRow[] = [
     {
       key: 'disposal' as const,
       info: 'L’épargnant paie des frais de cession d’immeubles quand il perçoit des revenus issus de la vente d’immeuble. La plupart des SCPI ne prélèvent des frais qu’à partir d’un certain niveau de plus-value. Autrement dit, ces frais ne sont dus que lorsque l’épargnant gagne de l’argent.',
-      label: 'Frais de cession d’immeubles',
+      label: 'Frais sur vente d’immeubles',
       basis: 'en % du prix de vente',
-      rstart: range(fees.disposal.tiers.map((t) => t.rate)),
-      /* Barème sous la fourchette, un palier par ligne (16/09/2026, texte de l'équipe) ; taux et
-         conditions viennent de facts.fees.disposal.tiers. */
-      rstartDetail: fees.disposal.tiers.map((t) => `${t.rate} ${t.condition}`),
+      rstartTiers: disposalTiers,
     },
     {
       key: 'withdrawal' as const,
       info: 'L’épargnant paie des frais de retrait anticipé s’il revend ses parts avant une certaine durée de détention (variable selon la SCPI). Ces frais sont prélevés même lorsque la SCPI ne verse aucun revenu à l’épargnant.',
-      label: 'Frais de retrait anticipé',
+      label: 'Frais de sortie anticipée',
       basis: 'en % de la valeur de retrait',
-      /* Fourchette, et non le seul dernier palier (15/09/2026, « mets au format de 0 % à 12 %
-         plutôt ») : on lisait « 0 % » là où le taux vaut 10 % pour qui sort avant quatre ans. */
-      rstart: range(fees.withdrawal.steps.map((s) => s.rate)),
-      /* Ce qui est COMPARÉ reste le taux au-delà de la durée retenue, 0 % : c'est l'hypothèse de
-         lecture consignée plus haut. Sans ce champ, la fourchette ne se comparerait à rien. */
-      rstartCompare: withdrawalAfterHolding,
-      /* Barème sous la fourchette, un palier par ligne (16/09/2026) : il rend l'hypothèse lisible,
-         il ne la change pas. */
-      rstartDetail: withdrawalSchedule,
+      rstartTiers: withdrawalTiers,
     },
 ];
 
@@ -223,15 +204,32 @@ export const comparator = {
   /* Nom du bouton « i » pour les lecteurs d'écran, complété par le libellé de la ligne. */
   infoLabel: 'Expliquer',
   /**
-   * Sources sous le tableau, une par colonne. `sourceOthers` est le repli porté par le HTML avant
-   * le script, seul affiché sans script.
+   * Sous le tableau (22/09/2026, texte de Martin) : la base HT de tous les taux. R Start étant
+   * exonérée de TVA, ses montants HT et TTC sont égaux.
    */
-  sourceLabel: 'Sources des données',
-  /** Qui publie les chiffres de la colonne de gauche, et dans quels documents. */
-  sourceRStartLabel: 'CORUM Asset Management',
-  sourceRStart: `document d’informations clés du ${product.dicDate.label}, note d’information visée par l’AMF et brochure partenaires 2026.`,
-  sourceOthers:
-    'Frais des autres SCPI : à relever dans le document d’informations clés et la note d’information de chacune, avec leur date d’arrêté. Un taux change : la date fait foi.',
+  htNote:
+    'Les frais mentionnés sont exprimés hors taxes (HT). R Start étant exonérée de TVA, le montant hors taxes est égal au montant toutes taxes comprises (TTC).',
+  /**
+   * Dans le bandeau « Points essentiels », après l'avertissement (22/09/2026, texte de Martin) : le
+   * mécanisme de réserve en cas de moins-value, qui conditionne la commission sur les ventes (note
+   * d'information, ch. III § 4).
+   */
+  lossNote: {
+    title: 'En cas de moins-value',
+    text: 'Si une vente génère une moins-value, celle-ci est enregistrée dans une réserve dédiée. CORUM ne peut percevoir aucune commission sur les ventes tant que cette réserve n’est pas intégralement compensée par des plus-values futures. CORUM ne se rémunère sur les cessions que lorsque le bilan global des ventes est positif. Retrouvez le détail du mécanisme de compensation au chapitre III, section 4 de la note d’information de R Start.',
+  },
+  /**
+   * Bandeau sous le comparateur (22/09/2026, demande de Martin) : l'avertissement sur la commission
+   * d'arbitrage, reproduit à l'identique depuis legal.ts par le composant, sous ce titre.
+   */
+  essentialsTitle: 'Points essentiels à connaître :',
+  /**
+   * Sources, en un paragraphe sous la mention HT (22/09/2026, texte de Martin) : R Start, puis les
+   * autres SCPI, dont la source est la même pour les dix-neuf (SOURCE_EQUIPE, aussi portée par
+   * chaque SCPI pour dire qu'elle a été documentée). Sans la brochure partenaires.
+   */
+  sourceLabel: 'Sources de données',
+  sourceText: `${product.name}, CORUM Asset Management : document d’informations clés du ${product.dicDate.label} et note d’information visée par l’AMF. Pour les autres, l’analyse est ${SOURCE_EQUIPE}`,
   /*
    * TROIS TEXTES ONT QUITTÉ L'ÉCRAN LE 14/09/2026 ET LE CODE LE 22/09/2026 (archivés hors du dépôt,
    * .claude/audits) : le périmètre du comparatif (des taux affichés, pas des coûts réels ; les
