@@ -1,16 +1,6 @@
-import type { FaqContent, LegalNote } from '@/content/types';
+import type { FaqContent } from '@/content/types';
 import { pages } from '@/config/pages';
-import {
-  corumGroup,
-  fees,
-  income,
-  product,
-  risk,
-  share,
-  strategy as strategyFacts,
-  subscription,
-} from '@/content/fr/facts';
-import { managementCompany } from '@/content/fr/legal';
+import { fees, risk, share } from '@/content/fr/facts';
 
 /**
  * Section « FAQ » et page /faq. Les questions servent aussi de base au JSON-LD FAQPage, limité aux
@@ -20,8 +10,8 @@ import { managementCompany } from '@/content/fr/legal';
  * avec `faqQuestions`.
  *
  * Vocabulaire (V2, §3) : à l'affichage, on écrit « frais sur les achats d'immeubles ». Le terme
- * réglementaire « frais d'acquisition » ne subsiste que dans les notes, dans le barème détaillé
- * (fees.ts, feesPage.ts) et dans facts.ts.
+ * réglementaire « frais d'acquisition » ne subsiste que dans le barème détaillé (fees.ts,
+ * feesPage.ts) et dans facts.ts.
  *
  * Règles appliquées : aucune donnée de performance ; chaque avantage cité est contrebalancé par son
  * risque dans la même réponse, dans le corps même de la réponse ; aucun « 0 % »
@@ -32,65 +22,10 @@ import { managementCompany } from '@/content/fr/legal';
  * révolution » est importé de legal.ts à l'identique.
  */
 
-/** Espace insécable avant % € : ; ? !, appliquée à toutes les questions, réponses et notes. */
-const nb = (s: string): string => s.replace(/ ([%€:;?!])/g, ' $1');
-const lowerFirst = (s: string): string => s.charAt(0).toLowerCase() + s.slice(1);
+/** Espace insécable avant % € : ; ? !, appliquée à toutes les questions et réponses. */
+const nb = (s: string): string => s.replace(/ ([%€:;?!])/g, '\u00A0$1');
 
-/** « a, b et c ». */
-const joinAnd = (items: readonly string[]): string =>
-  items.length > 1
-    ? `${items.slice(0, -1).join(', ')} et ${items[items.length - 1]}`
-    : items.join('');
-
-/** « CORUM Origin, CORUM XL, CORUM Eurion, CORUM USA et R Start » (note de source uniquement). */
-const scpiList = joinAnd(corumGroup.scpiNames);
-
-/** Date du bulletin de souscription dont sont issus les taux de prélèvement (voir note faq-fiscalite). */
-const bulletinDate = 'mai 2026';
-/** « démembrement, souscription papier et CORUM Life » : modalités non proposées (brochure p.5). */
-const notEligibleList = joinAnd(subscription.notEligible);
-
-const rawNotes: LegalNote[] = [
-  {
-    id: 'faq-leviers',
-    text: `Les deux leviers de performance visés par R Start, ${joinAnd(strategyFacts.levers.map(lowerFirst))}, et la formule « ${lowerFirst(strategyFacts.motto)} » : brochure partenaires 2026, p. 3. Il s’agit d’un objectif d’investissement, sans garantie de résultat.`,
-  },
-  {
-    id: 'faq-frais-achats',
-    text: `Terme réglementaire : « frais d’acquisition », tel qu’il figure au document d’informations clés du ${product.dicDate.label} et dans le barème détaillé de la section Frais. Il désigne la commission de la société de gestion sur le prix d’acquisition net vendeur des immeubles. Source : brochure partenaires 2026, p. 4.`,
-  },
-  {
-    id: 'faq-objectif',
-    text: `R Start n’affiche aucun objectif de rendement, à la différence des premières SCPI du groupe CORUM, dont les frais sont par ailleurs forfaitaires. Source : brochure partenaires 2026, p. 5, tableau « Une gamme complémentaire ».`,
-  },
-  {
-    id: 'faq-jouissance',
-    text: `Délai de jouissance de R Start : ${income.enjoymentDelayLabel} (brochure partenaires 2026, p. 3). Date de jouissance : date à partir de laquelle les parts donnent droit aux dividendes potentiels. Pour R Start : ${lowerFirst(income.enjoymentDate)}. Source : bulletin de souscription R Start, conditions générales de vente.`,
-  },
-  {
-    id: 'faq-sri',
-    text: `Indicateur synthétique de risque (SRI) : échelle de 1 (risque le plus faible) à ${risk.sriMax} (risque le plus élevé), établie en supposant que vous conservez le produit ${risk.recommendedHoldingLabel}. R Start y est classée ${risk.sriLabel}, valeur communiquée par CORUM. Source : CORUM, brochure partenaires 2026, p. 3. Le document d’informations clés du ${product.dicDate.label} reste le seul document qui fait foi : lisez-le avant toute décision.`,
-  },
-  {
-    id: 'faq-fiscalite',
-    text: `Prélèvement à la source obligatoire de ${income.withholdingTax} (hors prélèvements sociaux de ${income.socialContributions}) opéré par la société de gestion sur les produits financiers, pour tout associé personne physique résidant fiscalement en France. Il constitue un acompte d’impôt sur le revenu, imputable sur l’impôt dû et restituable s’il l’excède. Une dispense peut être demandée sous conditions de revenus (article 242 quater du Code général des impôts). Source : bulletin de souscription R Start, ${bulletinDate}. Taux en vigueur à cette date, susceptibles d’évoluer.`,
-  },
-  {
-    id: 'faq-corum-source',
-    text: `${corumGroup.statsSource} Nombre de SCPI gérées : brochure partenaires 2026 (${scpiList}). Agrément de la société de gestion : mentions légales de ${managementCompany.name}.`,
-  },
-  {
-    id: 'faq-gamme',
-    text: `Éligibilité de R Start : souscription ${subscription.onlineLabel} ; ${subscription.options.rd.name} et ${subscription.options.pei.name} proposés ; ${notEligibleList} non proposés. Positionnement : stratégie patrimoniale plus dynamique, en contrepartie d’un risque plus élevé, quand les premières SCPI du groupe visent des revenus potentiels réguliers. Source : brochure partenaires 2026, p. 5.`,
-  },
-];
-
-export const notes: LegalNote[] = rawNotes.map((n) => ({ ...n, text: nb(n.text) }));
-
-/**
- * Questions et réponses avant application de la typographie française (voir `nb`).
- * `noteId` : appel de note porté par la question.
- */
+/** Questions et réponses avant application de la typographie française (voir `nb`). */
 /*
  * VINGT-DEUX QUESTIONS EN SIX RUBRIQUES, contenu fourni par l'équipe le 16/09/2026 et repris mot pour
  * mot. Il remplace les seize questions précédentes.
@@ -380,10 +315,6 @@ if (homeItems.length !== HOME_FAQ.length) {
   }
 }
 
-/** Notes appelées par les six questions de l'accueil ; `notes` reste complet pour /documentation. */
-const idsAppeles = homeItems.map((item) => item.noteId).filter(Boolean);
-export const homeNotes: LegalNote[] = notes.filter((n) => idsAppeles.includes(n.id));
-
 export const faq = {
   title: 'Vos questions sur la SCPI R Start.',
   /* Pas d'introduction depuis le 16/09/2026 (demande de l'équipe), ni ici ni sur /faq. */
@@ -423,5 +354,4 @@ export const faq = {
   pageDescription:
     'Toutes les réponses sur R Start, SCPI de CORUM : frais, revenus, risques, fiscalité et souscription. Risque de perte en capital, revenus non garantis.',
   cta: { label: 'Souscrire en ligne', position: 'faq' },
-  notes,
 } satisfies FaqContent;

@@ -4,8 +4,7 @@
  * faq.ts) ; la FAQ complète a sa page, /faq, atteinte par `faq.moreLink`. AUCUN NOMBRE DE QUESTIONS
  * N'EST ÉCRIT DANS CES COMMENTAIRES : ils en donnaient quatre différents, tous périmés (audit du
  * 18/09/2026). Le compte est celui de faq.ts. Fond paper (après Risques, ink) ;
- * DERNIÈRE SECTION de l'accueil : le bloc « Notes et sources » qui la suivait n'est plus rendu depuis le
- * 14/09/2026.
+ * DERNIÈRE SECTION de l'accueil depuis le retrait du bloc « Notes et sources » (14/09/2026).
  * Deux colonnes sur grand écran : en-tête collant (surtitre, H2 en text-display-md : la FAQ clôt la page, un
  * cran sous les chapitres) face à la liste des questions en accordéons natifs <details name="faq"> (un
  * seul ouvert à la fois), chevron animé en CSS, questions en text-xl (text-display-sm dès sm : une question
@@ -33,16 +32,14 @@
  *    opacité 1 à tout instant et, une fois la réponse ouverte, plus rien ne bouge. Navigateurs sans
  *    `::details-content` : ouverture instantanée native. Rien de tout cela en reduced-motion (@media).
  * Le <summary> a pour unique enfant un H3 (modèle de contenu de summary) : le numéro d'ordre et le
- * chevron y sont des spans décoratifs (aria-hidden). <summary> a un rôle interactif implicite : un
- * <NoteRef> (lien) n'y est jamais imbriqué (violation d'accessibilité « nested-interactive », HTML
- * invalide de surcroît). Quand item.noteId est défini, la question porte un marqueur décoratif
- * (`interactive={false}`, span non focusable). Aucune question n'en porte.
+ * chevron y sont des spans décoratifs (aria-hidden). <summary> a un rôle interactif implicite : aucun
+ * lien n'y est jamais imbriqué (violation d'accessibilité « nested-interactive », HTML invalide de
+ * surcroît).
  * Contenu : src/content/fr/faq.ts.
  */
 import { ancreQuestion } from '@/lib/ancre';
 import { withBase } from '@/lib/href';
 import Container from '@/components/ui/Container.astro';
-import NoteRef from '@/components/ui/NoteRef.astro';
 import Section from '@/components/ui/Section.astro';
 import { sections } from '@/config/sections';
 import { faq } from '@/content/fr/faq';
@@ -184,10 +181,7 @@ const items = rendus.map((item) => {
                         >
                           {String(i + 1).padStart(2, '0')}
                         </span>
-                        <span>
-                          {item.question}
-                          {item.noteId && <NoteRef id={item.noteId} interactive={false} />}
-                        </span>
+                        <span>{item.question}</span>
                       </span>
                       <span
                         aria-hidden="true"

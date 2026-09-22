@@ -14,19 +14,11 @@ export type SectionKey =
   | 'subscribe'
   | 'corum'
   | 'risks'
-  | 'faq'
-  | 'notes';
+  | 'faq';
 
 export interface SectionMeta {
   /** Ancre HTML : l'id de la <section>. */
   id: string;
-}
-
-/** Note légale numérotée (façon Apple « ◊ 1, 2… »), agrégée par LegalNotes.astro dans l'ordre des sections. */
-export interface LegalNote {
-  /** Identifiant stable, référencé via <NoteRef id="…" />. */
-  id: string;
-  text: string;
 }
 
 /** Position d'un CTA « Souscrire » pour l'analytics (dataLayer cta_position). */
@@ -78,12 +70,10 @@ export interface HighlightCard {
   label?: string;
   /** Valeur mise en avant (ex. « 200 € »). */
   value: string;
-  /** Appel de note : source et portée de la valeur. */
-  noteId?: string;
   /**
    * Explication dépliable, derrière un bouton « i » posé après le libellé (15/09/2026). Elle dit ce que
    * la valeur RECOUVRE, quand le mot seul ne suffit pas : « Diversifiée », « Monde ». Ce n'est pas une
-   * note légale, qui porte source et portée et vit dans `noteId` ; c'est de la pédagogie.
+   * note légale, qui porte source et portée ; c'est de la pédagogie.
    */
   info?: string;
 }
@@ -102,7 +92,7 @@ export interface HighlightsContent {
    * caractéristiques du produit mais des modalités.
    */
   subscriptionTitle?: string;
-  subscriptionItems?: { label: string; value: string; noteId?: string }[];
+  subscriptionItems?: { label: string; value: string }[];
   /**
    * Appel à l'action secondaire, au pied de la section (15/09/2026). Il mène à une page du site, pas
    * au tunnel : il ne porte donc pas de `position`, contrairement aux CTA de souscription.
@@ -131,8 +121,6 @@ export interface FeeRow {
    */
   valueShort?: string;
   detail?: string;
-  /** Appel de note légale porté par le libellé de la ligne (id d'une LegalNote de la section). */
-  noteId?: string;
 }
 
 export interface WithdrawalStep {
@@ -177,7 +165,7 @@ export interface StrategyChapter {
  * trois volets (`what`, `where`, `how`), réunis en tuiles le 16/09/2026.
  * Ce que le type ne porte plus, parce que la page ne le dit plus : le mot d'ordre et son contre-poids,
  * les trois piliers, la zone Conseil de l'Europe + Canada et sa carte, les types d'actifs du DIC,
- * l'effet de levier. Plus de `notes` non plus : la page n'appelle aucune source.
+ * l'effet de levier.
  */
 export interface StrategyContent {
   /**
@@ -206,8 +194,6 @@ export interface StepItem {
   title: string;
   /** Détail de l'étape : plus rendu sur l'accueil depuis le 11/09/2026 (intitulés seuls). */
   description?: string;
-  /** Appel de note légale porté par le titre de l'étape (id d'une LegalNote de la section). */
-  noteId?: string;
 }
 
 export interface SubscribeContent {
@@ -251,8 +237,6 @@ export interface CorumContent {
 export interface RiskItem {
   title: string;
   description: string;
-  /** Appel de note légale porté par le titre du risque (id d'une LegalNote de la section). */
-  noteId?: string;
 }
 
 export interface RisksContent {
@@ -293,8 +277,6 @@ export interface FaqItem {
   question: string;
   /** Paragraphes de réponse (texte brut, pas de HTML). */
   answer: string[];
-  /** Appel de note légale porté par la question (id d'une LegalNote de la section). */
-  noteId?: string;
   /**
    * Rubrique de la question (16/09/2026). Elle ne sert QUE sur /faq, qui groupe les vingt-deux
    * questions ; les sélections courtes des autres pages l'ignorent.
@@ -340,7 +322,6 @@ export interface FaqContent {
   /** Renvoi vers la FAQ complète, rendu sous la liste de l'accueil. */
   moreLink?: { label: string; href: string };
   cta: Cta;
-  notes: LegalNote[];
 }
 
 export interface NavContent {
@@ -363,8 +344,6 @@ export interface NavContent {
   menuAriaLabel?: string;
   /** aria-label du fil d'Ariane des sous-pages (ex. « Fil d'Ariane »). */
   breadcrumbLabel?: string;
-  /** Début de l'aria-label des appels de note (ex. « Voir la note » → « Voir la note 3 »). */
-  noteRefLabel?: string;
 }
 
 /** Bandeau de consentement cookies (CNIL). */
@@ -408,13 +387,6 @@ export interface FooterContent {
   /** Libellé du retour en haut de page. Absent : le lien n'est pas rendu. */
   backToTopLabel?: string;
   copyright: string;
-  /** Titre H2 de la section Notes (ex. « Notes et sources »). */
-  notesTitle: string;
-  /**
-   * Libellé du repli de la liste des notes. `{n}` est remplacé par le nombre de notes de la page.
-   * Le titre reste `notesTitle` ; ce libellé n'ajoute que le décompte.
-   */
-  notesToggleLabel?: string;
   /** Titre (masqué visuellement) du bloc de mentions légales du pied de page. */
   legalTitle?: string;
   /** Libellé du <summary> qui replie les blocs d'identité (le premier bloc reste déplié). */

@@ -531,7 +531,6 @@ export const press = {
       email: 'h.detournemire@rudpedersen.com', // fournie par l'équipe le 16/09/2026
     },
   ],
-  contactsSource: 'corum.fr, rubrique Contacts presse, consultée le 8 septembre 2026',
   /**
    * Revue de presse « La presse en parle » : onze articles. Les neuf premiers sont la sélection livrée
    * par CORUM le 10/09/2026, dans l'ordre de la sélection ; les deux derniers ont été ajoutés par

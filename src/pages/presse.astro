@@ -2,8 +2,8 @@
 /**
  * Page /presse, « La presse en parle » (grand public) : SiteNav collée en haut → main#contenu
  * (PageHero avec le fil d'Ariane dans son slot et le CTA, sans ligne risques depuis le 14/09/2026 →
- * citations mises en avant → revue de presse → contacts presse, zone 4 → LegalNotes, toujours monté
- * mais qui ne rend rien, AFFICHER = false) → Footer. L'avertissement de la revue, dans sa bande
+ * citations mises en avant → revue de presse → contacts presse, zone 4) → Footer. Plus de notes
+ * légales : retirées de l'écran le 14/09/2026, du code le 22/09/2026. L'avertissement de la revue, dans sa bande
  * sombre, a été retiré le 16/09/2026 (voir press.ts).
  * La salle de presse, qui portait les communiqués et le kit média (arbitrage du 10/09/2026), a été
  * désactivée le 15/09/2026 puis supprimée le 22/09/2026 ; ses contacts sont rendus ici.
@@ -13,7 +13,6 @@
 import Base from '@/layouts/Base.astro';
 import SiteNav from '@/components/SiteNav.astro';
 import Footer from '@/components/Footer.astro';
-import LegalNotes from '@/components/LegalNotes.astro';
 import Breadcrumb from '@/components/ui/Breadcrumb.astro';
 import Button from '@/components/ui/Button.astro';
 import StickyCta from '@/components/StickyCta.astro';
@@ -60,8 +59,6 @@ const jsonLd = [
         sont servis ici, par le composant écrit pour elle, déplacé sous components/pages/presse/. */
     }
     <Contacts tone="paper" />
-
-    <LegalNotes notes={press.notes} />
   </main>
 
   {/* Pastille d'appel : rendue au niveau de la page, jamais dans une section. */}

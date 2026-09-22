@@ -1,18 +1,16 @@
 ---
 /**
  * Guide « Souscrire en ligne, en quatre étapes » de la page /documentation (id « guide »).
- * En-tête collant sur grand écran : H2 (avec l'appel de la note « souscription »), puis l'introduction
+ * En-tête collant sur grand écran : H2, puis l'introduction
  * (en ligne, versements programmés PEI, réinvestissement des dividendes). Son contre-poids, retiré
  * de l'écran le 14/09/2026 avec tous les « Bon à savoir », a quitté le code le 22/09/2026. Face à
  * lui, le stepper vertical des quatre étapes (liste ordonnée, ligne de progression, cascade déclarative),
- * repris de la section Souscrire de l'accueil. Les appels de note des étapes viennent du contenu.
+ * repris de la section Souscrire de l'accueil.
  * Contenu : documentation.howTo et documentation.labels.
  */
 import Container from '@/components/ui/Container.astro';
 import Section from '@/components/ui/Section.astro';
 import type { DocumentationContent, DocumentationLabels } from '@/content/types-v2';
-import NoteRef from '@/components/ui/NoteRef.astro';
-import { notes } from '@/content/fr/documentation';
 
 interface Props {
   howTo: DocumentationContent['howTo'];
@@ -29,11 +27,7 @@ const id = 'guide';
       <!-- En-tête collant : titre et introduction -->
       <div class="lg:col-span-5">
         <div class="lg:sticky lg:top-24">
-          <h2 id={id + '-title'} class="text-display-md">
-            {howTo.title}<span class="whitespace-nowrap"
-              ><NoteRef id="documentation-souscription" notes={notes} /></span
-            >
-          </h2>
+          <h2 id={id + '-title'} class="text-display-md">{howTo.title}</h2>
           <div class="mt-6 space-y-4">
             <p class="text-lead text-ink">{howTo.intro}</p>
           </div>
@@ -71,7 +65,6 @@ const id = 'guide';
                       </span>
                     )}
                     {step.title}
-                    {step.noteId && <NoteRef id={step.noteId} notes={notes} />}
                   </h3>
                   <p class="mt-3 max-w-xl text-base leading-relaxed sm:text-lg">
                     {step.description}

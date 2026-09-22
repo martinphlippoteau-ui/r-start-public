@@ -25,7 +25,6 @@
  */
 import Button from '@/components/ui/Button.astro';
 import Container from '@/components/ui/Container.astro';
-import NoteRef from '@/components/ui/NoteRef.astro';
 import Section from '@/components/ui/Section.astro';
 import Stat from '@/components/ui/Stat.astro';
 import SectionHeading from '@/components/ui/SectionHeading.astro';
@@ -91,11 +90,10 @@ const { stats } = trust;
       <div class="mt-section-sm">
         {
           /* PAS DE SOUS-TITRE : `stats.title` disait « Le groupe CORUM en quelques chiffres », ce que le
-            titre de la section dit maintenant lui-même (corum.ts, 15/09/2026). L'appel de note reste,
-            accroché au bandeau qu'il qualifie ; il ne rend rien tant que NoteRef est coupé
-            (AFFICHER = false) et que le registre de l'accueil est vide. */
+            titre de la section dit maintenant lui-même (corum.ts, 15/09/2026). Il reste lu par les
+            lecteurs d'écran, comme nom du bandeau. */
         }
-        <p class="visually-hidden">{stats.title}<NoteRef id="confiance-chiffres" tone="light" /></p>
+        <p class="visually-hidden">{stats.title}</p>
         {
           /* Deux colonnes dès le téléphone : en une seule, quatre nombres prenaient un écran entier.
             Le nombre de colonnes suit celui des chiffres, comme sur /a-propos, et les cases passent en

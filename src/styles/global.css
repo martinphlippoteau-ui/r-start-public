@@ -1432,7 +1432,7 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   display: inline-flex;
   /* CIBLE DE 44 PX SANS TOUCHER AU DESSIN (audit du 18/09/2026) : le rond fait 20 px, c'était la plus
      petite commande du site, treize fois sur téléphone (repères de l'accueil, lignes du comparateur).
-     Un pseudo-élément invisible élargit la zone de 12 px de chaque côté, comme pour les appels de note. */
+     Un pseudo-élément invisible élargit la zone de 12 px de chaque côté. */
   position: relative;
   &::after {
     content: '';

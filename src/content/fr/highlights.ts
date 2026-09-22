@@ -1,5 +1,5 @@
-import type { HighlightsContent, LegalNote } from '@/content/types';
-import { income, product, risk, share, strategy, subscription } from '@/content/fr/facts';
+import type { HighlightsContent } from '@/content/types';
+import { income, risk, share, subscription } from '@/content/fr/facts';
 import { pages } from '@/config/pages';
 
 /**
@@ -10,7 +10,7 @@ import { pages } from '@/config/pages';
  * options automatiques (brochure partenaires 2026, p. 3, p. 5 et p. 7).
  * Le niveau de risque est en deuxième position (réunion produit du 10/09/2026, donc haut dans la
  * page). Sa valeur, 4 sur 7, est celle de l'équipe et de CORUM, pas celle du DIC (3 sur 7) : voir
- * facts.risk, qui porte l'écart, et le commentaire du tableau plus bas. Sa note l'attribue à CORUM.
+ * facts.risk, qui porte l'écart, et le commentaire du tableau plus bas.
  * Plus de carte « zone » depuis le 16/09/2026, remplacée par l'horizon d'investissement. La carte
  * « Approche » dit « Diversifiée », mot que la brochure employait et que le contrôle de conformité
  * signale : le patrimoine peut être concentré au démarrage (strategy.ts, pilier « Où »).
@@ -21,60 +21,6 @@ import { pages } from '@/config/pages';
 
 /** Espace insécable avant % € : ; ? ! : les libellés de facts.ts utilisent une espace simple. */
 const nb = (s: string): string => s.replace(/ ([%€:;?!])/g, ' $1');
-/** Apostrophe typographique (’) : certains libellés de facts.ts sont saisis avec l'apostrophe droite. */
-const typo = (s: string): string => nb(s.replace(/'/g, '’'));
-const lower = (s: string): string => s.charAt(0).toLowerCase() + s.slice(1);
-
-export const notes: LegalNote[] = [
-  {
-    id: 'points-forts-prix-de-part',
-    text: nb(
-      `Prix de souscription de ${share.priceLabel} par part, dont ${share.nominal} € de valeur nominale et ${share.premium} € de prime d’émission. Les parts peuvent être fractionnées en ${share.fractions}. Source : bulletin de souscription R Start, conditions générales de vente, mai 2026.`
-    ),
-  },
-  {
-    id: 'points-forts-risque',
-    text: nb(
-      `Le niveau de risque est exprimé sur une échelle réglementaire de 1 à ${risk.sriMax}, où 1 correspond au risque le plus faible. R Start y est classée ${risk.sriLabel}, soit une ${risk.sriClass}, valeur communiquée par CORUM ; l’échelle suppose une détention de ${risk.recommendedHoldingLabel}. Cette échelle ne mesure pas tous les risques : elle ne dit rien de la liquidité de vos parts, ni du risque de change, ni de l’effet de levier. Source : CORUM, brochure partenaires 2026, p. 3. Le document d’informations clés du ${product.dicDate.label} reste le seul document qui fait foi : lisez-le avant toute décision.`
-    ),
-  },
-  {
-    id: 'points-forts-en-ligne',
-    text: nb(
-      `R Start se souscrit uniquement en ligne. Le démembrement, la souscription papier et CORUM Life ne sont pas proposés pour cette SCPI. Pièces à préparer : ${subscription.documentsRequired.map(lower).join(', ')}. Sources : brochure partenaires 2026, p. 5 et p. 7 ; bulletin de souscription, mai 2026.`
-    ),
-  },
-  {
-    id: 'points-forts-distribution',
-    text: nb(
-      `Fréquence de versement des dividendes potentiels : ${lower(income.frequency)}. Leur montant dépend des loyers encaissés et de la décision de la société de gestion. Aucun montant n’est annoncé à l’avance. Sources : bulletin de souscription R Start, conditions générales de vente, mai 2026 ; brochure partenaires 2026, p. 3.`
-    ),
-  },
-  {
-    id: 'points-forts-zone',
-    text: typo(
-      `Zone d’investissement selon le DIC du ${product.dicDate.label} : ${lower(strategy.zoneDetail)}. Les investissements portent sur tous types d’actifs immobiliers professionnels. Cette zone décrit où R Start peut investir, pas un patrimoine existant : il se constitue au fil des collectes et peut rester concentré sur peu d’immeubles, de pays ou de secteurs. L’étendue de la zone ne supprime aucun des risques du placement.`
-    ),
-  },
-  {
-    id: 'points-forts-approche',
-    text: typo(
-      `Approche de R Start selon le DIC du ${product.dicDate.label} : « ${lower(strategy.approach)} ». Une approche n’est pas un résultat : elle n’assure ni plus-value, ni revenu, et ne met pas le capital à l’abri d’une perte. Le patrimoine se constitue au fil des collectes et peut rester concentré sur peu d’immeubles, de pays ou de secteurs.`
-    ),
-  },
-  {
-    id: 'points-forts-automatique',
-    text: nb(
-      `Versements programmés (${lower(subscription.options.pei.name)}) : à partir de ${subscription.options.pei.minimumMonthlyLabel}, sous réserve de ${lower(subscription.options.pei.requirement)}. Réinvestissement des dividendes : ${lower(subscription.options.rd.description)} potentiels en nouvelles parts. Ces deux options s’interrompent et se modifient à tout demande ; elles ne garantissent aucun revenu. Sources : brochure partenaires 2026, p. 5 ; bulletins d’adhésion, avril 2026.`
-    ),
-  },
-  {
-    id: 'points-forts-jouissance',
-    text: nb(
-      `Date de jouissance des parts : « ${income.enjoymentDate} », soit un délai de ${income.enjoymentDelayLabel}. Aucun dividende n’est versé pendant ce délai. Sources : bulletin de souscription R Start, conditions générales de vente, mai 2026 ; brochure partenaires 2026, p. 3.`
-    ),
-  },
-];
 
 /*
  * Type DÉCLARÉ et non `satisfies` : `intro` est désormais facultative et absente de ce contenu.
@@ -107,28 +53,27 @@ export const highlights: HighlightsContent = {
    *    n'attribue cette valeur au DIC ;
    *  - « Zone d'investissement : Monde » : le DIC borne la zone aux pays du Conseil de l'Europe, en
    *    zone euro et hors zone euro, et au Canada. Carte remplacée le 16/09/2026 par l'horizon
-   *    d'investissement (voir plus bas), qui a gardé sa note, laquelle cite toujours le DIC ;
+   *    d'investissement (voir plus bas) ;
    *  - « Approche : Diversifiée » : R Start n'a pas encore de patrimoine à diversifier.
    * Aucun chiffre en dur : tout vient de src/content/fr/facts.ts.
    */
   title: 'R Start en un clin d’œil',
   cards: [
-    { label: 'Ticket d’entrée', value: nb(share.priceLabel), noteId: 'points-forts-prix-de-part' },
-    { label: 'Niveau de risque', value: risk.sriLabel, noteId: 'points-forts-risque' },
+    { label: 'Ticket d’entrée', value: nb(share.priceLabel) },
+    { label: 'Niveau de risque', value: risk.sriLabel },
     /** income.frequency vaut « Mensuelle » ; accordé ici au libellé (« revenus »). */
-    { label: 'Revenus potentiels', value: 'Mensuels', noteId: 'points-forts-distribution' },
+    { label: 'Revenus potentiels', value: 'Mensuels' },
     /*
      * DEUX EXPLICATIONS DÉPLIABLES (15/09/2026, textes de l'équipe). « Diversifiée » et « Monde » sont
      * les deux valeurs du tableau qu'un mot ne suffit pas à rendre : elles nomment un mandat, pas une
-     * caractéristique observable. Le bouton « i » les développe sans allonger la carte.
-     * Elles ne remplacent pas les notes légales, qui restent en `noteId` : celle de l'approche rappelle
-     * notamment que le patrimoine n'existe pas encore et peut rester concentré.
+     * caractéristique observable. Le bouton « i » les développe sans allonger la carte. Ce ne sont pas
+     * des notes légales : celles des cartes, qui donnaient leur source et leur limite, ont quitté
+     * l'écran le 14/09/2026 et le code le 22/09/2026 (archivées hors du dépôt, .claude/audits).
      */
     {
       label: 'Approche',
       value: 'Diversifiée',
       info: 'R Start investit dans tous secteurs, toutes zones géographiques et tous types d’immeubles pour ne pas dépendre d’une seule source de performance.',
-      noteId: 'points-forts-approche',
     },
     /*
      * « HORIZON D'INVESTISSEMENT » REMPLACE « ZONE D'INVESTISSEMENT » le 16/09/2026, demande de
@@ -175,7 +120,6 @@ export const highlights: HighlightsContent = {
          (« les revenus ne sont pas garantis et le prix. ») : elle est complétée par la formule employée
          partout ailleurs sur le site, le prix de la part varie à la hausse comme à la baisse. */
       info: 'La durée de placement recommandée dans une SCPI est de 10 ans. Comme un investissement immobilier en direct, l’investissement en SCPI présente un risque de perte en capital, les revenus ne sont pas garantis et le prix de la part peut varier à la hausse comme à la baisse. Les performances passées ne préjugent pas des performances futures.',
-      noteId: 'points-forts-zone',
     },
     {
       label: 'Délai de jouissance',
@@ -192,7 +136,6 @@ export const highlights: HighlightsContent = {
       /* Explication dépliable (16/09/2026, texte de l'équipe). « 1er jour du 6e mois » dit QUAND,
          pas POURQUOI : c'est le temps qu'il faut à la SCPI pour investir l'argent collecté. */
       info: 'Période d’attente entre votre investissement et le moment où vous commencez à percevoir des revenus. Le délai de jouissance correspond au temps nécessaire à la SCPI pour investir l’argent collecté.',
-      noteId: 'points-forts-jouissance',
     },
     /*
      * PAS DE LIGNE « 100 % Digital » dans le tableau (14/09/2026, demande de l'équipe) : elle disait la
@@ -206,11 +149,10 @@ export const highlights: HighlightsContent = {
    */
   subscriptionTitle: 'Souscription et options disponibles',
   subscriptionItems: [
-    { label: 'Souscription', value: nb(subscription.onlineLabel), noteId: 'points-forts-en-ligne' },
+    { label: 'Souscription', value: nb(subscription.onlineLabel) },
     {
       label: 'Versements automatiques',
       value: nb(`dès ${subscription.options.pei.minimumMonthlyLabel}`),
-      noteId: 'points-forts-automatique',
     },
     { label: 'Réinvestissement automatique', value: 'des dividendes' },
   ],
@@ -221,8 +163,7 @@ export const highlights: HighlightsContent = {
    * recommandée : 10 ans. »
    * Ce qu'il portait n'a plus d'équivalent près du tableau : la ligne risques du hero, qui ouvrait
    * la page avec la perte en capital, les revenus non garantis, la liquidité limitée et le risque
-   * de change, a été retirée le même jour, et les appels de note des lignes,
-   * qui donnaient leur source et leur limite, sont coupés (NoteRef, AFFICHER = false). Reste la
-   * section Risques, plus bas sur l'accueil.
+   * de change, a été retirée le même jour, comme les appels de note des lignes, qui donnaient leur
+   * source et leur limite. Reste la section Risques, plus bas sur l'accueil.
    */
 };

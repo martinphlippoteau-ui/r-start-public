@@ -1,13 +1,12 @@
-import type { LegalNote, StatItem } from '@/content/types';
+import type { StatItem } from '@/content/types';
 import type { TrustContent } from '@/content/types-v2';
 import { corumGroup, product, trust as trustFacts } from '@/content/fr/facts';
-import { managementCompany, visaNotice } from '@/content/fr/legal';
+import { managementCompany } from '@/content/fr/legal';
 
 /** Espace insécable (U+00A0, en échappement) avant % € : ; ? ! et devant « Md€ » : les libellés de facts.ts utilisent une espace simple. */
 const nb = (s: string): string => s.replace(/ ([%€:;?!])/g, ' $1').replace(/ (Md€)/g, ' $1');
 /** Espace insécable entre groupes de trois chiffres (ex. « 160 000 »). */
 const nbDigits = (s: string): string => s.replace(/(\d) (?=\d{3}(?!\d))/g, '$1 ');
-const lowerFirst = (s: string): string => s.charAt(0).toLowerCase() + s.slice(1);
 /** Apostrophe typographique (’) : facts.ts écrit « CORUM L'Épargne » avec l'apostrophe droite. */
 const typo = (s: string): string => s.replace(/'/g, '’');
 
@@ -68,37 +67,8 @@ export const experienceStats: StatItem[] = [
 ];
 
 const tp = trustFacts.trustpilot;
-/** Nom du distributeur en apostrophe typographique (titre et note Trustpilot). */
+/** Nom du distributeur en apostrophe typographique (titre du bloc Trustpilot). */
 const company = typo(tp.company);
-
-/** Notes de la section, dans l'ordre de lecture (cadre réglementaire, visa, avis, chiffres). */
-export const notes: LegalNote[] = [
-  {
-    id: 'confiance-agrement',
-    text: nb(
-      `${trustFacts.amf.managementCompanyApproval} ${trustFacts.amf.supervisorNote} ${trustFacts.amf.depositarySentence} R Start relève de l’${lowerFirst(trustFacts.amf.sfdrLabel)}, règlement (UE) 2019/2088. Ce texte encadre la publication d’informations en matière de durabilité. Cette classification n’atteste d’aucune performance ni d’aucun objectif d’investissement durable. Sources : bulletin de souscription, mai 2026 ; document d’informations clés du ${product.dicDate.label}.`
-    ),
-  },
-  {
-    id: 'confiance-visa',
-    /** legal.visaNotice en tête, à l'identique (`nb` n'y modifie aucun caractère), puis la réserve standard de facts.ts. */
-    text: nb(
-      `${visaNotice} ${trustFacts.amf.disclaimer} La note d’information est disponible sur www.corum.fr et sur la page Documentation. Source : bulletin de souscription R Start, conditions générales de vente, mai 2026.`
-    ),
-  },
-  {
-    id: 'confiance-trustpilot',
-    text: nb(
-      `Note et avis affichés en direct par Trustpilot depuis le profil ${tp.url}, revendiqué par ${company}. Trustpilot est une plateforme d’avis indépendante de CORUM : elle publie et modère ces avis, et CORUM ne les modifie pas. Le carrousel affiché ici est paramétré pour ne présenter que les avis notés 4 et 5 étoiles : il ne reflète donc pas l’ensemble des avis publiés. La note globale et la totalité des avis, toutes notes confondues, sont consultables sur le profil Trustpilot. Les avis portent sur les services du distributeur ${company}, non sur R Start. Ils évoluent en permanence : seule la page Trustpilot fait foi à la date de consultation. Ils ne constituent ni une recommandation ni une indication sur les résultats futurs de R Start, et ne réduisent aucun de ses risques : perte en capital, revenus non garantis, liquidité limitée.`
-    ),
-  },
-  {
-    id: 'confiance-chiffres',
-    text: nb(
-      `${corumGroup.statsSource} Ils décrivent l’activité du groupe à la date de consultation et peuvent évoluer. R Start a ouvert ses souscriptions le ${product.openingDate.label} et n’a pas d’historique propre : la taille du groupe ne préjuge ni de ses résultats, ni de la liquidité de ses parts.`
-    ),
-  },
-];
 
 export const trust = {
   amf: {
@@ -111,8 +81,6 @@ export const trust = {
       {
         label: 'Société de gestion',
         value: `${managementCompany.name}, agréée et réglementée par l’AMF depuis le ${corumGroup.amfSince}${amfApprovalNumber ? ` (n° ${amfApprovalNumber})` : ''}`,
-        /** Mention légale de l'agrément in extenso (legal.managementCompany.amfApproval), note définie dans corum.ts. */
-        noteId: 'corum-agrement',
       },
       {
         label: 'Dépositaire',

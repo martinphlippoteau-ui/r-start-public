@@ -1,10 +1,8 @@
 // Contrôle de conformité du HTML buildé (dist/). Exit 1 si une règle échoue.
 // Règles : mentions obligatoires présentes, formulations interdites absentes, structure du hero,
 // liens PDF valides, un seul H1, lang="fr", canonical, JSON-LD parsable, SRI égal à la valeur de
-// facts.ts, citations de presse de l'accueil marquées et couvertes par l'avertissement, notes du
-// registre toutes appelées (avertissement), mentions obligatoires jamais en text-xs.
-// Les contenus sont importés directement des sources TypeScript (Node ≥ 22, sans alias `@/` :
-// notes.ts, qui en dépend, est lu dans le HTML à la place).
+// facts.ts, citations de presse marquées, mentions obligatoires jamais en text-xs.
+// Les contenus sont importés directement des sources TypeScript (Node ≥ 22, sans alias `@/`).
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -355,23 +353,6 @@ async function checkIndex() {
 
   checkHeroClaims(text, file);
 
-  // Notes orphelines : chaque note du registre de l'accueil (li id="notes-N" de la section #notes)
-  // doit être appelée au moins une fois (href="#notes-N"). notes.ts n'est pas importable ici (alias
-  // `@/`) : on lit les ancres rendues.
-  const noteIds = [...html.matchAll(/<li[^>]*\bid="notes-(\d+)"/g)].map((m) => m[1]);
-  const noteRefs = new Set([...html.matchAll(/href="#notes-(\d+)"/g)].map((m) => m[1]));
-  const orphans = noteIds.filter((n) => !noteRefs.has(n));
-  /*
-   * Une page sans note NI appel de note est un état cohérent, plus un contrôle en panne : l'accueil est
-   * dans ce cas depuis le 14/09/2026 (registre vidé dans content/fr/notes.ts, section retirée de
-   * index.astro). L'avertissement ne se déclenche donc que si l'un des deux existe sans l'autre, ce qui
-   * signale un exposant qui ne mène nulle part, ou une note que personne n'appelle.
-   */
-  if (!noteIds.length && noteRefs.size)
-    errors.push(`${file} : ${noteRefs.size} appel(s) de note sans section #notes (ancres mortes)`);
-  if (orphans.length)
-    warnings.push(`${file} : note(s) sans appel dans la page, notes-${orphans.join(', notes-')}`);
-
   // Mentions obligatoires : jamais en text-xs (12 px), ni sur le <p> ni par un ancêtre.
   checkNoticeSize(html, file);
 
@@ -659,8 +640,8 @@ async function checkSubPages() {
         /*
          * Sources du comparatif : contrôle RESSERRÉ le 14/09/2026. Il cherchait la chaîne « Sources : »
          * n'importe où dans la page, et c'était le bloc « Notes et sources », en bas, qui la fournissait,
-         * pas le comparateur. Les notes sont parties avec le nouveau contenu, et le contrôle est tombé
-         * alors que les sources du tableau, elles, sont toujours là. Il vise désormais le bloc du
+         * pas le comparateur. Les notes sont parties ce jour-là, et le contrôle est tombé alors que les
+         * sources du tableau, elles, sont toujours là. Il vise désormais le bloc du
          * comparateur lui-même, par l'attribut que porte chaque source de colonne.
          */
         if (!/data-comparator-source\b/.test(html))

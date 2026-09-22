@@ -1,10 +1,9 @@
 import type { SectionKey, SectionMeta } from '@/content/types';
 
 /**
- * Ancres des sections : chaque composant de section lit ici l'`id` de sa <section>, et NoteRef celui
- * des notes. L'ORDRE RENDU sur l'accueil est HOME_ORDER (src/pages/index.astro) ; /strategie rend
- * 04-Strategy elle-même. La photo pleine largeur 03a-Immeuble n'a ni titre, ni note, ni entrée ici :
- * elle porte son id.
+ * Ancres des sections : chaque composant de section lit ici l'`id` de sa <section>. L'ORDRE RENDU
+ * sur l'accueil est HOME_ORDER (src/pages/index.astro) ; /strategie rend 04-Strategy elle-même. La photo pleine largeur 03a-Immeuble n'a ni titre ni entrée ici : elle porte
+ * son id.
  *
  * NETTOYÉ LE 22/09/2026 : les libellés, l'ordre et la présence dans la sous-navigation (`label`,
  * `order`, `inNav`) n'avaient plus de lecteur depuis la fin de la sous-navigation par ancres (10/09/2026),
@@ -20,5 +19,4 @@ export const sections: Record<SectionKey, SectionMeta> = {
   corum: { id: 'corum' },
   risks: { id: 'risques' },
   faq: { id: 'faq' },
-  notes: { id: 'notes' },
 };

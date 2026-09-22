@@ -10,7 +10,6 @@ import type {
   FaqItem,
   FeeKind,
   FeeRow,
-  LegalNote,
   StatItem,
   StepItem,
   WithdrawalStep,
@@ -46,8 +45,6 @@ export interface TrustContent {
     items: {
       label: string;
       value: string;
-      /** Appel de note légale porté par la valeur de la carte (id d'une LegalNote de la section). */
-      noteId?: string;
     }[];
     /** Phrase standard : le visa n'implique ni approbation ni authentification. */
     disclaimer: string;
@@ -83,7 +80,7 @@ export interface TrustContent {
  * Explique quand la société de gestion se rémunère : les deux situations où des frais sont prélevés
  * (loyers encaissés, plus-value réalisée à la vente), puis la démonstration de l'équipe. Les cartes
  * des deux moteurs et le mécanisme de réserve en cas de moins-value l'ont quittée le 11/09/2026, et
- * le contre-poids chiffré n'y est plus rendu (voir `counterweight.risk`).
+ * le contre-poids chiffré l'a suivie (voir `counterweight`).
  */
 export interface DifferenceContent {
   title: string;
@@ -93,28 +90,12 @@ export interface DifferenceContent {
   /** Les deux situations où des frais sont prélevés. `strong` est le mot mis en valeur dans `text`. */
   situations?: { text: string; strong?: string }[];
   /**
-   * Formule d'alignement (advantage) : « la société de gestion se rémunère sur les loyers encaissés et
-   * les plus-values réalisées, jamais sur le montant que vous versez » (jamais « nous ne touchons rien
-   * tant que vous n'avez pas gagné d'argent » : les 15 % sont prélevés sur les loyers même quand la
-   * valeur des parts baisse), et son contre-poids chiffré : frais de gestion, commission sur les
-   * cessions, commission de retrait, coût total inconnu à la souscription (risk).
+   * Conclusion de l'équipe, sous les deux situations (« nous, on ne touche rien tant que vous n'avez
+   * pas gagné d'argent »). Son contre-poids chiffré (frais de gestion prélevés sur les loyers même
+   * quand la valeur des parts baisse, commission sur les cessions, commission de retrait) a quitté
+   * l'écran le 11/09/2026 et le code le 22/09/2026, comme l'allégation de rang qui ouvrait le bloc.
    */
-  counterweight: {
-    /**
-     * Contre-poids chiffré (frais réels et commission d'arbitrage). Plus rendu depuis le 11/09/2026,
-     * sur demande réitérée de l'équipe ; le texte reste, c'est un texte de conformité.
-     */
-    risk: string;
-    noteId?: string;
-    /** Conclusion de l'équipe, en ouverture du bloc de démonstration. */
-    pedagogy?: string[];
-    /**
-     * Allégation de rang. `noteId` est FACULTATIF depuis le 14/09/2026 : quand la phrase porte son
-     * périmètre en elle (facts.product.definition, « du groupe CORUM »), elle n'a plus besoin d'un
-     * appel de note pour le dire, et l'accueil n'en rend plus.
-     */
-    claim?: { text: string; noteId?: string };
-  };
+  counterweight: { pedagogy?: string[] };
   /** Lien interne vers la page Frais : ce n'est pas un CTA de souscription, il ne porte pas de `position`. */
   cta: { label: string; href: string };
   /**
@@ -185,16 +166,12 @@ export interface FeeComparison {
   risk: string;
   /** Encadré « Une innovation, pas une révolution », reproduit à l'identique depuis legal.ts. */
   innovationBox: { title: string; body: string };
-  /** Appel de note légale porté par le titre du bloc. */
-  noteId?: string;
 }
 
 export interface FeeGroup {
   title: string;
   intro?: string;
   rows: FeeRow[];
-  /** Appel de note légale porté par le titre du tableau (id d'une LegalNote de la page). */
-  noteId?: string;
 }
 
 /**
@@ -281,7 +258,6 @@ export interface FeesPageContent {
   /** Titre de la note HT/TTC (« Bon à savoir : »), écrit en dur. */
   htNoteLabel?: string;
   cta: Cta;
-  notes: LegalNote[];
 }
 
 export type DocumentGroupKey = 'reglementaire' | 'frais' | 'formulaire';
@@ -311,8 +287,6 @@ export interface DocumentationLabels {
   faqEyebrow?: string;
   /** aria-label de la liste des questions (ex. « Questions fréquentes sur R Start »). */
   faqListLabel?: string;
-  /** Amorce du lien de note placé sous la réponse (le marqueur de la question n'est pas focusable). */
-  faqNoteLead?: string;
 }
 
 export interface DocumentationContent {
@@ -336,7 +310,6 @@ export interface DocumentationContent {
   mention: string;
   cta: Cta;
   labels?: DocumentationLabels;
-  notes: LegalNote[];
 }
 
 /**
@@ -395,14 +368,12 @@ export interface PressContent {
   coverage: { title: string; items: PressArticle[] };
   /** Appel à l'action de la page : en-tête et pastille flottante. */
   cta: Cta;
-  /** Zone 4, « Vous êtes journaliste ? » (Contacts.astro). `source` n'est plus affichée. */
+  /** Zone 4, « Vous êtes journaliste ? » (Contacts.astro). */
   contacts: {
     title: string;
     /** Phrase d'appel sous le titre. Absente : la liste suit directement le titre. */
     intro?: string;
     items: PressContact[];
-    source: string;
   };
   labels?: PressLabels;
-  notes: LegalNote[];
 }

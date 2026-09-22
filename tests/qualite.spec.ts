@@ -918,10 +918,7 @@ test.describe('Qualité', () => {
           };
         });
       });
-      /* Les notes ne comptent pas : elles fermaient toutes les pages sans faire leur structure. Aucune
-         page n'en rend plus depuis le 14/09/2026 (LegalNotes.astro), le filtre est donc sans effet
-         aujourd'hui ; il est gardé pour le jour où elles reviennent. */
-      const contenu = releve.filter((s) => s.id !== 'notes');
+      const contenu = releve;
       expect(contenu.length).toBeGreaterThanOrEqual(mini);
       expect(contenu.filter((s) => !s.titre || s.cache).map((s) => s.id)).toEqual([]);
       expect(

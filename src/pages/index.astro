@@ -86,11 +86,8 @@ const jsonLd = [
     {hero && <hero.Component />}
     {rest.map(({ Component }) => <Component />)}
     {
-      /* PLUS DE SECTION « Notes et sources » SUR L'ACCUEIL (14/09/2026, demande de l'équipe), et plus
-        aucun appel de note en exposant : le registre de l'accueil (content/fr/notes.ts) est vide, et
-        NoteRef ne rend rien pour un identifiant qu'il n'y trouve pas. Les notes elles-mêmes vivent
-        toujours dans les fichiers de contenu ; aucune page ne les rend plus, LegalNotes et NoteRef
-        étant coupés (AFFICHER = false) sur tout le site. */
+      /* PLUS DE SECTION « Notes et sources » NI D'APPELS DE NOTE (14/09/2026, demande de l'équipe) ;
+        les notes elles-mêmes ont quitté le code le 22/09/2026 (archivées hors du dépôt, .claude/audits). */
     }
   </main>
   {

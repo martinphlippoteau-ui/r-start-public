@@ -17,14 +17,12 @@
  * La photo n'a PAS de parallaxe : `data-parallax` exige le moteur GSAP, que cette page n'a aucune autre
  * raison de télécharger (tests/performance.spec.ts). Elle se révèle par `data-animate="clip"`, rendu par
  * le moteur léger.
- * Contenu : src/content/fr/corum.ts (le lien vers corum.fr), corumRange.ts, trust.ts et media.ts. Notes
- * résolues dans celles de la page (about.notes).
+ * Contenu : src/content/fr/corum.ts (le lien vers corum.fr), corumRange.ts, trust.ts et media.ts.
  */
 import { Image, Picture } from 'astro:assets';
 import amfLogo from '@/assets/logos/amf.svg';
 import Button from '@/components/ui/Button.astro';
 import Container from '@/components/ui/Container.astro';
-import NoteRef from '@/components/ui/NoteRef.astro';
 import Section from '@/components/ui/Section.astro';
 import Stat from '@/components/ui/Stat.astro';
 import { corum } from '@/content/fr/corum';
@@ -33,13 +31,7 @@ import { trust as trustFacts } from '@/content/fr/facts';
 import { trust } from '@/content/fr/trust';
 import { media } from '@/content/fr/media';
 import { resolveImage } from '@/lib/images';
-import type { LegalNote } from '@/content/types';
 
-interface Props {
-  /** Notes de la page, pour la numérotation des appels de note. */
-  notes?: LegalNote[];
-}
-const { notes } = Astro.props as Props;
 const officePhoto = await resolveImage(media.corum.src);
 const stats = trust.stats;
 const QUIET_TITLE_Y = 12;
@@ -50,7 +42,6 @@ const QUIET_TITLE_Y = 12;
   <Container size="wide">
     <h2 id="chiffres-title" class="text-display-md max-w-4xl" data-animate="fade-up">
       {stats.title}
-      <NoteRef notes={notes} id="confiance-chiffres" tone="light" />
     </h2>
     <!--
       Deux colonnes dès le téléphone (13/09/2026) : en une seule, les chiffres prenaient un écran pour

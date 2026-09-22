@@ -1,14 +1,11 @@
-import type { LegalNote, RisksContent } from '@/content/types';
-import { fees, product, risk } from '@/content/fr/facts';
+import type { RisksContent } from '@/content/types';
+import { fees } from '@/content/fr/facts';
 import {
   arbitrageWarningBullets,
   arbitrageWarningTitle,
   bulletinWarning,
   dicWarning,
 } from '@/content/fr/legal';
-
-/** Espace insécable avant % et € : les libellés de facts.ts utilisent une espace simple. */
-const nb = (s: string): string => s.replace(/ ([%€:;?!])/g, '\u00A0$1');
 
 /**
  * Section « Risques » (id : risques).
@@ -18,28 +15,6 @@ const nb = (s: string): string => s.replace(/ ([%€:;?!])/g, '\u00A0$1');
  * depuis legal.ts, sont aussi dans ce contenu, mais la section ne les rend plus depuis le
  * 11/09/2026 : c'est MandatoryWarnings.astro qui les lit ici, sur /documentation.
  */
-
-/**
- * Ordre de lecture des appels de note dans la section : sources (1er risque), sortie (liquidité),
- * levier (plus appelée depuis le retrait de ce risque, le 16/09/2026). Aucune n'est affichée :
- * NoteRef est coupé.
- */
-export const notes: LegalNote[] = [
-  {
-    id: 'risques-sources',
-    text: `Risques décrits d’après le document d’informations clés du ${product.dicDate.label} et le bulletin de souscription de mai 2026. L’ensemble des facteurs de risque figure dans la note d’information.`,
-  },
-  {
-    id: 'risques-sortie',
-    text: nb(
-      'Modalités de sortie (retrait et cession de parts) et commission de retrait anticipé : voir la note d’information de R Start.'
-    ),
-  },
-  {
-    id: 'risques-levier',
-    text: `Effet de levier : recours à l’endettement dans la limite de ${nb(risk.maxLeverage)} de la valeur d’expertise des actifs immobiliers. Cette limite est majorée des fonds collectés nets de frais non encore investis. Le montant maximum de l’emprunt est voté en assemblée générale. Source : document d’informations clés du ${product.dicDate.label}.`,
-  },
-];
 
 /*
  * Type DÉCLARÉ et non `satisfies` depuis le 15/09/2026 : `intro` est devenue facultative et absente
@@ -82,7 +57,6 @@ export const risks: RisksContent = {
       title: 'Risque de perte en capital',
       description:
         'La valeur des parts de R Start évolue avec la valeur de son patrimoine dans le temps. Elle peut donc varier à la hausse comme à la baisse en fonction de l’évolution des marchés immobiliers et des devises.',
-      noteId: 'risques-sources',
     },
     {
       title: 'Revenus non garantis',
@@ -92,7 +66,6 @@ export const risks: RisksContent = {
     {
       title: 'Risque de liquidité',
       description: `Comme tout placement immobilier, la SCPI est un placement peu liquide. Aussi, nous attirons votre attention sur la revente de vos parts, qui n’est pas garantie et peut être plus ou moins rapide en fonction de l’évolution du marché immobilier. Avant ${fees.withdrawal.zeroAfterYears} ans de détention, une commission de retrait dégressive s’applique.`,
-      noteId: 'risques-sortie',
     },
     {
       title: 'Risque de devise',
@@ -104,7 +77,7 @@ export const risks: RisksContent = {
      * s'en tient donc aux quatre rubriques de corum.fr. Ils disaient :
      *  - « Effet de levier : R Start peut emprunter jusqu'à [risk.maxLeverage] de la valeur d'expertise
      *    de ses immeubles. L'endettement amplifie les variations de valeur, à la hausse comme à la
-     *    baisse, et accroît le risque de perte. » (appel de note `risques-levier`) ;
+     *    baisse, et accroît le risque de perte. » ;
      *  - « Absence d'historique : R Start a ouvert ses souscriptions le [openingDate]. Elle n'a pas
      *    encore d'historique propre. Les résultats passés des autres SCPI CORUM ne préjugent pas de ses
      *    résultats futurs. »

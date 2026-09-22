@@ -4,10 +4,8 @@
  * (les quatre premières depuis le 16/09/2026, puis un renvoi vers /faq, voir documentation.ts).
  * Même construction que la section FAQ de l'accueil : en-tête collant face aux accordéons natifs
  * <details name="faq" data-faq> (un seul ouvert à la fois), chevron animé en CSS, réponse en text-lead.
- * L'appel de note viendrait du contenu (item.noteId, numéroté par NoteRef sur les notes de la page).
- * AUCUNE QUESTION NE PORTE PLUS DE `noteId` depuis la refonte de la FAQ (commit d289e0b,
- * 16/09/2026) : les deux branches `item.noteId` ci-dessous ne sont jamais vraies. Le découpage des
- * réponses en avantage et contre-poids (`riskFrom`) a quitté le code le 22/09/2026.
+ * Le découpage des réponses en avantage et contre-poids (`riskFrom`) et les appels de note, que plus
+ * aucune question ne portait, ont quitté le code le 22/09/2026.
  * Animation déclarative : seul chaque <summary> porte un fade-up.
  * Le JSON-LD FAQPage n'est pas émis ici (réservé à l'accueil et à /frais, plan §12).
  * Contenu : documentation.faq et documentation.labels.
@@ -16,8 +14,6 @@ import Container from '@/components/ui/Container.astro';
 import Section from '@/components/ui/Section.astro';
 import type { DocumentationContent, DocumentationLabels } from '@/content/types-v2';
 import { withBase } from '@/lib/href';
-import NoteRef from '@/components/ui/NoteRef.astro';
-import { notes } from '@/content/fr/documentation';
 
 interface Props {
   faq: DocumentationContent['faq'];
@@ -59,15 +55,7 @@ const items = faq.items;
                         >
                           {String(i + 1).padStart(2, '0')}
                         </span>
-                        <span>
-                          {item.question}
-                          {/* Marqueur décoratif : un <summary> est déjà interactif, un lien imbriqué y
-                              serait une violation « nested-interactive ». Le lien réel est dans la
-                              réponse, sous le dernier paragraphe. */}
-                          {item.noteId && (
-                            <NoteRef id={item.noteId} notes={notes} interactive={false} />
-                          )}
-                        </span>
+                        <span>{item.question}</span>
                       </span>
                       <span
                         aria-hidden="true"
@@ -89,16 +77,6 @@ const items = faq.items;
                     {item.answer.map((paragraph) => (
                       <p class="text-lead text-ink">{paragraph}</p>
                     ))}
-                    {/* Équivalent focusable du marqueur de la question, numéroté sur les notes de
-                      la page. Branche jamais vraie aujourd'hui (aucun `noteId`). Si un `noteId`
-                      revenait alors que NoteRef reste coupé (AFFICHER = false), ce paragraphe
-                      afficherait « Source de cette réponse : » seul, sans appel derrière. */}
-                    {item.noteId && (
-                      <p class="text-base text-slate-700">
-                        {labels.faqNoteLead}
-                        <NoteRef id={item.noteId} notes={notes} />
-                      </p>
-                    )}
                   </div>
                 </details>
               </li>

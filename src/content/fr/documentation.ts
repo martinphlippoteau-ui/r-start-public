@@ -1,4 +1,4 @@
-import type { DocumentItem, LegalNote } from '@/content/types';
+import type { DocumentItem } from '@/content/types';
 import type { DocumentationContent } from '@/content/types-v2';
 import { pages } from '@/config/pages';
 import {
@@ -10,10 +10,9 @@ import {
   risk,
   share,
   subscription,
-  trust,
 } from '@/content/fr/facts';
 import { faq } from '@/content/fr/faq';
-import { documentsNotice, managementCompany, visaNotice } from '@/content/fr/legal';
+import { documentsNotice } from '@/content/fr/legal';
 import manifest from '@/content/fr/media.manifest.json';
 import { PENDING_DOCUMENT_KEYS } from '@/content/fr/pendingDocuments';
 
@@ -42,7 +41,7 @@ import { PENDING_DOCUMENT_KEYS } from '@/content/fr/pendingDocuments';
 /**
  * Typographie française : apostrophe typographique, espace insécable (U+00A0, en échappement) avant % € : ; ? !,
  * entre groupes de trois chiffres (ex. « 10 000 € ») et à l'intérieur des guillemets « ». Jamais appliquée aux
- * mentions de legal.ts reproduites à l'identique (documentsNotice, visaNotice).
+ * mentions de legal.ts reproduites à l'identique (documentsNotice).
  */
 const nb = (s: string): string =>
   s
@@ -102,12 +101,8 @@ export const isDocumentPublished = (key: string): boolean => !PENDING_DOCUMENT_K
 const isPublished = (d: { key: string }): boolean => isDocumentPublished(d.key);
 
 const dicPublished = isDocumentPublished('dic');
-const statutsPublished = isDocumentPublished('statuts');
 
 const regulatoryDocuments = documentFacts.filter(isPublished);
-/** Entrées de facts.ts en attente, conservées pour les notes « à venir » (titre). */
-const statuts = documentFacts.find((d) => d.key === 'statuts');
-const dic = documentFacts.find((d) => d.key === 'dic');
 
 const feeDocuments = documentsExtra.filter((d) => d.group === 'frais').filter(isPublished);
 const formDocuments = documentsExtra.filter((d) => d.group === 'formulaire').filter(isPublished);
@@ -182,71 +177,6 @@ const allGroups: DocumentationContent['groups'] = [
 
 /** Groupes livrés au composant : uniquement ceux qui publient au moins un document. */
 const groups: DocumentationContent['groups'] = allGroups.filter((g) => g.items.length > 0);
-
-/** Tous les documents publiés sur la page, pour la note des versions. */
-const publishedItems = groups.flatMap((g) => g.items);
-
-/** Notes dont le texte commence par une mention de legal.ts reproduite à l'identique : `nb` n'y est appliquée qu'à la suite. */
-const VERBATIM_NOTE_IDS: readonly string[] = ['documentation-note-visa'];
-
-const rawNotes: LegalNote[] = [
-  {
-    id: 'documentation-versions',
-    text:
-      'Versions publiées sur ce site : ' +
-      publishedItems.map((d) => `${d.title} : ${d.version}`).join(' ; ') +
-      '. En cas de mise à jour, les versions disponibles sur www.corum.fr prévalent.',
-  },
-  ...(dicPublished
-    ? []
-    : [
-        {
-          id: 'documentation-dic',
-          text: `${dic?.title ?? 'Document d’informations clés (DIC)'} de R Start : mise en ligne à venir, dès réception de la version à jour. Dans l’attente, il est disponible sur www.corum.fr et sur simple demande auprès de ${managementCompany.name}. Sa lecture est obligatoire avant toute souscription.`,
-        },
-      ]),
-  ...(statutsPublished
-    ? []
-    : [
-        {
-          id: 'documentation-statuts',
-          text: `${statuts?.title ?? 'Statuts'} de R Start : mise en ligne à venir, dès réception d’un fichier complet. Dans l’attente, ils sont disponibles sur www.corum.fr et sur simple demande auprès de ${managementCompany.name}.`,
-        },
-      ]),
-  {
-    id: 'documentation-note-visa',
-    text: `${visaNotice} ${nb(
-      `${trust.amf.disclaimer} La note d’information est disponible ci-dessus, sur www.corum.fr et sur simple demande auprès de la société de gestion.`
-    )}`,
-  },
-  {
-    id: 'documentation-formulaires',
-    text: `Formulaires établis par R Start et ${managementCompany.name} ; la version et la date figurent sur chaque fichier. ${pei.name} : ${lowerFirst(pei.description)}, versement minimum de ${pei.minimumLabel} ; ${lowerFirst(pei.requirement)}. Source : conditions générales d’adhésion au ${pei.name}, avril 2026. ${rd.name} : ${lowerFirst(rd.description)}. Les formulaires complétés et signés sont à transmettre à ${managementCompany.name} selon les modalités indiquées sur chaque formulaire : espace personnel sur corum.fr ou courrier (${managementCompany.address}).`,
-  },
-  {
-    id: 'documentation-souscription',
-    text: `Souscription ${subscription.onlineLabel}, à partir de ${share.minimumLabel} (${share.minimumShares} part). Règlement par ${paymentMethods}. ${subscription.coolingOff}. Modalités non proposées pour R Start : ${subscription.notEligible.join(', ')}. Sources : bulletin de souscription, mai 2026 ; brochure R Start 2026.`,
-  },
-  {
-    id: 'documentation-poids',
-    text: 'Le poids indiqué pour chaque fichier est exprimé en kilooctets (ko) et arrondi.',
-  },
-];
-
-/**
- * Notes de la page, suivies des notes de la FAQ importées de faq.ts, limitées aux identifiants réellement
- * appelés par les questions retenues : la page n'importait que `faq.notes` en bloc, ce qui laissait des
- * notes que plus rien ne référençait une fois la FAQ réduite. Une note orpheline est du bruit
- * réglementaire : elle occupe la liste sans qu'aucun appel n'y mène.
- */
-const faqNoteIds = new Set(
-  faqItems.map((item) => item.noteId).filter((id): id is string => Boolean(id))
-);
-
-export const notes: LegalNote[] = [
-  ...rawNotes.map((n) => (VERBATIM_NOTE_IDS.includes(n.id) ? n : { ...n, text: nb(n.text) })),
-  ...faq.notes.filter((n) => faqNoteIds.has(n.id)),
-];
 
 export const documentation = {
   seo: {
@@ -343,8 +273,5 @@ export const documentation = {
     stepPrefix: 'Étape',
     faqEyebrow: 'FAQ',
     faqListLabel: 'Questions fréquentes sur R Start',
-    faqNoteLead: 'Source de cette réponse :',
   },
-
-  notes,
 } satisfies DocumentationContent;

@@ -1,4 +1,3 @@
-import type { LegalNote } from '@/content/types';
 import type { PressArticle, PressContact, PressContent, PressQuote } from '@/content/types-v2';
 import { press as pressFacts } from '@/content/fr/facts';
 
@@ -37,9 +36,6 @@ const contacts: PressContact[] = pressFacts.contacts.map((c) => ({
   ...(c.email ? { email: c.email } : {}),
 }));
 
-/** Date à laquelle la sélection d'articles a été livrée par CORUM et les adresses vérifiées. */
-const coverageCheckedOn = { label: '10 septembre 2026', iso: '2026-09-10' } as const;
-
 /**
  * Revue de presse : la sélection de facts.ts, dans son ordre, RÉDUITE AUX ARTICLES QUI ONT UNE ADRESSE
  * (14/09/2026, demande de l'équipe : « mets uniquement les parutions presse avec des liens »). Un titre
@@ -70,21 +66,7 @@ const quotes: PressQuote[] = pressFacts.quotes.map((q) => ({
   dateIso: q.date.iso,
 }));
 
-const rawNotes: LegalNote[] = [
-  {
-    id: 'presse-citations',
-    text: `Citations extraites d’articles publiés par des médias tiers, reproduites mot pour mot avec leur média et leur date, telles que transmises par CORUM L’Épargne le ${coverageCheckedOn.label}. Elles n’engagent que leurs auteurs et ne constituent ni une recommandation, ni un avis de CORUM Asset Management sur R Start.`,
-  },
-  {
-    id: 'presse-revue',
-    text: `Revue de presse : ${articles.length} articles de médias tiers publiés au lancement de R Start, sélection transmise par CORUM L’Épargne le ${coverageCheckedOn.label} et complétée depuis. Chacun renvoie vers sa publication d’origine ; les articles dont l’adresse n’a pas pu être vérifiée ne sont pas repris ici. Certains éditeurs réservent la lecture complète à leurs abonnés. Les titres sont ceux des articles : ils peuvent employer des formulations, des comparaisons ou des chiffres absents des documents réglementaires de R Start. Seuls le document d’informations clés et la note d’information font foi. Aucune donnée de performance de R Start n’est communiquée : la SCPI a moins de douze mois d’existence.`,
-  },
-];
-
-/** Notes de la page, typographiées (espace insécable avant : ; ? ! % €). */
-export const notes: LegalNote[] = rawNotes.map((n) => ({ ...n, text: nb(n.text) }));
-
-export const press: PressContent = {
+export const press = {
   seo: {
     /** ≤ 60 caractères. Contient « R Start » et « CORUM ». */
     title: 'La presse en parle : R Start, SCPI CORUM',
@@ -139,13 +121,13 @@ export const press: PressContent = {
    * place. La salle de presse, en veille depuis, a été supprimée le 22/09/2026.
    * Singulier depuis le 16/09/2026 : la question s'adresse à un lecteur, pas à une assemblée. La phrase
    * d'appel date du même jour : le titre posait une question et la liste arrivait sans transition.
-   * `source` n'est plus affichée depuis le 14/09/2026 (retrait des notes et sources du site).
+   * La ligne de source (« corum.fr, rubrique Contacts presse, consultée le… »), retirée de l'écran le
+   * 14/09/2026 avec toutes les sources du site, a quitté le code le 22/09/2026.
    */
   contacts: {
     title: 'Vous êtes journaliste ?',
     intro: 'Pour toute question, demande d’information ou d’interview, merci de contacter :',
     items: contacts,
-    source: nb(`Source : ${pressFacts.contactsSource}.`),
   },
 
   /** Micro-textes des composants (libellés d'accessibilité). */
@@ -157,6 +139,4 @@ export const press: PressContent = {
     phoneLabel: 'Téléphone',
     emailLabel: 'E-mail',
   },
-
-  notes,
 } satisfies PressContent;

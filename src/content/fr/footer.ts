@@ -80,9 +80,6 @@ export const footer = {
   /** Retour en haut, à côté des logos : ancre vers #contenu, comme le lien d'évitement. */
   backToTopLabel: 'Haut de page',
   copyright: `© 2026 ${publisher.name}. Tous droits réservés.`,
-  notesTitle: 'Notes et sources',
-  /** `{n}` : nombre de notes de la page, calculé par LegalNotes.astro. */
-  notesToggleLabel: 'Notes et sources ({n})',
   legalTitle: 'Mentions légales',
   externalLinkHint: 'nouvelle fenêtre',
   /*

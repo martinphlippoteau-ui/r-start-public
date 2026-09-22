@@ -1,6 +1,6 @@
-import type { HeroContent, LegalNote } from '@/content/types';
+import type { HeroContent } from '@/content/types';
 import { pages } from '@/config/pages';
-import { fees, product } from '@/content/fr/facts';
+import { product } from '@/content/fr/facts';
 
 /**
  * Section 1, Hero (id « apercu »), version minimale (décision du 10/09/2026, deux allègements successifs) :
@@ -8,23 +8,9 @@ import { fees, product } from '@/content/fr/facts';
  * accroche (`tagline`), deux CTA, puis le bandeau Trustpilot et la mention de la société de gestion
  * agréée (trust.ts). La pastille « Nouveau » et la photo plein cadre ont été retirées le
  * 11/09/2026, la ligne risques le 14/09/2026 avec tous les « Bon à savoir » (le champ `riskLine` a
- * quitté le code le 22/09/2026). Rien d'autre : ni définition, ni frais, ni phrases pédagogiques, tout cela ouvre la
- * zone 2 « Qui a envie de payer avant de gagner ? » (difference.ts). L'allégation de rang (`claim`,
- * retirée le 15/09/2026) et le contre-poids chiffré des frais (`counterweight.risk`, EN VEILLE) n'y
- * sont plus rendus.
+ * quitté le code le 22/09/2026). Rien d'autre : ni définition, ni frais, ni phrases pédagogiques, tout
+ * cela ouvre la zone 2 « Qui a envie de payer avant de gagner ? » (difference.ts).
  */
-
-/** Espace insécable avant % (typographie française). */
-const nb = (t: string): string => t.replace(/ ([%€:;?!])/g, '\u00A0$1');
-
-export const notes: LegalNote[] = [
-  {
-    id: 'hero-frais',
-    text: nb(
-      `${fees.subscription.label} de frais de souscription et ${fees.acquisition.label} de frais d’acquisition. R Start applique en revanche ${fees.management.label} de frais de gestion, ${fees.management.base}, une commission sur les cessions d’immeubles (${fees.disposal.label} selon la plus-value) et une commission de retrait dégressive avant ${fees.withdrawal.zeroAfterYears} ans de détention. ${fees.vatNote} Détail dans la section Frais.`
-    ),
-  },
-];
 
 export const hero = {
   /**
@@ -49,9 +35,9 @@ export const hero = {
    *    DU GROUPE CORUM sans frais d'entrée ni frais sur les achats d'immeubles » ; elle a été
    *    retirée le 15/09/2026 (voir difference.ts) : l'accueil ne porte plus que la formulation non
    *    bornée.
-   * Le détail des frais réellement prélevés était à un clic, dans la note `hero-frais` ; il ne
-   * l'est plus, la note n'étant plus rendue (registre de l'accueil vide, NoteRef coupé). Les frais
-   * restent affichés sur l'accueil par le comparateur de la section 03.
+   * Le détail des frais réellement prélevés était à un clic, dans une note de bas de page ; les notes
+   * ont quitté l'écran le 14/09/2026 et le code le 22/09/2026. Les frais restent affichés sur
+   * l'accueil par le comparateur de la section 03.
    */
   /* Sans point final depuis le 17/09/2026 (demande de Martin) : une accroche, pas une phrase. */
   tagline: 'La première SCPI sans frais de souscription ni frais d’acquisition',

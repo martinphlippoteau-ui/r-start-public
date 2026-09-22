@@ -5,7 +5,7 @@
  * deux paragraphes d'introduction, CTA souscrire, SANS ligne risques) → les cinq chiffres du groupe
  * (#corum), la bande illustrée en pleine largeur et la gamme des autres SCPI en chiffres (#gamme)
  * (CorumRange.astro) → le bloc Risques commun (#risques, 08-Risks.astro) → les avis Trustpilot
- * (#avis) → LegalNotes, toujours monté mais qui ne rend rien (AFFICHER = false) → Footer.
+ * (#avis) → Footer. Plus de notes légales : retirées de l'écran le 14/09/2026, du code le 22/09/2026.
  * La section des trois savoir-faire a été retirée le 14/09/2026, le bloc #histoire le 16/09/2026 ;
  * leur code et leurs textes ont suivi le 22/09/2026 (archivés hors du dépôt, .claude/audits).
  * Métadonnées et JSON-LD depuis aboutPage.ts, config/pages.ts et src/lib/seo.ts : aucun texte en dur.
@@ -13,7 +13,6 @@
 import Base from '@/layouts/Base.astro';
 import SiteNav from '@/components/SiteNav.astro';
 import Footer from '@/components/Footer.astro';
-import LegalNotes from '@/components/LegalNotes.astro';
 import Container from '@/components/ui/Container.astro';
 import Section from '@/components/ui/Section.astro';
 import TrustpilotReviews from '@/components/ui/TrustpilotReviews.astro';
@@ -29,7 +28,7 @@ import { aboutPage } from '@/content/fr/aboutPage';
 import { breadcrumbJsonLd, organizationJsonLd, webPageJsonLd } from '@/lib/seo';
 
 const page = pages.about;
-const { seo, hero, notes } = aboutPage;
+const { seo, hero } = aboutPage;
 
 const jsonLd = [
   organizationJsonLd(),
@@ -62,7 +61,7 @@ const jsonLd = [
        * La page enchaîne donc l'en-tête sur les chiffres, qui portent le même propos en plus court.
        */
     }
-    <CorumRange notes={notes} />
+    <CorumRange />
 
     {
       /* BLOC RISQUES sous la gamme (16/09/2026, demande de l'équipe). C'est le bloc commun, celui de
@@ -85,10 +84,9 @@ const jsonLd = [
     }
     <Section id="avis" tone="paper" labelledBy="avis-title">
       <Container size="wide">
-        <TrustpilotReviews notes={notes} titleId="avis-title" />
+        <TrustpilotReviews titleId="avis-title" />
       </Container>
     </Section>
-    <LegalNotes notes={notes} />
   </main>
 
   {/* Pastille d'appel : rendue au niveau de la page, jamais dans une section. */}

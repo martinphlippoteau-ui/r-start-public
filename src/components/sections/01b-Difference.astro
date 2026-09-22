@@ -25,7 +25,6 @@
  */
 import { Picture } from 'astro:assets';
 import Container from '@/components/ui/Container.astro';
-import NoteRef from '@/components/ui/NoteRef.astro';
 import Section from '@/components/ui/Section.astro';
 import { sections } from '@/config/sections';
 import { difference } from '@/content/fr/difference';
@@ -145,38 +144,10 @@ const situations = (difference.situations ?? []).map((s) => {
         </ul>
 
         {
-          /* Conclusion de l'équipe. La note détaille la rémunération réellement perçue. */
+          /* Conclusion de l'équipe. */
           difference.counterweight.pedagogy?.map((phrase) => (
-            <p class="mt-5 font-semibold">
-              {phrase}
-              {difference.counterweight.noteId && (
-                <span class="whitespace-nowrap">
-                  <NoteRef id={difference.counterweight.noteId} />
-                </span>
-              )}
-            </p>
+            <p class="mt-5 font-semibold">{phrase}</p>
           ))
-        }
-
-        {
-          /* Allégation de rang de l'équipe, retirée du contenu le 15/09/2026 : le rendu reste, il ne
-            trouve simplement plus rien à afficher. Voir difference.ts pour ce que son retrait emporte
-            du côté de la Conformité. */
-          difference.counterweight.claim && (
-            <p class="mt-6 flex gap-3 font-medium">
-              <span aria-hidden="true" class="text-teal-700">
-                →
-              </span>
-              <span>
-                {difference.counterweight.claim.text}
-                {difference.counterweight.claim.noteId && (
-                  <span class="whitespace-nowrap">
-                    <NoteRef id={difference.counterweight.claim.noteId} />
-                  </span>
-                )}
-              </span>
-            </p>
-          )
         }
 
         {

@@ -1,4 +1,4 @@
-import type { DocumentItem, FeeRow, LegalNote } from '@/content/types';
+import type { DocumentItem, FeeRow } from '@/content/types';
 import type { FeeComparison, FeeComparisonSide, FeesPageContent } from '@/content/types-v2';
 import {
   documents as documentFacts,
@@ -16,7 +16,6 @@ import {
   arbitrageWarningTitle,
   innovationNotRevolution,
   managementCompany,
-  publisher,
 } from '@/content/fr/legal';
 import manifest from '@/content/fr/media.manifest.json';
 
@@ -111,8 +110,6 @@ const deepNb = <T>(value: T): T => {
   return value;
 };
 
-const lowerFirst = (s: string): string => s.charAt(0).toLowerCase() + s.slice(1);
-
 /** « a, b ou c ». */
 const joinOr = (items: readonly string[]): string =>
   items.length > 1
@@ -186,47 +183,6 @@ const costDocument = (): DocumentItem => {
  * reste affiché sur /documentation, qui le tient de legal.ts.
  */
 const arbitrageVerbatim = `${arbitrageWarningTitle} ${arbitrageWarningBullets.join(' ')}`;
-
-const rawNotes: LegalNote[] = [
-  {
-    id: 'frais-page-ht',
-    text: `${feeFacts.vatNote} Sources : brochure R Start 2026 et bulletin de souscription, mai 2026.`,
-  },
-  {
-    id: 'frais-page-sources',
-    text: `Sources : document d’informations clés (DIC) du ${product.dicDate.label}, bulletin de souscription de mai 2026 (conditions générales de vente) et brochure R Start 2026. L’ensemble des frais figure dans la note d’information visée par l’AMF (visa SCPI n° ${product.visa.number} du ${product.visa.date}) et dans le DIC. ${
-      dicPublished
-        ? 'Ces documents sont disponibles sur www.corum.fr et dans la page Documentation.'
-        : 'La note d’information est disponible sur www.corum.fr et dans la page Documentation ; le DIC, sur www.corum.fr, dans l’attente de sa mise en ligne sur ce site.'
-    }`,
-  },
-  {
-    id: 'frais-page-commission-arbitrage',
-    text: `La commission sur les cessions d’immeubles est aussi appelée commission d’arbitrage. Elle est calculée sur le montant hors taxes de chaque vente, par paliers selon la plus-value réalisée, exprimée en pourcentage du prix de vente. Sources : brochure R Start 2026 (pages 4 et 6) et DIC du ${product.dicDate.label}.`,
-  },
-  {
-    id: 'frais-page-retrait',
-    text: `Prix de retrait : ${withdrawalPriceLabel} par part. La commission de retrait anticipé est prélevée en cas de sortie, totale ou partielle, avant ${zeroAfter} ans de détention ; elle est calculée sur le prix de retrait. Source : bulletin de souscription R Start, conditions générales de vente, mai 2026. Le rachat des parts n’est pas garanti : la sortie n’est possible que s’il existe une contrepartie à l’achat (DIC du ${product.dicDate.label}).`,
-  },
-  {
-    id: 'frais-page-exoneration-retrait',
-    text: `Cas d’exonération de la commission de retrait anticipé : ${lowerFirst(feeFacts.withdrawal.exemptionsSource)}. Chaque cas est soumis aux conditions qui y sont décrites ; l’exonération n’est pas automatique.`,
-  },
-  {
-    id: 'frais-page-moins-value',
-    text: 'Mécanisme de réserve en cas de moins-value : brochure R Start 2026, page 4, et note d’information de R Start, chapitre III, section 4 (mécanisme de compensation).',
-  },
-  {
-    id: 'frais-page-incidence-dic',
-    text: `Incidence des coûts selon le DIC du ${product.dicDate.label} (page 3), pour 10 000 € investis : ${after1Year} après 1 an, ${after5Years} après 5 ans et ${after10Years} après ${holdingYears} ans. Hypothèses réglementaires : au cours de la première année, vous récupérez le montant investi ; pour les autres durées, le produit évolue selon le scénario intermédiaire. L’incidence mesure la réduction moyenne, chaque année, de ce que le placement rapporte, du fait de l’ensemble des coûts, commission de retrait comprise en cas de sortie anticipée. Les montants en euros et les scénarios de performance du DIC ne sont pas repris sur ce site.`,
-  },
-  {
-    id: 'frais-page-distributeur',
-    text: `Dans le cadre de la commercialisation de R Start, ${managementCompany.name} est susceptible de reverser aux intermédiaires habilités une rémunération récurrente équivalente à ${feeFacts.distributorRemuneration}. ${publisher.name}, éditeur de ce site, distribue R Start. Source : bulletin de souscription R Start, conditions générales de vente, mai 2026.`,
-  },
-];
-
-export const notes: LegalNote[] = rawNotes.map((n) => ({ ...n, text: nb(n.text) }));
 
 /** Barème des cessions d'immeubles : une ligne par palier de plus-value (facts.fees.disposal.tiers). */
 const disposalRows: FeeRow[] = feeFacts.disposal.tiers.map((t, i) => ({
@@ -404,7 +360,6 @@ const rawComparison = {
   risk: `R Start n’est pas moins chère. Ses frais de gestion sont supérieurs à la moyenne du panel (${feeFacts.management.label} contre ${avg.management.label}). Sa commission de retrait avant ${zeroAfter} ans va jusqu’à ${w0.rate}, contre ${avg.withdrawal.label} en moyenne. Si les ventes dégagent de fortes plus-values, les ${disposalRates} sur les cessions peuvent dépasser une commission de souscription classique. Vous ne connaissez pas votre coût total à la souscription.`,
   /* Renvoi MORT : la note « frais-page-comparatif » a été supprimée le 11/09/2026, aucune note de
      ce nom n'existe dans `rawNotes`. À recréer, ou à retirer, si la bascule revient. */
-  noteId: 'frais-page-comparatif',
 };
 
 const feeComparison: FeeComparison = {
@@ -534,7 +489,6 @@ const raw = {
   groups: [
     {
       title: 'À l’entrée et à l’investissement',
-      noteId: 'frais-page-sources',
       intro: `Ces quatre postes sont à ${feeFacts.subscription.label}. Ils ne sont pas les seuls frais de R Start : les trois blocs suivants détaillent ceux qui s’appliquent.`,
       rows: [
         {
@@ -584,13 +538,11 @@ const raw = {
     },
     {
       title: 'Sur les cessions d’immeubles',
-      noteId: 'frais-page-commission-arbitrage',
       intro: `Aussi appelée commission d’arbitrage, elle dépend de la plus-value réalisée sur chaque vente. Son taux s’applique au montant HT de la vente. ${feeFacts.disposal.basisNote} Le prélèvement a des effets de seuil : la commission peut capter une partie significative de la plus-value.`,
       rows: disposalRows,
     },
     {
       title: 'À la sortie',
-      noteId: 'frais-page-retrait',
       intro: `Une commission de retrait est prélevée si vous sortez avant ${zeroAfter} ans de détention. Elle est calculée sur la valeur de retrait et diminue avec le temps.`,
       rows: [
         {
@@ -684,8 +636,6 @@ const raw = {
   },
 
   cta: { label: 'Souscrire en ligne', position: 'frais' },
-
-  notes,
 } satisfies Omit<
   FeesPageContent,
   'arbitrageWarning' | 'innovationBox' | 'htNote' | 'marketComparison' | 'simulationDoc'

@@ -8,12 +8,11 @@
  * CARROUSEL FILTRÉ depuis le 15/09/2026 : `data-stars` vaut « 4,5 », le widget ne présente donc que les
  * avis favorables. C'est un réglage de l'équipe, et il change la nature de l'intégration : ce n'est plus
  * un flux non trié. L'obligation d'information sur les avis en ligne (art. L111-7-2 du code de la
- * consommation) devait reposer sur le texte qui accompagne le widget (trust.ts, `scope`) et sur la
- * note `confiance-trustpilot`, tous deux réécrits le même jour pour dire que le carrousel est
- * filtré et renvoyer au profil Trustpilot pour l'ensemble des avis. NI L'UN NI L'AUTRE N'EST
- * AFFICHÉ : `scope` n'est rendu nulle part, et la note est coupée comme toutes les autres
- * (AFFICHER = false). Ce que le visiteur voit du filtre se limite à la mention que Trustpilot écrit
- * lui-même au bas du carrousel (« Nos avis 4 et 5 étoiles »). Voir facts.ts, `trustpilot.widgets`.
+ * consommation) devait reposer sur un texte de portée et sur une note de source, tous deux réécrits le
+ * même jour pour dire que le carrousel est filtré et renvoyer au profil Trustpilot pour l'ensemble
+ * des avis. NI L'UN NI L'AUTRE N'A ÉTÉ AFFICHÉ, et tous deux ont quitté le code le 22/09/2026
+ * (archivés hors du dépôt, .claude/audits). Ce que le visiteur voit du filtre se limite à la mention
+ * que Trustpilot écrit lui-même au bas du carrousel (« Nos avis 4 et 5 étoiles »). Voir facts.ts, `trustpilot.widgets`.
  * Un réglage local qui masquait cette mention (`PUBLIC_TRUSTBOX_CROP`, 15/09/2026), jamais posé en
  * production depuis le 17/09, a été retiré le 22/09/2026 : il ne doit pas revenir, la mention est la
  * seule trace à l'écran du filtre.

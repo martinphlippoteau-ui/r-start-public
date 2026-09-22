@@ -18,5 +18,4 @@ export const nav = {
   closeLabel: 'Fermer le menu',
   menuAriaLabel: 'Navigation principale',
   breadcrumbLabel: 'Fil d’Ariane',
-  noteRefLabel: 'Voir la note',
 } satisfies NavContent;

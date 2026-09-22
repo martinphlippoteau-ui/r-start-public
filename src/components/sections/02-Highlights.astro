@@ -9,9 +9,8 @@
  * La valeur est l'image : les pictos 3D de banque ont été retirés, la valeur de chaque carte (« 200 € »,
  * « 4 sur 7 », « Mensuels »…) est l'élément visuel principal, en sable (text-display-sm), même
  * utilitaire pour les six cartes (chiffres et valeurs en toutes lettres : aucune hiérarchie de
- * taille entre elles). Le libellé est AU-DESSUS de la valeur, avec son appel de note (coupé :
- * NoteRef ne rend rien) et, sur trois cartes, un bouton « i » qui déplie une explication. Ni
- * description ni contre-poids par carte.
+ * taille entre elles). Le libellé est AU-DESSUS de la valeur et, sur trois cartes, un bouton « i »
+ * déplie une explication. Ni description ni contre-poids par carte.
  * Motion (src/scripts/motion.ts), passe de sobriété du 11/09/2026 (un seul effet d'entrée par
  * bloc) :
  *  - en-tête : H2 mot à mot (data-reveal-text ; H1 interdit, H2 autorisé). Ni surtitre ni
@@ -27,7 +26,6 @@
  */
 import Container from '@/components/ui/Container.astro';
 import Button from '@/components/ui/Button.astro';
-import NoteRef from '@/components/ui/NoteRef.astro';
 import Section from '@/components/ui/Section.astro';
 import { sections } from '@/config/sections';
 import { highlights } from '@/content/fr/highlights';
@@ -69,7 +67,7 @@ const enExposant = (
    * FOND SOMBRE depuis le 14/09/2026 (demande de l'équipe) : le tableau prend l'ink, et « L'expérience
    * derrière R Start » prend le blanc en échange. C'est ce qui règle le rendu du carrousel Trustpilot,
    * qui pose ses propres cartes blanches et s'accommodait mal d'un fond bleu.
-   * Les repères passent donc en verre clair sur l'ink, valeurs en sand, appels de note en teal-200.
+   * Les repères passent donc en verre clair sur l'ink, valeurs en sand.
    */
 }
 <Section id={sections.highlights.id} tone="ink">
@@ -98,8 +96,8 @@ const enExposant = (
     </header>
 
     {
-      /* Six blocs simples en 3 × 2 (11/09/2026) : un libellé, une valeur, un appel de note. Ni
-        pictogramme, ni description, ni contre-poids par bloc. Le contre-poids de la section, qui
+      /* Six blocs simples en 3 × 2 (11/09/2026) : un libellé, une valeur. Ni pictogramme, ni
+        description, ni contre-poids par bloc. Le contre-poids de la section, qui
         les remplaçait sous la grille, a été retiré du contenu le 14/09/2026 (voir highlights.ts). */
     }
     <ul role="list" class="mt-chapter grid gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6">
@@ -110,13 +108,10 @@ const enExposant = (
             data-animate="fade-up"
             data-animate-delay={String((i % COLUMNS) * STAGGER)}
           >
-            {/* Sans libellé, la valeur se suffit à elle-même et l'appel de note la suit (« 100 % Digital »). */}
+            {/* Sans libellé, la valeur se suffit à elle-même (« 100 % Digital »). */}
             {card.label && (
               <p class="flex items-center gap-2 text-base font-medium text-white/80">
-                <span>
-                  {card.label}
-                  {card.noteId && <NoteRef id={card.noteId} tone="dark" />}
-                </span>
+                <span>{card.label}</span>
                 {card.info && (
                   <button
                     type="button"
@@ -136,7 +131,6 @@ const enExposant = (
             )}
             <p class:list={['text-display-sm text-sand', card.label && 'mt-2']}>
               {enExposant(card.value).map((b) => (typeof b === 'string' ? b : <>{b.chiffre}<sup class="ordinal">{b.suffixe}</sup></>))}
-              {!card.label && card.noteId && <NoteRef id={card.noteId} tone="dark" />}
             </p>
             {card.info && (
               <div id={'info-' + i} class="info-panneau">
@@ -166,10 +160,7 @@ const enExposant = (
           <ul role="list" class="mt-6 grid gap-6 sm:grid-cols-3 sm:gap-8 lg:mt-8">
             {highlights.subscriptionItems.map((item) => (
               <li class="border-t border-white/15 pt-4 sm:border-t-0 sm:pt-0">
-                <p class="text-base font-medium text-white/80">
-                  {item.label}
-                  {item.noteId && <NoteRef id={item.noteId} tone="dark" />}
-                </p>
+                <p class="text-base font-medium text-white/80">{item.label}</p>
                 <p class="text-lead mt-1 font-semibold text-sand">
               {enExposant(item.value).map((b) => (typeof b === 'string' ? b : <>{b.chiffre}<sup class="ordinal">{b.suffixe}</sup></>))}
                 </p>

@@ -1,20 +1,14 @@
 import type { PageHero, PageSeo } from '@/content/types-v2';
-import type { Cta, LegalNote } from '@/content/types';
-import { notes as corumNotes } from '@/content/fr/corum';
+import type { Cta } from '@/content/types';
 import { corumGroup, product } from '@/content/fr/facts';
 
 /**
- * Page /a-propos, la société de gestion : métadonnées, en-tête, appel à l'action et notes. Ses
- * blocs suivaient « Le groupe CORUM en chiffres » sur l'accueil jusqu'au 11/09/2026 ; ils ont
- * changé depuis : l'ambiance des bureaux est devenue une bande illustrée (15/09/2026), la gamme des
- * cinq SCPI une grille des quatre autres SCPI en chiffres, sans R Start (corumRange.ts,
- * 16/09/2026). Les notes sont celles de corum.ts, filtrées sur une liste QUI N'EST PLUS À JOUR :
- * `corum-savoir-faire` et `corum-gamme` ne sont plus appelées par aucun bloc, et
- * `confiance-trustpilot`, appelée par les avis du bas de page, n'y figure pas. Sans effet à l'écran
- * tant que les notes sont coupées (AFFICHER = false dans NoteRef et LegalNotes) ; à revoir avant de
- * les rétablir.
+ * Page /a-propos, la société de gestion : métadonnées, en-tête et appel à l'action. Ses blocs
+ * suivaient « Le groupe CORUM en chiffres » sur l'accueil jusqu'au 11/09/2026 ; ils ont changé
+ * depuis : l'ambiance des bureaux est devenue une bande illustrée (15/09/2026), la gamme des cinq
+ * SCPI une grille des quatre autres SCPI en chiffres, sans R Start (corumRange.ts, 16/09/2026).
  */
-export const aboutPage: { seo: PageSeo; hero: PageHero; notes: LegalNote[]; cta: Cta } = {
+export const aboutPage: { seo: PageSeo; hero: PageHero; cta: Cta } = {
   seo: {
     /** ≤ 60 caractères. */
     title: 'À propos de CORUM, société de gestion de R Start',
@@ -41,10 +35,6 @@ export const aboutPage: { seo: PageSeo; hero: PageHero; notes: LegalNote[]; cta:
        reste les mentions de risque du contenu, quand il en porte, et le pied de page, commun à tout
        le site. */
   },
-  /** Notes de la page : liste d'identifiants périmée, voir l'en-tête du fichier. */
-  notes: corumNotes.filter((note) =>
-    ['confiance-chiffres', 'corum-savoir-faire', 'corum-gamme'].includes(note.id)
-  ),
   /* Appel à l'action de la page (13/09/2026) : elle n'en portait aucun. */
   cta: { label: 'Souscrire en ligne', position: 'a-propos' },
 };

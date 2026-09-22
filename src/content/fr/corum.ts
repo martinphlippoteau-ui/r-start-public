@@ -1,7 +1,5 @@
-import type { CorumContent, LegalNote } from '@/content/types';
-import { corumGroup, externalLinks } from '@/content/fr/facts';
-import { managementCompany } from '@/content/fr/legal';
-import { notes as trustNotes } from '@/content/fr/trust';
+import type { CorumContent } from '@/content/types';
+import { externalLinks } from '@/content/fr/facts';
 
 /**
  * Section « Le groupe CORUM en quelques chiffres » (id : corum, « L'expérience derrière R Start »
@@ -13,83 +11,12 @@ import { notes as trustNotes } from '@/content/fr/trust';
  * le libellé du premier chiffre (« d'expertise et d'objectifs tenus », texte de l'équipe) : c'est
  * une allégation de performance, que le contrôle de conformité signale en avertissement. Le montant
  * de plus-values redistribuées cité dans la brochure reste hors du site tant que CORUM n'a pas
- * répondu à l'AMF. Contre-poids risque des blocs, EN VEILLE : `intro` (l'expérience du groupe ne
- * préjuge de rien), `statsRisk` (chiffres du groupe, pas de R Start), `disclaimer` (les cessions
- * passées ne préjugent pas des performances futures) et `alignmentBody` (effets de seuil de la
- * commission d'arbitrage, énoncés dans le même paragraphe que l'alignement d'intérêts). Aucun n'est
- * rendu, ni sur l'accueil ni sur /a-propos : les textes sont gardés, prêts à resservir.
- * Les chiffres du groupe restent gouvernés par facts.corumGroup : aucun arbitrage ici.
- * `alignmentBody` : « ne touche une commission que si l'ensemble des ventes est gagnant » décrit le
- * mécanisme de réserve (note d'information ch. III § 4), pas un alignement sur votre résultat.
- * Notes : `notes` agrège les notes de trust.ts (cadre réglementaire, visa, Trustpilot, chiffres) et
- * celles définies ici (mention légale de l'agrément, gamme, compensation), dans l'ordre de lecture
- * de l'ancienne section Confiance ; aboutPage.ts en tire la liste de /a-propos. Aucune n'est
- * affichée (NoteRef et LegalNotes coupés), et notes.ts n'importe plus rien.
+ * répondu à l'AMF. Les contre-poids des anciens blocs (l'expérience du groupe ne préjuge de rien,
+ * chiffres du groupe et non de R Start, cessions passées, effets de seuil de la commission
+ * d'arbitrage) et les notes de la section ont quitté le code le 22/09/2026 (archivés hors du dépôt,
+ * .claude/audits) : rien n'en était rendu. Les chiffres du groupe restent gouvernés par
+ * facts.corumGroup : aucun arbitrage ici.
  */
-
-const others = corumGroup.scpiNames.slice(0, -1);
-const otherScpi = `${others.slice(0, -1).join(', ')} et ${others[others.length - 1]}`;
-
-/** Notes propres à ce fichier (mention légale de l'agrément, gamme, compensation). */
-const corumNotes: LegalNote[] = [
-  {
-    id: 'corum-agrement',
-    text: `${managementCompany.name} : ${managementCompany.amfApproval}`,
-  },
-  {
-    id: 'corum-gamme',
-    text: `Nombre de SCPI gérées, ancienneté du groupe et nombre de bureaux : source CORUM, brochure partenaires 2026, p. 7. ${otherScpi} sont des SCPI distinctes de R Start. Chacune a sa propre stratégie et ses propres frais. Leurs résultats ne préjugent pas de ceux de R Start.`,
-  },
-  {
-    id: 'corum-savoir-faire',
-    text: `Familles de solutions d’épargne du groupe CORUM (SCPI, fonds obligataires, assurance vie et plan d’épargne retraite) : texte de présentation de CORUM L’Épargne remis avec le kit média, et corum.fr consulté le ${corumGroup.statsDate.label}. Ces solutions sont distinctes de R Start. Elles ne sont ni proposées ni décrites sur ce site : chacune a ses propres documents réglementaires, ses propres frais et ses propres risques.`,
-  },
-  {
-    id: 'corum-compensation',
-    text: 'Mécanisme de compensation des moins-values : lorsqu’une vente génère une moins-value, celle-ci est enregistrée dans une réserve dédiée. Aucune commission sur les cessions n’est perçue tant que cette réserve n’est pas intégralement compensée par des plus-values futures. Détail au chapitre III, section 4 de la note d’information de R Start.',
-  },
-];
-
-/**
- * Ordre de lecture des appels de note de l'ancienne section Confiance (07-Trust.astro, quand elle
- * portait encore le cadre réglementaire, les avis et la gamme) ; une note non listée irait en fin.
- */
-const readingOrder = [
-  'confiance-agrement',
-  'corum-agrement',
-  'confiance-visa',
-  'confiance-trustpilot',
-  'confiance-chiffres',
-  'corum-savoir-faire',
-  'corum-gamme',
-  'corum-compensation',
-];
-const rank = (id: string): number => {
-  const i = readingOrder.indexOf(id);
-  return i === -1 ? readingOrder.length : i;
-};
-
-/** Toutes les notes de la section Confiance (trust.ts + corum.ts), numérotées dans l'ordre de lecture. */
-export const notes: LegalNote[] = [...trustNotes, ...corumNotes].sort(
-  (a, b) => rank(a.id) - rank(b.id)
-);
-
-/**
- * Notes appelées par la section telle qu'elle était rendue sur l'accueil le 11/09/2026 : le cadre
- * réglementaire est passé sur /documentation, la gamme et l'ambiance sur /a-propos, et le bloc
- * « rémunération sur les ventes » a été retiré,
- * leurs notes n'ont donc plus d'appel ici. `notes` reste l'export complet pour les autres pages.
- * EN VEILLE : `homeNotes` n'est plus importé nulle part depuis que le registre de l'accueil
- * (notes.ts) est vide. La liste n'est plus à jour : les avis, et avec eux `confiance-trustpilot`,
- * sont partis sur /a-propos le 15/09/2026, et la section appelle aujourd'hui `confiance-chiffres`.
- */
-const APPELEES_SUR_ACCUEIL = ['confiance-trustpilot'];
-export const homeNotes: LegalNote[] = notes.filter((n) => APPELEES_SUR_ACCUEIL.includes(n.id));
-if (homeNotes.length !== APPELEES_SUR_ACCUEIL.length) {
-  throw new Error(
-    `corum.ts : ${homeNotes.length} note(s) trouvée(s) sur ${APPELEES_SUR_ACCUEIL.length}, un id a changé.`
-  );
-}
 
 export const corum = {
   /*

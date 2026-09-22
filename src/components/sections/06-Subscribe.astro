@@ -9,7 +9,7 @@
  * LE RENDU COMPLET (introduction, options facultatives, rappels « lisez le DIC » et commission de
  * retrait), qu'aucune page n'affichait plus, a quitté le code le 22/09/2026 avec Pill et RiskPair ; ses
  * textes sont archivés hors du dépôt (.claude/audits).
- * Fond white. Les appels de note des étapes viendraient du contenu (step.noteId) : aucune n'en porte.
+ * Fond white.
  * Motion (src/scripts/motion.ts) :
  *  - la ligne de progression du stepper est découpée en segments : chaque étape (sauf la dernière)
  *    porte un petit SVG vertical qui va du centre de sa pastille au centre de la suivante (hauteur
@@ -30,7 +30,6 @@ import { Picture } from 'astro:assets';
 import StoreBadge from '@/components/ui/StoreBadge.astro';
 import Container from '@/components/ui/Container.astro';
 import Button from '@/components/ui/Button.astro';
-import NoteRef from '@/components/ui/NoteRef.astro';
 import Section from '@/components/ui/Section.astro';
 import SectionHeading from '@/components/ui/SectionHeading.astro';
 import { sections } from '@/config/sections';
@@ -142,7 +141,6 @@ const STEP_STAGGER = 0.06;
                     </span>
                   )}
                   {step.title}
-                  {step.noteId && <NoteRef id={step.noteId} />}
                 </h3>
               </div>
             </li>
