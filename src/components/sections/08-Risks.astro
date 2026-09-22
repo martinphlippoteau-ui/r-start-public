@@ -1,25 +1,28 @@
 ---
 /**
  * Section 8, Risques (id « risques »). Contre-poids global de la page : section pleine sur fond ink
- * avec le même poids typographique que les sections avantages (H2 text-display-lg, intro text-lead).
- * Six risques en grille (titre text-display-sm, description text-base depuis le 15/09/2026). Les avertissements reproduits
- * in extenso (bulletin de souscription, DIC, commission d'arbitrage) ont quitté cette section le
+ * avec le même poids typographique que les sections avantages (H2 text-display-lg ; plus d'intro
+ * depuis le 15/09/2026). Rendue sur l'accueil, sur /strategie et, sans rideau, sur /a-propos.
+ * Quatre risques en grille depuis le 16/09/2026 (titre text-display-sm, description text-base
+ * depuis le 15/09/2026). Les avertissements reproduits in extenso (bulletin de souscription, DIC,
+ * commission d'arbitrage) ont quitté cette section le
  * 11/09/2026 à la demande de l'équipe : ils sont désormais sur /documentation, à côté des documents
  * dont ils sont extraits (components/pages/documentation/MandatoryWarnings.astro).
  * Motion (src/scripts/motion.ts) :
  *  - transition de chapitre en rideau (`data-curtain` sur la section) : la section précédente, sur
  *    l'accueil « Souscrire » (06) depuis que « La presse en parle » (08b) a quitté HOME_ORDER, et sur
- *    /strategie « Comment » (04-Strategy), est épinglée quand son bas touche le bas du viewport pendant
- *    que cette section monte
+ *    /strategie « Comment » (04-Strategy), est épinglée quand son bas atteint le milieu de l'écran
+ *    (`bottom center` depuis le 14/09/2026, voir plus bas) pendant que cette section monte
  *    par-dessus (coins arrondis et ombre posés par la CSS `[data-curtain]`). Comme elle contient un
  *    [data-risk], le moteur n'appliquerait ni recul ni atténuation à la section recouverte ; depuis le
  *    14/09/2026 plus aucun [data-risk] n'est rendu, c'est donc le comportement par défaut qui s'applique ;
- *  - rien d'autre ne bouge (sobriété du 11/09/2026 : les six intitulés n'entrent plus en fade-up, le
- *    contre-poids global de la page est en place d'emblée) : ni le H2, ni l'intro, ni les six risques.
+ *  - rien d'autre ne bouge (sobriété du 11/09/2026 : les intitulés n'entrent plus en fade-up, le
+ *    contre-poids global de la page est en place d'emblée) : ni le H2, ni les quatre risques.
  * Sans JS ou en reduced-motion : aucun pin, aucun rideau, tout est visible et stable.
  * Contenu : src/content/fr/risks.ts (textes réglementaires reproduits à l'identique depuis legal.ts) ;
- * les appels de note des risques viennent du contenu (item.noteId).
- * Le surtitre est rendu ici en teal-200 (contraste AA sur ink) plutôt que par SectionHeading.
+ * les appels de note des risques viennent du contenu (item.noteId), et NoteRef ne les rend plus.
+ * Plus de surtitre : le bloc n'en rend aucun. Le titre est en sable, par la classe passée à
+ * SectionHeading.
  */
 import Container from '@/components/ui/Container.astro';
 import NoteRef from '@/components/ui/NoteRef.astro';
@@ -70,7 +73,7 @@ const { rideau = true } = Astro.props as Props;
     }
     <SectionHeading id={id} title={risks.title} intro={risks.intro} class="text-sand" />
 
-    <!-- Six risques, statiques : intitulé et description visibles d'emblée. -->
+    <!-- Les risques, statiques : intitulé et description visibles d'emblée. -->
     <ul role="list"
       class="mt-8 sm:mt-12 grid gap-x-10 gap-y-8 sm:grid-cols-2 lg:mt-16 lg:gap-x-14 lg:gap-y-10"
     >

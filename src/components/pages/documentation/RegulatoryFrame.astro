@@ -3,8 +3,10 @@
  * Cadre réglementaire de R Start (visa AMF, société de gestion agréée, dépositaire, autorité compétente,
  * classification SFDR), descendu de l'accueil le 11/09/2026 : il a sa place ici, à côté des documents
  * qu'il décrit. Contenu : src/content/fr/trust.ts (`trust.amf`), repris sans réécriture.
- * Équilibre AMF : les cartouches portent `data-advantage`, la réserve et le contre-poids risque suivent
- * dans le même bloc et à la même taille (text-lead), jamais animés.
+ * Équilibre AMF : les cartouches portent `data-advantage`, la réserve (`amf.disclaimer`) suit dans
+ * le même bloc et à la même taille (text-lead), jamais animée. Le contre-poids risque (`amf.risk`)
+ * est toujours appelé à sa suite, mais RiskNote ne rend plus rien depuis le 14/09/2026 : seule la
+ * réserve s'affiche.
  */
 import Container from '@/components/ui/Container.astro';
 import RiskNote from '@/components/ui/RiskNote.astro';

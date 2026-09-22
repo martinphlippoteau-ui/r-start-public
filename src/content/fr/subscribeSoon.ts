@@ -1,8 +1,10 @@
 /**
  * Fenêtre affichée au clic sur un bouton « Souscrire » tant que l'URL du tunnel de souscription
  * n'est pas configurée (PUBLIC_SUBSCRIBE_URL encore sur sa valeur de repli). Message informatif :
- * aucune allégation commerciale, donc aucun contre-poids risque à afficher. Le renvoi vers les
- * documents réglementaires reprend le réflexe attendu avant toute décision d'investissement.
+ * aucune allégation commerciale, donc aucun contre-poids risque à afficher. La seconde phrase
+ * renvoie aux documents réglementaires, le réflexe attendu avant toute décision d'investissement.
+ * Le bouton « Voir la documentation » n'est plus rendu depuis le 16/09/2026 : `documentsLabel` et
+ * `documentsHref` sont EN VEILLE (voir components/SubscribeSoon.astro).
  */
 export const subscribeSoon = {
   eyebrow: 'Bientôt disponible',

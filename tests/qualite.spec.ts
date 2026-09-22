@@ -1091,8 +1091,9 @@ test.describe('Qualité', () => {
    */
   test('le soulignement des liens apparaît au survol, sous le texte', async ({ page }) => {
     await page.goto('/presse/');
-    /* Cible déplacée le 15/09/2026 : le renvoi vers la salle de presse a laissé la place aux
-       contacts presse (zone 4). Même page, même utilitaire `link-underline`. */
+    /* Cible déplacée le 15/09/2026 : le renvoi vers la salle de presse, sortie du site ce jour-là
+       et supprimée le 22/09/2026, a laissé la place aux contacts presse (zone 4). Même page, même
+       utilitaire `link-underline`. */
     const lien = page.locator('#contacts-presse a').first();
     await lien.scrollIntoViewIfNeeded();
 

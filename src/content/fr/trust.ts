@@ -26,11 +26,13 @@ const savers = groupStat('épargnants');
 
 /**
  * Les quatre chiffres de la zone 4 (brochure partenaires 2026, p. 7), dans l'ordre de la trame :
- * ancienneté, épargne gérée, épargnants, SCPI gérées depuis 2012. Espaces insécables appliquées.
+ * ancienneté, épargne gérée, épargnants, SCPI gérées depuis 2012, plus les bureaux depuis le
+ * 14/09/2026 (voir plus bas). Espaces insécables appliquées.
  * Le « + » devant le nombre d'épargnants vient de
  * facts.corumGroup.stats (savers.prefix), sourcé de la brochure p. 7. Partenaires et collaborateurs
- * (facts.corumGroup.stats) ne sont pas repris : hors trame. Réutilisés par corum.ts (`stats`) ; rendus
- * ici, dans trust.stats, par 07-Trust.astro.
+ * (facts.corumGroup.stats) ne sont pas repris : hors trame. Lus par `trust.stats` seulement
+ * (corum.ts ne les reprend plus depuis le 22/09/2026), et rendus par 07-Trust.astro sur l'accueil
+ * et par CorumRange.astro sur /a-propos.
  */
 export const experienceStats: StatItem[] = [
   {
@@ -145,8 +147,11 @@ export const trust = {
      * est celle que l'AMF a demandée dans ses retours sur la brochure (09/2026), mot pour mot.
      *
      * LE NUMÉRO D'AGRÉMENT EST RETIRÉ de la pastille (« supprime le code technique »). Il n'est pas
-     * perdu : `amf.items` le porte toujours dans le bloc de confiance, avec sa note légale, et le
-     * contrôle de conformité continue d'exiger « GP-11000012 » sur l'accueil (check-compliance.mjs).
+     * perdu : sur toutes les pages, l'accueil compris, le pied de page le donne dans la mention
+     * légale de la société de gestion (legal.managementCompany.amfApproval, bloc « Société de
+     * gestion », replié mais présent dans le HTML) ; c'est elle qui satisfait check-compliance.mjs,
+     * qui exige « GP-11000012 » sur l'accueil. `amf.items` le porte aussi, mais seulement sur
+     * /documentation (RegulatoryFrame.astro), et sa note légale n'y est plus affichée.
      */
     heroBadge: {
       label: 'Société de gestion agréée par l’AMF',
@@ -164,11 +169,18 @@ export const trust = {
     linkLabel: 'Lire les avis sur Trustpilot',
     /** Nom accessible des deux TrustBox (le contenu arrive dans une iframe servie par Trustpilot). */
     widgetLabel: `Avis Trustpilot sur ${company}`,
-    /** Portée, visible sous le bandeau du hero : les avis ne parlent pas de R Start. */
+    /**
+     * Portée des avis (ils ne parlent pas de R Start), qui était la légende du bandeau du hero.
+     * EN VEILLE : légende retirée le 15/09/2026 (« Enlever disclaimer »), rendue nulle part.
+     */
     heroCaption: `Avis sur ${company}, distributeur de R Start.`,
     url: tp.url,
     externalLinkHint: 'nouvelle fenêtre',
-    /** Périmètre des avis puis contre-poids risque, affichés ensemble et à la même taille que la note. */
+    /**
+     * Périmètre des avis puis contre-poids risque, prévus pour être affichés ensemble et à la même
+     * taille que la note. EN VEILLE : rendus nulle part, ni sur l'accueil ni avec le carrousel
+     * d'avis de /a-propos.
+     */
     scope: nb(
       `${tp.scope} Ils ne constituent pas une recommandation. Ils ne réduisent pas les risques de R Start : perte en capital, revenus non garantis, liquidité limitée.`
     ),

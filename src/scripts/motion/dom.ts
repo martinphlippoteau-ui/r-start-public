@@ -22,7 +22,7 @@ export const refuse = (el: Element, attr: string, why: string): false => {
 
 /**
  * Filtre standard : l'élément lui-même n'est pas protégé et, si `deep`, n'en contient pas. Tous les
- * effets qui altèrent l'apparence d'un conteneur (révélation, scrub, parallaxe, scène, rideau, intro)
+ * effets qui altèrent l'apparence d'un conteneur (révélation, scrub, parallaxe, rideau, intro)
  * passent par `deep = true` : un avantage s'anime seul, jamais avec le risque qui l'accompagne.
  */
 export const allowed = (el: Element, attr: string, deep = false): boolean => {

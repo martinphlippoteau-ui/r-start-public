@@ -4,25 +4,27 @@ import { managementCompany } from '@/content/fr/legal';
 import { notes as trustNotes } from '@/content/fr/trust';
 
 /**
- * Section « L'expérience derrière R Start » (id : corum), rendue avec trust.ts dans la section
- * « Confiance » (07-Trust.astro). Zone 4 de la page d'accueil, réunion produit du 10/09/2026.
- * Quatre chiffres repris de la brochure partenaires 2026, p. 7 : ancienneté, épargne gérée,
- * épargnants, SCPI gérées depuis 2012. La formule « objectifs tenus » de la brochure n'est pas
- * reprise (allégation de performance) : l'ancienneté est décrite comme une durée d'activité,
- * « 15 ans à investir en immobilier d'entreprise ». Le montant de plus-values redistribuées cité
- * dans la brochure reste hors du site tant que CORUM n'a pas répondu à l'AMF.
- * Chaque bloc porte son contre-poids risque, à la même taille : `intro` (l'expérience du groupe ne
+ * Section « Le groupe CORUM en quelques chiffres » (id : corum, « L'expérience derrière R Start »
+ * jusqu'au 15/09/2026), rendue sur l'accueil par 07-Trust.astro : le titre `corum.title`, le
+ * bandeau des chiffres du groupe, qui vient de trust.ts (`trust.stats`, seul élément de ce
+ * fichier-là rendu dans la section), et le bouton `aboutLink`. Zone 4 de la page d'accueil, réunion
+ * produit du 10/09/2026. Les chiffres (trust.experienceStats) viennent de la brochure partenaires
+ * 2026, p. 7. La formule « objectifs tenus » de la brochure EST reprise depuis le 14/09/2026, dans
+ * le libellé du premier chiffre (« d'expertise et d'objectifs tenus », texte de l'équipe) : c'est
+ * une allégation de performance, que le contrôle de conformité signale en avertissement. Le montant
+ * de plus-values redistribuées cité dans la brochure reste hors du site tant que CORUM n'a pas
+ * répondu à l'AMF. Contre-poids risque des blocs, EN VEILLE : `intro` (l'expérience du groupe ne
  * préjuge de rien), `statsRisk` (chiffres du groupe, pas de R Start), `disclaimer` (les cessions
  * passées ne préjugent pas des performances futures) et `alignmentBody` (effets de seuil de la
- * commission d'arbitrage, énoncés dans le même paragraphe que l'alignement d'intérêts).
+ * commission d'arbitrage, énoncés dans le même paragraphe que l'alignement d'intérêts). Aucun n'est
+ * rendu, ni sur l'accueil ni sur /a-propos : les textes sont gardés, prêts à resservir.
  * Les chiffres du groupe restent gouvernés par facts.corumGroup : aucun arbitrage ici.
- * Sur l'accueil, la bande de chiffres rendue est celle de trust.stats, qui expose les quatre chiffres
- * de la zone 4 (trust.experienceStats) ; `stats` les reprend à l'identique, gouvernés par STATS_DATED.
  * `alignmentBody` : « ne touche une commission que si l'ensemble des ventes est gagnant » décrit le
  * mécanisme de réserve (note d'information ch. III § 4), pas un alignement sur votre résultat.
  * Notes : `notes` agrège les notes de trust.ts (cadre réglementaire, visa, Trustpilot, chiffres) et
- * celles définies ici (mention légale de l'agrément, gamme, compensation) dans l'ordre de lecture de
- * 07-Trust.astro ; notes.ts n'importe que ce fichier.
+ * celles définies ici (mention légale de l'agrément, gamme, compensation), dans l'ordre de lecture
+ * de l'ancienne section Confiance ; aboutPage.ts en tire la liste de /a-propos. Aucune n'est
+ * affichée (NoteRef et LegalNotes coupés), et notes.ts n'importe plus rien.
  */
 
 /** Espace insécable avant % € : ; ? ! et devant « Md€ » : les libellés de facts.ts utilisent une espace simple. */
@@ -51,7 +53,10 @@ const corumNotes: LegalNote[] = [
   },
 ];
 
-/** Ordre de lecture des appels de note dans 07-Trust.astro ; une note non listée irait en fin. */
+/**
+ * Ordre de lecture des appels de note de l'ancienne section Confiance (07-Trust.astro, quand elle
+ * portait encore le cadre réglementaire, les avis et la gamme) ; une note non listée irait en fin.
+ */
 const readingOrder = [
   'confiance-agrement',
   'corum-agrement',
@@ -73,10 +78,13 @@ export const notes: LegalNote[] = [...trustNotes, ...corumNotes].sort(
 );
 
 /**
- * Notes appelées par la section telle qu'elle est rendue sur l'accueil (11/09/2026) : le cadre
+ * Notes appelées par la section telle qu'elle était rendue sur l'accueil le 11/09/2026 : le cadre
  * réglementaire est passé sur /documentation, la gamme et l'ambiance sur /a-propos, et le bloc
  * « rémunération sur les ventes » a été retiré,
  * leurs notes n'ont donc plus d'appel ici. `notes` reste l'export complet pour les autres pages.
+ * EN VEILLE : `homeNotes` n'est plus importé nulle part depuis que le registre de l'accueil
+ * (notes.ts) est vide. La liste n'est plus à jour : les avis, et avec eux `confiance-trustpilot`,
+ * sont partis sur /a-propos le 15/09/2026, et la section appelle aujourd'hui `confiance-chiffres`.
  */
 const APPELEES_SUR_ACCUEIL = ['confiance-trustpilot'];
 export const homeNotes: LegalNote[] = notes.filter((n) => APPELEES_SUR_ACCUEIL.includes(n.id));
@@ -90,12 +98,16 @@ if (homeNotes.length !== APPELEES_SUR_ACCUEIL.length) {
  * ZONE 2 de /a-propos (14/09/2026) : texte fourni par l'équipe, repris mot pour mot. Elle raconte d'où
  * vient CORUM et pourquoi R Start arrive maintenant. Aucun chiffre de performance, aucune comparaison
  * de résultats : que des caractéristiques de modèle.
+ * EN VEILLE depuis le 16/09/2026 : le bloc (CorumHistory.astro) a été retiré de /a-propos, le texte
+ * reste ici, prêt à resservir.
  *
- * DEUX PHRASES À FAIRE VALIDER PAR LA CONFORMITÉ, signalées à l'équipe le jour même :
+ * DEUX PHRASES SIGNALÉES À L'ÉQUIPE le 14/09/2026 :
  *  - « Aujourd'hui, la société est leader sur le marché » est une allégation de rang SANS PÉRIMÈTRE
  *    (leader de quoi, mesuré comment, à quelle date) et SANS SOURCE. C'est la même famille que le
- *    « la seule SCPI » de /frais ; check-compliance.mjs la signale désormais en avertissement ;
- *  - « d'objectifs tenus », dans les chiffres juste en dessous, est déjà signalé depuis le 14/09/2026.
+ *    « la seule SCPI » de /frais. check-compliance.mjs, qui lit les pages construites, ne la voit
+ *    plus depuis le retrait du bloc ; il la signalera de nouveau s'il revient ;
+ *  - « d'objectifs tenus », dans le libellé du premier chiffre du groupe (trust.ts), est signalé
+ *    depuis le 14/09/2026, et l'est toujours : ce libellé est rendu sur l'accueil et sur /a-propos.
  */
 export const history = {
   title: 'En 2011, CORUM a une conviction',
@@ -125,12 +137,18 @@ export const corum = {
    * qui titrait ce bandeau jusqu'ici en sous-titre et faisait donc doublon.
    */
   title: 'Le groupe CORUM en quelques chiffres',
-  /** Phrase d'ouverture de la zone 4, suivie de son contre-poids dans le même bloc et à la même taille. */
+  /**
+   * Phrase d'ouverture de la zone 4, qui porte son contre-poids dans le même bloc et à la même
+   * taille. EN VEILLE : retirée de l'accueil le 14/09/2026 (titre seul), rendue nulle part.
+   */
   intro: nb(
     `R Start s’appuie sur ${corumGroup.experienceLabel} d’expertise du groupe CORUM dans l’investissement immobilier. Cette expérience ne préjuge pas des résultats de R Start. La SCPI a ouvert ses souscriptions le ${product.openingDate.label} et n’a pas d’historique propre.`
   ),
 
-  /** Contre-poids des quatre chiffres, rendu avec eux et à la même taille. */
+  /**
+   * Contre-poids des chiffres du groupe, prévu pour être rendu avec eux et à la même taille.
+   * EN VEILLE : rendu nulle part.
+   */
   statsRisk: nb(
     `Ces chiffres décrivent le groupe CORUM, pas R Start. Ils peuvent évoluer. La taille du groupe ne préjuge ni des résultats de R Start, ni de la liquidité de ses parts. Le capital investi n’est pas garanti.`
   ),
@@ -141,8 +159,11 @@ export const corum = {
    * de ces produits. Chaque description reste au niveau de l'activité (ce que c'est), jamais du produit
    * (ce qu'il rapporte) : aucun chiffre, aucune performance, aucune comparaison.
    * SOURCE À VALIDER PAR CORUM : le texte de présentation du kit média (facts.press.mediaKit.boilerplate,
-   * lui-même « à valider ») cite « SCPI, assurance vie, fonds obligataires » ; le plan d'épargne retraite
-   * vient du nommage des visuels livrés par CORUM (assets, dossier ambiance). À confirmer avant diffusion.
+   * lui-même « à valider », supprimé avec la salle de presse le 22/09/2026 et gardé par
+   * l'historique git) cite « SCPI, assurance vie, fonds obligataires » ; le plan d'épargne retraite
+   * vient du nommage des visuels livrés par CORUM (assets, dossier ambiance). À confirmer avant
+   * diffusion. EN VEILLE depuis le 14/09/2026 : la section #savoir-faire a été retirée d'/a-propos
+   * (CorumRange.astro), ce contenu reste prêt à resservir.
    */
   expertise: {
     title: 'Les trois savoir-faire de CORUM L’Épargne',
@@ -181,9 +202,11 @@ export const corum = {
    * source, sans période, sans définition de l'objectif, et sans la mention que les performances
    * passées ne préjugent pas des performances futures.
    * Elle remplace un texte qui disait exactement l'inverse : « R Start n'a pas encore d'historique
-   * propre ; les résultats des autres SCPI CORUM ne préjugent pas des siens ». Ce texte-là reste dans
-   * l'en-tête de la note 3 de la page, c'est désormais le seul endroit qui le dit.
-   * check-compliance.mjs la signale à chaque exécution.
+   * propre ; les résultats des autres SCPI CORUM ne préjugent pas des siens ». Ce texte-là restait
+   * dans l'en-tête de la note 3 de la page ; aucune note n'est plus affichée (NoteRef et LegalNotes
+   * coupés). EN VEILLE depuis le 16/09/2026 : la gamme en chiffres de corumRange.ts a pris la place
+   * de ce bloc, qui n'est plus rendu. check-compliance.mjs, qui lit les pages construites, ne voit
+   * donc plus cette phrase ; il la signalera de nouveau si le bloc revient.
    */
   range: {
     title: `Des SCPI gérées depuis ${corumGroup.scpiSince}`,
@@ -195,14 +218,17 @@ export const corum = {
     currentBadge: 'Nouveau',
   },
 
-  /** Titre du bloc facultatif de la section : `alignmentBody` en est le corps (brochure p. 4). */
+  /**
+   * Titre du bloc facultatif de la section : `alignmentBody` en est le corps (brochure p. 4).
+   * EN VEILLE : le bloc a quitté l'accueil le 11/09/2026 et n'est rendu nulle part.
+   */
   alignmentTitle: 'La rémunération de CORUM sur les ventes',
   /** Avantage et contrepartie dans le même paragraphe, à la même taille (exigence AMF). */
   alignmentBody: nb(
     'Quand R Start revend un immeuble, CORUM ne touche une commission (dite « d’arbitrage ») que si l’ensemble des ventes est gagnant. Cette commission a des effets de seuil et peut capter une partie significative de la plus-value. CORUM peut aussi être rémunérée sur une plus-value alors même que la valeur de vos parts diminue.'
   ),
 
-  /** Bouton vers /a-propos (la gamme et l'ambiance y sont depuis le 11/09/2026). */
+  /** Bouton vers /a-propos (chiffres du groupe, gamme des autres SCPI et avis Trustpilot). */
   /* « Découvrir le groupe CORUM » depuis le 15/09/2026, ex-« En savoir plus sur CORUM » : même
      forme que « Découvrir notre approche », l'autre appel secondaire de l'accueil. */
   aboutLink: 'Découvrir le groupe CORUM',

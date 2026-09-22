@@ -26,16 +26,19 @@ import { PENDING_DOCUMENT_KEYS } from '@/content/fr/pendingDocuments';
  *
  * Documents en attente (voir PENDING_DOCUMENT_KEYS et README, « Points en attente ») :
  *  - statuts : PDF tronqué et illisible ;
- *  - DIC : le fichier hébergé (20/05/2026) classe R Start en 3 sur 7, valeur que le site affiche désormais
- *    (facts.risk) ; la brochure et CORUM (08/09/2026) annonçaient 4 sur 7. Publié dès que CORUM confirme la
- *    version du DIC en vigueur. Tant qu'il est en attente, le titre SEO, l'intro du hero, le lien corum.fr
- *    et l'intro du groupe réglementaire renvoient au DIC sur www.corum.fr ; la FAQ n'est plus filtrée sur ce
- *    point (elle cite la valeur du DIC avec sa date) ;
+ *  - DIC : le fichier fourni par CORUM (V7, 20/05/2026) classe R Start en 3 sur 7 ; le site affiche
+ *    4 sur 7 depuis le 14/09/2026, valeur de la brochure et de CORUM (08/09/2026), et facts.risk
+ *    porte l'écart. Le PDF n'est plus servi depuis le 18/09/2026 (pendingDocuments.ts). Publié dès
+ *    que CORUM confirme la version du DIC en vigueur. Tant qu'il est en attente, le titre SEO,
+ *    l'intro du hero, le lien corum.fr et l'intro du groupe réglementaire renvoient au DIC sur
+ *    www.corum.fr ; la FAQ n'est plus filtrée sur ce point (elle donne 4 sur 7, sans l'attribuer
+ *    au DIC) ;
  *  - simulation des frais ex-ante (V2, 27/03/2026) : affiche 1,12 % de frais de souscription et des montants
  *    d'épargne espérée issus des scénarios du DIC ; publiée dès livraison d'une version corrigée et validée.
  * PENDING_DOCUMENT_KEYS est la décision unique de publication des pages v2 : feesPage.ts la consomme pour le
- * document de référence sur les coûts. La section Documents de l'accueil (documents.ts, hors périmètre v2)
- * doit suivre la même liste. Aucune donnée de performance. La brochure partenaires (B2B) n'est jamais publiée.
+ * document de référence sur les coûts, et documents.ts, qui ne sert plus que la liste du pied de
+ * page depuis la suppression de la section Documents de l'accueil (15/09/2026), la relit telle
+ * quelle. Aucune donnée de performance. La brochure partenaires (B2B) n'est jamais publiée.
  */
 
 /**
@@ -78,16 +81,19 @@ const toItem = (d: {
 
 /**
  * Clés de facts.documents et facts.documentsExtra exclues de la publication tant que CORUM n'a pas livré le
- * fichier attendu (voir en-tête). Décision unique pour les pages v2 (/documentation et /frais). Retirer une clé
- * dès réception, en même temps que l'exclusion de documents.ts (accueil) et le seuil de liens PDF de
+ * fichier attendu (voir en-tête). Décision unique pour les pages v2 (/documentation et /frais) et
+ * pour le pied de page. Retirer une clé dès réception, dans pendingDocuments.ts : documents.ts la
+ * relit, il n'a plus d'exclusion propre. Revoir en même temps le seuil de liens PDF de
  * scripts/check-compliance.mjs pour les statuts.
  */
 // Retours AMF de la réunion produit du 10/09/2026 (voir plan §0) :
-//  - DIC : le fichier hébergé (V7, 20/05/2026) classe R Start en 3 sur 7 ; le site s'y est aligné le
-//    10/09/2026 (facts.risk.sri), une communication commerciale ne pouvant contredire le document
-//    réglementaire consultable (écart relevé par l'AMF). Il reste en attente parce que CORUM annonçait
-//    4 sur 7 (brochure p.3, 08/09/2026) : CORUM doit confirmer la version en vigueur avant publication
-//    (voir README, « Points en attente ») ; retirer alors la clé ici et dans documents.ts ;
+//  - DIC : le fichier fourni (V7, 20/05/2026) classe R Start en 3 sur 7 ; le site s'y était
+//    aligné le 10/09/2026 (facts.risk.sri), une communication commerciale ne pouvant contredire
+//    le document réglementaire consultable (écart relevé par l'AMF). Il est remonté à 4 sur 7 le
+//    14/09/2026, valeur de l'équipe (facts.risk.sriLabel, qui porte l'écart) : le site contredit de
+//    nouveau le DIC. Celui-ci reste en attente, et n'est plus servi depuis le 18/09/2026, tant que
+//    CORUM n'a pas confirmé la version en vigueur (voir README, « Points en attente ») ; retirer
+//    alors la clé de pendingDocuments.ts ;
 //  - simulation des frais ex-ante (V2, 27/03/2026) : affiche 1,12 % de frais de souscription et des
 //    montants d'épargne espérée issus des scénarios du DIC, qui contredisent le 0 % affiché sur tout le
 //    site et publient une donnée de performance (interdite tant que R Start a moins de 12 mois).
@@ -112,13 +118,17 @@ const feeDocuments = documentsExtra.filter((d) => d.group === 'frais').filter(is
 const formDocuments = documentsExtra.filter((d) => d.group === 'formulaire').filter(isPublished);
 
 /**
- * La question de la FAQ sur les risques n'est plus écartée : depuis le 10/09/2026, elle cite l'indicateur
- * synthétique de risque tel que le DIC du 20/05/2026 le donne (3 sur 7), avec sa date. Elle reste hors de
- * cette page par son sujet (FAQ_SUJETS_DOCUMENTAIRES), comme les autres questions non documentaires.
+ * La question de la FAQ sur les risques n'est plus écartée depuis le 10/09/2026. Elle citait alors
+ * le DIC du 20/05/2026 (3 sur 7) ; elle donne aujourd'hui 4 sur 7 (« Quel est le niveau de risque
+ * de R Start ? »), sans l'attribuer au DIC. Le filtre par sujet qui la tenait hors de cette page
+ * (FAQ_SUJETS_DOCUMENTAIRES) n'existe plus : la page reprend les quatre premières questions de
+ * faq.ts (voir plus bas).
  */
 const availableFaqItems = faq.allItems ?? faq.items;
 
 /**
+ * HISTORIQUE, remplacé le 16/09/2026 par le commentaire suivant : la sélection par sujet et son
+ * garde-fou décrits ici n'existent plus.
  * La page reprenait la FAQ entière de l'accueil : seize questions rendues deux fois sur le site, dont
  * les revenus, la fiscalité, la stratégie ou la zone d'investissement, qui n'ont rien à faire dans un
  * centre de documents. Elle ne garde que ce qu'un lecteur venu chercher un document a besoin de savoir :
@@ -139,7 +149,7 @@ const availableFaqItems = faq.allItems ?? faq.items;
  *
  * CE SONT LES QUATRE PREMIÈRES, et non une nouvelle sélection par sujet : le filtre par mot-clé qui avait
  * existé ici dérivait au premier ajustement d'un libellé dans faq.ts, ce que son propre garde-fou disait.
- * Les seize restent à un lien, sur /faq.
+ * Toutes les autres restent à un lien, sur /faq.
  */
 const faqItems = availableFaqItems.slice(0, 4);
 const pei = subscription.options.pei;
@@ -264,9 +274,12 @@ export const documentation = {
     ),
     /* Plus de ligne risques dans l'en-tête (14/09/2026, demande de l'équipe : « supprime les bon à
        savoir de tous les hero sauf celui de la home »). Le « Bon à savoir : … » sous le H1 a disparu de
-       TOUTES les sous-pages ; seul l'accueil le garde, sous ses appels à l'action. Ces pages n'ont donc
-       plus de mention de risque dans leur en-tête : il reste celles de leur contenu quand elles en ont,
-       et le pied de page, commun à tout le site. À rétablir en remettant `riskLine: shortRiskLine`. */
+       TOUTES les sous-pages ; celui de l'accueil, gardé ce jour-là, ne s'affiche plus non plus
+       depuis que RiskNote ne rend plus rien (même jour). Ces pages n'ont donc plus de mention de
+       risque dans leur en-tête : il reste celles de leur contenu quand elles en ont, et le pied de
+       page, commun à tout le site. Pour la rétablir, `riskLine: shortRiskLine` ici ne suffit plus :
+       la page doit aussi la passer à PageHero (`riskLine={hero.riskLine}`), et RiskNote doit rendre
+       de nouveau. */
   },
 
   groups,
@@ -277,7 +290,11 @@ export const documentation = {
     intro: nb(
       `La souscription se fait ${subscription.onlineLabel}, à partir d’une part de ${share.priceLabel}. Le ${pei.name} permet ensuite des versements dès ${pei.minimumMonthlyLabel}, si vous détenez déjà une part entière. Le ${lowerFirst(rd.name)} convertit automatiquement tout ou partie de vos dividendes potentiels en nouvelles parts.`
     ),
-    /** Contre-poids risque de l'intro, de longueur comparable, rendu en RiskNote dans le même bloc et la même taille. */
+    /**
+     * Contre-poids risque de l'intro, de longueur comparable, prévu en RiskNote dans le même bloc
+     * et la même taille. EN VEILLE : HowTo.astro l'appelle toujours, mais RiskNote ne rend plus
+     * rien.
+     */
     risk: nb(
       `Avant de vous engager, lisez le DIC et la note d’information. R Start comporte un risque de perte en capital et une liquidité limitée. Les revenus ne sont pas garantis, le rachat des parts non plus. Un retrait avant ${zeroAfter} ans de détention entraîne une commission dégressive. La durée de placement recommandée est de ${risk.recommendedHoldingLabel}.`
     ),

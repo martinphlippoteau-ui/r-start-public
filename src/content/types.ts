@@ -132,7 +132,8 @@ export interface FeeRow {
   value: string;
   /**
    * Variante courte de `value` pour les écrans étroits (ex. « 10 à 0 % » pour « 10 / 7 / 5 / 3 / 0 % »),
-   * affichée à la place de `value` sous 640 px afin que le taux tienne sur une ligne.
+   * qui remplaçait `value` sous 640 px afin que le taux tienne sur une ligne. PLUS RENDUE depuis le
+   * 16/09/2026 : le barème a quitté /frais, ses lignes restent EN VEILLE dans feesPage.ts.
    */
   valueShort?: string;
   detail?: string;
@@ -147,8 +148,8 @@ export interface WithdrawalStep {
 
 /**
  * Un chapitre de /strategie : un surtitre facultatif, un titre, la phrase qui annonce la liste, la
- * liste, et la phrase qui la referme. Les trois chapitres de la page ont exactement cette forme dans
- * le document fourni par l'équipe, c'est lui qui donne le type.
+ * liste, et la phrase qui la referme. Les quatre chapitres de la page (les deux moteurs, puis les
+ * trois volets) ont cette forme dans le document fourni par l'équipe, c'est lui qui donne le type.
  */
 export interface StrategyChapter {
   /** Mot-clé au-dessus du titre (« Sélective », « Diversifiée »…). Les moteurs n'en ont pas. */
@@ -180,15 +181,17 @@ export interface StrategyChapter {
 }
 
 /**
- * /strategie, contenu du 14/09/2026 : trois chapitres, ni plus ni moins.
+ * /strategie, contenu du 14/09/2026, « ni plus ni moins » : les deux moteurs (`engines`), puis les
+ * trois volets (`what`, `where`, `how`), réunis en tuiles le 16/09/2026.
  * Ce que le type ne porte plus, parce que la page ne le dit plus : le mot d'ordre et son contre-poids,
  * les trois piliers, la zone Conseil de l'Europe + Canada et sa carte, les types d'actifs du DIC,
  * l'effet de levier. Plus de `notes` non plus : la page n'appelle aucune source.
  */
 export interface StrategyContent {
   /**
-   * Titre commun aux trois volets (Sélective, Diversifiée, Opportuniste) de /strategie. Absent : le
-   * bloc n'a pas d'en-tête et c'est le premier volet qui nomme la section, comme avant le 16/09/2026.
+   * Titre commun aux trois volets (Sélective, Diversifiée, Opportuniste) de /strategie, depuis le
+   * 16/09/2026. C'est le H2 qui nomme la section : 04-Strategy.astro le rend sans condition, et son
+   * absence laisserait un H2 vide, le premier volet ne nommant plus la section comme avant.
    */
   tilesTitle?: string;
   /**
@@ -223,8 +226,8 @@ export interface SubscribeContent {
   /** Introduction du chapitre court (≤ 30 mots, factuelle) ; à défaut, `intro`. */
   homeIntro?: string;
   /**
-   * Contre-poids unique du chapitre court (RiskNote, même parent que la liste des étapes qui porte
-   * data-advantage) : ≥ 60 % du texte cumulé des étapes ; à défaut, `withdrawalReminder`.
+   * Contre-poids du chapitre court de l'accueil (≥ 60 % du texte cumulé des étapes). Plus lu par
+   * aucun composant depuis le 11/09/2026 : le texte reste EN VEILLE dans subscribe.ts.
    */
   homeRisk?: string;
   steps: StepItem[];
@@ -263,7 +266,7 @@ export interface StatItem {
 export interface CorumContent {
   title: string;
   intro: string;
-  /** Contre-poids risque des chiffres du groupe, rendu avec eux et à la même taille. Jamais animé. */
+  /** Contre-poids risque des chiffres du groupe. Aucun composant ne le rend, il reste EN VEILLE. */
   statsRisk?: string;
   range: {
     title: string;
@@ -280,8 +283,9 @@ export interface CorumContent {
     currentBadge?: string;
   };
   /**
-   * Les familles de solutions d'épargne du groupe (page /a-propos). Absent = section non rendue.
-   * `risk` est le contre-poids du bloc, rendu avec lui et à la même taille, jamais animé.
+   * Les familles de solutions d'épargne du groupe. Présent mais NON RENDU : la section
+   * #savoir-faire de /a-propos a été retirée le 14/09/2026, le contenu reste EN VEILLE dans corum.ts.
+   * `risk` est le contre-poids du bloc, à rendre avec lui et à la même taille, jamais animé.
    */
   expertise?: {
     title: string;
@@ -289,9 +293,12 @@ export interface CorumContent {
     items: { kicker: string; icon: string; title: string; description: string }[];
     risk: string;
   };
-  /** Titre du bloc facultatif sur la rémunération de CORUM lors des cessions. Absent = bloc non rendu. */
+  /**
+   * Titre du bloc sur la rémunération de CORUM lors des cessions. Présent mais NON RENDU : le bloc
+   * a quitté 07-Trust.astro le 11/09/2026, le texte reste EN VEILLE dans corum.ts.
+   */
   alignmentTitle?: string;
-  /** Corps du bloc « rémunération sur les ventes ». À défaut, le composant retombe sur `intro`. */
+  /** Corps du même bloc, en veille avec lui : aucun composant ne le lit. */
   alignmentBody?: string;
   /** Libellé du bouton vers la page À propos. */
   aboutLink?: string;
@@ -408,8 +415,9 @@ export interface NavContent {
   brand: string;
   cta: Cta;
   /**
-   * Libellé court du CTA de la barre (ex. « Souscrire »), pour laisser la place à la liste des pages à
-   * 375 px ; à défaut, `cta.label` est utilisé.
+   * Libellé court du CTA de la barre (ex. « Souscrire ») ; à défaut, `cta.label` est utilisé. Il
+   * fait tenir la barre sur une ligne : avec le logo, la loupe et le bouton Menu sur téléphone, avec
+   * la liste des pages à partir de « lg ». Le nom vient de l'ancienne sous-navigation.
    */
   subnavCtaLabel?: string;
   skipLink: string;

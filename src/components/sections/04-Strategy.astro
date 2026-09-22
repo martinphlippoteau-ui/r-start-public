@@ -3,8 +3,9 @@
  * Stratégie d'investissement : DEUX sections, rendues uniquement par /strategie.
  *  1. #strategie (paper) les deux moteurs de performance : deux cartes qui se retournent, chacune
  *                        illustrée par son dessin animé (EngineRent, EngineGain) ;
- *  2. #quoi      (paper) « Une approche en 3 volets pour les alimenter » : trois tuiles ink, Quoi, Où et
- *                        Comment (ancres #quoi, #ou, #comment), chacune avec son dessin (StrategySelect,
+ *  2. #quoi      (paper) « Une approche en 3 volets pour les alimenter » : trois tuiles ink,
+ *                        Sélective, Diversifiée et Opportuniste (ex-Quoi, Où et Comment, d'où les
+ *                        ancres #quoi, #ou, #comment), chacune avec son dessin (StrategySelect,
  *                        StrategyDiversify, StrategyTiming) et son détail au dos de la carte. Une
  *                        canalisation les relie aux deux moteurs sur grand écran.
  *
@@ -242,8 +243,8 @@ const pontVisible = !strategy.engines.outro && !strategy.engines.disclaimer;
     </ul>
 
     {
-      /* La phrase de méthode ferme le chapitre : elle explique ce que les deux moteurs supposent de
-        travail. Détachée par un filet plein largeur, dans la taille des introductions. */
+      /* Chute des deux moteurs (`engines.outro`), quand le contenu en porte une : détachée par un
+        filet plein largeur, dans la taille des introductions. */
     }
     {
       /* La phrase de méthode fermait ce chapitre ; elle ouvre maintenant « Tout commence par le
@@ -262,7 +263,8 @@ const pontVisible = !strategy.engines.outro && !strategy.engines.disclaimer;
 
     {
       /* Mention de la Conformité, jamais animée : un avertissement ne dépend pas d'un défilement pour
-        apparaître. Elle referme la zone, sous la phrase de méthode qu'elle qualifie. */
+        apparaître. Absente du contenu depuis le 16/09/2026, rien n'est rendu ; rétablie, elle
+        refermerait la zone, sous la chute s'il y en a une. */
     }
     {
       strategy.engines.disclaimer && (
@@ -272,7 +274,7 @@ const pontVisible = !strategy.engines.outro && !strategy.engines.disclaimer;
   </Container>
 </Section>
 
-{/* 2. Les trois volets : Quoi, Où, Comment */}
+{/* 2. Les trois volets : Sélective, Diversifiée, Opportuniste (ex-Quoi, Où, Comment) */}
 {
   /*
    * TUILES À FENÊTRE (16/09/2026, demande de l'équipe : « j'aime bien le format de card sur le site
@@ -281,7 +283,8 @@ const pontVisible = !strategy.engines.outro && !strategy.engines.disclaimer;
    * détail vient à la demande.
    *
    * AUCUN TEXTE N'EST AJOUTÉ NI RETIRÉ par la fusion, la répartition change seulement : la tuile porte
-   * le surtitre et le titre, la fenêtre porte l'introduction, la phrase d'annonce, la liste et la chute.
+   * le surtitre et le titre, son dos l'introduction, la phrase d'annonce, la liste et la chute
+   * (plus de fenêtre depuis le même jour, voir src/scripts/carteRetournee.ts).
    * Les trois titres étaient des H2 ; ils sont passés en H3 le 16/09/2026, quand l'équipe a demandé un
    * titre commun au-dessus des trois volets (« Une approche en 3 volets pour les alimenter »), qui
    * prend le rang H2. C'est le seul texte ajouté à ce bloc depuis la fusion.
@@ -291,10 +294,10 @@ const pontVisible = !strategy.engines.outro && !strategy.engines.disclaimer;
    * (src/scripts/carteRetournee.ts). C'est la seule façon de cacher un texte derrière un mouvement sans
    * le perdre pour qui n'exécute pas de script.
    *
-   * FOND INK sur les trois. Le globe était sur blanc depuis la fusion et s'y lisait mal : c'est un
-   * dessin au trait clair, il lui faut un fond sombre, celui qu'il avait avant. Les tuiles sombres sur
-   * la section claire donnent au passage le contraste que trois cartes blanches sur blanc n'avaient
-   * pas.
+   * FOND INK sur les trois. Le globe était sur blanc depuis la fusion et s'y lisait mal : dessin au
+   * trait clair, il lui fallait un fond sombre, celui qu'il avait avant ; les dessins qui l'ont
+   * remplacé sont au trait clair eux aussi. Les tuiles sombres sur la section claire donnent au
+   * passage le contraste que trois cartes blanches sur blanc n'avaient pas.
    */
 }
 {
@@ -433,8 +436,8 @@ const pontVisible = !strategy.engines.outro && !strategy.engines.disclaimer;
                     lente, en pause hors écran, complet en `prefers-reduced-motion`.
                     Les trois sont des SVG. Le globe en canvas a été retiré le 16/09/2026 : il ne
                     montrait que la moitié du propos de sa tuile, qui parle de secteurs autant que de
-                    géographie. Son fichier reste au dépôt, il n'est simplement plus appelé ; le globe
-                    filaire de StrategyDiversify, lui, porte un secteur sur chaque épingle.
+                    géographie. Son fichier a été supprimé le 19/09/2026 ; le globe filaire de
+                    StrategyDiversify, lui, porte un secteur sur chaque épingle.
                     PLEINE LARGEUR ET AU FORMAT PAYSAGE (160 × 120) depuis le 16/09/2026 au soir, pour
                     remplir la tuile ; `flex-1` centre le dessin dans tout l'espace qui reste. Elles
                     étaient carrées et bornées à 11 rem, la moitié basse de la tuile restait vide. */
@@ -484,7 +487,7 @@ const pontVisible = !strategy.engines.outro && !strategy.engines.disclaimer;
 
               {
                 /* Hôte du détail : visible dans le flux tant que le script n'a pas déplacé son contenu
-                  dans la fenêtre. Il est alors vidé, et le script le masque. */
+                  au dos de la carte. Il est alors vidé, et le script le masque. */
               }
               <div data-carte-detail-hote>
                 <div id={'detail-' + ancre} data-carte-detail class="mt-5 space-y-4">

@@ -1,11 +1,12 @@
 ---
 /**
  * Page /presse, « La presse en parle » (grand public) : SiteNav collée en haut → main#contenu
- * (PageHero avec le fil d'Ariane dans son slot et la ligne risques visible sans scroller → citations
- * mises en avant → revue de presse → avertissement dans sa propre bande sombre → renvoi vers la salle
- * de presse → notes propres à la page) → Footer.
- * Les communiqués, les contacts et le kit média ont quitté cette page : ils vivent sur /salle-de-presse,
- * accessible depuis le pied de page (arbitrage du 10/09/2026).
+ * (PageHero avec le fil d'Ariane dans son slot et le CTA, sans ligne risques depuis le 14/09/2026 →
+ * citations mises en avant → revue de presse → contacts presse, zone 4 → LegalNotes, toujours monté
+ * mais qui ne rend rien, AFFICHER = false) → Footer. L'avertissement de la revue, dans sa bande
+ * sombre, a été retiré le 16/09/2026 (voir press.ts).
+ * La salle de presse, qui portait les communiqués et le kit média (arbitrage du 10/09/2026), a été
+ * désactivée le 15/09/2026 puis supprimée le 22/09/2026 ; ses contacts sont rendus ici.
  * Métadonnées (title, description, canonical) depuis press.seo, chemin depuis src/config/pages.ts ;
  * JSON-LD Organization + WebPage + BreadcrumbList via src/lib/seo.ts. Aucun texte en dur.
  */
@@ -45,8 +46,8 @@ const jsonLd = [
           les trois médias cités et leur date dans la moitié droite. Les mêmes médias et les mêmes
           dates restent lisibles juste en dessous, sur chaque citation : l'information n'est pas perdue,
           elle n'est plus annoncée deux fois.
-          `press.labels.quotesListLabel` n'est plus lu ; il reste dans press.ts pour le jour où ce bloc
-          reviendrait. */
+          `press.labels.quotesListLabel` reste lu : c'est le nom accessible de la liste des
+          citations (Quotes.astro). */
       }
     </PageHero>
     <Quotes />
@@ -54,18 +55,16 @@ const jsonLd = [
 
     {
       /* ZONE 4 (15/09/2026). Cette place portait un renvoi vers /salle-de-presse. L'équipe a demandé de
-        ne pas encore ouvrir cette page aux journalistes, faute de communiqués à y mettre : la route est
-        désactivée et les contacts sont servis ici, par le composant déjà écrit pour eux. */
+        ne pas encore ouvrir cette page aux journalistes, faute de communiqués à y mettre : la route
+        a été désactivée ce jour-là, puis la salle de presse supprimée le 22/09/2026. Les contacts
+        sont servis ici, par le composant écrit pour elle, déplacé sous components/pages/presse/. */
     }
     <Contacts tone="paper" />
 
     <LegalNotes notes={press.notes} />
   </main>
 
-  {
-    /* Pastille d'appel : elle arrive avec la première section de contenu et reste jusqu'au bas de page.
-      Rendue au niveau de la page, jamais dans une section. */
-  }
+  {/* Pastille d'appel : rendue au niveau de la page, jamais dans une section. */}
   {
     /* Pastille d'appel : elle prend le RELAIS du CTA de l'en-tête, dès que celui-ci n'est plus à
       l'écran, et reste jusqu'au bas de page. Accrochée à une section, elle laissait un trou pendant

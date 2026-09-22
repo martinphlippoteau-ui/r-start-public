@@ -11,9 +11,12 @@ import { withdrawalExemptions } from '@/content/fr/fees';
  * V2 (§3 ter, brochure partenaires 2026, p. 5) : l'intro porte le positionnement complémentaire de
  * R Start (stratégie patrimoniale plus dynamique, en contrepartie d'un risque plus élevé) et la note
  * `souscrire-non-eligible` porte le tableau d'éligibilité complet, modalités proposées comprises.
- * Accueil (chapitre court, 11/09/2026) : `homeTitle`, `homeIntro` et `homeNotes` (les seules notes appelées
- * par les étapes, numérotées dans src/content/fr/notes.ts) ; le guide complet et MyCORUM restent sur
- * /documentation.
+ * Accueil (chapitre court, 11/09/2026) : `homeTitle`, les quatre étapes et le CTA. `homeIntro` est
+ * absente depuis le 14/09/2026 ; `homeNotes` (les notes appelées par les étapes) est vide depuis
+ * que les étapes n'en appellent plus (15/09/2026), et n'est importé nulle part. Le guide complet et
+ * le bloc MyCORUM restent sur /documentation.
+ * Le rendu complet de 06-Subscribe, qui lit `intro`, les options, `beforeYouSubscribe` et
+ * `withdrawalReminder`, est EN VEILLE : aucune page ne le rend.
  */
 
 /** Espace insécable avant % et € : les libellés de facts.ts utilisent une espace simple. */
@@ -42,7 +45,9 @@ export const notes: LegalNote[] = [
 
 /**
  * Rappel de la durée de placement et de la commission de retrait ; aussi réutilisé dans `homeRisk`
- * (accueil) : un seul des deux rappels y est trop court (≈ 58 % du texte cumulé des étapes, seuil 60 %).
+ * (accueil) : un seul des deux rappels y était trop court (≈ 58 % du texte cumulé des étapes, seuil
+ * 60 %). EN VEILLE : `homeRisk` n'est plus rendu depuis le 11/09/2026, et ce rappel ne l'est que
+ * par le rendu complet de 06-Subscribe, qu'aucune page n'affiche.
  */
 const withdrawalReminder = `R Start est un placement de long terme : ${risk.recommendedHoldingLabel} recommandés. Si vous retirez vos parts avant ${zeroAfter} ans de détention, une commission est prélevée sur la somme que vous récupérez ; elle diminue chaque année et disparaît après ${zeroAfter} ans. Le détail année par année figure dans la section Frais. ${withdrawalExemptions} Le rachat de vos parts n’est pas garanti : vous ne récupérez votre argent que si un autre épargnant les achète.`;
 
@@ -72,7 +77,8 @@ export const subscribe: SubscribeContent = {
    * Quatre intitulés, sans description (11/09/2026, trame de l'équipe) : le parcours se lit d'un coup
    * d'œil. Ce que portaient les descriptions n'est pas perdu, le délai de jouissance est un des six
    * repères de la zone 3, les moyens de règlement et le délai de rétractation sont dans les notes
-   * appelées ici, et le suivi de l'épargne a sa place sur /documentation, avec MyCORUM.
+   * `souscrire-reglement` et `souscrire-reflexion` (plus appelées depuis le 15/09/2026, voir
+   * ci-dessous), et le suivi de l'épargne a sa place sur /documentation, avec MyCORUM.
    */
   /*
    * QUATRE ÉTAPES RÉÉCRITES LE 15/09/2026, intitulés fournis par l'équipe. C'étaient : renseigner sa
@@ -105,7 +111,10 @@ export const subscribe: SubscribeContent = {
   stepPrefix: 'Étape',
 
   optionsTitle: 'Deux options facultatives',
-  /** Chaque option = avantage (`description`) + contre-poids (`risk`), rendus en RiskPair, même taille. */
+  /**
+   * Chaque option = avantage (`description`) + contre-poids (`risk`), rendus en RiskPair, même
+   * taille. Rendu complet seulement (EN VEILLE), et RiskNote n'y rendrait plus le contre-poids.
+   */
   options: [
     {
       title: subscription.options.pei.name,
@@ -126,7 +135,10 @@ export const subscribe: SubscribeContent = {
 
   withdrawalReminder,
 
-  /** Accueil : unique contre-poids des quatre étapes (RiskNote, jamais animé) ; rappel du DIC + `withdrawalReminder`. */
+  /**
+   * Contre-poids des quatre étapes sur l'accueil (RiskNote, jamais animé) : rappel du DIC +
+   * `withdrawalReminder`. EN VEILLE : retiré de l'accueil le 11/09/2026, lu par aucun composant.
+   */
   homeRisk: `Avant de souscrire, lisez le document d’informations clés (DIC) et la note d’information. ${withdrawalReminder}`,
 
   /**
@@ -147,7 +159,11 @@ export const subscribe: SubscribeContent = {
   cta: { label: 'Souscrire en ligne', position: 'souscrire' },
 };
 
-/** Notes appelées par les étapes (rendues sur l'accueil en `compact`) ; `notes` reste complet pour le guide. */
+/**
+ * Notes appelées par les étapes : liste vide depuis le 15/09/2026, aucune étape ne portant plus de
+ * `noteId`. EN VEILLE, comme `notes` : ni l'une ni l'autre n'est importée (le registre de
+ * l'accueil, notes.ts, est vide).
+ */
 const idsAppeles = subscribe.steps.map((step) => step.noteId).filter(Boolean);
 export const homeNotes: LegalNote[] = notes.filter((n) => idsAppeles.includes(n.id));
 

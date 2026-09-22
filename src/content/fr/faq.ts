@@ -16,7 +16,7 @@ import { managementCompany } from '@/content/fr/legal';
  * Section « FAQ » et page /faq. Les questions servent aussi de base au JSON-LD FAQPage, limité aux
  * questions visibles (src/lib/seo.ts).
  * L'ancien ordre de lecture, calé sur les dix questions SEO de seo.ts (`faqQuestions`) et les six
- * questions de pédagogie de la V2, ne correspondait plus aux questions présentes : retiré le 21/09/2026
+ * questions de pédagogie de la V2, ne correspondait plus aux questions présentes : retiré le 22/09/2026
  * avec `faqQuestions`.
  *
  * Vocabulaire (V2, §3) : à l'affichage, on écrit « frais sur les achats d'immeubles ». Le terme

@@ -1,11 +1,13 @@
 ---
 /**
  * Page /a-propos, la société de gestion. Contenu fourni par l'équipe le 14/09/2026.
- * SiteNav → main#contenu : PageHero (fil d'Ariane, H1 « L'expérience derrière R Start », deux
- * paragraphes d'introduction, CTA souscrire, SANS ligne risques) → #histoire, la conviction de 2011 et
- * les cinq transformations du modèle (CorumHistory.astro) → les cinq chiffres du groupe (#corum), la
- * photo des bureaux en pleine largeur et la gamme des cinq SCPI (#gamme) (CorumRange.astro) → Footer.
- * La section des trois savoir-faire et le bloc de notes ont été retirés le même jour.
+ * SiteNav → main#contenu : PageHero (fil d'Ariane, H1 « R Start, une innovation signée CORUM »,
+ * deux paragraphes d'introduction, CTA souscrire, SANS ligne risques) → les cinq chiffres du groupe
+ * (#corum), la bande illustrée en pleine largeur et la gamme des autres SCPI en chiffres (#gamme)
+ * (CorumRange.astro) → le bloc Risques commun (#risques, 08-Risks.astro) → les avis Trustpilot
+ * (#avis) → LegalNotes, toujours monté mais qui ne rend rien (AFFICHER = false) → Footer.
+ * La section des trois savoir-faire a été retirée le 14/09/2026, le bloc #histoire
+ * (CorumHistory.astro) le 16/09/2026 : tous deux EN VEILLE, leur contenu est gardé dans corum.ts.
  * Métadonnées et JSON-LD depuis aboutPage.ts, config/pages.ts et src/lib/seo.ts : aucun texte en dur.
  */
 import Base from '@/layouts/Base.astro';
@@ -89,10 +91,7 @@ const jsonLd = [
     <LegalNotes notes={notes} />
   </main>
 
-  {
-    /* Pastille d'appel : elle arrive avec la première section de contenu et reste jusqu'au bas de page.
-      Rendue au niveau de la page, jamais dans une section. */
-  }
+  {/* Pastille d'appel : rendue au niveau de la page, jamais dans une section. */}
   {
     /* Pastille d'appel : elle prend le RELAIS du CTA de l'en-tête, dès que celui-ci n'est plus à
       l'écran, et reste jusqu'au bas de page. Accrochée à la première section de contenu, elle

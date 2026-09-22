@@ -4,9 +4,15 @@ import { notes as corumNotes } from '@/content/fr/corum';
 import { corumGroup, product } from '@/content/fr/facts';
 
 /**
- * Page /a-propos, la société de gestion : métadonnées, en-tête, et les blocs qui suivaient « Le groupe
- * CORUM en chiffres » sur l'accueil jusqu'au 11/09/2026 (ambiance des bureaux, gamme des cinq SCPI).
- * Les notes sont celles de corum.ts, filtrées sur celles réellement appelées ici.
+ * Page /a-propos, la société de gestion : métadonnées, en-tête, appel à l'action et notes. Ses
+ * blocs suivaient « Le groupe CORUM en chiffres » sur l'accueil jusqu'au 11/09/2026 ; ils ont
+ * changé depuis : l'ambiance des bureaux est devenue une bande illustrée (15/09/2026), la gamme des
+ * cinq SCPI une grille des quatre autres SCPI en chiffres, sans R Start (corumRange.ts,
+ * 16/09/2026). Les notes sont celles de corum.ts, filtrées sur une liste QUI N'EST PLUS À JOUR :
+ * `corum-savoir-faire` et `corum-gamme` ne sont plus appelées par aucun bloc, et
+ * `confiance-trustpilot`, appelée par les avis du bas de page, n'y figure pas. Sans effet à l'écran
+ * tant que les notes sont coupées (AFFICHER = false dans NoteRef et LegalNotes) ; à revoir avant de
+ * les rétablir.
  */
 export const aboutPage: { seo: PageSeo; hero: PageHero; notes: LegalNote[]; cta: Cta } = {
   seo: {
@@ -32,11 +38,14 @@ export const aboutPage: { seo: PageSeo; hero: PageHero; notes: LegalNote[]; cta:
     ],
     /* Plus de ligne risques dans l'en-tête (14/09/2026, demande de l'équipe : « supprime les bon à
        savoir de tous les hero sauf celui de la home »). Le « Bon à savoir : … » sous le H1 a disparu de
-       TOUTES les sous-pages ; seul l'accueil le garde, sous ses appels à l'action. Ces pages n'ont donc
-       plus de mention de risque dans leur en-tête : il reste celles de leur contenu quand elles en ont,
-       et le pied de page, commun à tout le site. À rétablir en remettant `riskLine: shortRiskLine`. */
+       TOUTES les sous-pages ; celui de l'accueil, gardé ce jour-là, ne s'affiche plus non plus
+       depuis que RiskNote ne rend plus rien (même jour). Ces pages n'ont donc plus de mention de
+       risque dans leur en-tête : il reste celles de leur contenu quand elles en ont, et le pied de
+       page, commun à tout le site. Pour la rétablir, `riskLine: shortRiskLine` ici ne suffit plus :
+       la page doit aussi la passer à PageHero (`riskLine={hero.riskLine}`), et RiskNote doit rendre
+       de nouveau. */
   },
-  /** Seules les notes appelées par les blocs de cette page. */
+  /** Notes de la page : liste d'identifiants périmée, voir l'en-tête du fichier. */
   notes: corumNotes.filter((note) =>
     ['confiance-chiffres', 'corum-savoir-faire', 'corum-gamme'].includes(note.id)
   ),

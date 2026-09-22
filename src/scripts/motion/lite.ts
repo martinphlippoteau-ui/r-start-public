@@ -1,11 +1,11 @@
 /**
  * MOTEUR LÉGER, révélations `data-animate` sans GSAP (IntersectionObserver + transitions CSS).
  *
- * Pourquoi : les sous-pages (/frais, /documentation, /presse, /salle-de-presse, pages légales) ne
- * déclarent que des `data-animate`. Leur faire télécharger GSAP + ScrollTrigger (≈ 45 Ko gzip) pour
- * quelques fondus est disproportionné. `src/scripts/motion.ts` ne charge le moteur GSAP que si la page
- * déclare un effet qui en a besoin (scène, rideau, pin, scrub, tracé, jauge, compteur, texte mot à
- * mot) ; sinon il charge ce module.
+ * Pourquoi : les sous-pages (/frais, /simulateur, /a-propos, /documentation, /presse, /faq, pages
+ * légales) ne déclarent que des `data-animate`. Leur faire télécharger GSAP + ScrollTrigger
+ * (≈ 45 Ko gzip) pour quelques fondus est disproportionné. `src/scripts/motion.ts` ne charge le
+ * moteur GSAP que si la page déclare un effet qui en a besoin (rideau, parallaxe, scrub, tracé,
+ * texte mot à mot) ; sinon il charge ce module.
  *
  * Un seul des deux modules tourne par page : sur une page à moteur, `reveal.ts` garde la main et
  * `lite.ts` n'est jamais importé. Aucune double animation possible.

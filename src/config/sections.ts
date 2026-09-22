@@ -6,7 +6,7 @@ import type { SectionKey, SectionMeta } from '@/content/types';
  * 04-Strategy elle-même. La photo pleine largeur 03a-Immeuble n'a ni titre, ni note, ni entrée ici :
  * elle porte son id.
  *
- * NETTOYÉ LE 21/09/2026 : les libellés, l'ordre et la présence dans la sous-navigation (`label`,
+ * NETTOYÉ LE 22/09/2026 : les libellés, l'ordre et la présence dans la sous-navigation (`label`,
  * `order`, `inNav`) n'avaient plus de lecteur depuis la fin de la sous-navigation par ancres (10/09/2026),
  * et les entrées `income`, `press` et `documents` survivaient à leurs sections, supprimées le 15/09/2026.
  */

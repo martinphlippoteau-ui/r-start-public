@@ -54,7 +54,7 @@
  * mot, introduction en fade-up ; dans une carte, seul le titre (ou le picto) entre, description et risque
  * sont en place ; AUCUNE scène épinglée sur le site depuis le 14/09/2026 (celle du mot d'ordre de la
  * stratégie est partie avec son texte), et deux rideaux sur l'accueil : 01b-Différence sur le hero,
- * 08-Risques sur Souscrire. /strategie porte le troisième, le même bloc Risques sur « Comment ».
+ * 08-Risques sur Souscrire. /strategie porte le troisième, le même bloc Risques sur ses volets.
  *
  * GARDE-FOUS (appliqués par le moteur, contrôlés par scripts/check-compliance.mjs et tests/) :
  *  - Jamais d'effet sur le H1, sur un [data-risk] (ligne risques, contre-poids, avertissements

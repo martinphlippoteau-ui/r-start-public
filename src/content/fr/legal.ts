@@ -33,27 +33,39 @@ export const arbitrageWarningBullets = [
 export const bulletinWarning =
   "Acheter des parts de R Start est un investissement immobilier. Comme tout placement immobilier, il s'agit d'un investissement long terme dont la liquidité est limitée. Nous vous recommandons une durée de placement de 10 ans. Contrairement au livret A par exemple, ce placement comporte des risques. Il existe tout d'abord un risque de perte en capital. De plus, les revenus ne sont pas garantis et dépendront de l'évolution du marché immobilier et du cours des devises. Nous précisons que CORUM Asset Management ne garantit pas le rachat de vos parts. Enfin, comme pour tout placement, les performances passées ne présagent pas des performances futures.";
 
-/** Ligne risques courte, visible sans scroller (hero) et en rappel. */
+/**
+ * Ligne risques courte. Écrite pour être visible sans défiler dans le hero de l'accueil, mais elle
+ * y passe par RiskNote, qui ne rend plus rien depuis le 14/09/2026, et les sous-pages ne la portent
+ * plus dans leur en-tête. Seules les mentions légales l'affichent (pages.ts), en paragraphe direct.
+ */
 export const shortRiskLine =
   'Investissement immobilier de long terme, durée de placement recommandée de 10 ans. Risque de perte en capital, revenus non garantis, liquidité limitée, risque de change.';
 
-/** Préfixe lu par les lecteurs d'écran devant chaque contre-poids risque (RiskNote) ; masqué visuellement. */
+/**
+ * Préfixe lu par les lecteurs d'écran devant chaque contre-poids risque (RiskNote) ; masqué
+ * visuellement. EN VEILLE : RiskNote ne rend plus rien depuis le 14/09/2026, aucun contre-poids
+ * n'est rendu, ce préfixe n'est donc lu nulle part.
+ */
 export const riskPrefix = 'Risque : ';
 /**
- * Libellé VISIBLE qui ouvre chaque contre-poids (décision du 11/09/2026) : il remplace le pictogramme
- * d'alerte. Le préfixe « Risque : » reste lu par les lecteurs d'écran (riskPrefix) pour que l'avertissement
- * garde sa nature. Lecture stricte AMF à défendre : un avertissement présenté comme un conseil.
+ * Libellé VISIBLE qui ouvrait chaque contre-poids (décision du 11/09/2026) : il remplace le
+ * pictogramme d'alerte. Le préfixe « Risque : » était lu par les lecteurs d'écran (riskPrefix) pour
+ * que l'avertissement garde sa nature. Lecture stricte AMF à défendre : un avertissement présenté
+ * comme un conseil. EN VEILLE depuis le 14/09/2026 comme RiskNote ; c'est aussi le libellé par
+ * défaut de ui/NoteConformite.astro, qui n'a aujourd'hui aucune mention à rendre.
  */
 export const riskLabel = 'Bon à savoir :';
 
 /*
  * MENTION FOURNIE PAR LA CONFORMITÉ le 14/09/2026, reproduite MOT POUR MOT, ponctuation comprise.
  *
- * C'est la première des mentions que la Conformité replace elle-même après le retrait de tous les
- * « Bon à savoir » du site (voir src/components/ui/RiskNote.astro). Elle ne passe donc pas par RiskNote,
- * qui ne rend plus rien, mais par ui/NoteConformite.astro, et elle est posée à l'endroit exact que la
- * Conformité a indiqué, ni ailleurs ni en plus. Ne pas la reformuler, ne pas l'abréger, ne pas la
- * déplacer sans retour de leur part.
+ * C'est la première des mentions que la Conformité a replacées elle-même après le retrait de tous
+ * les « Bon à savoir » du site (voir src/components/ui/RiskNote.astro). Elle ne passait donc pas
+ * par RiskNote, qui ne rend plus rien, mais par ui/NoteConformite.astro, à l'endroit exact que la
+ * Conformité avait indiqué : sous les deux moteurs de /strategie. EN VEILLE : retirée de l'écran le
+ * 16/09/2026 à la demande de l'équipe (strategy.ts dit comment la rétablir), elle n'est plus
+ * affichée nulle part. Ne pas la reformuler, ne pas l'abréger ; la reposer au même endroit si elle
+ * revient.
  */
 export const corumProductsDisclaimer =
   'Les produits commercialisés par CORUM L’Épargne sont des investissements long terme qui n’offrent aucune garantie de rendement ou de performance et présentent un risque de perte en capital et de liquidité. Les revenus ne sont pas garantis et dépendent de l’évolution du marché immobilier et financier et du cours des devises.';
@@ -124,7 +136,8 @@ export const hosting = {
  * rien ne lit cet export (audit du 14/09/2026). Le contrôle réellement exécuté est la table FORBIDDEN
  * de scripts/check-compliance.mjs, qui porte ses propres expressions ET leurs fenêtres d'exception.
  * Les deux listes doivent donc être tenues à jour ensemble, ou celle-ci rejoindre la première.
- * Elle reste ici parce qu'elle se lit, là où la table du script est faite d'expressions régulières.
+ * EN VEILLE, gardée exprès (22/09/2026, avec les autres textes de conformité) : elle se lit, là où
+ * la table du script est faite d'expressions régulières.
  */
 export const forbiddenPhrases = [
   'sans frais', // sauf dans la phrase « n'est pas une SCPI sans frais »

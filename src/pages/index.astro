@@ -1,8 +1,9 @@
 ---
 /**
- * Page d'accueil : SiteNav collée en haut → main#contenu (sections de la trame, voir HOME_ORDER, puis Notes)
- * → Footer. Les sections viennent de src/components/sections/NN-Nom.astro ; l'ordre est celui de la trame
- * (contrat : src/config/sections.ts). Métadonnées et JSON-LD depuis seo.ts,
+ * Page d'accueil : SiteNav collée en haut → main#contenu (sections de la trame, voir HOME_ORDER ;
+ * plus de Notes depuis le 14/09/2026) → Footer. Les sections viennent de
+ * src/components/sections/NN-Nom.astro ; l'ordre est celui de HOME_ORDER, qui fait foi
+ * (src/config/sections.ts ne donne plus que les ancres). Métadonnées et JSON-LD depuis seo.ts,
  * legal.ts, facts.ts et faq.ts via src/lib/seo.ts (rien en dur).
  * Plus d'image de fond dans le hero depuis le 11/09/2026 : aucun préchargement d'image (le LCP est le logo ou l'accroche).
  */
@@ -30,13 +31,15 @@ const all = Object.entries(modules)
   .map(([path, mod]) => ({ path, Component: mod.default }));
 /**
  * Trame de l'accueil, par préfixe de fichier. HOME_ORDER ci-dessous fait foi, dans cet ordre exact :
- * 01 Hero → 01b Ce qui change vraiment → 02 R Start en un clin d'œil → 07 L'expérience derrière R Start
- * → 03a Immeuble (photo pleine largeur) → 06 Souscrire (chapitre court) → 08 Risques → 10 FAQ.
+ * 01 Hero → 01b Qui a envie de payer avant de gagner ? → 02 R Start en un clin d'œil
+ * → 03 Comparateur de frais → 07 Le groupe CORUM en quelques chiffres → 03a Immeuble
+ * (illustration pleine largeur) → 06 Souscrire (chapitre court) → 08 Risques → 10 FAQ.
  *
- * DES SECTIONS EXISTENT SANS ÊTRE RENDUES, ici ni ailleurs, faute de figurer dans HOME_ORDER :
- * 05 Revenus, 08b La presse en parle et 09 Documents. (03 Frais est revenue le 15/09/2026.) Leurs fichiers et leurs contenus sont
- * conservés (audit du 14/09/2026) : les remettre, c'est ajouter leur préfixe à la liste. 04 Stratégie,
- * elle, est importée directement par /strategie.
+ * PLUS AUCUNE SECTION N'EXISTE SANS ÊTRE RENDUE : 05 Revenus, 08b La presse en parle et 09
+ * Documents, restées hors de HOME_ORDER, ont été supprimées le 15/09/2026 (commit deec83a), avec
+ * l'ancienne 03-Fees ; 03 Frais est revenue le même jour sous la forme de 03-Frais.astro.
+ * 04 Stratégie, seul fichier du dossier absent de HOME_ORDER, est importée directement par
+ * /strategie.
  */
 /* « 03- » réinséré le 15/09/2026, JUSTE APRÈS « 02- » (« R Start en un clin d'œil ») : le
    comparateur de frais revient sur l'accueil. Les tons s'enchaînent ink puis white puis white,
@@ -89,8 +92,8 @@ const jsonLd = [
       /* PLUS DE SECTION « Notes et sources » SUR L'ACCUEIL (14/09/2026, demande de l'équipe), et plus
         aucun appel de note en exposant : le registre de l'accueil (content/fr/notes.ts) est vide, et
         NoteRef ne rend rien pour un identifiant qu'il n'y trouve pas. Les notes elles-mêmes vivent
-        toujours dans les fichiers de contenu et restent rendues sur les sous-pages, qui passent leur
-        propre liste à LegalNotes. */
+        toujours dans les fichiers de contenu ; aucune page ne les rend plus, LegalNotes et NoteRef
+        étant coupés (AFFICHER = false) sur tout le site. */
     }
   </main>
   {
@@ -108,8 +111,8 @@ const jsonLd = [
 
   {
     /* Seconde pastille, celle de la souscription : elle arrive AVEC la section qui la propose et reste
-      jusqu'en bas de page. Les deux ne se croisent jamais, la première se repliant à « L'expérience
-      derrière R Start », qui précède « Souscrire en 4 étapes ». */
+      jusqu'en bas de page. Les deux ne se croisent jamais, la première se repliant à « Le groupe
+      CORUM en quelques chiffres » (#corum), qui précède « 4 étapes pour souscrire ». */
   }
   <StickyCta label={subscribe.cta.label} from="#souscrire" />
   <Footer />

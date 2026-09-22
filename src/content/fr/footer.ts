@@ -32,8 +32,8 @@ export const footer = {
        * retiré à la demande de l'équipe ; la page existe toujours, elle n'est plus appelée d'ici.
        * /faq est arrivée au menu le même jour, elle vient donc par `menuPages` : la répéter la ferait
        * figurer deux fois dans la même colonne.
-       * La salle de presse était sortie le 15/09/2026, sa route étant désactivée
-       * (src/pages/_salle-de-presse.astro) : le lien aurait pointé dans le vide.
+       * La salle de presse en était sortie le 15/09/2026, sa route étant désactivée ; elle a été
+       * supprimée le 22/09/2026.
        */
       links: [...menuPages.map((p): FooterLink => ({ label: p.navLabel ?? p.label, href: p.path }))],
     },

@@ -5,8 +5,11 @@
  *                      colonnes et une taille de chiffre plus basse dès qu'ils sont cinq : à quatre
  *                      colonnes le cinquième restait seul sur une ligne, et à cinq colonnes en taille
  *                      pleine « 9,6 Md€ » passait à la ligne (14/09/2026) ;
- *  2. bande photo pleine largeur, hors section (décorative, sans titre : elle n'a donc pas d'ancre) ;
- *  3. #gamme   (white) la gamme des cinq SCPI, tuile R Start marquée « Nouveau ».
+ *  2. bande pleine largeur, hors section (décorative, sans titre : elle n'a donc pas d'ancre), une
+ *     illustration depuis le 15/09/2026 ;
+ *  3. #gamme   (white) « Nos autres SCPI en quelques chiffres » : une grille des quatre autres
+ *              SCPI du groupe et de leurs chiffres (corumRange.ts), sans R Start, depuis le
+ *              16/09/2026.
  * La section #savoir-faire, qui décrivait les trois familles de solutions du groupe, a été RETIRÉE le
  * 14/09/2026 à la demande de l'équipe ; son contenu reste dans corum.ts (`expertise`), prêt à
  * resservir. Ses trois visuels, eux, ont quitté media.ts le 15/09/2026 avec les dernières photographies.
@@ -73,9 +76,7 @@ const QUIET_TITLE_Y = 12;
         stats.items.length === 5 ? 'lg:grid-cols-5' : 'lg:grid-cols-4',
       ]}
     >
-      {
-        /* Chiffres STATIQUES : aucun ne passe `numeric` à Stat, le compteur animé n'est pas déclenché. */
-      }
+      {/* Chiffres STATIQUES : Stat n'a plus de compteur animé depuis le 22/09/2026. */}
       {
         stats.items.map((s) => (
           <li>
@@ -158,9 +159,11 @@ const QUIET_TITLE_Y = 12;
 
     {
       /* Le contre-poids « Ces chiffres sont ceux du groupe CORUM… » et la ligne de source ont été retirés
-        d'ici le 11/09/2026 (décision de l'équipe). Le rappel « cette expérience ne préjuge pas des résultats
-        de R Start, qui n'a pas d'historique propre » reste porté par l'introduction de l'en-tête de la
-        page (aboutPage.hero.intro). Les chiffres ne sont donc plus marqués [data-advantage]. */
+        d'ici le 11/09/2026 (décision de l'équipe). Le rappel « cette expérience ne préjuge pas des
+        résultats de R Start, qui n'a pas d'historique propre » n'est plus porté nulle part sur la
+        page : l'introduction de l'en-tête (aboutPage.hero.intro), réécrite le 14/09/2026, ne le dit
+        plus. Reste le bloc Risques, plus bas. Les chiffres ne sont donc plus marqués
+        [data-advantage]. */
     }
   </Container>
 </Section>
@@ -206,6 +209,8 @@ const QUIET_TITLE_Y = 12;
    * et plan d'épargne retraite), chacune avec sa photo. Le contenu reste dans corum.ts (`expertise`) ;
    * les trois visuels, eux, ont quitté media.ts le 15/09/2026 (l'historique git les garde).
    * La page passe ainsi de cinq blocs à quatre : l'histoire, les chiffres, la photo des bureaux, la gamme.
+   * Depuis : l'histoire a été retirée le 16/09/2026 (EN VEILLE, CorumHistory.astro), et la photo
+   * des bureaux est devenue une bande illustrée le 15/09/2026.
    */
 }
 

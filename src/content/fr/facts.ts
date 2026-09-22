@@ -5,12 +5,17 @@
  * corum.fr/mentions-legales.
  *
  * Points en attente de confirmation par CORUM (voir README) :
- *  - SRI : le site affiche 3/7, valeur du DIC V7 hébergé (20/05/2026, texte extrait du PDF le 10/09/2026 :
- *    « classe de risque 3 sur 7, qui est une classe de risque moyenne »). La brochure p.3 et CORUM
- *    (08/09/2026) annoncent 4/7 : une communication commerciale ne peut pas contredire le DIC en vigueur,
- *    CORUM doit soit confirmer le DIC hébergé, soit fournir un DIC à jour (le site suivra ce document).
+ *  - SRI : le site affiche 4/7 depuis le 14/09/2026 (`risk.sriLabel`, valeur de l'équipe, celle de
+ *    la brochure p.3 et de CORUM le 08/09/2026). Le DIC V7 du 20/05/2026 dit 3/7 (texte extrait du
+ *    PDF le 10/09/2026 : « classe de risque 3 sur 7, qui est une classe de risque moyenne ») ; il
+ *    n'est plus hébergé depuis le 18/09/2026 (pendingDocuments.ts). Écart non tranché : CORUM doit
+ *    soit fournir un DIC à jour, soit confirmer 3/7, et le site suivra ce document. Détail sous
+ *    `risk`.
  *  - Minimum des versements programmés (PEI) : 50 € (adhésion PEI 04/2026) → affiché.
- *  - Cas d'exonération de la commission de retrait : confirmés par la note d'information ch. III § 6 → affichés (libellé exact à confirmer).
+ *  - Cas d'exonération de la commission de retrait : confirmés par la note d'information ch. III
+ *    § 6 (libellé exact à confirmer) → EN VEILLE, affichés nulle part depuis le 14/09/2026 : leurs
+ *    derniers lecteurs (fees.ts, `withdrawalExemptions`) passent par RiskNote, qui ne rend plus
+ *    rien, ou par des blocs retirés de /frais.
  *  - Chiffres groupe : corum.fr consulté le 08/09/2026 ; date de référence officielle à fournir par CORUM.
  */
 
@@ -21,8 +26,11 @@ export const product = {
   tagline: 'La SCPI nouvelle génération', // brochure partenaires 2026, p.1, accroche rétablie par la réunion produit du 10/09/2026
   /**
    * Allégation de rang autorisée : périmètre limité à la gamme du groupe CORUM (arbitrage du
-   * 10/09/2026). La version marché (« la première SCPI… » sans le groupe CORUM) reste interdite tant
-   * que la Conformité ne l'a pas validée. Toujours affichée avec l'appel de note `definitionScope`.
+   * 10/09/2026). La version marché (« la première SCPI… » sans le groupe CORUM) reste interdite
+   * tant que la Conformité ne l'a pas validée. EN VEILLE : plus affichée depuis le 15/09/2026
+   * (retrait de l'allégation de rang du bloc « Le modèle », voir check-compliance.mjs). Seule la
+   * note `difference-definition` la lit encore, avec `definitionScope`, et aucune note n'est
+   * affichée.
    */
   definition:
     'La première SCPI du groupe CORUM sans frais d’entrée ni frais sur les achats d’immeubles', // brochure partenaires 2026, p.4 et p.6
@@ -131,15 +139,22 @@ export const fees = {
  * de R Start (6 % puis 12 %) : le site affiche le barème complet de la page 4 et de la note
  * d'information (0 / 6 / 12 %).
  *
- * Publicité comparative encadrée (arbitrage du 10/09/2026) : aucune SCPI tierce n'est nommée dans la
- * partie visible du site ; le panel et la source vivent dans la note affichée sous la bascule.
+ * Publicité comparative encadrée (arbitrage du 10/09/2026) : la bascule pédagogique ne nommait
+ * aucune SCPI tierce dans sa partie visible, le panel et la source vivant dans une note sous elle.
+ * EN VEILLE : la bascule et sa note (« frais-page-comparatif ») ont quitté /frais le 11/09/2026, le
+ * composant a été supprimé le 14/09/2026 (feesPage.ts, SHOW_MARKET_COMPARISON). Rien de cet objet
+ * n'est affiché ; seul `panel` est encore lu, par scripts/check-compliance.mjs, pour contrôler ce
+ * que /frais nomme. Le comparateur qui a remplacé la bascule (comparator.ts) nomme, lui, ses SCPI.
  * L'intitulé de la colonne de marché reste celui de la brochure, « SCPI avec frais d'acquisition » :
  * ces SCPI ne prélèvent pas de commission de souscription, les appeler « SCPI avec frais d'entrée »
  * contredirait le 0 % affiché sur leur propre ligne de souscription.
  */
 export const marketComparison = {
   columnLabel: 'SCPI avec frais d’acquisition',
-  /** Les neuf SCPI du panel, citées uniquement dans la note de périmètre, jamais dans la partie visible. */
+  /**
+   * Les neuf SCPI du panel, destinées à la seule note de périmètre de la bascule, jamais à sa
+   * partie visible. En veille avec elle ; lues par scripts/check-compliance.mjs (voir ci-dessus).
+   */
   panel: [
     'Novaxia NEO',
     'Iroko ZEN',
@@ -248,10 +263,10 @@ export const risk = {
   // classe de risque 3 sur 7, qui est une classe de risque moyenne » (texte extrait du PDF le
   // 10/09/2026). La brochure p.3 et CORUM (08/09/2026) disent 4 sur 7. L'AMF avait relevé cet écart
   // sur la brochure. Tant que le PDF était servi, un visiteur y lisait 3 là où la page affiche 4.
-  // À trancher avec CORUM : soit le DIC hébergé n'est pas la bonne version, soit la valeur affichée
-  // doit redescendre à 3. En attendant, AUCUNE phrase du site n'attribue plus cette valeur au DIC,
-  // elle est attribuée à CORUM : le site ne peut pas faire dire au document qu'il héberge autre chose
-  // que ce qu'il contient.
+  // À trancher avec CORUM : soit le DIC V7 fourni n'est pas la bonne version, soit la valeur
+  // affichée doit redescendre à 3. En attendant, AUCUNE phrase du site n'attribue plus cette valeur
+  // au DIC, elle est attribuée à CORUM : le site ne peut pas faire dire au DIC autre chose que ce
+  // qu'il contient.
   sri: 4,
   sriMax: 7,
   sriLabel: '4 sur 7',
@@ -262,11 +277,15 @@ export const risk = {
 } as const;
 
 export const strategy = {
-  // LIBELLÉ D'AFFICHAGE, « Monde » (14/09/2026, demande de l'équipe). Il sert de titre à la section
-  // Zone de /strategie et de ligne « Zone d'investissement » dans le kit média.
-  // ÉCART À CONNAÎTRE : `zoneDetail` juste en dessous garde la zone du DIC, et c'est lui que citent les
-  // notes légales. Le site affiche donc « Monde » et écrit, en note, la zone réelle du document
-  // réglementaire. Un site ne peut pas faire dire au DIC qu'il héberge autre chose que ce qu'il
+  // LIBELLÉ D'AFFICHAGE, « Monde » (14/09/2026, demande de l'équipe). EN VEILLE, plus aucun
+  // lecteur : la section Zone de /strategie ne le prend plus pour titre depuis le 14/09/2026, et le
+  // kit média, son dernier lecteur, a été supprimé le 22/09/2026. /strategie écrit « partout dans
+  // le monde » en toutes lettres (strategy.ts) ; ce champ garde la trace de la décision de
+  // l'équipe.
+  // ÉCART À CONNAÎTRE : `zoneDetail` juste en dessous garde la zone du DIC. Seule une note légale
+  // le cite (highlights.ts, `points-forts-zone`), et aucune note n'est affichée depuis le
+  // 14/09/2026 : l'écran dit « partout dans le monde » sans écrire nulle part la zone réelle du
+  // document réglementaire. Un site ne peut pas faire dire au DIC autre chose que ce qu'il
   // contient : la note reste la référence, le libellé est la formulation de l'équipe.
   zoneLabel: 'Monde',
   zoneDetail: "Pays du Conseil de l'Europe (en zone euro et hors zone euro) et Canada", // DIC p.1
@@ -325,8 +344,9 @@ export const corumGroup = {
    * Chiffres groupe : corum.fr (« Qui sommes-nous »), consulté le 08/09/2026 ; recoupés avec la brochure 2026.
    * Aucune date d'arrêté officielle (« données au … ») n'existe dans le dépôt ni dans les documents cités :
    * `statsSource` le dit explicitement et `statsDate` reste une date de consultation, pas d'arrêté.
-   * Dès que CORUM communique la date d'arrêté, l'écrire ici (« données au … ») et passer STATS_DATED à true
-   * dans corum.ts.
+   * Dès que CORUM communique la date d'arrêté, l'écrire ici (« données au … »), dans `statsSource`
+   * et `statsDate`. L'interrupteur STATS_DATED de corum.ts, qui ne gardait plus qu'une bande vide,
+   * a été supprimé le 22/09/2026 : il n'y a plus rien à basculer ailleurs.
    */
   stats: [
     {
@@ -516,10 +536,13 @@ export const press = {
   /**
    * Revue de presse « La presse en parle » : onze articles. Les neuf premiers sont la sélection livrée
    * par CORUM le 10/09/2026, dans l'ordre de la sélection ; les deux derniers ont été ajoutés par
-   * l'équipe le 14/09/2026. Titres et dates reproduits tels que fournis ou relevés sur la page ; ce sont
-   * des citations de tiers, couvertes par `coverageDisclaimer`, jamais des formulations du site.
-   * `url` n'est renseignée QUE POUR LES ADRESSES OUVERTES ET VÉRIFIÉES, titre de page à l'appui : un
-   * article sans adresse s'affiche avec son média et sa date, sans lien (arbitrage du 10/09/2026).
+   * l'équipe le 14/09/2026. Titres et dates reproduits tels que fournis ou relevés sur la page ; ce
+   * sont des citations de tiers, jamais des formulations du site. `coverageDisclaimer`, qui les
+   * couvrait, n'est plus affiché depuis le 16/09/2026 (en veille, voir plus bas).
+   * `url` n'est renseignée QUE POUR LES ADRESSES OUVERTES ET VÉRIFIÉES, titre de page à l'appui. Un
+   * article sans adresse s'affichait avec son média et sa date, sans lien (arbitrage du
+   * 10/09/2026) ; depuis le 14/09/2026 il n'est plus repris du tout (filtre de press.ts), et
+   * revient avec son `url`.
    * Une adresse fausse sur un site financier réglementé coûte plus cher qu'un lien manquant, donc rien
    * n'est écrit ici sur la foi d'un résultat de recherche.
    * Apport du 14/09/2026 : l'équipe a transmis une liste d'adresses, toutes TRONQUÉES au collage. Les
@@ -642,7 +665,8 @@ export const press = {
   ],
   /**
    * Trois citations mises en avant, livrées par CORUM le 10/09/2026 avec leur média et leur date.
-   * Reproduites mot pour mot : ce sont des propos de tiers, couverts par `coverageDisclaimer`.
+   * Reproduites mot pour mot : ce sont des propos de tiers. `coverageDisclaimer`, qui les couvrait,
+   * n'est plus affiché depuis le 16/09/2026 : seule la mention du pied de page les accompagne.
    */
   quotes: [
     {
@@ -661,7 +685,12 @@ export const press = {
       date: { label: 'Mai 2026', iso: '2026-05' },
     },
   ],
-  /** Avertissement de fin de page, livré par CORUM le 10/09/2026 ; reproduit à l'identique. */
+  /**
+   * Avertissement de fin de page, livré par CORUM le 10/09/2026 ; reproduit à l'identique.
+   * EN VEILLE : retiré de /presse le 16/09/2026 (demande de l'équipe), gardé ici. Seul le contrôle
+   * de l'accueil de scripts/check-compliance.mjs le lit encore, et il dort (#presse-en-parle
+   * absente).
+   */
   coverageDisclaimer:
     'Les articles référencés sur cette page sont des publications indépendantes. Ils n’engagent pas CORUM Asset Management et ne constituent pas un conseil en investissement. Les informations publiées par la presse reflètent le contexte du lancement de R Start en mai 2026. Investir dans une SCPI comporte des risques, notamment de perte en capital. Les performances passées ne préjugent pas des performances futures.',
 } as const;

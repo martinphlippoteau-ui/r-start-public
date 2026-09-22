@@ -12,14 +12,15 @@
  *
  * SLOT « aside » (audit UX) : le texte est borné à 4xl pour rester lisible, ce qui laissait la moitié
  * droite de l'écran vide sur grand écran, un demi-écran de dégradé avant le premier contenu utile.
- * À partir de `lg`, la grille passe à 12 colonnes : le texte en occupe 7, l'aside 5, aligné en bas sur
- * la ligne risques. L'aside ne dit rien de neuf : il remonte une information déjà présente plus bas
- * dans la page (repère chiffré, sommaire, médias, contacts), jamais un texte inventé pour l'occasion.
- * Sous `lg`, il passe sous le texte, ou n'est simplement pas fourni par la page quand l'information
- * se trouve juste en dessous (cas de /documentation et /salle-de-presse, où la barre d'ancres et la
- * section contacts suivent immédiatement).
- * L'aside n'est jamais animé : sur /frais il porte des valeurs de frais, qui ne peuvent ni bouger ni
- * apparaître dans une taille différente les unes des autres.
+ * À partir de `lg`, la grille passe à 12 colonnes : le texte en occupe 7, l'aside 5, aligné en bas
+ * de la colonne de texte. L'aside ne dit rien de neuf : il remonte une information déjà présente plus
+ * bas dans la page, jamais un texte inventé pour l'occasion. Sous `lg`, il passe sous le texte, ou
+ * n'est pas rendu (`asideOnLarge`) quand l'information se trouve juste en dessous. SEULE
+ * /documentation en fournit un depuis la suppression de la salle de presse (22/09/2026) : son
+ * sommaire, rendu à partir de `lg` seulement, la barre d'ancres suivant immédiatement l'en-tête sur
+ * petit écran.
+ * L'aside n'est jamais animé : il a porté des valeurs de frais sur /frais, qui ne peuvent ni bouger
+ * ni apparaître dans une taille différente les unes des autres.
  *
  * Rythme vertical calibré pour la navigation collée (bandeau blanc dans le flux, non superposé).
  * Sous `sm`, les marges hautes sont resserrées et l'introduction comme la ligne risques passent
@@ -47,7 +48,7 @@ interface Props {
   /**
    * `true` : l'aside n'est rendu qu'à partir de `lg`. À réserver aux pages dont l'information de
    * l'aside se trouve immédiatement sous l'en-tête sur petit écran (barre d'ancres de /documentation,
-   * section contacts de /salle-de-presse) : l'y répéter ferait défiler deux fois la même chose.
+   * seule page à le passer) : l'y répéter ferait défiler deux fois la même chose.
    */
   asideOnLarge?: boolean;
   class?: string;
@@ -66,7 +67,7 @@ const titleId = id + '-title';
 const intros = intro === undefined ? [] : Array.isArray(intro) ? intro : [intro];
 const hasAside = Astro.slots.has('aside');
 /* PLUS DE SURTITRE depuis le 13/09/2026 : le fil d'Ariane tient ce rôle. La prop `eyebrow`, reçue sans
-   être rendue, et les sept valeurs qui ne s'affichaient nulle part sont retirées le 21/09/2026. */
+   être rendue, et les sept valeurs qui ne s'affichaient nulle part sont retirées le 22/09/2026. */
 ---
 
 <section

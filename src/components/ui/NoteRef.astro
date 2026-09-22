@@ -5,6 +5,8 @@ import { nav } from '@/content/fr/nav';
 import type { LegalNote } from '@/content/types';
 /**
  * Appel de note légale numérotée pointant vers la section Notes.
+ * EN VEILLE : le composant NE REND PLUS RIEN depuis le 14/09/2026 (`AFFICHER`, plus bas). Ce qui
+ * suit décrit le rendu qu'il retrouverait.
  * Couleur auto-adaptative au fond (AA sur les deux) :
  *  - teal-700 par défaut (4,98:1 sur blanc, ≥ 4,5:1 sur paper) ;
  *  - teal-200 dès qu'un ancêtre porte `text-white` (sections tone 'ink' / 'brand', cartes « glass ») :
@@ -45,9 +47,10 @@ const classes = [
  * NE REND PLUS RIEN depuis le 14/09/2026, demande de l'équipe : « enlève les notes et les sources de
  * tout le site sauf du tableau de la page frais ».
  *
- * La coupe est ici, et non dans les fichiers de contenu : les seize registres de notes restent intacts,
- * avec leurs sources, leurs dates et leurs renvois aux documents réglementaires. Rien n'est réécrit,
- * rien n'est perdu. Remettre `AFFICHER` à `true` rétablit tout, appels de note compris.
+ * La coupe est ici, et non dans les fichiers de contenu : les registres de notes restent intacts,
+ * avec leurs sources, leurs dates et leurs renvois aux documents réglementaires. Rien n'est réécrit.
+ * Seul celui de la salle de presse est parti avec elle le 22/09/2026 (l'historique git le garde).
+ * Remettre `AFFICHER` à `true` rétablit tout, appels de note compris.
  *
  * SEULE EXCEPTION CONSERVÉE sur le site : le bloc « Sources des données » sous le comparateur de
  * /frais (FeeComparator.astro). Il dit d'où viennent les taux des dix-sept SCPI nommées et à quelle

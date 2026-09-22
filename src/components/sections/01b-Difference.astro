@@ -1,19 +1,27 @@
 ---
 /**
- * Section 2, « Pourquoi gagnant-gagnant ? » (id « ce-qui-change »), zone 2 de la V2.
- * Réduite au texte fourni par l'équipe le 11/09/2026 : H2, question d'accroche en H3, la phrase qui
- * annonce les deux situations, les deux situations en liste, la conclusion, l'allégation de rang et un
- * lien vers le comparateur. Plus de cartes, plus de sur-titre, plus de mécanisme de réserve : la section
- * tient en un écran.
+ * Section 2, « Qui a envie de payer avant de gagner ? » (id « ce-qui-change »), zone 2 de la V2
+ * (« Pourquoi gagnant-gagnant ? » jusqu'au 15/09/2026).
+ * Réduite au texte fourni par l'équipe le 11/09/2026 : la question en H2, « R Start, un modèle de
+ * frais gagnant-gagnant » en H3 (titres permutés le 15/09/2026), la phrase qui annonce les deux
+ * situations, les deux situations en liste et la conclusion, face à une illustration. L'allégation
+ * de rang (retirée du contenu le 15/09/2026) et le lien vers le comparateur (retiré le 16/09/2026)
+ * n'y sont plus. Plus de cartes, plus de sur-titre, plus de mécanisme de réserve : la section tient
+ * en un écran.
  * Le bouton qui la fermait est devenu une PASTILLE FLOTTANTE (components/StickyCta.astro, rendue par la
  * page) : le lien vers le comparateur reste atteignable pendant toute la lecture.
  * Équilibre AMF : la section ne porte PLUS de couple avantage / risque depuis le 11/09/2026, le
  * contre-poids chiffré a été retiré sur demande réitérée de l'équipe, et le marquage `data-advantage`
- * avec lui, faute de frère. Les risques de l'accueil reposent sur la ligne du hero et sur la section
- * Risques ; le détail des frais vit sur /frais, atteinte par le lien de fin de section.
- * Deux formulations sont à défendre en compliance (voir l'en-tête de src/content/fr/difference.ts) ;
- * scripts/check-compliance.mjs les signale en avertissement à chaque exécution.
- * Motion (sobriété) : H2 mot à mot, H3 en fade-up. Rien d'autre ne bouge.
+ * avec lui, faute de frère. Les risques de l'accueil reposent sur la seule section Risques, la
+ * ligne du hero ne rendant plus rien depuis le 14/09/2026 ; le détail des frais vit sur /frais,
+ * atteinte par la pastille flottante, et le comparateur est affiché plus bas sur l'accueil
+ * (section 03).
+ * Les formulations à défendre en compliance sont dans l'en-tête de src/content/fr/difference.ts (la
+ * conclusion est toujours là, l'allégation de rang a quitté la section) ;
+ * scripts/check-compliance.mjs signale en avertissement, à chaque exécution, celles qui sont
+ * rendues, « gagnant-gagnant » compris.
+ * Motion (sobriété) : H2 mot à mot, H3 en fade-up, illustration révélée par `clip`. Rien d'autre ne
+ * bouge.
  * Contenu : src/content/fr/difference.ts.
  */
 import { Picture } from 'astro:assets';
@@ -30,10 +38,11 @@ const titleId = id + '-title';
 /**
  * Photo d'illustration à droite de la démonstration. Changée le 12/09/2026 : la précédente venait du jeu
  * `strategy`, déjà employé par la section Stratégie, ce qui faisait doublon sur le site. Celle-ci n'est
- * utilisée nulle part ailleurs.
+ * utilisée nulle part ailleurs. C'est un dessin depuis le passage aux illustrations, le 15/09/2026.
  * Purement décorative pour la conformité, elle n'énonce aucun avantage, elle n'entre donc dans aucun
- * couple avantage / risque. Crédit visible : R Start n'a pas de patrimoine, la photo ne représente aucun
- * immeuble détenu.
+ * couple avantage / risque. Son crédit dit que R Start n'a pas de patrimoine et que l'image ne
+ * représente aucun immeuble détenu ; il n'est plus affiché depuis le 15/09/2026 (AFFICHER_LEGENDES,
+ * media.ts), EN VEILLE comme toutes les légendes.
  */
 const photo = await resolveImage(media.documents.src);
 
@@ -52,8 +61,8 @@ const situations = (difference.situations ?? []).map((s) => {
 {
   /* `data-curtain` (11/09/2026, transition « à la Revolut ») : le hero, section précédente, est épinglé pendant
     que celle-ci glisse par-dessus (coins arrondis et ombre posés par la CSS [data-curtain]). Le hero contient
-    la ligne risques : le moteur se limite à épingler et recouvrir, sans recul ni fondu (scroll.ts). Sous 64 rem,
-    aucun épinglage : défilement normal. */
+    le H1 (et contenait la ligne risques) : le moteur se limite à épingler et recouvrir, sans recul
+    ni fondu (scroll.ts). Sous 64 rem, aucun épinglage : défilement normal. */
 }
 <Section id={id} tone="paper" data-curtain class="overflow-hidden">
   <Container size="wide">
@@ -77,8 +86,10 @@ const situations = (difference.situations ?? []).map((s) => {
       /* Le contre-poids chiffré (frais de gestion, cessions, retrait, coût total inconnu) a été retiré de
         cette section le 11/09/2026, sur demande réitérée de l'équipe après signalement. Le bloc ne porte
         donc plus `data-advantage` : sans contre-poids frère, le marquage serait faux et le contrôle
-        d'équilibre AMF le refuserait. Les risques de l'accueil reposent désormais sur la ligne du hero et
-        sur la section Risques ; le détail des frais reste sur /frais, atteinte par le lien ci-dessous. */
+        d'équilibre AMF le refuserait. Les risques de l'accueil reposent désormais sur la seule
+        section Risques (la ligne du hero ne rend plus rien) ; le détail des frais reste sur /frais,
+        atteinte par la pastille flottante depuis le retrait du lien de la section, le
+        16/09/2026. */
     }
     {
       /* CORPS À 18 PX FIXES depuis le 15/09/2026, et espacements resserrés d'un cran.
@@ -103,8 +114,9 @@ const situations = (difference.situations ?? []).map((s) => {
     }
         <div class="mt-10 text-lg text-ink sm:mt-14">
         {
-          /* La question d'accroche est un H3 (11/09/2026) : mise en valeur et nettement détachée du H2,
-            elle ouvre la démonstration au lieu de la commenter. */
+          /* Le H3 (11/09/2026) portait la question d'accroche ; depuis la permutation du
+            15/09/2026, la question est le H2 et le H3 nomme le modèle. Mis en valeur et nettement
+            détaché du H2, il ouvre la démonstration au lieu de la commenter. */
         }
         <h3
           data-animate="fade-up"

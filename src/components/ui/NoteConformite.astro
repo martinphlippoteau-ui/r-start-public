@@ -6,6 +6,9 @@
  * retiré les soixante et un « Bon à savoir » du site, le service conformité les replaçant lui-même.
  * Ce composant est le véhicule de ce replacement : il rend UNE mention, au texte exact fourni et à
  * l'endroit exact demandé, ni ailleurs, ni en plus.
+ * UN SEUL APPEL AUJOURD'HUI, sous les deux moteurs de /strategie (04-Strategy.astro), et il ne rend
+ * rien : `strategy.engines.disclaimer` est absent du contenu depuis le 16/09/2026 (strategy.ts dit
+ * comment le rétablir).
  *
  * POURQUOI IL NE PORTE PAS `data-risk`. Les garde-fous du projet, en particulier le contrôle qui exige
  * un contre-poids dans le même bloc que chaque [data-advantage], se réarment dès qu'un [data-risk]

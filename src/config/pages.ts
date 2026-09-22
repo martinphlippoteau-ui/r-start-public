@@ -3,11 +3,13 @@
  * cinq pages publiques au menu (Accueil, Les frais, Stratégie
  * d'investissement, La presse en parle, À propos, cette dernière en bout de menu). « Les outils » et les
  * quatre simulateurs sous /outil ont été SUPPRIMÉS le 14/09/2026, sur demande de l'équipe : ni page, ni
- * composants, ni contenu, ni entrée de menu. Documentation et salle
- * de presse sont hors menu, accessibles par le pied de page, la salle de presse en pied de
- * page, puis les pages légales. Le menu ne contient que des pages, jamais d'ancre de section.
- * La navigation unique (src/components/SiteNav.astro) suit `order` ; `inMenu` exclut les pages
- * légales. `navLabel` permet un libellé de navigation plus explicite que celui du fil d'Ariane.
+ * composants, ni contenu, ni entrée de menu. /documentation est hors menu depuis le 11/09/2026 et
+ * hors pied de page depuis le 16/09/2026 : on y arrive par la fenêtre « la souscription arrive
+ * bientôt » (SubscribeSoon.astro), tant que la souscription n'est pas ouverte. La salle de presse a
+ * été supprimée le 22/09/2026. Le menu ne contient que des pages, jamais d'ancre de section.
+ * La navigation unique (src/components/SiteNav.astro) suit `order` ; `inMenu` exclut /documentation
+ * et les pages légales. `navLabel` permet un libellé de navigation plus explicite que celui du fil
+ * d'Ariane.
  * (`hasSectionNav`, reliquat de la sous-navigation par sections, est retiré le 10/09/2026 : aucun
  * consommateur.)
  */
@@ -100,7 +102,7 @@ export const pages: Record<PageKey, PageMeta> = {
     path: '/documentation',
     label: 'Documentation',
     order: 7,
-    // Hors menu depuis le 11/09/2026 : accessible par le pied de page, comme la salle de presse.
+    // Hors menu depuis le 11/09/2026, et hors pied de page depuis le 16/09/2026 (voir en tête).
     inMenu: false,
   },
   /*

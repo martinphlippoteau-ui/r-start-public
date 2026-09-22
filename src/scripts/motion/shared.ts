@@ -88,7 +88,7 @@ export const parseFromTo = (spec: string, el: Element, attr = 'data-scrub'): Fro
 };
 
 /**
- * Pose `will-change` le temps d'une animation unique (révélation, compteur, dessin) et le retire à la
+ * Pose `will-change` le temps d'une animation unique (révélation, dessin) et le retire à la
  * fin avec les propriétés animées, pour rendre la main au navigateur (aucune couche résiduelle).
  */
 export const onceVars = (targets: gsap.TweenTarget, props: string): gsap.TweenVars => ({

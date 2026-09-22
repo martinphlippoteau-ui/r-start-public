@@ -5,14 +5,18 @@ import { shortRiskLine } from '@/content/fr/legal';
 
 /**
  * Section 1, Hero (id « apercu »), version minimale (décision du 10/09/2026, deux allègements successifs) :
- * H1 unique « R Start », pastille « Nouveau », accroche (facts.product.tagline), ligne risques importée de
- * legal.ts (jamais recopiée, jamais animée), deux CTA, photo plein cadre. Rien d'autre : ni définition, ni
- * frais, ni phrases pédagogiques, tout cela ouvre la zone 2 « Ce qui change vraiment » (difference.ts :
- * claim + pedagogy + counterweight), où l'allégation de rang est immédiatement suivie des frais réels,
- * dans le même bloc et à la même taille (règle AMF).
+ * surtitre (`eyebrow`), H1 unique « R Start » (texte masqué, le logo en tient lieu à l'écran),
+ * accroche (`tagline`), deux CTA, puis le bandeau Trustpilot et la mention de la société de gestion
+ * agréée (trust.ts). La pastille « Nouveau » et la photo plein cadre ont été retirées le
+ * 11/09/2026. La ligne risques importée de legal.ts (`riskLine`, jamais recopiée, jamais animée)
+ * est toujours passée au composant, mais RiskNote ne rend plus rien depuis le 14/09/2026 : elle est
+ * EN VEILLE. Rien d'autre : ni définition, ni frais, ni phrases pédagogiques, tout cela ouvre la
+ * zone 2 « Qui a envie de payer avant de gagner ? » (difference.ts). L'allégation de rang (`claim`,
+ * retirée le 15/09/2026) et le contre-poids chiffré des frais (`counterweight.risk`, EN VEILLE) n'y
+ * sont plus rendus.
  */
 
-/** Une seule note dans le hero : les frais réels (l'allégation bornée et son périmètre vivent en zone 2). */
+/** Une seule note dans le hero, les frais réels : EN VEILLE, comme toutes celles de l'accueil. */
 /** Espace insécable avant % (typographie française). */
 const nb = (t: string): string => t.replace(/ ([%€:;?!])/g, '\u00A0$1');
 
@@ -44,25 +48,34 @@ export const hero = {
    *    nomme les deux frais absents au lieu de laisser entendre qu'il n'y en a aucun ;
    *  - « LA PREMIÈRE SCPI » n'a pas de périmètre. C'est l'allégation de rang que
    *    scripts/check-compliance.mjs signale déjà ailleurs, faute de source, de date et de marché de
-   *    référence. La même page porte deux sections plus bas la version bornée, « la première SCPI DU
-   *    GROUPE CORUM sans frais d'entrée ni frais sur les achats d'immeubles » : les deux formulations
-   *    coexistent donc, l'une bornée, l'autre non.
-   * Le détail des frais réellement prélevés reste à un clic, dans la note `hero-frais`.
+   *    référence. La même page portait deux sections plus bas la version bornée, « la première SCPI
+   *    DU GROUPE CORUM sans frais d'entrée ni frais sur les achats d'immeubles » ; elle a été
+   *    retirée le 15/09/2026 (voir difference.ts) : l'accueil ne porte plus que la formulation non
+   *    bornée.
+   * Le détail des frais réellement prélevés était à un clic, dans la note `hero-frais` ; il ne
+   * l'est plus, la note n'étant plus rendue (registre de l'accueil vide, NoteRef coupé). Les frais
+   * restent affichés sur l'accueil par le comparateur de la section 03.
    */
   /* Sans point final depuis le 17/09/2026 (demande de Martin) : une accroche, pas une phrase. */
   tagline: 'La première SCPI sans frais de souscription ni frais d’acquisition',
   /**
-   * Contre-poids unique du hero. La phrase qui énumérait les frais prélevés a été retirée le 11/09/2026
-   * à la demande de l'équipe : le bloc ne porte plus que la ligne risques de legal.ts, reproduite mot
-   * pour mot et jamais réécrite. Le détail des frais reste À UN CLIC, dans la note `hero-frais` appelée
-   * en fin de ligne, c'est elle qui garde les 15 % de frais de gestion sur l'accueil.
+   * Contre-poids unique du hero, EN VEILLE : RiskNote ne rend plus rien depuis le 14/09/2026, le
+   * premier écran ne porte donc aucune mention de risque. La phrase qui énumérait les frais
+   * prélevés a été retirée le 11/09/2026 à la demande de l'équipe : le bloc ne portait plus que la
+   * ligne risques de legal.ts, reproduite mot pour mot et jamais réécrite, et la note `hero-frais`
+   * appelée en fin de ligne. Cette note n'est plus rendue non plus ; les 15 % de frais de gestion
+   * restent sur l'accueil par le comparateur de frais (section 03).
    * À défendre en compliance : l'accroche annonce une absence de frais d'entrée et les frais réellement
-   * prélevés ne sont plus énoncés au même endroit, seulement en note.
+   * prélevés ne sont plus énoncés au même endroit, ni même en note.
    */
   riskLine: nb(shortRiskLine),
   riskNoteId: 'hero-frais',
   primaryCta: { label: 'Souscrire en ligne', position: 'hero' },
-  /** CTA secondaire (11/09/2026) : il mène à la page Frais, seul accès au barème depuis l'accueil. */
+  /**
+   * CTA secondaire (11/09/2026) : il mène à la page Frais. Ce n'est plus le seul accès aux frais
+   * depuis l'accueil : la pastille flottante mène aussi à /frais, et le comparateur est affiché sur
+   * la page même depuis le 15/09/2026 (section 03).
+   */
   secondaryCta: {
     label: 'Comparer les frais',
     href: pages.fees.path,

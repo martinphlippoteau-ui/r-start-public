@@ -1,9 +1,10 @@
 ---
 /**
- * Comparateur de frais (11/09/2026) : R Start à gauche, une SCPI choisie dans une liste à droite, sept
- * lignes de frais. Le choix se fait sans rechargement, toutes les valeurs sont dans le HTML, le script
- * ne fait qu'afficher la colonne demandée. Sans script, la première SCPI reste affichée : le tableau est
- * complet et lisible.
+ * Comparateur de frais (11/09/2026) : R Start à gauche, une SCPI choisie dans une liste à droite,
+ * sept lignes de frais. Le choix se fait sans rechargement : les valeurs de toutes les SCPI
+ * voyagent dans le HTML, en bloc de données, et le script remplit la colonne demandée. SANS SCRIPT,
+ * la colonne de droite reste à « À compléter » sur chaque ligne et sa source au texte de repli
+ * (`sourceOthers`) : seule la colonne R Start se lit.
  *
  * C'est un VRAI TABLEAU (<table>, en-têtes de colonne et de ligne) : une comparaison de frais se lit
  * aussi au lecteur d'écran, et la liste déroulante vit dans l'en-tête de la colonne qu'elle change.
@@ -11,11 +12,14 @@
  * Conformité :
  *  - chaque taux porte `data-fee-value` dans un même `data-fee-block` : le contrôle vérifie qu'aucun
  *    frais n'est affiché plus petit que ses voisins (retour AMF sur la brochure) ;
- *  - tant qu'une valeur manque, un avertissement le dit en toutes lettres au-dessus du tableau, et le
- *    tableau ne prétend rien comparer ;
- *  - les sources sont sous le tableau, celle de R Start et celle, à venir, des autres SCPI ;
- *  - nommer une autre SCPI engage : le périmètre, l'encadré « Une innovation, pas une révolution » et la
- *    source de l'analyse restent exigés sur la page par scripts/check-compliance.mjs.
+ *  - une case sans valeur n'est jamais marquée « taux le plus bas ». L'avertissement prévu
+ *    au-dessus du tableau quand des taux manquent (`pendingNotice`) passe par RiskNote, qui ne rend
+ *    plus rien depuis le 14/09/2026 : il n'apparaît pas ;
+ *  - les sources sont sous le tableau, celle de R Start et celle de la SCPI choisie ;
+ *  - nommer une autre SCPI engage : scripts/check-compliance.mjs n'exige plus sur /frais que la
+ *    source (data-comparator-source). Le périmètre et l'encadré « Une innovation, pas une
+ *    révolution », retirés de l'écran le 14/09/2026, ne le sont plus ; leurs textes restent en
+ *    veille dans comparator.ts.
  * Contenu : src/content/fr/comparator.ts. Les taux de R Start viennent de facts.fees.
  */
 import { Image } from 'astro:assets';
@@ -90,8 +94,9 @@ const data = scpis.map((s) => ({
     )}
 
     {
-      /* Avertissement tant que les taux des autres SCPI ne sont pas relevés. Le script le masque dès que
-        la SCPI choisie est complète. */
+      /* Avertissement prévu tant que les taux de la SCPI choisie ne sont pas relevés ; le script
+        masque l'enveloppe dès qu'elle est complète ou documentée. EN VEILLE : RiskNote ne rend plus
+        rien depuis le 14/09/2026, l'enveloppe reste vide. */
     }
     <div data-comparator-pending>
       <RiskNote text={comparator.pendingNotice} size="lead" />
@@ -317,9 +322,11 @@ const data = scpis.map((s) => ({
 
 <script>
   /*
-   * Changement de colonne sans rechargement. Les valeurs sont passées telles quelles : le script ne
-   * calcule rien, il recopie. Une valeur absente reste le libellé « à compléter » et l'avertissement
-   * reste affiché, c'est la seule règle métier ici.
+   * Changement de colonne sans rechargement. Les valeurs sont passées telles quelles : le script
+   * les recopie, et ne calcule que la mise en avant du taux le plus bas de chaque ligne (règle plus
+   * bas). Une valeur absente affiche « à compléter » et laisse visible l'enveloppe de
+   * l'avertissement, vide tant que RiskNote ne rend rien ; si la SCPI a une source, elle affiche
+   * « non publié », sans avertissement.
    */
   (() => {
     /* Ce que le gabarit sérialise plus haut (`data`, dans l'en-tête du composant). `JSON.parse` rend

@@ -1,12 +1,15 @@
 ---
 /**
  * FAQ de la page /documentation (id « faq ») : questions importées de faq.ts via documentation.faq
- * (la question sur les risques est retirée tant que le DIC à jour n'est pas publié, voir documentation.ts).
+ * (les quatre premières depuis le 16/09/2026, puis un renvoi vers /faq, voir documentation.ts).
  * Même construction que la section FAQ de l'accueil : en-tête collant face aux accordéons natifs
  * <details name="faq" data-faq> (un seul ouvert à la fois), chevron animé en CSS, réponse en text-lead.
- * Dans chaque réponse, les paragraphes « avantage » (data-advantage) sont suivis, dans le même bloc et la
- * même taille, de leur contre-poids RiskNote (data-risk) : la coupure vient du contenu (item.riskFrom),
- * l'appel de note aussi (item.noteId, numéroté par NoteRef sur les notes de la page).
+ * Dans chaque réponse, les paragraphes « avantage » (data-advantage) seraient suivis, dans le même
+ * bloc et la même taille, de leur contre-poids RiskNote (data-risk) : la coupure vient du contenu
+ * (item.riskFrom), l'appel de note aussi (item.noteId, numéroté par NoteRef sur les notes de la
+ * page). AUCUNE QUESTION NE PORTE PLUS NI `riskFrom` NI `noteId` depuis la refonte de la FAQ
+ * (commit d289e0b, 16/09/2026) : chaque réponse est rendue en entier comme avantage, et les deux
+ * branches `item.noteId` ci-dessous ne sont jamais vraies.
  * Animation déclarative : seul chaque <summary> porte un fade-up ; aucun ancêtre des RiskNote n'est animé.
  * Le JSON-LD FAQPage n'est pas émis ici (réservé à l'accueil et à /frais, plan §12).
  * Contenu : documentation.faq et documentation.labels.
@@ -97,7 +100,10 @@ const items = faq.items.map((item) => {
                     {item.risks.map((risk) => (
                       <RiskNote text={risk} size="lead" />
                     ))}
-                    {/* Équivalent focusable du marqueur de la question, numéroté sur les notes de la page. */}
+                    {/* Équivalent focusable du marqueur de la question, numéroté sur les notes de
+                      la page. Branche jamais vraie aujourd'hui (aucun `noteId`). Si un `noteId`
+                      revenait alors que NoteRef reste coupé (AFFICHER = false), ce paragraphe
+                      afficherait « Source de cette réponse : » seul, sans appel derrière. */}
                     {item.noteId && (
                       <p class="text-base text-slate-700">
                         {labels.faqNoteLead}
@@ -111,8 +117,8 @@ const items = faq.items.map((item) => {
           }
         </ul>
         {
-          /* La page ne republie plus la FAQ entière de l'accueil : les questions non documentaires y
-            restent lisibles, à un lien d'ici. */
+          /* La page ne republie plus la FAQ entière : les autres questions restent lisibles sur
+            /faq, à un lien d'ici. */
         }
         {
           faq.fullFaqLink && (

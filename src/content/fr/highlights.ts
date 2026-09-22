@@ -3,21 +3,20 @@ import { income, product, risk, share, strategy, subscription } from '@/content/
 import { pages } from '@/config/pages';
 
 /**
- * Section 2, « R Start en six repères » (id « points-forts »).
- * Six encarts repris de la brochure partenaires 2026, p. 3 (ticket d'entrée, niveau de risque,
- * distribution des revenus potentiels, zone d'investissement, délai de jouissance), plus la
- * souscription 100 % en ligne (brochure p. 7).
- * Ordre : ticket d'entrée, niveau de risque en deuxième position (réunion produit du 10/09/2026, donc
- * haut dans la page), souscription 100 % en ligne en troisième (audit UX : le parcours avant le
- * fonctionnement), puis revenus, zone, jouissance. La valeur du niveau de risque est celle du document
- * d'informations clés, cité avec sa date : une communication commerciale ne peut pas contredire le DIC
- * (retour AMF sur la brochure, qui annonçait une autre valeur).
- * La carte zone ne parle plus de « stratégie diversifiée » (brochure) : le patrimoine peut être
- * concentré au démarrage (strategy.ts, pilier « Où »), le mot contredirait ce risque.
- * Chaque encart porte son contre-poids risque (champ `risk`), de longueur comparable à
- * `description` et rendu à la même taille : la page « modèle unique » de la brochure n'est jamais
- * reprise sans ses contreparties. Aucune donnée de performance, aucun exemple d'investissement.
- * Aucun chiffre en dur : tout vient de src/content/fr/facts.ts.
+ * Section 2, « R Start en un clin d'œil » (id « points-forts »), titre du document de l'équipe
+ * (14/09/2026).
+ * Six cartes (ticket d'entrée, niveau de risque, revenus potentiels, approche, horizon
+ * d'investissement, délai de jouissance), puis, à part, la souscription 100 % en ligne et les deux
+ * options automatiques (brochure partenaires 2026, p. 3, p. 5 et p. 7).
+ * Le niveau de risque est en deuxième position (réunion produit du 10/09/2026, donc haut dans la
+ * page). Sa valeur, 4 sur 7, est celle de l'équipe et de CORUM, pas celle du DIC (3 sur 7) : voir
+ * facts.risk, qui porte l'écart, et le commentaire du tableau plus bas. Sa note l'attribue à CORUM.
+ * Plus de carte « zone » depuis le 16/09/2026, remplacée par l'horizon d'investissement. La carte
+ * « Approche » dit « Diversifiée », mot que la brochure employait et que le contrôle de conformité
+ * signale : le patrimoine peut être concentré au démarrage (strategy.ts, pilier « Où »).
+ * Aucun encart ne porte plus de contre-poids risque : ni champ `risk` par carte, ni contre-poids de
+ * section (retiré le 14/09/2026, voir en bas du fichier). Aucune donnée de performance, aucun
+ * exemple d'investissement. Aucun chiffre en dur : tout vient de src/content/fr/facts.ts.
  */
 
 /** Espace insécable avant % € : ; ? ! : les libellés de facts.ts utilisent une espace simple. */
@@ -100,12 +99,15 @@ export const highlights: HighlightsContent = {
    * explication ouvre la FAQ, là où le document la place.
    *
    * TOUTES LES VALEURS SONT CELLES DU DOCUMENT (14/09/2026, demande explicite de le respecter à la
-   * lettre). Trois d'entre elles s'écartent des documents de référence ; l'équipe en a décidé ainsi, et
-   * le contrôle de conformité les signale désormais en avertissement, à chaque exécution :
-   *  - « Niveau de risque 4/7 » : le DIC hébergé sur ce site dit 3 sur 7. Voir facts.risk, qui porte
-   *    l'écart au complet. Plus aucune phrase du site n'attribue cette valeur au DIC ;
+   * lettre). Trois d'entre elles s'écartaient des documents de référence ; l'équipe en a décidé
+   * ainsi, et le contrôle de conformité les signale désormais en avertissement, à chaque
+   * exécution :
+   *  - « Niveau de risque 4/7 » : le DIC dit 3 sur 7 (il n'est plus hébergé sur ce site depuis le
+   *    18/09/2026). Voir facts.risk, qui porte l'écart au complet. Plus aucune phrase du site
+   *    n'attribue cette valeur au DIC ;
    *  - « Zone d'investissement : Monde » : le DIC borne la zone aux pays du Conseil de l'Europe, en
-   *    zone euro et hors zone euro, et au Canada. La note de cette ligne cite toujours le DIC ;
+   *    zone euro et hors zone euro, et au Canada. Carte remplacée le 16/09/2026 par l'horizon
+   *    d'investissement (voir plus bas), qui a gardé sa note, laquelle cite toujours le DIC ;
    *  - « Approche : Diversifiée » : R Start n'a pas encore de patrimoine à diversifier.
    * Aucun chiffre en dur : tout vient de src/content/fr/facts.ts.
    */
@@ -132,19 +134,20 @@ export const highlights: HighlightsContent = {
      * « HORIZON D'INVESTISSEMENT » REMPLACE « ZONE D'INVESTISSEMENT » le 16/09/2026, demande de
      * l'équipe. La carte disait « Monde », elle dit maintenant la durée.
      *
-     * HUIT ANS, CHOIX DE L'ÉQUIPE RÉITÉRÉ APRÈS MISE EN GARDE, et la Conformité doit l'avoir sous les
-     * yeux. Ce qui a été signalé et qui reste vrai :
+     * HUIT ANS, CHOIX DE L'ÉQUIPE RÉITÉRÉ APRÈS MISE EN GARDE, abandonné le 16/09/2026 : la carte
+     * dit dix ans (commentaire suivant). Ce qui avait été signalé :
      *  - le DIC donne une durée de placement recommandée de DIX ans (facts.ts,
      *    `risk.recommendedHoldingLabel`, sourcé « DIC, bulletin ») ;
      *  - le site affiche ces dix ans PARTOUT AILLEURS : dans la FAQ de cette même page, dans celle de
-     *    /faq, et dans les mentions légales. La carte les contredit donc à quelques écrans d'écart ;
+     *    /faq, et dans les mentions légales. La carte les contredisait à quelques écrans d'écart ;
      *  - les huit ans sont autre chose dans les documents : le seuil au-delà duquel R Start ne prélève
      *    plus de commission de retrait (`fees.withdrawal.zeroAfterYears`) ;
      *  - une communication commerciale ne peut pas contredire le DIC, et l'AMF l'a déjà relevé sur ce
      *    projet à propos de l'indicateur de risque.
-     * LA VALEUR EST ÉCRITE EN DUR, et pas tirée de `zeroAfterYears` : ce serait accréditer l'idée que
-     * l'horizon se déduit du barème de retrait, et un ajustement du barème changerait l'horizon en
-     * silence. `risk.recommendedHoldingLabel` reste la source à reprendre pour rétablir le DIC.
+     * LA VALEUR ÉTAIT ÉCRITE EN DUR, et pas tirée de `zeroAfterYears` : c'eût été accréditer l'idée
+     * que l'horizon se déduit du barème de retrait, et un ajustement du barème aurait changé
+     * l'horizon en silence. `risk.recommendedHoldingLabel` était la source à reprendre pour
+     * rétablir le DIC : c'est elle que la carte lit depuis le 16/09/2026.
      *
      * L'explication de la zone est partie avec elle : elle parlait de géographie.
      */
@@ -217,9 +220,10 @@ export const highlights: HighlightsContent = {
    * suffit de le réécrire ici pour le faire revenir. Le texte retiré était : « Ces repères décrivent le
    * produit, ils ne réduisent aucun de ses risques. Le capital n'est pas garanti… Durée de placement
    * recommandée : 10 ans. »
-   * Ce qu'il portait n'est pas perdu pour autant : la ligne risques du hero, jamais animée, ouvre la
-   * page avec la perte en capital, les revenus non garantis, la liquidité limitée et le risque de
-   * change ; la section Risques les détaille ; et chaque ligne du tableau garde son appel de note, qui
-   * donne sa source et sa limite.
+   * Ce qu'il portait n'a plus d'équivalent près du tableau : la ligne risques du hero, qui ouvrait
+   * la page avec la perte en capital, les revenus non garantis, la liquidité limitée et le risque
+   * de change, ne rend plus rien depuis le 14/09/2026 (RiskNote), et les appels de note des lignes,
+   * qui donnaient leur source et leur limite, sont coupés (NoteRef, AFFICHER = false). Reste la
+   * section Risques, plus bas sur l'accueil.
    */
 };

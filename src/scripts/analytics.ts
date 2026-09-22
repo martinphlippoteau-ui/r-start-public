@@ -6,8 +6,8 @@
  * que le conteneur n'est pas là.
  *
  * PARAMÈTRES JOINTS À CHAQUE ÉVÉNEMENT, posés une fois plutôt que répétés :
- *  - page_type             accueil · frais · strategie · presse · a-propos · documentation ·
- *                          salle-de-presse · legal · 404 (data-page-type sur <body>)
+ *  - page_type             accueil · frais · simulateur · strategie · faq · presse · a-propos ·
+ *                          documentation · legal · 404 (data-page-type sur <body>, tiré du chemin)
  *  - souscription_ouverte  oui · non : tant que le tunnel n'est pas ouvert, tous les appels aboutissent
  *                          à une fenêtre d'attente. Sans ce repère, les taux d'avant et d'après
  *                          l'ouverture seraient comparés sans que rien ne signale qu'ils ne mesurent

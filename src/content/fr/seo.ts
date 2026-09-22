@@ -13,7 +13,7 @@ import { product } from '@/content/fr/facts';
  * InvestmentFund, keywords = `seo.keywords`) et FAQPage, strictement les questions visibles de faq.ts.
  * Interdits : Product, Offer, AggregateRating (signaux marchands trompeurs sur un produit financier).
  *
- * NETTOYÉ LE 21/09/2026 : `seoH2` (un H2 proposé par section) et `faqQuestions` (dix questions visées)
+ * NETTOYÉ LE 22/09/2026 : `seoH2` (un H2 proposé par section) et `faqQuestions` (dix questions visées)
  * étaient deux références éditoriales sans lecteur, et périmées : elles visaient des sections et des
  * questions qui n'existent plus. Les requêtes cibles vivent dans `keywords`.
  */

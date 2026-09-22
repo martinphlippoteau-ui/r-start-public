@@ -13,11 +13,17 @@ const nb = (s: string): string => s.replace(/ ([%€:;?!])/g, '\u00A0$1');
 /**
  * Section « Risques » (id : risques).
  * Contre-poids global de la page : même poids visuel que les sections avantages (fond ink, même
- * typographie). Six risques, avertissement du bulletin in extenso, avertissement du DIC et les trois
- * puces de la commission d'arbitrage reproduits à l'identique depuis legal.ts.
+ * typographie). Quatre risques depuis le 16/09/2026 (voir `items`). L'avertissement du bulletin in
+ * extenso, celui du DIC et les trois puces de la commission d'arbitrage, reproduits à l'identique
+ * depuis legal.ts, sont aussi dans ce contenu, mais la section ne les rend plus depuis le
+ * 11/09/2026 : c'est MandatoryWarnings.astro qui les lit ici, sur /documentation.
  */
 
-/** Ordre de lecture des appels de note dans la section : sources (1er risque), sortie (liquidité), levier. */
+/**
+ * Ordre de lecture des appels de note dans la section : sources (1er risque), sortie (liquidité),
+ * levier (plus appelée depuis le retrait de ce risque, le 16/09/2026). Aucune n'est affichée :
+ * NoteRef est coupé.
+ */
 export const notes: LegalNote[] = [
   {
     id: 'risques-sources',
@@ -68,7 +74,8 @@ export const risks: RisksContent = {
    * LES DEUX DERNIERS RISQUES NE VIENNENT PAS DE corum.fr et sont PROPRES À R START : l'effet de levier
    * et l'absence d'historique (souscriptions ouvertes le 20 mai 2026). Les SCPI de corum.fr sont
    * établies depuis des années, elles n'ont pas le second, et c'est précisément ce qui distingue
-   * R Start d'elles. Ils sont donc gardés. À dire si l'équipe veut s'en tenir aux quatre de corum.fr.
+   * R Start d'elles. Ils avaient donc été gardés ; l'équipe a choisi le même jour de s'en tenir aux
+   * quatre de corum.fr, et ils ont été retirés (voir en fin de liste).
    */
   items: [
     {
@@ -105,8 +112,11 @@ export const risks: RisksContent = {
      * CE QUE LE SECOND EMPORTE, et la Conformité doit le savoir : c'était la SEULE occurrence de
      * « ne préjugent pas » sur l'accueil. scripts/check-compliance.mjs y signale une allégation de
      * performance passée sur des SCPI tierces « sans la mention que les performances passées ne
-     * préjugent pas des performances futures » : l'avertissement portait déjà, il porte désormais sans
-     * contrepartie nulle part dans la page. La mention subsiste sur /a-propos, /presse et /strategie.
+     * préjugent pas des performances futures » : l'avertissement portait déjà. Sur l'accueil, la
+     * mention ne subsiste que dans l'explication dépliable de la carte « Horizon d'investissement »
+     * (highlights.ts, texte de l'équipe du même jour), repliée par défaut mais présente dans le
+     * HTML. Ailleurs, elle reste sur /a-propos, sous la gamme en chiffres ; elle a quitté /presse
+     * avec l'avertissement de la revue (16/09/2026), et /strategie ne la porte pas.
      * Les deux textes sont ci-dessus, une minute pour les rétablir.
      */
   ],

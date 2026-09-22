@@ -36,8 +36,9 @@ const norm = (s) =>
     .trim();
 /**
  * Retire les citations de tiers (titres d'articles, extraits) avant le contrôle des formulations
- * interdites : ce sont des propos rapportés, marqués `data-press-quote` dans le HTML et couverts par
- * l'avertissement de la page « La presse en parle » (plan §5). Tout le reste de la page reste contrôlé.
+ * interdites : ce sont des propos rapportés, marqués `data-press-quote` dans le HTML (plan §5).
+ * L'avertissement de la page « La presse en parle » qui les couvrait a été retiré le 16/09/2026 ;
+ * son absence est signalée à chaque exécution. Tout le reste de la page reste contrôlé.
  */
 const stripPressQuotes = (html) =>
   html.replace(/<([a-z]+)[^>]*\sdata-press-quote[^>]*>[\s\S]*?<\/\1>/gi, ' ');
@@ -375,8 +376,9 @@ async function checkIndex() {
   // « La presse en parle » : la section a quitté l'accueil le 11/09/2026, puis son composant
   // (08b-Press.astro) et son contenu (pressHome.ts) ont été SUPPRIMÉS le 15/09/2026. Ce contrôle ne peut
   // donc plus se déclencher aujourd'hui. Il est gardé tel quel : il est le filet qui attend le retour
-  // d'une revue de presse sur l'accueil, et il exigera alors ce qu'exige déjà /presse, citations de tiers
-  // marquées data-press-quote et avertissement de couverture présent. Rien à corriger tant qu'il dort.
+  // d'une revue de presse sur l'accueil, et il exigera alors l'avertissement de couverture et des
+  // citations de tiers marquées data-press-quote. Plus exigeant que /presse, qui ne réclame plus
+  // l'avertissement depuis le 16/09/2026. Rien à corriger tant qu'il dort.
   const pressMatch = html.match(/<section[^>]*id="presse-en-parle"[^>]*>[\s\S]*?<\/section>/i);
   if (pressMatch) {
     const press = pressMatch[0];
@@ -565,7 +567,10 @@ async function checkSimulateur() {
   });
 }
 
-/** Sous-pages produit : mêmes interdits, ligne risques dans l'en-tête, mentions obligatoires, structure. */
+/**
+ * Sous-pages produit : mêmes interdits, mentions obligatoires, structure. La ligne risques de
+ * l'en-tête n'y est plus exigée depuis le 14/09/2026 (voir plus bas).
+ */
 async function checkSubPages() {
   for (const p of [
     'frais',
@@ -586,21 +591,25 @@ async function checkSubPages() {
     }
     const text = toText(html);
     // Sur « La presse en parle », les citations de tiers sont exclues du contrôle des formulations
-    // interdites (elles portent data-press-quote) ; l'avertissement qui les couvre est exigé.
+    // interdites (elles portent data-press-quote). L'avertissement qui les couvrait n'est plus
+    // exigé depuis le 16/09/2026 : son absence est signalée plus bas, en avertissement.
     checkForbidden(p === 'presse' ? toText(stripPressQuotes(html)) : text, p);
     checkHeroClaims(text, p);
     /*
-     * LA LIGNE RISQUES N'EST PLUS EXIGÉE SUR LES SOUS-PAGES depuis le 14/09/2026, demande expresse de
-     * l'équipe : « supprime les bon à savoir de tous les hero sauf celui de la home ». Le « Bon à
-     * savoir : … » sous le H1 a disparu de toutes les sous-pages ; seul l'accueil le porte, et checkIndex
-     * continue de l'y exiger.
+     * LA LIGNE RISQUES N'EST PLUS EXIGÉE SUR LES SOUS-PAGES depuis le 14/09/2026, demande expresse
+     * de l'équipe : « supprime les bon à savoir de tous les hero sauf celui de la home ». Le « Bon
+     * à savoir : … » sous le H1 a disparu de toutes les sous-pages. L'accueil ne le porte plus non
+     * plus : sa ligne passe par RiskNote, qui ne rend plus rien depuis le même jour, et checkIndex
+     * ne l'exige plus (exigence commentée plus haut). La ligne ne figure plus que dans les mentions
+     * légales.
      *
-     * CE QUE CELA CHANGE, ET QUI DOIT ÊTRE SU : une sous-page peut désormais être publiée sans aucune
-     * mention de risque dans son en-tête. Ce qui protège encore ces pages, c'est le contenu de leurs
-     * propres sections (contre-poids [data-risk], toujours contrôlés) et le pied de page, présent
-     * partout : mention de caractère commercial et visa AMF, tous deux exigés juste en dessous.
-     * Pour rétablir : décommenter la ligne, et remettre `riskLine: shortRiskLine` dans les en-têtes de
-     * aboutPage.ts, press.ts, pressRoom.ts, documentation.ts, feesPage.ts et strategyPage.ts.
+     * CE QUE CELA CHANGE, ET QUI DOIT ÊTRE SU : une sous-page peut désormais être publiée sans
+     * aucune mention de risque dans son en-tête. Aucun contre-poids [data-risk] n'est plus rendu
+     * dans leurs sections non plus. Ce qui protège encore ces pages, c'est leur texte quand il en
+     * porte (les avertissements réglementaires de /documentation, exigés plus bas) et le pied de
+     * page, présent partout : mention de caractère commercial et visa AMF, tous deux exigés juste
+     * en dessous. Pour rétablir : décommenter la ligne, et remettre `riskLine: shortRiskLine` dans
+     * les en-têtes de aboutPage.ts, press.ts, documentation.ts, feesPage.ts et strategyPage.ts.
      */
     // requirePhrase(text, legal.shortRiskLine, 'ligne risques (en-tête de page)', file);
     requirePhrase(text, legal.commercialNotice, 'mention 1 (caractère commercial)', file);
@@ -669,8 +678,11 @@ async function checkSubPages() {
         errors.push(file + ' : aucune citation marquée data-press-quote (contrôle inopérant)');
     }
     if (p === 'frais') {
-      // Bascule des frais : une SCPI du panel ne peut être citée que dans le périmètre de l'analyse,
-      // et l'encadré « Une innovation, pas une révolution » accompagne toujours la comparaison.
+      // SCPI nommées sur /frais. Écrit pour la bascule des frais (en veille depuis le 11/09/2026),
+      // le contrôle vise aujourd'hui le comparateur, qui nomme des SCPI du panel. Il n'exige plus
+      // que la source : le périmètre et l'encadré « Une innovation, pas une révolution », qui
+      // accompagnaient la comparaison, ont quitté l'écran le 14/09/2026 (exigences commentées
+      // ci-dessous).
       const lower = text.toLowerCase();
       const named = marketComparison.panel.filter((n) => lower.includes(norm(n).toLowerCase()));
       if (named.length) {

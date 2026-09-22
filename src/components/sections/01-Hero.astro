@@ -7,26 +7,32 @@
  * La section est `isolate` ; sa hauteur minimale est le premier écran moins la barre (3,5 rem, dans le
  * flux) : le hero remplit exactement la première vue.
  * H1 porté par le logo R Start (texte du titre en visually-hidden ; image décorative, aria-hidden). Le
- * H1 réserve la place du logo en CSS (.hero-logo-wrap) : aucun décalage de mise en page. Puis surtitre +
- * pastille, accroche, ligne risques (jamais animée, opacité 1), deux CTA.
+ * bloc du logo réserve sa place en CSS (.hero-logo-wrap) : aucun décalage de mise en page. Puis
+ * surtitre, accroche, deux CTA, l'emplacement de la ligne risques, les avis et la mention AMF (la
+ * pastille « Nouveau » est retirée depuis le 11/09/2026).
+ * LIGNE RISQUES EN VEILLE : l'appel <RiskNote> est toujours là, sous les CTA, mais RiskNote ne rend
+ * plus rien depuis le 14/09/2026 : le premier écran ne porte aucune mention de risque. Les règles
+ * de mise en page qui la citent ci-dessous sont gardées pour son retour.
  * Le VOL DE LA MARQUE vers la barre est retiré le 12/09/2026 : la barre est désormais identique sur tout
  * le site, pleine dès le premier pixel, il n'y a plus de place vide où poser le logo.
- * LCP : le logo (eager) ou l'accroche, jamais d'animation d'opacité dessus : l'accroche entre par
- * transform seul (`data-intro-move`), c'est le cas de TOUS les textes et des CTA depuis le 11/09/2026 :
+ * LCP : le logo (eager) ou l'accroche. Aucun texte n'entre par l'opacité, ni les CTA, depuis le
+ * 11/09/2026 (transform ou `clip-path`, voir global.css ; l'accroche se découvre mot à mot) :
  * un contrôle d'accessibilité qui mesure la page pendant la cascade voyait le bouton à 30 % d'opacité, donc
- * un contraste de 1,19:1 (axe, reproductible). Le logo n'a ni data-intro ni data-animate ; plus d'image à
- * précharger. Un futur visuel du hero devra n'avoir qu'UNE définition (largeurs, format, `sizes`),
- * reprise par la balise <Image> et par le <link rel="preload"> d'index.astro : c'était le rôle de
- * src/lib/hero-image.ts, resté vide du 11/09 au 19/09/2026 puis supprimé.
- * Motion (src/scripts/motion.ts), orchestration d'ouverture (11/09/2026) :
- *  - la marque est le point fixe : peinte au premier rendu (candidat LCP, descendante du H1 : le moteur
- *    refuse tout effet sur elle), elle est le rang 0 autour duquel la cascade `data-intro` (CSS pur,
- *    500 ms expo.out, 70 ms par rang) se construit : surtitre (1, opacité + transform), accroche (2,
- *    transform seul), CTA (3), jamais le H1 ni la RiskNote, qui sont là d'emblée ;
- *  - second temps, au défilement (du défilement 0 à la moitié d'un écran, repère `html`),
- *    surtitre et accroche reculent vers le haut (y −20 px) et les CTA vers le bas (y +10 px), tous à
- *    35 % d'opacité (enveloppes `data-scrub`, transform/opacity, réversibles). Ils s'écartent ainsi de
- *    la ligne risques, hors de ces enveloppes, qui ne bouge pas et reste à opacité 1.
+ * un contraste de 1,19:1 (axe, reproductible). Le logo, image décorative, entre au rang 1 de la
+ * cascade avec un fondu bref, admis parce qu'il n'y a pas de texte à mesurer (global.css) ; plus
+ * d'image à précharger. Un futur visuel du hero devra n'avoir qu'UNE définition (largeurs, format,
+ * `sizes`), reprise par la balise <Image> et par le <link rel="preload"> d'index.astro : c'était le
+ * rôle de src/lib/hero-image.ts, resté vide du 11/09 au 19/09/2026 puis supprimé.
+ * Motion (src/scripts/motion.ts), orchestration d'ouverture (11/09/2026, reprise depuis) :
+ *  - cascade `data-intro` en CSS pur, réglée dans global.css (`html.intro #apercu`) : logo (1),
+ *    surtitre (2), accroche mot à mot (3), CTA (4), enveloppe de la ligne risques (5, vide tant que
+ *    RiskNote ne rend rien), avis et mention AMF (6), invitation à défiler (7). Le H1, masqué,
+ *    n'est jamais animé ;
+ *  - second temps, au défilement (sur les 30 premiers % d'un écran, repère `html`, `flightScrub`
+ *    plus bas) : surtitre et accroche montent, CTA, avis et flèche descendent, chacun avec son
+ *    amplitude, en s'effaçant (enveloppes `data-scrub`, transform/opacity, réversibles) ; le logo
+ *    grandit et se floute ensuite. L'enveloppe de la ligne risques reste hors de ces enveloppes, à
+ *    opacité 1.
  * Sous « sm », le contenu n'est PAS centré, il est calé en haut : centré, il chasserait les CTA et la
  * ligne risques sous la ligne de flottaison d'un petit écran. Il reçoit donc une respiration explicite
  * de 2,5 rem sous la barre (12/09/2026) : sans elle le surtitre démarrait exactement au bas de la barre,
@@ -61,10 +67,11 @@ const titleId = sections.hero.id + '-title';
 const showEyebrow = hero.eyebrow.trim() !== '';
 /**
  * Transition d'ouverture (11/09/2026, mécanique observée sur revolut.com) : le hero est épinglé par le rideau
- * de la section suivante (02-Highlights, data-curtain) qui glisse par-dessus ; pendant ce temps les textes
- * montent et s'effacent vite, sur les 30 premiers % d'un écran de défilement (repère `html`, `top top`), et
- * le halo se pose (dézoom, couche de fond ci-dessous). La ligne risques n'est dans aucune de ces
- * enveloppes : elle reste en place jusqu'à être recouverte.
+ * de la section suivante (01b-Difference, data-curtain) qui glisse par-dessus ; pendant ce temps
+ * les textes montent et s'effacent vite, sur les 30 premiers % d'un écran de défilement (repère
+ * `html`, `top top`), et le halo se pose (dézoom, couche de fond ci-dessous). L'enveloppe de la
+ * ligne risques (vide tant que RiskNote ne rend rien) n'est dans aucune de ces enveloppes : elle
+ * reste en place jusqu'à être recouverte.
  */
 /*
  * Sortie du hero au défilement : chaque élément part avec SON amplitude, jamais la même (idée reprise de
@@ -188,9 +195,10 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
         )
       }
       {
-        /* La pastille « Nouveau » se pose en haut à droite du logo (11/09/2026) : l'enveloppe `relative`
-          prend exactement la largeur réservée au logo (.hero-logo-wrap), la pastille s'accroche à son
-          angle. Elle est HORS du H1 (élément protégé du moteur) et s'efface avec le vol de la marque. */
+        /* L'enveloppe `relative` prend exactement la largeur réservée au logo (.hero-logo-wrap).
+          Elle a été posée le 11/09/2026 pour la pastille « Nouveau », accrochée à l'angle du logo
+          et retirée le même jour ; le vol de la marque, avec lequel elle s'effaçait, est parti le
+          12/09/2026. */
       }
       <div class="relative mx-auto w-fit max-sm:order-2">
         {
@@ -285,9 +293,10 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
               >{hero.primaryCta.label}</Button
             >
             {
-              /* Sous « sm », le bouton secondaire (simple ancre vers Points forts) cède la place : les CTA
-              et la ligne risques doivent rester au-dessus du bandeau cookies (tests/conformite.spec.ts).
-              Le défilement mène au même endroit. */
+              /* Sous « sm », le bouton secondaire (lien vers la page /frais) cède la place : les
+              CTA et la ligne risques, le jour où elle revient, doivent rester au-dessus du bandeau
+              cookies (tests/conformite.spec.ts). Le comparateur de frais reste atteignable en
+              défilant : il est affiché sur l'accueil (section 03). */
             }
             <Button
               href={hero.secondaryCta.href}
@@ -300,14 +309,17 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
           </div>
         </div>
         {
-          /* Ligne risques SOUS les CTA (11/09/2026) : à toutes les largeurs, jamais animée, jamais atténuée. */
+          /* Ligne risques SOUS les CTA (11/09/2026) : à toutes les largeurs, jamais animée, jamais
+            atténuée. EMPLACEMENT VIDE depuis le 14/09/2026 : RiskNote ne rend plus rien,
+            l'enveloppe et l'appel restent en place pour son retour. */
         }
         {
           /* La ligne risques entre dans la séquence d'ouverture (11/09/2026, demande de l'équipe) : elle
-            apparaît APRÈS les CTA et AVANT les avis, donc le risque précède la réassurance. L'enveloppe
-            est en `display: contents` pour ne pas s'intercaler dans la mise en page. Le garde-fou AMF est
-            resserré en conséquence : une révélation AU SCROLL reste interdite au-dessus d'un [data-risk]
-            (on peut ne jamais y arriver), la cascade de chargement est admise (elle se termine seule). */
+            apparaît AVEC les CTA (même délai, global.css) et AVANT les avis, donc le risque précède
+            la réassurance. L'enveloppe ne porte aucune classe : elle ne sert qu'au rang 5. Le
+            garde-fou AMF est resserré en conséquence : une révélation AU SCROLL reste interdite
+            au-dessus d'un [data-risk] (on peut ne jamais y arriver), la cascade de chargement est
+            admise (elle se termine seule). */
         }
         <div data-intro="5" data-intro-move>
           <RiskNote
@@ -320,10 +332,11 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
         </div>
         {
           /* TrustBox officiel (11/09/2026, code d'intégration fourni par l'équipe) : la réassurance sur le
-            distributeur arrive au premier écran, sous la ligne risques. Jamais dans une enveloppe animée ,
-            il est voisin de [data-risk], que le moteur doit trouver hors de tout parent animé, mais il
-            ferme la séquence d'ouverture (rang 5). Sa portée est dite juste dessous : les avis parlent de
-            CORUM L'Épargne, pas de R Start. */
+            distributeur arrive au premier écran, sous l'emplacement de la ligne risques. Il est
+            dans une enveloppe animée (`copyScrubDown`, recul au défilement) et entre au rang 6 de
+            l'ouverture ; seule l'invitation à défiler (rang 7) vient après. Sa portée (les avis
+            parlent de CORUM L'Épargne, pas de R Start) n'est plus dite à l'écran depuis le retrait
+            de la légende, le 15/09/2026 (voir plus bas). */
         }
         {
           /* La PASTILLE AMF rejoint les avis le 15/09/2026. Les deux réassurances sont mises côte à côte
@@ -346,18 +359,21 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
                 /* LÉGENDE RETIRÉE LE 15/09/2026, demande de l'équipe (« Enlever disclaimer »). Elle
                   disait « Avis sur CORUM L'Épargne, distributeur de R Start. », c'est-à-dire la portée
                   des avis : ils concernent le distributeur, pas la SCPI. Le texte n'est pas supprimé,
-                  il reste dans trust.ts (`trustpilot.heroCaption`) et sa version longue (`scope`) est
-                  toujours rendue par le bloc de confiance plus bas dans la page.
+                  il reste dans trust.ts (`trustpilot.heroCaption`), EN VEILLE, comme sa version
+                  longue (`scope`), qui n'est rendue nulle part non plus.
                   À signaler à la Conformité : c'est la seconde mention retirée de ce même widget, après
                   la divulgation du filtre 4 et 5 étoiles (PUBLIC_TRUSTBOX_CROP). */
               }
             </div>
             {
-              /* Le logo est posé sur une PLAQUE BLANCHE, et ce n'est pas une coquetterie : il est en
-                #003867 et #DB002E sur fond transparent, or le hero est en #03242e. Le bleu marine du
-                logo s'y confondrait presque entièrement avec le fond.
-                Le numéro d'agrément a été retiré de la pastille le 15/09/2026 ; il reste dans le bloc
-                de confiance plus bas, avec sa note légale. */
+              /* PLUS DE LOGO NI DE PLAQUE BLANCHE ici depuis le 15/09/2026 (voir plus bas). La
+                plaque n'était pas une coquetterie : le logo de l'AMF est en #003867 et #DB002E sur
+                fond transparent, or le hero est en #03242e, où son bleu marine se confondait
+                presque entièrement avec le fond. Logo et plaque ont reparu ensemble le 16/09/2026
+                sur /a-propos (CorumRange.astro).
+                Le numéro d'agrément a été retiré de la pastille le 15/09/2026 ; sur cette page, il
+                reste dans la mention légale du pied de page (bloc « Société de gestion »), et le
+                cadre réglementaire de /documentation le donne aussi. */
             }
             {
               /* ALIGNEMENT CENTRÉ depuis le 15/09/2026 : la colonne des avis fait 28 px, la mention
@@ -371,8 +387,9 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
                * MENTION DE RÉASSURANCE, à côté des avis. Elle a porté le LOGO DE L'AMF quelques heures
                * le 15/09/2026, avant que l'équipe demande de revenir à la mention seule : l'AMF ne
                * concède pas son logo aux communications commerciales, et le fichier venait de Wikipédia
-               * France au titre d'un usage non libre. Le retrait règle les deux points. Le fichier reste
-               * dans src/assets/logos/amf.svg, inutilisé.
+               * France au titre d'un usage non libre. Le retrait règle les deux points ici. Le
+               * fichier, src/assets/logos/amf.svg, sert depuis le 16/09/2026 à l'écusson de
+               * /a-propos (CorumRange.astro), où l'équipe l'a voulu en connaissance de cause.
                *
                * LE PICTO EST LE NÔTRE, dessiné au trait (ui/Picto.astro), donc sans marque déposée.
                * FRONTON À COLONNES, EN SABLE, 24 px, PLEINE OPACITÉ : choix de l'équipe du 16/09/2026,

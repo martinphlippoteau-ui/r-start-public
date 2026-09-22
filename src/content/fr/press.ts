@@ -5,14 +5,17 @@ import { press as pressFacts } from '@/content/fr/facts';
 /**
  * Page /presse, « La presse en parle » (grand public, arbitrage du 10/09/2026).
  * Trois citations mises en avant, la revue des articles reliés avec leur média et leur date, puis
- * l'avertissement livré par CORUM. Les communiqués, les contacts et le kit média ont quitté cette page :
- * ils vivent sur /salle-de-presse (pressRoom.ts), en pied de page seulement.
+ * les contacts presse (zone 4, `contacts`). L'avertissement livré par CORUM n'est plus rendu depuis
+ * le 16/09/2026 (voir `coverage`). La salle de presse (/salle-de-presse), qui portait les
+ * communiqués et le kit média, a été désactivée le 15/09/2026 puis supprimée le 22/09/2026, avec
+ * pressRoom.ts : les contacts, sa seule partie vivante, sont venus ici.
  *
  * Règles appliquées :
- *  - les titres et les citations sont des propos de tiers, reproduits mot pour mot depuis facts.ts et
- *    couverts par `coverage.disclaimer` ; ils ne sont ni réécrits ni neutralisés (le filtre historique
- *    sur « sans frais » est retiré, plan §5). L'introduction de la revue rappelle, dans le même bloc,
- *    les frais réellement prélevés par R Start : R Start n'est pas une SCPI sans frais ;
+ *  - les titres et les citations sont des propos de tiers, reproduits mot pour mot depuis
+ *    facts.ts ; ils ne sont ni réécrits ni neutralisés (le filtre historique sur « sans frais » est
+ *    retiré, plan §5). Ils étaient couverts par l'avertissement de la revue et par son
+ *    introduction, qui rappelait dans le même bloc les frais réellement prélevés : les deux ont été
+ *    retirés le 16/09/2026 (voir `coverage`), R Start n'est pourtant pas une SCPI sans frais ;
  *  - un article dont l'adresse n'a pas été vérifiée N'EST PAS REPRIS (14/09/2026) : il reste dans
  *    facts.ts et revient de lui-même le jour où son adresse est renseignée ;
  *  - aucun logo de média (aucune licence) : les noms sont en typographie ;
@@ -101,9 +104,12 @@ export const press: PressContent = {
     intro: 'Découvrez les derniers articles parus',
     /* Plus de ligne risques dans l'en-tête (14/09/2026, demande de l'équipe : « supprime les bon à
        savoir de tous les hero sauf celui de la home »). Le « Bon à savoir : … » sous le H1 a disparu de
-       TOUTES les sous-pages ; seul l'accueil le garde, sous ses appels à l'action. Ces pages n'ont donc
-       plus de mention de risque dans leur en-tête : il reste celles de leur contenu quand elles en ont,
-       et le pied de page, commun à tout le site. À rétablir en remettant `riskLine: shortRiskLine`. */
+       TOUTES les sous-pages ; celui de l'accueil, gardé ce jour-là, ne s'affiche plus non plus
+       depuis que RiskNote ne rend plus rien (même jour). Ces pages n'ont donc plus de mention de
+       risque dans leur en-tête : il reste celles de leur contenu quand elles en ont, et le pied de
+       page, commun à tout le site. Pour la rétablir, `riskLine: shortRiskLine` ici ne suffit plus :
+       la page doit aussi la passer à PageHero (`riskLine={hero.riskLine}`), et RiskNote doit rendre
+       de nouveau. */
   },
 
   quotes: {

@@ -2,6 +2,8 @@
 /**
  * Section « Notes » : liste ordonnée des notes légales (sources, dates, définitions), numérotées
  * dans l'ordre des sections. Chaque item porte l'ancre `${sections.notes.id}-${n}` ciblée par NoteRef.
+ * EN VEILLE : le composant NE REND PLUS RIEN depuis le 14/09/2026 (`AFFICHER`, plus bas). Ce qui
+ * suit décrit le rendu qu'il retrouverait.
  * Prop optionnelle `notes` : une sous-page rend ses propres notes (export `notes` de son fichier de
  * contenu, numérotées par son appel de note local) ; sans prop, le registre de l'accueil (allNotes).
  *
@@ -40,9 +42,10 @@ const toggleLabel = (footer.notesToggleLabel ?? '{n}').replace('{n}', String(not
  * NE REND PLUS RIEN depuis le 14/09/2026, demande de l'équipe : « enlève les notes et les sources de
  * tout le site sauf du tableau de la page frais ».
  *
- * La coupe est ici, et non dans les fichiers de contenu : les seize registres de notes restent intacts,
- * avec leurs sources, leurs dates et leurs renvois aux documents réglementaires. Rien n'est réécrit,
- * rien n'est perdu. Remettre `AFFICHER` à `true` rétablit tout, appels de note compris.
+ * La coupe est ici, et non dans les fichiers de contenu : les registres de notes restent intacts,
+ * avec leurs sources, leurs dates et leurs renvois aux documents réglementaires. Rien n'est réécrit.
+ * Seul celui de la salle de presse est parti avec elle le 22/09/2026 (l'historique git le garde).
+ * Remettre `AFFICHER` à `true` rétablit tout, appels de note compris.
  *
  * SEULE EXCEPTION CONSERVÉE sur le site : le bloc « Sources des données » sous le comparateur de
  * /frais (FeeComparator.astro). Il dit d'où viennent les taux des dix-sept SCPI nommées et à quelle

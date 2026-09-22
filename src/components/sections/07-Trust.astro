@@ -1,23 +1,27 @@
 ---
 /**
- * Section 7, « L'expérience derrière R Start » (id « corum »), rendue sur l'accueil seulement.
+ * Section 7, « Le groupe CORUM en quelques chiffres » (id « corum » ; « L'expérience derrière
+ * R Start » jusqu'au 15/09/2026), rendue sur l'accueil seulement.
  *
- * CE QU'ELLE REND AUJOURD'HUI, et rien d'autre : un H2, un H3 « Les avis sur CORUM L'Épargne », le
- * carrousel Trustpilot officiel, son lien externe et le renvoi vers /a-propos. Elle a beaucoup maigri :
- * le cadre réglementaire est passé sur /documentation le 11/09/2026 ; les quatre chiffres du groupe,
- * les logos de la gamme et le bloc « rémunération sur les ventes » ont suivi sur /a-propos ; les
- * contre-poids qu'elle portait ne sont plus rendus depuis la neutralisation de RiskNote le 14/09/2026.
+ * CE QU'ELLE REND AUJOURD'HUI, et rien d'autre : un H2, le bandeau des chiffres du groupe
+ * (`trust.stats`) et le renvoi vers /a-propos. Elle a beaucoup maigri : le cadre réglementaire est
+ * passé sur /documentation le 11/09/2026 ; la gamme est partie sur /a-propos (CorumRange.astro) ;
+ * le bloc « rémunération sur les ventes » a quitté l'accueil le 11/09/2026 et n'est rendu nulle
+ * part (EN VEILLE dans corum.ts) ; les avis Trustpilot (H3, carrousel officiel, lien externe) sont
+ * descendus au bas de /a-propos le 15/09/2026 (ui/TrustpilotReviews.astro) ; les contre-poids
+ * qu'elle portait ne sont plus rendus depuis la neutralisation de RiskNote le 14/09/2026.
  *
- * Aucun logo AMF, aucune photo (droits media.corum non confirmés). Le logo Trustpilot, les étoiles et
- * les avis viennent du TrustBox OFFICIEL (ui/TrustBox.astro), donc de Trustpilot, pas du site
- * (11/09/2026). Le carrousel est FILTRÉ sur 4 et 5 étoiles depuis le 15/09/2026 : il ne présente que
- * les avis favorables, et le texte qui l'accompagne le dit.
+ * Aucun logo AMF, aucune photo (droits media.corum non confirmés). Le carrousel Trustpilot, FILTRÉ
+ * sur 4 et 5 étoiles depuis le 15/09/2026, n'est plus ici : voir ui/TrustBox.astro pour ce que ce
+ * filtre implique.
  *
- * FOND BLANC, et c'est une contrainte, pas un choix : sur fond bleu, l'iframe Trustpilot affichait son
- * propre texte gris clair sur ses cartes blanches, à 1,85:1 (six violations axe). Le fond a été échangé
- * avec « R Start en un clin d'œil », qui est passé en bleu.
+ * FOND BLANC, choisi comme une contrainte tant que la section portait le carrousel : sur fond bleu,
+ * l'iframe Trustpilot affichait son propre texte gris clair sur ses cartes blanches, à 1,85:1 (six
+ * violations axe). Le fond a été échangé avec « R Start en un clin d'œil », qui est passé en bleu.
+ * Les avis sont partis le 15/09/2026, le fond est resté.
  *
- * Motion : un seul effet d'entrée, sur le bloc d'avis. Aucun rideau ne la recouvre.
+ * Motion : le H2 entre mot à mot (SectionHeading `motion`) ; le bandeau et le bouton sont
+ * statiques. Aucun rideau ne la recouvre.
  */
 import Button from '@/components/ui/Button.astro';
 import Container from '@/components/ui/Container.astro';
@@ -33,12 +37,17 @@ import { trust } from '@/content/fr/trust';
 const id = sections.corum.id;
 const { stats } = trust;
 
-/** Gamme en texte (décision du 09/09/2026 : seuls les logos R Start et CORUM L'Épargne sont utilisés sur le site). */
+/*
+ * Plus de gamme dans cette section depuis le 11/09/2026 : elle vit sur /a-propos. Elle y était en
+ * texte (décision du 09/09/2026 : seuls les logos R Start et CORUM L'Épargne sur le site) ; c'est
+ * une grille de chiffres depuis le 16/09/2026, et l'écusson de l'AMF y a rejoint ces deux logos le
+ * même jour.
+ */
 
 ---
 
 <Section id={id} tone="white" spacing="none">
-  <!-- Bande blanche : en-tête, avis Trustpilot, renvoi vers /a-propos -->
+  <!-- Bande blanche : en-tête, chiffres du groupe, renvoi vers /a-propos -->
   {/* `pt-section-sm` et non `py-section` (15/09/2026) : la marge haute valait 10vw, soit 138 px sur
     un écran de 1380, et elle s'ajoutait à la marge basse du comparateur juste au-dessus. Le palier
     court la ramène à 6vw, environ 83 px. La marge basse, elle, ne bouge pas : c'est elle qui sépare
@@ -46,18 +55,21 @@ const { stats } = trust;
   <div class="pt-section-sm pb-section">
     <Container size="wide">
       {
-        /* Zone 4 de la trame : en-tête de corum.ts (« L'expérience derrière R Start »), dont l'introduction porte
-          l'avantage et son contre-poids dans la même phrase. trust.ts garde les cartes, chiffres et sources. */
+        /* Zone 4 de la trame : en-tête de corum.ts (« Le groupe CORUM en quelques chiffres »),
+          titre seul ; son introduction, qui portait l'avantage et son contre-poids dans la même
+          phrase, est EN VEILLE (voir ci-dessous). trust.ts fournit le bandeau des chiffres
+          (`trust.stats`). */
       }
       {
         /*
          * TITRE SEUL (14/09/2026, demande de l'équipe) : ni introduction, ni chiffres, ni contre-poids.
-         * Le bloc enchaîne directement sur les avis, et le bouton renvoie à /a-propos, où les quatre
-         * chiffres du groupe, la gamme des cinq SCPI et les bureaux sont détaillés avec leurs sources
-         * et leurs contre-poids.
-         * Retirés d'ici : l'introduction « R Start s'appuie sur 15 ans d'expertise… », les quatre
-         * chiffres (15 ans, 9,6 Md€, + 160 000 épargnants, 5 SCPI) et leur contre-poids « Ces chiffres
-         * sont ceux du groupe CORUM, pas ceux de R Start… ». Ils n'ont pas disparu du site.
+         * Retirés d'ici ce jour-là : l'introduction « R Start s'appuie sur 15 ans d'expertise… »,
+         * les quatre chiffres (15 ans, 9,6 Md€, + 160 000 épargnants, 5 SCPI) et leur contre-poids
+         * « Ces chiffres sont ceux du groupe CORUM, pas ceux de R Start… ».
+         * Les chiffres sont revenus le 15/09/2026, à la place des avis (bandeau ci-dessous).
+         * L'introduction et le contre-poids, eux, restent EN VEILLE dans corum.ts et trust.ts : ils
+         * ne sont rendus ni ici ni sur /a-propos, où les chiffres s'affichent sans source ni
+         * contre-poids.
          */
       }
       <SectionHeading id={id} title={corum.title} motion />
@@ -65,24 +77,26 @@ const { stats } = trust;
       {
         /*
          * LE BANDEAU DES CHIFFRES DU GROUPE REMPLACE LES AVIS (15/09/2026, demande de l'équipe). Les
-         * avis Trustpilot sont descendus au bas de /a-propos ; ces quatre chiffres, eux, avaient quitté
-         * l'accueil le 14/09 et reviennent ici. Ils sont rendus par le même composant `Stat` et lus
-         * dans le même `trust.stats` que sur /a-propos : une seule source, deux rendus.
+         * avis Trustpilot sont descendus au bas de /a-propos ; les chiffres du groupe, eux, avaient
+         * quitté l'accueil le 14/09 et reviennent ici. Ils sont rendus par le même composant `Stat`
+         * et lus dans le même `trust.stats` que sur /a-propos : une seule source, deux rendus.
          *
          * CE QU'IL FAUT SAVOIR CÔTÉ CONFORMITÉ : `trust.stats.risk` existe (« Ces chiffres sont ceux du
          * groupe CORUM, pas ceux de R Start… ») et n'est rendu NI ICI NI SUR /a-propos, où il avait été
-         * retiré le 11/09 sur décision de l'équipe. Sur /a-propos, l'introduction de l'en-tête porte le
-         * rappel ; sur l'accueil, il n'y a pas d'équivalent, seule la section Risques plus bas. Le
-         * bandeau n'est donc pas marqué [data-advantage], sans quoi le contrôle d'équilibre AMF
-         * réclamerait un contre-poids frère qui n'existe pas. Une ligne à ajouter si la Conformité le
-         * demande, le texte est prêt.
+         * retiré le 11/09 sur décision de l'équipe. Aucune des deux pages n'a d'équivalent : sur
+         * /a-propos, l'introduction de l'en-tête, réécrite le 14/09/2026, ne dit plus que cette
+         * expérience ne préjuge pas des résultats de R Start. Il ne reste, sur l'une comme sur
+         * l'autre, que la section Risques plus bas. Le bandeau n'est donc pas marqué
+         * [data-advantage], sans quoi le contrôle d'équilibre AMF réclamerait un contre-poids frère
+         * qui n'existe pas. Une ligne à ajouter pour le rendre, le texte est prêt.
          */
       }
       <div class="mt-section-sm">
         {
           /* PAS DE SOUS-TITRE : `stats.title` disait « Le groupe CORUM en quelques chiffres », ce que le
             titre de la section dit maintenant lui-même (corum.ts, 15/09/2026). L'appel de note reste,
-            accroché au bandeau qu'il qualifie. */
+            accroché au bandeau qu'il qualifie ; il ne rend rien tant que NoteRef est coupé
+            (AFFICHER = false) et que le registre de l'accueil est vide. */
         }
         <p class="visually-hidden">{stats.title}<NoteRef id="confiance-chiffres" tone="light" /></p>
         {
@@ -123,8 +137,9 @@ const { stats } = trust;
       </div>
 
       {
-        /* La photo d'ambiance, la gamme des cinq SCPI et les quatre chiffres détaillés vivent sur
-          /a-propos (components/pages/a-propos/CorumRange.astro), atteinte par ce bouton. */
+        /* Les mêmes chiffres, la bande illustrée, la gamme des autres SCPI en chiffres et les avis
+          Trustpilot vivent sur /a-propos (components/pages/a-propos/CorumRange.astro et
+          pages/a-propos.astro), atteinte par ce bouton. */
       }
       <div class="mt-section-sm">
         {/* Pas de `withBase` ici : Button le pose lui-même. L'appliquer des deux côtés doublait
@@ -139,7 +154,8 @@ const { stats } = trust;
 
       {
         /* « La rémunération de CORUM sur les ventes » a quitté l'accueil le 11/09/2026 : la zone 2
-          (« Ce qui change vraiment », moteur 2 et son contre-poids) porte déjà le sujet, et /frais le détaille. */
+          (01b-Difference, la situation « plus-value ») porte déjà le sujet, sans son contre-poids,
+          retiré le même jour, et /frais le détaille. Le bloc est EN VEILLE dans corum.ts. */
       }
     </Container>
   </div>

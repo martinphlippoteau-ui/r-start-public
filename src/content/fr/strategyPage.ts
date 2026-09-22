@@ -24,10 +24,12 @@ export const strategyPage: { seo: PageSeo; hero: PageHero; cta: Cta } = {
    *
    * PAS DE LIGNE RISQUES NON PLUS, demande expresse de l'équipe (« ne crée pas de bon à savoir »). Elle
    * portait la mention courte de legal.ts, en « Bon à savoir : … », sous le H1 de toutes les sous-pages.
-   * CONSÉQUENCE À CONNAÎTRE : /strategie est désormais la SEULE page du site sans aucune mention de
-   * risque en propre. Il ne reste que le pied de page (« Communication commerciale », renvoi au DIC et à
-   * la note d'information), présent partout. À rétablir en une ligne si la Conformité le demande :
-   * `riskLine: shortRiskLine`.
+   * La page s'est ainsi trouvée sans aucune mention de risque en propre ; ce n'est plus le cas :
+   * elle rend en fin de page le bloc Risques de l'accueil (08-Risks.astro, voir strategie.astro,
+   * même jour), en plus du pied de page (« Communication commerciale », renvoi au DIC et à la note
+   * d'information), présent partout. Pour rétablir la ligne de l'en-tête,
+   * `riskLine: shortRiskLine` ici ne suffit plus : strategie.astro doit aussi la passer à PageHero
+   * (`riskLine={hero.riskLine}`), et RiskNote doit rendre de nouveau.
    */
   hero: {
     /* « R Start : une approche inédite au service de la performance » depuis le 16/09/2026, texte

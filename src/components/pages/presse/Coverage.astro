@@ -1,21 +1,28 @@
 ---
 /**
- * Page « La presse en parle », La revue de presse (id « revue-de-presse », fond white) suivie de son
- * avertissement dans une section à part (id « avertissement-presse », fond ink, refonte du 13/09/2026).
- * La revue faisait 2 909 px sur téléphone, pour neuf articles : les cartes sont désormais de simples
- * lignes séparées d'un filet sous `sm` (média, titre, date), et ne reprennent leur forme de carte qu'à
- * partir de deux colonnes. L'avertissement, qui fermait la section dans un encadré, a sa propre bande
- * sombre : il se lit comme une fin de chapitre et non comme un post-scriptum.
- * Introduction (qui rappelle, dans le même bloc, que R Start n'est pas une SCPI sans frais et cite les
- * frais réellement prélevés) et avertissement de fin (facts.press.coverageDisclaimer) en texte normal,
- * jamais animés. Entre les deux, la liste : média (surtitre), titre de l'article, date.
+ * Page « La presse en parle », La revue de presse (id « revue-de-presse », fond white), prévue pour
+ * être suivie de son avertissement dans une section à part (id « avertissement-presse », fond ink,
+ * refonte du 13/09/2026). La revue faisait 2 909 px sur téléphone, pour neuf articles : les cartes
+ * sont désormais de simples lignes séparées d'un filet sous `sm` (média, titre, date), et ne
+ * reprennent leur forme de carte qu'à partir de deux colonnes. L'avertissement, qui fermait la
+ * section dans un encadré, a sa propre bande sombre : il se lit comme une fin de chapitre et non
+ * comme un post-scriptum.
+ * INTRODUCTION ET AVERTISSEMENT RETIRÉS LE 16/09/2026, demande de l'équipe (press.ts dit comment
+ * les rétablir). L'introduction rappelait, dans le même bloc, que R Start n'est pas une SCPI sans
+ * frais ; l'avertissement de fin reprenait facts.press.coverageDisclaimer, en veille. Le paragraphe
+ * d'introduction reste dans le gabarit, vide ; la bande d'avertissement n'est plus rendue. Les deux
+ * étaient en texte normal, jamais animés. Reste la liste : média (surtitre), titre de l'article,
+ * date.
  *  - article dont l'adresse est vérifiée : le titre est un lien externe (nouvel onglet, rel noopener
  *    noreferrer, mention « nouvelle fenêtre » portée par aria-describedby vers un span caché commun),
  *    étendu à toute la ligne par ::after ;
  *  - article sans adresse : le titre s'affiche sans lien, avec son média et sa date (arbitrage du
- *    10/09/2026 ; les adresses manquantes sont attendues de CORUM).
- * Les titres sont des citations de tiers : ils portent `data-press-quote`, ce qui les exclut du contrôle
- * des formulations interdites de scripts/check-compliance.mjs, ils sont couverts par l'avertissement.
+ *    10/09/2026). Branche inerte depuis le 14/09/2026 : press.ts ne transmet plus que les articles
+ *    qui ont une adresse, les autres attendent la leur dans facts.ts.
+ * Les titres sont des citations de tiers : ils portent `data-press-quote`, ce qui les exclut du
+ * contrôle des formulations interdites de scripts/check-compliance.mjs. L'avertissement qui les
+ * couvrait est retiré : le contrôle le signale à chaque exécution, et seul le pied de page les
+ * accompagne.
  * Aucun logo de média : les noms sont en typographie (aucune licence).
  * Animation : révélation en cascade de la liste seulement.
  * Contenu : src/content/fr/press.ts (coverage, labels).

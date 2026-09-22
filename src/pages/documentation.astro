@@ -1,13 +1,17 @@
 ---
 /**
  * Page /documentation (périmètre v2, plan §12) : centre de documents de R Start.
- * SiteNav collée en haut → main#contenu : PageHero (fil d'Ariane, H1, intro, ligne
- * risques visible sans scroller) → navigation d'ancres collante → un groupe de documents par section
- * (#reglementaire, #frais, #formulaire ; seuls les groupes publiant au moins un document existent) →
- * guide de souscription en quatre étapes (avec le bloc MyCORUM, trame du 10/09/2026) → FAQ → mention 2 + renvoi corum.fr + CTA → notes de la page →
- * Footer. Métadonnées et JSON-LD (Organization, WebPage, BreadcrumbList) depuis documentation.ts,
- * config/pages.ts et src/lib/seo.ts : aucun texte en dur.
- * Les notes légales sont celles de la page (documentation.notes), numérotées par NoteRef (prop `notes`).
+ * SiteNav collée en haut → main#contenu : PageHero (fil d'Ariane, H1, intro et sommaire des
+ * groupes, sans ligne risques depuis le 14/09/2026) → navigation d'ancres collante → un groupe de
+ * documents par section (#reglementaire, #frais, #formulaire ; seuls les groupes publiant au moins
+ * un document existent) → guide de souscription en quatre étapes (avec le bloc MyCORUM, trame du
+ * 10/09/2026) → FAQ courte → cadre réglementaire → avertissements reproduits in extenso
+ * → mention 2 + renvoi corum.fr + CTA → LegalNotes → Footer. Métadonnées et JSON-LD
+ * (Organization, WebPage, BreadcrumbList) depuis documentation.ts, config/pages.ts et
+ * src/lib/seo.ts : aucun texte en dur.
+ * Les notes légales sont celles de la page (documentation.notes), numérotées par NoteRef (prop
+ * `notes`) ; ni LegalNotes ni NoteRef ne rendent rien tant que `AFFICHER` vaut false : aucune note
+ * n'est affichée.
  */
 import Base from '@/layouts/Base.astro';
 import AppMyCorum from '@/components/AppMyCorum.astro';

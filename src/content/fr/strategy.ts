@@ -19,12 +19,14 @@ import type { StrategyContent } from '@/content/types';
  * corps n'est pas contrebalancé avantage par avantage : c'est la suite du retrait de tous
  * les « Bon à savoir » du site, la Conformité replaçant les siennes une par une. Aucun [data-advantage]
  * n'est posé ici, faute de quoi le garde-fou qui exige un contre-poids dans le même bloc réclamerait un
- * texte que la page ne prévoit pas. La mention passe par ui/NoteConformite.astro, pas par RiskNote.
+ * texte que la page ne prévoit pas. Rétablie, la mention passerait par ui/NoteConformite.astro, pas
+ * par RiskNote.
  */
 
 export const strategy: StrategyContent = {
-  /* Libellés des tuiles à fenêtre (16/09/2026) : lus par les lecteurs d'écran, jamais affichés,
-     le bouton ne montrant qu'un « + ». */
+  /* Libellés des cartes qui se retournent, AFFICHÉS en toutes lettres depuis le 16/09/2026 :
+     « En savoir plus » sur le bouton du recto, « Fermer » sur celui du dos
+     (src/scripts/carteRetournee.ts). */
   dialogOpen: 'En savoir plus',
   dialogClose: 'Fermer',
   engines: {
@@ -122,7 +124,7 @@ export const strategy: StrategyContent = {
        « PARTOUT DANS LE MONDE », ET CE QUI RESTE À TRANCHER : le DIC du 20/05/2026 borne la zone aux
        pays du Conseil de l'Europe et au Canada. Le site dit « Monde » depuis le 14/09/2026, décision
        de l'équipe (facts.strategy.zoneLabel). La carte qui illustrait la zone a quitté la page le
-       16/09/2026, sa légende le 21/09/2026 ; cette réserve, elle, vaut pour le texte. */
+       16/09/2026, sa légende le 22/09/2026 ; cette réserve, elle, vaut pour le texte. */
     items: [
       { lead: 'partout dans le monde', icon: 'exploration' },
       { lead: 'dans tous les secteurs', icon: 'equipe' },
@@ -130,7 +132,10 @@ export const strategy: StrategyContent = {
     outro: 'Un seul mot d’ordre : identifier une opportunité',
   },
 
-  /** 4. Comment (zone 5 du document de l'équipe, reçue le 14/09/2026 après les trois autres). */
+  /**
+   * Volet « Opportuniste », ex-« Comment » (zone 5 du document de l'équipe, reçue le 14/09/2026
+   * après les trois autres).
+   */
   how: {
     eyebrow: 'Opportuniste',
     title: 'Les bons immeubles, au bon prix',

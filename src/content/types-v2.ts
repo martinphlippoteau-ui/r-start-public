@@ -39,10 +39,10 @@ export interface PageHero {
   punchline?: string;
   /**
    * Ligne risques visible sans scroller, même taille que l'intro. Jamais animée.
-   * FACULTATIVE depuis le 14/09/2026, et une seule page s'en passe, /strategie : l'équipe a fourni son
-   * texte exact et demandé qu'aucun « Bon à savoir » ne s'y ajoute. Toute page qui l'omet n'a alors
-   * plus AUCUNE mention de risque en propre, seules restent celles du pied de page. À ne pas retirer
-   * ailleurs sans arbitrage.
+   * FACULTATIVE depuis le 14/09/2026, et AUCUNE page ne la passe plus : l'équipe a demandé le même
+   * jour de retirer les « Bon à savoir » de tous les en-têtes de sous-page (voir ui/PageHero.astro).
+   * Leur en-tête n'a donc plus de mention de risque ; restent celles de leur contenu, quand il en
+   * porte, et du pied de page. Le texte reste EN VEILLE dans le contenu de chaque page.
    */
   riskLine?: string;
 }
@@ -83,7 +83,7 @@ export interface TrustContent {
     externalLinkHint?: string;
     /** Nom accessible des TrustBox officiels (contenu rendu par Trustpilot dans une iframe). */
     widgetLabel?: string;
-    /** Portée des avis, affichée sous le bandeau du hero. */
+    /** Portée des avis, sous le bandeau du hero. Retirée le 15/09/2026, EN VEILLE (01-Hero). */
     heroCaption?: string;
   };
   stats: {
@@ -95,9 +95,10 @@ export interface TrustContent {
 
 /**
  * Section « Ce qui change vraiment » (zone 2 de l'accueil, brochure partenaires 2026 p.4 et p.6).
- * Explique quand la société de gestion se rémunère : les deux moteurs (loyers encaissés, plus-value
- * réalisée à la vente), le mécanisme de réserve en cas de moins-value, et le contre-poids chiffré des
- * frais réellement prélevés. Chaque avantage porte son risque dans le même bloc et à la même taille.
+ * Explique quand la société de gestion se rémunère : les deux situations où des frais sont prélevés
+ * (loyers encaissés, plus-value réalisée à la vente), puis la démonstration de l'équipe. Les cartes
+ * des deux moteurs et le mécanisme de réserve en cas de moins-value l'ont quittée le 11/09/2026, et
+ * le contre-poids chiffré n'y est plus rendu (voir `counterweight.risk`).
  */
 export interface DifferenceContent {
   title: string;
@@ -173,10 +174,12 @@ export interface FeeComparisonSide {
 }
 
 /**
- * Bascule pédagogique des frais de la page /frais (brochure partenaires 2026, p.6).
- * Garde-fous : aucune SCPI tierce nommée dans la partie visible (le panel et la source vivent dans
- * `perimeter`, toujours affiché), une seule taille de police pour toutes les valeurs de frais, et
- * l'encadré « Une innovation, pas une révolution » (legal.ts) reproduit à l'identique sous la bascule.
+ * Bascule pédagogique des frais de la page /frais (brochure partenaires 2026, p.6). PLUS RENDUE :
+ * son composant a été supprimé le 14/09/2026, le contenu reste EN VEILLE dans feesPage.ts (voir
+ * SHOW_MARKET_COMPARISON). Garde-fous à tenir si elle revient : aucune SCPI tierce nommée dans la
+ * partie visible (`perimeter` ne nomme pas le panel), une seule taille de police pour toutes les
+ * valeurs de frais, et l'encadré « Une innovation, pas une révolution » (legal.ts) reproduit à
+ * l'identique sous la bascule.
  */
 export interface FeeComparison {
   enabled: boolean;
@@ -189,7 +192,7 @@ export interface FeeComparison {
   sides: [FeeComparisonSide, FeeComparisonSide];
   /** En-têtes de colonnes de la lecture sans JavaScript (moment, frais, valeur). */
   columns: { moment: string; fee: string; value: string };
-  /** Périmètre et sources, toujours affichés sous la bascule (les neuf SCPI y sont citées). */
+  /** Phrase de périmètre, sous la bascule. Elle ne nomme pas les SCPI du panel. */
   perimeter: string;
   /** Note de bas de tableau (frais d'agent immobilier) ; affichée avec le périmètre. */
   footnote?: string;
@@ -210,8 +213,9 @@ export interface FeeGroup {
 }
 
 /**
- * Micro-textes de la page /frais (aria-label, en-têtes de colonnes, surtitres, libellés de fichier) :
- * aucun texte en dur dans src/pages/frais.astro.
+ * Micro-textes des anciens blocs de /frais (aria-label, en-têtes de colonnes, surtitres, libellés
+ * de fichier). PLUS LUS depuis le 16/09/2026 : src/pages/frais.astro n'appelle plus ces blocs, et
+ * ces libellés restent EN VEILLE dans feesPage.ts avec eux.
  */
 export interface FeesPageLabels {
   /** aria-label de la liste des trois « 0 % » (ex. « Les trois frais à 0 % »). */
@@ -243,10 +247,15 @@ export interface FeesPageLabels {
   faqList: string;
 }
 
+/**
+ * Contenu de /frais. La page ne lit plus que `seo`, `hero` et `cta` (src/pages/frais.astro) : le
+ * reste est EN VEILLE, gardé exprès et non affiché (blocs retirés entre le 11 et le 16/09/2026). Les
+ * commentaires des champs décrivent le rendu qu'ils avaient et retrouveraient.
+ */
 export interface FeesPageContent {
   seo: PageSeo;
   hero: PageHero;
-  /** Micro-textes de la page ; sans eux, les libellés correspondants ne sont pas rendus. */
+  /** Micro-textes des blocs en veille (voir FeesPageLabels). */
   labels?: FeesPageLabels;
   zeroHighlights: { value: string; label: string; base: string }[];
   counterweight: AdvantageRisk;
@@ -276,7 +285,10 @@ export interface FeesPageContent {
     note: string;
     risk: string;
   };
-  /** Bascule pédagogique des frais (brochure p.6) ; enabled=false pour la retirer en une ligne. */
+  /**
+   * Bascule pédagogique des frais (brochure p.6), en veille (voir FeeComparison). Son `enabled`
+   * n'est lu par rien : il ne la retire ni ne la rétablit.
+   */
   marketComparison: FeeComparison;
   simulationDoc: DocumentItem;
   faq: { title: string; items: FaqItem[] };
@@ -330,7 +342,8 @@ export interface DocumentationContent {
   /**
    * FAQ de la page : seulement les questions dont le sujet est un document ou la souscription (la
    * sélection est faite dans documentation.ts). `fullFaqLink` renvoie vers la foire aux questions
-   * complète de l'accueil, où les autres questions restent lisibles, elles ne sont plus dupliquées.
+   * complète (/faq depuis le 16/09/2026), où les autres questions restent lisibles, elles ne sont
+   * plus dupliquées.
    */
   faq: {
     title: string;

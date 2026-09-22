@@ -1,25 +1,26 @@
 ---
 /**
- * Page /frais. TROIS ZONES, texte fourni par l'équipe le 14/09/2026 (« je veux ce contenu là ») :
- *  1. l'en-tête : H1 « Un modèle de frais gagnant-gagnant », introduction et phrase-clé en gras, CTA.
- *     Plus de ligne risques : elle a quitté tous les en-têtes de sous-page le même jour ;
- *  2. le comparateur SCPI par SCPI (FeeComparator), titre visible, accroche, tableau et, seul rescapé
- *     du grand ménage des sources, le bloc « Sources des données » ;
- *  3. le barème en quatre tableaux accessibles (caption = titre H3 + introduction, th scope="col" /
- *     scope="row", nature du frais en pastille depuis FeeRow.kind, assiette et précisions repliées sous
- *     le libellé aux largeurs étroites, taux jamais coupé : `valueShort` sous 640 px), suivi de la note
- *     HT rendue par ui/NoteConformite.astro.
+ * Page /frais. DEUX ZONES depuis le 16/09/2026 :
+ *  1. l'en-tête : H1 « Comparateur de frais SCPI » (texte de l'équipe du 16/09/2026), introduction,
+ *     CTA. Plus de ligne risques : elle a quitté tous les en-têtes de sous-page le 14/09/2026 ;
+ *  2. le comparateur SCPI par SCPI (FeeComparator), titre hors écran, accroche (`hero.punchline`),
+ *     tableau et, seul rescapé du grand ménage des sources, le bloc « Sources des données ».
  * Puis le Footer. La page n'a plus de bloc de notes.
+ * Le 14/09/2026, l'équipe avait fourni le contenu de TROIS zones (« je veux ce contenu là ») ; la
+ * troisième, le barème, a été retirée le 16/09/2026 (voir plus bas).
  *
- * CE QUI A QUITTÉ LA PAGE le 14/09/2026, et dont le contenu reste dans feesPage.ts et comparator.ts :
- * la bande des trois « 0 % », la frise de la commission de retrait, le mécanisme de réserve en cas de
- * moins-value, l'avertissement commission d'arbitrage (toujours reproduit sur /documentation, où le
- * contrôle l'exige), l'incidence des coûts du DIC, la bascule pédagogique, le document de référence,
- * la FAQ des frais, le bloc d'appel final et les huit notes.
+ * CE QUI A QUITTÉ LA PAGE, et dont le contenu reste en veille dans feesPage.ts et comparator.ts :
+ * le 11/09/2026, l'incidence des coûts du DIC, la bascule pédagogique et le document de référence ;
+ * le 14/09/2026, la bande des trois « 0 % », la frise de la commission de retrait, le mécanisme de
+ * réserve en cas de moins-value, l'avertissement commission d'arbitrage (toujours reproduit sur
+ * /documentation, où le contrôle l'exige), la FAQ des frais, le bloc d'appel final, les huit notes,
+ * et, autour du comparateur, son périmètre, ses deux avertissements courts et l'encadré « Une
+ * innovation, pas une révolution » ; le 16/09/2026, le barème et sa mention HT.
  *
  * Animations déclaratives sobres uniquement (data-animate clip / stagger / fade-up) ; aucun H1 et aucun
  * avertissement sous un data-animate.
- * Contenu : src/content/fr/feesPage.ts (aucun texte en dur ; micro-textes dans feesPage.labels).
+ * Contenu : src/content/fr/feesPage.ts (`seo`, `hero`, `cta` ; le reste y est en veille) et
+ * comparator.ts pour le comparateur. Aucun texte en dur.
  */
 import Base from '@/layouts/Base.astro';
 import SiteNav from '@/components/SiteNav.astro';
@@ -61,10 +62,11 @@ const jsonLd = [
   <SiteNav />
   <main id="contenu">
     {
-      /* L'introduction REVIENT dans l'en-tête (14/09/2026) : l'équipe a fourni le texte du hero, il tient
-        en deux phrases sous le titre. Elle en était partie le 12/09/2026 pour arriver au comparateur
-        sans défiler ; le comparateur reste juste en dessous, ces deux phrases ne le repoussent pas d'un
-        écran. La phrase-clé est en gras, dans la MÊME taille que l'introduction et la ligne risques. */
+      /* L'introduction REVIENT dans l'en-tête (14/09/2026) : l'équipe a fourni le texte du hero.
+        Elle en était partie le 12/09/2026 pour arriver au comparateur sans défiler ; le comparateur
+        reste juste en dessous, elle ne le repousse pas d'un écran. Elle tient seule sous le titre
+        depuis le 16/09/2026 : la phrase-clé en gras est descendue introduire le comparateur, et il
+        n'y a plus de ligne risques. */
     }
     <PageHero
       title={hero.title}
@@ -81,11 +83,13 @@ const jsonLd = [
     </PageHero>
 
     {
-      /* Comparateur SCPI par SCPI, PREMIER ÉLÉMENT de la page (11/09/2026, demande de l'équipe) : on
-        compare d'abord des taux, on comprend ensuite ce qu'ils recouvrent. Tout ce qui suit explique les
-        frais de R Start à partir de la brochure partenaires et du document d'informations clés.
-        NON PUBLIABLE tant que les taux des autres SCPI ne sont pas relevés, le composant l'affiche et le
-        script de conformité le signale. */
+      /* Comparateur SCPI par SCPI, PREMIER ÉLÉMENT de la page (11/09/2026, demande de l'équipe) :
+        on compare d'abord des taux. C'est aussi le DERNIER depuis le 16/09/2026 : les blocs qui
+        expliquaient ensuite les frais de R Start ont tous quitté la page (voir plus bas). Les
+        dix-neuf SCPI ont leurs sept taux et une source depuis le 15/09/2026 : le script de
+        conformité ne signalerait qu'une SCPI sans source, et l'avertissement prévu pour ce cas
+        passe par RiskNote, qui ne rend plus rien. La réserve qui demeure est écrite dans
+        comparator.ts : une source unique et globale, sans document ni date d'arrêté par SCPI. */
     }
     {/* L'accroche « Comparez chaque ligne… » a quitté l'en-tête le 16/09/2026 pour introduire le
       comparateur, où elle dit ce qu'on va faire au moment de le faire. Le texte n'a pas bougé, il
@@ -93,13 +97,15 @@ const jsonLd = [
     <FeeComparator id="comparateur" intro={hero.punchline} />
 
     {
-      /* La bande « trois 0 % + les frais réellement prélevés + leur contre-poids » (#zero-frais) a été
-        RETIRÉE le 14/09/2026 (demande de l'équipe) : le comparateur juste au-dessus montre déjà ces
-        mêmes taux, R Start et autres SCPI côte à côte, et le barème complet les détaille juste en
-        dessous. La page les annonçait donc trois fois. `zeroHighlights`, `counterweight` et
-        `counterweightRates` restent dans feesPage.ts, prêts à resservir. L'appel de la note sur la
-        rémunération du distributeur, qui vivait dans ce bloc, a suivi jusqu'au bas de page : c'est une
-        information réglementaire, elle ne pouvait pas disparaître avec la bande. */
+      /* La bande « trois 0 % + les frais réellement prélevés + leur contre-poids » (#zero-frais) a
+        été RETIRÉE le 14/09/2026 (demande de l'équipe) : le comparateur juste au-dessus montre déjà
+        ces mêmes taux, R Start et autres SCPI côte à côte, et le barème complet les détaillait
+        juste en dessous (retiré à son tour le 16/09/2026). La page les annonçait donc trois fois.
+        `zeroHighlights`, `counterweight` et `counterweightRates` restent dans feesPage.ts, prêts à
+        resservir. L'appel de la note sur la rémunération du distributeur, qui vivait dans ce bloc,
+        avait suivi jusqu'au bas de page ; il est parti le soir même avec le bloc de notes (voir
+        plus bas) : cette information réglementaire n'est plus affichée, son texte reste dans
+        feesPage.ts (`frais-page-distributeur`). */
     }
 
     {
@@ -122,15 +128,17 @@ const jsonLd = [
 
     {
       /*
-       * RETIRÉES le 14/09/2026, l'équipe ayant fourni le contenu exact de la page (« je veux ce contenu
-       * là ») : la page tient en trois zones, l'en-tête, le comparateur et le barème.
+       * RETIRÉES le 14/09/2026, l'équipe ayant fourni le contenu exact de la page (« je veux ce
+       * contenu là ») : la page tenait alors en trois zones, l'en-tête, le comparateur et le barème
+       * (deux depuis le 16/09/2026, voir ci-dessus).
        *
        * Ce qui part avec elles :
        *  - #moins-value, le mécanisme de réserve ET l'avertissement AMF sur la commission d'arbitrage.
        *    CET AVERTISSEMENT N'EST PAS PERDU : il est reproduit in extenso sur /documentation, où
        *    check-compliance.mjs continue de l'exiger, puce par puce ;
        *  - #faq-frais, ses quatre questions ;
-       *  - #souscrire-frais, son appel et la mention HT, remontée sous le barème ;
+       *  - #souscrire-frais, son appel et la mention HT (remontée sous le barème, partie avec
+       *    lui le 16/09/2026) ;
        *  - le bloc « Notes et sources », ses huit notes et tous les appels qui y menaient.
        * Les textes restent dans feesPage.ts et legal.ts, la page ne les appelle plus.
        *

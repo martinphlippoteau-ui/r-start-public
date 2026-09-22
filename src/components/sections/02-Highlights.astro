@@ -1,27 +1,27 @@
 ---
 /**
- * Section 2, Points forts (id « points-forts »). Fond blanc, juste après le hero (ink) et avant « Ce qui
- * change vraiment » (paper) : trame du 10/09/2026, comprendre le produit avant le modèle de frais.
- * En-tête centré façon page produit, puis six cartes. L'en-tête est rendu ici (et non par
- * SectionHeading) pour poser les attributs motion sur le H2.
+ * Section 2, « R Start en un clin d'œil » (id « points-forts »). Fond ink depuis le 14/09/2026
+ * (voir plus bas), entre « Qui a envie de payer avant de gagner ? » (01b, paper) et le comparateur
+ * de frais (03), dans l'ordre de HOME_ORDER (index.astro).
+ * En-tête aligné à gauche, puis six cartes, le bloc « Souscription et options disponibles » et le
+ * bouton vers /strategie. L'en-tête est rendu ici (et non par SectionHeading) pour poser les
+ * attributs motion sur le H2.
  * La valeur est l'image : les pictos 3D de banque ont été retirés, la valeur de chaque carte (« 200 € »,
- * « 3 sur 7 », « Chaque mois »…) est rendue en très grand (text-display-lg) comme élément visuel principal,
- * même utilitaire pour les six cartes (chiffres et valeurs en toutes lettres : aucune hiérarchie de taille
- * entre elles). Libellé en text-lead sous la valeur, puis description et contre-poids.
- * Motion (src/scripts/motion.ts), modèle « l'avantage s'anime seul, jamais son enveloppe », passe de
- * sobriété du 11/09/2026 (un seul effet d'entrée par bloc) :
- *  - en-tête : surtitre statique, H2 mot à mot (data-reveal-text ; H1 interdit, H2 autorisé), intro en
- *    fade-up décalée de 0,1 s ;
- *  - dans chaque carte, UN seul effet : le H3 (valeur + libellé) entre en fade-up ; la description
- *    (data-advantage) et la RiskNote sont en place d'emblée. Chaque carte ayant son propre déclencheur, le
- *    délai dépend de la COLONNE (0 / 0,08 s), pas de l'index : en 2e rangée desktop comme sur mobile (une
- *    colonne), une carte qui entre seule n'attend pas la cascade des précédentes ; la RiskNote est leur
- *    sœur dans la carte, jamais enveloppée par un élément animé : aucun ancêtre d'un [data-risk] n'est
- *    animé (règle AMF « aucun avertissement masqué »), la carte elle-même (li) ne porte donc aucun
- *    attribut motion ;
- *  - valeurs : statiques et exactes (plus de compteur, « 200 € », « 3 sur 7 », « 6 mois » sont des
- *    caractéristiques réglementaires, « 100 % » ressemblerait à un taux en cours de comptage, ni mot à
- *    mot, réservé aux H2 de chapitre). Retirés le 11/09/2026 : tilt du H3, fade-up de la description.
+ * « 4 sur 7 », « Mensuels »…) est l'élément visuel principal, en sable (text-display-sm), même
+ * utilitaire pour les six cartes (chiffres et valeurs en toutes lettres : aucune hiérarchie de
+ * taille entre elles). Le libellé est AU-DESSUS de la valeur, avec son appel de note (coupé :
+ * NoteRef ne rend rien) et, sur trois cartes, un bouton « i » qui déplie une explication. Ni
+ * description ni contre-poids par carte.
+ * Motion (src/scripts/motion.ts), passe de sobriété du 11/09/2026 (un seul effet d'entrée par
+ * bloc) :
+ *  - en-tête : H2 mot à mot (data-reveal-text ; H1 interdit, H2 autorisé). Ni surtitre ni
+ *    introduction : le contenu n'en porte plus ;
+ *  - chaque carte (li) entre d'un bloc en fade-up : elle ne contient aucun [data-risk]. Chaque
+ *    carte ayant son propre déclencheur, le délai alterne 0 / 0,08 s selon `i % COLUMNS`, pas selon
+ *    l'index : une carte qui entre seule n'attend pas la cascade des précédentes ;
+ *  - valeurs : statiques et exactes (plus de compteur, « 200 € », « 4 sur 7 », « 1er jour du 6e
+ *    mois » sont des caractéristiques réglementaires, ni mot à mot, réservé aux H2 de chapitre).
+ *    Retirés le 11/09/2026 : tilt du H3, fade-up de la description.
  * Sans JS / reduced-motion : HTML complet et statique, valeurs exactes.
  * Contenu : src/content/fr/highlights.ts.
  */
@@ -100,9 +100,10 @@ const enExposant = (
 
     {
       /* Six blocs simples en 3 × 2 (11/09/2026) : un libellé, une valeur, un appel de note. Ni
-        pictogramme, ni description, ni contre-poids par bloc, celui de la section les remplace, sous la
-        grille. Les blocs ne portent donc pas `data-advantage` : ce sont des caractéristiques du produit,
-        pas des arguments, et le contrôle d'équilibre AMF compte le couple de la section. */
+        pictogramme, ni description, ni contre-poids par bloc. Le contre-poids de la section, qui
+        les remplaçait sous la grille, a été retiré du contenu le 14/09/2026 (voir highlights.ts).
+        Les blocs ne portent pas `data-advantage` : ce sont des caractéristiques du produit, pas des
+        arguments. */
     }
     <ul role="list" class="mt-chapter grid gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6">
       {
@@ -182,7 +183,11 @@ const enExposant = (
       )
     }
 
-    {/* Contre-poids unique de la section, jamais animé. */}
+    {
+      /* Contre-poids unique de la section, jamais animé. Absent du contenu depuis le 14/09/2026 (le
+      texte retiré est cité dans highlights.ts), et RiskNote ne rend plus rien : rien ne s'affiche
+      ici. */
+    }
     {highlights.risk && <RiskNote text={highlights.risk} size="lead" class="mt-8 lg:mt-10" />}
     {
       /* APPEL À L'ACTION DE LA SECTION (15/09/2026). `outline-light` et non `light` : le fond est ink,

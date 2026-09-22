@@ -21,7 +21,16 @@ import {
 import manifest from '@/content/fr/media.manifest.json';
 
 /**
- * Page /frais (périmètre v2, plan §12), version complète de la section « Frais » de l'accueil (fees.ts).
+ * Page /frais (périmètre v2, plan §12). DEUX ZONES depuis le 16/09/2026 : l'en-tête et le
+ * comparateur SCPI par SCPI, dont le contenu est dans comparator.ts. La page ne lit plus ici que
+ * `seo`, `hero` (titre, introduction, et `punchline`, qui introduit le comparateur) et `cta`.
+ * TOUT LE RESTE DE CE FICHIER EST EN VEILLE, gardé exprès (décision de Martin, 22/09/2026) :
+ * barème, bande des trois « 0 % », frise du retrait, mécanisme de réserve, incidence des coûts,
+ * bascule du comparatif de marché, document de référence, FAQ, notes, avertissement commission
+ * d'arbitrage, encadré et mention HT. Rien de cela n'est affiché, et check-compliance.mjs, qui ne
+ * lit que le HTML publié, ne le voit pas. Les règles ci-dessous valent pour le jour où ces blocs
+ * reviennent.
+ *
  * Sources : brochure R Start 2026 (p.4 : barème et mécanisme de réserve), DIC du 20/05/2026 (p.1 :
  * avertissement commission d'arbitrage ; p.3 : incidence des coûts), bulletin de souscription de mai 2026
  * (CGV : commission de retrait, rémunération des intermédiaires).
@@ -35,21 +44,25 @@ import manifest from '@/content/fr/media.manifest.json';
  * legal.ts sont reproduites à l'identique, hors typographie `nb`. La formulation « 0 % de commission de
  * souscription » remplace tout « rien » ou « sans frais » : le prix de la part inclut une prime d'émission.
  *
- * Le PDF « Simulation des frais ex-ante » (V2, 27/03/2026) n'est pas publié : il affiche 1,12 % de frais de
- * souscription et des montants d'épargne espérée issus des scénarios du DIC. Le bloc document renvoie à la
- * section « Que va me coûter cet investissement ? » du DIC, jusqu'à livraison d'une version corrigée et
- * validée par la Conformité. La publication du DIC suit la décision unique des pages v2
- * (documentation.ts, PENDING_DOCUMENT_KEYS) : tant qu'il est en attente (fichier hébergé du 20/05/2026 à
- * 3 sur 7, CORUM ayant confirmé 4 sur 7), le bloc renvoie vers www.corum.fr et non vers le PDF.
+ * Le PDF « Simulation des frais ex-ante » (V2, 27/03/2026) n'est pas publié : il affiche 1,12 % de
+ * frais de souscription et des montants d'épargne espérée issus des scénarios du DIC. Le bloc
+ * document (en veille, retiré de /frais le 11/09/2026) renvoie à la section « Que va me coûter cet
+ * investissement ? » du DIC, jusqu'à livraison d'une version corrigée et validée par la Conformité.
+ * La publication du DIC suit la décision unique des pages v2 (documentation.ts,
+ * PENDING_DOCUMENT_KEYS) : tant qu'il est en attente (DIC du 20/05/2026 à 3 sur 7, CORUM ayant
+ * confirmé 4 sur 7, fichier plus hébergé depuis le 18/09/2026), le bloc renvoie vers www.corum.fr
+ * et non vers le PDF.
  *
- * Bascule pédagogique des frais (plan §3 bis, arbitrage du 10/09/2026) : les moyennes de marché de la
- * brochure p.6 sont portées dans facts.ts (`marketComparison`) avec leur périmètre et leur source ; les
- * valeurs de R Start viennent, elles, de facts.fees. Garde-fous appliqués ici : aucune SCPI tierce
- * nommée dans la partie visible (le panel des neuf SCPI vit dans `perimeter`, toujours affiché sous la
- * bascule, et dans la note « frais-page-comparatif ») ; une seule taille de police pour toutes les
- * valeurs de frais, des deux côtés ; l'encadré « Une innovation, pas une révolution » (legal.ts)
- * accompagne la bascule, reproduit à l'identique. La position de marché s'intitule « SCPI avec frais
- * d'acquisition », comme dans la brochure : ces SCPI ne prélèvent pas de commission de souscription.
+ * Bascule pédagogique des frais (plan §3 bis, arbitrage du 10/09/2026), EN VEILLE : retirée de
+ * /frais le 11/09/2026, composant supprimé le 14/09/2026 (voir SHOW_MARKET_COMPARISON). Les
+ * moyennes de marché de la brochure p.6 sont portées dans facts.ts (`marketComparison`) avec leur
+ * périmètre et leur source ; les valeurs de R Start viennent, elles, de facts.fees. Garde-fous
+ * prévus pour elle : aucune SCPI tierce nommée dans la partie visible (le panel des neuf SCPI
+ * réservé à la note « frais-page-comparatif », supprimée le 11/09/2026) ; une seule taille de
+ * police pour toutes les valeurs de frais, des deux côtés ; l'encadré « Une innovation, pas une
+ * révolution » (legal.ts) à ses côtés, reproduit à l'identique. La position de marché s'intitule
+ * « SCPI avec frais d'acquisition », comme dans la brochure : ces SCPI ne prélèvent pas de
+ * commission de souscription.
  */
 
 /**
@@ -64,10 +77,11 @@ import manifest from '@/content/fr/media.manifest.json';
  * il N'A PLUS DE CONSOMMATEUR : son dernier lecteur était FeeSwitcher.astro, retiré avec la bascule,
  * et non les simulateurs supprimés le 14/09/2026, qui n'ont jamais importé ce fichier. Les moyennes de
  * marché et le panel des neuf SCPI restent donc ICI sans être affichés nulle part, ce que
- * check-compliance.mjs ne voit pas puisqu'il ne lit que le HTML publié. À supprimer avec la bascule si
- * elle n'est pas rétablie.
- * NE PAS TOUCHER À `facts.marketComparison` pour autant : ses champs `panel` et `perimeterLead` sont
- * lus par scripts/check-compliance.mjs (lignes 437 et 445) pour contrôler ce que /frais nomme.
+ * check-compliance.mjs ne voit pas puisqu'il ne lit que le HTML publié. EN VEILLE, gardés exprès
+ * avec les anciens blocs de /frais (décision de Martin, 22/09/2026).
+ * NE PAS TOUCHER À `facts.marketComparison` pour autant : son champ `panel` est lu par
+ * scripts/check-compliance.mjs pour contrôler ce que /frais nomme. `perimeterLead` n'y figure plus
+ * que dans une exigence commentée depuis le 14/09/2026.
  * Pour rétablir la bascule : repasser à `true`, réécrire le composant, et le faire relire.
  */
 export const SHOW_MARKET_COMPARISON = false;
@@ -138,8 +152,9 @@ const kbOf = (file: string): number | undefined =>
 /**
  * Document de référence sur les coûts : le DIC (facts.documents), section « Que va me coûter cet
  * investissement ? ». Remplace le PDF « Simulation des frais ex-ante », non publié (voir en-tête).
- * Tant que le DIC est en attente, le bloc renvoie vers www.corum.fr (`file` porte alors une URL externe,
- * sans poids) et non vers le PDF hébergé.
+ * Tant que le DIC est en attente, le bloc renvoie vers www.corum.fr (`file` porte alors une URL
+ * externe, sans poids) et non vers le PDF. EN VEILLE : le bloc document a quitté /frais le
+ * 11/09/2026 ; `simulationDoc` est encore calculé, plus lu.
  */
 const costDocument = (): DocumentItem => {
   const doc = documentFacts.find((d) => d.key === 'dic');
@@ -165,7 +180,11 @@ const costDocument = (): DocumentItem => {
   };
 };
 
-/** Avertissement commission d'arbitrage, tel que repris dans la FAQ (reproduit à l'identique, hors `nb`). */
+/**
+ * Avertissement commission d'arbitrage, tel que repris dans la FAQ des frais (reproduit à
+ * l'identique, hors `nb`). En veille avec elle : la FAQ a quitté /frais le 14/09/2026. Le texte
+ * reste affiché sur /documentation, qui le tient de legal.ts.
+ */
 const arbitrageVerbatim = `${arbitrageWarningTitle} ${arbitrageWarningBullets.join(' ')}`;
 
 const rawNotes: LegalNote[] = [
@@ -361,10 +380,12 @@ const rstartSide: FeeComparisonSide = {
 };
 
 /**
- * Phrase de périmètre affichée sous la bascule, sans nommer le panel (garde-fou publicité comparative,
- * arbitrage du 10/09/2026 : « aucun concurrent nommé dans la partie visible »). Les neuf SCPI, la note
- * d'agent immobilier et la source complète vivent uniquement dans la note « frais-page-comparatif »,
- * déjà appelée par le titre de la bascule (comparison.noteId), toujours affichée.
+ * Phrase de périmètre prévue sous la bascule, sans nommer le panel (garde-fou publicité
+ * comparative, arbitrage du 10/09/2026 : « aucun concurrent nommé dans la partie visible »).
+ * EN VEILLE avec la bascule. Les neuf SCPI, la note d'agent immobilier et la source complète
+ * vivaient dans la note « frais-page-comparatif », appelée par le titre de la bascule
+ * (comparison.noteId) et SUPPRIMÉE le 11/09/2026 : « la note ci-dessus » ne renvoie plus à rien,
+ * phrase à réécrire si la bascule revient.
  */
 const comparisonPerimeter =
   'Moyennes de marché calculées sur un panel de SCPI sans frais de souscription et avec frais d’acquisition. Panel, périmètre et sources détaillés dans la note ci-dessus.';
@@ -381,6 +402,8 @@ const rawComparison = {
   sides: [marketSide, rstartSide] as [FeeComparisonSide, FeeComparisonSide],
   perimeter: comparisonPerimeter,
   risk: `R Start n’est pas moins chère. Ses frais de gestion sont supérieurs à la moyenne du panel (${feeFacts.management.label} contre ${avg.management.label}). Sa commission de retrait avant ${zeroAfter} ans va jusqu’à ${w0.rate}, contre ${avg.withdrawal.label} en moyenne. Si les ventes dégagent de fortes plus-values, les ${disposalRates} sur les cessions peuvent dépasser une commission de souscription classique. Vous ne connaissez pas votre coût total à la souscription.`,
+  /* Renvoi MORT : la note « frais-page-comparatif » a été supprimée le 11/09/2026, aucune note de
+     ce nom n'existe dans `rawNotes`. À recréer, ou à retirer, si la bascule revient. */
   noteId: 'frais-page-comparatif',
 };
 
@@ -421,7 +444,7 @@ const raw = {
      * Il emporte au passage la DERNIÈRE occurrence de « gagnant-gagnant » sur cette page, que
      * scripts/check-compliance.mjs signalait (« suggère un gain, capital non garanti ») : l'autre était
      * partie avec la chute du hero le 15/09.
-     * (« inédit » reste descendu en zone 3, sur le barème.)
+     * (« inédit » était descendu en zone 3, sur le barème, retiré de la page le même jour.)
      */
     title: 'Comparateur de frais SCPI',
     intro:
@@ -431,19 +454,25 @@ const raw = {
      * ne touche rien tant que vous n'avez pas gagné d'argent. C'est gagnant-gagnant. » La nouvelle ne
      * promet plus rien et envoie au comparateur, qui est l'outil de la page.
      * Au passage, elle retire l'une des deux occurrences de « gagnant-gagnant » que le contrôle de
-     * conformité signalait sur cette page (« suggère un gain, capital non garanti »). L'autre est encore
-     * dans le titre juste au-dessus.
+     * conformité signalait sur cette page (« suggère un gain, capital non garanti »). L'autre était
+     * dans le titre, parti à son tour le 16/09/2026 (voir ci-dessus).
+     * Depuis le 16/09/2026, cette phrase n'est plus dans l'en-tête : frais.astro la passe au
+     * comparateur, qu'elle introduit.
      */
     punchline:
       'Comparez chaque ligne de frais de R Start avec les autres SCPI du marché grâce à notre comparateur.',
     /* Plus de ligne risques dans l'en-tête (14/09/2026, demande de l'équipe : « supprime les bon à
-       savoir de tous les hero sauf celui de la home »). Le « Bon à savoir : … » sous le H1 a disparu de
-       TOUTES les sous-pages ; seul l'accueil le garde, sous ses appels à l'action. Ces pages n'ont donc
-       plus de mention de risque dans leur en-tête : il reste celles de leur contenu quand elles en ont,
-       et le pied de page, commun à tout le site. À rétablir en remettant `riskLine: shortRiskLine`. */
+       savoir de tous les hero sauf celui de la home »). Le « Bon à savoir : … » sous le H1 a
+       disparu de TOUTES les sous-pages. L'accueil ne l'affiche plus non plus : sa ligne passe par
+       RiskNote, qui ne rend plus rien depuis le même jour. Il reste le pied de page, commun à tout
+       le site. À rétablir en remettant `riskLine: shortRiskLine`. */
   },
 
-  /** Micro-textes de la page (aria-label, en-têtes, surtitres) : rien n'est écrit en dur dans frais.astro. */
+  /**
+   * Micro-textes des anciens blocs de la page (aria-label, en-têtes, surtitres). EN VEILLE depuis
+   * le 16/09/2026 : frais.astro ne lit plus `labels`, le barème qui s'en servait ayant quitté la
+   * page.
+   */
   labels: {
     zeroHighlights: 'Les trois frais à 0 %',
     columns: { fee: 'Frais', base: 'Prélevé sur', value: 'Taux', detail: 'Précisions' },
@@ -492,8 +521,10 @@ const raw = {
   },
 
   /**
-   * Frais réellement prélevés, affichés à la même taille (text-stat) que les trois « 0 % » juste
-   * au-dessus : retour AMF sur la brochure, taille de police uniforme pour tous les frais (plan §0).
+   * Frais réellement prélevés, à afficher à la même taille (text-stat) que les trois « 0 % » juste
+   * au-dessus : retour AMF sur la brochure, taille de police uniforme pour tous les frais
+   * (plan §0). EN VEILLE, comme `zeroHighlights` et `counterweight` : la bande a quitté /frais
+   * le 14/09/2026.
    */
   counterweightRates: [
     { value: feeFacts.management.label, label: 'de frais de gestion sur les loyers HT' },
@@ -580,8 +611,10 @@ const raw = {
     intro: `Si vous demandez le retrait de vos parts avant ${zeroAfter} ans, une commission est prélevée sur la valeur de retrait. Le prix de retrait est aujourd’hui de ${withdrawalPriceLabel} par part. La commission diminue à chaque palier, jusqu’à ${w4.rate} après ${zeroAfter} ans. Le rachat de vos parts n’est pas garanti : il suppose une contrepartie à l’achat.`,
     steps: steps.map(({ period, rate }) => ({ period, rate })),
     /**
-     * Le libellé exact des cas d'exonération reste à confirmer par CORUM (facts.fees.withdrawal.exemptions) :
-     * d'ici là, la phrase unique « sous conditions » de l'accueil (fees.ts) remplace la liste titrée.
+     * Le libellé exact des cas d'exonération reste à confirmer par CORUM
+     * (facts.fees.withdrawal.exemptions) : d'ici là, la phrase unique « sous conditions » de
+     * fees.ts (`withdrawalExemptions`) remplace la liste titrée. EN VEILLE avec toute la frise du
+     * retrait, retirée de /frais le 14/09/2026.
      */
     exemptionsTitle: 'Sous conditions, des cas d’exonération',
     exemptions: [withdrawalExemptions],
@@ -610,8 +643,11 @@ const raw = {
   },
 
   /**
-   * `riskFrom` : index du premier paragraphe de contre-poids risque (rendu en RiskNote, jamais animé). Dans les
-   * trois premières réponses, le deuxième paragraphe décrit déjà les frais prélevés : il fait partie du contre-poids.
+   * FAQ des frais, EN VEILLE : retirée de /frais le 14/09/2026, et de ses données structurées
+   * FAQPage le 18/09/2026 (voir frais.astro). Rien n'en est rendu.
+   * `riskFrom` : index du premier paragraphe de contre-poids risque (prévu en RiskNote, jamais
+   * animé ; RiskNote ne rend plus rien). Dans les trois premières réponses, le deuxième paragraphe
+   * décrit déjà les frais prélevés : il fait partie du contre-poids.
    */
   faq: {
     title: 'Vos questions sur les frais de R Start.',
@@ -667,9 +703,10 @@ const raw = {
 const typeset = deepNb(raw);
 
 /**
- * Les textes importés de legal.ts et de facts.ts sont reproduits à l'identique, hors `deepNb` :
- * avertissement commission d'arbitrage (bloc et paragraphe de la FAQ), encadré
- * « Une innovation, pas une révolution », note HT/TTC.
+ * Les textes importés de legal.ts sont reproduits à l'identique, hors `deepNb` : avertissement
+ * commission d'arbitrage (bloc et paragraphe de la FAQ), encadré « Une innovation, pas une
+ * révolution ». La mention HT, texte de l'équipe, reste elle aussi hors `deepNb`.
+ * Aucun de ces champs n'est rendu : /frais ne lit que `seo`, `hero` et `cta` (voir l'en-tête).
  */
 export const feesPage: FeesPageContent = {
   ...typeset,
@@ -688,6 +725,8 @@ export const feesPage: FeesPageContent = {
   arbitrageWarning: { title: arbitrageWarningTitle, bullets: [...arbitrageWarningBullets] },
   innovationBox: innovationNotRevolution,
   /*
+   * EN VEILLE depuis le 16/09/2026 : elle suivait le tableau des frais, et a quitté /frais avec
+   * lui.
    * Note sous le tableau des frais, texte FOURNI PAR L'ÉQUIPE le 14/09/2026, repris mot pour mot. Elle
    * remplace `feeFacts.vatNote`, plus longue, qui exceptait les commissions de cession et de retrait,
    * exprimées TTC. L'exception tombe sans rien fausser : R Start est exonérée de TVA, HT et TTC sont

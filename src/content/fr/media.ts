@@ -12,8 +12,8 @@
  *
  * Ce qui tient toujours, et qui a servi à trier les quinze reçues :
  *  - aucun texte incrusté ni logo de tiers lisible ;
- *  - aucune personne identifiable : les silhouettes dessinées ne le sont pas, les photos d'ambiance
- *    des bureaux CORUM restent la seule exception assumée ;
+ *  - aucune personne identifiable : les silhouettes dessinées ne le sont pas. Les photos d'ambiance
+ *    des bureaux CORUM, seule exception assumée, ont quitté le site le 15/09/2026 ;
  *  - aucun bâtiment réel reconnaissable qu'on pourrait croire détenu par R Start.
  *
  * LES FORMATS NE SONT PAS INTERCHANGEABLES. Chaque rapport a son cadre : 2,36 pour la bande pleine
