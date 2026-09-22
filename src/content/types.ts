@@ -217,32 +217,14 @@ export interface StepItem {
 }
 
 export interface SubscribeContent {
+  /** Titre (H2) du chapitre de l'accueil. */
   title: string;
-  /** Titre du chapitre court sur l'accueil (prop `compact` de 06-Subscribe), si différent de `title`. */
-  homeTitle?: string;
-  intro: string;
-  /** Introduction du chapitre court (≤ 30 mots, factuelle) ; à défaut, `intro`. */
-  homeIntro?: string;
-  /**
-   * Contre-poids du chapitre court de l'accueil (≥ 60 % du texte cumulé des étapes). Plus lu par
-   * aucun composant depuis le 11/09/2026 : le texte reste EN VEILLE dans subscribe.ts.
-   */
-  homeRisk?: string;
   steps: StepItem[];
   /** aria-label de la liste des étapes (ex. « Les quatre étapes de la souscription »). */
   stepsLabel?: string;
   /** Mot lu par les lecteurs d'écran devant le numéro de chaque étape (ex. « Étape »). */
   stepPrefix?: string;
-  /** Titre (H3) du bloc des options facultatives. */
-  optionsTitle?: string;
-  /**
-   * Options facultatives. `description` est l'avantage (data-advantage) ; `risk`, s'il est renseigné,
-   * est son contre-poids rendu en RiskPair (même taille, jamais animé).
-   */
-  options: { title: string; description: string; badge?: string; risk?: string }[];
-  beforeYouSubscribe: string;
-  withdrawalReminder: string;
-  /** Bloc MyCORUM (à la place de la photo) : application de suivi, liens vers les deux stores. */
+  /** Application MyCORUM : liens vers les deux magasins (accueil) et bloc de /documentation. */
   app?: {
     title: string;
     description: string;

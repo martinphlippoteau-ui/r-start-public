@@ -50,9 +50,6 @@ const hero = byPrefix('01-');
 const rest = HOME_ORDER.slice(1)
   .map(byPrefix)
   .filter((s): s is NonNullable<typeof s> => s !== undefined);
-/** Souscrire est rendue en chapitre court (prop `compact`) : le guide complet et MyCORUM vivent sur
- *  /documentation. La Stratégie a quitté l'accueil le 11/09/2026, elle vit sur /strategie. */
-const propsFor = (path: string) => (/\/06-/.test(path) ? { compact: true } : {});
 
 const jsonLd = [
   organizationJsonLd(),
@@ -87,7 +84,7 @@ const jsonLd = [
   <SiteNav />
   <main id="contenu">
     {hero && <hero.Component />}
-    {rest.map(({ path, Component }) => <Component {...propsFor(path)} />)}
+    {rest.map(({ Component }) => <Component />)}
     {
       /* PLUS DE SECTION « Notes et sources » SUR L'ACCUEIL (14/09/2026, demande de l'équipe), et plus
         aucun appel de note en exposant : le registre de l'accueil (content/fr/notes.ts) est vide, et
