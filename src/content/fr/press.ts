@@ -1,5 +1,6 @@
 import type { PressArticle, PressContact, PressContent, PressQuote } from '@/content/types-v2';
 import { press as pressFacts } from '@/content/fr/facts';
+import { nb } from '@/lib/texte';
 
 /**
  * Page /presse, « La presse en parle » (grand public, arbitrage du 10/09/2026).
@@ -22,14 +23,9 @@ import { press as pressFacts } from '@/content/fr/facts';
  *    cités, et R Start n'a pas d'historique propre.
  */
 
-/** Espace insécable (U+00A0) avant % € : ; ? ! : les libellés de facts.ts utilisent une espace simple. */
-const nb = (s: string): string => s.replace(/ ([%€:;?!])/g, ' $1');
-/** Apostrophe typographique pour les libellés écrits avec une apostrophe droite, puis `nb`. */
-const typo = (s: string): string => nb(s.replace(/'/g, '’'));
-
 /** Contacts presse ; l'e-mail n'est renseigné que s'il est confirmé (le composant masque la ligne sinon). */
 const contacts: PressContact[] = pressFacts.contacts.map((c) => ({
-  organisation: typo(c.organisation),
+  organisation: nb(c.organisation),
   name: c.name,
   role: c.role,
   phone: c.phone,
@@ -52,7 +48,7 @@ const articles: PressArticle[] = pressFacts.coverage
   .filter((a) => a.url.trim() !== '')
   .map((a) => ({
     media: a.media,
-    title: typo(a.title),
+    title: nb(a.title),
     date: a.date.label,
     dateIso: a.date.iso,
     url: a.url,
@@ -60,7 +56,7 @@ const articles: PressArticle[] = pressFacts.coverage
 
 /** Citations mises en avant : propos de tiers, avec leur média et leur date. */
 const quotes: PressQuote[] = pressFacts.quotes.map((q) => ({
-  text: typo(q.text),
+  text: nb(q.text),
   media: q.media,
   date: q.date.label,
   dateIso: q.date.iso,

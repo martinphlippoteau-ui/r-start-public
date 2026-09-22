@@ -1,6 +1,7 @@
 import type { HighlightsContent } from '@/content/types';
 import { income, risk, share, subscription } from '@/content/fr/facts';
 import { pages } from '@/config/pages';
+import { nb } from '@/lib/texte';
 
 /**
  * Section 2, « R Start en un clin d'œil » (id « points-forts »), titre du document de l'équipe
@@ -18,9 +19,6 @@ import { pages } from '@/config/pages';
  * section (retiré le 14/09/2026, voir en bas du fichier). Aucune donnée de performance, aucun
  * exemple d'investissement. Aucun chiffre en dur : tout vient de src/content/fr/facts.ts.
  */
-
-/** Espace insécable avant % € : ; ? ! : les libellés de facts.ts utilisent une espace simple. */
-const nb = (s: string): string => s.replace(/ ([%€:;?!])/g, ' $1');
 
 /*
  * Type DÉCLARÉ et non `satisfies` : `intro` est désormais facultative et absente de ce contenu.

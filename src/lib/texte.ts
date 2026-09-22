@@ -22,3 +22,24 @@ export const plier = (texte: string): string =>
     .toLowerCase()
     .replace(/\u0153/g, 'oe')
     .replace(/\u00e6/g, 'ae');
+
+/**
+ * TYPOGRAPHIE FRANÇAISE, UNE SEULE VERSION (audit du 22/09/2026). Il en existait onze copies dans
+ * src/content/fr, en quatre variantes qui ne faisaient pas toutes la même chose ; quatre écrivaient
+ * l'espace insécable en caractère BRUT dans le source (voir `plier` ci-dessus pour ce que cela
+ * coûte). Ici, en échappements.
+ *
+ * Ce que fait `nb` : apostrophe typographique ; espace insécable (U+00A0) avant % € : ; ? ! », après
+ * «, devant « Md€ » et entre les groupes de trois chiffres (« 10 000 € »). Elle ne s'applique jamais
+ * aux mentions de legal.ts reproduites à l'identique.
+ */
+export const nb = (texte: string): string =>
+  texte
+    .replace(/'/g, '\u2019')
+    .replace(/ ([%\u20ac:;?!\u00bb])/g, '\u00a0$1')
+    .replace(/ (Md\u20ac)/g, '\u00a0$1')
+    .replace(/(\d) (?=\d{3}(?!\d))/g, '$1\u00a0')
+    .replace(/\u00ab /g, '\u00ab\u00a0');
+
+/** Minuscule sur la seule initiale : `toLowerCase()` abîmerait un sigle (« SCPI ») plus loin. */
+export const lowerFirst = (texte: string): string => texte.charAt(0).toLowerCase() + texte.slice(1);

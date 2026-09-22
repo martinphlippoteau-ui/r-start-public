@@ -2,13 +2,7 @@ import type { StatItem } from '@/content/types';
 import type { TrustContent } from '@/content/types-v2';
 import { corumGroup, product, trust as trustFacts } from '@/content/fr/facts';
 import { managementCompany } from '@/content/fr/legal';
-
-/** Espace insécable (U+00A0, en échappement) avant % € : ; ? ! et devant « Md€ » : les libellés de facts.ts utilisent une espace simple. */
-const nb = (s: string): string => s.replace(/ ([%€:;?!])/g, ' $1').replace(/ (Md€)/g, ' $1');
-/** Espace insécable entre groupes de trois chiffres (ex. « 160 000 »). */
-const nbDigits = (s: string): string => s.replace(/(\d) (?=\d{3}(?!\d))/g, '$1 ');
-/** Apostrophe typographique (’) : facts.ts écrit « CORUM L'Épargne » avec l'apostrophe droite. */
-const typo = (s: string): string => s.replace(/'/g, '’');
+import { nb } from '@/lib/texte';
 
 /** Numéro d'agrément AMF, extrait de la mention légale (jamais recopié en dur). */
 const amfApprovalNumber = managementCompany.amfApproval.match(/GP-\d+/)?.[0] ?? '';
@@ -45,11 +39,11 @@ export const experienceStats: StatItem[] = [
   },
   {
     value: nb(savings.value),
-    label: typo(savings.label),
+    label: nb(savings.label),
   },
   {
-    value: `${savers.prefix}${nbDigits(savers.value)}`,
-    label: typo(savers.label),
+    value: `${savers.prefix}${nb(savers.value)}`,
+    label: nb(savers.label),
   },
   {
     value: String(corumGroup.scpiCount),
@@ -68,7 +62,7 @@ export const experienceStats: StatItem[] = [
 
 const tp = trustFacts.trustpilot;
 /** Nom du distributeur en apostrophe typographique (titre du bloc Trustpilot). */
-const company = typo(tp.company);
+const company = nb(tp.company);
 
 export const trust = {
   amf: {

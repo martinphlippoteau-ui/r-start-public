@@ -1,6 +1,7 @@
 import type { FaqContent } from '@/content/types';
 import { pages } from '@/config/pages';
 import { fees, risk, share } from '@/content/fr/facts';
+import { nb } from '@/lib/texte';
 
 /**
  * Section « FAQ » et page /faq. Les questions servent aussi de base au JSON-LD FAQPage, limité aux
@@ -20,9 +21,6 @@ import { fees, risk, share } from '@/content/fr/facts';
  * date de jouissance, chiffres du groupe) viennent de facts.ts ; l'encadré « Une innovation, pas une
  * révolution » est importé de legal.ts à l'identique.
  */
-
-/** Espace insécable avant % € : ; ? !, appliquée à toutes les questions et réponses. */
-const nb = (s: string): string => s.replace(/ ([%€:;?!])/g, '\u00A0$1');
 
 /** Questions et réponses avant application de la typographie française (voir `nb`). */
 /*

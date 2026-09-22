@@ -10,34 +10,7 @@ import {
   subscription,
 } from '@/content/fr/facts';
 import { bulletinWarning } from '@/content/fr/legal';
-
-/**
- * Page /simulateur (19/09/2026, demande de Martin, d'après un prototype qu'il a fourni) : tous les
- * textes de la page, et les règles de calcul que src/scripts/simulateur/moteur.ts reçoit en paramètre.
- *
- * UN PARCOURS GUIDÉ, PAS UN TABLEAU DE BORD (arbitrage de Martin du 20/09/2026, après avoir vu la
- * première version, fidèle au prototype : cinq réglages posés d'un coup, « ça ne surcharge pas la
- * charge cognitive, là ? »). Quatre questions, une par écran (`steps`), puis le résultat, où les mêmes
- * réglages restent modifiables un par un (`summary`). La durée n'est pas une question : elle arrive
- * à 25 ans et se règle sur l'écran de résultat, c'est le paramètre avec lequel on joue.
- *
- * AUCUNE VALEUR MÉTIER N'EST SAISIE ICI. Le prototype portait les siennes dans un bloc CONFIG, avec la
- * mention « à valider, viennent de sites de distributeurs ». Elles sont toutes DÉRIVÉES de facts.ts :
- * prix de part et minimum de souscription, délai de jouissance, durée de placement recommandée,
- * barème de la commission de retrait, minimum du versement programmé. Si facts.ts change, le
- * simulateur suit, et les garde-fous ci-dessous arrêtent le build plutôt que de calculer de travers.
- *
- * LE POINT SENSIBLE : LE TAUX. R Start n'a pas d'historique, et le contrôle de conformité du build
- * interdit « taux de distribution » partout ailleurs que sur /a-propos. Cette page en est exemptée
- * (scripts/check-compliance.mjs dit à quelles conditions) parce qu'elle ne publie AUCUN taux pour
- * R Start : c'est le visiteur qui fixe l'hypothèse, rien n'est présélectionné, et l'avertissement
- * reste affiché tant que des résultats le sont. Les deux repères sont des chiffres de marché, sourcés
- * et datés, jamais un objectif.
- *
- * Ne pas écrire ici : « diversifié », un pourcentage suivi de « par an », « rendement attendu ».
- * scripts/check-compliance.mjs les relève, à raison.
- */
-const nb = (s: string): string => s.replace(/ ([%€:;?!»])/g, '\u00A0$1').replace(/« /g, '«\u00A0');
+import { nb } from '@/lib/texte';
 
 /** « 4,91 % » : virgule décimale, deux décimales, espace insécable avant le signe. */
 const pourcent = (valeur: number, decimales = 2): string =>

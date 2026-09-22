@@ -15,6 +15,7 @@ import { faq } from '@/content/fr/faq';
 import { documentsNotice } from '@/content/fr/legal';
 import manifest from '@/content/fr/media.manifest.json';
 import { PENDING_DOCUMENT_KEYS } from '@/content/fr/pendingDocuments';
+import { lowerFirst, nb } from '@/lib/texte';
 
 /**
  * Page /documentation (périmètre v2, plan §12) : centre de documents de R Start.
@@ -37,20 +38,6 @@ import { PENDING_DOCUMENT_KEYS } from '@/content/fr/pendingDocuments';
  * PENDING_DOCUMENT_KEYS est la décision unique de publication : cette page la lit.
  * Aucune donnée de performance. La brochure partenaires (B2B) n'est jamais publiée.
  */
-
-/**
- * Typographie française : apostrophe typographique, espace insécable (U+00A0, en échappement) avant % € : ; ? !,
- * entre groupes de trois chiffres (ex. « 10 000 € ») et à l'intérieur des guillemets « ». Jamais appliquée aux
- * mentions de legal.ts reproduites à l'identique (documentsNotice).
- */
-const nb = (s: string): string =>
-  s
-    .replace(/'/g, '’')
-    .replace(/ ([%€:;?!])/g, ' $1')
-    .replace(/(\d) (?=\d{3}(?!\d))/g, '$1 ')
-    .replace(/« /g, '« ')
-    .replace(/ »/g, ' »');
-const lowerFirst = (s: string): string => s.charAt(0).toLowerCase() + s.slice(1);
 
 /** Poids (ko) des PDF indexé par chemin public, depuis le manifeste des médias (`documents[].kb`). */
 const kbByFile = new Map<string, number>(

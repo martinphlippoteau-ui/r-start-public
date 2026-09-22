@@ -12,6 +12,7 @@ import {
   visaNotice,
 } from '@/content/fr/legal';
 import { legalPages } from '@/content/fr/pages';
+import { nb } from '@/lib/texte';
 
 /**
  * Pied de page : colonnes de liens, libellé « Gérer les cookies », copyright et blocs de mentions
@@ -19,9 +20,6 @@ import { legalPages } from '@/content/fr/pages';
  * hébergeur) sont importées de legal.ts et reproduites à l'identique ; ce fichier ne fait que les
  * assembler en paragraphes courts.
  */
-
-/** Espace insécable avant « : » et « ; » dans les paragraphes assemblés ici. */
-const nb = (s: string): string => s.replace(/ ([%€:;?!])/g, '\u00A0$1');
 
 export const footer = {
   columns: [

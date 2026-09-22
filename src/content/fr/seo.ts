@@ -1,5 +1,6 @@
 import type { SeoContent } from '@/content/types';
 import { product } from '@/content/fr/facts';
+import { lowerFirst } from '@/lib/texte';
 
 /**
  * SEO de l'accueil (FR) : titre, description, texte de l'image Open Graph et requêtes cibles. Les
@@ -17,8 +18,6 @@ import { product } from '@/content/fr/facts';
  * étaient deux références éditoriales sans lecteur, et périmées : elles visaient des sections et des
  * questions qui n'existent plus. Les requêtes cibles vivent dans `keywords`.
  */
-/** Minuscule sur la seule initiale : `toLowerCase()` abîmerait le sigle SCPI de l'accroche. */
-const lowerFirst = (value: string): string => value.charAt(0).toLowerCase() + value.slice(1);
 
 export const seo = {
   /** ≤ 60 caractères. Contient « R Start » et « CORUM ». « Frais d’entrée » : vocabulaire du DIC (« coûts d’entrée », 0 %). */

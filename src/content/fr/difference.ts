@@ -1,5 +1,6 @@
 import type { DifferenceContent } from '@/content/types-v2';
 import { pages } from '@/config/pages';
+import { nb } from '@/lib/texte';
 
 /**
  * Section 2, « Qui a envie de payer avant de gagner ? » (zone 2 de la V2 ; « Pourquoi
@@ -26,9 +27,6 @@ import { pages } from '@/config/pages';
  * Garde-fous : aucune donnée de performance, aucun exemple d'investissement. Aucun avantage de la
  * section ne porte plus son risque à l'écran.
  */
-
-/** Espace insécable avant % et € : les libellés de facts.ts utilisent une espace simple. */
-const nb = (s: string): string => s.replace(/ ([%€:;?!])/g, ' $1');
 
 export const difference = {
   /** Titre et copie fournis par l'équipe le 11/09/2026, repris tels quels (deux points à défendre en

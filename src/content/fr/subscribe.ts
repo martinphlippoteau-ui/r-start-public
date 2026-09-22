@@ -1,5 +1,6 @@
 import type { SubscribeContent } from '@/content/types';
 import { externalLinks, subscription } from '@/content/fr/facts';
+import { nb } from '@/lib/texte';
 
 /**
  * Section « Souscrire » (id : souscrire), chapitre court de l'accueil (11/09/2026) : le titre, les
@@ -11,9 +12,6 @@ import { externalLinks, subscription } from '@/content/fr/facts';
  * commission de retrait, et l'ancien contre-poids de l'accueil (`homeRisk`) sont archivés hors du
  * dépôt (.claude/audits).
  */
-
-/** Espace insécable avant % et € : les libellés de facts.ts utilisent une espace simple. */
-const nb = (s: string): string => s.replace(/ ([%€:;?!])/g, '\u00A0$1');
 
 export const subscribe: SubscribeContent = {
   /*

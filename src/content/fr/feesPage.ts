@@ -1,4 +1,5 @@
 import type { FeesPageContent } from '@/content/types-v2';
+import { nb } from '@/lib/texte';
 
 /**
  * Page /frais : l'en-tête (titre, introduction, `punchline` qui introduit le comparateur) et le
@@ -13,18 +14,6 @@ import type { FeesPageContent } from '@/content/types-v2';
  * comparateur, ligne par ligne ; c'est lui qui porte le « 15 % » que scripts/check-compliance.mjs
  * exige sur cette page. L'avertissement commission d'arbitrage est reproduit sur /documentation.
  */
-
-/**
- * Typographie française : apostrophe typographique, espace insécable (U+00A0, en échappement) avant
- * % € : ; ? !, entre groupes de trois chiffres (ex. « 10 000 € ») et à l'intérieur des « ».
- */
-const nb = (s: string): string =>
-  s
-    .replace(/'/g, '’')
-    .replace(/ ([%€:;?!])/g, '\u00A0$1')
-    .replace(/(\d) (?=\d{3}(?!\d))/g, '$1\u00A0')
-    .replace(/« /g, '«\u00A0')
-    .replace(/ »/g, '\u00A0»');
 
 export const feesPage = {
   seo: {
