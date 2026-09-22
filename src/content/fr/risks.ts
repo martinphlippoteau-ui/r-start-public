@@ -56,9 +56,9 @@ export const risks: RisksContent = {
      * EFFET DE LEVIER ET ABSENCE D'HISTORIQUE, propres à R Start, RETIRÉS le 16/09/2026 à la
      * demande de l'équipe, qui s'en tient aux quatre de corum.fr. Le second était la SEULE
      * occurrence de « ne préjugent pas » sur l'accueil, où scripts/check-compliance.mjs signale une
-     * allégation de performance passée sur des SCPI tierces sans cette mention ; elle ne subsiste
-     * que dans l'explication dépliable de la carte « Horizon d'investissement » (highlights.ts),
-     * repliée par défaut mais présente dans le HTML, et sur /a-propos sous la gamme en chiffres.
+     * allégation de performance passée (« objectifs tenus ») sans cette mention ; l'explication de
+     * la carte « Horizon d'investissement » l'a portée jusqu'au 22/09/2026 (highlights.ts). Elle ne
+     * subsiste que sur /a-propos, sous la gamme en chiffres.
      */
   ],
 

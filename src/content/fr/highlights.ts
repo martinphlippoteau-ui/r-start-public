@@ -14,9 +14,12 @@ import { nb } from '@/lib/texte';
  *  - « Niveau de risque 4/7 » : le DIC dit 3 sur 7 ; facts.risk porte l'écart, aucune phrase du
  *    site n'attribue cette valeur au DIC, et scripts/check-compliance.mjs ne vérifie que la
  *    cohérence avec facts.ts, pas l'écart lui-même ;
- *  - « Approche : Diversifiée » : mot de la brochure, alors que R Start n'a pas encore de
- *    patrimoine à diversifier et peut être concentrée au démarrage (strategy.ts, pilier « Où ») ;
- *    le contrôle le signale en avertissement à chaque exécution.
+ *  - « Stratégie d'investissement : Diversifiée » : mot de la brochure, alors que R Start n'a pas
+ *    encore de patrimoine à diversifier et peut être concentrée au démarrage (strategy.ts, pilier
+ *    « Où ») ; le contrôle le signale en avertissement à chaque exécution.
+ * Depuis le 22/09/2026 (texte de Martin pour l'explication de l'horizon), l'accueil ne porte plus
+ * la mention « les performances passées ne préjugent pas des performances futures » : le libellé
+ * « objectifs tenus » des chiffres du groupe (07-Trust) s'affiche sans elle.
  * Aucune carte ne porte plus de contre-poids risque ni de note légale (source et limite de chaque
  * valeur) : retirés le 14/09/2026 à la demande de l'équipe, les textes ont quitté le code le
  * 22/09/2026 (archivés hors du dépôt, .claude/audits). Reste la section Risques, plus bas.
@@ -43,7 +46,8 @@ export const highlights: HighlightsContent = {
        pas une caractéristique observable, un mot ne suffit pas à le rendre. Ce ne sont pas des
        notes légales (voir l'en-tête). */
     {
-      label: 'Approche',
+      /* « Stratégie d'investissement » depuis le 22/09/2026 (demande de Martin), ex-« Approche ». */
+      label: 'Stratégie d’investissement',
       value: 'Diversifiée',
       info: 'R Start investit dans tous secteurs, toutes zones géographiques et tous types d’immeubles pour ne pas dépendre d’une seule source de performance.',
     },
@@ -59,10 +63,11 @@ export const highlights: HighlightsContent = {
        */
       label: 'Horizon d’investissement',
       value: nb(risk.recommendedHoldingLabel),
-      /* Texte de l'équipe, 16/09/2026. La dernière phrase de la phrase fournie était interrompue
-         (« les revenus ne sont pas garantis et le prix. ») : elle est complétée par la formule employée
-         partout ailleurs sur le site, le prix de la part varie à la hausse comme à la baisse. */
-      info: 'La durée de placement recommandée dans une SCPI est de 10 ans. Comme un investissement immobilier en direct, l’investissement en SCPI présente un risque de perte en capital, les revenus ne sont pas garantis et le prix de la part peut varier à la hausse comme à la baisse. Les performances passées ne préjugent pas des performances futures.',
+      /* Texte de Martin, 22/09/2026 ; il remplace celui de l'équipe du 16/09/2026, qui ajoutait la
+         perte en capital et les revenus non garantis. La durée est celle de facts.ts, en chiffres. */
+      info: nb(
+        `Comme tout placement immobilier, l’investissement dans R Start s’envisage sur le long terme. La durée de placement recommandée dans une SCPI est de ${risk.recommendedHoldingLabel}.`
+      ),
     },
     {
       label: 'Délai de jouissance',
@@ -84,7 +89,8 @@ export const highlights: HighlightsContent = {
    * À part : la façon de souscrire et ce qu'on peut automatiser, pas des caractéristiques du
    * produit.
    */
-  subscriptionTitle: 'Souscription et options disponibles',
+  /* « Modes de souscription disponibles » depuis le 22/09/2026 (demande de Martin). */
+  subscriptionTitle: 'Modes de souscription disponibles',
   subscriptionItems: [
     { label: 'Souscription', value: nb(subscription.onlineLabel) },
     {
