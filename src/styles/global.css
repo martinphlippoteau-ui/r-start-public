@@ -1575,6 +1575,35 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   line-height: 0;
   vertical-align: 0.42em;
 }
+/* Renvois vers les notes de la gamme (/a-propos, MesureGamme.astro) : « (1) » en exposant, même
+   recette que les ordinaux, décollé de l'intitulé par une marge (pas par une espace : elle
+   offrirait un repli) et insécable, pour que « (3)(5) » restent ensemble. Les liens sont soulignés
+   au survol. */
+.renvoi {
+  font-size: 0.62em;
+  line-height: 0;
+  vertical-align: 0.42em;
+  margin-left: 0.25em;
+  white-space: nowrap;
+}
+.renvoi a + a {
+  margin-left: 0.2em;
+}
+.renvoi a {
+  color: var(--color-teal-200);
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 0.15em;
+  transition: text-decoration-color 180ms ease;
+}
+.renvoi a:hover,
+.renvoi a:focus-visible {
+  text-decoration-color: currentColor;
+}
+.renvoi a:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
 
 /* La main n'apparaît que si le script a tourné (il pose l'attribut) : sans lui, la carte n'ouvre
    rien et promettre un clic serait un mensonge. Le bouton, lui, garde son propre curseur. */

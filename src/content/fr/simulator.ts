@@ -47,21 +47,16 @@ if (!dernierPalier) throw new Error('simulator.ts : barème de retrait vide dans
 
 /**
  * MOYENNE DES SCPI CORUM, CALCULÉE et non saisie (arbitrage de Martin du 19/09/2026) : moyenne
- * SIMPLE des taux de distribution que corumRange.ts publie sur /a-propos, dont elle ne peut pas
- * diverger. Le build s'arrête si une SCPI n'a plus de taux ou si les millésimes ne concordent plus.
+ * SIMPLE des taux de distribution 2025 de corumRange.ts (`distribution`, par SCPI), dont /a-propos
+ * ne peut pas diverger : les cartes affichent la performance globale annuelle 2025, égale au taux
+ * de distribution (prix de souscription inchangé en 2025), et tests/simulateur.spec.ts refait la
+ * moyenne depuis ce qu'un visiteur y lit. Le build s'arrête si les millésimes ne concordent plus.
  */
-const tauxCorum = corumRange.items.map((scpi) => {
-  const mesure = scpi.autres.find((m) => m.unit === '%' && /^Rendement \d{4}$/.test(m.label));
-  if (!mesure)
-    throw new Error(
-      `simulator.ts : pas de taux de distribution pour ${scpi.name} dans corumRange.ts`
-    );
-  return {
-    name: scpi.name,
-    year: Number(mesure.label.slice(-4)),
-    rate: parseFloat(mesure.value.replace(',', '.')),
-  };
-});
+const tauxCorum = corumRange.items.map((scpi) => ({
+  name: scpi.name,
+  year: scpi.distribution.year,
+  rate: parseFloat(scpi.distribution.value.replace(',', '.')),
+}));
 const aspim = marketBenchmarks.aspim;
 if (!tauxCorum.length || tauxCorum.some((t) => t.year !== aspim.year || !(t.rate > 0)))
   throw new Error(

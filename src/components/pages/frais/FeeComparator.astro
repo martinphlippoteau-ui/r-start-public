@@ -205,9 +205,13 @@ const data = scpis.map((s) => ({
                       {/* La grille est DANS l'élément `data-fee-value` : global.css force celui-ci en
                         `inline-block` pour la pastille du gagnant, une grille posée dessus était
                         écrasée. Deux colonnes, les taux alignés à gauche entre eux ; la grille a une
-                        largeur FIXE, centrée dans la colonne, pour que les taux des deux barèmes
-                        (vente, sortie) tombent sur le même axe d'une ligne à l'autre. */}
-                      <span class="mx-auto grid w-[18rem] max-w-full grid-cols-[auto_1fr] items-baseline gap-x-2 gap-y-1 text-left">
+                        largeur FIXE, pour que les taux des deux barèmes (vente, sortie) tombent sur
+                        le même axe d'une ligne à l'autre. CALÉE À DROITE de la colonne et non
+                        centrée (demande de Martin) : les taux se rapprochent des valeurs centrées
+                        des lignes du dessus. Seize rem : la ligne la plus longue (« 12 % Si 7 % <
+                        plus-value < 13 % ») y tient sans se replier ; sur téléphone, `max-w-full`
+                        ramène la grille à la largeur de la case. */}
+                      <span class="ml-auto grid w-[16rem] max-w-full grid-cols-[auto_1fr] items-baseline gap-x-2 gap-y-1 text-left">
                         {row.rstartTiers.map((tier) => (
                           <>
                             <span>{tier.rate}</span>
@@ -232,7 +236,7 @@ const data = scpis.map((s) => ({
                         ça on a une harmonisation ») : la même grille de largeur fixe, le taux à
                         gauche et sa précision à côté. Le script remplit les deux cases par leur
                         index, comme ailleurs. */}
-                      <span class="mx-auto grid w-[18rem] max-w-full grid-cols-[auto_1fr] items-baseline gap-x-2 text-left">
+                      <span class="ml-auto grid w-[16rem] max-w-full grid-cols-[auto_1fr] items-baseline gap-x-2 text-left">
                         <span data-comparator-cell={String(i)} class="text-display-sm text-slate-700">
                           {comparator.pendingLabel}
                         </span>

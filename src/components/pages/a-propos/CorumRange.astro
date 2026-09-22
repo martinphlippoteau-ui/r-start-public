@@ -6,7 +6,10 @@
  *                      corum.fr ;
  *  2. bande pleine largeur, hors section (décorative, sans titre : elle n'a donc pas d'ancre) ;
  *  3. #gamme   (white) « Nos autres SCPI en quelques chiffres » : une grille des quatre autres
- *              SCPI du groupe et de leurs chiffres (corumRange.ts), sans R Start.
+ *              SCPI du groupe et de leurs chiffres (corumRange.ts, ceux des pages produit de
+ *              corum.fr), sans R Start ; chaque chiffre renvoie à sa note numérotée sous les
+ *              cartes et un bouton « i » la déplie sur place (MesureGamme.astro, dépliage par
+ *              src/scripts/infoToggle.ts, chargé en bas de ce fichier).
  * La section #savoir-faire (trois familles de solutions du groupe) et l'histoire du groupe ont été
  * retirées les 14 et 16/09/2026 à la demande de l'équipe, leurs textes archivés hors du dépôt
  * (.claude/audits).
@@ -23,6 +26,7 @@ import Container from '@/components/ui/Container.astro';
 import Section from '@/components/ui/Section.astro';
 import Stat from '@/components/ui/Stat.astro';
 import { corum } from '@/content/fr/corum';
+import MesureGamme from '@/components/pages/a-propos/MesureGamme.astro';
 import { corumRange } from '@/content/fr/corumRange';
 import { trust } from '@/content/fr/trust';
 import { media } from '@/content/fr/media';
@@ -81,13 +85,11 @@ const QUIET_TITLE_Y = 12;
        * l'utiliser »). Décoratif (alt vide) : le texte à côté nomme R Start.
        */
     }
-    {/* `sm:items-stretch` : la plaque prend la hauteur de la rangée, donc celle du texte à sa
-      droite, et le logo la remplit. Une hauteur écrite en dur se serait décalée dès qu'une phrase
-      passe d'une ligne à l'autre, ce qui arrive entre 640 et 1024 px. */}
-    <div class="mt-section-sm flex flex-col gap-5 sm:flex-row sm:items-stretch sm:gap-7">
-      <span class="flex shrink-0 items-center justify-center rounded-xl bg-white px-5 py-4 ring-1 ring-navy/10">
-        <Image src={brandLogo} alt="" width={142} height={44} class="w-auto max-sm:h-10 sm:h-11" />
-      </span>
+    {/* Logo NU, sans plaque ni filet (demande de Martin), centré sur la hauteur de la phrase dès
+      `sm` : quel que soit le nombre de lignes du texte, qui varie entre 640 et 1024 px, le logo
+      reste au milieu. */}
+    <div class="mt-section-sm flex flex-col gap-5 sm:flex-row sm:items-center sm:gap-8">
+      <Image src={brandLogo} alt="" width={142} height={44} class="h-11 w-auto shrink-0" />
       <p class="max-w-3xl text-base leading-snug text-slate-700">{trust.amf.aboutSentence}</p>
     </div>
 
@@ -152,12 +154,13 @@ const QUIET_TITLE_Y = 12;
   <Container size="wide">
     {
       /*
-       * LA GAMME (16/09/2026, contenu fourni par l'équipe) : les chiffres remplacent les noms des
-       * SCPI. R START N'Y EST PLUS : elle n'a ni TRI ni rendement à montrer. Les années de création
-       * restent dans facts.ts (`scpiCreated`), que la gamme lit toujours.
-       * SUR LES CHIFFRES, voir l'en-tête de corumRange.ts : chaque intitulé est celui fourni, la
-       * mention réglementaire sur les performances passées a été ajoutée, et la date d'arrêté reste
-       * à demander à CORUM.
+       * LA GAMME : les chiffres des pages produit de corum.fr (22/09/2026, demande de Martin ;
+       * jusque-là, le document de l'équipe du 16/09/2026). R START N'Y EST PAS : elle n'a ni TRI ni
+       * rendement à montrer. Les années de création restent dans facts.ts (`scpiCreated`), que la
+       * gamme lit toujours.
+       * SUR LES CHIFFRES, voir l'en-tête de corumRange.ts : chaque intitulé est celui de corum.fr,
+       * chaque chiffre renvoie à sa note, et la mention réglementaire sur les performances passées
+       * est ajoutée au contenu de corum.fr.
        */
     }
     <header class="max-w-4xl">
@@ -186,7 +189,7 @@ const QUIET_TITLE_Y = 12;
       class="mt-10 grid gap-4 sm:grid-cols-2 sm:gap-5 lg:mt-14 lg:grid-cols-4"
     >
       {
-        corumRange.items.map((scpi) => (
+        corumRange.items.map((scpi, i) => (
           <li class="flex flex-col rounded-3xl bg-ink p-6 text-white sm:p-7">
             <p class="text-display-sm text-sand">{scpi.name}</p>
             {
@@ -197,29 +200,25 @@ const QUIET_TITLE_Y = 12;
             {scpi.created && <p class="text-caption mt-1 font-normal text-white/70">{scpi.created}</p>}
 
             {
-              /* LA MESURE MISE EN AVANT, et son intitulé juste dessous : un grand nombre seul ne
+              /* LE TRI EN PREMIER (22/09/2026, demande de Martin), en display-md et non plus lg
+                (« diminue la taille du TRI »), son intitulé juste dessous : un grand nombre seul ne
                 dit pas ce qu'il mesure, et ces quatre-là ne mesurent pas la même chose (trois TRI
-                réalisés et un objectif). */
+                réalisés et un objectif). Renvoi et bouton « i » : MesureGamme.astro. */
             }
-            <p class="text-display-lg mt-6 leading-none text-white">
-              {scpi.principale.value}
-              <span class="text-display-sm text-teal-200">{scpi.principale.unit}</span>
-            </p>
-            <p class="mt-2 text-base leading-snug text-white/80">{scpi.principale.label}</p>
+            <div class="mt-6">
+              <MesureGamme mesure={scpi.principale} id={`gamme-${i}-tri`} principale />
+            </div>
 
             {
-              /* `mt-auto` sur le bloc du bas : les intitulés de la mesure mise en avant font une ou
-                deux lignes selon la SCPI, et sans lui les trois dernières lignes ne s'alignaient pas
-                d'une carte à l'autre. */
+              /* PLUS DE `mt-auto` sur le bloc du bas (22/09/2026) : depuis que les cartes portent
+                des panneaux dépliables, un panneau ouvert sur une carte allonge la rangée, et le
+                bloc du bas des trois autres s'en allait au fond, un trou au milieu. Les cartes
+                restent de même hauteur (grille), le vide est en bas. */
             }
-            <ul role="list" class="mt-auto space-y-4 border-t border-white/15 pt-5">
-              {scpi.autres.map((m) => (
-                <li class="flex items-baseline justify-between gap-3">
-                  <span class="text-base leading-snug text-white/80">{m.label}</span>
-                  <span class="text-lead shrink-0 font-semibold text-sand tabular-nums">
-                    {m.value}
-                    <span class="text-base text-teal-200">{m.unit}</span>
-                  </span>
+            <ul role="list" class="mt-6 space-y-4 border-t border-white/15 pt-5">
+              {scpi.autres.map((m, j) => (
+                <li>
+                  <MesureGamme mesure={m} id={`gamme-${i}-${j}`} />
                 </li>
               ))}
             </ul>
@@ -229,13 +228,30 @@ const QUIET_TITLE_Y = 12;
     </ul>
 
     {
-      /* LA MENTION RÉGLEMENTAIRE D'ABORD, les définitions ensuite : elle qualifie tous les chiffres
+      /* LA MENTION RÉGLEMENTAIRE D'ABORD, les notes ensuite : elle qualifie tous les chiffres
         au-dessus, elle ne peut pas être la sixième ligne d'une liste de notes. Jamais animée.
-        Pleine largeur des cartes (17/09/2026, demande de Martin) : plus de `max-w-4xl`. */
+        Pleine largeur des cartes (17/09/2026, demande de Martin) : plus de `max-w-4xl`.
+        LES NOTES SONT NUMÉROTÉES comme leurs renvois sur les cartes, « (1) » à « (5) », chacune
+        avec l'ancre que le renvoi vise, et en text-base et non plus en caption (22/09/2026,
+        « augmente la taille des disclaimers sous les cards »). Le numéro est écrit dans la ligne
+        et non par `list-style` : il doit s'écrire « (1) », comme sur la carte. */
     }
     <p class="mt-10 text-base leading-relaxed text-ink">{corumRange.pastPerformance}</p>
-    <ul role="list" class="text-caption mt-5 space-y-3 text-slate-700">
-      {corumRange.notes.map((note) => <li>{note}</li>)}
-    </ul>
+    <ol role="list" class="mt-5 space-y-3 text-base leading-snug text-slate-700">
+      {
+        corumRange.notes.map((note, n) => (
+          <li id={`gamme-note-${n + 1}`} class="flex gap-2">
+            <span class="shrink-0 tabular-nums">({n + 1})</span>
+            <span>{note.text}</span>
+          </li>
+        ))
+      }
+    </ol>
   </Container>
 </Section>
+
+<script>
+  /* Dépliage des notes par les boutons « i » des cartes, le module des repères de l'accueil et du
+     comparateur (src/scripts/infoToggle.ts) : sans lui, panneaux ouverts et boutons cachés. */
+  import '@/scripts/infoToggle';
+</script>

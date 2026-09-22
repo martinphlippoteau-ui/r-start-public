@@ -1,0 +1,109 @@
+---
+/**
+ * Une mesure d'une carte de la gamme (/a-propos, CorumRange.astro) : le chiffre, son intitulé,
+ * ses RENVOIS vers les notes sous les cartes (« (1) », liens vers `#gamme-note-1`, comme sur les
+ * pages produit de corum.fr) et un bouton « i » qui déplie ces mêmes notes sur place (le dépliage
+ * est celui des repères de l'accueil, src/scripts/infoToggle.ts, chargé par CorumRange.astro).
+ * Deux dispositions : `principale` (le TRI : le chiffre en grand, l'intitulé dessous) et la ligne
+ * (l'intitulé, puis le chiffre dessous, puis la ligne de détail du prix de la part). EMPILÉES et
+ * non côte à côte : dans une colonne de quatre, « Performance globale annuelle moyenne de 2020 à
+ * 2025 » à gauche d'un chiffre prenait cinq lignes.
+ * Fond ink : le bouton est en `info-bouton-sombre`, les liens de renvoi en teal-200.
+ * Sans JavaScript : panneaux ouverts, bouton caché, renvois actifs (ancres natives).
+ */
+import { corumRange, numeroNote, type MesureScpi, type NoteKey } from '@/content/fr/corumRange';
+
+interface Props {
+  mesure: MesureScpi;
+  /** Identifiant du panneau déplié par le bouton « i » (unique dans la page). */
+  id: string;
+  principale?: boolean;
+}
+
+const { mesure, id, principale = false } = Astro.props;
+const { labels, notes } = corumRange;
+/** Les textes dépliés par le « i » : les notes que la mesure et sa ligne de détail citent. */
+const textes = [...(mesure.notes ?? []), ...(mesure.detail?.notes ?? [])].map(
+  (cle) => notes.find((n) => n.key === cle)?.text ?? ''
+);
+
+/*
+ * INTITULÉ ET RENVOIS EN UNE SEULE CHAÎNE, rendue par `set:html`, et non en balises du gabarit :
+ * Astro conserve les blancs du source, et Prettier sépare deux nœuds voisins d'un retour à la
+ * ligne, donc d'une espace, donc d'une occasion de repli ; un renvoi seul en début de ligne ne se
+ * lirait pas. Ici, rien entre le dernier mot et « (1) », et « (3)(5) » tiennent dans un seul
+ * <span> insécable (`.renvoi`, global.css, qui les met aussi en exposant), le saut de ligne étant
+ * permis entre « ) » et « ( ». Le texte est échappé ; les renvois ne contiennent que des nombres.
+ */
+const echapper = (texte: string): string =>
+  texte.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const avecRenvois = (texte: string, cles: readonly NoteKey[] | undefined): string => {
+  const liens = (cles ?? []).map((cle) => {
+    const n = numeroNote(cle);
+    return `<a href="#gamme-note-${n}" aria-label="${labels.note} ${n}">(${n})</a>`;
+  });
+  return (
+    echapper(texte) + (liens.length > 0 ? `<span class="renvoi">${liens.join('')}</span>` : '')
+  );
+};
+---
+
+{
+  principale && (
+    <p class="text-display-md leading-none text-white">
+      {mesure.value}
+      <span class="text-display-sm text-teal-200">{mesure.unit}</span>
+    </p>
+  )
+}
+{
+  /* Le bouton « i » est EN LIGNE derrière l'intitulé, pas dans une boîte flex : il y passait seul
+    à la ligne sous l'intitulé. */
+}
+<p class:list={['text-base leading-snug text-white/80', principale && 'mt-2']}>
+  <span set:html={avecRenvois(mesure.label, mesure.notes)} />
+  {
+    textes.length > 0 && (
+      <button
+        type="button"
+        data-info-bouton
+        hidden
+        aria-expanded="false"
+        aria-controls={id}
+        class="info-bouton info-bouton-sombre ml-2 align-middle"
+      >
+        <span aria-hidden="true">i</span>
+        <span class="visually-hidden">
+          {labels.info} : {mesure.label}
+        </span>
+      </button>
+    )
+  }
+</p>
+{
+  !principale && (
+    <p class="text-lead mt-1 font-semibold leading-none text-sand tabular-nums">
+      {mesure.value}
+      <span class="text-base text-teal-200">{mesure.unit}</span>
+    </p>
+  )
+}
+{
+  !principale && mesure.detail && (
+    <p
+      class="text-caption mt-1.5 text-white/70"
+      set:html={avecRenvois(mesure.detail.text, mesure.detail.notes)}
+    />
+  )
+}
+{
+  textes.length > 0 && (
+    <div id={id} class="info-panneau">
+      <div class="space-y-2">
+        {textes.map((t) => (
+          <p class="text-caption leading-snug text-white/70">{t}</p>
+        ))}
+      </div>
+    </div>
+  )
+}

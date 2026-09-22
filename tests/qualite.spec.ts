@@ -801,14 +801,19 @@ test.describe('Qualité', () => {
      interminables (8,5 écrans sans titre). On vérifie ce qui les rendait illisibles, pas la mise en
      page du jour : plusieurs sections, un titre visible par section, aucun pavé de plusieurs
      écrans. */
-  const PAGES_REFONDUES = [
+  const PAGES_REFONDUES: { chemin: string; mini: number; plafonds?: Record<string, number> }[] = [
     /* Quatre sur /strategie : le texte exact fourni par l'équipe tient en trois chapitres, plus le
        bloc des risques qui ferme la page. */
     { chemin: '/strategie/', mini: 4 },
-    { chemin: '/a-propos/', mini: 2 },
+    /* #gamme dépasse quatre écrans sur téléphone depuis le 22/09/2026 : quatre cartes titrées, de
+       quatre indicateurs chacune (ceux des pages produit de corum.fr), et cinq notes
+       réglementaires en corps de texte (demande de Martin). Ce n'est pas un pavé sans titre, ce
+       que le garde-fou traque ; plafond porté à six écrans pour cette section seule (elle en fait
+       cinq sur l'iPhone 13, dont la fenêtre ne fait que 664 px de haut). */
+    { chemin: '/a-propos/', mini: 2, plafonds: { gamme: 6 } },
     { chemin: '/presse/', mini: 4 },
   ];
-  for (const { chemin, mini } of PAGES_REFONDUES) {
+  for (const { chemin, mini, plafonds = {} } of PAGES_REFONDUES) {
     test(`${chemin} se lit en sections courtes et titrées`, async ({ page }) => {
       await page.goto(chemin);
       const releve = await page.evaluate(() => {
@@ -827,7 +832,9 @@ test.describe('Qualité', () => {
       expect(contenu.length).toBeGreaterThanOrEqual(mini);
       expect(contenu.filter((s) => !s.titre || s.cache).map((s) => s.id)).toEqual([]);
       expect(
-        contenu.filter((s) => s.ecrans > 4).map((s) => `${s.id} ${s.ecrans.toFixed(1)} écrans`)
+        contenu
+          .filter((s) => s.ecrans > (plafonds[s.id] ?? 4))
+          .map((s) => `${s.id} ${s.ecrans.toFixed(1)} écrans`)
       ).toEqual([]);
     });
   }

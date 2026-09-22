@@ -106,6 +106,12 @@ const FORBIDDEN = [
     allow: /(pas|aucun|sans)\s+(d'|de\s)?(objectif de rendement|taux de distribution)/i,
   },
   {
+    /* MÊME EXEMPTION DE /a-propos que la règle précédente (22/09/2026) : sur les cartes de la
+       gamme, la valeur « 7,70 % » de CORUM USA est suivie de la note dépliable « Rendement : taux
+       de distribution… », et le texte de la page enchaîne « 7,70 % Rendement ». Ce n'est pas une
+       phrase ; la page ne porte aucun pourcentage attribué à R Start, à relire à chaque
+       modification de corumRange.ts puisque la règle ne le verra plus. */
+    except: ['a-propos'],
     re: /\d+(?:[,.]\d+)?\s?%\s?(?:de\s)?(?:rendement|performance|par an|annuel)/gi,
     label: 'pourcentage de performance',
   },

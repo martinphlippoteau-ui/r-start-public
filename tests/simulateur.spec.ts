@@ -294,18 +294,28 @@ test.describe('Simulateur : aucun taux n’est supposé à R Start', () => {
   });
 
   /* LE REPÈRE « SCPI CORUM » NE PEUT PAS DIVERGER DE /a-propos : le test refait la moyenne à partir
-     des quatre taux qu'un visiteur y lit. */
+     des quatre taux qu'un visiteur y lit. Depuis le 22/09/2026 les cartes reprennent les pages
+     produit de corum.fr : trois affichent la performance globale annuelle 2025 (égale au taux de
+     distribution, prix de souscription inchangé en 2025), CORUM USA son rendement 2025 ; le test
+     lit la ligne « Rendement 2025 » quand elle existe, sinon « Performance globale annuelle
+     2025 » : le premier « n,nn % » qui suit l'intitulé (entre les deux, les renvois « (3) » et le
+     libellé masqué du bouton « i »). Une carte par SCPI (les `li` de la liste nommée), et non
+     tout `li` : les mesures sont elles-mêmes des `li`. */
   test('le repère CORUM est la moyenne des taux publiés sur /a-propos', async ({ page }) => {
     await page.goto('/a-propos/');
     const taux = await page.evaluate(() =>
-      [...document.querySelectorAll('#gamme li, #gamme article')]
+      [...document.querySelectorAll('#gamme ul[aria-label] > li')]
         .map((carte) => (carte.textContent ?? '').replace(/\s+/g, ' '))
-        .map((t) => /(\d+,\d+)\s*%\s*Rendement 2025|Rendement 2025\s*(\d+,\d+)\s*%/.exec(t))
+        .map(
+          (t) =>
+            /Rendement 2025[^%]*?(\d+,\d+)\s*%/.exec(t) ??
+            /Performance globale annuelle 2025[^%]*?(\d+,\d+)\s*%/.exec(t)
+        )
         .filter((m): m is RegExpExecArray => m !== null)
-        .map((m) => parseFloat((m[1] ?? m[2] ?? '').replace(',', '.')))
+        .map((m) => parseFloat((m[1] ?? '').replace(',', '.')))
     );
-    const uniques = [...new Set(taux)];
-    expect(uniques.length, 'quatre SCPI, quatre taux lus sur /a-propos').toBe(4);
+    expect(taux.length, 'quatre SCPI, quatre taux lus sur /a-propos').toBe(4);
+    const uniques = taux;
     const moyenne = uniques.reduce((s, t) => s + t, 0) / uniques.length;
     await page.goto('/simulateur/');
     const repere = page.locator('[data-simu-repere]').nth(1);
