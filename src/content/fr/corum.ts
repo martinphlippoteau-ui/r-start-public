@@ -1,7 +1,7 @@
 import type { CorumContent, LegalNote } from '@/content/types';
 import { corumGroup, product, externalLinks, scpiCreated } from '@/content/fr/facts';
 import { managementCompany } from '@/content/fr/legal';
-import { experienceStats, notes as trustNotes } from '@/content/fr/trust';
+import { notes as trustNotes } from '@/content/fr/trust';
 
 /**
  * Section « L'expérience derrière R Start » (id : corum), rendue avec trust.ts dans la section
@@ -27,17 +27,6 @@ import { experienceStats, notes as trustNotes } from '@/content/fr/trust';
 
 /** Espace insécable avant % € : ; ? ! et devant « Md€ » : les libellés de facts.ts utilisent une espace simple. */
 const nb = (s: string): string => s.replace(/ ([%€:;?!])/g, ' $1').replace(/ (Md€)/g, ' $1');
-
-/**
- * Passer à true une fois la date d'arrêté des chiffres groupe confirmée par CORUM et reportée dans
- * facts.corumGroup.statsSource (« données au … »). Aujourd'hui false : le dépôt ne contient qu'une date
- * de consultation de corum.fr (08/09/2026, facts.corumGroup.statsDate), la brochure partenaires 2026
- * n'en donne pas non plus. Une date de consultation n'est pas une date d'arrêté : `stats` reste donc
- * vide ici. La bande rendue sur l'accueil (trust.stats, 07-Trust.astro) affiche les mêmes chiffres avec
- * une source qui dit explicitement que la date d'arrêté n'est pas communiquée, faute d'état vide dans le
- * composant ; lui appliquer ce même drapeau demande d'y ajouter un état vide (hors périmètre contenu).
- */
-const STATS_DATED = false;
 
 const others = corumGroup.scpiNames.slice(0, -1);
 const otherScpi = `${others.slice(0, -1).join(', ')} et ${others[others.length - 1]}`;
@@ -129,7 +118,6 @@ export const history = {
 } as const;
 
 export const corum = {
-  eyebrow: 'CORUM',
   /*
    * « Le groupe CORUM en quelques chiffres » depuis le 15/09/2026, ex-« L'expérience derrière
    * R Start ». La section ne porte plus les avis Trustpilot mais le bandeau des quatre chiffres du
@@ -142,13 +130,6 @@ export const corum = {
     `R Start s’appuie sur ${corumGroup.experienceLabel} d’expertise du groupe CORUM dans l’investissement immobilier. Cette expérience ne préjuge pas des résultats de R Start. La SCPI a ouvert ses souscriptions le ${product.openingDate.label} et n’a pas d’historique propre.`
   ),
 
-  /** Bloc vide tant que STATS_DATED est false : le composant n'affiche alors ni chiffres ni source. */
-  stats: STATS_DATED ? experienceStats : [],
-  statsSource: STATS_DATED
-    ? nb(
-        `${corumGroup.statsSource} Ancienneté du groupe et nombre de SCPI gérées : brochure partenaires 2026, p. 7.`
-      )
-    : '',
   /** Contre-poids des quatre chiffres, rendu avec eux et à la même taille. */
   statsRisk: nb(
     `Ces chiffres décrivent le groupe CORUM, pas R Start. Ils peuvent évoluer. La taille du groupe ne préjuge ni des résultats de R Start, ni de la liquidité de ses parts. Le capital investi n’est pas garanti.`
@@ -237,8 +218,6 @@ export const corum = {
     newTabHint: 'nouvelle fenêtre',
   },
   disclaimer: corumGroup.disposalsDisclaimer,
-
-  notes,
 } satisfies CorumContent;
 
 export default corum;

@@ -41,7 +41,6 @@ export const notes: LegalNote[] = [
  * `risks.intro` ne compilait plus. L'annotation garde le contrôle du littéral et expose le champ.
  */
 export const risks: RisksContent = {
-  eyebrow: 'Risques',
   /** « R Start » en espace insécable : le nom de marque ne se coupe jamais dans le H2 (mobile 375 px). */
   title: 'Investir dans R Start comporte des risques.',
   /*
@@ -119,8 +118,6 @@ export const risks: RisksContent = {
   dicWarning,
   arbitrageTitle: arbitrageWarningTitle,
   arbitrageBullets: [...arbitrageWarningBullets],
-
-  notes,
 };
 
 export default risks;

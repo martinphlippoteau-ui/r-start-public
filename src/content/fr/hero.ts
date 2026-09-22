@@ -65,7 +65,6 @@ export const hero = {
   /** CTA secondaire (11/09/2026) : il mène à la page Frais, seul accès au barème depuis l'accueil. */
   secondaryCta: {
     label: 'Comparer les frais',
-    position: 'hero',
     href: pages.fees.path,
   },
   /**
@@ -73,5 +72,4 @@ export const hero = {
    * 11/09/2026, au-dessus du chevron : il nomme le lien pour tout le monde, à l'écran comme au clavier.
    */
   scrollHint: { label: 'Découvrir R Start' },
-  notes,
 } satisfies HeroContent;

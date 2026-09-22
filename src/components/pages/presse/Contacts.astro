@@ -1,15 +1,17 @@
 ---
 /**
- * Page Salle de presse, Contacts presse (id « contacts-presse »). Fond réglable par la prop `tone` (alternance des sections).
+ * Contacts presse de /presse, zone 4 (id « contacts-presse »). Fond réglable par la prop `tone`
+ * (alternance des sections). NÉ POUR LA SALLE DE PRESSE, qui a été mise en veille le 15/09/2026 puis
+ * supprimée le 22/09/2026 : c'est aujourd'hui le seul endroit du site où un journaliste trouve un contact.
  * Une carte par contact : organisation (surtitre), nom (H3), rôle, puis une liste de définitions
  * téléphone (lien tel: sans espaces dans le href, numéro insécable) et e-mail (lien mailto:, ligne rendue
- * seulement si le contenu porte un e-mail confirmé). Source des contacts en dessous, avec son appel de note.
+ * seulement si le contenu porte un e-mail confirmé).
  * Animation : révélation en cascade des cartes.
- * Contenu : src/content/fr/pressRoom.ts (contacts, labels).
+ * Contenu : src/content/fr/press.ts (`contacts`, `labels`).
  */
 import Container from '@/components/ui/Container.astro';
 import Section from '@/components/ui/Section.astro';
-import { pressRoom } from '@/content/fr/pressRoom';
+import { press } from '@/content/fr/press';
 
 interface Props {
   /** Fond de la section : 'paper' par défaut, 'white' pour alterner avec la section précédente. */
@@ -18,8 +20,8 @@ interface Props {
 const { tone = 'paper' } = Astro.props;
 
 const id = 'contacts-presse';
-const { contacts } = pressRoom;
-const labels = pressRoom.labels ?? {};
+const { contacts } = press;
+const labels = press.labels ?? {};
 
 /** href tel: : indicatif et chiffres seulement (ex. « +33 6 99 60 10 25 » → « +33699601025 »). */
 const telHref = (phone: string) => 'tel:' + phone.replace(/[^\d+]/g, '');
@@ -92,7 +94,7 @@ const telHref = (phone: string) => 'tel:' + phone.replace(/[^\d+]/g, '');
     {
       /* LIGNE DE SOURCE RETIRÉE le 14/09/2026 (« enlève les notes et les sources de tout le site sauf du
         tableau de la page frais ») : elle disait d'où venaient les contacts et à quelle date ils
-        avaient été relevés. Le texte reste dans pressRoom.ts (`contacts.source`). C'était la dernière
+        avaient été relevés. Le texte reste dans press.ts (`contacts.source`). C'était la dernière
         mention de source du site hors comparateur de /frais. */
     }
   </Container>

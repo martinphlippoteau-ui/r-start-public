@@ -179,19 +179,6 @@
 }
 
 /* --- Utilitaires de marque --- */
-@utility bg-brand-gradient {
-  background-image: linear-gradient(
-    135deg,
-    #024b68 0%,
-    #0b7a93 32%,
-    #1198af 57%,
-    #14a4ba 71%,
-    #2fb6c9 100%
-  );
-}
-@utility bg-brand-gradient-dark {
-  background-image: linear-gradient(160deg, #0d2e3d 0%, #024b68 45%, #0b7a93 100%);
-}
 /* Texte en dégradé (grands chiffres, Stat) : bornes navy → teal-700 → teal-500. La borne claire s'arrête
    à #1198af (3,4:1 sur blanc, 3,2:1 sur paper) : un grand texte (≥ 24 px gras) reste AA (≥ 3:1) sur
    toute sa longueur ; #14a4ba (2,98:1 sur blanc) est réservé aux fonds sombres. */
@@ -230,11 +217,10 @@
  * qui crient, le reste qui parle normalement.
  *
  * CE QU'ON REPREND, et ce qu'on adapte :
- *   display-xl  40 →  96 px  devient  48 → 88 px   (l'accroche d'accueil)
  *   display-lg  28 →  64 px  devient  36 → 52 px   (les H1 et les H2 de chapitre)
  *   display-md  24 →  46 px  devient  28 → 36 px   (les H2 de section)
  *   display-sm  20 →  30 px  devient  20 → 24 px   (les H3)
- * Grand écran : tout descend encore, de 8 à 22 %. Téléphone : les deux premiers paliers REMONTENT,
+ * Grand écran : tout descend encore, de 19 à 22 %. Téléphone : les deux premiers paliers REMONTENT,
  * parce que c'est là que Revolut est plus gros que nous et que c'est ce qui donne la tenue.
  *
  * L'INTERLIGNE DE 1 N'EST PAS REPRIS TEL QUEL. Il tient chez eux parce que leurs accroches font trois
@@ -245,13 +231,6 @@
  * Les bornes restent calées sur 390 et 1440 px, et la pente est recalculée pour les atteindre
  * exactement là : c'est ce qui garde la progression régulière entre les deux.
  */
-@utility text-display-xl {
-  /* 48 px à 390, 88 px à 1440. */
-  font-size: clamp(3rem, 2.071rem + 3.81vw, 5.5rem);
-  line-height: 1.05;
-  letter-spacing: -0.02em;
-  font-weight: 700;
-}
 @utility text-display-lg {
   /* 36 px à 390, 52 px à 1440. */
   font-size: clamp(2.25rem, 1.879rem + 1.52vw, 3.25rem);
@@ -284,20 +263,6 @@
   font-size: clamp(2rem, 0.75rem + 5.14vw, 5.5rem);
   line-height: 1.05;
   letter-spacing: -0.04em;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-}
-
-/* Chiffre de frais dans un bloc comparé (12/09/2026, page Frais). `text-stat` monte à 88 px : taillé
-   pour un nombre court posé seul (« 160 000 »), il fait passer « de 0 % à 12 % » à la ligne et écrase
-   ses voisins.
-   La TAILLE EST COMMUNE à tout le bloc, c'est une exigence AMF : aucun frais ne doit être affiché plus
-   petit que ses voisins (tests/conformite.spec.ts). Elle est donc calée sur la valeur la PLUS LONGUE,
-   pas sur « 0 % » : à 44 px, « de 0 % à 12 % » tient sur une ligne dans une colonne de tiers de page. */
-@utility text-fee-stat {
-  font-size: clamp(1.75rem, 3vw, 2.75rem);
-  line-height: 1.05;
-  letter-spacing: -0.03em;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
@@ -1163,79 +1128,15 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   }
 }
 
-/* Cadre image façon page produit : coins arrondis, ombre portée douce, débordement masqué */
-@utility img-frame {
-  position: relative;
-  overflow: hidden;
-  border-radius: 1.5rem;
-  box-shadow: var(--shadow-float);
-  isolation: isolate;
-  @media (width >= 40rem) {
-    border-radius: 2rem;
-  }
-}
-
-/* Visuel produit détouré posé sans cadre (11/09/2026) : ses bords se fondent dans la page au lieu d'être
-   coupés net par un rectangle. Masque radial, le cœur reste parfaitement opaque jusqu'à 56 %, donc le
-   sujet n'est jamais atténué, seule la marge de fond s'efface. À n'utiliser que sur un visuel dont le
-   fond est proche de celui de la section (ici, blanc sur blanc), sinon le dégradé se voit. */
-@utility photo-fade {
-  position: relative;
-  overflow: hidden;
-  /* DEUX dégradés croisés plutôt qu'un masque radial (11/09/2026) : un cercle centré sur une boîte que le
-     sujet remplit presque ne peut pas à la fois effacer les coins et épargner le sujet, il laissait les
-     coins à 80 % d'opacité, donc le bord restait net. Ici, chaque bord a sa bande de fondu et le centre
-     n'est jamais touché ; `intersect` les croise, ce qui efface les coins deux fois.
-     Les bandes sont calées sur la place du sujet dans le cadre : 20 % à gauche et à droite (le téléphone
-     commence à 34 %), 14 % en haut (il commence à 25 %), 10 % en bas (il finit à 89 %). */
-  -webkit-mask-image:
-    linear-gradient(
-      to bottom,
-      rgb(0 0 0 / 0) 0%,
-      rgb(0 0 0 / 1) 14%,
-      rgb(0 0 0 / 1) 90%,
-      rgb(0 0 0 / 0) 100%
-    ),
-    linear-gradient(
-      to right,
-      rgb(0 0 0 / 0) 0%,
-      rgb(0 0 0 / 1) 20%,
-      rgb(0 0 0 / 1) 80%,
-      rgb(0 0 0 / 0) 100%
-    );
-  mask-image:
-    linear-gradient(
-      to bottom,
-      rgb(0 0 0 / 0) 0%,
-      rgb(0 0 0 / 1) 14%,
-      rgb(0 0 0 / 1) 90%,
-      rgb(0 0 0 / 0) 100%
-    ),
-    linear-gradient(
-      to right,
-      rgb(0 0 0 / 0) 0%,
-      rgb(0 0 0 / 1) 20%,
-      rgb(0 0 0 / 1) 80%,
-      rgb(0 0 0 / 0) 100%
-    );
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  -webkit-mask-composite: source-in;
-  mask-composite: intersect;
-}
-
-/* Défilement horizontal sans barre visible (liste de la navigation) */
 /* --- Photo de téléphone (AppMyCorum.astro) ---
-   Pose 3D légère : perspective + rotation figée (ce n'est pas une animation, rien à couper en
-   reduced-motion), coins arrondis et ombre portée qui décollent la photo du fond. */
-/* Depuis le 11/09/2026, le visuel fourni est un PNG DÉTOURÉ qui porte déjà sa perspective et son ombre :
-   la pose 3D et l'ombre rectangulaire d'ici s'y ajoutaient, penchaient le téléphone deux fois et le
-   faisaient déborder de sa carte. Il ne reste que la hauteur automatique. À rétablir si un jour l'image
-   redevient une capture à plat. */
+   Le visuel est un PNG DÉTOURÉ qui porte déjà sa perspective et son ombre (11/09/2026) : la pose 3D et
+   l'ombre rectangulaire qu'ajoutait la CSS penchaient le téléphone deux fois et le faisaient déborder
+   de sa carte. Il ne reste que la hauteur automatique. */
 .phone-shot {
   height: auto;
 }
 
+/* Défilement horizontal sans barre visible (liste de la navigation, barre d'ancres de /documentation) */
 @utility scrollbar-none {
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -1698,62 +1599,6 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
    ÉTAT PAR DÉFAUT : OUVERT. Le panneau est écrit ouvert dans le HTML et c'est le script qui le referme
    au chargement, en même temps qu'il révèle le bouton. Sans JavaScript, on lit donc les explications,
    et aucun bouton mort ne traîne. */
-/*
- * LA BULLE D'EXPLICATION (17/09/2026, définition « SCPI » du premier bloc de l'accueil) : posée sous la
- * phrase qui la porte (`position: relative` sur celle-ci), pointe sous le bouton « i » (`--pointe`,
- * posée par scripts/infoToggle.ts à l'ouverture). ELLE S'OUVRE COMME LES PASTILLES D'APPEL : opacité en
- * 240 ms, échelle au ressort (`--ease-spring`, 420 ms, comme le dépliage de la pastille), depuis sa
- * pointe. Elle se referme plus vite et sans ressort (une fermeture doit être nette), et `visibility`
- * ne bascule qu'à la fin : plus rien n'est atteignable au clavier une fois refermée.
- * SANS SCRIPT (`[data-bulle-liee]` absent), c'est un paragraphe ordinaire sous la phrase, lu en clair.
- */
-@utility info-bulle {
-  margin-top: 0.75rem;
-  color: var(--color-ink);
-
-  &[data-bulle-liee] {
-    position: absolute;
-    left: 0;
-    top: calc(100% + 0.85rem);
-    z-index: 20;
-    width: min(26rem, 100%);
-    margin-top: 0;
-    padding: 1rem 1.25rem;
-    border-radius: 1.25rem;
-    background: #fff;
-    box-shadow: var(--shadow-float);
-    transform-origin: var(--pointe, 1.5rem) top;
-    &::before {
-      content: '';
-      position: absolute;
-      top: -0.4rem;
-      left: calc(var(--pointe, 1.5rem) - 0.45rem);
-      width: 0.9rem;
-      height: 0.9rem;
-      border-radius: 0.15rem;
-      background: #fff;
-      transform: rotate(45deg);
-    }
-    @media (prefers-reduced-motion: no-preference) {
-      transition:
-        opacity 240ms var(--ease-out-expo),
-        transform 420ms var(--ease-spring),
-        visibility 0s;
-    }
-  }
-  &[data-bulle-liee][data-ferme] {
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(-0.4rem) scale(0.9);
-    @media (prefers-reduced-motion: no-preference) {
-      transition:
-        opacity 160ms ease-in,
-        transform 200ms var(--ease-out-expo),
-        visibility 0s linear 200ms;
-    }
-  }
-}
-
 /* REPLIÉ VEUT DIRE MASQUÉ, pas seulement écrasé (audit du 18/09/2026). Le panneau replié ramenait sa
    rangée à 0fr, mais son texte restait dans l'arbre d'accessibilité et dans la recherche du
    navigateur, alors que le bouton annonçait `aria-expanded="false"`. Dans le comparateur, il vit dans
@@ -2023,16 +1868,6 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   }
   to {
     transform: translate3d(2.5%, -1%, 0) rotate(1.5deg) scale(1.03);
-  }
-}
-
-/* --- Scènes (data-scene) : superposition des steps, seulement quand le moteur tourne --- */
-@media (prefers-reduced-motion: no-preference) {
-  html.motion .scene-stack {
-    display: grid;
-  }
-  html.motion .scene-stack > [data-step] {
-    grid-area: 1 / 1;
   }
 }
 

@@ -33,7 +33,7 @@ interface Props {
 const { notes = allNotes } = Astro.props;
 
 const id = sections.notes.id;
-const title = footer.notesTitle ?? sections.notes.label;
+const title = footer.notesTitle;
 /** Libellé du <summary> : le titre de la section, suivi du nombre de notes de la page. */
 const toggleLabel = (footer.notesToggleLabel ?? '{n}').replace('{n}', String(notes.length));
 /*

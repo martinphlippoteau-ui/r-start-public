@@ -2,7 +2,7 @@
  * Curation visuelle du site R Start.
  *
  * Chemins relatifs à src/assets/images. TOUT CE QUI EST DANS CE DOSSIER EST LIVRÉ AU NAVIGATEUR,
- * cité ou non (src/lib/images.ts) : ce qu'on écarte va dans src/assets/vivier, hors du glob.
+ * cité ou non (src/lib/images.ts) : ce qu'on écarte quitte le dossier, l'historique git le garde.
  *
  * LES IMMEUBLES SONT DES ILLUSTRATIONS DEPUIS LE 15/09/2026, fournies par l'équipe. Les photos du
  * dossier Assets qui les précédaient ont été retirées. Ce changement défait la règle qui ouvrait ce
@@ -16,9 +16,10 @@
  *    des bureaux CORUM restent la seule exception assumée ;
  *  - aucun bâtiment réel reconnaissable qu'on pourrait croire détenu par R Start.
  *
- * LES FORMATS NE SONT PAS INTERCHANGEABLES. Le lot vient en trois rapports, et chacun a son cadre :
- * 2,36 pour la bande pleine largeur (03a-Immeuble, 2,0 à 2,7 selon l'écran), 0,80 pour les trois de
- * la section Stratégie (`aspect-[4/5]`), 1,25 pour le bloc « Ce qui change vraiment » (`aspect-[4/3]`).
+ * LES FORMATS NE SONT PAS INTERCHANGEABLES. Chaque rapport a son cadre : 2,36 pour la bande pleine
+ * largeur (03a-Immeuble, 2,0 à 2,7 selon l'écran), 1,25 pour le bloc « Ce qui change vraiment »
+ * (`aspect-[4/3]`). Les portraits en 0,80 de l'ancienne section Stratégie, qui n'a plus de photo depuis
+ * le 16/09/2026, ont été retirés le 22/09/2026 : ils partaient en production sans être cités.
  * Remplacer une image par une autre d'un rapport différent la fait recadrer de moitié.
  * Les alt décrivent l'architecture : aucun locataire ni adresse n'est nommé faute de certitude.
  * Les pictogrammes ne sont plus des images : ce sont des SVG au trait dessinés dans
@@ -40,10 +41,9 @@ export interface MediaImage {
 /**
  * INTERRUPTEUR DES LÉGENDES, posé le 15/09/2026 : « supprime toutes les légendes sous les images ».
  * Même geste que pour les notes légales (src/components/LegalNotes.astro) et les « Bon à savoir » :
- * RIEN N'EST EFFACÉ, seul l'affichage est coupé. Les textes restent dans ce fichier et dans
- * strategy.ts, le service conformité les replacera où il l'entend.
- * Les cinq rendus concernés : 03a-Immeuble, 01b-Difference, 04-Strategy (deux, la légende commune et
- * celle par photo), CorumRange, et la légende du globe dans 04-Strategy.
+ * RIEN N'EST EFFACÉ, seul l'affichage est coupé. Les textes restent dans ce fichier, le service
+ * conformité les replacera où il l'entend.
+ * Les trois rendus concernés : 03a-Immeuble, 01b-Difference et CorumRange.
  * Pour les rétablir : passer cette constante à `true`, et rien d'autre.
  */
 export const AFFICHER_LEGENDES = false;
@@ -65,8 +65,6 @@ export interface MediaContent {
    * de repli n'était plus lue depuis que le hero est passé aux aurores en dégradé.
    */
   hero: { main: MediaImage };
-  /** Trois immeubles variés pour le défilement de la section Stratégie. */
-  strategy: readonly MediaImage[];
   /** Bande pleine largeur de la page /a-propos, entre les deux chapitres. */
   corum: MediaImage;
   documents?: MediaImage;
@@ -78,7 +76,6 @@ export interface MediaContent {
 }
 
 export const media = {
-  // 768 × 1365, fournie par l'équipe le 11/09/2026 : téléphone affichant l'application MyCORUM.
   // 338 × 536, PNG DÉTOURÉ (fond transparent), fourni par l'équipe le 11/09/2026. Il remplace
   // app/iphone-rstart.jpeg, dont l'arrière-plan blanc devait être fondu au masque et dont les badges
   // incrustés portaient « Apple Store » et « Android Store » au lieu des marques déposées.
@@ -104,34 +101,6 @@ export const media = {
    * (rue-vitrines, rue-hotel-marquise) montraient un décor ; les dessins montrent le mécanisme.
    * L'entrée est retirée d'ici et de MediaContent : une donnée que personne ne lit induit en erreur.
    */
-  /*
-   * Les trois portraits du lot d'illustrations, en 1856 × 2304 (rapport 0,80). Le cadre de la section
-   * est `aspect-[3/4]` puis `sm:aspect-[4/5]` : à 0,80 ils remplissent le second exactement, là où
-   * l'ancien lot en 3:2 était recadré de moitié.
-   * L'ORDRE SUIT LES TROIS ZONES : ce qu'on achète, où, et comment.
-   */
-  strategy: [
-    // Quoi : rue piétonne, commerces en pied d'immeuble et bureaux au-dessus, la cible mixte.
-    {
-      src: 'immeubles/rue-pietonne-coupole.png',
-      alt: 'Illustration : rue piétonne pavée bordée d’arbres et de terrasses, coupole d’un édifice ancien en fond',
-      credit: illustration,
-    },
-    // Où : front de mer, seule vue du lot qui ne soit pas une rue de centre-ville. Elle porte
-    // l'idée d'ailleurs sans nommer de pays, ce que la carte fait ensuite précisément.
-    {
-      src: 'immeubles/promenade-bord-de-mer.png',
-      alt: 'Illustration : promenade en bord de mer au crépuscule, lampadaires alignés et façades d’immeubles à droite',
-      credit: illustration,
-    },
-    // Comment : des locataires à l'ouvrage. Personne n'est identifiable, ce sont des silhouettes
-    // dessinées, mais le bâtiment est occupé, ce qui est le sujet même de cette zone.
-    {
-      src: 'immeubles/terrasse-affaires.png',
-      alt: 'Illustration : salle de restaurant d’un quartier d’affaires, tables occupées et tours visibles par la verrière',
-      credit: illustration,
-    },
-  ],
   /*
    * LES PHOTOS D'AMBIANCE SONT PARTIES LE 15/09/2026 : plus aucune photographie sur le site, tout
    * l'imagier est dessiné. Les deux vues des bureaux CORUM ont été supprimées, ainsi que l'atelier

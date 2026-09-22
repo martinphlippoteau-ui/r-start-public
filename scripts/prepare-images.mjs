@@ -1,6 +1,11 @@
-// Prépare les images sources pour le site : redimensionne les originaux (trop lourds pour le repo)
-// vers src/assets/images/*, copie les logos/favicons/PDF vers leurs emplacements, et écrit un manifeste
-// (src/content/fr/media.manifest.json) que les agents de curation utilisent pour choisir les visuels.
+// Prépare les fichiers sources pour le site : copie les logos, les favicons et les documents
+// réglementaires (PDF) vers leurs emplacements, et écrit un manifeste (src/content/fr/media.manifest.json)
+// dont le site lit la liste des documents et leur poids.
+//
+// PLUS DE PHOTOS depuis le 22/09/2026. Le script redimensionnait les photos de la source vers une réserve
+// de curation (src/assets/vivier) ; le site n'affiche plus aucune photographie depuis le 15/09/2026, et la
+// réserve a été supprimée. Les illustrations d'immeubles sont déposées à la main dans src/assets/images
+// et citées par src/content/fr/media.ts.
 //
 // Usage : node scripts/prepare-images.mjs [--assets "C:\\chemin\\vers\\Assets R Start"]
 // Idempotent : un fichier déjà présent et plus récent que sa source n'est pas retraité.
@@ -8,7 +13,6 @@
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import sharp from 'sharp';
 import { PENDING_DOCUMENT_KEYS } from '../src/content/fr/pendingDocuments.ts';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -18,31 +22,13 @@ const ASSETS =
     ? path.resolve(process.argv[argIndex + 1])
     : path.resolve(ROOT, '..', 'Assets R Start');
 
-/*
- * Les photos redimensionnées vont dans le VIVIER, pas dans src/assets/images (14/09/2026).
- * src/assets/images est scanné par un `import.meta.glob` (src/lib/images.ts) qui émet TOUT ce qu'il
- * attrape, cité ou non : y déverser les deux cent photos de la source, c'était livrer 25,7 Mo au
- * navigateur pour treize images affichées. Curer une photo, c'est la déplacer du vivier vers
- * src/assets/images et l'ajouter à media.ts.
- */
-const OUT_IMAGES = path.join(ROOT, 'src', 'assets', 'vivier');
 const OUT_LOGOS = path.join(ROOT, 'src', 'assets', 'logos');
 const OUT_PUBLIC = path.join(ROOT, 'public');
 const OUT_DOCS = path.join(OUT_PUBLIC, 'documents');
 const MANIFEST = path.join(ROOT, 'src', 'content', 'fr', 'media.manifest.json');
 
-/**
- * Jeux d'images raster : dossier source → dossier cible, taille max, format de sortie.
- * Le dossier « 4 - Pictogrammes 3D » n'est plus traité : les pictos sont des SVG au trait dessinés dans
- * src/components/ui/Picto.astro. (`alpha: true` reste géré pour un futur jeu WebP à transparence.)
- */
-const RASTER_SETS = [
-  { src: '3 - Photos immeubles', out: 'immeubles', maxWidth: 2400, format: 'jpg', quality: 84 },
-  { src: '6 - Photos ambiance', out: 'ambiance', maxWidth: 2400, format: 'jpg', quality: 84 },
-];
-
 /* Logos vectoriels réellement importés par un composant (copie brute). `globe.svg` en est sorti le
-   14/09/2026 : aucun fichier ne l'importait, et le globe de /strategie est dessiné au canvas. */
+   14/09/2026 : aucun fichier ne l'importait. */
 const LOGOS = [
   ['1 - Logos R Start/R_Start_couleur_CMJN.svg', 'r-start-couleur.svg'],
   ['1 - Logos R Start/R_Start_blanc_CMJN.svg', 'r-start-blanc.svg'],
@@ -106,15 +92,6 @@ const DOCUMENTS = [
   ],
 ];
 
-const slug = (name) =>
-  name
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/\.(jpg|jpeg|png|webp)(\.webp)?$/i, '')
-    .replace(/[^a-zA-Z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .toLowerCase();
-
 async function isFresh(target, source) {
   try {
     const [t, s] = await Promise.all([fs.stat(target), fs.stat(source)]);
@@ -133,55 +110,10 @@ async function copyFile(rel, outDir, outName) {
   return { file: outName, skipped: false };
 }
 
-async function processSet(set) {
-  const srcDir = path.join(ASSETS, set.src);
-  const outDir = path.join(OUT_IMAGES, set.out);
-  await fs.mkdir(outDir, { recursive: true });
-  const entries = (await fs.readdir(srcDir)).filter((f) => /\.(jpe?g|png|webp)$/i.test(f));
-  const results = [];
-  for (const file of entries) {
-    const src = path.join(srcDir, file);
-    const outName = `${slug(file)}.${set.format}`;
-    const dst = path.join(outDir, outName);
-    const fresh = await isFresh(dst, src);
-    if (!fresh) {
-      let pipeline = sharp(src, { failOn: 'none' }).rotate().resize({
-        width: set.maxWidth,
-        withoutEnlargement: true,
-        fit: 'inside',
-      });
-      if (set.format === 'jpg')
-        pipeline = pipeline
-          .flatten({ background: '#ffffff' })
-          .jpeg({ quality: set.quality, mozjpeg: true });
-      else pipeline = pipeline.webp({ quality: set.quality, alphaQuality: 90 });
-      await pipeline.toFile(dst);
-    }
-    const meta = await sharp(dst).metadata();
-    const stat = await fs.stat(dst);
-    results.push({
-      set: set.out,
-      file: `${set.out}/${outName}`,
-      source: file,
-      width: meta.width,
-      height: meta.height,
-      orientation: meta.width >= meta.height ? 'paysage' : 'portrait',
-      kb: Math.round(stat.size / 1024),
-    });
-    process.stdout.write(
-      `${fresh ? '=' : '+'} ${set.out}/${outName} ${meta.width}x${meta.height}\n`
-    );
-  }
-  return results;
-}
-
 async function main() {
   await fs.access(ASSETS).catch(() => {
     throw new Error(`Dossier d'assets introuvable : ${ASSETS}`);
   });
-  const images = [];
-  for (const set of RASTER_SETS) images.push(...(await processSet(set)));
-
   const logos = [];
   for (const [rel, out] of LOGOS) logos.push(await copyFile(rel, OUT_LOGOS, out));
   const publicFiles = [];
@@ -206,7 +138,6 @@ async function main() {
         /* Le NOM du dossier source, pas son chemin : le manifeste est versionné, et il publiait le
            chemin absolu du poste qui l'avait généré (nom d'utilisateur compris). */
         generatedFrom: path.basename(ASSETS),
-        images,
         logos: logos.map((l) => `logos/${l.file}`),
         publicFiles: publicFiles.map((p) => p.file),
         documents,
@@ -217,7 +148,7 @@ async function main() {
     'utf8'
   );
   console.log(
-    `\nManifeste écrit : ${path.relative(ROOT, MANIFEST)} (${images.length} images, ${documents.length} documents)`
+    `\nManifeste écrit : ${path.relative(ROOT, MANIFEST)} (${documents.length} documents)`
   );
 }
 

@@ -31,7 +31,6 @@ const interrupteur = (nom: string, valeur: string): boolean => {
 export const site = {
   name: 'R Start',
   publisher: "CORUM L'Épargne",
-  lang: 'fr',
   locale: 'fr_FR',
   url: PUBLIC_SITE_URL.replace(/\/+$/, ''),
   /** URL du tunnel de souscription réglementé. */

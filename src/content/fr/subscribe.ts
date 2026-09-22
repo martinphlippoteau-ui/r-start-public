@@ -52,7 +52,6 @@ const withdrawalReminder = `R Start est un placement de long terme : ${risk.reco
  * ne compilait plus. L'annotation garde le contrôle du littéral et expose le champ optionnel.
  */
 export const subscribe: SubscribeContent = {
-  eyebrow: 'Souscrire',
   /** « R Start » en espace insécable : le nom de marque ne se coupe jamais dans le H2 (mobile 375 px). */
   title: `Souscrire à R Start, ${nb(subscription.onlineLabel)}.`,
   /* Chiffre et non lettre dans le titre (12/09/2026, demande de l'équipe) : un titre se balaie, un
@@ -135,7 +134,6 @@ export const subscribe: SubscribeContent = {
    * d'illustration. Description factuelle des fonctions, aucune promesse de résultat.
    */
   app: {
-    eyebrow: 'Après la souscription',
     title: 'Suivez votre épargne dans MyCORUM',
     description:
       'L’application de CORUM L’Épargne, sur iPhone et Android, permet de consulter vos parts, vos versements et vos documents, de programmer des versements et de gérer le réinvestissement de vos revenus.',
@@ -147,8 +145,6 @@ export const subscribe: SubscribeContent = {
     newTabHint: 'nouvelle fenêtre',
   },
   cta: { label: 'Souscrire en ligne', position: 'souscrire' },
-
-  notes,
 };
 
 /** Notes appelées par les étapes (rendues sur l'accueil en `compact`) ; `notes` reste complet pour le guide. */

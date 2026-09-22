@@ -21,7 +21,6 @@
  *    visuelles. Après le passage, la précédente reste décalée derrière le rideau (comportement
  *    ScrollTrigger sans espace réservé) : la section rideau doit donc mesurer au moins la hauteur du
  *    viewport.
- *  - data-pin + data-pin-end="+=800" : épingle l'élément dans son parent (compatibilité).
  *
  * Refusés sur le H1 et [data-risk] ; parallaxe et scrub refusés aussi sur un conteneur qui en contient
  * (ces effets ne rendent jamais l'état final : le contenu réglementaire y resterait altéré).
@@ -147,21 +146,5 @@ export const setupCurtains = (): void => {
         },
       }
     );
-  });
-};
-
-/** EN SOMMEIL : aucune page ne porte `data-pin` (relevé sur dist le 19/09/2026). */
-export const setupPins = (): void => {
-  all('[data-pin]').forEach((el) => {
-    if (!allowed(el, 'data-pin')) return;
-    ScrollTrigger.create({
-      trigger: el.parentElement || el,
-      start: 'top top',
-      end: el.dataset.pinEnd || 'bottom bottom',
-      pin: el,
-      pinSpacing: false,
-      anticipatePin: 1,
-      fastScrollEnd: true,
-    });
   });
 };

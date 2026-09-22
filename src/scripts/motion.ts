@@ -3,22 +3,21 @@
  * Tout se pilote par attributs dans le HTML ; aucune section n'écrit de code GSAP.
  *
  * Ce fichier est le point d'entrée LÉGER (sans GSAP, dans le chunk principal avec consent/analytics) :
- * classes d'état (data-on-load, data-in-view), puis chargement d'un moteur en chunk séparé via
+ * classe d'état (data-in-view), puis chargement d'un moteur en chunk séparé via
  * `import()`, au premier temps d'inactivité (requestIdleCallback, 1 s maximum), jamais en
  * `prefers-reduced-motion: reduce` (rien n'est alors téléchargé).
  * DEUX MOTEURS, un seul par page, choisi d'après ce que la page déclare :
  *  - motion/engine.ts (GSAP + ScrollTrigger, ≈ 45 Ko gzip + 4 Ko) dès qu'un effet de la liste
- *    BESOIN_GSAP est présent, épinglage, défilement lié, tracé, compteur, texte mot à mot.
+ *    BESOIN_GSAP est présent : rideau, défilement lié, tracé, texte mot à mot.
  *    Aujourd'hui : l'accueil et /strategie ;
  *  - motion/lite.ts (≈ 1 Ko, IntersectionObserver + transitions CSS) sinon : il rend les révélations
  *    `data-animate` avec les mêmes types, les mêmes durées et LES MÊMES GARDE-FOUS. Les sous-pages ne
  *    déclarent que cela : elles ne téléchargent plus GSAP.
  * Les deux ne cohabitent jamais : aucune double animation possible.
  *
- * EN SOMMEIL (relevé sur dist le 19/09/2026) : `data-on-load`, `data-counter`, `data-fill`, `data-scene`
- * et `data-pin` ne sont portés par aucune page. Ils restent dans le vocabulaire et dans le moteur, où
- * ils ne trouvent rien à faire (deux à trois Ko dans un chunk de 122 Ko, chargé au repos). Chaque
- * module le dit en tête ; qui rallume un effet retire la mention.
+ * RETIRÉS LE 22/09/2026, après trois jours en sommeil sans qu'aucune page ne les porte : `data-on-load`
+ * (loaded.ts), `data-counter` (counter.ts, et le compteur de ui/Stat.astro), `data-fill` (draw.ts),
+ * `data-scene` (scene.ts) et `data-pin` (scroll.ts). L'historique git les garde.
  *
  * ┌ VOCABULAIRE ─────────────────────────────────────────────────────────────────────────────────┐
  * │ Chargement (CSS pur, sans GSAP)                                                               │
@@ -29,7 +28,6 @@
  * │  data-intro-move              variante par transform seul (translateY 14 px, opacité intacte) │
  * │                               OBLIGATOIRE sur un candidat LCP (grand paragraphe du 1er        │
  * │                               viewport) : un élément à opacité 0 est ignoré par le LCP.        │
- * │  data-on-load="classe"        classe ajoutée à `load` (états CSS, ex. dézoom hero).          │
  * │  data-in-view="classe"        classe posée tant que l'élément est dans le viewport (IO) :     │
  * │                               animations CSS continues jouées seulement à l'écran.            │
  * │ Révélations uniques (once, interruptibles, 88 % du viewport), motion/reveal.ts              │
@@ -39,21 +37,14 @@
  * │                               isolé (picto), `clip` aux médias (sinon fade-up) ; un élément    │
  * │                               déjà à l'écran à l'init n'est pas animé (pas de flash).         │
  * │  data-reveal-text[="scrub"]   mot à mot, H2 de chapitre (≤ 12 mots) uniquement. → text.ts    │
- * │  data-counter="160000"        + -prefix / -suffix / -decimals / -from / -duration (fr-FR) ;   │
- * │                               chiffres non réglementaires seulement (jamais un frais, un SRI) │
  * │  data-draw[="width"]          tracé SVG (stroke-dashoffset) ou barre (scaleX) ; data-draw-scrub│
- * │  data-fill="0.57"             jauge (scaleX, ou scaleY avec data-fill-axis="y")               │
- * │ Scènes au scroll (lissage SCRUB 0,6 partout, transform/opacity), motion/scroll.ts, scene.ts │
+ * │ Effets au scroll (lissage SCRUB 0,6 partout, transform/opacity), motion/scroll.ts           │
  * │  data-parallax="0.15"         + -trigger / -start / -end                                      │
  * │  data-scrub="scale:1,1.08|opacity:1,0"  + -trigger / -start / -end / -ease ; `blur:0,10` (px)  │
  * │                               admis pour un objet décoratif isolé, jamais du texte (shared.ts)  │
- * │  data-scene + data-scene-end="+=120%"   enfants [data-step] (+ data-step-stay), classe        │
- * │                               `scene-stack` pour superposer les steps ; RiskNote HORS des     │
- * │                               steps (toujours visible).                                        │
  * │  data-curtain                 la section recouvre la précédente (pin) ; recul scale 0.96 /    │
  * │                               opacity 0.6 seulement si la précédente n'a aucun [data-risk] ;  │
  * │                               jamais après un épinglage, seulement clair → ink.                │
- * │  data-pin + data-pin-end      épinglage simple (compatibilité)                                │
  * │ Exclusion                                                                                     │
  * │  data-no-motion               l'élément et ses descendants sont exclus de tout effet          │
  * └───────────────────────────────────────────────────────────────────────────────────────────────┘
@@ -69,50 +60,43 @@
  *  - Jamais d'effet sur le H1, sur un [data-risk] (ligne risques, contre-poids, avertissements
  *    réglementaires) ni sur les mentions du footer, ni directement, ni PAR UN ANCÊTRE : tout
  *    attribut est refusé sur un élément qui contient un risque (révélation, scrub, parallaxe, intro,
- *    reveal-text, scène) ; les enfants d'un `stagger` qui en contiennent restent visibles ; le recul
+ *    reveal-text) ; les enfants d'un `stagger` qui en contiennent restent visibles ; le recul
  *    du rideau est supprimé si la section précédente en contient un. Une révélation n'enveloppe donc
  *    jamais un risque : on anime l'avantage seul (modèle : 02-Highlights).
- *  - L'image du hero n'est jamais animée avant le LCP : seul un dézoom CSS après `load` est admis.
- *    Jamais de data-intro (opacité) ni de data-animate sur un candidat LCP.
+ *  - Jamais de data-intro (opacité) ni de data-animate sur un candidat LCP : un élément à opacité 0
+ *    est ignoré par le LCP.
  *  - prefers-reduced-motion: reduce → rien n'est créé (GSAP non chargé, gsap.matchMedia ensuite) :
  *    contenu visible et stable ; cascade CSS et transitions coupées par @media.
  *  - Transform et opacity uniquement (mini-syntaxe filtrée, `clip` limité aux médias) ; `will-change`
- *    posé le temps de l'animation (onToggle pour les scènes) ; pins avec anticipatePin/fastScrollEnd ;
+ *    posé le temps de l'animation ; rideaux avec anticipatePin/fastScrollEnd ;
  *    scrub ≤ 1 ; pas de scroll hijacking, SANS EXCEPTION : celle du hero de l'accueil, franchi d'un
  *    seul geste du 17 au 19/09/2026, a été retirée à la demande de Martin. Le défilement est partout
  *    celui du navigateur.
  *  - Jamais d'état initial invisible en CSS : c'est GSAP qui pose l'état de départ (anti-CLS, no-JS) ;
  *    la cascade d'entrée CSS se résout seule (animation-fill-mode: backwards, 850 ms au plus).
- *  - Les valeurs finales (compteurs, jauges, textes) sont dans le HTML : sans JS, tout est exact.
+ *  - Les valeurs finales (textes, tracés) sont dans le HTML : sans JS, tout est exact.
  */
 import { all, allowed } from './motion/dom';
 import { setupInView } from './motion/inview';
-import { setupLoadedClasses } from './motion/loaded';
 
 const IDLE_TIMEOUT = 1000;
 
 /**
- * Effets qui exigent GSAP + ScrollTrigger : épinglage, défilement lié, tracé, compteur, découpe de
- * texte. Une page qui n'en déclare aucun n'a besoin que des révélations `data-animate`, rendues par
+ * Effets qui exigent GSAP + ScrollTrigger : rideau, défilement lié, tracé, découpe de texte. Une page qui n'en déclare aucun n'a besoin que des révélations `data-animate`, rendues par
  * le moteur léger (motion/lite.ts) : elle ne télécharge pas les 45 Ko gzip de la bibliothèque.
  * La navigation (src/components/SiteNav.astro) ne dépend d'aucun moteur : ni barre de progression, ni
  * vol de la marque (retiré le 12/09/2026, la barre est identique sur tout le site), et le CTA compact
  * est géré par son script en ligne.
  */
 const BESOIN_GSAP = [
-  '[data-scene]',
   '[data-curtain]',
-  '[data-pin]',
   '[data-parallax]',
   '[data-scrub]',
   '[data-draw]',
-  '[data-fill]',
-  '[data-counter]',
   '[data-reveal-text]',
 ].join(',');
 
 const boot = () => {
-  setupLoadedClasses();
   setupInView();
   // La cascade d'entrée est en CSS : on contrôle seulement, en développement, qu'elle n'enveloppe
   // aucun H1 ni [data-risk].

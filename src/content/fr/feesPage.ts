@@ -414,7 +414,6 @@ const raw = {
    * Le texte est rendu tel quel : c'est la décision de l'équipe, pas un oubli.
    */
   hero: {
-    eyebrow: `Frais · SCPI ${product.name}`,
     /*
      * « Comparateur de frais SCPI » depuis le 16/09/2026, texte de l'équipe. Le titre disait « Un modèle
      * de frais gagnant-gagnant » ; il dit maintenant ce que la page EST, et reprend l'intitulé du menu,

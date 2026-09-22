@@ -44,7 +44,7 @@ const jsonLd = [
 <Base title={titre} description={intro} path={page.path} jsonLd={jsonLd}>
   <SiteNav />
   <main id="contenu">
-    <PageHero eyebrow={faq.eyebrow} title={titre} intro={intro}>
+    <PageHero title={titre} intro={intro}>
       <Breadcrumb slot="breadcrumb" key="faq" tone="dark" />
       <Button slot="cta" position={faq.cta.position} variant="light" size="lg">
         {faq.cta.label}

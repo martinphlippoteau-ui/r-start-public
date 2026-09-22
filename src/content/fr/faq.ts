@@ -13,18 +13,11 @@ import {
 import { managementCompany } from '@/content/fr/legal';
 
 /**
- * Section « FAQ ».
- * Ordre de lecture : les 10 questions de la stratégie SEO (src/content/fr/seo.ts, `faqQuestions`), avec
- * leur libellé exact, complétées par les 6 questions de pédagogie de la V2 (réunion produit du
- * 10/09/2026), insérées au plus près de la question SEO qu'elles éclairent :
- *  - « Comment R Start compte-t-elle créer de la performance ? » (réponse fournie par l'équipe) ;
- *  - « Les frais d'entrée, c'est quoi ? » et « Les frais sur les achats d'immeubles, c'est quoi ? » ;
- *  - « Pourquoi R Start n'affiche-t-elle pas d'objectif de rendement ? » ;
- *  - « Délai de jouissance et dividendes : comment ça marche ? » ;
- *  - « R Start remplace-t-elle les autres SCPI du groupe CORUM ? » (gamme complémentaire, brochure p.5).
- * La réponse fournie par l'équipe pour « Une SCPI, c'est quoi ? » est portée par la question SEO
- * équivalente, « Qu'est-ce qu'une SCPI ? » : même contenu, libellé SEO conservé, pas de doublon dans le
- * JSON-LD FAQPage. Sert aussi de base à ce JSON-LD.
+ * Section « FAQ » et page /faq. Les questions servent aussi de base au JSON-LD FAQPage, limité aux
+ * questions visibles (src/lib/seo.ts).
+ * L'ancien ordre de lecture, calé sur les dix questions SEO de seo.ts (`faqQuestions`) et les six
+ * questions de pédagogie de la V2, ne correspondait plus aux questions présentes : retiré le 21/09/2026
+ * avec `faqQuestions`.
  *
  * Vocabulaire (V2, §3) : à l'affichage, on écrit « frais sur les achats d'immeubles ». Le terme
  * réglementaire « frais d'acquisition » ne subsiste que dans les notes, dans le barème détaillé
@@ -43,8 +36,6 @@ import { managementCompany } from '@/content/fr/legal';
 /** Espace insécable avant % € : ; ? !, appliquée à toutes les questions, réponses et notes. */
 const nb = (s: string): string => s.replace(/ ([%€:;?!])/g, ' $1');
 const lowerFirst = (s: string): string => s.charAt(0).toLowerCase() + s.slice(1);
-
-/** « a, b ou c ». */
 
 /** « a, b et c ». */
 const joinAnd = (items: readonly string[]): string =>
@@ -404,7 +395,6 @@ const idsAppeles = homeItems.map((item) => item.noteId).filter(Boolean);
 export const homeNotes: LegalNote[] = notes.filter((n) => idsAppeles.includes(n.id));
 
 export const faq = {
-  eyebrow: 'FAQ',
   title: 'Vos questions sur la SCPI R Start.',
   /* Supprimée le 16/09/2026 à la demande de l'équipe, sur toutes les pages : la phrase annonçait ce
      que les questions montrent d'elles-mêmes, et le renvoi au DIC et à la note d'information est déjà

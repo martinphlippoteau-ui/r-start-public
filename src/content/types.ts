@@ -11,24 +11,15 @@ export type SectionKey =
   | 'highlights'
   | 'fees'
   | 'strategy'
-  | 'income'
   | 'subscribe'
   | 'corum'
   | 'risks'
-  | 'press'
-  | 'documents'
   | 'faq'
   | 'notes';
 
 export interface SectionMeta {
-  /** Ancre HTML (id de la <section>) et cible de la sous-navigation. */
+  /** Ancre HTML : l'id de la <section>. */
   id: string;
-  /** Libellé affiché dans la sous-navigation. */
-  label: string;
-  /** Ordre d'apparition dans la page. */
-  order: number;
-  /** Présent dans la sous-navigation sticky ? */
-  inNav: boolean;
 }
 
 /** Note légale numérotée (façon Apple « ◊ 1, 2… »), agrégée par LegalNotes.astro dans l'ordre des sections. */
@@ -71,28 +62,15 @@ export interface HeroContent {
   /** H1 unique de la page. */
   title: string;
   tagline: string;
-  /** Note de périmètre de l'allégation de rang portée par l'accroche. */
-  taglineNoteId?: string;
   /** Note des frais réels, accolée au contre-poids du hero. */
   riskNoteId?: string;
-  /**
-   * Ligne de définition du produit (facts.product.definition) : allégation de rang au périmètre du
-   * groupe CORUM, toujours accompagnée de son appel de note (`definitionNoteId`).
-   */
-  definition?: string;
-  /** Id de la LegalNote qui porte le périmètre de la définition (facts.product.definitionScope). */
-  definitionNoteId?: string;
-  /** Frais réellement prélevés, obligatoire dès que `definition` annonce une absence de frais (hors hero depuis le 10/09/2026). */
-  subtitle?: string;
-  /** Claim de la trame, en deux temps : l'énoncé puis la réponse (« Oui ! » / « Non ! »), en petit et animé. */
-  claims?: { text: string; answer: string }[];
-  /** Ligne risques visible sans scroller, même taille que le corps du hero. Jamais animée. */
+  /** Ligne risques du hero, même taille que son corps, jamais animée. En veille avec RiskNote. */
   riskLine: string;
   primaryCta: Cta;
-  secondaryCta: Cta;
+  /** Lien interne vers /frais : ce n'est pas un CTA de souscription, il ne porte pas de `position`. */
+  secondaryCta: { label: string; href: string };
   /** Invitation à descendre, au bas du hero : la flèche n'a pas de texte visible, ce libellé la nomme. */
   scrollHint?: { label: string };
-  notes: LegalNote[];
 }
 
 export interface HighlightCard {
@@ -112,14 +90,9 @@ export interface HighlightCard {
    * note légale, qui porte source et portée et vit dans `noteId` ; c'est de la pédagogie.
    */
   info?: string;
-  /** Champs de l'ancienne carte détaillée, plus rendus depuis le 11/09/2026 (blocs simples). */
-  icon?: string;
-  description?: string;
-  risk?: string;
 }
 
 export interface HighlightsContent {
-  eyebrow: string;
   title: string;
   /**
    * Facultative depuis le 14/09/2026 : le document de l'équipe ouvre la section sur le tableau, sans
@@ -146,7 +119,6 @@ export interface HighlightsContent {
     /** Nom du bouton « i » pour les lecteurs d'écran, complété par le libellé de la carte. */
     info: string;
   };
-  notes: LegalNote[];
 }
 
 export type FeeKind = 'entree' | 'investissement' | 'gestion' | 'transaction' | 'sortie';
@@ -179,11 +151,11 @@ export interface WithdrawalStep {
  * le document fourni par l'équipe, c'est lui qui donne le type.
  */
 export interface StrategyChapter {
-  /** Mot-clé au-dessus du titre (« Quoi », « Où »). Le premier chapitre n'en a pas. */
+  /** Mot-clé au-dessus du titre (« Sélective », « Diversifiée »…). Les moteurs n'en ont pas. */
   eyebrow?: string;
   title: string;
-  /** Texte d'ouverture du chapitre. */
-  intro: string;
+  /** Texte d'ouverture du chapitre. Les moteurs n'en ont pas. */
+  intro?: string;
   /**
    * Annonce de la liste, deux points compris, quand `intro` sert déjà à autre chose (16/09/2026 : la
    * zone « Quoi » a reçu une phrase de méthode en ouverture, et son « L'équipe cible… » est descendu
@@ -205,8 +177,6 @@ export interface StrategyChapter {
   outro?: string;
   /** Mention placée par la Conformité sous le chapitre (ui/NoteConformite.astro). */
   disclaimer?: string;
-  /** Légende de la carte de la zone d'investissement (zone « Où »), rendue hors du SVG. */
-  map?: { legend: string };
 }
 
 /**
@@ -246,7 +216,6 @@ export interface StepItem {
 }
 
 export interface SubscribeContent {
-  eyebrow: string;
   title: string;
   /** Titre du chapitre court sur l'accueil (prop `compact` de 06-Subscribe), si différent de `title`. */
   homeTitle?: string;
@@ -274,7 +243,6 @@ export interface SubscribeContent {
   withdrawalReminder: string;
   /** Bloc MyCORUM (à la place de la photo) : application de suivi, liens vers les deux stores. */
   app?: {
-    eyebrow?: string;
     title: string;
     description: string;
     /** aria-label de la liste des liens de téléchargement. */
@@ -284,25 +252,17 @@ export interface SubscribeContent {
     newTabHint: string;
   };
   cta: Cta;
-  notes: LegalNote[];
 }
 
 export interface StatItem {
+  /** Chiffre affiché tel quel, unité comprise (« 9,6 Md€ », « + 160 000 »). */
   value: string;
-  /** Valeur numérique pour le compteur animé (optionnel). */
-  numeric?: number;
-  /** Préfixe du compteur (ex. « + » pour « + 160 000 ») : sans lui, le comptage perdrait le signe. */
-  prefix?: string;
-  suffix?: string;
   label: string;
 }
 
 export interface CorumContent {
-  eyebrow: string;
   title: string;
   intro: string;
-  stats: StatItem[];
-  statsSource: string;
   /** Contre-poids risque des chiffres du groupe, rendu avec eux et à la même taille. Jamais animé. */
   statsRisk?: string;
   range: {
@@ -341,7 +301,6 @@ export interface CorumContent {
    */
   siteLink?: { label: string; href: string; newTabHint: string };
   disclaimer: string;
-  notes: LegalNote[];
 }
 
 export interface RiskItem {
@@ -352,7 +311,6 @@ export interface RiskItem {
 }
 
 export interface RisksContent {
-  eyebrow: string;
   title: string;
   /**
    * Facultative depuis le 15/09/2026 : l'équipe a demandé de retirer celle de l'accueil. Le texte reste
@@ -373,7 +331,6 @@ export interface RisksContent {
   /** Phrase d'introduction des puces de la commission d'arbitrage (legal.ts, à l'identique). */
   arbitrageTitle?: string;
   arbitrageBullets: string[];
-  notes: LegalNote[];
 }
 
 export interface DocumentItem {
@@ -421,7 +378,6 @@ export interface FaqItem {
 }
 
 export interface FaqContent {
-  eyebrow: string;
   title: string;
   intro: string;
   items: FaqItem[];
@@ -450,16 +406,13 @@ export interface FaqContent {
 
 export interface NavContent {
   brand: string;
-  brandSuffix: string;
   cta: Cta;
   /**
-   * Libellé court du CTA de la sous-navigation sticky (ex. « Souscrire »), pour laisser la place à la
-   * liste des sections à 375 px ; à défaut, `cta.label` est utilisé.
+   * Libellé court du CTA de la barre (ex. « Souscrire »), pour laisser la place à la liste des pages à
+   * 375 px ; à défaut, `cta.label` est utilisé.
    */
   subnavCtaLabel?: string;
   skipLink: string;
-  /** aria-label de la sous-navigation locale (ex. « Sections »). */
-  sectionsLabel?: string;
   /** Libellé du lien de retour en haut de page porté par le logo (ex. « R Start, retour en haut »). */
   homeLinkLabel?: string;
   /** Libellé visible du bouton d'ouverture du menu mobile (ex. « Menu »). */
@@ -468,8 +421,6 @@ export interface NavContent {
   closeLabel?: string;
   /** aria-label de la navigation principale entre pages (ex. « Navigation principale »). */
   menuAriaLabel?: string;
-  /** aria-label de la liste des pages dans le panneau de menu mobile (ex. « Pages du site »). */
-  pagesLabel?: string;
   /** aria-label du fil d'Ariane des sous-pages (ex. « Fil d'Ariane »). */
   breadcrumbLabel?: string;
   /** Début de l'aria-label des appels de note (ex. « Voir la note » → « Voir la note 3 »). */
@@ -518,7 +469,7 @@ export interface FooterContent {
   backToTopLabel?: string;
   copyright: string;
   /** Titre H2 de la section Notes (ex. « Notes et sources »). */
-  notesTitle?: string;
+  notesTitle: string;
   /**
    * Libellé du repli de la liste des notes. `{n}` est remplacé par le nombre de notes de la page.
    * Le titre reste `notesTitle` ; ce libellé n'ajoute que le décompte.

@@ -2,8 +2,9 @@ import type { StrategyContent } from '@/content/types';
 
 /**
  * Page /strategie, « Stratégie d'investissement ». CONTENU FOURNI PAR L'ÉQUIPE le 14/09/2026 et repris
- * mot pour mot, « ni plus ni moins » : trois chapitres, les deux moteurs de performance, le « Quoi » et
- * le « Où ». L'en-tête de la page porte le titre (strategyPage.ts) ; ce fichier porte le corps.
+ * mot pour mot, « ni plus ni moins » : les deux moteurs de performance, puis trois volets (`what`,
+ * `where`, `how` : Sélective, Diversifiée, Opportuniste). L'en-tête de la page porte le titre
+ * (strategyPage.ts) ; ce fichier porte le corps.
  *
  * CE QUI A QUITTÉ LA PAGE, et ne vit plus nulle part sur le site : le mot d'ordre « Acheter décoté,
  * valoriser, revendre » et son contre-poids, les trois piliers avec les leurs, la carte des pays du
@@ -31,7 +32,6 @@ export const strategy: StrategyContent = {
        Chiffre et non lettre, comme dans « 4 étapes pour souscrire » : un titre se balaie, un
        chiffre s'y repère plus vite. */
     title: 'R Start : 2 moteurs au service de la performance',
-    intro: '',
     /*
      * TEXTES DE L'ÉQUIPE, 16/09/2026. Les deux cartes portaient une ligne chacune (« versés par les
      * entreprises locataires », « réalisées sur les ventes d'immeuble ») ; elles portent maintenant
@@ -118,27 +118,16 @@ export const strategy: StrategyContent = {
     title: 'Viser large pour viser juste.',
     intro: 'R Start diversifiera ses acquisitions :',
     /* Pictogrammes sur les deux items (16/09/2026, demande de l'équipe) : ce sont les deux éléments
-       importants de la zone, ils prennent une puce dessinée à la place du point. */
+       importants de la zone, ils prennent une puce dessinée à la place du point.
+       « PARTOUT DANS LE MONDE », ET CE QUI RESTE À TRANCHER : le DIC du 20/05/2026 borne la zone aux
+       pays du Conseil de l'Europe et au Canada. Le site dit « Monde » depuis le 14/09/2026, décision
+       de l'équipe (facts.strategy.zoneLabel). La carte qui illustrait la zone a quitté la page le
+       16/09/2026, sa légende le 21/09/2026 ; cette réserve, elle, vaut pour le texte. */
     items: [
       { lead: 'partout dans le monde', icon: 'exploration' },
       { lead: 'dans tous les secteurs', icon: 'equipe' },
     ],
     outro: 'Un seul mot d’ordre : identifier une opportunité',
-    /*
-     * CARTE DU MONDE (14/09/2026, demande de l'équipe : « adapte la map au texte »). La carte d'origine
-     * montrait le Conseil de l'Europe et le Canada, soit le périmètre du DIC du 20/05/2026, à côté d'un
-     * « partout dans le monde » : elle disait moins que le texte. Elle a été régénérée en planisphère
-     * (node scripts/make-map.mjs <countries.geo.json> monde), l'ancienne version reste disponible par
-     * le mode `univers` du même script.
-     * CE QUI RESTE À TRANCHER, et qui n'est pas une affaire de dessin : le DIC borne la zone aux pays du
-     * Conseil de l'Europe et au Canada. Le site dit « Monde » depuis le 14/09/2026, décision de l'équipe
-     * (facts.strategy.zoneLabel), et la carte le suit désormais. À faire valider par la Conformité.
-     * La légende est rendue par la section, la carte elle-même est décorative (aria-hidden).
-     */
-    map: {
-      legend:
-        'Carte simplifiée, à titre d’illustration : elle ne représente aucun immeuble détenu par R Start.',
-    },
   },
 
   /** 4. Comment (zone 5 du document de l'équipe, reçue le 14/09/2026 après les trois autres). */

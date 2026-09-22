@@ -24,7 +24,6 @@ export interface PageSeo {
 }
 
 export interface PageHero {
-  eyebrow: string;
   /** H1 unique de la page. */
   title: string;
   /**
@@ -50,8 +49,6 @@ export interface PageHero {
 
 /** Bloc « Confiance » : cadre réglementaire, avis Trustpilot, chiffres clés CORUM. */
 export interface TrustContent {
-  eyebrow: string;
-  title: string;
   intro: string;
   amf: {
     title: string;
@@ -78,17 +75,10 @@ export interface TrustContent {
   };
   trustpilot: {
     title: string;
-    scoreLabel: string;
-    reviewsLabel: string;
-    dateLabel: string;
     linkLabel: string;
     url: string;
     /** Précision : avis sur le distributeur CORUM L'Épargne, pas sur R Start. */
     scope: string;
-    /** Valeur numérique de la note pour le compteur animé (ex. 4.5) ; scoreLabel reste la valeur affichée. */
-    score?: number;
-    /** Suffixe du compteur (ex. « /5 »), dérivé de scoreLabel. */
-    scoreSuffix?: string;
     /** Mention lue par les lecteurs d'écran sur le lien externe (ex. « nouvelle fenêtre »). */
     externalLinkHint?: string;
     /** Nom accessible des TrustBox officiels (contenu rendu par Trustpilot dans une iframe). */
@@ -99,10 +89,8 @@ export interface TrustContent {
   stats: {
     title: string;
     items: StatItem[];
-    source: string;
     risk: string;
   };
-  notes: LegalNote[];
 }
 
 /**
@@ -112,27 +100,12 @@ export interface TrustContent {
  * frais réellement prélevés. Chaque avantage porte son risque dans le même bloc et à la même taille.
  */
 export interface DifferenceContent {
-  eyebrow: string;
   title: string;
   intro: string;
   /** Phrase qui annonce les deux situations, juste avant la liste. */
   lead?: string;
   /** Les deux situations où des frais sont prélevés. `strong` est le mot mis en valeur dans `text`. */
   situations?: { text: string; strong?: string }[];
-  /** Surtitre du bloc des deux moteurs (ex. « Deux moteurs »). */
-  enginesTitle?: string;
-  /** aria-label de la liste des moteurs (ex. « Les deux moteurs de rémunération »). */
-  enginesLabel?: string;
-  /** Les deux moteurs. `description` est l'avantage, `risk` son contre-poids (même taille, même carte). */
-  /** Anciennes cartes du modèle : plus rendues sur l'accueil depuis le 11/09/2026 (zone 2 réduite). */
-  engines?: {
-    title: string;
-    description: string;
-    risk: string;
-    noteId?: string;
-    /** Index de la photo d'illustration dans media.strategy (carte du modèle). */
-    image?: number;
-  }[];
   /**
    * Formule d'alignement (advantage) : « la société de gestion se rémunère sur les loyers encaissés et
    * les plus-values réalisées, jamais sur le montant que vous versez » (jamais « nous ne touchons rien
@@ -141,15 +114,14 @@ export interface DifferenceContent {
    * cessions, commission de retrait, coût total inconnu à la souscription (risk).
    */
   counterweight: {
-    /** Paragraphe d'avantage libre : plus rendu sur l'accueil depuis le 11/09/2026 (zone 2 réduite). */
-    advantage?: string;
-    /** Contre-poids chiffré, TOUJOURS rendu : c'est le seul couple avantage / risque de la section. */
+    /**
+     * Contre-poids chiffré (frais réels et commission d'arbitrage). Plus rendu depuis le 11/09/2026,
+     * sur demande réitérée de l'équipe ; le texte reste, c'est un texte de conformité.
+     */
     risk: string;
-    title?: string;
     noteId?: string;
     /** Conclusion de l'équipe, en ouverture du bloc de démonstration. */
     pedagogy?: string[];
-    /** Allégation de rang : jamais affichée sans son appel de note, qui en porte le périmètre. */
     /**
      * Allégation de rang. `noteId` est FACULTATIF depuis le 14/09/2026 : quand la phrase porte son
      * périmètre en elle (facts.product.definition, « du groupe CORUM »), elle n'a plus besoin d'un
@@ -157,9 +129,6 @@ export interface DifferenceContent {
      */
     claim?: { text: string; noteId?: string };
   };
-  /** Mécanisme de réserve en cas de moins-value, résumé en deux phrases (brochure partenaires 2026, p.4). */
-  /** Mécanisme de réserve : plus rendu sur l'accueil depuis le 11/09/2026. */
-  lossMechanism?: { title: string; body: string[]; risk: string; noteId?: string };
   /** Lien interne vers la page Frais : ce n'est pas un CTA de souscription, il ne porte pas de `position`. */
   cta: { label: string; href: string };
   /**
@@ -167,7 +136,6 @@ export interface DifferenceContent {
    * ci-dessus, qui alimente la pastille flottante de la page.
    */
   secondaryCta?: { label: string; href: string };
-  notes: LegalNote[];
 }
 
 /**
@@ -338,10 +306,6 @@ export interface DocumentationLabels {
    * deux repères de navigation d'une même page ne peuvent pas porter le même nom accessible.
    */
   anchorsAsideLabel?: string;
-  /** Surtitre commun des groupes de documents (ex. « Documents »). */
-  groupsEyebrow?: string;
-  /** Surtitre du guide de souscription (ex. « Souscrire »). */
-  howToEyebrow?: string;
   /** aria-label de la liste des étapes (ex. « Les quatre étapes de la souscription »). */
   stepsLabel?: string;
   /** Mot lu par les lecteurs d'écran devant le numéro de chaque étape (ex. « Étape »). */
@@ -380,16 +344,6 @@ export interface DocumentationContent {
   notes: LegalNote[];
 }
 
-export interface PressRelease {
-  title: string;
-  date: string;
-  dateIso: string;
-  /** Chemin public du PDF ; vide tant que CORUM ne l'a pas fourni. */
-  file: string;
-  available: boolean;
-  summary?: string;
-}
-
 /**
  * Article de presse tiers. Le titre est une citation : il est reproduit tel qu'il a été publié, jamais
  * réécrit, et il est couvert par l'avertissement de fin de page. `url` est vide tant que l'adresse de
@@ -421,32 +375,22 @@ export interface PressContact {
 
 /** Micro-textes de la page Presse (libellés d'accessibilité et de métadonnées de fichiers). */
 export interface PressLabels {
-  /** Type de fichier des communiqués (ex. « PDF »), affiché avant le poids et lu avec le lien. */
-  fileTypeLabel?: string;
-  /** Unité du poids des fichiers (ex. « ko »). */
-  sizeUnit?: string;
   /** Mention lue par les lecteurs d'écran sur les liens ouvrant une nouvelle fenêtre. */
   newTabHint?: string;
-  /** Libellé de l'action de téléchargement des logos (ex. « Télécharger »). */
-  downloadLabel?: string;
-  /** aria-label des listes (communiqués, articles, citations, contacts, logos). */
-  releasesListLabel?: string;
+  /** aria-label des listes (articles, citations, contacts). */
   coverageListLabel?: string;
   quotesListLabel?: string;
   contactsListLabel?: string;
-  logosListLabel?: string;
   /** Intitulés des lignes d'une carte contact. */
   phoneLabel?: string;
   emailLabel?: string;
-  /** Sous-titres du kit média. */
-  logosTitle?: string;
-  keyFactsTitle?: string;
 }
 
 /**
  * Page /presse « La presse en parle » (grand public) : trois citations mises en avant, la revue des
  * articles et l'avertissement de fin. Aucun logo de média (aucune licence), les noms sont en
- * typographie. Les communiqués, contacts et kit média vivent sur /salle-de-presse (PressRoomContent).
+ * typographie. Les contacts presse sont en zone 4 ; la salle de presse (communiqués, kit média) a été
+ * supprimée le 22/09/2026.
  */
 export interface PressContent {
   seo: PageSeo;
@@ -461,19 +405,9 @@ export interface PressContent {
     /** Titre de cette bande. */
     disclaimerTitle?: string;
   };
-  /** Renvoi vers /salle-de-presse, absente du menu principal. */
-  /* `pressRoomLink` retiré le 15/09/2026 avec la désactivation de /salle-de-presse. */
   /** Appel à l'action de la page : en-tête et pastille flottante. */
   cta: Cta;
-  labels?: PressLabels;
-  notes: LegalNote[];
-}
-
-/** Page /salle-de-presse (journalistes) : communiqués, contacts, kit média et texte de présentation. */
-export interface PressRoomContent {
-  seo: PageSeo;
-  hero: PageHero;
-  releases: { title: string; intro: string; items: PressRelease[]; emptyLabel: string };
+  /** Zone 4, « Vous êtes journaliste ? » (Contacts.astro). `source` n'est plus affichée. */
   contacts: {
     title: string;
     /** Phrase d'appel sous le titre. Absente : la liste suit directement le titre. */
@@ -481,17 +415,6 @@ export interface PressRoomContent {
     items: PressContact[];
     source: string;
   };
-  mediaKit: {
-    title: string;
-    intro: string;
-    logos: { label: string; file: string }[];
-    keyFacts: { label: string; value: string }[];
-    /** Rappel des risques sous la fiche de chiffres clés, même taille que la fiche ; jamais animé. */
-    riskLine?: string;
-    boilerplate: { title: string; body: string };
-  };
-  /** Renvoi vers /presse, dans le menu principal. */
-  coverageLink: { title: string; body: string; label: string; href: string };
   labels?: PressLabels;
   notes: LegalNote[];
 }

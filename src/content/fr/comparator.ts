@@ -259,7 +259,6 @@ export const comparator = {
   homeHeading: 'Un modèle de frais inédit. Comparez par vous-même !',
   /** Colonne de gauche, toujours R Start. */
   leftLabel: product.name,
-  leftManager: 'CORUM Asset Management',
   /* Intitulé VISIBLE au-dessus de la liste déroulante (12/09/2026, demande de l'équipe) : il dit ce
      que la colonne de droite oppose à R Start, là où « SCPI à comparer » ne disait pas laquelle.
      RACCOURCI le 14/09/2026 à la demande de l'équipe : la mention « dites “sans frais” » tombe. Ce que

@@ -1,37 +1,24 @@
 ---
 /**
- * En-tête de section façon page produit : surtitre court (utilitaire text-eyebrow), H2 très grand,
- * introduction en texte lead.
- * `motion` (défaut false) : signature d'entrée commune des chapitres de l'accueil (src/scripts/motion.ts) ,
- * H2 mot à mot (data-reveal-text, ≤ 12 mots) et introduction en fade-up ; le surtitre reste statique.
- * Laisser à false quand l'en-tête ne doit pas bouger (ex. 08-Risques, contre-poids global de la page).
+ * En-tête de section façon page produit : H2 très grand, introduction en texte lead. Trois appelants :
+ * 06-Subscribe, 07-Trust et 08-Risks.
+ * `motion` (défaut false) : signature d'entrée commune des chapitres de l'accueil (src/scripts/motion.ts),
+ * H2 mot à mot (data-reveal-text, ≤ 12 mots) et introduction en fade-up. Laisser à false quand l'en-tête
+ * ne doit pas bouger (ex. 08-Risques, contre-poids global de la page).
+ *
+ * ALLÉGÉ LE 21/09/2026 : le surtitre (`eyebrow`), reçu sans être rendu depuis que les sections n'en
+ * portent plus (11/09/2026), et l'alignement centré, qu'aucun appelant ne passait.
  */
 interface Props {
   id: string;
-  eyebrow?: string;
   title: string;
   intro?: string;
-  align?: 'left' | 'center';
   class?: string;
   motion?: boolean;
 }
-const {
-  id,
-  eyebrow,
-  title,
-  intro,
-  align = 'left',
-  class: className = '',
-  motion = false,
-} = Astro.props;
+const { id, title, intro, class: className = '', motion = false } = Astro.props;
 /** Délai de l'introduction après le titre (s) : même valeur que dans les en-têtes rendus à la main. */
 const INTRO_DELAY = '0.1';
-/*
- * `eyebrow` est REÇU MAIS JAMAIS RENDU : les sections rendent leur surtitre elles-mêmes. La prop reste acceptée pour ne pas
- * casser les six pages qui la passent, et les valeurs `eyebrow` des fichiers de contenu ne s'affichent
- * donc nulle part (audit du 14/09/2026). À trancher : les rendre, ou retirer la prop et les valeurs.
- */
-void eyebrow;
 ---
 
 {
@@ -39,7 +26,7 @@ void eyebrow;
     « Pourquoi gagnant-gagnant ? » se coupait en deux alors qu'il tient sur une ligne dans le conteneur.
     L'introduction, elle, garde sa mesure : une ligne de texte courant sur 1 150 px ne se lit pas. */
 }
-<header class:list={[align === 'center' && 'mx-auto text-center', className]}>
+<header class={className}>
   <h2
     id={id + '-title'}
     class="text-display-lg text-balance"

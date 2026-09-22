@@ -60,7 +60,7 @@ const { stats } = trust;
          * sont ceux du groupe CORUM, pas ceux de R Start… ». Ils n'ont pas disparu du site.
          */
       }
-      <SectionHeading id={id} eyebrow={corum.eyebrow} title={corum.title} motion />
+      <SectionHeading id={id} title={corum.title} motion />
 
       {
         /*
@@ -114,7 +114,6 @@ const { stats } = trust;
                 <Stat
                   size={stats.items.length === 5 ? 'solid-compact' : 'solid'}
                   value={s.value}
-                  suffix={s.suffix}
                   label={s.label}
                 />
               </li>

@@ -16,7 +16,7 @@
  *
  * CE QUI N'EST PAS LU dans une section : scripts, styles, images, boutons et liens-boutons (« Souscrire
  * en ligne » n'apprend rien), fils d'Ariane et autres <nav>, contenus masqués (`hidden`,
- * `aria-hidden="true"`, `sr-only`), et tout élément marqué `data-search-ignore`.
+ * `aria-hidden="true"`, `sr-only`).
  * Les segments répétés dans une même section (recto et verso d'une carte retournée) ne comptent qu'une
  * fois.
  *
@@ -82,7 +82,6 @@ const ignore = (n, { titre = false } = {}) => {
     ELEMENTS_IGNORES.has(n.name) ||
     'hidden' in a ||
     a['aria-hidden'] === 'true' ||
-    'data-search-ignore' in a ||
     'data-cta' in a ||
     / btn /.test(classes) ||
     (!titre && / (sr-only|visually-hidden) /.test(classes))

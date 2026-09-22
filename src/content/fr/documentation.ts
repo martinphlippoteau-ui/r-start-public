@@ -7,14 +7,13 @@ import {
   externalLinks,
   fees as feeFacts,
   income as incomeFacts,
-  product,
   risk,
   share,
   subscription,
   trust,
 } from '@/content/fr/facts';
 import { faq } from '@/content/fr/faq';
-import { documentsNotice, managementCompany, publisher, visaNotice } from '@/content/fr/legal';
+import { documentsNotice, managementCompany, visaNotice } from '@/content/fr/legal';
 import manifest from '@/content/fr/media.manifest.json';
 import { PENDING_DOCUMENT_KEYS } from '@/content/fr/pendingDocuments';
 
@@ -259,7 +258,6 @@ export const documentation = {
   },
 
   hero: {
-    eyebrow: `SCPI ${product.name} · ${publisher.name}`,
     title: 'Documentation',
     intro: nb(
       `Les documents de R Start, au même endroit : documents réglementaires et formulaires. Ce sont eux qui font foi. Lisez le DIC${dicPublished ? '' : ', disponible sur corum.fr,'} et la note d’information avant toute décision.`
@@ -342,8 +340,6 @@ export const documentation = {
     anchorsLabel: 'Groupes de documents',
     anchorsCountLabel: '{n} document{s}',
     anchorsAsideLabel: 'Sommaire des documents',
-    groupsEyebrow: 'Documents',
-    howToEyebrow: 'Souscrire',
     stepsLabel: 'Les quatre étapes de la souscription',
     stepPrefix: 'Étape',
     faqEyebrow: 'FAQ',

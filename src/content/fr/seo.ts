@@ -1,31 +1,21 @@
 import type { SeoContent } from '@/content/types';
-import { product, share } from '@/content/fr/facts';
+import { product } from '@/content/fr/facts';
 
 /**
- * Stratégie SEO du site one-page R Start (FR).
+ * SEO de l'accueil (FR) : titre, description, texte de l'image Open Graph et requêtes cibles. Les
+ * sous-pages portent les leurs dans leur propre fichier de contenu (`seo`).
  *
- * Requêtes cibles (par ordre de priorité) :
- *  1. « SCPI R Start »                       → title, H1 + H2 hero, H2 FAQ, JSON-LD WebPage.about
- *  2. « R Start CORUM » / « SCPI CORUM »     → title, H2 hero, H2 corum, JSON-LD Organization
- *  3. « SCPI sans frais de souscription »    → intention servie UNIQUEMENT par la formulation conforme
- *                                              « 0 % de frais de souscription » (title, H2 frais, FAQ 2 et 3).
- *                                              « sans frais » ne doit jamais apparaître sur la page (legal.ts).
- *  4. « nouvelle SCPI 2026 » / « SCPI nouvelle génération » → H2 hero, description, notes (visa, ouverture)
- *  5. « SCPI 200 euros »                     → H2 points forts, description, FAQ 10
- *  6. « SCPI distribution mensuelle »        → H2 revenus, FAQ 4
- *  7. « SCPI Europe Canada »                 → H2 stratégie, FAQ 9
- *  8. « souscrire SCPI en ligne »            → H2 souscrire, FAQ 10
- *  9. « frais SCPI R Start »                 → H2 frais, FAQ 3
+ * « sans frais » n'apparaît jamais : l'intention « SCPI sans frais de souscription » est servie par la
+ * formulation conforme « 0 % de frais de souscription » (scripts/check-compliance.mjs). Aucune donnée
+ * de performance dans une balise ; chaque avantage cité y est contrebalancé.
  *
- * Règles : H1 unique « R Start » ; un H2 par section, ≤ 8 mots, un chiffre maximum ; aucune donnée de
- * performance ; chaque avantage cité dans une balise est contrebalancé dans le bloc correspondant.
+ * JSON-LD (src/lib/seo.ts, généré depuis content/fr, jamais en dur) : Organization, WebPage (about
+ * InvestmentFund, keywords = `seo.keywords`) et FAQPage, strictement les questions visibles de faq.ts.
+ * Interdits : Product, Offer, AggregateRating (signaux marchands trompeurs sur un produit financier).
  *
- * JSON-LD attendu de l'intégrateur (généré depuis content/fr, jamais en dur) :
- *  - Organization : CORUM L'Épargne (legal.publisher), logo, sameAs corum.fr, contactPoint (téléphone, e-mail).
- *  - WebPage : name = seo.title, description = seo.description, inLanguage « fr »,
- *    about = { @type: 'InvestmentFund', name: 'R Start' }, keywords = seo.keywords.
- *  - FAQPage : strictement les questions/réponses visibles de faq.ts.
- *  Interdits : Product, Offer, AggregateRating (signaux marchands trompeurs sur un produit financier).
+ * NETTOYÉ LE 21/09/2026 : `seoH2` (un H2 proposé par section) et `faqQuestions` (dix questions visées)
+ * étaient deux références éditoriales sans lecteur, et périmées : elles visaient des sections et des
+ * questions qui n'existent plus. Les requêtes cibles vivent dans `keywords`.
  */
 /** Minuscule sur la seule initiale : `toLowerCase()` abîmerait le sigle SCPI de l'accroche. */
 const lowerFirst = (value: string): string => value.charAt(0).toLowerCase() + value.slice(1);
@@ -61,59 +51,3 @@ export const seo = {
     'frais SCPI R Start',
   ],
 } satisfies SeoContent;
-
-/**
- * Proposition de H2 par section, à reprendre (ou adapter) dans le champ `title` de chaque fichier de
- * contenu. Style Apple : phrase courte terminée par un point, un chiffre au plus, aucune performance.
- * Clés = SectionKey (src/config/sections.ts), hors « notes ».
- */
-/*
- * RÉFÉRENCE ÉDITORIALE, sans lecteur : aucun composant ne lit cet export (audit du 14/09/2026).
- * Les H2 réellement rendus sont les `title` des fichiers de contenu. Cette table dit ce que le SEO
- * aimerait y voir ; elle sert de repère quand on réécrit un titre, pas de source de vérité.
- */
-export const seoH2: Record<string, string> = {
-  /** Sous le H1 « R Start ». Reprend l’accroche de facts.product.tagline. */
-  hero: `${product.tagline} de CORUM.`,
-  /** Requête « SCPI 200 euros ». Les 4 cartes portent chacune leur contre-poids. */
-  highlights: `L’immobilier à partir de ${share.minimumLabel}.`,
-  /** Formulation autorisée, à contrebalancer immédiatement par `counterweight` (15 % de gestion, cessions, retrait). */
-  fees: '0 % de frais de souscription.',
-  /** Requête « SCPI Europe Canada ». Le mot d’ordre « Acheter décoté, valoriser, revendre » vit dans l’intro. */
-  strategy: 'De l’immobilier partout dans le monde.',
-  /** Requête « SCPI distribution mensuelle ». « Potentiels » est indispensable : revenus non garantis. */
-  income: 'Des revenus potentiels chaque mois.',
-  /** Requête « souscrire SCPI en ligne ». */
-  subscribe: 'Souscrire à R Start, 100 % en ligne.',
-  /** Requête « SCPI CORUM ». Fait sourcé (facts.corumGroup.scpiSince), sans « expertise » ni superlatif. */
-  corum: 'CORUM gère des SCPI depuis 2012.',
-  /** Même poids visuel que les sections avantages. */
-  risks: 'Investir dans R Start comporte des risques.',
-  /** DIC, note d’information, statuts, bulletin. */
-  documents: 'Les documents à lire avant de souscrire.',
-  /** Requête « SCPI R Start ». */
-  faq: 'Vos questions sur la SCPI R Start.',
-};
-
-/**
- * Les 10 questions de la FAQ, dans l’ordre d’affichage, formulées comme les internautes les tapent.
- * Aucune question ne porte sur la performance (rendement, taux de distribution, TRI, scénarios).
- * Chaque réponse doit rester équilibrée : l’avantage et son risque dans le même paragraphe.
- * Sert aussi de base au JSON-LD FAQPage (strictement les Q/R visibles).
- */
-/*
- * RÉFÉRENCE ÉDITORIALE, sans lecteur (audit du 14/09/2026) : les questions rendues sont celles de
- * faq.ts. Cette liste dit les intentions de recherche visées, elle ne produit rien.
- */
-export const faqQuestions: string[] = [
-  'Qu’est-ce qu’une SCPI ?',
-  'Pourquoi R Start affiche-t-elle 0 % de frais de souscription ?',
-  'Combien coûte réellement la SCPI R Start ?',
-  'Quand reçoit-on les premiers revenus avec R Start ?',
-  'Peut-on revendre ses parts de R Start ?',
-  'Quels sont les risques de la SCPI R Start ?',
-  'Quelle est la fiscalité des revenus de R Start ?',
-  'Qui gère la SCPI R Start ?',
-  'Où investit R Start ?',
-  'Comment souscrire à R Start en ligne ?',
-];

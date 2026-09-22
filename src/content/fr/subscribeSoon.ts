@@ -5,7 +5,6 @@
  * documents réglementaires reprend le réflexe attendu avant toute décision d'investissement.
  */
 export const subscribeSoon = {
-  ariaLabel: 'Souscription à venir',
   eyebrow: 'Bientôt disponible',
   /** Espace insécable avant le %, et « 100 % » jamais coupé en fin de ligne. */
   title: 'La souscription 100\u00A0% en ligne ouvre bientôt sur cette page.',

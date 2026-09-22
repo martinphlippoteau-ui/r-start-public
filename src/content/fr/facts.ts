@@ -28,10 +28,10 @@ export const product = {
     'La première SCPI du groupe CORUM sans frais d’entrée ni frais sur les achats d’immeubles', // brochure partenaires 2026, p.4 et p.6
   definitionScope:
     'Périmètre : la gamme du groupe CORUM, soit cinq SCPI gérées par CORUM Asset Management depuis 2012. R Start est la première à ne prélever ni commission de souscription, ni frais sur les achats d’immeubles. Cette comparaison ne porte pas sur l’ensemble du marché des SCPI. Source : brochure partenaires 2026, p. 4, p. 6 et p. 7.',
-  visa: { number: '26-06', date: '4 mars 2026', dateIso: '2026-03-04' }, // bulletin, brochure p.8
+  visa: { number: '26-06', date: '4 mars 2026' }, // bulletin, brochure p.8
   creationDate: { label: '19 janvier 2026', iso: '2026-01-19' }, // bulletin CGV
-  openingDate: { label: '20 mai 2026', iso: '2026-05-20' }, // bulletin CGV
-  dicDate: { label: '20 mai 2026', iso: '2026-05-20' }, // DIC p.1
+  openingDate: { label: '20 mai 2026' }, // bulletin CGV
+  dicDate: { label: '20 mai 2026' }, // DIC p.1
   rcs: 'RCS Paris 100 177 997', // DIC p.4
   address: '1 rue Euler, 75008 Paris',
   phone: '01 53 75 87 48',
@@ -292,7 +292,6 @@ export const strategy = {
 } as const;
 
 export const subscription = {
-  online: true,
   onlineLabel: '100 % en ligne', // brochure p.7
   paymentMethods: ['Virement', 'Prélèvement SEPA'], // bulletin p.3
   options: {
@@ -304,12 +303,10 @@ export const subscription = {
       minimumLabel: '50 €',
       minimumMonthlyLabel: '50 € par mois',
       requirement: 'Détenir au préalable au moins une part entière de R Start en pleine propriété', // adhésion PEI CGV
-      form: '/documents/r-start-adhesion-plan-epargne-immobilier.pdf',
     },
     rd: {
       name: 'Réinvestissement des dividendes',
       description: 'Réinvestissement automatique de tout ou partie des dividendes',
-      form: '/documents/r-start-adhesion-reinvestissement-dividendes.pdf',
     },
   }, // brochure p.5, bulletin p.1
   notEligible: ['démembrement', 'souscription papier', 'CORUM Life'], // brochure p.5
@@ -334,31 +331,24 @@ export const corumGroup = {
   stats: [
     {
       value: '9,6 Md€',
-      numeric: 9.6,
-      suffix: ' Md€',
       prefix: '',
       label: "d'épargne gérée par le groupe",
     },
     // « + » devant le nombre d'épargnants : brochure partenaires 2026, p. 7 ; la valeur vient de corum.fr.
-    { value: '160 000', numeric: 160000, suffix: '', prefix: '+ ', label: 'épargnants' },
-    { value: '2 500', numeric: 2500, suffix: '', prefix: '', label: 'partenaires professionnels' },
-    { value: '250', numeric: 250, suffix: '', prefix: '', label: 'collaborateurs dans 7 pays' },
+    { value: '160 000', prefix: '+ ', label: 'épargnants' },
+    { value: '2 500', prefix: '', label: 'partenaires professionnels' },
+    { value: '250', prefix: '', label: 'collaborateurs dans 7 pays' },
   ],
   statsSource:
     'Source : CORUM L’Épargne, corum.fr, chiffres relevés le 8 septembre 2026 ; date d’arrêté des données non communiquée par CORUM. Chiffres du groupe CORUM, sans lien avec les résultats futurs de R Start.',
   /** Date de consultation de corum.fr, pas date d'arrêté des chiffres. */
-  statsDate: { label: '8 septembre 2026', iso: '2026-09-08' },
-  employees: 250, // corum.fr
-  countries: 7, // corum.fr
-  nationalities: 25, // corum.fr
-  partners: 2500, // corum.fr
-  independent: true, // brochure p.7 (« 100 % indépendant »)
+  statsDate: { label: '8 septembre 2026' },
   /**
    * Ancienneté du groupe CORUM dans l'immobilier d'entreprise : brochure partenaires 2026, p.7
    * (« 15 ans d'expertise »), cohérente avec l'agrément AMF du 14 avril 2011. Décrit une durée
-   * d'activité, jamais un résultat : la formule « objectifs tenus » de la brochure n'est pas reprise.
+   * d'activité. La formule « objectifs tenus » de la brochure est reprise dans le libellé du chiffre
+   * (trust.ts, document de l'équipe du 14/09/2026) : c'est une allégation, signalée par le contrôle.
    */
-  experienceYears: 15,
   experienceLabel: '15 ans',
   scpiSince: 2012,
   scpiCount: 5,
@@ -456,11 +446,6 @@ export const trust = {
   },
   trustpilot: {
     company: "CORUM L'Épargne",
-    score: 4.5,
-    scoreLabel: '4,5/5',
-    reviews: 248,
-    reviewsLabel: '248 avis',
-    claimed: true,
     url: 'https://fr.trustpilot.com/review/www.corum.fr', // profil visé par les codes d'intégration Trustpilot
     /**
      * Identifiants des TrustBox officiels, remis par l'équipe depuis le back-office Trustpilot de CORUM.
@@ -498,7 +483,6 @@ export const trust = {
         },
       },
     },
-    snapshotDate: { label: '8 septembre 2026', iso: '2026-09-08' }, // relevé fr.trustpilot.com/review/corum.fr
     scope:
       'Avis publiés sur Trustpilot à propos de CORUM L’Épargne, distributeur de R Start. Ils ne portent ni sur R Start ni sur ses résultats futurs.',
   },
@@ -529,21 +513,6 @@ export const press = {
     },
   ],
   contactsSource: 'corum.fr, rubrique Contacts presse, consultée le 8 septembre 2026',
-  /** Communiqués officiels : fichiers à fournir par CORUM (aucun PDF disponible dans les assets). */
-  releases: [
-    {
-      title: 'CORUM L’Épargne lance R Start, sa cinquième SCPI',
-      date: { label: '20 mai 2026', iso: '2026-05-20' },
-      file: '',
-      available: false,
-    },
-    {
-      title: 'R Start obtient le visa de l’AMF',
-      date: { label: '4 mars 2026', iso: '2026-03-04' },
-      file: '',
-      available: false,
-    },
-  ],
   /**
    * Revue de presse « La presse en parle » : onze articles. Les neuf premiers sont la sélection livrée
    * par CORUM le 10/09/2026, dans l'ordre de la sélection ; les deux derniers ont été ajoutés par
@@ -695,15 +664,6 @@ export const press = {
   /** Avertissement de fin de page, livré par CORUM le 10/09/2026 ; reproduit à l'identique. */
   coverageDisclaimer:
     'Les articles référencés sur cette page sont des publications indépendantes. Ils n’engagent pas CORUM Asset Management et ne constituent pas un conseil en investissement. Les informations publiées par la presse reflètent le contexte du lancement de R Start en mai 2026. Investir dans une SCPI comporte des risques, notamment de perte en capital. Les performances passées ne préjugent pas des performances futures.',
-  mediaKit: {
-    logos: [
-      { label: 'Logo R Start (couleur, SVG)', file: '/presse/r-start-logo-couleur.svg' },
-      { label: 'Logo R Start (blanc, SVG)', file: '/presse/r-start-logo-blanc.svg' },
-      { label: 'Logo R Start (couleur, PNG)', file: '/presse/r-start-logo-couleur.png' },
-    ],
-    boilerplate:
-      'CORUM L’Épargne est la marque de distribution du groupe CORUM, groupe indépendant créé en 2011 qui conçoit et gère des solutions d’épargne (SCPI, assurance vie, fonds obligataires). R Start est sa cinquième SCPI, gérée par CORUM Asset Management, société de gestion agréée et réglementée par l’AMF.', // à valider par CORUM
-  },
 } as const;
 
 /** Documents complémentaires (périmètre v2), en plus de `documents`. Fichiers vérifiés (intègres) le 08/09/2026. */
@@ -760,62 +720,3 @@ export const documentsExtra = [
     version: 'Version 2.1, avril 2026',
   },
 ] as const;
-
-/**
- * Univers d'investissement de R Start (DIC p.1) : les États membres du Conseil de l'Europe et le Canada.
- * Liste des 46 États membres relevée sur coe.int le 09/09/2026 (codes ISO 3166-1 alpha-3), utilisée par
- * scripts/make-map.mjs pour la carte de la section Stratégie. Aucun pays hors de cette liste n'y figure.
- */
-export const investmentUniverse = {
-  source:
-    'Conseil de l’Europe, liste des États membres consultée le 9 septembre 2026 ; DIC du 20 mai 2026',
-  canada: ['CAN'],
-  councilOfEurope: [
-    'ALB',
-    'AND',
-    'ARM',
-    'AUT',
-    'AZE',
-    'BEL',
-    'BIH',
-    'BGR',
-    'HRV',
-    'CYP',
-    'CZE',
-    'DNK',
-    'EST',
-    'FIN',
-    'FRA',
-    'GEO',
-    'DEU',
-    'GRC',
-    'HUN',
-    'ISL',
-    'IRL',
-    'ITA',
-    'LVA',
-    'LIE',
-    'LTU',
-    'LUX',
-    'MLT',
-    'MDA',
-    'MCO',
-    'MNE',
-    'NLD',
-    'MKD',
-    'NOR',
-    'POL',
-    'PRT',
-    'ROU',
-    'SMR',
-    'SRB',
-    'SVK',
-    'SVN',
-    'ESP',
-    'SWE',
-    'CHE',
-    'TUR',
-    'UKR',
-    'GBR',
-  ],
-} as const;

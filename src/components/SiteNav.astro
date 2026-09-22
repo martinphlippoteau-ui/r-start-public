@@ -47,8 +47,7 @@
  *    GSAP : le comportement est le même sur l'accueil et sur les sous-pages (ex-motion/progress.ts).
  * Reprise de l'ancien en-tête :
  *  - logo et CTA (le suffixe « par CORUM L'Épargne » est retiré de la barre depuis le 10/09/2026, à la
- *    demande de l'équipe ; `nav.brandSuffix` n'a plus de consommateur, il reste dans nav.ts parce que
- *    NavContent l'exige encore) ;
+ *    demande de l'équipe) ;
  *  - un TIROIR qui entre par la droite (aria-expanded / aria-controls, Échap, piège à focus, retour du
  *    focus sur le bouton, voile cliquable) et liste les mêmes entrées à la verticale. Il ne s'ouvre que
  *    SOUS « lg » : au-delà, les pages sont dans la barre et le bouton Menu est masqué (`lg:hidden`).
@@ -250,7 +249,7 @@ const linkClass =
           les deux étant à rayon plein. Le resserrement ne vaut QU'À PARTIR DE `lg` : en dessous, ce
           n'est pas le CTA qui borde la barre à droite mais le bouton du menu, plus petit (40 px), qui
           demande son propre retrait. */}
-        <Button position="nav" variant="primary" size="md" class="subnav-cta px-7 max-[26rem]:px-5">{ctaLabel}</Button>
+        <Button position={nav.cta.position} variant="primary" size="md" class="subnav-cta px-7 max-[26rem]:px-5">{ctaLabel}</Button>
       </div>
 
       <button
@@ -349,7 +348,7 @@ const linkClass =
           }
         </ul>
         <div class="mt-10 flex flex-col gap-3 sm:flex-row">
-          <Button position="nav" variant="light" size="lg" class="w-full sm:w-auto"
+          <Button position={nav.cta.position} variant="light" size="lg" class="w-full sm:w-auto"
             >{nav.cta.label}</Button
           >
         </div>

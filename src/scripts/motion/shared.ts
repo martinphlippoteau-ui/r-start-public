@@ -5,10 +5,8 @@
 import { gsap } from 'gsap';
 
 export {
-  PROTECTED,
   all,
   allowed,
-  classList,
   containsProtected,
   isProtected,
   num,
@@ -19,16 +17,14 @@ import { refuse, seuilAtteignable } from './dom';
 
 /**
  * RYTHME UNIQUE des entrées (11/09/2026, passe de sobriété) : une seule courbe, une seule gamme de durées
- * et de distances, partagées par reveal.ts, text.ts, counter.ts, draw.ts, scene.ts, et reprises à
+ * et de distances, partagées par reveal.ts, text.ts, draw.ts et scroll.ts, et reprises à
  * l'identique par le moteur léger (lite.ts) et la cascade CSS d'ouverture (global.css, --ease-out-expo).
- *  - EASE `expo.out` : le mouvement finit avant que l'œil ne lise ; EASE_IN est son miroir, réservé aux
- *    sorties pilotées par le défilement (scène) ;
+ *  - EASE `expo.out` : le mouvement finit avant que l'œil ne lise ;
  *  - DURATION 0,6 s (titres 0,7 s), DISTANCE 20 px (titres 24 px), STAGGER 0,08 s entre éléments ;
  *  - START `top 88%` : tous les déclencheurs uniques partent au même seuil ;
- *  - SCRUB 0,6 : lissage identique de tout effet lié au défilement (parallaxe, scrub, scène, tracé).
+ *  - SCRUB 0,6 : lissage identique de tout effet lié au défilement (parallaxe, scrub, tracé).
  */
 export const EASE = 'expo.out';
-export const EASE_IN = 'expo.in';
 export const DURATION = 0.6;
 export const DURATION_TITLE = 0.7;
 export const DISTANCE = 20;

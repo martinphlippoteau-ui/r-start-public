@@ -1,5 +1,5 @@
 import type { LegalNote } from '@/content/types';
-import type { PressArticle, PressContent, PressQuote } from '@/content/types-v2';
+import type { PressArticle, PressContact, PressContent, PressQuote } from '@/content/types-v2';
 import { press as pressFacts } from '@/content/fr/facts';
 
 /**
@@ -24,6 +24,15 @@ import { press as pressFacts } from '@/content/fr/facts';
 const nb = (s: string): string => s.replace(/ ([%€:;?!])/g, ' $1');
 /** Apostrophe typographique pour les libellés écrits avec une apostrophe droite, puis `nb`. */
 const typo = (s: string): string => nb(s.replace(/'/g, '’'));
+
+/** Contacts presse ; l'e-mail n'est renseigné que s'il est confirmé (le composant masque la ligne sinon). */
+const contacts: PressContact[] = pressFacts.contacts.map((c) => ({
+  organisation: typo(c.organisation),
+  name: c.name,
+  role: c.role,
+  phone: c.phone,
+  ...(c.email ? { email: c.email } : {}),
+}));
 
 /** Date à laquelle la sélection d'articles a été livrée par CORUM et les adresses vérifiées. */
 const coverageCheckedOn = { label: '10 septembre 2026', iso: '2026-09-10' } as const;
@@ -85,7 +94,6 @@ export const press: PressContent = {
   },
 
   hero: {
-    eyebrow: 'La presse en parle',
     /* Zones réécrites le 15/09/2026, texte fourni par l'équipe. */
     /* « dans les médias » depuis le 16/09/2026, ex-« dans vos médias » : le possessif s'adressait au
        lecteur alors que la page parle de ce que la presse a écrit. */
@@ -133,27 +141,34 @@ export const press: PressContent = {
      */
   },
 
-  /** Renvoi vers /salle-de-presse, absente du menu principal (arbitrage du 10/09/2026). */
-  /*
-   * ZONE 4 : LE RENVOI VERS LA SALLE DE PRESSE EST RETIRÉ (15/09/2026). Il disait « Vous êtes
-   * journaliste ? » et envoyait sur /salle-de-presse. L'équipe a tranché : « Ne pas activer encore la
-   * page presse pour les journalistes : pas assez d'infos, pas de CP, ça va plus nous desservir
-   * qu'autre chose. » De fait, la salle de presse annonçait des communiqués dont aucun fichier n'a
-   * jamais été livré. La route est donc désactivée (src/pages/_salle-de-presse.astro), et la zone 4
-   * porte maintenant les contacts presse eux-mêmes, par le composant Contacts déjà écrit pour elle.
-   * Pour rétablir : renommer la page sans le tiret bas, remettre ce bloc et son lien en pied de page,
-   * et les entrées retirées des listes de tests et de scripts.
-   */
-
-  /** Micro-textes du composant (libellés d'accessibilité). */
   /* Appel à l'action de la page (13/09/2026) : elle n'en portait aucun, on lisait la revue de presse et
      la page s'arrêtait là. */
   cta: { label: 'Souscrire en ligne', position: 'presse' as const },
 
+  /*
+   * ZONE 4, « Vous êtes journaliste ? » (15/09/2026, texte de l'équipe), rendue par
+   * components/pages/presse/Contacts.astro. Elle portait un renvoi vers une salle de presse que
+   * l'équipe n'a pas voulu ouvrir (« pas assez d'infos, pas de CP ») ; les contacts y sont venus à sa
+   * place. La salle de presse, en veille depuis, a été supprimée le 22/09/2026.
+   * Singulier depuis le 16/09/2026 : la question s'adresse à un lecteur, pas à une assemblée. La phrase
+   * d'appel date du même jour : le titre posait une question et la liste arrivait sans transition.
+   * `source` n'est plus affichée depuis le 14/09/2026 (retrait des notes et sources du site).
+   */
+  contacts: {
+    title: 'Vous êtes journaliste ?',
+    intro: 'Pour toute question, demande d’information ou d’interview, merci de contacter :',
+    items: contacts,
+    source: nb(`Source : ${pressFacts.contactsSource}.`),
+  },
+
+  /** Micro-textes des composants (libellés d'accessibilité). */
   labels: {
     newTabHint: 'nouvelle fenêtre',
     coverageListLabel: 'Articles de presse sur R Start',
     quotesListLabel: 'Citations de la presse sur R Start',
+    contactsListLabel: 'Contacts presse',
+    phoneLabel: 'Téléphone',
+    emailLabel: 'E-mail',
   },
 
   notes,

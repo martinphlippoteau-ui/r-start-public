@@ -1,5 +1,5 @@
 /**
- * Dessins et jauges à l'entrée dans le viewport (88 %, START), une seule fois, ou au scrub si demandé
+ * Dessins à l'entrée dans le viewport (88 %, START), une seule fois, ou au scrub si demandé
  * (lissage SCRUB 0,6). Courbe unique du moteur (EASE) pour les tracés joués une fois.
  *
  *  - data-draw : tracé progressif des formes SVG (path, line, polyline, polygon, circle, ellipse,
@@ -7,10 +7,7 @@
  *  - data-draw="width" : barre qui s'étire (scaleX 0 → 1, origine gauche).
  *    Options communes : data-draw-scrub (présent → piloté par le scroll entre data-draw-start,
  *    défaut `top 80%`, et data-draw-end, défaut `bottom 60%`), data-draw-stagger="0.15" (s).
- *  - data-fill="0.57" : jauge remplie par scaleX 0 → 1 (ou scaleY avec data-fill-axis="y", origine
- *    bas). L'état statique de l'élément (largeur 57 % posée dans le HTML) est la vérité : la valeur
- *    de l'attribut règle la durée (0,9 s + 0,5 s × valeur) pour rester en phase avec un compteur.
- * Sans JS ou en reduced-motion, tout est dessiné/rempli. Refusés sur le H1 et [data-risk].
+ * Sans JS ou en reduced-motion, tout est dessiné. Refusés sur le H1 et [data-risk].
  */
 import { gsap } from 'gsap';
 import { EASE, SCRUB, all, allowed, num, onceTrigger, onceVars } from './shared';
@@ -67,27 +64,6 @@ export const setupDraw = (): void => {
       stagger,
       scrollTrigger,
       clearProps: scrub ? '' : 'strokeDasharray,strokeDashoffset',
-    });
-  });
-};
-
-/** EN SOMMEIL : aucune page ne porte `data-fill` (relevé sur dist le 19/09/2026). */
-export const setupFill = (): void => {
-  all('[data-fill]').forEach((el) => {
-    if (!allowed(el, 'data-fill')) return;
-    const value = gsap.utils.clamp(0, 1, num(el.dataset.fill, 1));
-    const vertical = el.dataset.fillAxis === 'y';
-    const from = vertical
-      ? { scaleY: 0, transformOrigin: '50% 100%' }
-      : { scaleX: 0, transformOrigin: '0% 50%' };
-    const to = vertical ? { scaleY: 1 } : { scaleX: 1 };
-    gsap.fromTo(el, from, {
-      ...to,
-      duration: 0.9 + 0.5 * value,
-      ease: EASE,
-      scrollTrigger: onceTrigger(el),
-      clearProps: 'transform,willChange',
-      ...onceVars(el, 'transform'),
     });
   });
 };

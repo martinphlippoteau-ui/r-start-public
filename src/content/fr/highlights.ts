@@ -83,7 +83,6 @@ export const notes: LegalNote[] = [
  * ne compilait plus. L'annotation garde le contrôle du littéral et expose le champ optionnel.
  */
 export const highlights: HighlightsContent = {
-  eyebrow: 'Points forts',
   /*
    * Appel à l'action au pied de la section (15/09/2026, demande de l'équipe). Le tableau dit CE QUE
    * R Start est ; la page Stratégie dit COMMENT elle investit. Le libellé reprend l'intitulé du menu,
@@ -223,5 +222,4 @@ export const highlights: HighlightsContent = {
    * change ; la section Risques les détaille ; et chaque ligne du tableau garde son appel de note, qui
    * donne sa source et sa limite.
    */
-  notes,
 };

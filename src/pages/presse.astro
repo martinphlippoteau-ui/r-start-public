@@ -19,9 +19,7 @@ import StickyCta from '@/components/StickyCta.astro';
 import PageHero from '@/components/ui/PageHero.astro';
 import Coverage from '@/components/pages/presse/Coverage.astro';
 import Quotes from '@/components/pages/presse/Quotes.astro';
-/* Zone 4 : le composant vit sous salle-de-presse/ parce qu'il y est né. Sa page est désactivée,
-   lui reste, c'est /presse qui le rend maintenant. */
-import Contacts from '@/components/pages/salle-de-presse/Contacts.astro';
+import Contacts from '@/components/pages/presse/Contacts.astro';
 import { pages } from '@/config/pages';
 import { press } from '@/content/fr/press';
 import { breadcrumbJsonLd, organizationJsonLd, webPageJsonLd } from '@/lib/seo';
@@ -37,7 +35,7 @@ const jsonLd = [
 <Base title={press.seo.title} description={press.seo.description} path={path} jsonLd={jsonLd}>
   <SiteNav />
   <main id="contenu">
-    <PageHero eyebrow={press.hero.eyebrow} title={press.hero.title} intro={press.hero.intro}>
+    <PageHero title={press.hero.title} intro={press.hero.intro}>
       <Breadcrumb slot="breadcrumb" key="press" tone="dark" />
       <Button slot="cta" position={press.cta.position} variant="light" size="lg">
         {press.cta.label}

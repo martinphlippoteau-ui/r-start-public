@@ -1,6 +1,5 @@
 import type { Cta } from '@/content/types';
 import type { PageHero, PageSeo } from '@/content/types-v2';
-import { product } from '@/content/fr/facts';
 
 /**
  * Page /strategie, « Stratégie d'investissement » : métadonnées et en-tête. Le corps de la page tient
@@ -31,7 +30,6 @@ export const strategyPage: { seo: PageSeo; hero: PageHero; cta: Cta } = {
    * `riskLine: shortRiskLine`.
    */
   hero: {
-    eyebrow: `Stratégie · SCPI ${product.name}`,
     /* « R Start : une approche inédite au service de la performance » depuis le 16/09/2026, texte
        de l'équipe. L'en-tête posait une question, « Comment R Start investit l'argent de ses
        clients ? » ; il annonce maintenant le propos. */

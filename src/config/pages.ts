@@ -20,7 +20,6 @@ export type PageKey =
   | 'documentation'
   | 'faq'
   | 'press'
-  | 'pressRoom'
   | 'legal'
   | 'privacy'
   | 'cookies';
@@ -128,15 +127,6 @@ export const pages: Record<PageKey, PageMeta> = {
     navLabel: 'La presse en parle',
     order: 6,
     inMenu: true,
-  },
-  // Salle de presse : réservée aux journalistes, accessible depuis le pied de page seulement
-  // (arbitrage du 10/09/2026), donc hors du menu et hors de la navigation unique.
-  pressRoom: {
-    key: 'pressRoom',
-    path: '/salle-de-presse',
-    label: 'Salle de presse',
-    order: 9,
-    inMenu: false,
   },
   legal: {
     key: 'legal',

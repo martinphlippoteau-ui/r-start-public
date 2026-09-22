@@ -61,7 +61,6 @@ export const notes: LegalNote[] = [
  * composant qui teste `claim.noteId` ne compilait plus.
  */
 export const difference: DifferenceContent = {
-  eyebrow: 'Le modèle',
   /** Titre et copie fournis par l'équipe le 11/09/2026, repris tels quels (deux points à défendre en
    *  compliance, signalés en avertissement par scripts/check-compliance.mjs, voir l'en-tête du fichier). */
   /*
@@ -82,7 +81,6 @@ export const difference: DifferenceContent = {
     },
   ],
   counterweight: {
-    title: undefined,
     /*
      * ALLÉGATION DE RANG RETIRÉE le 15/09/2026 (« Supprimer dernière phrase : la première SCPI… »).
      * Elle disait `facts.product.definition` : « La première SCPI DU GROUPE CORUM sans frais d'entrée
@@ -125,5 +123,4 @@ export const difference: DifferenceContent = {
    * d'autre à défaire. Pour rétablir :
    * `secondaryCta: { label: 'Voir notre comparateur de frais', href: pages.fees.path }`.
    */
-  notes,
 };

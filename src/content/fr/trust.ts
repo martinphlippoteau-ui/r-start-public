@@ -15,7 +15,7 @@ const typo = (s: string): string => s.replace(/'/g, '’');
 const amfApprovalNumber = managementCompany.amfApproval.match(/GP-\d+/)?.[0] ?? '';
 
 /** Chiffre du groupe repris de facts.corumGroup.stats ; erreur explicite si le libellé y disparaît. */
-const groupStat = (fragment: string): StatItem => {
+const groupStat = (fragment: string) => {
   const found = corumGroup.stats.find((s) => s.label.includes(fragment));
   if (!found) throw new Error(`Chiffre absent de facts.corumGroup.stats : ${fragment}`);
   return found;
@@ -26,8 +26,8 @@ const savers = groupStat('épargnants');
 
 /**
  * Les quatre chiffres de la zone 4 (brochure partenaires 2026, p. 7), dans l'ordre de la trame :
- * ancienneté, épargne gérée, épargnants, SCPI gérées depuis 2012. Espaces insécables appliquées,
- * compteurs (numeric / prefix / suffix) conservés. Le « + » devant le nombre d'épargnants vient de
+ * ancienneté, épargne gérée, épargnants, SCPI gérées depuis 2012. Espaces insécables appliquées.
+ * Le « + » devant le nombre d'épargnants vient de
  * facts.corumGroup.stats (savers.prefix), sourcé de la brochure p. 7. Partenaires et collaborateurs
  * (facts.corumGroup.stats) ne sont pas repris : hors trame. Réutilisés par corum.ts (`stats`) ; rendus
  * ici, dans trust.stats, par 07-Trust.astro.
@@ -35,8 +35,6 @@ const savers = groupStat('épargnants');
 export const experienceStats: StatItem[] = [
   {
     value: nb(corumGroup.experienceLabel),
-    numeric: corumGroup.experienceYears,
-    suffix: ' ans',
     /**
      * Libellé du document de l'équipe (14/09/2026), « objectifs tenus » compris. C'est une allégation
      * de performance : le contrôle de conformité ne la bloque plus mais la signale à chaque exécution,
@@ -46,19 +44,14 @@ export const experienceStats: StatItem[] = [
   },
   {
     value: nb(savings.value),
-    numeric: savings.numeric,
-    suffix: nb(savings.suffix ?? ''),
     label: typo(savings.label),
   },
   {
     value: `${savers.prefix}${nbDigits(savers.value)}`,
-    numeric: savers.numeric,
-    prefix: savers.prefix,
     label: typo(savers.label),
   },
   {
     value: String(corumGroup.scpiCount),
-    numeric: corumGroup.scpiCount,
     label: `SCPI gérées depuis ${corumGroup.scpiSince}`,
   },
   /*
@@ -68,7 +61,6 @@ export const experienceStats: StatItem[] = [
    */
   {
     value: String(corumGroup.offices),
-    numeric: corumGroup.offices,
     label: 'bureaux dans le monde',
   },
 ];
@@ -107,8 +99,6 @@ export const notes: LegalNote[] = [
 ];
 
 export const trust = {
-  eyebrow: 'Confiance',
-  title: 'Un cadre réglementé, des chiffres sourcés.',
   intro: nb(
     'R Start s’inscrit dans un cadre réglementé. Visa, agrément, dépositaire, avis publics, chiffres du groupe : chaque élément a sa source et sa date. Aucun d’eux ne réduit les risques de l’investissement.'
   ),
@@ -160,7 +150,7 @@ export const trust = {
      */
     heroBadge: {
       label: 'Société de gestion agréée par l’AMF',
-      /** Ce que les lecteurs d'écran entendent à la place du logo. */
+      /** Ce que les lecteurs d'écran entendent à la place du logo (écusson de CorumRange, /a-propos). */
       logoAlt: 'Autorité des marchés financiers',
     },
     /** Contre-poids du bloc de réassurance : longueur comparable aux items et au disclaimer réunis, sans nouveau chiffre. */
@@ -171,12 +161,6 @@ export const trust = {
 
   trustpilot: {
     title: `Les avis sur ${company}`,
-    scoreLabel: tp.scoreLabel,
-    /** Compteur animé : valeur numérique et suffixe (« /5 ») dérivés de facts ; scoreLabel reste la valeur affichée. */
-    score: tp.score,
-    scoreSuffix: tp.scoreLabel.replace(/^[\d,.]+/, ''),
-    reviewsLabel: nbDigits(tp.reviewsLabel),
-    dateLabel: `au ${tp.snapshotDate.label}`,
     linkLabel: 'Lire les avis sur Trustpilot',
     /** Nom accessible des deux TrustBox (le contenu arrive dans une iframe servie par Trustpilot). */
     widgetLabel: `Avis Trustpilot sur ${company}`,
@@ -194,11 +178,8 @@ export const trust = {
     /** Libellé du document de l'équipe (14/09/2026), ex-« Le groupe CORUM en chiffres ». */
     title: 'Le groupe CORUM en quelques chiffres',
     items: experienceStats,
-    source: nb(corumGroup.statsSource),
     risk: `Ces chiffres sont ceux du groupe CORUM, pas ceux de R Start. R Start a ouvert ses souscriptions le ${product.openingDate.label} et n’a pas d’historique propre. La taille du groupe ne préjuge ni de ses résultats, ni de la liquidité de ses parts.`,
   },
-
-  notes,
 } satisfies TrustContent;
 
 export default trust;
