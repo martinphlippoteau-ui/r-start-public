@@ -49,8 +49,11 @@ export const risks: RisksContent = {
     },
     {
       title: 'Risque de devise',
+      /* Une seule phrase depuis le 22/09/2026 (demande de Martin) : la seconde, « R Start peut
+         investir hors zone euro, notamment au Canada, et n'aura pas recours à une couverture
+         systématique du risque de change », est retirée. */
       description:
-        'La variation du cours des devises implique un risque de perte en capital et des fluctuations potentielles dans les revenus distribués. R Start peut investir hors zone euro, notamment au Canada, et n’aura pas recours à une couverture systématique du risque de change.',
+        'La variation du cours des devises implique un risque de perte en capital et des fluctuations potentielles dans les revenus distribués.',
     },
     /*
      * EFFET DE LEVIER ET ABSENCE D'HISTORIQUE, propres à R Start, RETIRÉS le 16/09/2026 à la

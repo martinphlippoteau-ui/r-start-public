@@ -22,8 +22,10 @@ export const subscribe: SubscribeContent = {
    * de rétractation, moyens de règlement, éligibilité) ont quitté le code le 22/09/2026.
    */
   steps: [
-    { title: 'Définissez votre profil et vos objectifs' },
-    { title: 'CORUM vérifie que R Start est bien fait pour vous' },
+    /* Deux intitulés réécrits le 22/09/2026 (texte de Martin) : ex-« Définissez votre profil et vos
+       objectifs » et « CORUM vérifie que R Start est bien fait pour vous ». */
+    { title: 'Dites-nous qui vous êtes et quels sont vos projets d’investissement' },
+    { title: 'CORUM L’Épargne vérifie que R Start est bien fait pour vous' },
     { title: 'Signez électroniquement votre souscription' },
     /* La quatrième étape décrit ce qui vient APRÈS la souscription ; seul endroit de l'accueil qui
        nomme MyCORUM, dont le bloc complet vit sur /documentation. */
