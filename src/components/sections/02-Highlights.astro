@@ -1,8 +1,8 @@
 ---
 /**
- * Section 2, « R Start en un clin d'œil » (id « points-forts »). Fond white (voir plus bas), entre
- * « Qui a envie de payer avant de gagner ? » (01b, paper) et le comparateur de frais (03), dans
- * l'ordre de HOME_ORDER (index.astro).
+ * Section 2, « R Start en un clin d'œil » (id « points-forts »). Fond paper (voir plus bas), entre
+ * le bandeau « Points essentiels à connaître » (01c, ink) et le comparateur de frais (03, white),
+ * dans l'ordre de HOME_ORDER (index.astro).
  * En-tête aligné à gauche (H2 rendu ici pour porter ses attributs motion), puis six cartes, le bloc
  * « Souscription et options disponibles » et le bouton vers /strategie.
  * La valeur est l'image : la valeur de chaque carte (« 200 € », « 4 sur 7 », « Mensuels »…) est
@@ -56,11 +56,11 @@ const enExposant = (
 ---
 
 {
-  /* FOND CLAIR depuis le 22/09/2026 (demande de Martin), ex-ink depuis le 14/09/2026 : repères en
-    cartes paper cerclées sur le blanc, comme les cartes de la revue de presse, valeurs en marine.
-    Le seul bloc sombre de l'accueil hors hero est désormais Risques. */
+  /* FOND CLAIR depuis le 22/09/2026 (demande de Martin), ex-ink depuis le 14/09/2026 : section
+    paper, repères en cartes blanches à ombre portée (« qu'elles ressortent un peu plus », le même
+    jour ; cerclées sur blanc, elles se fondaient dans la page), valeurs en marine. */
 }
-<Section id={sections.highlights.id} tone="white">
+<Section id={sections.highlights.id} tone="paper">
   <Container size="wide">
     <header>
       <h2 id={titleId} class="text-display-lg text-balance text-ink" data-reveal-text>
@@ -87,7 +87,7 @@ const enExposant = (
       {
         cards.map((card, i) => (
           <li
-            class="rounded-3xl bg-paper p-6 ring-1 ring-navy/5 sm:p-8"
+            class="rounded-3xl bg-white p-6 shadow-card ring-1 ring-navy/5 sm:p-8"
             data-animate="fade-up"
             data-animate-delay={String((i % COLUMNS) * STAGGER)}
           >
