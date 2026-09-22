@@ -74,12 +74,14 @@ const aide = 'mt-2 text-sm text-slate-700';
 const erreur = 'mt-2 text-sm font-semibold text-coral-700';
 /*
  * LE CHAMP AU FOCUS : UN SEUL TRAIT (22/09/2026, Martin : « l'UI du champ est un peu cassée quand on
- * sélectionne »). La bordure passait au marine ET l'anneau du site se posait à 2 px d'elle : trois
- * lignes concentriques. L'anneau vient maintenant se coller à la bordure, en 2 px : un trait marine
- * de 3 px, net, qui suit les coins. En erreur, le même trait en corail.
+ * sélectionne »). La bordure passait au marine ET l'anneau du site (`outline`) se posait à 2 px
+ * d'elle : trois lignes concentriques. Collé à la bordure, l'`outline` laissait encore un liseré
+ * clair dans les coins, son arrondi n'étant pas tout à fait celui de la bordure. C'est donc une
+ * ombre portée (`ring`, box-shadow) qui épaissit la bordure : elle en épouse l'arrondi au pixel
+ * près. Un trait marine de 3 px, corail en erreur.
  */
 const montant =
-  'flex items-center gap-2 rounded-2xl border border-navy/20 bg-white px-4 py-2.5 transition-colors focus-within:border-navy focus-within:outline-2 focus-within:outline-offset-0 focus-within:outline-navy data-[invalide]:border-coral-700 data-[invalide]:focus-within:border-coral-700 data-[invalide]:focus-within:outline-coral-700';
+  'flex items-center gap-2 rounded-2xl border border-navy/20 bg-white px-4 py-2.5 transition-colors focus-within:border-navy focus-within:ring-2 focus-within:ring-navy data-[invalide]:border-coral-700 data-[invalide]:focus-within:border-coral-700 data-[invalide]:focus-within:ring-coral-700';
 const saisie =
   'min-w-0 flex-1 border-0 bg-transparent p-0 text-2xl font-bold text-ink tabular-nums outline-none focus-visible:shadow-none focus-visible:outline-none';
 const pastille =
