@@ -27,14 +27,10 @@ env:
   PUBLIC_BASE_PATH: r-start-public
   # Prévisualisation interne : aucune indexation par les moteurs de recherche.
   PUBLIC_NOINDEX: 'true'
-  # PLUS DE ROGNAGE DE LA MENTION « Nos avis 4 et 5 étoiles » depuis le 17/09/2026 (« remets nos
-  # avis »). Le rognage, demandé le 15/09/2026 pour voir le rendu sans elle, ne tenait que par l'écran
-  # de mot de passe et le noindex : le mot de passe est parti le même jour, et masquer cette mention
-  # devant qui a l'adresse présenterait une sélection d'avis favorables comme si elle n'en était pas
-  # une. La variable PUBLIC_TRUSTBOX_CROP n'est donc plus posée ici ; le mécanisme reste dans
-  # src/components/ui/TrustBox.astro, éteint par défaut, pour un aperçu local (`PUBLIC_TRUSTBOX_CROP=true`).
-  # Les deux sorties propres pour ne plus avoir la mention restent : retirer le filtre (`stars` dans
-  # src/content/fr/facts.ts) ou changer de gabarit Trustpilot.
+  # La mention « Nos avis 4 et 5 étoiles » du carrousel Trustpilot n'est plus rognée depuis le
+  # 17/09/2026, et le mécanisme a quitté le code le 22/09/2026 : la masquer présenterait une sélection
+  # d'avis favorables comme si elle n'en était pas une. Pour ne plus l'avoir : retirer le filtre
+  # (`stars` dans src/content/fr/facts.ts) ou changer de gabarit Trustpilot.
   # Vide tant que le tunnel de souscription n'a pas ouvert : les CTA ouvrent la fenêtre d'attente.
   # Le jour de l'ouverture, passer à 'true' ET renseigner PUBLIC_SUBSCRIBE_URL.
   PUBLIC_SUBSCRIBE_OPEN: ''

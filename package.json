@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Site one-page de présentation de la SCPI R Start (CORUM L'Épargne)",
+  "description": "Site de présentation de la SCPI R Start (CORUM L'Épargne)",
   "engines": {
     "node": ">=22.18.0"
   },

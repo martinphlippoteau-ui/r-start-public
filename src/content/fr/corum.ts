@@ -245,5 +245,3 @@ export const corum = {
   },
   disclaimer: corumGroup.disposalsDisclaimer,
 } satisfies CorumContent;
-
-export default corum;

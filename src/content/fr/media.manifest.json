@@ -1,16 +1,5 @@
 {
   "generatedFrom": "Assets R Start",
-  "logos": [
-    "logos/r-start-couleur.svg",
-    "logos/r-start-blanc.svg",
-    "logos/corum-lepargne-couleur.svg",
-    "logos/globe.svg"
-  ],
-  "publicFiles": [
-    "favicon.ico",
-    "favicon.svg",
-    "apple-touch-icon.png"
-  ],
   "documents": [
     {
       "file": "documents/r-start-note-information.pdf",

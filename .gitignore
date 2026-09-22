@@ -14,14 +14,10 @@ dist/
 playwright-report/
 test-results/
 .lighthouseci/
-tests/screenshots/
 tests/mesures/
 
 # os / editors
 .DS_Store
-Thumbs.db
-.vscode/*
-!.vscode/extensions.json
 *.log
 
 # Sources de rédaction, jamais publiées (brochure réservée aux professionnels)

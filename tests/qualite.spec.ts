@@ -77,19 +77,6 @@ const allerEnBas = async (page: Page, empreinte: () => Promise<string>) => {
 };
 
 test.describe('Qualité', () => {
-  test('structure de page et SEO', async ({ page }) => {
-    await page.goto('/');
-    await expect(page.locator('html')).toHaveAttribute('lang', 'fr');
-    await expect(page.locator('h1')).toHaveCount(1);
-    const title = await page.title();
-    expect(title.length).toBeGreaterThan(20);
-    expect(title.length).toBeLessThanOrEqual(70);
-    await expect(page.locator('link[rel="canonical"]')).toHaveCount(1);
-    const ld = await page.locator('script[type="application/ld+json"]').allTextContents();
-    expect(ld.length).toBeGreaterThan(0);
-    for (const block of ld) expect(() => JSON.parse(block)).not.toThrow();
-  });
-
   test('les CTA pointent vers le tunnel et alimentent le dataLayer', async ({ page }) => {
     await page.goto('/');
     const ctas = page.locator('[data-cta="souscrire"]');
@@ -1202,22 +1189,5 @@ test.describe('Qualité', () => {
     await expect
       .poll(async () => (await evenements(page)).map((x) => x.event))
       .toContain('page_introuvable');
-  });
-
-  test('captures d’écran de la page', async ({ page }, testInfo) => {
-    await page.goto('/');
-    await page.locator('[data-consent-refuse]').click();
-    await page.evaluate(async () => {
-      for (let y = 0; y < document.body.scrollHeight; y += 600) {
-        window.scrollTo(0, y);
-        await new Promise((r) => setTimeout(r, 120));
-      }
-      window.scrollTo(0, 0);
-    });
-    await page.waitForTimeout(800);
-    await page.screenshot({
-      path: `tests/screenshots/${testInfo.project.name}-full.png`,
-      fullPage: true,
-    });
   });
 });

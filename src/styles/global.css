@@ -11,7 +11,6 @@
 
   /* Marque */
   --color-navy: #024b67;
-  --color-navy-900: #023a50;
   --color-teal-700: #0b7a93;
   --color-teal-500: #1198af;
   --color-teal-400: #14a4ba;
@@ -22,12 +21,10 @@
   /* Fonds sombres (brochure) */
   --color-ink: #0d2e3d;
   --color-ink-800: #123b4d;
-  --color-ink-700: #1a4a5e;
 
   /* Accents */
   --color-sand: #f3e6cf;
   --color-sand-200: #f8f0e2;
-  --color-coral: #c4695a;
   --color-coral-700: #a8503f;
   --color-coral-100: #f7e4e0;
 
@@ -65,7 +62,6 @@
 
   --shadow-card: 0 1px 2px rgb(2 75 103 / 0.06), 0 12px 32px -12px rgb(2 75 103 / 0.18);
   --shadow-float: 0 24px 64px -24px rgb(2 75 103 / 0.35);
-  --shadow-nav: 0 1px 0 rgb(2 75 103 / 0.08), 0 8px 24px -16px rgb(2 75 103 / 0.25);
 
   /* Rythme vertical des sections (py-section, pt-section-sm, gap-chapter…). Minimum abaissé le 10/09/2026 :
      à 390 px, 80 px en haut ET en bas par section coûtaient deux écrans de défilement sur l'accueil. */
@@ -178,17 +174,6 @@
   }
 }
 
-/* --- Utilitaires de marque --- */
-/* Texte en dégradé (grands chiffres, Stat) : bornes navy → teal-700 → teal-500. La borne claire s'arrête
-   à #1198af (3,4:1 sur blanc, 3,2:1 sur paper) : un grand texte (≥ 24 px gras) reste AA (≥ 3:1) sur
-   toute sa longueur ; #14a4ba (2,98:1 sur blanc) est réservé aux fonds sombres. */
-@utility text-brand-gradient {
-  background-image: linear-gradient(135deg, #024b68 0%, #0b7a93 55%, #1198af 100%);
-  background-clip: text;
-  -webkit-background-clip: text;
-  color: transparent;
-}
-
 /* Typographie fluide façon page produit.
    RECALIBRÉE LE 12/09/2026, pour le téléphone. Les paliers étaient écrits `clamp(plancher, Nvw, plafond)`
    sans terme constant : le terme en `vw` ne rattrapait le plancher que vers 730 px de large, si bien que
@@ -258,16 +243,6 @@
   line-height: 1.5;
   font-weight: 400;
 }
-@utility text-stat {
-  /* 32 px à 390, 86 px à 1440 (inchangé) : même recalibrage que les titres. */
-  font-size: clamp(2rem, 0.75rem + 5.14vw, 5.5rem);
-  line-height: 1.05;
-  letter-spacing: -0.04em;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-}
-
-/* Lien d'évitement */
 /* Lien d'évitement. Caché AU-DESSUS de l'écran par une translation (deux fois sa hauteur), et non par
    `top: -100 %` animé : `top` est une propriété de mise en page, `transform` se compose (audit du
    16/09/2026). Rien n'est animé en mouvement réduit, le lien apparaît d'un coup au focus.

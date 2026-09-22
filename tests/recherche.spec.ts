@@ -207,6 +207,10 @@ test.describe('Recherche du site', () => {
     await expect(vide).toBeVisible();
     await expect(vide).toContainText('« xylophone »');
     await expect(vide.locator('a')).toHaveAttribute('href', /\/faq\/$/);
+    /* Le terme est cité tel quel, signes « $ » compris : `$&` et `$'` ne doivent pas être lus comme
+       des motifs de remplacement. */
+    await page.locator('[data-recherche-champ]').fill("$&zzqq$'");
+    await expect(page.locator('[data-recherche-vide-texte]')).toHaveText(/« \$&zzqq\$' »/);
   });
 
   test('Entrée mène à la question, ouverte sous la barre', async ({ page }) => {
@@ -370,15 +374,6 @@ test.describe('Recherche du site', () => {
     await page.keyboard.press('Escape');
     await expect(page.locator('[data-subscribe-soon]')).not.toHaveAttribute('open', '');
     await expect(page.locator('[data-recherche-ouvrir]')).toBeFocused();
-  });
-
-  test('le message « aucun résultat » cite ce qui a été tapé, signes « $ » compris', async ({
-    page,
-  }) => {
-    await page.goto('/frais/');
-    await ouvrir(page);
-    await page.locator('[data-recherche-champ]').fill("$&zzqq$'");
-    await expect(page.locator('[data-recherche-vide-texte]')).toHaveText(/« \$&zzqq\$' »/);
   });
 
   test('sur une fenêtre très basse, il reste toujours un résultat à lire', async ({

@@ -60,8 +60,7 @@ const nettoyer = (valeur: unknown): string => {
 
 /** Le consentement EN VIGUEUR, relu à chaque fois : il peut changer pendant la visite. */
 const consentementDonne = (): boolean => {
-  const nom = document.getElementById('consent-banner')?.dataset.cookieName || consentCookie.name;
-  return new RegExp('(?:^|; )' + nom + '=granted(?:;|$)').test(document.cookie);
+  return new RegExp('(?:^|; )' + consentCookie.name + '=granted(?:;|$)').test(document.cookie);
 };
 
 /**

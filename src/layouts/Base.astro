@@ -18,10 +18,8 @@ interface Props {
   description: string;
   path?: string;
   noindex?: boolean;
-  ogImage?: string;
   ogImageAlt?: string;
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
-  bodyClass?: string;
 }
 
 const {
@@ -29,10 +27,8 @@ const {
   description,
   path,
   noindex,
-  ogImage,
   ogImageAlt,
   jsonLd,
-  bodyClass = '',
 } = Astro.props;
 
 /**
@@ -78,7 +74,7 @@ const typeDePage = !chemin
       content="default-src 'self'; script-src 'self' https://*.googletagmanager.com https://widget.trustpilot.com; connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://*.trustpilot.com; img-src 'self' data: https://*.googletagmanager.com https://*.google-analytics.com https://*.trustpilot.com; style-src 'self' 'unsafe-inline'; font-src 'self' https://*.trustpilot.com; frame-src https://widget.trustpilot.com; base-uri 'self'; object-src 'none'; form-action 'self'"
     />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
-    <Seo {title} {description} {path} {noindex} {ogImage} {ogImageAlt} />
+    <Seo {title} {description} {path} {noindex} {ogImageAlt} />
     <link rel="preload" href={plusJakartaLatinUrl} as="font" type="font/woff2" crossorigin />
     <link rel="icon" href={withBase('/favicon.ico')} sizes="32x32" />
     <link rel="icon" href={withBase('/favicon.svg')} type="image/svg+xml" />
@@ -90,7 +86,7 @@ const typeDePage = !chemin
     <slot name="head" />
   </head>
   <body
-    class:list={['min-h-svh bg-paper text-ink', bodyClass]}
+    class="min-h-svh bg-paper text-ink"
     data-page-type={typeDePage}
     data-souscription-ouverte={site.subscribeOpen ? 'oui' : 'non'}
   >

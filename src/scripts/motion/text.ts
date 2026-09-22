@@ -7,15 +7,13 @@
  * Sans JS ou en reduced-motion, le texte est intact.
  * Usage (sobriété du 11/09/2026) : réservé aux H2 de chapitre ; les valeurs, libellés et sous-titres
  * entrent par un simple fade-up ou restent statiques.
- *  - data-reveal-text (vide ou "once") : à l'entrée (88 %, START), mots en cascade (opacity 0 → 1,
- *    y 0.4em → 0, 0,6 s expo.out, 0,04 s par mot : le pas est celui d'un mot, plus serré que la cascade
- *    d'éléments de 0,08 s).
- *  - data-reveal-text="scrub" : les mots passent de 0.2 à 1 d'opacité au fil du défilement
- *    (data-reveal-start, défaut `top 80%` ; data-reveal-end, défaut `bottom 55%`, lissage SCRUB).
+ * À l'entrée (88 %, START), mots en cascade (opacity 0 → 1, y 0.4em → 0, 0,6 s expo.out, 0,04 s par
+ * mot : le pas est celui d'un mot, plus serré que la cascade d'éléments de 0,08 s). La variante
+ * « scrub » (mots éclairés au fil du défilement), jamais employée, a été retirée le 22/09/2026.
  * Refusé sur le H1, [data-risk], tout élément contenant des balises ou plus de 12 mots.
  */
 import { gsap } from 'gsap';
-import { DURATION, EASE, SCRUB, all, allowed, onceTrigger, refuse } from './shared';
+import { DURATION, EASE, all, allowed, onceTrigger, refuse } from './shared';
 
 const MAX_WORDS = 12;
 /** Pas de la cascade entre deux mots (s). */
@@ -35,7 +33,6 @@ export const setupRevealText = (): (() => void) => {
   const titres = all('[data-reveal-text]');
   const hauteur = window.innerHeight;
   const dejaVisible = titres.map((el) => {
-    if (el.dataset.revealText === 'scrub') return false;
     const r = el.getBoundingClientRect();
     return r.bottom > 0 && r.top < hauteur;
   });
@@ -76,33 +73,15 @@ export const setupRevealText = (): (() => void) => {
     el.replaceChildren(sr, visual);
     restore.push(() => el.replaceChildren(...original));
 
-    if (el.dataset.revealText === 'scrub') {
-      gsap.fromTo(
-        spans,
-        { opacity: 0.2 },
-        {
-          opacity: 1,
-          ease: 'none',
-          stagger: 0.5,
-          scrollTrigger: {
-            trigger: el,
-            start: el.dataset.revealStart || 'top 80%',
-            end: el.dataset.revealEnd || 'bottom 55%',
-            scrub: SCRUB,
-          },
-        }
-      );
-    } else {
-      gsap.from(spans, {
-        opacity: 0,
-        y: '0.4em',
-        duration: DURATION,
-        ease: EASE,
-        stagger: WORD_STAGGER,
-        scrollTrigger: onceTrigger(el),
-        clearProps: 'opacity,transform',
-      });
-    }
+    gsap.from(spans, {
+      opacity: 0,
+      y: '0.4em',
+      duration: DURATION,
+      ease: EASE,
+      stagger: WORD_STAGGER,
+      scrollTrigger: onceTrigger(el),
+      clearProps: 'opacity,transform',
+    });
   });
   return () => restore.forEach((fn) => fn());
 };

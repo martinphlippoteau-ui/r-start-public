@@ -13,8 +13,10 @@
  * filtré et renvoyer au profil Trustpilot pour l'ensemble des avis. NI L'UN NI L'AUTRE N'EST
  * AFFICHÉ : `scope` n'est rendu nulle part, et la note est coupée comme toutes les autres
  * (AFFICHER = false). Ce que le visiteur voit du filtre se limite à la mention que Trustpilot écrit
- * lui-même au bas du carrousel (« Nos avis 4 et 5 étoiles »), tant que le rognage décrit plus bas
- * reste éteint. Voir facts.ts, `trustpilot.widgets`.
+ * lui-même au bas du carrousel (« Nos avis 4 et 5 étoiles »). Voir facts.ts, `trustpilot.widgets`.
+ * Un réglage local qui masquait cette mention (`PUBLIC_TRUSTBOX_CROP`, 15/09/2026), jamais posé en
+ * production depuis le 17/09, a été retiré le 22/09/2026 : il ne doit pas revenir, la mention est la
+ * seule trace à l'écran du filtre.
  *
  * Le script d'amorçage doit être chargé UNE SEULE FOIS par page, dans le <head> :
  * components/TrustpilotScript.astro, passé à Base.astro par le slot « head ». Sans lui, le contenu du
@@ -39,31 +41,6 @@ interface Props {
 const { template, theme, label, class: className = '' } = Astro.props as Props;
 const tp = trustFacts.trustpilot;
 const widget = tp.widgets.templates[template];
-/*
- * ROGNAGE DE LA MENTION DE FILTRE, ÉTEINT PAR DÉFAUT ET RÉSERVÉ AU LOCAL (15/09/2026).
- *
- * Quand `data-stars` filtre les avis, Trustpilot écrit « Nos avis 4 et 5 étoiles » en bas de son
- * iframe, sur les dix-sept derniers pixels. Ce drapeau masque cette bande. L'équipe l'a demandé pour
- * voir le rendu sans elle.
- *
- * SEULEMENT SUR UN GABARIT FILTRÉ (`widget.stars` renseigné), et c'est la condition qui manquait au
- * premier essai : le bandeau du hero ne filtre rien, il n'a donc aucune mention à masquer, et il ne
- * fait que 28 px de haut. Les dix-huit pixels de marge négative lui en retiraient les deux tiers.
- *
- * IL EST ÉTEINT SAUF SI `PUBLIC_TRUSTBOX_CROP=true` EST POSÉ DANS L'ENVIRONNEMENT. Le workflow de
- * déploiement (.github/workflows/github-pages.yml) l'a posé du 15 au 17/09/2026, tant que la
- * prévisualisation était chiffrée par mot de passe et en noindex ; le mot de passe retiré, l'équipe a
- * demandé de « remettre nos avis », la variable n'y est plus. Il ne sert qu'à un aperçu local.
- *
- * CE QUE CE RÉGLAGE FAIT, EN CLAIR. Il masque, sans la supprimer, la seule mention qui dit au visiteur
- * que le carrousel ne présente que les avis favorables. Devant de vrais visiteurs, il présenterait une
- * sélection d'avis comme si elle n'en était pas une : c'est ce que l'article L111-7-2 du code de la
- * consommation et les conditions d'utilisation du widget Trustpilot interdisent l'un et l'autre.
- * À RETIRER LE JOUR DE L'OUVERTURE AU PUBLIC, avec PUBLIC_NOINDEX et l'écran de mot de passe. Les deux
- * sorties propres sont alors de retirer le filtre (`stars` à « 1,2,3,4,5 » dans facts.ts) ou de changer
- * de gabarit Trustpilot. Voir facts.ts, `trustpilot.widgets`.
- */
-const ROGNER = import.meta.env.PUBLIC_TRUSTBOX_CROP === 'true' && widget.stars !== undefined;
 ---
 
 {
@@ -78,12 +55,7 @@ const ROGNER = import.meta.env.PUBLIC_TRUSTBOX_CROP === 'true' && widget.stars !
     tiers, l'enveloppe ne contenait que le lien de repli, une ligne de 24 px ; l'iframe arrivait ensuite
     à `data-style-height`, 140 px pour le carrousel de /a-propos, et poussait tout ce qui suit. */
 }
-<div
-  class:list={[className, ROGNER && 'tb-rogne']}
-  role="group"
-  aria-label={label}
-  style={`min-height:${widget.height}`}
->
+<div class={className} role="group" aria-label={label} style={`min-height:${widget.height}`}>
   <div
     class="trustpilot-widget"
     data-locale={tp.widgets.locale}
@@ -99,15 +71,3 @@ const ROGNER = import.meta.env.PUBLIC_TRUSTBOX_CROP === 'true' && widget.stars !
     <a href={tp.url} target="_blank" rel="noopener noreferrer">Trustpilot</a>
   </div>
 </div>
-
-<style>
-  /* Voir le bandeau du frontmatter : rognage local seulement, jamais en production.
-     La marge négative remonte ce qui suit et le débordement masqué coupe la bande du bas ; l'iframe
-     n'est ni redimensionnée ni modifiée, on ne fait que la cadrer. */
-  .tb-rogne {
-    overflow: hidden;
-  }
-  .tb-rogne > .trustpilot-widget {
-    margin-bottom: -18px;
-  }
-</style>

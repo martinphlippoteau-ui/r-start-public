@@ -23,23 +23,20 @@ import type { LegalNote } from '@/content/types';
 interface Props {
   /** Registre de notes de la page hôte. Absent sur l'accueil, dont le registre est vide. */
   notes?: LegalNote[];
-  /** Niveau de titre : h2 quand le bloc est seul dans sa section, h3 quand il en ferme une. */
-  niveau?: 2 | 3;
   /** Identifiant du titre, pour l'`aria-labelledby` de la section hôte. */
   titleId?: string;
   class?: string;
 }
-const { notes, niveau = 3, titleId, class: className = '' } = Astro.props as Props;
+const { notes, titleId, class: className = '' } = Astro.props as Props;
 const { trustpilot } = trust;
 const hint = trustpilot.externalLinkHint;
-const Titre = niveau === 2 ? 'h2' : 'h3';
 ---
 
 <div class={className}>
-  <Titre id={titleId} class="text-display-sm text-ink" data-animate="fade-up">
+  <h2 id={titleId} class="text-display-sm text-ink" data-animate="fade-up">
     {trustpilot.title}
     <NoteRef notes={notes} id="confiance-trustpilot" tone="light" />
-  </Titre>
+  </h2>
 
   {
     /* Carrousel officiel : rien n'est composé ni trié ici, le contenu arrive dans une iframe servie par

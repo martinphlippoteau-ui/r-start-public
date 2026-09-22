@@ -33,15 +33,6 @@ export default defineConfig({
     baseURL: 'http://127.0.0.1:4321',
     trace: 'retain-on-failure',
     locale: 'fr-FR',
-    /*
-     * `--disable-dev-shm-usage` : sur un runner GitHub, /dev/shm est minuscule et Chromium y place ses
-     * tampons de rendu. Mesure de prudence, pas un correctif ciblé : la première exécution en CI du
-     * 14/09/2026 a vu quatre-vingt-treize tests tomber sur les trois profils, et le temps d'attente
-     * du runner est l'explication qui tient, pas la mémoire partagée. Le drapeau reste parce qu'il
-     * écarte une cause classique d'instabilité en conteneur, sans effet sur une machine de
-     * développement, où /dev/shm est généreux.
-     */
-    launchOptions: { args: ['--disable-dev-shm-usage'] },
   },
   /*
    * `pnpm preview` SE DÉTACHE : `astro preview` rend la main aussitôt et laisse un serveur

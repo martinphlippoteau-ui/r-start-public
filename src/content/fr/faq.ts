@@ -46,17 +46,10 @@ const joinAnd = (items: readonly string[]): string =>
 /** « CORUM Origin, CORUM XL, CORUM Eurion, CORUM USA et R Start » (note de source uniquement). */
 const scpiList = joinAnd(corumGroup.scpiNames);
 
-/**
- * Barème complet de la commission de retrait, libellés des périodes dérivés de facts.fees.withdrawal.steps :
- * « 10 % pour un retrait avant 4 ans de détention, 7 % pour un retrait au cours de la 5e ou de la 6e année, … ».
- */
-/** « 0, 6 ou 12 % » : paliers de la commission sur les cessions d'immeubles. */
-/** « 0 % si la plus-value est inférieure à 7 %, 6 % si …, 12 % si … ». */
 /** Date du bulletin de souscription dont sont issus les taux de prélèvement (voir note faq-fiscalite). */
 const bulletinDate = 'mai 2026';
 /** « démembrement, souscription papier et CORUM Life » : modalités non proposées (brochure p.5). */
 const notEligibleList = joinAnd(subscription.notEligible);
-/** « ni démembrement, ni souscription papier, ni CORUM Life » : énumération négative des mêmes modalités. */
 
 const rawNotes: LegalNote[] = [
   {

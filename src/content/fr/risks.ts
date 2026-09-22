@@ -129,5 +129,3 @@ export const risks: RisksContent = {
   arbitrageTitle: arbitrageWarningTitle,
   arbitrageBullets: [...arbitrageWarningBullets],
 };
-
-export default risks;

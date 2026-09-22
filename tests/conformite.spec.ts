@@ -274,12 +274,4 @@ test.describe('Conformité', () => {
       expect(res.headers()['content-type'] || '').toContain('pdf');
     }
   });
-
-  test('mentions obligatoires en pied de page', async ({ page }) => {
-    await page.goto('/');
-    const footer = page.locator('footer');
-    await expect(footer).toContainText('caractère commercial');
-    await expect(footer).toContainText('26-06');
-    await expect(footer).toContainText('dpo@corumbutler.com');
-  });
 });

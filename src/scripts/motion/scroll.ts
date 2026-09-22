@@ -3,7 +3,7 @@
  *
  *  - data-parallax="0.15" : translateY de 0 à −0,15 × hauteur du viewport pendant la traversée du
  *    déclencheur (valeur négative : l'élément « traîne », effet d'arrière-plan).
- *    Options : data-parallax-trigger (sélecteur ou `parent`), data-parallax-start, data-parallax-end.
+ *    Option : data-parallax-trigger (sélecteur ou `parent`) ; traversée de `top bottom` à `bottom top`.
  *  - data-scrub="scale:1,1.08|opacity:1,0" : interpolation from,to par propriété (x, y, xPercent,
  *    yPercent, scale, scaleX, scaleY, rotate, opacity) sur la traversée du viewport.
  *    Options : data-scrub-trigger, data-scrub-start (défaut `top bottom`), data-scrub-end (`bottom top`),
@@ -51,8 +51,8 @@ export const setupParallax = (): void => {
         ease: 'none',
         scrollTrigger: {
           trigger: resolveTrigger(el, el.dataset.parallaxTrigger),
-          start: el.dataset.parallaxStart || 'top bottom',
-          end: el.dataset.parallaxEnd || 'bottom top',
+          start: 'top bottom',
+          end: 'bottom top',
           scrub: SCRUB,
           invalidateOnRefresh: true,
           ...scrubWillChange(el, 'transform'),
@@ -89,7 +89,7 @@ export const setupScrub = (): void => {
         trigger: resolveTrigger(el, el.dataset.scrubTrigger),
         start: el.dataset.scrubStart || 'top bottom',
         end: el.dataset.scrubEnd || 'bottom top',
-        scrub: num(el.dataset.scrubSmooth, SCRUB),
+        scrub: SCRUB,
         invalidateOnRefresh: true,
         ...scrubWillChange(el, props),
       },

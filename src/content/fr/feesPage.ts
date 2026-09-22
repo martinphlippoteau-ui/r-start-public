@@ -739,5 +739,3 @@ export const feesPage: FeesPageContent = {
   marketComparison: feeComparison,
   simulationDoc: deepNb(costDocument()),
 };
-
-export default feesPage;

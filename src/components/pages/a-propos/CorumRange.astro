@@ -39,18 +39,17 @@ import { resolveImage } from '@/lib/images';
 import type { LegalNote } from '@/content/types';
 
 interface Props {
-  tone?: 'paper' | 'white';
   /** Notes de la page, pour la numérotation des appels de note. */
   notes?: LegalNote[];
 }
-const { tone = 'white', notes } = Astro.props as Props;
+const { notes } = Astro.props as Props;
 const officePhoto = await resolveImage(media.corum.src);
 const stats = trust.stats;
 const QUIET_TITLE_Y = 12;
 ---
 
 {/* 1. Le groupe CORUM en chiffres */}
-<Section id="corum" tone={tone} labelledBy="chiffres-title">
+<Section id="corum" tone="white" labelledBy="chiffres-title">
   <Container size="wide">
     <h2 id="chiffres-title" class="text-display-md max-w-4xl" data-animate="fade-up">
       {stats.title}

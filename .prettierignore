@@ -5,12 +5,5 @@ pnpm-lock.yaml
 
 # Fichiers générés : ils sont réécrits par leur script, un formatage manuel serait perdu au premier appel.
 src/content/fr/media.manifest.json
-# Frontières du globe (scripts/make-map.mjs) : écrites sur une ligne. Prettier les réétalait sur
-# 3 919 lignes, soit 22 Ko d'indentation et un diff illisible à chaque régénération.
-src/content/fr/globe.json
 
-# Sorties de build et rapports.
-dist/
-playwright-report/
-test-results/
-tests/screenshots/
+# Les sorties de build et les rapports sont déjà ignorés : Prettier 3 lit aussi .gitignore.

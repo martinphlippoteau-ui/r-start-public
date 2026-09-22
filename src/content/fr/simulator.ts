@@ -455,5 +455,3 @@ export const simulator = {
     `Simulation dédiée exclusivement à la SCPI ${product.name}. Simulation non contractuelle, fournie à titre d’illustration. Les revenus potentiels présentés sont des montants bruts, avant fiscalité. Les performances passées ne préjugent pas des performances futures. L’investissement en SCPI comporte un risque de perte en capital et un risque de liquidité. Durée de placement recommandée : ${recommendedYears} ans minimum.`
   ),
 } as const;
-
-export type SimulatorContent = typeof simulator;

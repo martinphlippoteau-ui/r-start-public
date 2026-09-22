@@ -114,10 +114,8 @@ async function main() {
   await fs.access(ASSETS).catch(() => {
     throw new Error(`Dossier d'assets introuvable : ${ASSETS}`);
   });
-  const logos = [];
-  for (const [rel, out] of LOGOS) logos.push(await copyFile(rel, OUT_LOGOS, out));
-  const publicFiles = [];
-  for (const [rel, out] of PUBLIC_FILES) publicFiles.push(await copyFile(rel, OUT_PUBLIC, out));
+  for (const [rel, out] of LOGOS) await copyFile(rel, OUT_LOGOS, out);
+  for (const [rel, out] of PUBLIC_FILES) await copyFile(rel, OUT_PUBLIC, out);
   const documents = [];
   for (const [cle, rel, out] of DOCUMENTS) {
     if (PENDING_DOCUMENT_KEYS.includes(cle)) {
@@ -138,8 +136,8 @@ async function main() {
         /* Le NOM du dossier source, pas son chemin : le manifeste est versionné, et il publiait le
            chemin absolu du poste qui l'avait généré (nom d'utilisateur compris). */
         generatedFrom: path.basename(ASSETS),
-        logos: logos.map((l) => `logos/${l.file}`),
-        publicFiles: publicFiles.map((p) => p.file),
+        /* Seule liste lue par le site (documentation.ts, feesPage.ts) : les logos et fichiers de
+           public/ sont copiés sans être listés, rien ne lisait leur liste (22/09/2026). */
         documents,
       },
       null,

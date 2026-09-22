@@ -12,9 +12,11 @@
  *
  * Équivalences avec `reveal.ts` (mêmes types, même rythme unique : 0,6 s / 20 px, titres 0,7 s / 24 px,
  * pas de cascade 0,08 s, constantes reprises à la main de shared.ts, qui importe gsap) :
- *   fade-up (défaut) · fade · scale · tilt · clip (médias seulement) · stagger
+ *   fade-up (défaut) · clip (médias seulement) · stagger
  *   data-animate-delay (s) · data-animate-stagger (s) · data-animate-y (px)
- *   data-animate-child : type joué par les enfants d'un `stagger` (défaut fade-up)
+ * La bascule des enfants d'un `stagger` (`data-animate-child="tilt"`) n'existe que côté GSAP : son
+ * seul emploi, les tuiles de /strategie, est sur une page servie par le moteur. Les types « fade »,
+ * « scale » et « tilt » isolés, jamais employés, ont été retirés le 22/09/2026.
  * La courbe est l'équivalent CSS de `expo.out`, la seule employée côté moteur (--ease-out-expo).
  *
  * GARDE-FOUS, identiques à ceux du moteur (src/scripts/motion.ts) :
@@ -54,16 +56,6 @@ interface Depart {
 const depart = (type: string, y: number, titre: boolean): Depart => {
   const base = { opacity: '0', duree: titre ? DURATION_TITLE : DURATION, ease: EASE };
   switch (type) {
-    case 'fade':
-      return { ...base, transform: 'none' };
-    case 'scale':
-      return { ...base, transform: 'scale(0.95)' };
-    case 'tilt':
-      return {
-        ...base,
-        transform: `perspective(900px) translateY(${Math.max(y, DISTANCE_TITLE)}px) rotateX(6deg)`,
-        duree: DURATION_TITLE,
-      };
     case 'clip':
       return {
         ...base,
@@ -149,16 +141,8 @@ export const setupLite = (): void => {
       if (!enfants.length) return;
       const pas = num(el.dataset.animateStagger, STAGGER);
       const y = num(el.dataset.animateY, DISTANCE);
-      /*
-       * TYPE DES ENFANTS, réglable depuis le 16/09/2026 par `data-animate-child` (« j'aimerais que
-       * ce soit plus spectaculaire » pour les tuiles de /strategie). La cascade imposait `fade-up` à
-       * tous ses enfants : le seul levier restant était la distance, et monter la distance seule
-       * donne une glissade, pas un effet. `tilt` ajoute la perspective et la bascule.
-       * `fade-up` reste le défaut : aucune cascade existante ne change de rendu.
-       */
-      const typeEnfant = el.dataset.animateChild || 'fade-up';
       // La cascade est déclenchée par le conteneur : les enfants s'échelonnent sur son entrée.
-      enfants.forEach((enfant, rang) => preparer(enfant, typeEnfant, delai + rang * pas, y));
+      enfants.forEach((enfant, rang) => preparer(enfant, 'fade-up', delai + rang * pas, y));
       observerConteneur(el, enfants);
       return;
     }

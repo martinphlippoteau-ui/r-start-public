@@ -193,5 +193,3 @@ export const trust = {
     risk: `Ces chiffres sont ceux du groupe CORUM, pas ceux de R Start. R Start a ouvert ses souscriptions le ${product.openingDate.label} et n’a pas d’historique propre. La taille du groupe ne préjuge ni de ses résultats, ni de la liquidité de ses parts.`,
   },
 } satisfies TrustContent;
-
-export default trust;

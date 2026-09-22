@@ -5,7 +5,6 @@ import {
   PUBLIC_SUBSCRIBE_OPEN,
   PUBLIC_SUBSCRIBE_URL,
 } from 'astro:env/client';
-import { consentCookie } from '@/content/fr/consent';
 import { withBase } from '@/lib/href';
 import type { CtaPosition } from '@/content/types';
 
@@ -35,7 +34,6 @@ export const site = {
   url: PUBLIC_SITE_URL.replace(/\/+$/, ''),
   /** URL du tunnel de souscription réglementé. */
   subscribeUrl: PUBLIC_SUBSCRIBE_URL,
-  /** Vrai tant que l'URL réelle du tunnel n'a pas été fournie. */
   /**
    * Vrai seulement quand la souscription est réellement ouverte : PUBLIC_SUBSCRIBE_OPEN vaut « true »
    * ET l'URL du tunnel n'est plus celle de repli. Faux (le cas d'aujourd'hui) : tous les CTA
@@ -48,11 +46,6 @@ export const site = {
   noindex: interrupteur('PUBLIC_NOINDEX', PUBLIC_NOINDEX),
   gtmId: PUBLIC_GTM_ID,
   ogImagePath: '/og/og-rstart.jpg',
-  /* Lus dans le contenu, qui alimente aussi la politique cookies : une seule valeur, deux usages. */
-  consent: {
-    cookieName: consentCookie.name,
-    maxAgeDays: consentCookie.days,
-  },
 } as const;
 
 /** Repli sans JavaScript quand la souscription n'est pas ouverte : les documents réglementaires. */

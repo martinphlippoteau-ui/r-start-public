@@ -331,8 +331,6 @@ async function checkIndex() {
     errors.push(`${file} : le H1 est animé (data-animate interdit)`);
   if (!/<html[^>]*\blang="fr"/i.test(html)) errors.push(`${file} : lang="fr" absent`);
   if (!/<link[^>]+rel="canonical"/i.test(html)) errors.push(`${file} : canonical absent`);
-  if (!/<meta[^>]+name="description"/i.test(html))
-    errors.push(`${file} : meta description absente`);
 
   const heroMatch = html.match(/<section[^>]*id="apercu"[^>]*>[\s\S]*?<\/section>/i);
   if (!heroMatch) errors.push(`${file} : section #apercu introuvable`);

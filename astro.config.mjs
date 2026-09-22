@@ -17,7 +17,6 @@ const BASE_PATH = BASE_SEGMENTS.length ? '/' + BASE_SEGMENTS[BASE_SEGMENTS.lengt
 export default defineConfig({
   site: SITE_URL,
   base: BASE_PATH,
-  trailingSlash: 'ignore',
   compressHTML: true,
   /*
    * Préchargement au SURVOL (12/09/2026) : la page cible est demandée pendant que le doigt approche, la
@@ -25,9 +24,6 @@ export default defineConfig({
    * à l'écran ferait télécharger huit pages à chaque visite, pour un site qui tient à sa légèreté.
    */
   prefetch: { defaultStrategy: 'hover' },
-  build: {
-    inlineStylesheets: 'auto',
-  },
   vite: {
     plugins: [tailwindcss()],
     build: {

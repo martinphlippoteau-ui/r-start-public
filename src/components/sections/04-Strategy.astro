@@ -666,8 +666,7 @@ const pontVisible = !strategy.engines.outro && !strategy.engines.disclaimer;
       animation: pont-eclat var(--pont-cycle) ease-out infinite;
       animation-play-state: paused;
     }
-    .pont-en-vue ~ .pont-noeud::after,
-    .pont--confluence:has(.pont-en-vue) .pont-noeud::after {
+    .pont-en-vue ~ .pont-noeud::after {
       animation-play-state: running;
     }
   }

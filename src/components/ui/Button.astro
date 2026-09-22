@@ -28,7 +28,6 @@ interface Props {
   variant?: 'primary' | 'secondary' | 'light' | 'outline-light';
   size?: 'sm' | 'md' | 'lg';
   class?: string;
-  ariaLabel?: string;
   /**
    * Ouverture dans un nouvel onglet, pour les liens qui SORTENT DU SITE (16/09/2026). `rel` suit
    * automatiquement : `noopener noreferrer` est obligatoire avec `_blank`, la page ouverte pouvant
@@ -48,7 +47,6 @@ const {
   variant = 'primary',
   size = 'md',
   class: className = '',
-  ariaLabel,
   target,
 } = Astro.props;
 /*
@@ -90,7 +88,6 @@ const finalHref = href ? withBase(href) : ctaHref(position);
     : isSubscribe && site.subscribeOpen
       ? 'noopener'
       : undefined}
-  aria-label={ariaLabel}
 >
   <slot />
   {target === '_blank' && (

@@ -43,25 +43,16 @@ interface Props {
   punchline?: string;
   /** Facultative depuis le 14/09/2026, et passée par aucune page : voir plus haut. */
   riskLine?: string;
-  /** Ancre de la section (par défaut « en-tete »). */
-  id?: string;
   /**
    * `true` : l'aside n'est rendu qu'à partir de `lg`. À réserver aux pages dont l'information de
    * l'aside se trouve immédiatement sous l'en-tête sur petit écran (barre d'ancres de /documentation,
    * seule page à le passer) : l'y répéter ferait défiler deux fois la même chose.
    */
   asideOnLarge?: boolean;
-  class?: string;
 }
-const {
-  title,
-  intro,
-  punchline,
-  riskLine,
-  id = 'en-tete',
-  asideOnLarge = false,
-  class: className = '',
-} = Astro.props;
+const { title, intro, punchline, riskLine, asideOnLarge = false } = Astro.props;
+/** Ancre de l'en-tête, la même sur toutes les pages (les tests la visent). */
+const id = 'en-tete';
 const titleId = id + '-title';
 /** Une chaîne ou plusieurs : le rendu ne connaît qu'un tableau, vide quand il n'y a pas d'intro. */
 const intros = intro === undefined ? [] : Array.isArray(intro) ? intro : [intro];
@@ -84,7 +75,6 @@ const hasAside = Astro.slots.has('aside');
        tablette ne changent pas, ils n'avaient pas ce défaut. */
     'pt-[calc(var(--spacing-nav-total)+0.75rem)] pb-10 sm:pt-[calc(var(--spacing-nav-total)+3.5rem)] sm:pb-20',
     'lg:pt-[calc(var(--spacing-nav-total)+2rem)] lg:pb-12',
-    className,
   ]}
 >
   <Container size="wide" class="relative">

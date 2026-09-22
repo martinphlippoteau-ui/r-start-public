@@ -703,5 +703,3 @@ export const comparatorScpis = comparator.scpis.filter((s) => !s.unavailable);
  * qu'une SCPI proposée n'a pas été documentée ». Le même calcul est refait à la main dans
  * scripts/check-compliance.mjs, qui est le seul endroit où il servait vraiment.
  */
-
-export default comparator;

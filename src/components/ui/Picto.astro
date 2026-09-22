@@ -1,36 +1,30 @@
 ---
 /**
- * DE NOUVEAU UTILISÉ depuis le 15/09/2026, par la mention AMF du hero (sections/01-Hero.astro). Il ne
- * l'était plus depuis le 14/09 : les pictogrammes avaient quitté les points forts (11/09/2026) puis les
- * piliers de la stratégie et les savoir-faire de /a-propos, remplacés par des photos. Les autres clés
- * restent conservées, comme le bloc `corum.expertise` qui les nomme encore.
+ * Pictogrammes R Start. Trois appelants : la mention AMF du hero (01-Hero, `institution`), les puces
+ * de la stratégie (04-Strategy, champ `icon` de strategy.ts) et la fenêtre d'accès du simulateur.
  *
  * Pictogrammes R Start : dessins au TRAIT PLAT, vus de face, sans support ni volume (la tuile de verre et
  * l'isométrie ont été abandonnées le 11/09/2026 : illisibles à petite taille, et le support jurait avec le
  * trait). Grille 24 × 24, trait de 1,5 pour la forme et 1,25 à 55 % d'opacité pour les détails (fenêtres,
  * lignes, jours) : ce second niveau évite l'effet « gros trait » d'une épaisseur unique. `currentColor` :
  * la couleur vient de la classe reçue, contraste tenu sur fond clair comme sur fond sombre.
- * Formes volontairement archi-connues (billet, triangle, feuille, calendrier, immeubles, globe, loupe) :
- * un pictogramme se reconnaît, il ne s'interprète pas.
- * Clés (champ `icon` de strategy.ts / highlights.ts) : institution (fronton à colonnes, mention AMF
- * du hero), argent, alerte, document-valide, calendrier,
- * equipe (deux immeubles et flèche montante), exploration (globe et repère), analyse (immeuble et loupe).
- * Accessibilité : décoratif par défaut (aria-hidden) ; avec `title`, le SVG devient une image nommée.
+ * Formes volontairement archi-connues (fronton, billet, calendrier, immeubles, globe, loupe) : un
+ * pictogramme se reconnaît, il ne s'interprète pas.
+ * Clés : institution (fronton à colonnes), argent, calendrier, equipe (deux immeubles et flèche
+ * montante), exploration (globe et repère), analyse (immeuble et loupe). `alerte` et
+ * `document-valide`, jamais employés, ont été retirés le 22/09/2026.
+ * Accessibilité : toujours décoratif (aria-hidden), le texte voisin porte le sens.
  * Aucun attribut motion ici : l'animation se pose sur l'enveloppe.
  */
 export const PICTO_KEYS = [
   'institution',
   'argent',
-  'alerte',
-  'document-valide',
   'calendrier',
   'equipe',
   'exploration',
   'analyse',
 ] as const;
 export type PictoKey = (typeof PICTO_KEYS)[number];
-export const isPictoKey = (value: string): value is PictoKey =>
-  (PICTO_KEYS as readonly string[]).includes(value);
 
 interface Props {
   name: PictoKey;
@@ -41,10 +35,8 @@ interface Props {
    * fois, le 15 et le 16/09/2026.
    */
   class?: string;
-  /** Nom accessible facultatif ; sans lui, le picto est purement décoratif. */
-  title?: string;
 }
-const { name, class: className, title } = Astro.props as Props;
+const { name, class: className } = Astro.props as Props;
 
 /**
  * Dessins sur une grille 24 × 24, en DEUX niveaux : `trait` porte la forme principale, `detail` les
@@ -83,25 +75,6 @@ const glyphs: Record<PictoKey, { trait: string; detail?: string }> = {
     detail: ['<circle cx="8.75" cy="10.75" r="1.9"/>', '<path d="M17 13.9v4.2M15.4 16h3.2"/>'].join(
       ''
     ),
-  },
-  // Triangle d'avertissement.
-  alerte: {
-    trait:
-      '<path d="M10.4 3.7 2.2 17.9A1.9 1.9 0 0 0 3.8 20.8h16.4a1.9 1.9 0 0 0 1.6-2.9L13.6 3.7a1.9 1.9 0 0 0-3.2 0z"/>',
-    detail: '<path d="M12 9.6v4.3M12 17.3h.01"/>',
-  },
-  // Feuille avec une coche.
-  'document-valide': {
-    trait: [
-      '<path d="M12.75 2.5H6.25A1.75 1.75 0 0 0 4.5 4.25v15.5A1.75 1.75 0 0 0 6.25 21.5H12"/>',
-      '<path d="M12.75 2.5 17.5 7.25V11"/>',
-      '<circle cx="17" cy="17" r="4.5"/>',
-    ].join(''),
-    detail: [
-      '<path d="M12.75 2.5v3.75A1 1 0 0 0 13.75 7.25H17.5"/>',
-      '<path d="M7.6 11h4.4M7.6 14.6h2.6"/>',
-      '<path d="M15.1 17.1 16.4 18.4 18.9 15.8"/>',
-    ].join(''),
   },
   // Calendrier, un jour cerclé.
   calendrier: {
@@ -156,11 +129,6 @@ const glyphs: Record<PictoKey, { trait: string; detail?: string }> = {
 
 const glyph = glyphs[name];
 if (!glyph) throw new Error(`Pictogramme inconnu : ${name}`);
-
-/* Identifiant du <title> : unique par picto rendu (le frontmatter s'exécute une fois par instance). */
-const g = globalThis as { __pictoSeq?: number };
-g.__pictoSeq = (g.__pictoSeq ?? 0) + 1;
-const titleId = title ? `picto-title-${name}-${g.__pictoSeq}` : undefined;
 ---
 
 <svg
@@ -171,13 +139,10 @@ const titleId = title ? `picto-title-${name}-${g.__pictoSeq}` : undefined;
   stroke-linecap="round"
   stroke-linejoin="round"
   focusable="false"
-  aria-hidden={title ? undefined : 'true'}
-  role={title ? 'img' : undefined}
-  aria-labelledby={titleId}
+  aria-hidden="true"
   data-picto={name}
   class:list={['shrink-0', className]}
 >
-  {title && <title id={titleId}>{title}</title>}
   <Fragment set:html={glyph.trait} />
   {
     glyph.detail && (

@@ -19,8 +19,9 @@ type ConsentStatus = 'granted' | 'denied' | 'unset';
 
 const banner = document.getElementById('consent-banner');
 const gtmId = banner?.dataset.gtmId || '';
-const cookieName = banner?.dataset.cookieName || consentCookie.name;
-const maxAgeDays = Number(banner?.dataset.maxAgeDays || consentCookie.days);
+/* Nom et durée du cookie : une seule source, le contenu, qui alimente aussi la politique cookies. */
+const cookieName = consentCookie.name;
+const maxAgeDays = consentCookie.days;
 
 window.dataLayer = window.dataLayer || [];
 /**

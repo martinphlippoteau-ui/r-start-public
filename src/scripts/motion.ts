@@ -31,15 +31,16 @@
  * │  data-in-view="classe"        classe posée tant que l'élément est dans le viewport (IO) :     │
  * │                               animations CSS continues jouées seulement à l'écran.            │
  * │ Révélations uniques (once, interruptibles, 88 % du viewport), motion/reveal.ts              │
- * │  data-animate="fade-up|fade|scale|tilt|clip|stagger"  + data-animate-delay / -stagger / -y   │
+ * │  data-animate="fade-up|clip|stagger"  + data-animate-delay / -stagger / -y                   │
  * │                               rythme unique (shared.ts) : 0,6 s / 20 px / expo.out, titres    │
- * │                               0,7 s / 24 px, cascade 0,08 s ; `tilt` réservé à un objet visuel │
- * │                               isolé (picto), `clip` aux médias (sinon fade-up) ; un élément    │
- * │                               déjà à l'écran à l'init n'est pas animé (pas de flash).         │
- * │  data-reveal-text[="scrub"]   mot à mot, H2 de chapitre (≤ 12 mots) uniquement. → text.ts    │
- * │  data-draw[="width"]          tracé SVG (stroke-dashoffset) ou barre (scaleX) ; data-draw-scrub│
+ * │                               0,7 s / 24 px, cascade 0,08 s ; `clip` réservé aux médias       │
+ * │                               (sinon fade-up) ; data-animate-child="tilt" : enfants d'un       │
+ * │                               `stagger` en bascule (GSAP) ; un élément déjà à l'écran à       │
+ * │                               l'init n'est pas animé (pas de flash).                          │
+ * │  data-reveal-text             mot à mot, H2 de chapitre (≤ 12 mots) uniquement. → text.ts    │
+ * │  data-draw                    tracé SVG (stroke-dashoffset) ; + data-draw-scrub / -start / -end│
  * │ Effets au scroll (lissage SCRUB 0,6 partout, transform/opacity), motion/scroll.ts           │
- * │  data-parallax="0.15"         + -trigger / -start / -end                                      │
+ * │  data-parallax="0.15"         + -trigger                                                      │
  * │  data-scrub="scale:1,1.08|opacity:1,0"  + -trigger / -start / -end / -ease ; `blur:0,10` (px)  │
  * │                               admis pour un objet décoratif isolé, jamais du texte (shared.ts)  │
  * │  data-curtain                 la section recouvre la précédente (pin) ; recul scale 0.96 /    │

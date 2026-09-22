@@ -4,15 +4,16 @@
  *
  *  - data-draw : tracé progressif des formes SVG (path, line, polyline, polygon, circle, ellipse,
  *    rect) contenues dans l'élément (ou de l'élément lui-même) via stroke-dashoffset, en cascade.
- *  - data-draw="width" : barre qui s'étire (scaleX 0 → 1, origine gauche).
- *    Options communes : data-draw-scrub (présent → piloté par le scroll entre data-draw-start,
- *    défaut `top 80%`, et data-draw-end, défaut `bottom 60%`), data-draw-stagger="0.15" (s).
+ *    Option : data-draw-scrub (présent → piloté par le scroll entre data-draw-start, défaut `top 80%`,
+ *    et data-draw-end, défaut `bottom 60%`). Cascade de 0,15 s entre les formes.
  * Sans JS ou en reduced-motion, tout est dessiné. Refusés sur le H1 et [data-risk].
  */
 import { gsap } from 'gsap';
-import { EASE, SCRUB, all, allowed, num, onceTrigger, onceVars } from './shared';
+import { EASE, SCRUB, all, allowed, onceTrigger } from './shared';
 
 const SHAPES = 'path, line, polyline, polygon, circle, ellipse, rect';
+/** Cascade entre deux formes (s). */
+const STAGGER_FORMES = 0.15;
 
 const shapesOf = (el: HTMLElement): SVGGeometryElement[] => {
   const list = el.matches(SHAPES)
@@ -32,23 +33,7 @@ export const setupDraw = (): void => {
   all('[data-draw]').forEach((el) => {
     if (!allowed(el, 'data-draw')) return;
     const scrub = el.hasAttribute('data-draw-scrub');
-    const stagger = num(el.dataset.drawStagger, 0.15);
     const scrollTrigger = scrub ? scrubTrigger(el) : onceTrigger(el);
-
-    if (el.dataset.draw === 'width') {
-      gsap.fromTo(
-        el,
-        { scaleX: 0, transformOrigin: '0% 50%' },
-        {
-          scaleX: 1,
-          duration: 1.2,
-          ease: scrub ? 'none' : EASE,
-          scrollTrigger,
-          ...onceVars(el, 'transform'),
-        }
-      );
-      return;
-    }
 
     const shapes = shapesOf(el);
     if (!shapes.length) return;
@@ -61,7 +46,7 @@ export const setupDraw = (): void => {
       strokeDashoffset: 0,
       duration: 1.4,
       ease: scrub ? 'none' : EASE,
-      stagger,
+      stagger: STAGGER_FORMES,
       scrollTrigger,
       clearProps: scrub ? '' : 'strokeDasharray,strokeDashoffset',
     });

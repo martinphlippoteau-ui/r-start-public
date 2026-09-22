@@ -12,9 +12,7 @@ interface Props {
   /** Chemin canonique (ex. "/"). Par défaut : chemin courant. */
   path?: string;
   noindex?: boolean;
-  ogImage?: string;
   ogImageAlt?: string;
-  type?: 'website' | 'article';
 }
 
 const {
@@ -22,15 +20,13 @@ const {
   description,
   path = Astro.url.pathname,
   noindex = false,
-  ogImage = site.ogImagePath,
   ogImageAlt = site.name + ', ' + site.publisher,
-  type = 'website',
 } = Astro.props;
 
 /* La barre finale RESTE (18/09/2026) : c'est la forme que l'hébergeur sert et que le sitemap liste. Elle
    était retirée ici, et la page servie en « /frais/ » déclarait canonique « /frais », qui redirige. */
 const canonical = new URL(withBase(path), site.url + '/').toString();
-const ogImageUrl = new URL(withBase(ogImage), site.url + '/').toString();
+const ogImageUrl = new URL(withBase(site.ogImagePath), site.url + '/').toString();
 ---
 
 <title>{title}</title>
@@ -43,7 +39,7 @@ const ogImageUrl = new URL(withBase(ogImage), site.url + '/').toString();
   content={noindex || preview ? 'noindex, nofollow' : 'index, follow, max-image-preview:large'}
 />
 
-<meta property="og:type" content={type} />
+<meta property="og:type" content="website" />
 <meta property="og:site_name" content={site.name} />
 <meta property="og:locale" content={site.locale} />
 <meta property="og:title" content={title} />

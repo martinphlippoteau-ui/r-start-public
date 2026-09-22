@@ -166,5 +166,3 @@ export const subscribe: SubscribeContent = {
  */
 const idsAppeles = subscribe.steps.map((step) => step.noteId).filter(Boolean);
 export const homeNotes: LegalNote[] = notes.filter((n) => idsAppeles.includes(n.id));
-
-export default subscribe;

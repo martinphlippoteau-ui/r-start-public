@@ -179,5 +179,3 @@ export const press: PressContent = {
 
   notes,
 } satisfies PressContent;
-
-export default press;

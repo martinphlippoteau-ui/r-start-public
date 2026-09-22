@@ -35,10 +35,8 @@ import { PENDING_DOCUMENT_KEYS } from '@/content/fr/pendingDocuments';
  *    au DIC) ;
  *  - simulation des frais ex-ante (V2, 27/03/2026) : affiche 1,12 % de frais de souscription et des montants
  *    d'épargne espérée issus des scénarios du DIC ; publiée dès livraison d'une version corrigée et validée.
- * PENDING_DOCUMENT_KEYS est la décision unique de publication des pages v2 : feesPage.ts la consomme pour le
- * document de référence sur les coûts, et documents.ts, qui ne sert plus que la liste du pied de
- * page depuis la suppression de la section Documents de l'accueil (15/09/2026), la relit telle
- * quelle. Aucune donnée de performance. La brochure partenaires (B2B) n'est jamais publiée.
+ * PENDING_DOCUMENT_KEYS est la décision unique de publication : cette page et feesPage.ts la lisent.
+ * Aucune donnée de performance. La brochure partenaires (B2B) n'est jamais publiée.
  */
 
 /**
@@ -81,10 +79,8 @@ const toItem = (d: {
 
 /**
  * Clés de facts.documents et facts.documentsExtra exclues de la publication tant que CORUM n'a pas livré le
- * fichier attendu (voir en-tête). Décision unique pour les pages v2 (/documentation et /frais) et
- * pour le pied de page. Retirer une clé dès réception, dans pendingDocuments.ts : documents.ts la
- * relit, il n'a plus d'exclusion propre. Revoir en même temps le seuil de liens PDF de
- * scripts/check-compliance.mjs pour les statuts.
+ * fichier attendu (voir en-tête). Retirer une clé dès réception, dans pendingDocuments.ts, et revoir en
+ * même temps le seuil de liens PDF de scripts/check-compliance.mjs pour les statuts.
  */
 // Retours AMF de la réunion produit du 10/09/2026 (voir plan §0) :
 //  - DIC : le fichier fourni (V7, 20/05/2026) classe R Start en 3 sur 7 ; le site s'y était
@@ -101,7 +97,6 @@ const toItem = (d: {
 // La liste elle-même vit dans pendingDocuments.ts, un module sans import que l'outillage Node peut
 // lire : depuis le 18/09/2026 un document en attente n'est plus seulement sans lien, il n'est plus copié
 // dans public/documents (il y restait téléchargeable à son adresse directe).
-export { PENDING_DOCUMENT_KEYS } from '@/content/fr/pendingDocuments';
 /** Un document de facts.ts est-il publié sur les pages v2 ? */
 export const isDocumentPublished = (key: string): boolean => !PENDING_DOCUMENT_KEYS.includes(key);
 const isPublished = (d: { key: string }): boolean => isDocumentPublished(d.key);
@@ -366,5 +361,3 @@ export const documentation = {
 
   notes,
 } satisfies DocumentationContent;
-
-export default documentation;

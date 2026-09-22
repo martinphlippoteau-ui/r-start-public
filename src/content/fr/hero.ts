@@ -16,7 +16,6 @@ import { shortRiskLine } from '@/content/fr/legal';
  * sont plus rendus.
  */
 
-/** Une seule note dans le hero, les frais réels : EN VEILLE, comme toutes celles de l'accueil. */
 /** Espace insécable avant % (typographie française). */
 const nb = (t: string): string => t.replace(/ ([%€:;?!])/g, '\u00A0$1');
 

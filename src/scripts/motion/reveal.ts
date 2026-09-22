@@ -3,15 +3,14 @@
  * Rythme unique (shared.ts, 11/09/2026) : 0,6 s, 20 px, expo.out ; les grands titres (h2, h3,
  * text-display-*) 0,7 s / 24 px, même courbe. Le mouvement finit avant que l'œil ne lise.
  *  - "fade-up" (défaut) : opacity 0 → 1, y 20 → 0
- *  - "fade"             : opacity 0 → 1
- *  - "scale"            : opacity 0 → 1, scale 0.95 → 1
- *  - "tilt"             : opacity 0 → 1, y 24 → 0, rotationX 6° → 0 (perspective 900 px). Réservé à un
- *                         objet visuel isolé (picto, image), jamais un titre ni une carte entière.
  *  - "clip"             : clip-path inset bas → 0. Réservé aux médias (img, picture, svg, video,
  *                         figure) : la propriété n'est pas composée sur le GPU. Sur tout autre
  *                         élément, rendu en fade-up (avertissement en développement).
- *  - "stagger"          : les enfants directs cascadent (opacity 0 → 1, y 20 → 0, pas de 0,08 s)
+ *  - "stagger"          : les enfants directs cascadent (opacity 0 → 1, y 20 → 0, pas de 0,08 s) ;
+ *                         `data-animate-child="tilt"` les fait entrer en bascule (rotationX 6° → 0,
+ *                         perspective 900 px, y 24 → 0) : les trois tuiles de /strategie.
  * Options : data-animate-delay="0.1" (s), data-animate-stagger="0.08" (s), data-animate-y="20" (px).
+ * Les types « fade », « scale » et « tilt » isolés, jamais employés, ont été retirés le 22/09/2026.
  *
  * Règle de sobriété (11/09/2026) : au plus UN effet d'entrée par bloc de contenu (une carte, une liste,
  * un titre), jamais sur un conteneur ET son contenu ; une cascade de plus de quatre éléments est un seul
@@ -88,22 +87,6 @@ export const setupReveals = (): void => {
       ...onceVars(targets, 'transform, opacity'),
     };
     switch (type) {
-      case 'fade':
-        gsap.from(el, { ...base, opacity: 0 });
-        break;
-      case 'scale':
-        gsap.from(el, { ...base, opacity: 0, scale: 0.95 });
-        break;
-      case 'tilt':
-        gsap.from(el, {
-          ...base,
-          opacity: 0,
-          y: Math.max(y, DISTANCE_TITLE),
-          rotationX: 6,
-          transformPerspective: 900,
-          duration: DURATION_TITLE,
-        });
-        break;
       case 'clip':
         gsap.from(el, { ...base, clipPath: 'inset(0 0 100% 0)', duration: DURATION_TITLE });
         break;
@@ -114,7 +97,6 @@ export const setupReveals = (): void => {
          * alors que son unique emploi, les trois tuiles de /strategie (`tilt`, « plus spectaculaire »,
          * demande de l'équipe du 16/09/2026), vit sur une page servie par CE moteur : l'effet demandé
          * n'a jamais été joué en production, la cascade retombait sur son `fade-up`.
-         * Mêmes valeurs que le type `tilt` ci-dessus, pour que les deux moteurs rendent la même chose.
          */
         const bascule = el.dataset.animateChild === 'tilt';
         const distance = num(el.dataset.animateY, DISTANCE);
