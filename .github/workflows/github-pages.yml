@@ -2,7 +2,7 @@
 #
 # Les actions sont épinglées sur le SHA du commit, l'étiquette restant en commentaire (14/09/2026) :
 # une étiquette se déplace, et qui contrôle le dépôt d'une action contrôlerait ce qui s'exécute ici,
-# avec le jeton de publication Pages et le secret PREVIEW_PASSWORD à portée. Pour mettre à jour,
+# avec le jeton de publication Pages à portée. Pour mettre à jour,
 # résoudre l'étiquette voulue :
 #   curl -s https://api.github.com/repos/<dépôt>/commits/<étiquette> | jq -r .sha
 name: GitHub Pages
@@ -114,14 +114,8 @@ jobs:
             test-results/
           retention-days: 7
 
-      # Chiffre chaque page derrière un écran de mot de passe, SI le secret PREVIEW_PASSWORD existe.
-      # Sans lui, le script ne fait rien et le site est publié en clair (décision de l'équipe du
-      # 17/09/2026 : le mot de passe rendait l'arrivée sur le site « pas fluide du tout »). Avant,
-      # l'étape échouait sans secret, et rien n'était publié sans protection.
-      - name: Protection par mot de passe (si le secret existe)
-        run: node scripts/encrypt-preview.mjs
-        env:
-          PREVIEW_PASSWORD: ${{ secrets.PREVIEW_PASSWORD }}
+      # Plus de mot de passe devant la prévisualisation depuis le 17/09/2026 (« pas fluide du tout »,
+      # décision de l'équipe) ; le script qui chiffrait les pages a été retiré le 22/09/2026.
 
       - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3
         with:
