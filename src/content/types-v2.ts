@@ -29,13 +29,8 @@ export interface TrustContent {
     }[];
     /** Phrase standard : le visa n'implique ni approbation ni authentification. */
     disclaimer: string;
-    /** Pastille de réassurance du hero. Elle porte l'agrément de la SOCIÉTÉ DE GESTION, jamais
-        celui de R Start, qui n'est pas agréé mais visé (détail dans trust.ts, `heroBadge`). */
-    heroBadge: {
-      label: string;
-      /** Ce que les lecteurs d'écran entendent à la place du logo. */
-      logoAlt: string;
-    };
+    /** Ce que les lecteurs d'écran entendent à la place du logo de l'AMF (/a-propos). */
+    logoAlt: string;
   };
   trustpilot: {
     title: string;

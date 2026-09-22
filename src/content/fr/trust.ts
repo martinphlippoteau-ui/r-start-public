@@ -81,23 +81,17 @@ export const trust = {
     ],
     disclaimer: trustFacts.amf.disclaimer,
     /*
-     * PASTILLE DU HERO, à côté des avis Trustpilot (15/09/2026, demande de l'équipe, en
-     * connaissance de cause). Le TEXTE dit « société de gestion agréée », jamais « R Start
-     * agréé » : R Start n'est pas agréé, il est VISÉ (visa SCPI n° 26-06 du 4 mars 2026),
-     * formulation demandée par l'AMF dans ses retours sur la brochure (09/2026). Le logo de l'AMF
-     * n'est pas concédé aux communications commerciales (fichier venu de Wikipédia France, usage
-     * non libre) et, posé près d'une note Trustpilot, se lit comme une caution, ce que la mention
-     * du pied de page dit ne pas être le cas : sur l'accueil l'écusson est dessiné (Picto.astro,
-     * `institution`), le logo ne reste que sur /a-propos (CorumRange.astro). Le NUMÉRO D'AGRÉMENT
-     * est retiré de la pastille (« supprime le code technique ») : le pied de page le donne sur
-     * toutes les pages (legal.managementCompany.amfApproval), et c'est lui qui satisfait
-     * check-compliance.mjs, qui exige « GP-11000012 » sur l'accueil.
+     * Ce que les lecteurs d'écran entendent à la place du logo de l'AMF, sur /a-propos
+     * (CorumRange.astro), seule page à le montrer : l'AMF ne concède pas son logo aux
+     * communications commerciales (fichier venu de Wikipédia, usage non libre) et, posé près d'une
+     * note Trustpilot, il se lirait comme une caution. La mention « Société de gestion agréée par
+     * l'AMF » du hero, qui accompagnait les avis, a été retirée le 22/09/2026 (demande de Martin) ;
+     * le numéro d'agrément reste au pied de page (legal.managementCompany.amfApproval), et c'est
+     * lui qui satisfait check-compliance.mjs. Le vocabulaire ne change pas : « société de gestion
+     * agréée », jamais « R Start agréé », R Start étant VISÉ (visa SCPI n° 26-06 du 4 mars 2026),
+     * formulation demandée par l'AMF dans ses retours sur la brochure (09/2026).
      */
-    heroBadge: {
-      label: 'Société de gestion agréée par l’AMF',
-      /** Ce que les lecteurs d'écran entendent à la place du logo (écusson de CorumRange, /a-propos). */
-      logoAlt: 'Autorité des marchés financiers',
-    },
+    logoAlt: 'Autorité des marchés financiers',
   },
 
   trustpilot: {

@@ -6,8 +6,8 @@
  * d'ouverture. La section est `isolate` ; sa hauteur minimale est le premier écran moins la barre
  * (3,5 rem, dans le flux) : le hero remplit exactement la première vue.
  * H1 en visually-hidden ; le logo (image décorative, aria-hidden) réserve sa place en CSS
- * (.hero-logo-wrap) : aucun décalage de mise en page. Puis surtitre, accroche, deux CTA, les avis
- * et la mention AMF.
+ * (.hero-logo-wrap) : aucun décalage de mise en page. Puis surtitre, accroche, deux CTA et les
+ * avis Trustpilot, centrés (la mention AMF qui les accompagnait est partie le 22/09/2026).
  * PLUS DE LIGNE RISQUES depuis le 14/09/2026 (retrait de tous les « Bon à savoir », demande de
  * l'équipe) : le premier écran ne porte aucune mention de risque. Les règles de mise en page qui la
  * protégeaient valent aujourd'hui pour les CTA.
@@ -18,8 +18,8 @@
  * visuel du hero devra n'avoir qu'UNE définition (largeurs, format, `sizes`), reprise par <Image>
  * et par le <link rel="preload"> d'index.astro.
  * Motion (src/scripts/motion.ts) : cascade `data-intro` en CSS pur (global.css, `html.intro
- * #apercu`), rangs 1 logo, 2 surtitre, 3 accroche mot à mot, 4 CTA, 6 avis et mention AMF, 7
- * invitation à défiler (le 5 était la ligne risques) ; le H1, masqué, n'est jamais animé. Sortie au
+ * #apercu`), rangs 1 logo, 2 surtitre, 3 accroche mot à mot, 4 CTA, 6 avis, 7 invitation à
+ * défiler (le 5 était la ligne risques) ; le H1, masqué, n'est jamais animé. Sortie au
  * défilement : `flightScrub` plus bas. Mise en page sous « sm » et centrage vertical : voir le
  * <Container>. Contenu : src/content/fr/hero.ts.
  */
@@ -27,7 +27,6 @@ import { Image } from 'astro:assets';
 import brandLogo from '@/assets/logos/r-start-blanc.svg';
 import Button from '@/components/ui/Button.astro';
 import Container from '@/components/ui/Container.astro';
-import Picto from '@/components/ui/Picto.astro';
 import TrustBox from '@/components/ui/TrustBox.astro';
 import Section from '@/components/ui/Section.astro';
 import { sections } from '@/config/sections';
@@ -262,65 +261,16 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
         </div>
         {
           /* TrustBox officiel (code d'intégration fourni par l'équipe) : réassurance sur le
-            distributeur au premier écran, sous les CTA, rang 6 de l'ouverture. Sa portée (les avis
-            parlent de CORUM L'Épargne, pas de R Start) n'est plus dite à l'écran depuis le retrait
-            de la légende (15/09/2026, voir plus bas). La PASTILLE AMF est à côté des avis : côte à
-            côte à partir de `sm`, empilées en dessous (à 390 px, une rangée de deux les rendrait
-            illisibles) ; l'enveloppe est en max-w-3xl pour loger la paire, la colonne des avis
-            garde max-w-md pour que le widget ne s'étire pas. Ce que la pastille dit et ne dit pas
-            est argumenté dans trust.ts (`amf.heroBadge`) : l'agrément est celui de la société de
-            gestion, pas de R Start, et l'écusson est dessiné, ce n'est pas le logo de l'AMF. */
+            distributeur au premier écran, sous les CTA, rang 6 de l'ouverture, centré. Sa portée
+            (les avis parlent de CORUM L'Épargne, pas de R Start) n'est plus dite à l'écran depuis
+            le retrait de la légende (15/09/2026), archivée hors du dépôt (.claude/audits). La
+            mention « Société de gestion agréée par l'AMF » qui lui faisait face a été retirée le
+            22/09/2026 (demande de Martin) ; le numéro d'agrément reste dans la mention légale du
+            pied de page, et c'est lui que scripts/check-compliance.mjs exige sur l'accueil. */
         }
-        <div {...copyScrubDown} class="mx-auto mt-6 w-full max-w-4xl sm:mt-10">
-          <div
-            data-intro="6"
-            class="flex flex-col items-center gap-6 sm:flex-row sm:items-center sm:justify-center sm:gap-8"
-          >
-            <div class="w-full max-w-md">
-              <TrustBox template="horizontal" theme="dark" label={trust.trustpilot.widgetLabel!} />
-              {
-                /* Légende retirée le 15/09/2026 (demande de l'équipe, « Enlever disclaimer ») :
-                  elle disait la portée des avis, « Avis sur CORUM L'Épargne, distributeur de R
-                  Start. », le distributeur et non la SCPI. Sortie du code le 22/09/2026, archivée
-                  hors du dépôt (.claude/audits). */
-              }
-            </div>
-            {
-              /* Plus de logo de l'AMF ni de plaque blanche ici depuis le 15/09/2026 (voir la
-                mention ci-dessous) ; ils sont sur /a-propos (CorumRange.astro). Le numéro
-                d'agrément a quitté la pastille le même jour ; il reste dans la mention légale du
-                pied de page (bloc « Société de gestion ») et dans le cadre réglementaire de
-                /documentation. Colonne des avis (28 px) et mention d'une ligne alignées au centre,
-                pas par le haut ; gouttière 8 et non 12, resserrée plutôt qu'une marge sur la
-                mention, sinon la paire cesserait d'être centrée dans la colonne. */
-            }
-            {
-              /*
-               * MENTION DE RÉASSURANCE, à côté des avis. Elle a porté le LOGO DE L'AMF quelques
-               * heures le 15/09/2026, avant que l'équipe demande de revenir à la mention seule :
-               * l'AMF ne concède pas son logo aux communications commerciales, et le fichier venait
-               * de Wikipédia au titre d'un usage non libre. Le fichier (src/assets/logos/amf.svg)
-               * sert depuis le 16/09/2026 à l'écusson de /a-propos (CorumRange.astro), voulu là en
-               * connaissance de cause.
-               * LE PICTO EST LE NÔTRE, dessiné au trait (ui/Picto.astro), donc sans marque
-               * déposée : fronton à colonnes, en sable, 24 px, pleine opacité, choisi par l'équipe
-               * le 16/09/2026 (« un élément de réassurance fort »). LA RÉSERVE EST CONSIGNÉE DANS
-               * ui/Picto.astro, clé `institution` : ce dessin représente l'institution, donc l'AMF,
-               * la lecture qu'on avait écartée en retirant le logo la veille. Décision prise en
-               * connaissance de cause.
-               * LE LIBELLÉ NE CHANGE PAS : « société de gestion agréée », jamais « R Start agréé ».
-               * R Start est VISÉ et non agréé, la distinction est argumentée dans trust.ts.
-               * `shrink-0` : la colonne des avis est en `w-full`, elle réclame toute la rangée et
-               * comprimait cette mention jusqu'à casser son libellé en plusieurs lignes.
-               */
-            }
-            {/* Blanc plein depuis le 16/09/2026, ex-`text-white/80` : la mention porte la réassurance
-              réglementaire, elle n'a pas à être en retrait des avis qui lui font face. */}
-            <p class="flex shrink-0 items-center gap-2 text-sm leading-snug text-white">
-              {/* Pas de `shrink-0` ici : Picto.astro le pose déjà, et html-validate refuse une classe répétée. */}
-              <Picto name="institution" class="size-6 text-sand" />
-              {trust.amf.heroBadge.label}
-            </p>
+        <div {...copyScrubDown} class="mx-auto mt-6 w-full max-w-md sm:mt-10">
+          <div data-intro="6">
+            <TrustBox template="horizontal" theme="dark" label={trust.trustpilot.widgetLabel!} />
           </div>
         </div>
       </div>

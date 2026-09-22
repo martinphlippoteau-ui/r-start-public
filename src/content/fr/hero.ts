@@ -21,10 +21,12 @@ export const hero = {
      nature juridique du produit (facts.product.type) reste dans les données structurées. */
   eyebrow: 'CORUM invente',
   title: product.name,
-  /* Accroche de l'équipe marketing, mot pour mot (15/09/2026) : « sans frais de souscription ni
-     frais d'acquisition » est exact et borné, « la première SCPI » est l'allégation de rang de
-     l'en-tête. Sans point final (17/09/2026, demande de Martin) : une accroche, pas une phrase. */
-  tagline: 'La première SCPI sans frais de souscription ni frais d’acquisition',
+  /* Accroche réécrite le 22/09/2026 (demande de Martin) : « frais d'entrée » et « frais d'achat
+     sur les immeubles » remplacent les termes réglementaires « frais de souscription » et « frais
+     d'acquisition ». Exact et borné (les deux frais absents sont nommés) ; « la première SCPI »
+     reste l'allégation de rang de l'en-tête. Sans point final (17/09/2026, demande de Martin) :
+     une accroche, pas une phrase. */
+  tagline: 'La première SCPI sans frais d’entrée ni frais d’achat sur les immeubles',
   primaryCta: { label: 'Souscrire en ligne', position: 'hero' },
   /** Vers /frais ; la pastille flottante y mène aussi, et le comparateur est sur l'accueil. */
   secondaryCta: {

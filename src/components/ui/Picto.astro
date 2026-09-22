@@ -1,24 +1,17 @@
 ---
 /**
  * Pictogrammes R Start, dessins au TRAIT PLAT, vus de face, sans support ni volume (la tuile de
- * verre et l'isométrie ont été abandonnées le 11/09/2026 : illisibles à petite taille). Trois
- * appelants : la mention AMF du hero (01-Hero, `institution`), les puces de la stratégie
- * (04-Strategy, champ `icon` de strategy.ts) et la fenêtre d'accès du simulateur. Grille 24 × 24,
- * trait de 1,5 pour la forme et 1,25 à 55 % d'opacité pour les détails : ce second niveau évite
- * l'effet « gros trait » d'une épaisseur unique. `currentColor` : la couleur vient de la classe
- * reçue. Formes archi-connues (fronton, billet, calendrier, immeubles, globe, loupe) : un
- * pictogramme se reconnaît, il ne s'interprète pas. Clés : institution, argent, calendrier, equipe,
+ * verre et l'isométrie ont été abandonnées le 11/09/2026 : illisibles à petite taille). Deux
+ * appelants : les puces de la stratégie (04-Strategy, champ `icon` de strategy.ts) et la fenêtre
+ * d'accès du simulateur ; le fronton `institution` de la mention AMF du hero est parti avec elle
+ * le 22/09/2026. Grille 24 × 24, trait de 1,5 pour la forme et 1,25 à 55 % d'opacité pour les
+ * détails : ce second niveau évite l'effet « gros trait » d'une épaisseur unique. `currentColor` :
+ * la couleur vient de la classe reçue. Formes archi-connues (billet, calendrier, immeubles, globe,
+ * loupe) : un pictogramme se reconnaît, il ne s'interprète pas. Clés : argent, calendrier, equipe,
  * exploration, analyse. Toujours décoratif (aria-hidden), le texte voisin porte le sens ; aucun
  * attribut motion ici, l'animation se pose sur l'enveloppe.
  */
-export const PICTO_KEYS = [
-  'institution',
-  'argent',
-  'calendrier',
-  'equipe',
-  'exploration',
-  'analyse',
-] as const;
+export const PICTO_KEYS = ['argent', 'calendrier', 'equipe', 'exploration', 'analyse'] as const;
 export type PictoKey = (typeof PICTO_KEYS)[number];
 
 interface Props {
@@ -37,23 +30,6 @@ const { name, class: className } = Astro.props as Props;
  * éléments secondaires (fenêtres, lignes de texte, jours), plus fins et à 55 % d'opacité.
  */
 const glyphs: Record<PictoKey, { trait: string; detail?: string }> = {
-  /* Fronton à colonnes : le bâtiment d'une autorité, choisi par l'équipe le 16/09/2026 pour la
-     mention AMF du hero parmi six candidats présentés sur /test. IL Y AVAIT UNE RÉSERVE, affichée
-     au moment du choix et consignée ici pour la Conformité : ce dessin REPRÉSENTE L'INSTITUTION,
-     donc l'AMF ; posé près d'une note Trustpilot, il peut se lire comme une caution de l'autorité,
-     ce que la mention du pied de page dit explicitement ne pas être le cas, et c'est la raison pour
-     laquelle le logo de l'AMF a été retiré la veille. L'équipe a tranché en connaissance de cause.
-     Le libellé n'a jamais bougé : « société de gestion agréée », jamais « R Start agréé ». Le toit
-     est tracé en deux segments ouverts plutôt qu'en triangle fermé : à 24 px, un tympan plein se
-     referme en tache. */
-  institution: {
-    trait: [
-      '<path d="M3.6 9.4 12 4.2l8.4 5.2"/>',
-      '<path d="M3.4 20.4h17.2"/>',
-      '<path d="M5.2 9.9v9.2M18.8 9.9v9.2"/>',
-    ].join(''),
-    detail: '<path d="M9.8 10.2v8.6M14.2 10.2v8.6"/>',
-  },
   // Billet et pièce.
   argent: {
     trait: [
