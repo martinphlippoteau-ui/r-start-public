@@ -43,19 +43,21 @@ const QUIET_TITLE_Y = 12;
     <h2 id="chiffres-title" class="text-display-md max-w-4xl" data-animate="fade-up">
       {stats.title}
     </h2>
-    <!--
-      Deux colonnes dès le téléphone (13/09/2026) : en une seule, les chiffres prenaient un écran pour
-      quatre nombres. Plusieurs colonnes dès `lg` seulement : plus étroites, « 160 000 » en text-stat
-      déborde de sa cellule (texte dégradé tronqué).
-      LE NOMBRE DE COLONNES SUIT LE NOMBRE DE CHIFFRES (14/09/2026) : l'équipe en a ajouté un cinquième,
-      « 7 bureaux dans le monde », et sur une grille de quatre il se retrouvait seul sur une deuxième
-      ligne, à côté de trois cases vides. La grille est bornée à cinq : au-delà, on repasse à quatre et
-      c'est la deuxième ligne qui se remplit.
-      À CINQ COLONNES, les cases descendent à 215 px sur un écran de 1440 : « 9,6 Md€ » et
-      « + 160 000 » passaient à la ligne en taille `solid` et les cinq libellés ne s'alignaient plus.
-      Les chiffres passent donc en `solid-compact`, un cran plus bas, dès qu'ils sont cinq. Un chiffre
-      un peu plus petit se lit ; cinq chiffres désalignés, non.
-    -->
+    {
+      /*
+       * Deux colonnes dès le téléphone (13/09/2026) : en une seule, les chiffres prenaient un écran pour
+       * quatre nombres. Plusieurs colonnes dès `lg` seulement : plus étroites, « 160 000 » en text-stat
+       * déborde de sa cellule (texte dégradé tronqué).
+       * LE NOMBRE DE COLONNES SUIT LE NOMBRE DE CHIFFRES (14/09/2026) : l'équipe en a ajouté un cinquième,
+       * « 7 bureaux dans le monde », et sur une grille de quatre il se retrouvait seul sur une deuxième
+       * ligne, à côté de trois cases vides. La grille est bornée à cinq : au-delà, on repasse à quatre et
+       * c'est la deuxième ligne qui se remplit.
+       * À CINQ COLONNES, les cases descendent à 215 px sur un écran de 1440 : « 9,6 Md€ » et
+       * « + 160 000 » passaient à la ligne en taille `solid` et les cinq libellés ne s'alignaient plus.
+       * Les chiffres passent donc en `solid-compact`, un cran plus bas, dès qu'ils sont cinq. Un chiffre
+       * un peu plus petit se lit ; cinq chiffres désalignés, non.
+       */
+    }
     <ul
       role="list"
       class:list={[

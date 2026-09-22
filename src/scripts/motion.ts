@@ -21,13 +21,11 @@
  *
  * ┌ VOCABULAIRE ─────────────────────────────────────────────────────────────────────────────────┐
  * │ Chargement (CSS pur, sans GSAP)                                                               │
- * │  data-intro="1|2|3…"          cascade d'entrée (opacity + translateY 18 px, 500 ms, expo.out,  │
- * │                               70 ms par rang, ≤ 6 rangs) jouée au premier rendu : classe       │
- * │                               `intro` rendue côté serveur sur <html> (Base.astro), animation   │
- * │                               CSS `intro-in` (global.css). Déterministe, aucun flash.          │
- * │  data-intro-move              variante par transform seul (translateY 14 px, opacité intacte) │
- * │                               OBLIGATOIRE sur un candidat LCP (grand paragraphe du 1er        │
- * │                               viewport) : un élément à opacité 0 est ignoré par le LCP.        │
+ * │  data-intro="1|2|3…"          cascade d'ouverture du hero, jouée au premier rendu : classe    │
+ * │                               `intro` rendue côté serveur sur <html> (Base.astro), une         │
+ * │                               animation CSS par rang (global.css, « Ouverture de l'accueil »). │
+ * │                               Déterministe, aucun flash. Jamais d'opacité sur un texte ni sur  │
+ * │                               un candidat LCP : un élément à opacité 0 est ignoré par le LCP.  │
  * │  data-in-view="classe"        classe posée tant que l'élément est dans le viewport (IO) :     │
  * │                               animations CSS continues jouées seulement à l'écran.            │
  * │ Révélations uniques (once, interruptibles, 88 % du viewport), motion/reveal.ts              │

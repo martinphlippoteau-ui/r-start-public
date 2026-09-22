@@ -91,8 +91,9 @@ const copyScrubUp = { 'data-scrub': 'y:0,-48|opacity:1,0', ...flightScrub };
 const copyScrubFar = { 'data-scrub': 'y:0,-72|opacity:1,0', ...flightScrub };
 /** CTA : recul et EFFACEMENT (11/09/2026), celui de la barre prenant le relais à l'écran.
  *  Le fondu avait été retiré parce qu'un contrôle d'accessibilité surprenait le bouton à mi-opacité, avec
- *  un contraste sous 4,5:1 ; la cause réelle était la cascade d'entrée, corrigée depuis (data-intro-move
- *  partout dans le hero). Le fondu du défilement est donc rétabli, et le contrôle est rejoué en série. */
+ *  un contraste sous 4,5:1 ; la cause réelle était la cascade d'entrée, corrigée depuis (plus aucun
+ *  texte n'y entre par l'opacité). Le fondu du défilement est donc rétabli, et le contrôle est rejoué
+ *  en série. */
 const copyScrubDown = { 'data-scrub': 'y:0,24|opacity:1,0', ...flightScrub };
 /** CTA : taille md sous « sm ». */
 const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
@@ -178,7 +179,6 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
           <div {...copyScrubFar} class="mb-5 max-sm:order-1 sm:mb-8">
             <p
               data-intro="2"
-              data-intro-move
               class="text-base leading-tight font-semibold tracking-[0.14em] text-teal-100 uppercase sm:text-lg lg:text-xl"
             >
               {hero.eyebrow}
@@ -221,7 +221,7 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
           data-scrub-ease="power1.in"
         >
           {/* Rang 1 de l'ouverture : le logo entre par déplacement seul (candidat LCP, jamais d'opacité). */}
-          <span class="hero-logo-stack" data-intro="1" data-intro-move>
+          <span class="hero-logo-stack" data-intro="1">
             <Image
               src={brandLogo}
               alt=""
@@ -278,7 +278,6 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
           <div
             data-hero-cta
             data-intro="4"
-            data-intro-move
             class="flex w-full flex-col items-stretch gap-2 sm:w-auto sm:flex-row sm:items-center sm:justify-center sm:gap-3"
           >
             <Button position={hero.primaryCta.position} variant="light" size="lg" class={ctaMobile}
@@ -319,7 +318,6 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
         <div {...copyScrubDown} class="mx-auto mt-6 w-full max-w-4xl sm:mt-10">
           <div
             data-intro="6"
-            data-intro-move
             class="flex flex-col items-center gap-6 sm:flex-row sm:items-center sm:justify-center sm:gap-8"
           >
             <div class="w-full max-w-md">
@@ -408,7 +406,6 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
             data-hero-scroll-hint
             data-in-view="is-in-view"
             data-intro="7"
-            data-intro-move
             class="pointer-events-auto flex flex-col items-center gap-2 rounded-2xl px-4 py-2 text-white/70 no-underline transition-colors hover:text-white focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-white"
           >
             <span class="text-sm font-semibold tracking-[0.08em]">{hero.scrollHint.label}</span>

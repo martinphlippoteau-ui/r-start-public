@@ -7,8 +7,6 @@ import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import * as legal from '../src/content/fr/legal.ts';
-/* `product` a quitté cet import le 15/09/2026 avec la neutralisation des deux contrôles de
-   périmètre plus bas : à remettre en même temps qu'eux. */
 import { marketComparison, risk } from '../src/content/fr/facts.ts';
 import { comparator } from '../src/content/fr/comparator.ts';
 import { lignesOg } from './og-lignes.mjs';
@@ -306,16 +304,13 @@ async function checkIndex() {
    */
   requirePhrase(text, legal.gdpr.dpoEmail, 'e-mail DPO', file);
   /*
-   * NEUTRALISÉES LE 15/09/2026 avec le retrait de l'allégation de rang du bloc « Le modèle » (demande
-   * de l'équipe : « Supprimer dernière phrase : la première SCPI… »). Cette phrase, `product.definition`,
-   * était la SEULE occurrence du périmètre « du groupe CORUM » sur l'accueil : les deux contrôles
-   * ci-dessous n'ont donc plus d'objet, et échoueraient sur une page dont le contenu a été arbitré.
-   * L'accueil ne porte plus qu'une allégation de rang NON BORNÉE, celle de l'accroche du hero (« La
-   * première SCPI sans frais de souscription ni frais d'acquisition »), signalée par ailleurs en
-   * avertissement. COMMENTÉES, pas supprimées : elles reprennent effet dès que le périmètre revient.
+   * PLUS DE CONTRÔLE DU PÉRIMÈTRE DE L'ALLÉGATION DE RANG depuis le 15/09/2026 (demande de l'équipe :
+   * « Supprimer dernière phrase : la première SCPI… »). La phrase bornée, « La première SCPI du groupe
+   * CORUM sans frais d'entrée ni frais sur les achats d'immeubles », était la SEULE occurrence du
+   * périmètre « du groupe CORUM » sur l'accueil ; elle a quitté le code le 22/09/2026. L'accueil ne
+   * porte plus qu'une allégation de rang NON BORNÉE, celle de l'accroche du hero (« La première SCPI
+   * sans frais de souscription ni frais d'acquisition »), signalée par ailleurs en avertissement.
    */
-  // requirePhrase(text, product.definition, 'ligne de définition du hero', file);
-  // requirePhrase(text, 'groupe CORUM', 'périmètre de l’allégation de rang', file);
   requirePhrase(text, 'GP-11000012', 'agrément AMF de la société de gestion', file);
   requirePhrase(text, legal.publisher.rcs, "RCS de l'éditeur", file);
   requirePhrase(text, '15 %', 'frais de gestion 15 %', file);

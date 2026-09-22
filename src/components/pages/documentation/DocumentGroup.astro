@@ -40,7 +40,7 @@ const cardTone = tone === 'paper' ? 'bg-white shadow-card' : 'bg-paper ring-1 ri
 <Section id={id} tone={tone}>
   <Container size="wide">
     <div class="grid gap-12 lg:grid-cols-12 lg:gap-16">
-      <!-- En-tête collant -->
+      {/* En-tête collant */}
       <div class="lg:col-span-5">
         <header class="lg:sticky lg:top-24">
           <h2 id={id + '-title'} class="text-display-md">{group.title}</h2>
@@ -48,7 +48,7 @@ const cardTone = tone === 'paper' ? 'bg-white shadow-card' : 'bg-paper ring-1 ri
         </header>
       </div>
 
-      <!-- Documents -->
+      {/* Documents */}
       <ul
         role="list"
         aria-label={group.title}

@@ -42,11 +42,12 @@ export interface MediaContent {
   hero: { main: MediaImage };
   /** Bande pleine largeur de la page /a-propos, entre les deux chapitres. */
   corum: MediaImage;
+  /** Bloc « Ce qui change vraiment » (01b-Difference), face à la démonstration. */
   documents: MediaImage;
-  /**
-   * Pas d'image Open Graph photographique : diffusée seule sur les réseaux sociaux, une photo d'immeuble
-   * ne peut pas porter la mention « Immeuble non détenu par R Start ». L'image OG est le visuel logo +
-   * dégradé public/og/og-rstart.jpg (src/config/site.ts, ogImagePath), décrit par seo.ogImageAlt.
+  /*
+   * Pas d'image Open Graph photographique : diffusée seule sur les réseaux sociaux, une image
+   * d'immeuble se lirait comme un patrimoine détenu. L'image OG est le visuel logo + dégradé
+   * public/og/og-rstart.jpg (src/config/site.ts, ogImagePath), décrit par seo.ogImageAlt.
    */
 }
 

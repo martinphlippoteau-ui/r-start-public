@@ -23,18 +23,13 @@ export const product = {
   legalName: 'R Start, Société Civile de Placement Immobilier à capital variable',
   type: 'SCPI de rendement à capital variable',
   tagline: 'La SCPI nouvelle génération', // brochure partenaires 2026, p.1, accroche rétablie par la réunion produit du 10/09/2026
-  /**
-   * Allégation de rang autorisée : périmètre limité à la gamme du groupe CORUM (arbitrage du
-   * 10/09/2026). La version marché (« la première SCPI… » sans le groupe CORUM) reste interdite
-   * tant que la Conformité ne l'a pas validée. EN VEILLE : plus affichée depuis le 15/09/2026
-   * (retrait de l'allégation de rang du bloc « Le modèle », voir check-compliance.mjs). Seule la
-   * note `difference-definition` la lit encore, avec `definitionScope`, et aucune note n'est
-   * affichée.
+  /*
+   * L'allégation de rang bornée de la brochure (p. 4 et 6), « La première SCPI du groupe CORUM sans
+   * frais d'entrée ni frais sur les achats d'immeubles », et son périmètre (les cinq SCPI du
+   * groupe) ont quitté l'écran le 15/09/2026 et le code le 22/09/2026 (archivés hors du dépôt,
+   * .claude/audits). La version marché, sans le groupe CORUM, reste celle de l'accroche du hero,
+   * que scripts/check-compliance.mjs signale.
    */
-  definition:
-    'La première SCPI du groupe CORUM sans frais d’entrée ni frais sur les achats d’immeubles', // brochure partenaires 2026, p.4 et p.6
-  definitionScope:
-    'Périmètre : la gamme du groupe CORUM, soit cinq SCPI gérées par CORUM Asset Management depuis 2012. R Start est la première à ne prélever ni commission de souscription, ni frais sur les achats d’immeubles. Cette comparaison ne porte pas sur l’ensemble du marché des SCPI. Source : brochure partenaires 2026, p. 4, p. 6 et p. 7.',
   visa: { number: '26-06', date: '4 mars 2026' }, // bulletin, brochure p.8
   creationDate: { label: '19 janvier 2026', iso: '2026-01-19' }, // bulletin CGV
   openingDate: { label: '20 mai 2026' }, // bulletin CGV
@@ -125,8 +120,7 @@ export const fees = {
   }, // DIC p.3
   // Correction demandée par l'AMF sur la brochure (09/2026) : les frais sur cessions immobilières sont
   // exprimés TTC. La commission de retrait anticipé l'est également (bulletin de souscription, CGV).
-  vatNote:
-    "Les frais mentionnés sont exprimés hors taxes (HT), à l'exception des frais sur cessions immobilières et de la commission de retrait anticipé, exprimés toutes taxes comprises (TTC). R Start étant exonérée de TVA, le montant hors taxes est égal au montant toutes taxes comprises.",
+  // R Start étant exonérée de TVA, ses montants HT et TTC sont égaux.
   distributorRemuneration: '0,85 % des encours', // bulletin CGV (rémunération récurrente des intermédiaires)
 } as const;
 
@@ -175,7 +169,6 @@ export const marketBenchmarks = {
 
 export const income = {
   frequency: 'Mensuelle', // bulletin CGV, DIC
-  frequencyLabel: 'Distribution mensuelle des dividendes potentiels',
   enjoymentDate: 'Le premier jour du sixième mois qui suit la souscription et son règlement', // bulletin CGV
   enjoymentShort: '1er jour du 6e mois',
   /** Délai de jouissance affiché en clin d'œil (brochure partenaires 2026, p.3 : « 6 mois ») ; règle du bulletin CGV inchangée. */
@@ -275,10 +268,8 @@ export const corumGroup = {
   /**
    * Chiffres groupe : corum.fr (« Qui sommes-nous »), consulté le 08/09/2026 ; recoupés avec la brochure 2026.
    * Aucune date d'arrêté officielle (« données au … ») n'existe dans le dépôt ni dans les documents cités :
-   * `statsSource` le dit explicitement et `statsDate` reste une date de consultation, pas d'arrêté.
-   * Dès que CORUM communique la date d'arrêté, l'écrire ici (« données au … »), dans `statsSource`
-   * et `statsDate`. L'interrupteur STATS_DATED de corum.ts, qui ne gardait plus qu'une bande vide,
-   * a été supprimé le 22/09/2026 : il n'y a plus rien à basculer ailleurs.
+   * `statsDate` reste une date de consultation, pas d'arrêté. Dès que CORUM communique la date
+   * d'arrêté, l'écrire ici (« données au … »).
    */
   stats: [
     {
@@ -291,8 +282,6 @@ export const corumGroup = {
     { value: '2 500', prefix: '', label: 'partenaires professionnels' },
     { value: '250', prefix: '', label: 'collaborateurs dans 7 pays' },
   ],
-  statsSource:
-    'Source : CORUM L’Épargne, corum.fr, chiffres relevés le 8 septembre 2026 ; date d’arrêté des données non communiquée par CORUM. Chiffres du groupe CORUM, sans lien avec les résultats futurs de R Start.',
   /** Date de consultation de corum.fr, pas date d'arrêté des chiffres. */
   statsDate: { label: '8 septembre 2026' },
   /**
@@ -307,8 +296,6 @@ export const corumGroup = {
   scpiNames: ['CORUM Origin', 'CORUM XL', 'CORUM Eurion', 'CORUM USA', 'R Start'],
   offices: 7,
   amfSince: '14 avril 2011',
-  disposalsDisclaimer:
-    'Les cessions réalisées par les SCPI CORUM ne préjugent pas de leurs performances futures.', // brochure p.7
 } as const;
 
 /**

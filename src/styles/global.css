@@ -1910,34 +1910,10 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
 /* --- Cascade d'entrée (data-intro) : CSS pur, jouée au premier rendu ---
    La classe `intro` est rendue côté serveur sur <html> (Base.astro) : la décision est prise avant tout
    rendu, sans script, donc sans flash quel que soit le réseau ou le CPU (la CSP interdit l'inline).
-   `backwards` : état de départ pendant le délai seulement, aucune valeur résiduelle ensuite (pas de
-   couche conservée). Rang 1 → 6 via data-intro="n" (70 ms par rang, 500 ms, expo.out) ; au-delà de 6,
-   même délai que 6. `data-intro-move` : transform seul (LCP intact). Rien en reduced-motion. */
-@media (prefers-reduced-motion: no-preference) {
-  html.intro [data-intro] {
-    animation: intro-in 500ms var(--ease-out-expo) backwards;
-    animation-delay: calc(var(--intro-i, 0) * 70ms);
-  }
-  html.intro [data-intro][data-intro-move] {
-    animation-name: intro-move;
-  }
-  html.intro [data-intro='2'] {
-    --intro-i: 1;
-  }
-  html.intro [data-intro='3'] {
-    --intro-i: 2;
-  }
-  html.intro [data-intro='4'] {
-    --intro-i: 3;
-  }
-  html.intro [data-intro='5'] {
-    --intro-i: 4;
-  }
-  html.intro [data-intro='6'] {
-    --intro-i: 5;
-  }
-}
-/* Ouverture de l'accueil, RÉÉCRITE le 14/09/2026 (cadence donnée par l'équipe), puis RECADENCÉE le
+   Seul le hero en porte : la cascade générique qui précédait (un fondu par rang, 70 ms par rang,
+   variante `data-intro-move` par transform seul) était entièrement recouverte par les règles du hero
+   ci-dessous et a été retirée le 22/09/2026.
+   Ouverture de l'accueil, RÉÉCRITE le 14/09/2026 (cadence donnée par l'équipe), puis RECADENCÉE le
    17/09/2026 : « au chargement ça ne rend pas bien du tout, j'aimerais voir le logo R Start en gros en
    premier puis les éléments suivants ». Le premier rendu, sur téléphone, était un fond vide avec un
    rond de verre en haut ; le logo n'arrivait qu'à 200 ms, à 20 % de sa taille.
@@ -1959,10 +1935,13 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
    découpage ne change aucune couleur. L'opacité reste admise là où il n'y a pas de texte à mesurer :
    le logo (image décorative), le cadre d'avis Trustpilot et la flèche. */
 @media (prefers-reduced-motion: no-preference) {
+  /* `backwards` : état de départ pendant le délai seulement, aucune valeur résiduelle ensuite (pas de
+     couche conservée). Chaque rang fixe son nom, son délai et sa durée. */
   html.intro #apercu [data-intro] {
     animation-duration: var(--intro-dur, 700ms);
     animation-delay: var(--intro-delay, 0ms);
     animation-timing-function: var(--ease-out-expo);
+    animation-fill-mode: backwards;
   }
 
   /* 100 ms, le surtitre : fondu et resserrement de l'interlettrage.
@@ -1998,10 +1977,10 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
     animation: intro-hero-mot 700ms var(--ease-out-expo) backwards;
     animation-delay: calc(500ms + var(--mot, 0) * 70ms);
   }
-  /* ET LE PARAGRAPHE LUI-MÊME NE JOUE RIEN (audit du 16/09/2026) : la règle générique `[data-intro]` lui
-     donnait `intro-in`, un fondu d'opacité de 700 ms, par-dessus la cascade de ses mots. Deux animations
-     sur le même texte, et un texte à mi-opacité, ce que le bandeau ci-dessus interdit ; l'accroche, plus
-     grand texte du premier écran, entrait de surcroît dans le LCP avec 700 ms de retard. */
+  /* ET LE PARAGRAPHE LUI-MÊME NE JOUE RIEN (audit du 16/09/2026) : ses mots portent la cascade, lui
+     n'a pas de nom d'animation. Deux animations sur le même texte donnaient un texte à mi-opacité, ce
+     que le bandeau ci-dessus interdit ; l'accroche, plus grand texte du premier écran, entrait de
+     surcroît dans le LCP avec 700 ms de retard. */
   html.intro #apercu [data-intro='3'] {
     animation: none;
   }
@@ -2097,18 +2076,6 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
     opacity: 1;
   }
 }
-@keyframes intro-in {
-  from {
-    opacity: 0;
-    transform: translateY(18px);
-  }
-}
-@keyframes intro-move {
-  from {
-    transform: translateY(14px);
-  }
-}
-
 /* Invitation à descendre, au bas du hero (01-Hero.astro). Elle respire lentement : un objet posé qui
    attend, plutôt qu'un pictogramme figé, la respiration est sur le CHEVRON, pas sur le lien, dont la
    transform est déjà prise par le scrub de défilement. Rien en mouvement réduit.

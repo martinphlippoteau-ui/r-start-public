@@ -43,7 +43,7 @@ export const feesPage = {
    * DEUX POINTS À FAIRE VALIDER PAR LA CONFORMITÉ, signalés à l'équipe le jour même :
    *  - « la seule SCPI qui » est une allégation de rang SANS PÉRIMÈTRE et sur TOUT LE MARCHÉ. La
    *    brochure, elle, écrit « la première SCPI DU GROUPE CORUM sans frais d'entrée ni frais sur les
-   *    achats d'immeubles » (facts.ts, product.definition) : le périmètre y est dans la phrase. C'est
+   *    achats d'immeubles » : le périmètre y est dans la phrase. C'est
    *    exactement le type de formulation que l'AMF avait repris sur la brochure ;
    *  - « gagnant-gagnant » est dans la liste « à défendre en compliance » de check-compliance.mjs
    *    (suggère un gain alors que le capital n'est pas garanti). Le contrôle le signale, il ne le
