@@ -27,7 +27,12 @@ export const difference = {
   lead: 'Quand vous détenez des parts de la SCPI R Start, on ne vous prélève des frais que dans deux situations :',
   /** Les deux situations, en liste. `strong` est le mot mis en valeur par le gabarit. */
   situations: [
-    { text: 'Quand elle encaisse des loyers qu’elle vous redistribue', strong: 'loyers' },
+    /* « reversés sous forme de dividendes potentiels » depuis le 22/09/2026 (demande de Martin),
+       ex-« qu'elle vous redistribue » : la formule dit que les revenus ne sont pas acquis. */
+    {
+      text: 'Quand elle encaisse des loyers qui sont reversés sous forme de dividendes potentiels',
+      strong: 'loyers',
+    },
     {
       text: 'Quand elle réalise une plus-value sur la vente d’immeubles',
       strong: 'plus-value',
