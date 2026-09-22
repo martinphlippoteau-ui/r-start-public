@@ -11,9 +11,8 @@
  * Le bouton qui la fermait est devenu une PASTILLE FLOTTANTE (components/StickyCta.astro, rendue par la
  * page) : le lien vers le comparateur reste atteignable pendant toute la lecture.
  * Équilibre AMF : la section ne porte PLUS de couple avantage / risque depuis le 11/09/2026, le
- * contre-poids chiffré a été retiré sur demande réitérée de l'équipe, et le marquage `data-advantage`
- * avec lui, faute de frère. Les risques de l'accueil reposent sur la seule section Risques, la
- * ligne du hero ne rendant plus rien depuis le 14/09/2026 ; le détail des frais vit sur /frais,
+ * contre-poids chiffré a été retiré sur demande réitérée de l'équipe. Les risques de l'accueil
+ * reposent sur la seule section Risques depuis le retrait de la ligne du hero (14/09/2026) ; le détail des frais vit sur /frais,
  * atteinte par la pastille flottante, et le comparateur est affiché plus bas sur l'accueil
  * (section 03).
  * Les formulations à défendre en compliance sont dans l'en-tête de src/content/fr/difference.ts (la
@@ -82,10 +81,8 @@ const situations = (difference.situations ?? []).map((s) => {
 
     {
       /* Le contre-poids chiffré (frais de gestion, cessions, retrait, coût total inconnu) a été retiré de
-        cette section le 11/09/2026, sur demande réitérée de l'équipe après signalement. Le bloc ne porte
-        donc plus `data-advantage` : sans contre-poids frère, le marquage serait faux et le contrôle
-        d'équilibre AMF le refuserait. Les risques de l'accueil reposent désormais sur la seule
-        section Risques (la ligne du hero ne rend plus rien) ; le détail des frais reste sur /frais,
+        cette section le 11/09/2026, sur demande réitérée de l'équipe après signalement. Les risques de
+        l'accueil reposent désormais sur la seule section Risques ; le détail des frais reste sur /frais,
         atteinte par la pastille flottante depuis le retrait du lien de la section, le
         16/09/2026. */
     }

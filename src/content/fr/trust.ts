@@ -1,6 +1,6 @@
 import type { LegalNote, StatItem } from '@/content/types';
 import type { TrustContent } from '@/content/types-v2';
-import { corumGroup, product, risk as riskFacts, trust as trustFacts } from '@/content/fr/facts';
+import { corumGroup, product, trust as trustFacts } from '@/content/fr/facts';
 import { managementCompany, visaNotice } from '@/content/fr/legal';
 
 /** Espace insécable (U+00A0, en échappement) avant % € : ; ? ! et devant « Md€ » : les libellés de facts.ts utilisent une espace simple. */
@@ -154,10 +154,6 @@ export const trust = {
       /** Ce que les lecteurs d'écran entendent à la place du logo (écusson de CorumRange, /a-propos). */
       logoAlt: 'Autorité des marchés financiers',
     },
-    /** Contre-poids du bloc de réassurance : longueur comparable aux items et au disclaimer réunis, sans nouveau chiffre. */
-    risk: nb(
-      `Le visa et l’agrément n’écartent aucun risque. Le visa porte sur la note d’information, pas sur l’opportunité d’investir. Vous pouvez perdre tout ou partie du capital investi. Les revenus ne sont pas garantis, le rachat de vos parts non plus : la liquidité est limitée. R Start peut investir hors zone euro : sa valeur et ses revenus dépendent aussi du cours des devises. La durée de placement recommandée est de ${riskFacts.recommendedHoldingLabel}.`
-    ),
   },
 
   trustpilot: {

@@ -292,13 +292,6 @@ export const comparator = {
   /* Nom du bouton « i » pour les lecteurs d'écran, complété par le libellé de la ligne. */
   infoLabel: 'Expliquer',
   /**
-   * Avertissement prévu au-dessus du tableau quand des taux manquent pour une SCPI choisie sans
-   * source. EN VEILLE : il passe par RiskNote, qui ne rend plus rien depuis le 14/09/2026, et les
-   * dix-neuf SCPI ont une source ; rien n'est affiché.
-   */
-  pendingNotice:
-    'Les taux de cette SCPI ne sont pas encore relevés. Tant qu’ils manquent, ce tableau ne compare rien : il ne montre que les frais de R Start. Aucune conclusion ne peut en être tirée.',
-  /**
    * Hypothèse de lecture, prévue au-dessus du tableau : elle change la ligne « retrait ».
    * EN VEILLE, et JAMAIS affichée : aucun gabarit ne l'a rendue. Le tableau applique pourtant cette
    * hypothèse (voir HOLDING_YEARS et `rstartCompare`).

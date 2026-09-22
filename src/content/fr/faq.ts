@@ -24,8 +24,7 @@ import { managementCompany } from '@/content/fr/legal';
  * (fees.ts, feesPage.ts) et dans facts.ts.
  *
  * Règles appliquées : aucune donnée de performance ; chaque avantage cité est contrebalancé par son
- * risque dans la même réponse, et la longueur cumulée des contre-poids (RiskNote) d'une réponse atteint
- * au moins 80 % de celle de ses paragraphes « avantage » (deux RiskNote si nécessaire) ; aucun « 0 % »
+ * risque dans la même réponse, dans le corps même de la réponse ; aucun « 0 % »
  * sans les frais réellement appliqués dans le même bloc ; fiscalité limitée à la nature des revenus
  * (note d'information, chapitre IV) et au prélèvement à la source du bulletin, sans conseil
  * personnalisé ; tous les chiffres et libellés réglementaires (paliers de la commission de retrait,
@@ -90,8 +89,7 @@ export const notes: LegalNote[] = rawNotes.map((n) => ({ ...n, text: nb(n.text) 
 
 /**
  * Questions et réponses avant application de la typographie française (voir `nb`).
- * `riskFrom` : index du premier paragraphe de contre-poids risque de chaque réponse (rendu en RiskNote,
- * même taille que l'avantage qui précède) ; `noteId` : appel de note porté par la question.
+ * `noteId` : appel de note porté par la question.
  */
 /*
  * VINGT-DEUX QUESTIONS EN SIX RUBRIQUES, contenu fourni par l'équipe le 16/09/2026 et repris mot pour
@@ -106,10 +104,9 @@ export const notes: LegalNote[] = rawNotes.map((n) => ({ ...n, text: nb(n.text) 
  * d'investissement » de l'accueil dit « 8 ans minimum », choix de l'équipe du même jour. Les deux
  * coexistent donc sur des pages différentes.
  *
- * `riskFrom` n'est plus posé : le contenu fourni porte ses propres réserves dans le corps des réponses
- * (« ne peut pas être garantie », « le capital et les revenus ne sont pas garantis »), et RiskNote ne
- * rend plus rien depuis le 14/09/2026. Le découpage avantage / contre-poids serait donc invisible tout
- * en continuant de couper les réponses en deux.
+ * Le contenu fourni porte ses propres réserves dans le corps des réponses (« ne peut pas être
+ * garantie », « le capital et les revenus ne sont pas garantis ») : plus aucune réponse n'est coupée
+ * en avantage et contre-poids.
  */
 const RUB = {
   comprendre: 'Comprendre R Start',

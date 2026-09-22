@@ -2,13 +2,11 @@
 /**
  * En-tête de sous-page (/frais, /strategie, /a-propos, /documentation, /presse, /faq) : fond ink +
  * halo de marque, sans image. Fil d'Ariane (slot « breadcrumb »), H1 (text-display-lg), puis, dans une
- * seule et même taille (text-lead) : l'introduction, la phrase-clé en gras et la ligne risques
- * (RiskNote size 'lead', jamais animée). Le tout visible sans scroller à 375×812 comme à 1440×900.
- *
- * `intro`, `punchline` et `riskLine` sont TOUTES LES TROIS FACULTATIVES. Aucune page ne passe plus
- * `riskLine` depuis le 14/09/2026 : l'équipe a demandé de retirer tous les « Bon à savoir » du site, et
- * RiskNote ne rend d'ailleurs plus rien (voir RiskNote.astro). Pour rétablir une ligne risques, il faut
- * à la fois la remettre dans le contenu de la page et la transmettre ici (`riskLine={hero.riskLine}`).
+ * seule et même taille (text-lead) : l'introduction et la phrase-clé en gras, toutes deux
+ * facultatives. Le tout visible sans scroller à 375×812 comme à 1440×900.
+ * PLUS DE LIGNE RISQUES depuis le 14/09/2026 : l'équipe a demandé de retirer tous les « Bon à savoir »
+ * du site. La prop `riskLine` et le composant qui la rendait (RiskNote) ont quitté le code le
+ * 22/09/2026.
  *
  * SLOT « aside » (audit UX) : le texte est borné à 4xl pour rester lisible, ce qui laissait la moitié
  * droite de l'écran vide sur grand écran, un demi-écran de dégradé avant le premier contenu utile.
@@ -23,26 +21,20 @@
  * ni apparaître dans une taille différente les unes des autres.
  *
  * Rythme vertical calibré pour la navigation collée (bandeau blanc dans le flux, non superposé).
- * Sous `sm`, les marges hautes sont resserrées et l'introduction comme la ligne risques passent
- * ensemble à `text-base` : avec le bandeau cookies déplié au premier chargement, la ligne risques
- * passait dessous sur plusieurs sous-pages. LES TROIS PARAGRAPHES changent de taille ENSEMBLE, et
- * portent les mêmes classes : l'égalité entre un texte qui met en avant et son contre-poids est une
- * exigence AMF, et seule la graisse distingue la phrase-clé. Attention, AUCUN TEST ne mesure cette
- * égalité sur un en-tête de sous-page : les deux tests de tests/conformite.spec.ts qui la vérifient
- * ciblent `#apercu`, donc l'accueil seul. Ici, la garantie tient aux classes écrites côte à côte.
+ * Sous `sm`, les marges hautes sont resserrées et l'introduction comme la phrase-clé passent ensemble
+ * à `text-base` : avec le bandeau cookies déplié au premier chargement, le bas de l'en-tête passait
+ * dessous sur plusieurs sous-pages. Les paragraphes changent de taille ENSEMBLE et portent les mêmes
+ * classes : seule la graisse distingue la phrase-clé.
  * Contenu : props issues du fichier de contenu de la page (PageHero de types-v2.ts).
  */
-import RiskNote from '@/components/ui/RiskNote.astro';
 import Container from '@/components/ui/Container.astro';
 
 interface Props {
   title: string;
   /** Facultative ; un tableau rend un paragraphe par entrée. */
   intro?: string | string[];
-  /** Phrase-clé sous l'introduction, en gras, MÊME TAILLE que l'introduction et la ligne risques. */
+  /** Phrase-clé sous l'introduction, en gras, MÊME TAILLE que l'introduction. */
   punchline?: string;
-  /** Facultative depuis le 14/09/2026, et passée par aucune page : voir plus haut. */
-  riskLine?: string;
   /**
    * `true` : l'aside n'est rendu qu'à partir de `lg`. À réserver aux pages dont l'information de
    * l'aside se trouve immédiatement sous l'en-tête sur petit écran (barre d'ancres de /documentation,
@@ -50,7 +42,7 @@ interface Props {
    */
   asideOnLarge?: boolean;
 }
-const { title, intro, punchline, riskLine, asideOnLarge = false } = Astro.props;
+const { title, intro, punchline, asideOnLarge = false } = Astro.props;
 /** Ancre de l'en-tête, la même sur toutes les pages (les tests la visent). */
 const id = 'en-tete';
 const titleId = id + '-title';
@@ -124,9 +116,9 @@ const hasAside = Astro.slots.has('aside');
           ))
         }
         {
-          /* Phrase-clé : même taille que l'introduction et que la ligne risques qui suit, seule la
-            graisse change. Une phrase qui insiste sur l'avantage ne doit pas s'afficher plus grande
-            que son contre-poids, c'est précisément le reproche fait à la brochure. */
+          /* Phrase-clé : même taille que l'introduction, seule la graisse change. Une phrase qui
+            insiste sur l'avantage ne doit pas s'afficher plus grande que le reste, c'est précisément
+            le reproche fait à la brochure. */
         }
         {
           punchline && (
@@ -134,20 +126,6 @@ const hasAside = Astro.slots.has('aside');
               {punchline}
             </p>
           )
-        }
-        {
-          riskLine && (
-            <RiskNote
-              text={riskLine}
-              tone="dark"
-              size="lead"
-              class="mt-2 max-w-3xl max-sm:text-base max-sm:leading-snug sm:mt-5"
-            />
-          )
-        }
-        {
-          /* Appel à l'action de l'en-tête, APRÈS la ligne risques : on ne propose pas de souscrire
-            avant d'avoir dit ce qu'on risque. */
         }
         <div class="empty:hidden mt-8 sm:mt-10">
           <slot name="cta" />

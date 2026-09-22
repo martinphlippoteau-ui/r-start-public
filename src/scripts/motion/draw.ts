@@ -6,7 +6,7 @@
  *    rect) contenues dans l'élément (ou de l'élément lui-même) via stroke-dashoffset, en cascade.
  *    Option : data-draw-scrub (présent → piloté par le scroll entre data-draw-start, défaut `top 80%`,
  *    et data-draw-end, défaut `bottom 60%`). Cascade de 0,15 s entre les formes.
- * Sans JS ou en reduced-motion, tout est dessiné. Refusés sur le H1 et [data-risk].
+ * Sans JS ou en reduced-motion, tout est dessiné. Refusés sur le H1 et [data-no-motion].
  */
 import { gsap } from 'gsap';
 import { EASE, SCRUB, all, allowed, onceTrigger } from './shared';

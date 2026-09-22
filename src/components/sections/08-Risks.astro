@@ -13,9 +13,8 @@
  *    l'accueil « Souscrire » (06) depuis que « La presse en parle » (08b) a quitté HOME_ORDER, et sur
  *    /strategie « Comment » (04-Strategy), est épinglée quand son bas atteint le milieu de l'écran
  *    (`bottom center` depuis le 14/09/2026, voir plus bas) pendant que cette section monte
- *    par-dessus (coins arrondis et ombre posés par la CSS `[data-curtain]`). Comme elle contient un
- *    [data-risk], le moteur n'appliquerait ni recul ni atténuation à la section recouverte ; depuis le
- *    14/09/2026 plus aucun [data-risk] n'est rendu, c'est donc le comportement par défaut qui s'applique ;
+ *    par-dessus (coins arrondis et ombre posés par la CSS `[data-curtain]`). La section recouverte
+ *    recule (scale 0,96, opacité 0,6) : elle ne contient aucun élément protégé ;
  *  - rien d'autre ne bouge (sobriété du 11/09/2026 : les intitulés n'entrent plus en fade-up, le
  *    contre-poids global de la page est en place d'emblée) : ni le H2, ni les quatre risques.
  * Sans JS ou en reduced-motion : aucun pin, aucun rideau, tout est visible et stable.

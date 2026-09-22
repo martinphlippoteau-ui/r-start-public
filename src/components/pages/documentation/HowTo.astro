@@ -1,15 +1,14 @@
 ---
 /**
  * Guide « Souscrire en ligne, en quatre étapes » de la page /documentation (id « guide »).
- * En-tête collant sur grand écran : surtitre, H2 (avec l'appel de la note « souscription »), puis, dans le
- * même bloc et la même taille (text-lead), l'avantage (data-advantage : en ligne, versements programmés
- * PEI, réinvestissement des dividendes) et son contre-poids RiskNote (data-risk, jamais animé). Face à
+ * En-tête collant sur grand écran : H2 (avec l'appel de la note « souscription »), puis l'introduction
+ * (en ligne, versements programmés PEI, réinvestissement des dividendes). Son contre-poids, retiré
+ * de l'écran le 14/09/2026 avec tous les « Bon à savoir », a quitté le code le 22/09/2026. Face à
  * lui, le stepper vertical des quatre étapes (liste ordonnée, ligne de progression, cascade déclarative),
  * repris de la section Souscrire de l'accueil. Les appels de note des étapes viennent du contenu.
  * Contenu : documentation.howTo et documentation.labels.
  */
 import Container from '@/components/ui/Container.astro';
-import RiskNote from '@/components/ui/RiskNote.astro';
 import Section from '@/components/ui/Section.astro';
 import type { DocumentationContent, DocumentationLabels } from '@/content/types-v2';
 import NoteRef from '@/components/ui/NoteRef.astro';
@@ -27,7 +26,7 @@ const id = 'guide';
 <Section id={id} tone={tone}>
   <Container size="wide">
     <div class="grid gap-12 lg:grid-cols-12 lg:gap-16">
-      <!-- En-tête collant : titre, avantage et contre-poids dans le même bloc -->
+      <!-- En-tête collant : titre et introduction -->
       <div class="lg:col-span-5">
         <div class="lg:sticky lg:top-24">
           <h2 id={id + '-title'} class="text-display-md">
@@ -36,18 +35,7 @@ const id = 'guide';
             >
           </h2>
           <div class="mt-6 space-y-4">
-            {
-              howTo.risk ? (
-                <>
-                  <p data-advantage class="text-lead text-ink">
-                    {howTo.intro}
-                  </p>
-                  <RiskNote text={howTo.risk} size="lead" />
-                </>
-              ) : (
-                <p class="text-lead text-ink">{howTo.intro}</p>
-              )
-            }
+            <p class="text-lead text-ink">{howTo.intro}</p>
           </div>
         </div>
       </div>

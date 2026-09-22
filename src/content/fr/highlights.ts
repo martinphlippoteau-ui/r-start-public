@@ -216,13 +216,12 @@ export const highlights: HighlightsContent = {
   ],
   /*
    * PAS DE CONTRE-POIDS SOUS LE TABLEAU depuis le 14/09/2026 (demande de l'équipe) : le document
-   * n'en porte pas, le tableau s'arrête à ses sept lignes. Le champ reste optionnel dans le type, il
-   * suffit de le réécrire ici pour le faire revenir. Le texte retiré était : « Ces repères décrivent le
+   * n'en porte pas, le tableau s'arrête à ses sept lignes. Le texte retiré était : « Ces repères décrivent le
    * produit, ils ne réduisent aucun de ses risques. Le capital n'est pas garanti… Durée de placement
    * recommandée : 10 ans. »
    * Ce qu'il portait n'a plus d'équivalent près du tableau : la ligne risques du hero, qui ouvrait
    * la page avec la perte en capital, les revenus non garantis, la liquidité limitée et le risque
-   * de change, ne rend plus rien depuis le 14/09/2026 (RiskNote), et les appels de note des lignes,
+   * de change, a été retirée le même jour, et les appels de note des lignes,
    * qui donnaient leur source et leur limite, sont coupés (NoteRef, AFFICHER = false). Reste la
    * section Risques, plus bas sur l'accueil.
    */

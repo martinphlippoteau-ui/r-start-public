@@ -8,11 +8,12 @@
  * flux) : le hero remplit exactement la première vue.
  * H1 porté par le logo R Start (texte du titre en visually-hidden ; image décorative, aria-hidden). Le
  * bloc du logo réserve sa place en CSS (.hero-logo-wrap) : aucun décalage de mise en page. Puis
- * surtitre, accroche, deux CTA, l'emplacement de la ligne risques, les avis et la mention AMF (la
- * pastille « Nouveau » est retirée depuis le 11/09/2026).
- * LIGNE RISQUES EN VEILLE : l'appel <RiskNote> est toujours là, sous les CTA, mais RiskNote ne rend
- * plus rien depuis le 14/09/2026 : le premier écran ne porte aucune mention de risque. Les règles
- * de mise en page qui la citent ci-dessous sont gardées pour son retour.
+ * surtitre, accroche, deux CTA, les avis et la mention AMF (la pastille « Nouveau » est retirée depuis
+ * le 11/09/2026).
+ * PLUS DE LIGNE RISQUES depuis le 14/09/2026 (retrait de tous les « Bon à savoir », demande de
+ * l'équipe) : le premier écran ne porte aucune mention de risque. Son emplacement, sous les CTA, a
+ * quitté le code le 22/09/2026 ; les règles de mise en page ci-dessous qui la protégeaient valent
+ * aujourd'hui pour les CTA.
  * Le VOL DE LA MARQUE vers la barre est retiré le 12/09/2026 : la barre est désormais identique sur tout
  * le site, pleine dès le premier pixel, il n'y a plus de place vide où poser le logo.
  * LCP : le logo (eager) ou l'accroche. Aucun texte n'entre par l'opacité, ni les CTA, depuis le
@@ -25,36 +26,31 @@
  * rôle de src/lib/hero-image.ts, resté vide du 11/09 au 19/09/2026 puis supprimé.
  * Motion (src/scripts/motion.ts), orchestration d'ouverture (11/09/2026, reprise depuis) :
  *  - cascade `data-intro` en CSS pur, réglée dans global.css (`html.intro #apercu`) : logo (1),
- *    surtitre (2), accroche mot à mot (3), CTA (4), enveloppe de la ligne risques (5, vide tant que
- *    RiskNote ne rend rien), avis et mention AMF (6), invitation à défiler (7). Le H1, masqué,
- *    n'est jamais animé ;
+ *    surtitre (2), accroche mot à mot (3), CTA (4), avis et mention AMF (6), invitation à défiler
+ *    (7) ; le rang 5 était la ligne risques. Le H1, masqué, n'est jamais animé ;
  *  - second temps, au défilement (sur les 30 premiers % d'un écran, repère `html`, `flightScrub`
  *    plus bas) : surtitre et accroche montent, CTA, avis et flèche descendent, chacun avec son
  *    amplitude, en s'effaçant (enveloppes `data-scrub`, transform/opacity, réversibles) ; le logo
- *    grandit et se floute ensuite. L'enveloppe de la ligne risques reste hors de ces enveloppes, à
- *    opacité 1.
- * Sous « sm », le contenu n'est PAS centré, il est calé en haut : centré, il chasserait les CTA et la
- * ligne risques sous la ligne de flottaison d'un petit écran. Il reçoit donc une respiration explicite
+ *    grandit et se floute ensuite.
+ * Sous « sm », le contenu n'est PAS centré, il est calé en haut : centré, il chasserait les CTA sous la
+ * ligne de flottaison d'un petit écran. Il reçoit donc une respiration explicite
  * de 2,5 rem sous la barre (12/09/2026) : sans elle le surtitre démarrait exactement au bas de la barre,
  * collé à elle. L'espace vient du bas, où l'invitation à défiler laissait une centaine de pixels vides.
- * Sous « sm » (11/09/2026) : CTA en taille md (16 px) et ligne risques en text-sm (14 px, soit ≥ 85 % du
- * libellé des CTA, tests/conformite.spec.ts), interligne serré, icône 16 px, blanc à 85 %, largeur bornée,
- * placée APRÈS les CTA (`order-last`) pour ne plus s'imposer d'entrée, toujours visible sans défiler et
- * au-dessus du bandeau cookies (Pixel 5, iPhone 13). À partir de « sm », ordre et tailles ne changent pas
- * (CTA lg, risque text-base). CENTRAGE VERTICAL (11/09/2026) : à partir de 64 rem de large ET 56 rem de
+ * Sous « sm » (11/09/2026) : CTA en taille md (16 px), toujours visibles sans défiler et au-dessus du
+ * bandeau cookies (Pixel 5, iPhone 13, tests/conformite.spec.ts). À partir de « sm », CTA en taille lg.
+ * CENTRAGE VERTICAL (11/09/2026) : à partir de 64 rem de large ET 56 rem de
  * haut, la copie est exactement centrée dans la section (paddings haut et bas égaux) ; elle ne remonte que
  * TANT QUE LE BANDEAU COOKIES EST DÉPLIÉ, par une règle de global.css accrochée à
  * `#consent-banner:not([hidden])`. Une fois le choix fait, l'état d'une visite normale, le hero est
  * centré. Sous 56 rem de haut (écran de 800 px), le bandeau prend jusqu'à 190 px en permanence au premier
- * écran : la copie y reste calée haut, seule façon de garder la ligne risques découverte. iPhone SE
+ * écran : la copie y reste calée haut, seule façon de garder les CTA découverts. iPhone SE
  * (320 × 568) reste hors de portée : le bandeau y couvre un tiers de l'écran.
- * Contenu : src/content/fr/hero.ts (ligne risques importée de legal.ts, jamais réécrite).
+ * Contenu : src/content/fr/hero.ts.
  */
 import { Image } from 'astro:assets';
 import brandLogo from '@/assets/logos/r-start-blanc.svg';
 import Button from '@/components/ui/Button.astro';
 import Container from '@/components/ui/Container.astro';
-import RiskNote from '@/components/ui/RiskNote.astro';
 import Picto from '@/components/ui/Picto.astro';
 import TrustBox from '@/components/ui/TrustBox.astro';
 import Section from '@/components/ui/Section.astro';
@@ -69,9 +65,7 @@ const showEyebrow = hero.eyebrow.trim() !== '';
  * Transition d'ouverture (11/09/2026, mécanique observée sur revolut.com) : le hero est épinglé par le rideau
  * de la section suivante (01b-Difference, data-curtain) qui glisse par-dessus ; pendant ce temps
  * les textes montent et s'effacent vite, sur les 30 premiers % d'un écran de défilement (repère
- * `html`, `top top`), et le halo se pose (dézoom, couche de fond ci-dessous). L'enveloppe de la
- * ligne risques (vide tant que RiskNote ne rend rien) n'est dans aucune de ces enveloppes : elle
- * reste en place jusqu'à être recouverte.
+ * `html`, `top top`), et le halo se pose (dézoom, couche de fond ci-dessous).
  */
 /*
  * Sortie du hero au défilement : chaque élément part avec SON amplitude, jamais la même (idée reprise de
@@ -87,7 +81,7 @@ const flightScrub = {
   'data-scrub-end': '+=30%',
   'data-scrub-ease': 'power1.out',
 };
-/** Accroche : montée franche et disparition (comme le titre de Revolut), loin de la ligne risques. */
+/** Accroche : montée franche et disparition (comme le titre de Revolut). */
 const copyScrubUp = { 'data-scrub': 'y:0,-48|opacity:1,0', ...flightScrub };
 /**
  * Surtitre et claim : même montée, SANS fondu. Ce sont de petits textes (11 à 14 px) : à mi-fondu leur
@@ -100,9 +94,7 @@ const copyScrubFar = { 'data-scrub': 'y:0,-72|opacity:1,0', ...flightScrub };
  *  un contraste sous 4,5:1 ; la cause réelle était la cascade d'entrée, corrigée depuis (data-intro-move
  *  partout dans le hero). Le fondu du défilement est donc rétabli, et le contrôle est rejoué en série. */
 const copyScrubDown = { 'data-scrub': 'y:0,24|opacity:1,0', ...flightScrub };
-/** Ligne risques : variantes mobile seulement (voir en-tête) ; rien ne change à partir de « sm ». */
-const riskMobile = 'max-sm:order-5 max-sm:max-w-[24rem] max-sm:text-sm max-sm:leading-snug';
-/** CTA : taille md sous « sm » (la référence de taille de la ligne risques est leur libellé). */
+/** CTA : taille md sous « sm ». */
 const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
 ---
 
@@ -115,7 +107,7 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
 >
   {
     /* Couche de fond : halo de marque (dérive lente jouée à l'écran via data-in-view) + grain, isolée du
-      contenu pour pouvoir être scrubée sans toucher la ligne risques : dézoom d'installation 1,04 → 1 sur les
+      contenu pour pouvoir être scrubée sans toucher au texte : dézoom d'installation 1,04 → 1 sur les
       40 premiers % d'écran de défilement, comme le décor de revolut.com qui « se pose » sous le contenu. */
   }
   <div
@@ -279,9 +271,9 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
           {
             /* `data-hero-cta` : repère stable pour la mesure et pour le test « les CTA du hero sont
             visibles sans scroller », il ne dépend pas du rang dans la cascade d'entrée.
-            `sm:justify-center` (11/09/2026) : l'enveloppe commune au logo, à l'accroche, aux CTA et à la
-            ligne risques prend la largeur du plus large, la ligne risques. Sans cette règle, la rangée
-            de boutons se collait à son bord gauche au lieu de rester centrée sous l'accroche. */
+            `sm:justify-center` (11/09/2026) : l'enveloppe commune au logo, à l'accroche et aux CTA prend
+            la largeur du plus large. Sans cette règle, la rangée de boutons se collait à son bord gauche
+            au lieu de rester centrée sous l'accroche. */
           }
           <div
             data-hero-cta
@@ -294,8 +286,7 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
             >
             {
               /* Sous « sm », le bouton secondaire (lien vers la page /frais) cède la place : les
-              CTA et la ligne risques, le jour où elle revient, doivent rester au-dessus du bandeau
-              cookies (tests/conformite.spec.ts). Le comparateur de frais reste atteignable en
+              CTA doivent rester au-dessus du bandeau cookies (tests/conformite.spec.ts). Le comparateur de frais reste atteignable en
               défilant : il est affiché sur l'accueil (section 03). */
             }
             <Button
@@ -309,30 +300,8 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
           </div>
         </div>
         {
-          /* Ligne risques SOUS les CTA (11/09/2026) : à toutes les largeurs, jamais animée, jamais
-            atténuée. EMPLACEMENT VIDE depuis le 14/09/2026 : RiskNote ne rend plus rien,
-            l'enveloppe et l'appel restent en place pour son retour. */
-        }
-        {
-          /* La ligne risques entre dans la séquence d'ouverture (11/09/2026, demande de l'équipe) : elle
-            apparaît AVEC les CTA (même délai, global.css) et AVANT les avis, donc le risque précède
-            la réassurance. L'enveloppe ne porte aucune classe : elle ne sert qu'au rang 5. Le
-            garde-fou AMF est resserré en conséquence : une révélation AU SCROLL reste interdite
-            au-dessus d'un [data-risk] (on peut ne jamais y arriver), la cascade de chargement est
-            admise (elle se termine seule). */
-        }
-        <div data-intro="5" data-intro-move>
-          <RiskNote
-            text={hero.riskLine}
-            noteId={hero.riskNoteId}
-            tone="dark"
-            size="base"
-            class:list={['mx-auto mt-5 max-w-3xl text-left sm:mt-10', riskMobile]}
-          />
-        </div>
-        {
           /* TrustBox officiel (11/09/2026, code d'intégration fourni par l'équipe) : la réassurance sur le
-            distributeur arrive au premier écran, sous l'emplacement de la ligne risques. Il est
+            distributeur arrive au premier écran, sous les CTA. Il est
             dans une enveloppe animée (`copyScrubDown`, recul au défilement) et entre au rang 6 de
             l'ouverture ; seule l'invitation à défiler (rang 7) vient après. Sa portée (les avis
             parlent de CORUM L'Épargne, pas de R Start) n'est plus dite à l'écran depuis le retrait

@@ -5,8 +5,11 @@
  * Référence complète du vocabulaire : src/scripts/motion.ts.
  */
 
-/** Éléments qui ne s'animent jamais, ni eux-mêmes ni par un ancêtre animé. */
-export const PROTECTED = 'h1, [data-risk], [data-no-motion]';
+/**
+ * Éléments qui ne s'animent jamais, ni eux-mêmes ni par un ancêtre animé. `[data-risk]`, qui
+ * protégeait les contre-poids risque, a quitté la liste le 22/09/2026 avec le dernier d'entre eux.
+ */
+export const PROTECTED = 'h1, [data-no-motion]';
 
 /** Vrai si l'élément est lui-même protégé ou se trouve dans un élément protégé. */
 export const isProtected = (el: Element): boolean => el.closest(PROTECTED) !== null;
@@ -23,15 +26,15 @@ export const refuse = (el: Element, attr: string, why: string): false => {
 /**
  * Filtre standard : l'élément lui-même n'est pas protégé et, si `deep`, n'en contient pas. Tous les
  * effets qui altèrent l'apparence d'un conteneur (révélation, scrub, parallaxe, rideau, intro)
- * passent par `deep = true` : un avantage s'anime seul, jamais avec le risque qui l'accompagne.
+ * passent par `deep = true` : un conteneur ne s'anime jamais avec l'élément protégé qu'il contient.
  */
 export const allowed = (el: Element, attr: string, deep = false): boolean => {
-  if (isProtected(el)) return refuse(el, attr, 'H1, [data-risk] ou [data-no-motion]');
+  if (isProtected(el)) return refuse(el, attr, 'H1 ou [data-no-motion]');
   if (deep && containsProtected(el)) {
     return refuse(
       el,
       attr,
-      'contient un H1 ou un [data-risk] : animer l’avantage seul, jamais son enveloppe'
+      'contient un H1 ou un [data-no-motion] : animer le reste seul, jamais son enveloppe'
     );
   }
   return true;

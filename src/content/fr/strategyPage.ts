@@ -27,9 +27,7 @@ export const strategyPage: { seo: PageSeo; hero: PageHero; cta: Cta } = {
    * La page s'est ainsi trouvée sans aucune mention de risque en propre ; ce n'est plus le cas :
    * elle rend en fin de page le bloc Risques de l'accueil (08-Risks.astro, voir strategie.astro,
    * même jour), en plus du pied de page (« Communication commerciale », renvoi au DIC et à la note
-   * d'information), présent partout. Pour rétablir la ligne de l'en-tête,
-   * `riskLine: shortRiskLine` ici ne suffit plus : strategie.astro doit aussi la passer à PageHero
-   * (`riskLine={hero.riskLine}`), et RiskNote doit rendre de nouveau.
+   * d'information), présent partout.
    */
   hero: {
     /* « R Start : une approche inédite au service de la performance » depuis le 16/09/2026, texte

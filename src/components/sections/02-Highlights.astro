@@ -16,7 +16,7 @@
  * bloc) :
  *  - en-tête : H2 mot à mot (data-reveal-text ; H1 interdit, H2 autorisé). Ni surtitre ni
  *    introduction : le contenu n'en porte plus ;
- *  - chaque carte (li) entre d'un bloc en fade-up : elle ne contient aucun [data-risk]. Chaque
+ *  - chaque carte (li) entre d'un bloc en fade-up. Chaque
  *    carte ayant son propre déclencheur, le délai alterne 0 / 0,08 s selon `i % COLUMNS`, pas selon
  *    l'index : une carte qui entre seule n'attend pas la cascade des précédentes ;
  *  - valeurs : statiques et exactes (plus de compteur, « 200 € », « 4 sur 7 », « 1er jour du 6e
@@ -28,7 +28,6 @@
 import Container from '@/components/ui/Container.astro';
 import Button from '@/components/ui/Button.astro';
 import NoteRef from '@/components/ui/NoteRef.astro';
-import RiskNote from '@/components/ui/RiskNote.astro';
 import Section from '@/components/ui/Section.astro';
 import { sections } from '@/config/sections';
 import { highlights } from '@/content/fr/highlights';
@@ -101,9 +100,7 @@ const enExposant = (
     {
       /* Six blocs simples en 3 × 2 (11/09/2026) : un libellé, une valeur, un appel de note. Ni
         pictogramme, ni description, ni contre-poids par bloc. Le contre-poids de la section, qui
-        les remplaçait sous la grille, a été retiré du contenu le 14/09/2026 (voir highlights.ts).
-        Les blocs ne portent pas `data-advantage` : ce sont des caractéristiques du produit, pas des
-        arguments. */
+        les remplaçait sous la grille, a été retiré du contenu le 14/09/2026 (voir highlights.ts). */
     }
     <ul role="list" class="mt-chapter grid gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6">
       {
@@ -183,12 +180,6 @@ const enExposant = (
       )
     }
 
-    {
-      /* Contre-poids unique de la section, jamais animé. Absent du contenu depuis le 14/09/2026 (le
-      texte retiré est cité dans highlights.ts), et RiskNote ne rend plus rien : rien ne s'affiche
-      ici. */
-    }
-    {highlights.risk && <RiskNote text={highlights.risk} size="lead" class="mt-8 lg:mt-10" />}
     {
       /* APPEL À L'ACTION DE LA SECTION (15/09/2026). `outline-light` et non `light` : le fond est ink,
         et un bouton blanc plein aurait le poids d'un CTA de souscription, alors que celui-ci mène à une

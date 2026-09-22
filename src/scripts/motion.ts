@@ -44,7 +44,7 @@
  * │  data-scrub="scale:1,1.08|opacity:1,0"  + -trigger / -start / -end / -ease ; `blur:0,10` (px)  │
  * │                               admis pour un objet décoratif isolé, jamais du texte (shared.ts)  │
  * │  data-curtain                 la section recouvre la précédente (pin) ; recul scale 0.96 /    │
- * │                               opacity 0.6 seulement si la précédente n'a aucun [data-risk] ;  │
+ * │                               opacity 0.6 seulement si la précédente n'a aucun H1 ;           │
  * │                               jamais après un épinglage, seulement clair → ink.                │
  * │ Exclusion                                                                                     │
  * │  data-no-motion               l'élément et ses descendants sont exclus de tout effet          │
@@ -52,18 +52,18 @@
  *
  * SOBRIÉTÉ (passe du 11/09/2026, niveau page produit) : au plus UN effet d'entrée par bloc de contenu
  * (carte, liste, titre), jamais sur un conteneur ET son contenu ; surtitres statiques ; H2 de chapitre mot à
- * mot, introduction en fade-up ; dans une carte, seul le titre (ou le picto) entre, description et risque
- * sont en place ; AUCUNE scène épinglée sur le site depuis le 14/09/2026 (celle du mot d'ordre de la
+ * mot, introduction en fade-up ; dans une carte, seul le titre (ou le picto) entre, la description est
+ * en place ; AUCUNE scène épinglée sur le site depuis le 14/09/2026 (celle du mot d'ordre de la
  * stratégie est partie avec son texte), et deux rideaux sur l'accueil : 01b-Différence sur le hero,
  * 08-Risques sur Souscrire. /strategie porte le troisième, le même bloc Risques sur ses volets.
  *
  * GARDE-FOUS (appliqués par le moteur, contrôlés par scripts/check-compliance.mjs et tests/) :
- *  - Jamais d'effet sur le H1, sur un [data-risk] (ligne risques, contre-poids, avertissements
- *    réglementaires) ni sur les mentions du footer, ni directement, ni PAR UN ANCÊTRE : tout
- *    attribut est refusé sur un élément qui contient un risque (révélation, scrub, parallaxe, intro,
- *    reveal-text) ; les enfants d'un `stagger` qui en contiennent restent visibles ; le recul
- *    du rideau est supprimé si la section précédente en contient un. Une révélation n'enveloppe donc
- *    jamais un risque : on anime l'avantage seul (modèle : 02-Highlights).
+ *  - Jamais d'effet sur le H1 ni sur un [data-no-motion], ni directement, ni PAR UN ANCÊTRE : tout
+ *    attribut est refusé sur un élément qui en contient un (révélation, scrub, parallaxe, intro,
+ *    reveal-text) ; les enfants d'un `stagger` qui en contiennent restent visibles ; le recul du
+ *    rideau est supprimé si la section précédente en contient un. Les mentions du footer ne portent
+ *    aucun attribut d'animation. Les contre-poids risque, protégés de la même façon par
+ *    `[data-risk]`, ont quitté le site le 14/09/2026 et le moteur le 22/09/2026.
  *  - Jamais de data-intro (opacité) ni de data-animate sur un candidat LCP : un élément à opacité 0
  *    est ignoré par le LCP.
  *  - prefers-reduced-motion: reduce → rien n'est créé (GSAP non chargé, gsap.matchMedia ensuite) :
@@ -100,7 +100,7 @@ const BESOIN_GSAP = [
 const boot = () => {
   setupInView();
   // La cascade d'entrée est en CSS : on contrôle seulement, en développement, qu'elle n'enveloppe
-  // aucun H1 ni [data-risk].
+  // aucun élément protégé.
   if (import.meta.env.DEV) all('[data-intro]').forEach((el) => allowed(el, 'data-intro', true));
 
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');

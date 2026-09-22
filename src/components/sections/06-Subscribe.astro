@@ -5,8 +5,7 @@
  * le stepper des quatre étapes et son CTA, face au visuel de l'application et aux liens des deux
  * magasins. Pas d'introduction (retirée le 14/09/2026). Le contre-poids qui suivait la liste (rappel du
  * DIC, durée de placement, commission de retrait, rachat non garanti) a été retiré le 11/09/2026 à la
- * demande de l'équipe ; la liste ne porte donc plus `data-advantage`, faute de contre-poids frère. Le
- * guide de souscription et le bloc MyCORUM complet vivent sur /documentation.
+ * demande de l'équipe. Le guide de souscription et le bloc MyCORUM complet vivent sur /documentation.
  * LE RENDU COMPLET (introduction, options facultatives, rappels « lisez le DIC » et commission de
  * retrait), qu'aucune page n'affichait plus, a quitté le code le 22/09/2026 avec Pill et RiskPair ; ses
  * textes sont archivés hors du dépôt (.claude/audits).
@@ -168,11 +167,8 @@ const STEP_STAGGER = 0.06;
 
       {
         /* Le contre-poids des étapes (rappel du DIC, durée de placement, commission de retrait) a été
-          retiré de l'accueil le 11/09/2026 à la demande de l'équipe. La liste ne porte donc plus
-          `data-advantage` : sans contre-poids frère, le marquage serait faux et le contrôle d'équilibre
-          AMF (tests/conformite.spec.ts) le refuserait. Les risques restent portés par la section
-          Risques (la ligne du hero ne rend plus rien depuis le 14/09/2026) ; le rappel complet vit
-          sur /documentation. */
+          retiré de l'accueil le 11/09/2026 à la demande de l'équipe. Les risques restent portés par la
+          section Risques ; le rappel complet vit sur /documentation. */
       }
 
       {

@@ -1869,7 +1869,7 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
    l'axe horizontal reste visible : anneaux de focus intacts sur les côtés). L'élément de grille
    (.faq-answer) a `min-height: 0` et ne porte aucun padding ni marge (l'espacement est sur son enfant) :
    la rangée 0fr descend jusqu'à 0 px, la fermeture est continue, sans plateau ni saut final. Aucune
-   opacité ni transform : les RiskNote de la réponse restent à opacité 1 à tout instant, et rien ne bouge
+   opacité ni transform : le texte de la réponse reste à opacité 1 à tout instant, et rien ne bouge
    une fois la réponse ouverte. Sans ::details-content ou en reduced-motion : ouverture instantanée native.
    ICI ET NON DANS 10-Faq.astro depuis le 16/09/2026 : la FAQ de /documentation, qui n'avait qu'un
    glissement sans hauteur animée, joue maintenant le même geste. */
@@ -1946,7 +1946,7 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
           taille, et s'y pose ;
      350  le surtitre paraît en resserrant son interlettrage ;
      500  l'accroche, mot à mot, 70 ms d'écart ;
-     750  les boutons et la ligne risques, ensemble, sans décalage entre eux ;
+     750  les boutons (la ligne risques, qui les accompagnait, est partie le 14/09/2026) ;
      700  la barre de navigation descend et se découvre, d'un bloc ;
      900  les avis et la flèche, en fondu ; la flèche enchaîne sur son oscillation, en boucle.
    Trois principes hérités et conservés :
@@ -2006,16 +2006,9 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
     animation: none;
   }
 
-  /* 750 ms, les boutons et la ligne risques, ENSEMBLE et sans décalage entre eux : c'est la demande.
-     Les boutons montent de 12 px, la ligne risques ne bouge pas, elle s'annonce, elle ne se met pas en
-     scène. */
+  /* 750 ms, les boutons : ils montent de 12 px. */
   html.intro #apercu [data-intro='4'] {
     animation-name: intro-hero-cta;
-    --intro-delay: 750ms;
-    --intro-dur: 700ms;
-  }
-  html.intro #apercu [data-intro='5'] {
-    animation-name: intro-hero-risk;
     --intro-delay: 750ms;
     --intro-dur: 700ms;
   }
@@ -2095,16 +2088,6 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   }
 }
 
-/* La ligne risques : elle se découvre sur place, sans déplacement. */
-@keyframes intro-hero-risk {
-  from {
-    clip-path: inset(0 0 100% 0);
-  }
-  to {
-    clip-path: inset(0 0 0 0);
-  }
-}
-
 /* Les avis et la flèche : fondu seul, aucun déplacement. */
 @keyframes intro-hero-fondu {
   from {
@@ -2160,8 +2143,8 @@ body:has(#consent-banner:not([hidden])) [data-hero-scroll-hint] {
   visibility: hidden;
 }
 
-/* Bandeau cookies déplié : il occupe le bas du premier écran et recouvrirait la ligne risques du hero
-   (− 7 px de marge en 1440 × 900). Tant qu'il est là, la copie remonte ; comme elle est centrée par
+/* Bandeau cookies déplié : il occupe le bas du premier écran et recouvrait la ligne risques du hero
+   (− 7 px de marge en 1440 × 900) ; la règle garde aujourd'hui les boutons bien au-dessus de lui. Tant qu'il est là, la copie remonte ; comme elle est centrée par
    `justify-content: center`, une marge basse de 4 rem la décale de la moitié, soit 32 px. Le bandeau passe
    en `hidden` dès que le choix est fait (scripts/consent.ts) : la règle cesse alors de s'appliquer et le
    hero retrouve son centrage exact. Bornée aux écrans où le hero est centré (voir 01-Hero.astro). */
@@ -2231,8 +2214,8 @@ body:has(#consent-banner:not([hidden])) [data-hero-scroll-hint] {
   display: block;
   /* RÉDUIT D'UN HUITIÈME le 17/09/2026 (« réduis un peu la taille du logo du hero ») : l'accroche, passée
      à 48 px et en blanc le même jour, porte désormais le premier écran avec lui ; 13,5, 26 et 24 rem
-     deviennent 12, 23 et 21 rem. La ligne risques et les deux boutons restent au-dessus du bandeau
-     cookies au premier chargement (tests/conformite.spec.ts : Pixel 5, iPhone 13, 1440 × 900). */
+     deviennent 12, 23 et 21 rem. Les deux boutons restent au-dessus du bandeau cookies au premier
+     chargement (tests/conformite.spec.ts : Pixel 5, iPhone 13, 1440 × 900). */
   width: min(46vw, 12rem);
   margin-inline: auto;
   aspect-ratio: 290 / 89;

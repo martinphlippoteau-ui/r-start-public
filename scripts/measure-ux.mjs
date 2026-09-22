@@ -84,13 +84,11 @@ const run = async () => {
         const box = (el) => (el ? el.getBoundingClientRect() : null);
         const banner = box(q('#consent-banner'));
         const cta = box(q('#apercu [data-hero-cta]')) ?? box(q('#apercu a[data-cta="souscrire"]'));
-        const risk = box(q('#apercu [data-risk]')) ?? box(q('[data-risk]'));
         return {
           hauteur: document.documentElement.scrollHeight,
           viewport: window.innerHeight,
           debordement: document.documentElement.scrollWidth - document.documentElement.clientWidth,
           ctaBas: cta ? Math.round(cta.bottom) : null,
-          risqueBas: risk ? Math.round(risk.bottom) : null,
           bandeauHaut: banner && banner.height ? Math.round(banner.top) : null,
         };
       });
@@ -101,10 +99,6 @@ const run = async () => {
         ecrans: +(geo.hauteur / geo.viewport).toFixed(1),
         margeCtaBandeau:
           geo.ctaBas !== null && geo.bandeauHaut !== null ? geo.bandeauHaut - geo.ctaBas : null,
-        margeRisqueBandeau:
-          geo.risqueBas !== null && geo.bandeauHaut !== null
-            ? geo.bandeauHaut - geo.risqueBas
-            : null,
         jsKo: +(js.bytes / 1024).toFixed(1),
         moteurGsap: js.engine,
       };
@@ -138,7 +132,7 @@ const run = async () => {
     console.log(
       `${key.padEnd(30)} h=${String(p.hauteur).padStart(6)} px (${String(p.ecrans).padStart(4)} écrans)  ` +
         `js=${String(p.jsKo).padStart(6)} Ko  gsap=${p.moteurGsap ? 'oui' : 'non '}  ` +
-        `CTA/bandeau=${p.margeCtaBandeau ?? ','}  risque/bandeau=${p.margeRisqueBandeau ?? ','}  débordement=${p.debordement}`
+        `CTA/bandeau=${p.margeCtaBandeau ?? ','}  débordement=${p.debordement}`
     );
   }
   console.log(`\naxe : ${result.axe.violations.length} violation(s)`);

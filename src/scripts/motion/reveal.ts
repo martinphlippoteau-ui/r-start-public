@@ -17,9 +17,8 @@
  * `stagger` sur le parent.
  *
  * Garde-fous :
- *  - refusé sur le H1, sur un [data-risk] et sur tout élément qui en contient : une révélation
- *    n'enveloppe jamais un risque, on anime l'avantage seul (modèle : 02-Highlights) ;
- *  - "stagger" : seuls les enfants sans risque cascadent, les autres restent visibles d'emblée ;
+ *  - refusé sur le H1, sur un [data-no-motion] et sur tout élément qui en contient ;
+ *  - "stagger" : seuls les enfants sans élément protégé cascadent, les autres restent visibles d'emblée ;
  *  - un élément déjà dans le viewport à l'initialisation (arrivée par une ancre, moteur chargé après
  *    le premier rendu) reste tel quel : l'éteindre pour le rallumer serait un flash et retarderait
  *    le LCP. Pour une entrée au chargement, utiliser data-intro (CSS).
@@ -51,7 +50,7 @@ const staggerTargets = (el: HTMLElement): Element[] =>
     refuse(
       child,
       'data-animate="stagger" (enfant)',
-      'contient un [data-risk] : reste visible, les autres cascadent'
+      'contient un élément protégé : reste visible, les autres cascadent'
     );
     return false;
   });

@@ -2,70 +2,12 @@ import { test, expect } from '@playwright/test';
 
 /** Règles AMF vérifiées dans le DOM rendu (complète scripts/check-compliance.mjs). */
 test.describe('Conformité', () => {
-  test('la ligne risques du hero est visible sans scroller', async ({ page }) => {
-    await page.goto('/');
-    /*
-     * EN SOMMEIL depuis le 14/09/2026 : « supprime tous les bon à savoir du site. Le service conformité
-     * va les placer manuellement plus tard. » RiskNote.astro ne rend plus rien, il n'y a plus de
-     * [data-risk] dans le DOM. Le test est CONSERVÉ ENTIER, pas supprimé : il se réarme tout seul le
-     * jour où la Conformité replace les mentions, et il vérifiera exactement ce qu'il vérifiait avant.
-     */
-    test.skip(
-      (await page.locator('[data-risk]').count()) === 0,
-      'aucun [data-risk] rendu : voir src/components/ui/RiskNote.astro'
-    );
-    const risk = page.locator('#apercu [data-risk]').first();
-    await expect(risk).toBeVisible();
-    const box = await risk.boundingBox();
-    expect(box).not.toBeNull();
-    const height = page.viewportSize()?.height ?? 800;
-    expect(box!.y + box!.height, 'ligne risques sous la ligne de flottaison').toBeLessThanOrEqual(
-      height
-    );
-    // Référence : le libellé des CTA, seul texte courant du hero depuis le hero minimal du 10/09/2026
-    // (plus aucun corps de texte hors la ligne risques). L'ancienne référence, le paragraphe des frais
-    // réels (`data-hero-subtitle`), a disparu avec lui.
-    const reference = page.locator('#apercu [data-hero-cta] a').first();
-    await expect(reference, 'aucun corps de texte de référence dans le hero').toBeVisible();
-    const subtitleSize = await reference.evaluate((el) =>
-      parseFloat(getComputedStyle(el).fontSize)
-    );
-    const riskSize = await risk.evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
-    expect(riskSize, 'ligne risques plus petite que le sous-titre').toBeGreaterThanOrEqual(
-      subtitleSize * 0.85
-    );
-  });
-
-  test('le bandeau cookies ne recouvre pas la ligne risques du hero', async ({ page }) => {
-    await page.goto('/');
-    /*
-     * EN SOMMEIL depuis le 14/09/2026 : « supprime tous les bon à savoir du site. Le service conformité
-     * va les placer manuellement plus tard. » RiskNote.astro ne rend plus rien, il n'y a plus de
-     * [data-risk] dans le DOM. Le test est CONSERVÉ ENTIER, pas supprimé : il se réarme tout seul le
-     * jour où la Conformité replace les mentions, et il vérifiera exactement ce qu'il vérifiait avant.
-     */
-    test.skip(
-      (await page.locator('[data-risk]').count()) === 0,
-      'aucun [data-risk] rendu : voir src/components/ui/RiskNote.astro'
-    );
-    // Le bandeau n'est déplié que par le script de consentement, au premier chargement.
-    await expect(page.locator('#consent-banner')).toBeVisible();
-    const geo = await page.evaluate(() => {
-      const risk = document.querySelector('#apercu [data-risk]')!.getBoundingClientRect();
-      const banner = document.getElementById('consent-banner')!.getBoundingClientRect();
-      return { basRisque: risk.bottom, hautBandeau: banner.top };
-    });
-    expect(
-      geo.hautBandeau - geo.basRisque,
-      `ligne risques recouverte par le bandeau cookies (bas ${Math.round(geo.basRisque)} px, bandeau à ${Math.round(geo.hautBandeau)} px)`
-    ).toBeGreaterThanOrEqual(16);
-  });
-
   /**
    * Audit UX : le hero portait cinq blocs de texte avant ses boutons, qui tombaient sous le bandeau
    * cookies au premier chargement, le lecteur voyait le produit mais pas comment y souscrire. Les deux
    * phrases pédagogiques sont descendues dans « Ce qui change vraiment » ; ce test empêche le hero de
-   * regrossir. Il ne dit rien de la ligne risques, vérifiée par les deux tests précédents.
+   * regrossir. Les deux tests qui vérifiaient la ligne risques du hero (visible sans défiler, jamais
+   * sous le bandeau cookies) sont partis le 22/09/2026 avec elle.
    */
   test('les CTA du hero sont visibles sans scroller', async ({ page }) => {
     await page.goto('/');
@@ -90,85 +32,6 @@ test.describe('Conformité', () => {
         `CTA du hero recouverts par le bandeau cookies (bas ${Math.round(geo.basCta)} px, bandeau à ${Math.round(geo.hautBandeau)} px)`
       ).toBeGreaterThanOrEqual(0);
     }
-  });
-
-  test('chaque avantage a un risque de longueur comparable', async ({ page }) => {
-    await page.goto('/');
-    /*
-     * EN SOMMEIL depuis le 14/09/2026 : « supprime tous les bon à savoir du site. Le service conformité
-     * va les placer manuellement plus tard. » RiskNote.astro ne rend plus rien, il n'y a plus de
-     * [data-risk] dans le DOM. Le test est CONSERVÉ ENTIER, pas supprimé : il se réarme tout seul le
-     * jour où la Conformité replace les mentions, et il vérifiera exactement ce qu'il vérifiait avant.
-     */
-    test.skip(
-      (await page.locator('[data-risk]').count()) === 0,
-      'aucun [data-risk] rendu : voir src/components/ui/RiskNote.astro'
-    );
-    const pairs = await page.locator('[data-advantage]').evaluateAll((nodes) =>
-      nodes.map((adv) => {
-        const parent = adv.parentElement;
-        const risk = parent?.querySelector('[data-risk]');
-        const advSize = parseFloat(getComputedStyle(adv).fontSize);
-        const riskSize = risk ? parseFloat(getComputedStyle(risk).fontSize) : 0;
-        return {
-          advantage: adv.textContent?.trim().length ?? 0,
-          risk: risk?.textContent?.trim().length ?? 0,
-          advSize,
-          riskSize,
-          text: adv.textContent?.trim().slice(0, 60),
-        };
-      })
-    );
-    for (const p of pairs) {
-      expect(p.risk, `avantage sans risque : ${p.text}`).toBeGreaterThan(0);
-      expect(p.risk, `risque trop court pour : ${p.text}`).toBeGreaterThanOrEqual(
-        p.advantage * 0.6
-      );
-      expect(p.riskSize, `risque plus petit que l'avantage : ${p.text}`).toBeGreaterThanOrEqual(
-        p.advSize * 0.95
-      );
-    }
-  });
-
-  /**
-   * Un avertissement de risque ne doit jamais dépendre d'une action du visiteur pour apparaître : une
-   * révélation AU SCROLL (`data-animate`, `data-scrub`, `data-reveal-text`) est donc interdite au-dessus
-   * d'un [data-risk], on peut ne jamais atteindre le point qui la déclenche.
-   * `data-intro` a été SORTI de cette liste le 11/09/2026 : c'est la cascade de chargement du hero, elle
-   * se joue seule dès l'ouverture de la page, se termine en moins de trois secondes sans aucune action,
-   * et son état final est toujours l'élément pleinement visible (`animation-fill-mode: backwards`, aucun
-   * `forwards`). La ligne risques y entre entre les CTA et les avis, donc le risque précède la
-   * réassurance. Le contrôle de l'état final ci-dessous (opacité, visibilité, affichage) reste entier :
-   * il s'exécute après le chargement et échouerait si la cascade laissait quoi que ce soit masqué.
-   */
-  test('aucun risque n’est masqué ou animé', async ({ page }) => {
-    await page.goto('/');
-    /*
-     * EN SOMMEIL depuis le 14/09/2026, comme les trois autres contrôles de risque de ce fichier : plus
-     * aucun [data-risk] n'est rendu (RiskNote.astro). Sans ce saut, le test passait en parcourant une
-     * liste VIDE : il annonçait « aucun risque masqué » alors qu'il n'y a plus de risque du tout, ce
-     * qui est plus trompeur qu'un test absent. Il se réarme seul au retour des mentions.
-     */
-    test.skip(
-      (await page.locator('[data-risk]').count()) === 0,
-      'aucun [data-risk] rendu : voir src/components/ui/RiskNote.astro'
-    );
-    // L'assertion porte sur l'état APRÈS la cascade d'ouverture : on la laisse se terminer.
-    await page.waitForTimeout(3000);
-    const hidden = await page.locator('[data-risk]').evaluateAll(
-      (nodes) =>
-        nodes.filter((n) => {
-          const cs = getComputedStyle(n);
-          const animatedAncestor = n.closest('[data-animate],[data-scrub],[data-reveal-text]');
-          return (
-            !!animatedAncestor ||
-            cs.visibility === 'hidden' ||
-            parseFloat(cs.opacity) < 0.99 ||
-            cs.display === 'none'
-          );
-        }).length
-    );
-    expect(hidden).toBe(0);
   });
 
   /**

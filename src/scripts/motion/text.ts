@@ -10,7 +10,7 @@
  * À l'entrée (88 %, START), mots en cascade (opacity 0 → 1, y 0.4em → 0, 0,6 s expo.out, 0,04 s par
  * mot : le pas est celui d'un mot, plus serré que la cascade d'éléments de 0,08 s). La variante
  * « scrub » (mots éclairés au fil du défilement), jamais employée, a été retirée le 22/09/2026.
- * Refusé sur le H1, [data-risk], tout élément contenant des balises ou plus de 12 mots.
+ * Refusé sur le H1, [data-no-motion], tout élément contenant des balises ou plus de 12 mots.
  */
 import { gsap } from 'gsap';
 import { DURATION, EASE, all, allowed, onceTrigger, refuse } from './shared';

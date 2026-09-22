@@ -300,12 +300,12 @@ async function checkIndex() {
   );
   requirePhrase(text, 'visa S.C.P.I. n° 26-06 en date du 4 mars 2026', 'visa AMF', file);
   /*
-   * NEUTRALISÉ le 14/09/2026 avec les « Bon à savoir » : « supprime tous les bon à savoir du site. Le
-   * service conformité va les placer manuellement plus tard. » RiskNote.astro ne rend plus rien, ces
-   * contrôles n'ont donc plus d'objet tant que la Conformité n'a pas replacé les mentions. Ils sont
-   * COMMENTÉS, pas supprimés : ils reprennent effet en même temps que RiskNote.
+   * PLUS AUCUN CONTRÔLE DE CONTRE-POIDS depuis le 22/09/2026 : la ligne risques du hero, l'équilibre
+   * entre avantages et risques et l'interdiction d'animer un risque visaient les « Bon à savoir »,
+   * retirés de l'écran le 14/09/2026 (« supprime tous les bon à savoir du site ») puis du code. Le
+   * site ne porte plus de contre-poids à côté de ses avantages ; restent la section Risques et les
+   * mentions du pied de page, exigées ici.
    */
-  // requirePhrase(text, legal.shortRiskLine, 'ligne risques courte', file);
   requirePhrase(text, legal.gdpr.dpoEmail, 'e-mail DPO', file);
   /*
    * NEUTRALISÉES LE 15/09/2026 avec le retrait de l'allégation de rang du bloc « Le modèle » (demande
@@ -336,25 +336,9 @@ async function checkIndex() {
   if (!heroMatch) errors.push(`${file} : section #apercu introuvable`);
   else {
     const hero = heroMatch[0];
-    /* Voir le bandeau ci-dessus : plus de [data-risk] rendu, ce contrôle attend le retour de RiskNote. */
-    const risk = hero.match(/<p[^>]*data-risk[^>]*>/i);
-    if (risk && /data-animate/i.test(risk[0]))
-      errors.push(`${file} : la ligne risques du hero est animée`);
     if (!/data-cta="souscrire"/i.test(hero))
       errors.push(`${file} : aucun CTA de souscription dans le hero`);
   }
-  const risksAnimated =
-    html.match(
-      /<p[^>]*data-risk[^>]*data-animate[^>]*>|<p[^>]*data-animate[^>]*data-risk[^>]*>/gi
-    ) || [];
-  if (risksAnimated.length)
-    errors.push(`${file} : ${risksAnimated.length} bloc(s) risque animé(s)`);
-  /* Voir le bandeau ci-dessus. Les [data-advantage] restent en place dans les pages : ils sont la carte
-     de ce que la Conformité a à contrebalancer. Le décompte reprendra avec RiskNote. */
-  const nAdv = (html.match(/data-advantage/g) || []).length;
-  const nRisk = (html.match(/data-risk/g) || []).length;
-  // if (nAdv > nRisk) errors.push(`${file} : ${nAdv} avantages pour ${nRisk} risques`);
-  void [nAdv, nRisk];
 
   // Indicateur synthétique de risque : toute occurrence « N sur 7 » doit être la valeur de facts.ts
   // (risk.sriLabel). Un « 3 sur 7 » hérité du DIC hébergé ou une coquille est une erreur.
@@ -570,32 +554,18 @@ async function checkSubPages() {
     checkHeroClaims(text, p);
     /*
      * LA LIGNE RISQUES N'EST PLUS EXIGÉE SUR LES SOUS-PAGES depuis le 14/09/2026, demande expresse
-     * de l'équipe : « supprime les bon à savoir de tous les hero sauf celui de la home ». Le « Bon
-     * à savoir : … » sous le H1 a disparu de toutes les sous-pages. L'accueil ne le porte plus non
-     * plus : sa ligne passe par RiskNote, qui ne rend plus rien depuis le même jour, et checkIndex
-     * ne l'exige plus (exigence commentée plus haut). La ligne ne figure plus que dans les mentions
-     * légales.
-     *
-     * CE QUE CELA CHANGE, ET QUI DOIT ÊTRE SU : une sous-page peut désormais être publiée sans
-     * aucune mention de risque dans son en-tête. Aucun contre-poids [data-risk] n'est plus rendu
-     * dans leurs sections non plus. Ce qui protège encore ces pages, c'est leur texte quand il en
-     * porte (les avertissements réglementaires de /documentation, exigés plus bas) et le pied de
-     * page, présent partout : mention de caractère commercial et visa AMF, tous deux exigés juste
-     * en dessous. Pour rétablir : décommenter la ligne, et remettre `riskLine: shortRiskLine` dans
-     * les en-têtes de aboutPage.ts, press.ts, documentation.ts, feesPage.ts et strategyPage.ts.
+     * de l'équipe (« supprime les bon à savoir de tous les hero »). Elle ne figure plus que dans les
+     * mentions légales. CE QUE CELA CHANGE, ET QUI DOIT ÊTRE SU : une sous-page peut être publiée
+     * sans aucune mention de risque dans son en-tête. Ce qui protège encore ces pages, c'est leur
+     * texte quand il en porte (les avertissements réglementaires de /documentation, exigés plus bas)
+     * et le pied de page, présent partout : mention de caractère commercial et visa AMF, tous deux
+     * exigés juste en dessous.
      */
-    // requirePhrase(text, legal.shortRiskLine, 'ligne risques (en-tête de page)', file);
     requirePhrase(text, legal.commercialNotice, 'mention 1 (caractère commercial)', file);
     requirePhrase(text, 'visa S.C.P.I. n° 26-06 en date du 4 mars 2026', 'visa AMF', file);
     const h1 = html.match(/<h1\b[^>]*>/gi) || [];
     if (h1.length !== 1) errors.push(file + ' : ' + h1.length + ' balise(s) <h1> (attendu : 1)');
     if (!/<link[^>]+rel="canonical"/i.test(html)) errors.push(file + ' : canonical absent');
-    const risksAnimated =
-      html.match(
-        /<p[^>]*data-risk[^>]*data-animate[^>]*>|<p[^>]*data-animate[^>]*data-risk[^>]*>/gi
-      ) || [];
-    if (risksAnimated.length)
-      errors.push(file + ' : ' + risksAnimated.length + ' bloc(s) risque animé(s)');
     if (p === 'frais' && !/15\s?%/.test(text))
       errors.push(file + ' : frais de gestion 15 % absents');
     if (p === 'frais' && /data-comparator\b/.test(html)) {
@@ -616,8 +586,8 @@ async function checkSubPages() {
     if (p === 'documentation') {
       /*
        * Avertissements reproduits in extenso, descendus de l'accueil le 11/09/2026. Ils étaient rendus
-       * par RiskNote sur les fiches de documents, et sont partis le 14/09/2026 avec tous les « Bon à
-       * savoir ». CE SONT DEUX TEXTES RÉGLEMENTAIRES, pas des contre-poids rédigés : depuis le
+       * par le composant des « Bon à savoir » sur les fiches de documents, et sont partis avec eux le
+       * 14/09/2026. CE SONT DEUX TEXTES RÉGLEMENTAIRES, pas des contre-poids rédigés : depuis le
        * 18/09/2026 la page les rend en paragraphes directs (MandatoryWarnings.astro), et les deux
        * exigences sont de nouveau actives.
        */

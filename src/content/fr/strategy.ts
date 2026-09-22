@@ -16,7 +16,7 @@ import type { StrategyContent } from '@/content/types';
  * PAS DE MENTION DE RISQUE DANS CE CORPS : celle qui suivait les deux moteurs (mention de la
  * Conformité du 14/09/2026) a quitté l'écran le 16/09/2026 et le code le 22/09/2026 ; son texte est
  * archivé hors du dépôt (.claude/audits/archive-contenus-2026-09-22.json). Les risques sont portés par
- * le bloc Risques que la page rend ensuite. Aucun [data-advantage] n'est posé ici.
+ * le bloc Risques que la page rend ensuite.
  */
 
 export const strategy: StrategyContent = {

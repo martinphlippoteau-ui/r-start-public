@@ -100,13 +100,9 @@ export const press: PressContent = {
     title: 'R Start dans les médias',
     intro: 'Découvrez les derniers articles parus',
     /* Plus de ligne risques dans l'en-tête (14/09/2026, demande de l'équipe : « supprime les bon à
-       savoir de tous les hero sauf celui de la home »). Le « Bon à savoir : … » sous le H1 a disparu de
-       TOUTES les sous-pages ; celui de l'accueil, gardé ce jour-là, ne s'affiche plus non plus
-       depuis que RiskNote ne rend plus rien (même jour). Ces pages n'ont donc plus de mention de
-       risque dans leur en-tête : il reste celles de leur contenu quand elles en ont, et le pied de
-       page, commun à tout le site. Pour la rétablir, `riskLine: shortRiskLine` ici ne suffit plus :
-       la page doit aussi la passer à PageHero (`riskLine={hero.riskLine}`), et RiskNote doit rendre
-       de nouveau. */
+       savoir de tous les hero sauf celui de la home », puis celui de l'accueil le même jour). Il
+       reste les mentions de risque du contenu, quand il en porte, et le pied de page, commun à tout
+       le site. */
   },
 
   quotes: {

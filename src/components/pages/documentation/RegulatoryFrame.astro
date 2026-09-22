@@ -3,13 +3,11 @@
  * Cadre réglementaire de R Start (visa AMF, société de gestion agréée, dépositaire, autorité compétente,
  * classification SFDR), descendu de l'accueil le 11/09/2026 : il a sa place ici, à côté des documents
  * qu'il décrit. Contenu : src/content/fr/trust.ts (`trust.amf`), repris sans réécriture.
- * Équilibre AMF : les cartouches portent `data-advantage`, la réserve (`amf.disclaimer`) suit dans
- * le même bloc et à la même taille (text-lead), jamais animée. Le contre-poids risque (`amf.risk`)
- * est toujours appelé à sa suite, mais RiskNote ne rend plus rien depuis le 14/09/2026 : seule la
- * réserve s'affiche.
+ * La réserve (`amf.disclaimer`) suit les cartouches dans le même bloc et à la même taille (text-lead),
+ * jamais animée. Le contre-poids risque qui la suivait, retiré de l'écran le 14/09/2026 avec tous les
+ * « Bon à savoir », a quitté le code le 22/09/2026.
  */
 import Container from '@/components/ui/Container.astro';
-import RiskNote from '@/components/ui/RiskNote.astro';
 import Section from '@/components/ui/Section.astro';
 import { trust } from '@/content/fr/trust';
 
@@ -24,7 +22,7 @@ const id = 'cadre-reglementaire';
 <Section id={id} tone={tone} labelledBy={id + '-title'}>
   <Container size="wide">
     <h2 id={id + '-title'} class="text-display-md">{amf.title}</h2>
-    <dl data-advantage class="mt-8 grid gap-4 sm:grid-cols-2 lg:mt-10 lg:gap-6">
+    <dl class="mt-8 grid gap-4 sm:grid-cols-2 lg:mt-10 lg:gap-6">
       {
         amf.items.map((item) => (
           <div class="rounded-3xl border border-navy/10 bg-paper p-6 sm:p-8">
@@ -36,7 +34,6 @@ const id = 'cadre-reglementaire';
     </dl>
     <div class="mt-6 rounded-3xl border border-navy/15 p-6 sm:p-8 lg:p-10">
       <p class="text-lead text-ink">{amf.disclaimer}</p>
-      <RiskNote text={amf.risk} size="lead" class="mt-5" />
     </div>
   </Container>
 </Section>

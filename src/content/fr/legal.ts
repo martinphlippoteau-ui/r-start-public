@@ -34,26 +34,12 @@ export const bulletinWarning =
   "Acheter des parts de R Start est un investissement immobilier. Comme tout placement immobilier, il s'agit d'un investissement long terme dont la liquidité est limitée. Nous vous recommandons une durée de placement de 10 ans. Contrairement au livret A par exemple, ce placement comporte des risques. Il existe tout d'abord un risque de perte en capital. De plus, les revenus ne sont pas garantis et dépendront de l'évolution du marché immobilier et du cours des devises. Nous précisons que CORUM Asset Management ne garantit pas le rachat de vos parts. Enfin, comme pour tout placement, les performances passées ne présagent pas des performances futures.";
 
 /**
- * Ligne risques courte. Écrite pour être visible sans défiler dans le hero de l'accueil, mais elle
- * y passe par RiskNote, qui ne rend plus rien depuis le 14/09/2026, et les sous-pages ne la portent
- * plus dans leur en-tête. Seules les mentions légales l'affichent (pages.ts), en paragraphe direct.
+ * Ligne risques courte. Écrite pour être visible sans défiler dans le hero de l'accueil, qui ne la
+ * porte plus depuis le 14/09/2026 (retrait des « Bon à savoir »), pas plus que les en-têtes des
+ * sous-pages. Seules les mentions légales l'affichent (pages.ts), en paragraphe direct.
  */
 export const shortRiskLine =
   'Investissement immobilier de long terme, durée de placement recommandée de 10 ans. Risque de perte en capital, revenus non garantis, liquidité limitée, risque de change.';
-
-/**
- * Préfixe lu par les lecteurs d'écran devant chaque contre-poids risque (RiskNote) ; masqué
- * visuellement. EN VEILLE : RiskNote ne rend plus rien depuis le 14/09/2026, aucun contre-poids
- * n'est rendu, ce préfixe n'est donc lu nulle part.
- */
-export const riskPrefix = 'Risque : ';
-/**
- * Libellé VISIBLE qui ouvrait chaque contre-poids (décision du 11/09/2026) : il remplace le
- * pictogramme d'alerte. Le préfixe « Risque : » était lu par les lecteurs d'écran (riskPrefix) pour
- * que l'avertissement garde sa nature. Lecture stricte AMF à défendre : un avertissement présenté
- * comme un conseil. EN VEILLE depuis le 14/09/2026 comme RiskNote.
- */
-export const riskLabel = 'Bon à savoir :';
 
 /** Encadré brochure p.4 « Une innovation, pas une révolution », adapté au grand public (« Vos clients » → « Vous »). */
 export const innovationNotRevolution = {

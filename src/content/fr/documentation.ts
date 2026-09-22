@@ -268,30 +268,17 @@ export const documentation = {
       `Les documents de R Start, au même endroit : documents réglementaires et formulaires. Ce sont eux qui font foi. Lisez le DIC${dicPublished ? '' : ', disponible sur corum.fr,'} et la note d’information avant toute décision.`
     ),
     /* Plus de ligne risques dans l'en-tête (14/09/2026, demande de l'équipe : « supprime les bon à
-       savoir de tous les hero sauf celui de la home »). Le « Bon à savoir : … » sous le H1 a disparu de
-       TOUTES les sous-pages ; celui de l'accueil, gardé ce jour-là, ne s'affiche plus non plus
-       depuis que RiskNote ne rend plus rien (même jour). Ces pages n'ont donc plus de mention de
-       risque dans leur en-tête : il reste celles de leur contenu quand elles en ont, et le pied de
-       page, commun à tout le site. Pour la rétablir, `riskLine: shortRiskLine` ici ne suffit plus :
-       la page doit aussi la passer à PageHero (`riskLine={hero.riskLine}`), et RiskNote doit rendre
-       de nouveau. */
+       savoir de tous les hero sauf celui de la home », puis celui de l'accueil le même jour). Il
+       reste les mentions de risque du contenu, quand il en porte, et le pied de page, commun à tout
+       le site. */
   },
 
   groups,
 
   howTo: {
     title: 'Souscrire en ligne, en quatre étapes.',
-    /** Avantages (en ligne, versements programmés, réinvestissement), rendus en data-advantage. */
     intro: nb(
       `La souscription se fait ${subscription.onlineLabel}, à partir d’une part de ${share.priceLabel}. Le ${pei.name} permet ensuite des versements dès ${pei.minimumMonthlyLabel}, si vous détenez déjà une part entière. Le ${lowerFirst(rd.name)} convertit automatiquement tout ou partie de vos dividendes potentiels en nouvelles parts.`
-    ),
-    /**
-     * Contre-poids risque de l'intro, de longueur comparable, prévu en RiskNote dans le même bloc
-     * et la même taille. EN VEILLE : HowTo.astro l'appelle toujours, mais RiskNote ne rend plus
-     * rien.
-     */
-    risk: nb(
-      `Avant de vous engager, lisez le DIC et la note d’information. R Start comporte un risque de perte en capital et une liquidité limitée. Les revenus ne sont pas garantis, le rachat des parts non plus. Un retrait avant ${zeroAfter} ans de détention entraîne une commission dégressive. La durée de placement recommandée est de ${risk.recommendedHoldingLabel}.`
     ),
     steps: [
       {

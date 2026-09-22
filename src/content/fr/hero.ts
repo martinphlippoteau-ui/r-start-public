@@ -1,16 +1,14 @@
 import type { HeroContent, LegalNote } from '@/content/types';
 import { pages } from '@/config/pages';
 import { fees, product } from '@/content/fr/facts';
-import { shortRiskLine } from '@/content/fr/legal';
 
 /**
  * Section 1, Hero (id « apercu »), version minimale (décision du 10/09/2026, deux allègements successifs) :
  * surtitre (`eyebrow`), H1 unique « R Start » (texte masqué, le logo en tient lieu à l'écran),
  * accroche (`tagline`), deux CTA, puis le bandeau Trustpilot et la mention de la société de gestion
  * agréée (trust.ts). La pastille « Nouveau » et la photo plein cadre ont été retirées le
- * 11/09/2026. La ligne risques importée de legal.ts (`riskLine`, jamais recopiée, jamais animée)
- * est toujours passée au composant, mais RiskNote ne rend plus rien depuis le 14/09/2026 : elle est
- * EN VEILLE. Rien d'autre : ni définition, ni frais, ni phrases pédagogiques, tout cela ouvre la
+ * 11/09/2026, la ligne risques le 14/09/2026 avec tous les « Bon à savoir » (le champ `riskLine` a
+ * quitté le code le 22/09/2026). Rien d'autre : ni définition, ni frais, ni phrases pédagogiques, tout cela ouvre la
  * zone 2 « Qui a envie de payer avant de gagner ? » (difference.ts). L'allégation de rang (`claim`,
  * retirée le 15/09/2026) et le contre-poids chiffré des frais (`counterweight.risk`, EN VEILLE) n'y
  * sont plus rendus.
@@ -57,18 +55,12 @@ export const hero = {
    */
   /* Sans point final depuis le 17/09/2026 (demande de Martin) : une accroche, pas une phrase. */
   tagline: 'La première SCPI sans frais de souscription ni frais d’acquisition',
-  /**
-   * Contre-poids unique du hero, EN VEILLE : RiskNote ne rend plus rien depuis le 14/09/2026, le
-   * premier écran ne porte donc aucune mention de risque. La phrase qui énumérait les frais
-   * prélevés a été retirée le 11/09/2026 à la demande de l'équipe : le bloc ne portait plus que la
-   * ligne risques de legal.ts, reproduite mot pour mot et jamais réécrite, et la note `hero-frais`
-   * appelée en fin de ligne. Cette note n'est plus rendue non plus ; les 15 % de frais de gestion
-   * restent sur l'accueil par le comparateur de frais (section 03).
-   * À défendre en compliance : l'accroche annonce une absence de frais d'entrée et les frais réellement
-   * prélevés ne sont plus énoncés au même endroit, ni même en note.
+  /*
+   * PLUS DE CONTRE-POIDS au premier écran depuis le 14/09/2026. À défendre en compliance : l'accroche
+   * annonce une absence de frais d'entrée et les frais réellement prélevés ne sont plus énoncés au
+   * même endroit, ni même en note ; les 15 % de frais de gestion restent sur l'accueil par le
+   * comparateur de frais (section 03).
    */
-  riskLine: nb(shortRiskLine),
-  riskNoteId: 'hero-frais',
   primaryCta: { label: 'Souscrire en ligne', position: 'hero' },
   /**
    * CTA secondaire (11/09/2026) : il mène à la page Frais. Ce n'est plus le seul accès aux frais

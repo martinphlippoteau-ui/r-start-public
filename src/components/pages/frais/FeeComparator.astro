@@ -13,8 +13,8 @@
  *  - chaque taux porte `data-fee-value` dans un même `data-fee-block` : le contrôle vérifie qu'aucun
  *    frais n'est affiché plus petit que ses voisins (retour AMF sur la brochure) ;
  *  - une case sans valeur n'est jamais marquée « taux le plus bas ». L'avertissement prévu
- *    au-dessus du tableau quand des taux manquent (`pendingNotice`) passe par RiskNote, qui ne rend
- *    plus rien depuis le 14/09/2026 : il n'apparaît pas ;
+ *    au-dessus du tableau quand des taux manquent n'a jamais eu à s'afficher (les dix-neuf SCPI ont
+ *    une source) ; il a quitté le code le 22/09/2026 ;
  *  - les sources sont sous le tableau, celle de R Start et celle de la SCPI choisie ;
  *  - nommer une autre SCPI engage : scripts/check-compliance.mjs n'exige plus sur /frais que la
  *    source (data-comparator-source). Le périmètre et l'encadré « Une innovation, pas une
@@ -25,7 +25,6 @@
 import { Image } from 'astro:assets';
 import brandLogo from '@/assets/logos/r-start-couleur.svg';
 import Container from '@/components/ui/Container.astro';
-import RiskNote from '@/components/ui/RiskNote.astro';
 import Section from '@/components/ui/Section.astro';
 import { comparator, comparatorScpis } from '@/content/fr/comparator';
 import { jsonScript } from '@/lib/jsonScript';
@@ -92,15 +91,6 @@ const data = scpis.map((s) => ({
         {intro && <p class="text-lead max-w-4xl text-pretty text-slate-700">{intro}</p>}
       </>
     )}
-
-    {
-      /* Avertissement prévu tant que les taux de la SCPI choisie ne sont pas relevés ; le script
-        masque l'enveloppe dès qu'elle est complète ou documentée. EN VEILLE : RiskNote ne rend plus
-        rien depuis le 14/09/2026, l'enveloppe reste vide. */
-    }
-    <div data-comparator-pending>
-      <RiskNote text={comparator.pendingNotice} size="lead" />
-    </div>
 
     {
       /* AUCUNE enveloppe à défilement (12/09/2026). Il y en avait une sous « sm » et elle coûtait cher :
@@ -324,9 +314,8 @@ const data = scpis.map((s) => ({
   /*
    * Changement de colonne sans rechargement. Les valeurs sont passées telles quelles : le script
    * les recopie, et ne calcule que la mise en avant du taux le plus bas de chaque ligne (règle plus
-   * bas). Une valeur absente affiche « à compléter » et laisse visible l'enveloppe de
-   * l'avertissement, vide tant que RiskNote ne rend rien ; si la SCPI a une source, elle affiche
-   * « non publié », sans avertissement.
+   * bas). Une valeur absente affiche « à compléter » ; si la SCPI a une source, elle affiche
+   * « non publié ».
    */
   (() => {
     /* Ce que le gabarit sérialise plus haut (`data`, dans l'en-tête du composant). `JSON.parse` rend
@@ -349,7 +338,6 @@ const data = scpis.map((s) => ({
     const table = document.querySelector('[data-comparator]');
     const select = document.querySelector<HTMLSelectElement>('[data-comparator-select]');
     if (!table || !select) return;
-    const pending = document.querySelector<HTMLElement>('[data-comparator-pending]');
     const source = document.querySelector('[data-comparator-source]');
     const sourceName = document.querySelector('[data-comparator-source-name]');
     const cells = [...table.querySelectorAll<HTMLElement>('[data-comparator-cell]')];
@@ -364,17 +352,14 @@ const data = scpis.map((s) => ({
     const render = () => {
       const scpi = data[Number(select.value)] || data[0];
       if (!scpi) return;
-      let missing = 0;
       cells.forEach((cell, i) => {
         const value = scpi.values[i];
         cell.textContent = value || (scpi.documentee ? notPublishedLabel : pendingLabel);
         cell.classList.toggle('text-navy', Boolean(value));
         cell.classList.toggle('text-slate-700', !value);
-        if (!value && !scpi.documentee) missing += 1;
         const detail = details[i];
         if (detail) detail.textContent = (value && scpi.details[i]) || '';
       });
-      if (pending) pending.hidden = missing === 0;
       if (sourceName) sourceName.textContent = scpi.name + ' :';
       if (source) source.textContent = scpi.source || sourceFallback;
 

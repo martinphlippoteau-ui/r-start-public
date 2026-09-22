@@ -62,10 +62,6 @@ export interface HeroContent {
   /** H1 unique de la page. */
   title: string;
   tagline: string;
-  /** Note des frais réels, accolée au contre-poids du hero. */
-  riskNoteId?: string;
-  /** Ligne risques du hero, même taille que son corps, jamais animée. En veille avec RiskNote. */
-  riskLine: string;
   primaryCta: Cta;
   /** Lien interne vers /frais : ce n'est pas un CTA de souscription, il ne porte pas de `position`. */
   secondaryCta: { label: string; href: string };
@@ -107,8 +103,6 @@ export interface HighlightsContent {
    */
   subscriptionTitle?: string;
   subscriptionItems?: { label: string; value: string; noteId?: string }[];
-  /** Contre-poids unique de la section, sous les repères. */
-  risk?: string;
   /**
    * Appel à l'action secondaire, au pied de la section (15/09/2026). Il mène à une page du site, pas
    * au tunnel : il ne porte donc pas de `position`, contrairement aux CTA de souscription.
@@ -299,12 +293,6 @@ export interface FaqItem {
   question: string;
   /** Paragraphes de réponse (texte brut, pas de HTML). */
   answer: string[];
-  /**
-   * Index, dans `answer`, du premier paragraphe de contre-poids risque : les paragraphes précédents
-   * sont l'avantage (data-advantage), ceux à partir de cet index sont rendus en RiskNote (data-risk),
-   * même taille. Absent = réponse purement factuelle, sans paire avantage / risque.
-   */
-  riskFrom?: number;
   /** Appel de note légale porté par la question (id d'une LegalNote de la section). */
   noteId?: string;
   /**

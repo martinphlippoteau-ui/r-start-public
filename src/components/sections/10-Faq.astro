@@ -9,24 +9,19 @@
  * Deux colonnes sur grand écran : en-tête collant (surtitre, H2 en text-display-md : la FAQ clôt la page, un
  * cran sous les chapitres) face à la liste des questions en accordéons natifs <details name="faq"> (un
  * seul ouvert à la fois), chevron animé en CSS, questions en text-xl (text-display-sm dès sm : une question
- * longue tient sur deux lignes à 375 px), réponse en paragraphes text-lead. Dans chaque réponse, les paragraphes « avantage »
- * (data-advantage) sont suivis, dans le même bloc et la même taille, de leur contre-poids risque
- * (RiskNote, data-risk) : la coupure vient du contenu (item.riskFrom), l'appel de note aussi
- * (item.noteId). ATTENTION : depuis le 14/09/2026 ni RiskNote ni NoteRef ne rendent quoi que ce soit,
- * les contre-poids et les appels sont donc invisibles, alors que le découpage continue de les préparer. Le CTA tunnel ferme la colonne des questions. Le JSON-LD FAQPage est émis par la
+ * longue tient sur deux lignes à 375 px), réponse en paragraphes text-lead. Le découpage des réponses
+ * en avantage et contre-poids (`riskFrom`), que plus aucune question ne portait, a quitté le code le
+ * 22/09/2026. Le CTA tunnel ferme la colonne des questions. Le JSON-LD FAQPage est émis par la
  * page (src/lib/seo.ts), pas ici.
  *
  * L'en-tête est rendu ici (et non par SectionHeading) pour poser les attributs motion sur le H2 ; le
  * surtitre est en teal-700 (AA sur paper).
  *
- * Motion (src/scripts/motion.ts, attributs seulement), même signature que 02-Highlights / 05-Income :
+ * Motion (src/scripts/motion.ts, attributs seulement), même signature que 02-Highlights :
  *  - en-tête, dans son enveloppe collante (les attributs sont sur les enfants, jamais sur l'élément
  *    sticky) : H2 mot à mot (data-reveal-text, titre court) ;
  *  - questions : statiques (sobriété du 11/09/2026 : les <summary> entrant un à un formaient une cascade
- *    de plus de quatre éléments, et un `stagger` sur la liste serait refusé par le moteur, chaque réponse
- *    contenant un risque). Le mouvement de la FAQ est celui de l'accordéon (CSS ci-dessous). Ni le H2, ni
- *    la liste, ni aucun ancêtre des RiskNote n'est animé (règle « aucun [data-risk] sous un
- *    [data-animate] ») ;
+ *    de plus de quatre éléments). Le mouvement de la FAQ est celui de l'accordéon (CSS ci-dessous) ;
  *  - chevron : rotation 180° et inversion des couleurs en CSS à l'ouverture (transform, couleurs) ;
  *  - ouverture / fermeture d'une réponse : transition de hauteur en CSS pur, sans JS, sur le pseudo-élément
  *    `::details-content` (grille `grid-template-rows` 0fr → 1fr sous `@supports selector(::details-content)`,
@@ -34,23 +29,20 @@
  *    de <details> (.faq-answer, l'élément de grille) ne porte NI padding NI marge : avec `min-height: 0`,
  *    la rangée 0fr vaut alors exactement 0 px (un padding sur l'élément de grille lui donnait un plancher
  *    de 32-40 px : plateau puis saut de 40 px à la fin de chaque fermeture). L'espacement (pb, pl, space-y)
- *    est porté par un enfant intérieur. Aucune opacité ni transform sur la réponse : les RiskNote sont à
+ *    est porté par un enfant intérieur. Aucune opacité ni transform sur la réponse : son texte est à
  *    opacité 1 à tout instant et, une fois la réponse ouverte, plus rien ne bouge. Navigateurs sans
  *    `::details-content` : ouverture instantanée native. Rien de tout cela en reduced-motion (@media).
  * Le <summary> a pour unique enfant un H3 (modèle de contenu de summary) : le numéro d'ordre et le
  * chevron y sont des spans décoratifs (aria-hidden). <summary> a un rôle interactif implicite : un
  * <NoteRef> (lien) n'y est jamais imbriqué (violation d'accessibilité « nested-interactive », HTML
  * invalide de surcroît). Quand item.noteId est défini, la question porte un marqueur décoratif
- * (`interactive={false}`, span non focusable) et le lien réel équivalent est accolé au dernier
- * paragraphe risque de la réponse (RiskNote `noteId`), toujours présent quel que soit item.riskFrom ,
- * accessible dès l'ouverture, jamais en même temps que le marqueur de la question.
+ * (`interactive={false}`, span non focusable). Aucune question n'en porte.
  * Contenu : src/content/fr/faq.ts.
  */
 import { ancreQuestion } from '@/lib/ancre';
 import { withBase } from '@/lib/href';
 import Container from '@/components/ui/Container.astro';
 import NoteRef from '@/components/ui/NoteRef.astro';
-import RiskNote from '@/components/ui/RiskNote.astro';
 import Section from '@/components/ui/Section.astro';
 import { sections } from '@/config/sections';
 import { faq } from '@/content/fr/faq';
@@ -58,8 +50,8 @@ import { faq } from '@/content/fr/faq';
 /*
  * PARAMÉTRÉ LE 16/09/2026 pour servir aussi la page /faq, qui rend toutes les questions avec un champ
  * de recherche. Le composant lisait `faq.items` en dur. Le rendre paramétrable plutôt que le recopier :
- * l'accordéon, ses transitions `::details-content` et le découpage avantage / contre-poids sont écrits
- * une fois, et les deux surfaces ne peuvent pas diverger.
+ * l'accordéon et ses transitions `::details-content` sont écrits une fois, et les deux surfaces ne
+ * peuvent pas diverger.
  */
 interface Props {
   /** Questions à rendre. Par défaut la sélection courte de l'accueil (faq.items). */
@@ -100,13 +92,10 @@ const titleId = id + '-title';
  */
 let rubriquePrecedente: string | undefined;
 const items = rendus.map((item) => {
-  const from = Math.min(Math.max(item.riskFrom ?? item.answer.length, 0), item.answer.length);
   const nouvelleRubrique = search && item.category && item.category !== rubriquePrecedente;
   if (item.category) rubriquePrecedente = item.category;
   return {
     ...item,
-    advantage: item.answer.slice(0, from),
-    risks: item.answer.slice(from),
     rubrique: nouvelleRubrique ? item.category : undefined,
     /* Rubrique de CHAQUE question quand la liste se filtre : voir le commentaire du <li>. */
     categorie: search ? item.category : undefined,
@@ -219,19 +208,10 @@ const items = rendus.map((item) => {
                   {/* .faq-answer = élément de la grille ::details-content : aucun padding ni marge ici (voir en-tête) */}
                   <div class="faq-answer">
                     <div class="max-w-3xl space-y-5 pb-8 sm:pb-10 sm:pl-12">
-                      {item.advantage.map((paragraph) => (
-                        <p data-advantage class="text-lead text-ink">
+                      {item.answer.map((paragraph) => (
+                        <p class="text-lead text-ink">
                           {paragraph}
                         </p>
-                      ))}
-                      {item.risks.map((risk, i) => (
-                        <RiskNote
-                          text={risk}
-                          size="lead"
-                          noteId={
-                            item.noteId && i === item.risks.length - 1 ? item.noteId : undefined
-                          }
-                        />
                       ))}
 
                       {

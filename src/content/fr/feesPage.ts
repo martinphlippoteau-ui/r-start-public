@@ -463,9 +463,8 @@ const raw = {
       'Comparez chaque ligne de frais de R Start avec les autres SCPI du marché grâce à notre comparateur.',
     /* Plus de ligne risques dans l'en-tête (14/09/2026, demande de l'équipe : « supprime les bon à
        savoir de tous les hero sauf celui de la home »). Le « Bon à savoir : … » sous le H1 a
-       disparu de TOUTES les sous-pages. L'accueil ne l'affiche plus non plus : sa ligne passe par
-       RiskNote, qui ne rend plus rien depuis le même jour. Il reste le pied de page, commun à tout
-       le site. À rétablir en remettant `riskLine: shortRiskLine`. */
+       disparu de TOUTES les sous-pages, puis de l'accueil le même jour. Il reste le pied de page,
+       commun à tout le site. */
   },
 
   /**
@@ -645,9 +644,6 @@ const raw = {
   /**
    * FAQ des frais, EN VEILLE : retirée de /frais le 14/09/2026, et de ses données structurées
    * FAQPage le 18/09/2026 (voir frais.astro). Rien n'en est rendu.
-   * `riskFrom` : index du premier paragraphe de contre-poids risque (prévu en RiskNote, jamais
-   * animé ; RiskNote ne rend plus rien). Dans les trois premières réponses, le deuxième paragraphe
-   * décrit déjà les frais prélevés : il fait partie du contre-poids.
    */
   faq: {
     title: 'Vos questions sur les frais de R Start.',
@@ -659,7 +655,6 @@ const raw = {
           `Vous payez ensuite, indirectement, ${feeFacts.management.label} HT des loyers encaissés au titre des frais de gestion. À chaque vente d’immeuble, une commission de ${disposalRates} du montant HT s’applique, selon la plus-value. Avant ${zeroAfter} ans, la commission de retrait est de ${withdrawalRates} de la valeur de retrait.`,
           `Ces prélèvements réduisent vos dividendes potentiels et, en cas de sortie anticipée, la somme que vous récupérez. Le DIC en donne une illustration pour 10 000 € investis. L’incidence annuelle des coûts y est de ${after1Year} après 1 an et de ${after10Years} après ${holdingYears} ans. Votre coût total n’est pas connu à la souscription.`,
         ],
-        riskFrom: 1,
       },
       {
         question: `Pourquoi ${feeFacts.management.label} de frais de gestion ?`,
@@ -668,7 +663,6 @@ const raw = {
           'Ce taux s’applique pendant toute la durée de détention. Il réduit d’autant les revenus distribuables, avant les autres charges de la SCPI (impôts, frais non refacturables aux locataires).',
           'Ces frais ne dépendent pas de la valeur de vos parts. Ils sont dus dès qu’un loyer est encaissé, même si cette valeur baisse. Les revenus ne sont pas garantis et varient selon le marché immobilier et le cours des devises.',
         ],
-        riskFrom: 1,
       },
       {
         question: `Que se passe-t-il si je sors avant ${zeroAfter} ans ?`,
@@ -677,7 +671,6 @@ const raw = {
           `Le DIC illustre ce coût pour 10 000 € investis : l’incidence annuelle des coûts atteint ${after1Year} en cas de sortie après 1 an, commission de retrait comprise. ${withdrawalExemptions}`,
           `Le rachat de vos parts n’est pas garanti : il n’est possible que si une souscription vient en contrepartie. Sans contrepartie, vous pourriez devoir attendre. R Start est un placement de long terme, ${risk.recommendedHoldingLabel} recommandés.`,
         ],
-        riskFrom: 1,
       },
       {
         question: 'Comment CORUM se rémunère-t-elle sur les ventes d’immeubles ?',
@@ -686,7 +679,6 @@ const raw = {
           'En cas de moins-value, celle-ci est inscrite dans une réserve dédiée. Aucune commission sur les ventes n’est perçue tant que cette réserve n’est pas compensée par des plus-values futures. Détail : note d’information, chapitre III, section 4.',
           arbitrageVerbatim,
         ],
-        riskFrom: 2,
       },
     ],
   },
@@ -731,7 +723,7 @@ export const feesPage: FeesPageContent = {
    * remplace `feeFacts.vatNote`, plus longue, qui exceptait les commissions de cession et de retrait,
    * exprimées TTC. L'exception tombe sans rien fausser : R Start est exonérée de TVA, HT et TTC sont
    * égaux, la phrase le dit elle-même. Le libellé « Bon à savoir » est ici un titre de note, pas un
-   * contre-poids de risque : il est écrit en dur, il ne passe pas par RiskNote, qui ne rend plus rien.
+   * contre-poids de risque : il est écrit en dur.
    */
   htNote:
     'Les frais mentionnés sont exprimés hors taxes (HT). R Start étant exonérée de TVA, le montant hors taxes est égal au montant toutes taxes comprises (TTC).',

@@ -33,18 +33,10 @@ export interface PageHero {
   intro?: string | string[];
   /**
    * Phrase-clé sous l'introduction, en gras (14/09/2026, /frais). Elle reste dans le MÊME corps de
-   * texte que l'introduction et que la ligne risques : le gras marque l'insistance, jamais une taille
-   * plus grande qu'un contre-poids, ce que l'AMF a déjà reproché à la brochure.
+   * texte que l'introduction : le gras marque l'insistance, jamais une taille plus grande, ce que
+   * l'AMF a déjà reproché à la brochure.
    */
   punchline?: string;
-  /**
-   * Ligne risques visible sans scroller, même taille que l'intro. Jamais animée.
-   * FACULTATIVE depuis le 14/09/2026, et AUCUNE page ne la passe plus : l'équipe a demandé le même
-   * jour de retirer les « Bon à savoir » de tous les en-têtes de sous-page (voir ui/PageHero.astro).
-   * Leur en-tête n'a donc plus de mention de risque ; restent celles de leur contenu, quand il en
-   * porte, et du pied de page. Le texte reste EN VEILLE dans le contenu de chaque page.
-   */
-  riskLine?: string;
 }
 
 /** Bloc « Confiance » : cadre réglementaire, avis Trustpilot, chiffres clés CORUM. */
@@ -59,7 +51,6 @@ export interface TrustContent {
     }[];
     /** Phrase standard : le visa n'implique ni approbation ni authentification. */
     disclaimer: string;
-    risk: string;
     /**
      * Pastille de réassurance du hero, à côté des avis Trustpilot (15/09/2026). Elle porte l'agrément
      * de la SOCIÉTÉ DE GESTION, jamais celui de R Start, qui n'est pas agréé mais visé : le détail de
@@ -287,7 +278,7 @@ export interface FeesPageContent {
   simulationDoc: DocumentItem;
   faq: { title: string; items: FaqItem[] };
   htNote: string;
-  /** Titre de la note HT/TTC (« Bon à savoir : »), écrit en dur : il ne passe pas par RiskNote. */
+  /** Titre de la note HT/TTC (« Bon à savoir : »), écrit en dur. */
   htNoteLabel?: string;
   cta: Cta;
   notes: LegalNote[];
@@ -328,11 +319,8 @@ export interface DocumentationContent {
   seo: PageSeo;
   hero: PageHero;
   groups: { key: DocumentGroupKey; title: string; intro: string; items: DocumentItem[] }[];
-  /**
-   * Guide de souscription. `intro` est l'avantage (data-advantage) ; `risk`, s'il est renseigné, est son
-   * contre-poids rendu en RiskNote dans le même bloc et la même taille (jamais animé).
-   */
-  howTo: { title: string; intro: string; risk?: string; steps: StepItem[] };
+  /** Guide de souscription. */
+  howTo: { title: string; intro: string; steps: StepItem[] };
   /**
    * FAQ de la page : seulement les questions dont le sujet est un document ou la souscription (la
    * sélection est faite dans documentation.ts). `fullFaqLink` renvoie vers la foire aux questions

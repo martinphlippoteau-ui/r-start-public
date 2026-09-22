@@ -20,9 +20,8 @@
  * La courbe est l'équivalent CSS de `expo.out`, la seule employée côté moteur (--ease-out-expo).
  *
  * GARDE-FOUS, identiques à ceux du moteur (src/scripts/motion.ts) :
- *  - refusé sur un H1, sur un [data-risk] et sur tout élément qui en contient : une révélation
- *    n'enveloppe jamais un risque ni un avertissement réglementaire ;
- *  - `stagger` : seuls les enfants sans risque cascadent, les autres restent visibles d'emblée ;
+ *  - refusé sur un H1, sur un [data-no-motion] et sur tout élément qui en contient ;
+ *  - `stagger` : seuls les enfants sans élément protégé cascadent, les autres restent visibles d'emblée ;
  *  - un élément déjà à l'écran à l'initialisation n'est pas touché (pas de flash, pas de LCP retardé) ;
  *  - `prefers-reduced-motion: reduce` : rien n'est créé, ce module n'est même pas importé ;
  *  - transform et opacity uniquement ; `will-change` posé le temps de l'animation puis retiré ;
@@ -69,14 +68,14 @@ const depart = (type: string, y: number, titre: boolean): Depart => {
   }
 };
 
-/** Enfants d'un `stagger` autorisés à cascader : ceux qui ne portent ni ne contiennent de risque. */
+/** Enfants d'un `stagger` autorisés à cascader : ceux qui ne sont ni ne contiennent d'élément protégé. */
 const enfantsStagger = (el: HTMLElement): HTMLElement[] =>
   Array.from(el.children).filter((child): child is HTMLElement => {
     if (!isProtected(child) && !containsProtected(child)) return child instanceof HTMLElement;
     refuse(
       child,
       'data-animate="stagger" (enfant)',
-      'contient un [data-risk] : reste visible, les autres cascadent'
+      'contient un élément protégé : reste visible, les autres cascadent'
     );
     return false;
   });
