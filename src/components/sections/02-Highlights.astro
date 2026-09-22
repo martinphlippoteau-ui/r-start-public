@@ -1,13 +1,13 @@
 ---
 /**
- * Section 2, « R Start en un clin d'œil » (id « points-forts »). Fond ink (voir plus bas), entre
+ * Section 2, « R Start en un clin d'œil » (id « points-forts »). Fond white (voir plus bas), entre
  * « Qui a envie de payer avant de gagner ? » (01b, paper) et le comparateur de frais (03), dans
  * l'ordre de HOME_ORDER (index.astro).
  * En-tête aligné à gauche (H2 rendu ici pour porter ses attributs motion), puis six cartes, le bloc
  * « Souscription et options disponibles » et le bouton vers /strategie.
  * La valeur est l'image : la valeur de chaque carte (« 200 € », « 4 sur 7 », « Mensuels »…) est
- * l'élément visuel principal, en sable (text-display-sm), même utilitaire pour les six (chiffres et
- * valeurs en toutes lettres : aucune hiérarchie de taille entre elles). Le libellé est AU-DESSUS de
+ * l'élément visuel principal, en marine (text-display-sm), même utilitaire pour les six (chiffres
+ * et valeurs en toutes lettres : aucune hiérarchie de taille entre elles). Le libellé est AU-DESSUS de
  * la valeur et, sur trois cartes, un bouton « i » déplie une explication. Ni pictogramme, ni
  * description, ni contre-poids par carte.
  * Motion (src/scripts/motion.ts), un seul effet d'entrée par bloc :
@@ -56,16 +56,14 @@ const enExposant = (
 ---
 
 {
-  /* FOND SOMBRE (14/09/2026, demande de l'équipe), échangé avec la section CORUM, passée en blanc
-    pour le carrousel Trustpilot qu'elle portait alors. Repères en verre clair sur l'ink, valeurs en
-    sable. */
+  /* FOND CLAIR depuis le 22/09/2026 (demande de Martin), ex-ink depuis le 14/09/2026 : repères en
+    cartes paper cerclées sur le blanc, comme les cartes de la revue de presse, valeurs en marine.
+    Le seul bloc sombre de l'accueil hors hero est désormais Risques. */
 }
-<Section id={sections.highlights.id} tone="ink">
+<Section id={sections.highlights.id} tone="white">
   <Container size="wide">
     <header>
-      {/* Titre en sable, comme celui de la section Risques : les deux blocs sur fond ink partagent
-        la même couleur de titre. */}
-      <h2 id={titleId} class="text-display-lg text-balance text-sand" data-reveal-text>
+      <h2 id={titleId} class="text-display-lg text-balance text-ink" data-reveal-text>
         {highlights.title}
       </h2>
       {
@@ -89,13 +87,13 @@ const enExposant = (
       {
         cards.map((card, i) => (
           <li
-            class="rounded-3xl border border-white/15 bg-white/5 p-6 sm:p-8"
+            class="rounded-3xl bg-paper p-6 ring-1 ring-navy/5 sm:p-8"
             data-animate="fade-up"
             data-animate-delay={String((i % COLUMNS) * STAGGER)}
           >
             {/* Sans libellé, la valeur se suffit à elle-même (« 100 % Digital »). */}
             {card.label && (
-              <p class="flex items-center gap-2 text-base font-medium text-white/80">
+              <p class="flex items-center gap-2 text-base font-medium text-slate-700">
                 <span>{card.label}</span>
                 {card.info && (
                   <button
@@ -104,7 +102,7 @@ const enExposant = (
                     hidden
                     aria-expanded="false"
                     aria-controls={'info-' + i}
-                    class="info-bouton info-bouton-sombre"
+                    class="info-bouton"
                   >
                     <span aria-hidden="true">i</span>
                     <span class="visually-hidden">
@@ -114,12 +112,12 @@ const enExposant = (
                 )}
               </p>
             )}
-            <p class:list={['text-display-sm text-sand', card.label && 'mt-2']}>
+            <p class:list={['text-display-sm text-navy', card.label && 'mt-2']}>
               {enExposant(card.value).map((b) => (typeof b === 'string' ? b : <>{b.chiffre}<sup class="ordinal">{b.suffixe}</sup></>))}
             </p>
             {card.info && (
               <div id={'info-' + i} class="info-panneau">
-                <p class="text-base leading-snug text-white/80">{card.info}</p>
+                <p class="text-base leading-snug text-slate-700">{card.info}</p>
               </div>
             )}
           </li>
@@ -132,20 +130,20 @@ const enExposant = (
         détachent des six repères, et il est rendu sans encadré : ce ne sont pas des
         caractéristiques du produit, mais des modalités. */
       highlights.subscriptionItems && highlights.subscriptionItems.length > 0 && (
-        <div class="mt-chapter border-t border-white/20 pt-8 sm:pt-10">
+        <div class="mt-chapter border-t border-navy/10 pt-8 sm:pt-10">
           {
-            /* Le TITRE du bloc est en sable, pas ses libellés, en blanc atténué comme ceux des six
-              cartes : un libellé nomme, il ne porte pas l'information, le sable est réservé à ce
-              qu'on doit lire, la valeur. */
+            /* Le TITRE du bloc est en ink, ses libellés en gris comme ceux des six cartes : un libellé
+              nomme, il ne porte pas l'information, le marine est réservé à ce qu'on doit lire, la
+              valeur. */
           }
           {highlights.subscriptionTitle && (
-            <h3 class="text-display-sm text-sand">{highlights.subscriptionTitle}</h3>
+            <h3 class="text-display-sm text-ink">{highlights.subscriptionTitle}</h3>
           )}
           <ul role="list" class="mt-6 grid gap-6 sm:grid-cols-3 sm:gap-8 lg:mt-8">
             {highlights.subscriptionItems.map((item) => (
-              <li class="border-t border-white/15 pt-4 sm:border-t-0 sm:pt-0">
-                <p class="text-base font-medium text-white/80">{item.label}</p>
-                <p class="text-lead mt-1 font-semibold text-sand">
+              <li class="border-t border-navy/10 pt-4 sm:border-t-0 sm:pt-0">
+                <p class="text-base font-medium text-slate-700">{item.label}</p>
+                <p class="text-lead mt-1 font-semibold text-navy">
               {enExposant(item.value).map((b) => (typeof b === 'string' ? b : <>{b.chiffre}<sup class="ordinal">{b.suffixe}</sup></>))}
                 </p>
               </li>
@@ -156,12 +154,12 @@ const enExposant = (
     }
 
     {
-      /* APPEL À L'ACTION DE LA SECTION. `outline-light` et non `light` : le fond est ink, et un
-        bouton blanc plein aurait le poids d'un CTA de souscription, alors que celui-ci mène à une
-        page du site. La hiérarchie de l'accueil reste celle du hero. */
+      /* APPEL À L'ACTION DE LA SECTION. `secondary`, le contour marine, et non `primary` : un bouton
+        plein aurait le poids d'un CTA de souscription, alors que celui-ci mène à une page du site.
+        La hiérarchie de l'accueil reste celle du hero. */
       highlights.secondaryCta && (
         <p class="mt-chapter">
-          <Button href={highlights.secondaryCta.href} variant="outline-light" size="md">
+          <Button href={highlights.secondaryCta.href} variant="secondary" size="md">
             {highlights.secondaryCta.label}
           </Button>
         </p>
