@@ -1469,30 +1469,6 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   }
 }
 
-/* LUEURS SABLE DES CARTES (17/09/2026, demande de l'équipe : « adoucir les cards avec des ombres
-   sable comme la hero de la home ») : le sable de l'aurore en haut à droite, là où la carte ne
-   porte rien, et un foyer plus faible en bas à gauche. LOIN DU TEXTE : le titre est en sable et à
-   gauche, un foyer de la même teinte l'effacerait ; le bouton garde bien plus de 4,5:1
-   (tests/qualite.spec.ts). FIXES, sans `filter`. SUR UN PSEUDO-ÉLÉMENT sous le contenu et non en
-   `background-image` sur la carte : les contrôles de contraste sautent tout élément à image de
-   fond. Sur les DEUX faces. */
-@utility carte-lueur {
-  --lueur-haut: 0.3;
-  --lueur-bas: 0.14;
-  isolation: isolate;
-  &::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    border-radius: inherit;
-    pointer-events: none;
-    background-image:
-      radial-gradient(75% 65% at 100% 0%, rgb(231 204 165 / var(--lueur-haut)) 0%, transparent 70%),
-      radial-gradient(60% 45% at 0% 100%, rgb(231 204 165 / var(--lueur-bas)) 0%, transparent 70%);
-  }
-}
-
 /* LA CARTE A DEUX FACES (16/09/2026, demande de l'équipe), retournée par
    src/scripts/carteRetournee.ts. `preserve-3d` sur l'enveloppe, `backface-visibility: hidden` sur
    CHAQUE FACE : sans la première le dos serait aplati sur le recto, sans la seconde on lirait le
@@ -1529,7 +1505,13 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   display: flex;
   flex-direction: column;
   border-radius: 1.5rem;
-  background: var(--color-ink);
+  /* Blanc, ombre et filet : la recette des cartes claires du site (02-Highlights.astro), la même
+     que le recto (22/09/2026, cartes passées du sombre au clair ; avant, fond ink et lueur sable,
+     utilitaire `carte-lueur`, retiré). */
+  background: #fff;
+  box-shadow: var(--shadow-card);
+  outline: 1px solid rgb(2 75 103 / 0.05);
+  outline-offset: -1px;
   padding: 1.5rem;
   /* ESPACE MINIMUM ENTRE LE TEXTE ET LE BOUTON (« ne pas coller le contenu avec le CTA Fermer ») :
      le `margin-top: auto` du bouton tombe à zéro dès que le texte remplit la carte. Le `gap` de la
@@ -1611,8 +1593,19 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   cursor: pointer;
 }
 
-/* ILLUSTRATIONS DES CARTES de /strategie (grammaire en tête de StrategySelect.astro) : EN PAUSE
-   HORS ÉCRAN (`data-in-view="illus-en-vue"`, classe posée par motion.ts) et DERRIÈRE UNE CARTE
+/* ILLUSTRATIONS DES CARTES de /strategie (grammaire en tête de StrategySelect.astro). PALETTE
+   (22/09/2026, cartes passées du sombre au clair à la demande de Martin) : les cinq dessins ne
+   nomment plus une couleur, ils lisent ces quatre variables, posées sur le recto de la carte.
+   Le trait est marine, l'accent teal, le fond (les aplats qui masquent, pastilles et cadres) celui
+   de la carte ; `--illus-trait-rgb` sert aux traits à opacité (`rgb(… / 0.3)`). Avant, trait
+   teal-200 et fond ink. */
+.carte-recto {
+  --illus-trait: var(--color-navy);
+  --illus-trait-rgb: 2 75 103;
+  --illus-accent: var(--color-teal-400);
+  --illus-fond: #fff;
+}
+/* EN PAUSE HORS ÉCRAN (`data-in-view="illus-en-vue"`, classe posée par motion.ts) et DERRIÈRE UNE CARTE
    RETOURNÉE (`[inert]`, posé par carteRetournee.ts). SEULEMENT SI UN SCRIPT TOURNE : sans lui,
    personne ne poserait la classe et les dessins resteraient figés. L'attribut est répété pour PESER
    PLUS que les sélecteurs des composants (classe + attribut de portée d'Astro), sinon l'ordre des

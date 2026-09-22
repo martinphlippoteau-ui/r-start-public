@@ -3,7 +3,7 @@
  * Stratégie d'investissement : DEUX sections, rendues uniquement par /strategie.
  *  1. #strategie (paper) les deux moteurs de performance : deux cartes qui se retournent, chacune
  *                        illustrée par son dessin animé (EngineRent, EngineGain) ;
- *  2. #quoi      (paper) « Une approche en 3 volets pour les alimenter » : trois tuiles ink,
+ *  2. #quoi      (paper) « Une approche en 3 volets pour les alimenter » : trois tuiles blanches,
  *                        Sélective, Diversifiée et Opportuniste (ex-Quoi, Où et Comment, d'où les
  *                        ancres #quoi, #ou, #comment), chacune avec son dessin (StrategySelect,
  *                        StrategyDiversify, StrategyTiming) et son détail au dos de la carte. Une
@@ -14,8 +14,10 @@
  *
  * FONDS. Les deux sections sont claires : l'en-tête de la page est déjà sombre, une première
  * section ink enchaînerait deux pavés sombres sans coupure, et un test l'interdit sur toutes les
- * sous-pages. Le sombre est porté par les tuiles, puis par le bloc Risques que la page rend
- * ensuite. Ce bloc porte aussi les risques : AUCUNE MENTION DE RISQUE DANS CES DEUX SECTIONS
+ * sous-pages. LES CARTES AUSSI SONT CLAIRES depuis le 22/09/2026 (demande de Martin ; elles
+ * étaient ink) : blanches, à ombre et filet, la recette des repères de l'accueil, les dessins
+ * re-teintés en marine par les variables `--illus-*` (global.css). Le seul bloc sombre est celui
+ * des Risques, que la page rend ensuite et qui porte les risques : AUCUNE MENTION DE RISQUE DANS CES DEUX SECTIONS
  * (retirée de l'écran le 16/09/2026, du code le 22/09/2026 avec le composant NoteConformite).
  *
  * Motion (src/scripts/motion.ts, tout par attributs) : aucun rideau ici, la section suit
@@ -127,16 +129,16 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
             <li class="[perspective:1400px]">
             <div class="carte-face relative h-full">
               <article
-                class="carte-recto carte-lueur relative flex min-h-[24rem] flex-col overflow-hidden rounded-3xl bg-ink p-6 text-white sm:min-h-[26rem] sm:p-8"
+                class="carte-recto relative flex min-h-[24rem] flex-col overflow-hidden rounded-3xl bg-white p-6 text-ink shadow-card ring-1 ring-navy/5 sm:min-h-[26rem] sm:p-8"
               >
-                <p class="text-eyebrow text-teal-200 tabular-nums" aria-hidden="true">{numero}</p>
-                <p class="text-display-sm mt-3 text-sand">{item.lead}</p>
+                <p class="text-eyebrow text-teal-700 tabular-nums" aria-hidden="true">{numero}</p>
+                <p class="text-display-sm mt-3 text-navy">{item.lead}</p>
                 {
                   /* Ce que le moteur apporte, sous le titre (17/09/2026, demande de l'équipe).
                     Recto seulement : le dos porte déjà l'explication complète. */
                 }
                 {item.benefit && (
-                  <p class="mt-2 text-base leading-snug text-pretty text-white/80">
+                  <p class="mt-2 text-base leading-snug text-pretty text-slate-700">
                     {item.benefit}
                   </p>
                 )}
@@ -160,7 +162,7 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
                   hidden
                   aria-controls={cible}
                   data-carte-fermer={strategy.dialogClose}
-                  class="carte-savoir btn btn-motion btn-outline-light btn-sm mt-auto self-start"
+                  class="carte-savoir btn btn-motion btn-secondary btn-sm mt-auto self-start"
                 >
                   <span>{strategy.dialogOpen}</span>
                   <span class="visually-hidden"> : {item.lead}</span>
@@ -175,8 +177,8 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
                   texte écrit plus bas dans le flux, pour que la page se lise entière sans
                   JavaScript. La marque reste, petite et en coin, hors du chemin du texte. */
               }
-              <div class="carte-verso carte-lueur">
-                <MarqueR class="carte-verso-marque w-12 text-white/10" />
+              <div class="carte-verso">
+                <MarqueR class="carte-verso-marque w-12 text-navy/10" />
               </div>
             </div>
 
@@ -186,9 +188,9 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
               }
               <div data-carte-detail-hote>
                 <div id={cible} data-carte-detail class="mt-5 space-y-4">
-                  <p class="text-eyebrow text-teal-200 tabular-nums">{numero}</p>
-                  <p class="text-display-sm text-sand">{item.lead}</p>
-                  {item.rest && <p class="text-base leading-relaxed text-white/80">{item.rest}</p>}
+                  <p class="text-eyebrow text-teal-700 tabular-nums">{numero}</p>
+                  <p class="text-display-sm text-navy">{item.lead}</p>
+                  {item.rest && <p class="text-base leading-relaxed text-slate-700">{item.rest}</p>}
                 </div>
               </div>
             </li>
@@ -209,8 +211,9 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
    * bouton d'ouverture arrive `hidden`. Le script le déplace au DOS de la carte et révèle le
    * bouton : la seule façon de cacher un texte derrière un mouvement sans le perdre pour qui
    * n'exécute pas de script.
-   * FOND INK sur les trois : dessins au trait clair, il leur faut un fond sombre, et les tuiles
-   * sombres sur la section claire donnent le contraste que trois cartes blanches n'avaient pas.
+   * BLANCHES depuis le 22/09/2026 (demande de Martin), comme les deux moteurs ; elles étaient ink
+   * (« dessins au trait clair, il leur faut un fond sombre ») : les dessins lisent depuis leur
+   * palette dans les variables `--illus-*`, trait marine sur fond blanc.
    */
 }
 {
@@ -312,15 +315,15 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
                   quand elle présente son envers. */
               }
             <div class="carte-face relative h-full">
-              <article class="carte-recto carte-lueur relative flex min-h-[24rem] flex-col overflow-hidden rounded-3xl bg-ink p-6 text-white sm:min-h-[28rem] sm:p-8">
-                {zone.eyebrow && <p class="text-eyebrow text-teal-200">{zone.eyebrow}</p>}
-                <h3 id={ancre + '-title'} class="text-display-sm mt-3 max-w-[16rem] text-sand">
+              <article class="carte-recto relative flex min-h-[24rem] flex-col overflow-hidden rounded-3xl bg-white p-6 text-ink shadow-card ring-1 ring-navy/5 sm:min-h-[28rem] sm:p-8">
+                {zone.eyebrow && <p class="text-eyebrow text-teal-700">{zone.eyebrow}</p>}
+                <h3 id={ancre + '-title'} class="text-display-sm mt-3 max-w-[16rem] text-navy">
                   {zone.title}
                 </h3>
 
                 {
                   /* Une illustration par tuile, même grammaire (en tête de StrategySelect.astro) :
-                    SVG au trait clair sur fond ink, en boucle lente, en pause hors écran, complet
+                    SVG au trait marine sur fond blanc, en boucle lente, en pause hors écran, complet
                     en `prefers-reduced-motion`. Le globe en canvas est parti le 16/09/2026 (il ne
                     montrait que la géographie, la tuile parle aussi de secteurs ; fichier supprimé
                     le 19/09/2026). Format paysage (160 × 120) pleine largeur, `flex-1` centre le
@@ -344,7 +347,7 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
                   hidden
                   aria-controls={'detail-' + ancre}
                   data-carte-fermer={strategy.dialogClose}
-                  class="carte-savoir btn btn-motion btn-outline-light btn-sm mt-auto self-start"
+                  class="carte-savoir btn btn-motion btn-secondary btn-sm mt-auto self-start"
                 >
                   <span>{strategy.dialogOpen}</span>
                   <span class="visually-hidden"> : {zone.title}</span>
@@ -354,39 +357,39 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
                 </button>
               </article>
               {/* Dos de la carte : même mécanique que les moteurs, voir plus haut. */}
-              <div class="carte-verso carte-lueur">
-                <MarqueR class="carte-verso-marque w-12 text-white/10" />
+              <div class="carte-verso">
+                <MarqueR class="carte-verso-marque w-12 text-navy/10" />
               </div>
             </div>
 
               {/* Hôte du détail : lu dans le flux sans script, vidé puis masqué par le script. */}
               <div data-carte-detail-hote>
                 <div id={'detail-' + ancre} data-carte-detail class="mt-5 space-y-4">
-                  <p class="text-eyebrow text-teal-200">{zone.eyebrow}</p>
-                  <p class="text-display-sm text-sand">{zone.title}</p>
-                  <p class="text-base leading-snug text-white/80">{zone.intro}</p>
-                  {zone.lead && <p class="text-base font-semibold text-white">{zone.lead}</p>}
+                  <p class="text-eyebrow text-teal-700">{zone.eyebrow}</p>
+                  <p class="text-display-sm text-navy">{zone.title}</p>
+                  <p class="text-base leading-snug text-slate-700">{zone.intro}</p>
+                  {zone.lead && <p class="text-base font-semibold text-ink">{zone.lead}</p>}
 
                   <ul role="list" class="space-y-3">
                     {zone.items.map((item) => (
                       <li class="flex items-start gap-3">
                         {item.icon ? (
-                          <Picto name={item.icon} class="mt-0.5 size-6 text-teal-200" />
+                          <Picto name={item.icon} class="mt-0.5 size-6 text-teal-700" />
                         ) : (
                           <span
                             aria-hidden="true"
-                            class="mt-2 size-2 shrink-0 rounded-full bg-teal-200"
+                            class="mt-2 size-2 shrink-0 rounded-full bg-teal-700"
                           />
                         )}
-                        <p class="text-base leading-snug text-white">
+                        <p class="text-base leading-snug text-ink">
                           {item.lead}
-                          {item.rest && <span class="mt-1 block text-white/75">{item.rest}</span>}
+                          {item.rest && <span class="mt-1 block text-slate-700">{item.rest}</span>}
                         </p>
                       </li>
                     ))}
                   </ul>
 
-                  <p class="text-base leading-snug text-white/80">{zone.outro}</p>
+                  <p class="text-base leading-snug text-slate-700">{zone.outro}</p>
                 </div>
               </div>
             </li>

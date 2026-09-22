@@ -86,29 +86,29 @@ const CADRAN = { cx: 130, cy: 60, r: 15 };
     aspect-ratio: 160 / 120;
   }
   .timing-sol {
-    stroke: rgb(169 221 230 / 0.22);
+    stroke: rgb(var(--illus-trait-rgb) / 0.22);
     stroke-width: 1;
   }
   .timing-cadre {
-    stroke: rgb(169 221 230 / 0.6);
+    stroke: rgb(var(--illus-trait-rgb) / 0.6);
     stroke-width: 1.4;
-    fill: var(--color-ink);
+    fill: var(--illus-fond);
   }
   .timing-fenetre {
-    fill: rgb(169 221 230 / 0.5);
+    fill: rgb(var(--illus-trait-rgb) / 0.5);
   }
   .timing-cadran-fond {
-    stroke: rgb(169 221 230 / 0.18);
+    stroke: rgb(var(--illus-trait-rgb) / 0.18);
     stroke-width: 2;
   }
   .timing-cadran-axe {
-    fill: rgb(169 221 230 / 0.5);
+    fill: rgb(var(--illus-trait-rgb) / 0.5);
   }
 
   /* État de repos = image complète : les quatre étages bâtis, la silhouette effacée, le cadran
      plein, la coche posée. */
   .timing-silhouette {
-    stroke: var(--color-teal-400);
+    stroke: var(--illus-accent);
     stroke-width: 1.2;
     stroke-dasharray: 3 3;
     opacity: 0;
@@ -119,7 +119,7 @@ const CADRAN = { cx: 130, cy: 60, r: 15 };
     opacity: 1;
   }
   .timing-cadran-arc {
-    stroke: var(--color-teal-400);
+    stroke: var(--illus-accent);
     stroke-width: 2;
     stroke-linecap: butt;
     /* `pathLength="100"` : le tiret se compte en pour-cent du tour. L'écart de 120 dépasse le tour :
@@ -133,7 +133,7 @@ const CADRAN = { cx: 130, cy: 60, r: 15 };
     opacity: 1;
   }
   .timing-onde {
-    stroke: var(--color-teal-400);
+    stroke: var(--illus-accent);
     stroke-width: 1.2;
     opacity: 0;
     transform-box: fill-box;
@@ -145,12 +145,12 @@ const CADRAN = { cx: 130, cy: 60, r: 15 };
     transform-origin: center;
   }
   .timing-coche-fond {
-    fill: var(--color-ink);
-    stroke: var(--color-teal-400);
+    fill: var(--illus-fond);
+    stroke: var(--illus-accent);
     stroke-width: 1.6;
   }
   .timing-coche-trait {
-    stroke: var(--color-teal-200);
+    stroke: var(--illus-trait);
     stroke-width: 1.6;
     stroke-linecap: round;
     stroke-linejoin: round;

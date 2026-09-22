@@ -95,11 +95,11 @@ const PHASES = [5, 0, 9, 3, 11, 7, 1, 8, 4, 10, 2, 6];
     aspect-ratio: 236 / 100;
   }
   .rent-cadre {
-    stroke: rgb(169 221 230 / 0.38);
+    stroke: rgb(var(--illus-trait-rgb) / 0.38);
     stroke-width: 1.6;
   }
   .rent-ligne {
-    stroke: rgb(169 221 230 / 0.22);
+    stroke: rgb(var(--illus-trait-rgb) / 0.22);
     stroke-width: 1.2;
     stroke-dasharray: 3 7;
     stroke-linecap: round;
@@ -108,26 +108,26 @@ const PHASES = [5, 0, 9, 3, 11, 7, 1, 8, 4, 10, 2, 6];
   /* État de repos = image complète : l'immeuble occupé, les versements posés le long du chemin à
      intervalles égaux, la marque pleine. */
   .rent-fenetre {
-    fill: var(--color-teal-200);
+    fill: var(--illus-trait);
     opacity: 0.5;
   }
   .rent-versement {
     transform: translateX(calc(14px + var(--rang) * 34px));
   }
   .rent-versement-corps {
-    fill: var(--color-teal-200);
+    fill: var(--illus-trait);
     transform-box: fill-box;
     transform-origin: center;
   }
   .rent-onde {
-    stroke: var(--color-teal-400);
+    stroke: var(--illus-accent);
     stroke-width: 1.2;
     opacity: 0;
     transform-box: fill-box;
     transform-origin: center;
   }
   .rent-marque {
-    fill: var(--color-teal-200);
+    fill: var(--illus-trait);
   }
 
   @media (prefers-reduced-motion: no-preference) {

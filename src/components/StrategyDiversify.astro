@@ -111,31 +111,31 @@ const picto = (secteur: Secteur, hx: number, hy: number): string => {
     aspect-ratio: 160 / 120;
   }
   .div-disque {
-    fill: var(--color-teal-400);
+    fill: var(--illus-accent);
     fill-opacity: 0.06;
   }
   .div-limbe {
-    stroke: rgb(169 221 230 / 0.32);
+    stroke: rgb(var(--illus-trait-rgb) / 0.32);
     stroke-width: 1;
   }
   .div-trame {
-    stroke: rgb(169 221 230 / 0.16);
+    stroke: rgb(var(--illus-trait-rgb) / 0.16);
     stroke-width: 1;
   }
   .div-goutte {
-    fill: var(--color-ink);
-    stroke: var(--color-teal-200);
+    fill: var(--illus-fond);
+    stroke: var(--illus-trait);
     stroke-width: 1.3;
     stroke-linejoin: round;
   }
   .div-picto {
-    stroke: var(--color-teal-200);
+    stroke: var(--illus-trait);
     stroke-width: 1.2;
     stroke-linecap: round;
     stroke-linejoin: round;
   }
   .div-picto--bureaux {
-    fill: var(--color-teal-200);
+    fill: var(--illus-trait);
     stroke: none;
   }
   .div-picto--sante {
@@ -150,7 +150,7 @@ const picto = (secteur: Secteur, hx: number, hy: number): string => {
     transform: translateY(0);
   }
   .div-onde {
-    stroke: var(--color-teal-400);
+    stroke: var(--illus-accent);
     stroke-width: 1.2;
     opacity: 0;
     transform-box: fill-box;

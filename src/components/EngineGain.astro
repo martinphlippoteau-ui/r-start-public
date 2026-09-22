@@ -152,34 +152,34 @@ const MARQUE_H = Math.round((MARQUE_L * 88.98) / 94.08 * 100) / 100;
     aspect-ratio: 236 / 100;
   }
   .gain-cadre {
-    stroke: rgb(169 221 230 / 0.38);
+    stroke: rgb(var(--illus-trait-rgb) / 0.38);
     stroke-width: 1.6;
   }
   .gain-fenetre {
-    fill: rgb(169 221 230 / 0.3);
+    fill: rgb(var(--illus-trait-rgb) / 0.3);
   }
   .gain-sol {
-    stroke: rgb(169 221 230 / 0.2);
+    stroke: rgb(var(--illus-trait-rgb) / 0.2);
     stroke-width: 1;
   }
   .gain-surface {
-    fill: var(--color-teal-400);
+    fill: var(--illus-accent);
     fill-opacity: 0.14;
   }
   .gain-trait {
-    stroke: var(--color-teal-200);
+    stroke: var(--illus-trait);
     stroke-width: 2;
     stroke-linecap: round;
   }
   .gain-achat {
-    fill: var(--color-ink);
-    stroke: var(--color-teal-200);
+    fill: var(--illus-fond);
+    stroke: var(--illus-trait);
     stroke-width: 1.4;
     transform-box: fill-box;
     transform-origin: center;
   }
   .gain-pointe-lueur {
-    fill: var(--color-teal-400);
+    fill: var(--illus-accent);
     opacity: 0.3;
   }
   /* En sable (17/09/2026, demande de l'équipe : « mets-le en sable pour qu'il ressorte ») : en
@@ -197,12 +197,12 @@ const MARQUE_H = Math.round((MARQUE_L * 88.98) / 94.08 * 100) / 100;
     transform-origin: center;
   }
   .gain-vente-fond {
-    fill: var(--color-ink);
-    stroke: var(--color-teal-200);
+    fill: var(--illus-fond);
+    stroke: var(--illus-trait);
     stroke-width: 1.4;
   }
   .gain-euro {
-    fill: var(--color-teal-200);
+    fill: var(--illus-trait);
     font-family: inherit;
     font-size: 10px;
     font-weight: 700;
@@ -228,7 +228,7 @@ const MARQUE_H = Math.round((MARQUE_L * 88.98) / 94.08 * 100) / 100;
     }
   }
   .gain-onde {
-    stroke: var(--color-teal-400);
+    stroke: var(--illus-accent);
     stroke-width: 1.2;
     opacity: 0;
     transform-box: fill-box;
