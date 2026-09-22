@@ -81,17 +81,19 @@ export const trust = {
     ],
     disclaimer: trustFacts.amf.disclaimer,
     /*
-     * Ce que les lecteurs d'écran entendent à la place du logo de l'AMF, sur /a-propos
-     * (CorumRange.astro), seule page à le montrer : l'AMF ne concède pas son logo aux
-     * communications commerciales (fichier venu de Wikipédia, usage non libre) et, posé près d'une
-     * note Trustpilot, il se lirait comme une caution. La mention « Société de gestion agréée par
-     * l'AMF » du hero, qui accompagnait les avis, a été retirée le 22/09/2026 (demande de Martin) ;
-     * le numéro d'agrément reste au pied de page (legal.managementCompany.amfApproval), et c'est
-     * lui qui satisfait check-compliance.mjs. Le vocabulaire ne change pas : « société de gestion
-     * agréée », jamais « R Start agréé », R Start étant VISÉ (visa SCPI n° 26-06 du 4 mars 2026),
-     * formulation demandée par l'AMF dans ses retours sur la brochure (09/2026).
+     * Cadre réglementaire de /a-propos (CorumRange.astro), une phrase (22/09/2026, texte de Martin ;
+     * elle remplace les deux phrases du bulletin, visa puis agrément). Elle porte les DEUX faits sans
+     * les confondre : R Start est VISÉE (visa SCPI n° 26-06 du 4 mars 2026), la société de gestion
+     * est AGRÉÉE, formulation demandée par l'AMF dans ses retours sur la brochure (09/2026). Les
+     * numéros et dates viennent de facts.ts et legal.ts. Plus aucun logo de l'AMF sur le site depuis
+     * le même jour (« on n'a pas le droit de l'utiliser ») : c'est le logo R Start qui l'accompagne.
+     * La mention « Société de gestion agréée par l'AMF » du hero est partie le même jour ; le numéro
+     * d'agrément reste au pied de page (legal.managementCompany.amfApproval), et c'est lui qui
+     * satisfait check-compliance.mjs.
      */
-    logoAlt: 'Autorité des marchés financiers',
+    aboutSentence: nb(
+      `${product.name}, visa S.C.P.I. n° ${product.visa.number} en date du ${product.visa.date}, est gérée par ${managementCompany.name}, société de gestion de portefeuille, agréée et réglementée par l’AMF (Autorité des marchés financiers) le ${corumGroup.amfSince} sous le numéro ${amfApprovalNumber} et sous le régime de la directive AIFM 2011/61/UE.`
+    ),
   },
 
   trustpilot: {

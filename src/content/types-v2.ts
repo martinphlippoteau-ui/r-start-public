@@ -29,8 +29,8 @@ export interface TrustContent {
     }[];
     /** Phrase standard : le visa n'implique ni approbation ni authentification. */
     disclaimer: string;
-    /** Ce que les lecteurs d'écran entendent à la place du logo de l'AMF (/a-propos). */
-    logoAlt: string;
+    /** Cadre réglementaire de /a-propos : visa de R Start et agrément de la société de gestion. */
+    aboutSentence: string;
   };
   trustpilot: {
     title: string;

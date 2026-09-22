@@ -2,7 +2,7 @@
 /**
  * Page /a-propos, société de gestion : DEUX sections et une photo pleine largeur.
  *  1. #corum   (white) « Le groupe CORUM en quelques chiffres », les cinq chiffres du groupe, puis
- *                      le cadre réglementaire (logo AMF, deux phrases de facts.ts) et l'appel vers
+ *                      le cadre réglementaire (logo R Start, une phrase de trust.ts) et l'appel vers
  *                      corum.fr ;
  *  2. bande pleine largeur, hors section (décorative, sans titre : elle n'a donc pas d'ancre) ;
  *  3. #gamme   (white) « Nos autres SCPI en quelques chiffres » : une grille des quatre autres
@@ -17,14 +17,13 @@
  * media.ts.
  */
 import { Image, Picture } from 'astro:assets';
-import amfLogo from '@/assets/logos/amf.svg';
+import brandLogo from '@/assets/logos/r-start-couleur.svg';
 import Button from '@/components/ui/Button.astro';
 import Container from '@/components/ui/Container.astro';
 import Section from '@/components/ui/Section.astro';
 import Stat from '@/components/ui/Stat.astro';
 import { corum } from '@/content/fr/corum';
 import { corumRange } from '@/content/fr/corumRange';
-import { trust as trustFacts } from '@/content/fr/facts';
 import { trust } from '@/content/fr/trust';
 import { media } from '@/content/fr/media';
 import { resolveImage } from '@/lib/images';
@@ -75,41 +74,21 @@ const QUIET_TITLE_Y = 12;
     </ul>
     {
       /*
-       * CADRE RÉGLEMENTAIRE (16/09/2026, demande de l'équipe : « mettre le logo AMF en disant que
-       * R Start est agréé par l'AMF »). LE TEXTE NE DIT PAS CELA, ET C'EST VOULU. R Start n'est pas
-       * agréé, il est VISÉ : la note d'information a obtenu le visa SCPI n° 26-06 du 4 mars 2026.
-       * Ce qui est AGRÉÉ, c'est la société de gestion. Écrire « R Start est agréé par l'AMF »
-       * affirmerait exactement ce que la mention standard du pied de page nie (« le visa n'implique
-       * ni approbation de l'opportunité de l'opération »). L'équipe a arbitré entre trois
-       * formulations exactes et retenu celle-ci, qui porte les DEUX faits.
-       * LES DEUX PHRASES SONT REPRISES DE facts.ts, mot pour mot : elles viennent du bulletin de
-       * souscription, et celle de l'agrément est la formulation que l'AMF a demandée dans ses
-       * retours sur la brochure (09/2026). Rien n'est reparaphrasé ici.
-       * LE LOGO : un fichier hébergé sur Wikipédia France au titre d'un usage non libre, et l'AMF
-       * ne concède pas son logo aux communications commerciales. La réserve vaut toujours,
-       * l'équipe l'a levée en connaissance de cause.
+       * CADRE RÉGLEMENTAIRE, une phrase (22/09/2026, texte de Martin, trust.ts `amf.aboutSentence`) :
+       * R Start est VISÉE, la société de gestion est AGRÉÉE, et le texte ne dit jamais « R Start
+       * agréé ». Le logo est celui de R START : celui de l'AMF, que l'autorité ne concède pas aux
+       * communications commerciales, a quitté le site le même jour (« on n'a pas le droit de
+       * l'utiliser »). Décoratif (alt vide) : le texte à côté nomme R Start.
        */
     }
     {/* `sm:items-stretch` : la plaque prend la hauteur de la rangée, donc celle du texte à sa
       droite, et le logo la remplit. Une hauteur écrite en dur se serait décalée dès qu'une phrase
       passe d'une ligne à l'autre, ce qui arrive entre 640 et 1024 px. */}
     <div class="mt-section-sm flex flex-col gap-5 sm:flex-row sm:items-stretch sm:gap-7">
-      {/* Le logo prend toute la hauteur du texte à sa droite : à 40 px sa ligne de tête (« AUTORITÉ
-      DES MARCHÉS FINANCIERS ») se refermait. Sous `sm`, la plaque passe au-dessus du texte et il
-      garde ses 56 px, rien à épouser dans ce sens-là. */}
       <span class="flex shrink-0 items-center justify-center rounded-xl bg-white px-5 py-4 ring-1 ring-navy/10">
-        <Image
-          src={amfLogo}
-          alt={trust.amf.logoAlt}
-          width={142}
-          height={57}
-          class="w-auto max-sm:h-14 sm:h-full"
-        />
+        <Image src={brandLogo} alt="" width={142} height={44} class="w-auto max-sm:h-10 sm:h-11" />
       </span>
-      <div class="max-w-3xl space-y-2">
-        <p class="text-base leading-snug text-slate-700">{trustFacts.amf.managementCompanyApproval}</p>
-        <p class="text-base leading-snug text-slate-700">{trustFacts.amf.visaSentence}</p>
-      </div>
+      <p class="max-w-3xl text-base leading-snug text-slate-700">{trust.amf.aboutSentence}</p>
     </div>
 
     {

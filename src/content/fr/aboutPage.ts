@@ -13,15 +13,12 @@ export const aboutPage: { seo: PageSeo; hero: PageHero; cta: Cta } = {
     /** 140-155 caractères, avec rappel de risque. */
     description: `CORUM gère des SCPI depuis ${corumGroup.scpiSince} et en compte ${corumGroup.scpiCount}, dont ${product.name}. Cette expérience ne préjuge pas des résultats. Risque de perte en capital.`,
   },
-  /* En-tête du 14/09/2026, texte de l'équipe repris mot pour mot. Deux paragraphes d'introduction,
-     que PageHero rend l'un sous l'autre, dans la même taille. */
+  /* En-tête du 14/09/2026, texte de l'équipe. Le 22/09/2026 (demande de Martin) : deux-points dans
+     le titre, et plus de premier paragraphe (« On ne part pas d'une feuille blanche… »). */
   hero: {
     /* Titre du 16/09/2026, texte de l'équipe. */
-    title: 'R Start, une innovation signée CORUM',
-    intro: [
-      'On ne part pas d’une feuille blanche…',
-      `R Start s’appuie sur ${corumGroup.experienceLabel} d’expertise du groupe CORUM dans l’investissement immobilier.`,
-    ],
+    title: 'R Start\u00A0: une innovation signée CORUM',
+    intro: `R Start s’appuie sur ${corumGroup.experienceLabel} d’expertise du groupe CORUM dans l’investissement immobilier.`,
     /* Plus de ligne risques dans l'en-tête (14/09/2026, « supprime les bon à savoir de tous les
        hero sauf celui de la home ») ; restent les mentions du contenu et le pied de page. */
   },

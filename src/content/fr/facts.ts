@@ -341,11 +341,6 @@ export const externalLinks = {
 /** Blocs de confiance (périmètre v2). Aucun logo AMF, aucune formulation de caution. */
 export const trust = {
   amf: {
-    visaSentence:
-      'La note d’information de R Start a obtenu le visa SCPI n° 26-06 de l’Autorité des marchés financiers (AMF) le 4 mars 2026.', // bulletin CGV
-    managementCompanyApproval:
-      // « agréée et réglementée » : formulation demandée par l'AMF dans ses retours sur la brochure (09/2026).
-      'CORUM Asset Management, société de gestion de portefeuille, est agréée et réglementée par l’AMF depuis le 14 avril 2011 sous le numéro GP-11000012, et relève de la directive AIFM depuis le 10 juillet 2014.', // bulletin CGV
     disclaimer:
       'Le visa de l’AMF n’implique ni approbation de l’opportunité de l’opération ni authentification des éléments comptables et financiers présentés.', // formulation standard AMF, à valider par la Conformité
     depositary: 'Société Générale', // DIC p.1
