@@ -8,9 +8,8 @@
  * visible sans JavaScript et en reduced-motion). Textes : footer.ts (qui assemble les mentions de
  * legal.ts à l'identique). Logos R Start et CORUM L'Épargne ; aucun logo AMF. Titres : un H2 masqué
  * (`footer.navLabel`) chapeaute les quatre colonnes en H3 ; le bloc légal garde son H2 masqué et
- * ses H3. Le bloc des mentions obligatoires (commercialNotice, documentsNotice, visa) reste en
- * text-caption (14 px, contrôlé par scripts/check-compliance.mjs : jamais text-xs) ; les blocs
- * d'identité repliés et le copyright peuvent être en text-xs.
+ * ses H3. Les blocs d'identité repliés et le copyright sont en text-xs ; le bloc des mentions
+ * obligatoires, qui devait rester en text-caption, a quitté le pied de page le 22/09/2026.
  */
 import IconExterne from '@/components/ui/IconExterne.astro';
 import { Image } from 'astro:assets';
@@ -22,13 +21,12 @@ import { withBase } from '@/lib/href';
 
 const hint = footer.externalLinkHint;
 /**
- * Alléger le pied de page sans rien retirer : le premier bloc légal (mentions obligatoires, visa
- * AMF) reste déplié ; les suivants (identité, RGPD, médiation, hébergeur) passent dans un
- * <details>, le texte reste dans le document, seul son affichage est replié.
+ * Alléger le pied de page sans rien retirer : les blocs légaux (identité, RGPD, médiation,
+ * hébergeur) sont dans un <details>, le texte reste dans le document, seul son affichage est
+ * replié. Le bloc « Communication commerciale » qui restait déplié a quitté le pied de page le
+ * 22/09/2026 (demande de Martin).
  */
-const legalBlocks = footer.legalBlocks ?? [];
-const alwaysVisible = legalBlocks.slice(0, 1);
-const collapsible = legalBlocks.slice(1);
+const collapsible = footer.legalBlocks ?? [];
 /**
  * Retour en haut : ancre vers #contenu, la même cible que le lien d'évitement de Base.astro, écrite
  * en dur des deux côtés. Un <a> et non un <button> : il fonctionne sans JavaScript, et le
@@ -178,26 +176,13 @@ const topLabel = footer.backToTopLabel;
     >
       <h2 id="footer-legal-title" class="visually-hidden">{footer.legalTitle ?? ''}</h2>
       {
-        /* Toujours déplié : mentions obligatoires (caractère commercial, documents à consulter) et visa AMF. */
-      }
-      {
-        alwaysVisible.map((block) => (
-          <div class="text-caption">
-            <h3 class="font-semibold text-navy">{block.title}</h3>
-            {block.paragraphs.map((p) => (
-              <p class="mt-1.5">{p}</p>
-            ))}
-          </div>
-        ))
-      }
-      {
         /* Replié par défaut : identité de l'éditeur et de la société de gestion, RGPD, médiation,
            hébergeur. Rien n'est retiré, <details> garde le texte dans le document, lisible par les
            moteurs et les lecteurs d'écran, et sans JavaScript. */
       }
       {
         collapsible.length > 0 && (
-          <details class="footer-legal mt-6 border-t border-mist pt-6 text-xs">
+          <details class="footer-legal text-xs">
             <summary class="link-underline cursor-pointer list-none text-sm font-semibold text-navy hover:text-teal-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-navy">
               {footer.legalToggleLabel ?? footer.legalTitle ?? ''}
             </summary>

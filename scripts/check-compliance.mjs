@@ -1,7 +1,8 @@
 // Contrôle de conformité du HTML buildé (dist/). Exit 1 si une règle échoue.
-// Règles : mentions obligatoires présentes, formulations interdites absentes, structure du hero,
-// liens PDF valides, un seul H1, lang="fr", canonical, JSON-LD parsable, SRI égal à la valeur de
-// facts.ts, citations de presse marquées, mentions obligatoires jamais en text-xs.
+// Règles : mentions obligatoires présentes sur /mentions-legales (et signalées absentes ailleurs
+// depuis le 22/09/2026), formulations interdites absentes, structure du hero, liens PDF valides,
+// un seul H1, lang="fr", canonical, JSON-LD parsable, SRI égal à la valeur de facts.ts, citations
+// de presse marquées, mentions obligatoires jamais en text-xs.
 // Les contenus sont importés directement des sources TypeScript (Node ≥ 22, sans alias `@/`).
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
@@ -196,6 +197,20 @@ function checkHeroClaims(text, file) {
   }
 }
 
+/** Avertissement, page par page, tant que les mentions de communication commerciale en sont absentes. */
+function signalerMentionsAbsentes(text, file) {
+  const absentes = [
+    [legal.commercialNotice, 'caractère commercial'],
+    ['visa S.C.P.I. n° 26-06 en date du 4 mars 2026', 'visa AMF'],
+  ]
+    .filter(([phrase]) => !text.toLowerCase().includes(norm(phrase).toLowerCase()))
+    .map(([, label]) => label);
+  if (absentes.length)
+    warnings.push(
+      `${file} : mentions de communication commerciale absentes (${absentes.join(', ')}) — retirées du pied de page le 22/09/2026, elles ne subsistent que sur /mentions-legales`
+    );
+}
+
 function checkNoticeSize(html, file) {
   const start = norm(legal.commercialNotice).slice(0, 40).toLowerCase();
   const stack = [];
@@ -235,15 +250,14 @@ async function checkIndex() {
   const html = await readHtml(file);
   const text = toText(html);
 
-  // Mentions obligatoires
-  requirePhrase(text, legal.commercialNotice, 'mention 1 (caractère commercial)', file);
-  requirePhrase(
-    text,
-    legal.documentsNotice.replace(/\.$/, ''),
-    "mention 2 (documents d'information)",
-    file
-  );
-  requirePhrase(text, 'visa S.C.P.I. n° 26-06 en date du 4 mars 2026', 'visa AMF', file);
+  /*
+   * LES MENTIONS DE COMMUNICATION COMMERCIALE NE SONT PLUS EXIGÉES SUR LES PAGES depuis le
+   * 22/09/2026 (demande de Martin : le bloc « Communication commerciale » quitte le pied de page).
+   * Le caractère commercial de la communication, le renvoi aux documents d'information et le visa
+   * AMF ne subsistent que sur /mentions-legales, où ils restent exigés (checkOtherPages). Ailleurs,
+   * leur absence est signalée en avertissement à chaque exécution.
+   */
+  signalerMentionsAbsentes(text, file);
   /* PLUS AUCUN CONTRÔLE DE CONTRE-POIDS : ils visaient les « Bon à savoir », retirés le 14/09/2026
      à la demande de l'équipe (« supprime tous les bon à savoir du site »). Le site ne porte plus de
      contre-poids à côté de ses avantages ; restent la section Risques et le pied de page, exigés
@@ -288,9 +302,6 @@ async function checkIndex() {
   }
 
   checkHeroClaims(text, file);
-
-  // Mentions obligatoires : jamais en text-xs (12 px), ni sur le <p> ni par un ancêtre.
-  checkNoticeSize(html, file);
 
   // Documents PDF
   const pdfLinks = [...new Set([...html.matchAll(/href="([^"]+\.pdf)"/gi)].map((m) => m[1]))];
@@ -456,12 +467,11 @@ async function checkSubPages() {
     checkForbidden(p === 'presse' ? toText(stripPressQuotes(html)) : text, p);
     checkHeroClaims(text, p);
     /* LA LIGNE RISQUES N'EST PLUS EXIGÉE SUR LES SOUS-PAGES (14/09/2026, demande expresse de
-       l'équipe : « supprime les bon à savoir de tous les hero »). CE QUE CELA CHANGE, ET QUI DOIT
-       ÊTRE SU : une sous-page peut être publiée sans aucune mention de risque dans son en-tête.
-       Restent son texte (les avertissements de /documentation, exigés plus bas) et le pied de page
-       : mention de caractère commercial et visa AMF, exigés juste en dessous. */
-    requirePhrase(text, legal.commercialNotice, 'mention 1 (caractère commercial)', file);
-    requirePhrase(text, 'visa S.C.P.I. n° 26-06 en date du 4 mars 2026', 'visa AMF', file);
+       l'équipe : « supprime les bon à savoir de tous les hero »), ni les mentions de communication
+       commerciale du pied de page (22/09/2026, voir checkIndex). CE QUE CELA CHANGE, ET QUI DOIT
+       ÊTRE SU : une sous-page peut être publiée sans aucune mention de risque ni de caractère
+       commercial. Reste son texte (les avertissements de /documentation, exigés plus bas). */
+    signalerMentionsAbsentes(text, file);
     const h1 = html.match(/<h1\b[^>]*>/gi) || [];
     if (h1.length !== 1) errors.push(file + ' : ' + h1.length + ' balise(s) <h1> (attendu : 1)');
     if (!/<link[^>]+rel="canonical"/i.test(html)) errors.push(file + ' : canonical absent');
@@ -551,7 +561,21 @@ async function checkOtherPages() {
       errors.push(`page /${p} absente de dist`);
       continue;
     }
-    checkForbidden(toText(html), `${p}`);
+    const text = toText(html);
+    checkForbidden(text, `${p}`);
+    /* Les mentions de communication commerciale n'ont plus qu'une page depuis le 22/09/2026 : ici
+       elles restent EXIGÉES, et jamais en text-xs. */
+    if (p === 'mentions-legales') {
+      requirePhrase(text, legal.commercialNotice, 'mention 1 (caractère commercial)', `${p}`);
+      requirePhrase(
+        text,
+        legal.documentsNotice.replace(/\.$/, ''),
+        "mention 2 (documents d'information)",
+        `${p}`
+      );
+      requirePhrase(text, 'visa S.C.P.I. n° 26-06 en date du 4 mars 2026', 'visa AMF', `${p}`);
+      checkNoticeSize(html, `${p}`);
+    }
   }
 }
 

@@ -2,14 +2,11 @@ import type { FooterContent, FooterLink } from '@/content/types';
 import { menuPages } from '@/config/pages';
 import { externalLinks, product } from '@/content/fr/facts';
 import {
-  commercialNotice,
-  documentsNotice,
   gdpr,
   hosting,
   managementCompany,
   mediation,
   publisher,
-  visaNotice,
 } from '@/content/fr/legal';
 import { legalPages } from '@/content/fr/pages';
 import { nb } from '@/lib/texte';
@@ -71,14 +68,15 @@ export const footer = {
   /* Signature « R Start par CORUM L'Épargne » : pas de logo CORUM seul au dépôt (src/assets/logos),
      c'est donc l'éditeur du site qui signe, comme le copyright et les mentions légales dessous. */
   logos: { brandAlt: product.name, publisherAlt: publisher.name, byLabel: 'par' },
-  /** Repli des blocs d'identité (« alléger sans retirer ») ; le premier, « Communication
-      commerciale », reste déplié : il porte les mentions obligatoires et le visa. */
+  /** Repli des blocs d'identité (« alléger sans retirer »), tous sous ce libellé. */
   legalToggleLabel: 'Mentions légales détaillées',
+  /*
+   * PLUS DE BLOC « Communication commerciale » depuis le 22/09/2026 (demande de Martin) : le
+   * caractère commercial de la communication, le renvoi aux documents d'information et le visa AMF
+   * ne sont plus dans le pied de page. Ils ne subsistent que sur /mentions-legales (pages.ts) ;
+   * scripts/check-compliance.mjs, qui les exigeait sur chaque page, les signale en avertissement.
+   */
   legalBlocks: [
-    {
-      title: 'Communication commerciale',
-      paragraphs: [commercialNotice, documentsNotice, visaNotice],
-    },
     {
       title: 'Éditeur du site',
       paragraphs: [
