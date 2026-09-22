@@ -1,5 +1,5 @@
 import type { CorumContent, LegalNote } from '@/content/types';
-import { corumGroup, product, externalLinks, scpiCreated } from '@/content/fr/facts';
+import { corumGroup, externalLinks } from '@/content/fr/facts';
 import { managementCompany } from '@/content/fr/legal';
 import { notes as trustNotes } from '@/content/fr/trust';
 
@@ -26,9 +26,6 @@ import { notes as trustNotes } from '@/content/fr/trust';
  * de l'ancienne section Confiance ; aboutPage.ts en tire la liste de /a-propos. Aucune n'est
  * affichée (NoteRef et LegalNotes coupés), et notes.ts n'importe plus rien.
  */
-
-/** Espace insécable avant % € : ; ? ! et devant « Md€ » : les libellés de facts.ts utilisent une espace simple. */
-const nb = (s: string): string => s.replace(/ ([%€:;?!])/g, ' $1').replace(/ (Md€)/g, ' $1');
 
 const others = corumGroup.scpiNames.slice(0, -1);
 const otherScpi = `${others.slice(0, -1).join(', ')} et ${others[others.length - 1]}`;
@@ -94,41 +91,6 @@ if (homeNotes.length !== APPELEES_SUR_ACCUEIL.length) {
   );
 }
 
-/**
- * ZONE 2 de /a-propos (14/09/2026) : texte fourni par l'équipe, repris mot pour mot. Elle raconte d'où
- * vient CORUM et pourquoi R Start arrive maintenant. Aucun chiffre de performance, aucune comparaison
- * de résultats : que des caractéristiques de modèle.
- * EN VEILLE depuis le 16/09/2026 : le bloc (CorumHistory.astro) a été retiré de /a-propos, le texte
- * reste ici, prêt à resservir.
- *
- * DEUX PHRASES SIGNALÉES À L'ÉQUIPE le 14/09/2026 :
- *  - « Aujourd'hui, la société est leader sur le marché » est une allégation de rang SANS PÉRIMÈTRE
- *    (leader de quoi, mesuré comment, à quelle date) et SANS SOURCE. C'est la même famille que le
- *    « la seule SCPI » de /frais. check-compliance.mjs, qui lit les pages construites, ne la voit
- *    plus depuis le retrait du bloc ; il la signalera de nouveau s'il revient ;
- *  - « d'objectifs tenus », dans le libellé du premier chiffre du groupe (trust.ts), est signalé
- *    depuis le 14/09/2026, et l'est toujours : ce libellé est rendu sur l'accueil et sur /a-propos.
- */
-export const history = {
-  title: 'En 2011, CORUM a une conviction',
-  lead: 'L’immobilier professionnel doit être accessible à tous, et pas réservé aux initiés ou aux plus aisés.',
-  transformIntro: 'Très vite, CORUM transforme le modèle des SCPI de fond en comble :',
-  transformItems: [
-    'Un faible ticket d’entrée à partir de quelques dizaines d’euros,',
-    'Des explications sans jargon,',
-    'Des revenus potentiels qui tombent tous les mois,',
-    'Des SCPI qui se mettent à acheter des immeubles hors de France puis hors d’Europe,',
-    'La possibilité de réinvestir automatiquement ses revenus ou de mettre en place un programme d’investissement progressif…',
-  ],
-  transformOutro: 'Tout ça, c’est CORUM.',
-  today: 'Aujourd’hui, la société est leader sur le marché.',
-  /** La phrase de bascule : c'est elle qui amène R Start, le gras est dans le document fourni. */
-  chapter: {
-    lead: '14 ans et quatre SCPI plus tard,',
-    strong: 'R Start ouvre un nouveau chapitre.',
-  },
-} as const;
-
 export const corum = {
   /*
    * « Le groupe CORUM en quelques chiffres » depuis le 15/09/2026, ex-« L'expérience derrière
@@ -137,97 +99,6 @@ export const corum = {
    * qui titrait ce bandeau jusqu'ici en sous-titre et faisait donc doublon.
    */
   title: 'Le groupe CORUM en quelques chiffres',
-  /**
-   * Phrase d'ouverture de la zone 4, qui porte son contre-poids dans le même bloc et à la même
-   * taille. EN VEILLE : retirée de l'accueil le 14/09/2026 (titre seul), rendue nulle part.
-   */
-  intro: nb(
-    `R Start s’appuie sur ${corumGroup.experienceLabel} d’expertise du groupe CORUM dans l’investissement immobilier. Cette expérience ne préjuge pas des résultats de R Start. La SCPI a ouvert ses souscriptions le ${product.openingDate.label} et n’a pas d’historique propre.`
-  ),
-
-  /**
-   * Contre-poids des chiffres du groupe, prévu pour être rendu avec eux et à la même taille.
-   * EN VEILLE : rendu nulle part.
-   */
-  statsRisk: nb(
-    `Ces chiffres décrivent le groupe CORUM, pas R Start. Ils peuvent évoluer. La taille du groupe ne préjuge ni des résultats de R Start, ni de la liquidité de ses parts. Le capital investi n’est pas garanti.`
-  ),
-
-  /**
-   * Les trois familles de solutions du groupe (page /a-propos, demande du 13/09/2026). Le site ne parle
-   * que de R Start : ce bloc dit ce que fait le groupe, il ne propose rien d'autre et ne décrit aucun
-   * de ces produits. Chaque description reste au niveau de l'activité (ce que c'est), jamais du produit
-   * (ce qu'il rapporte) : aucun chiffre, aucune performance, aucune comparaison.
-   * SOURCE À VALIDER PAR CORUM : le texte de présentation du kit média (facts.press.mediaKit.boilerplate,
-   * lui-même « à valider », supprimé avec la salle de presse le 22/09/2026 et gardé par
-   * l'historique git) cite « SCPI, assurance vie, fonds obligataires » ; le plan d'épargne retraite
-   * vient du nommage des visuels livrés par CORUM (assets, dossier ambiance). À confirmer avant
-   * diffusion. EN VEILLE depuis le 14/09/2026 : la section #savoir-faire a été retirée d'/a-propos
-   * (CorumRange.astro), ce contenu reste prêt à resservir.
-   */
-  expertise: {
-    title: 'Les trois savoir-faire de CORUM L’Épargne',
-    intro: `CORUM L’Épargne est la marque de distribution du groupe CORUM, indépendant, créé en 2011. Le groupe conçoit et gère trois familles de solutions d’épargne. R Start relève de la première.`,
-    items: [
-      {
-        kicker: 'Immobilier',
-        icon: 'equipe',
-        title: 'Les SCPI',
-        description: `CORUM Asset Management gère ${corumGroup.scpiCount} SCPI depuis ${corumGroup.scpiSince}. Une SCPI achète et loue des immeubles d’entreprise, puis reverse à ses associés les loyers encaissés, après frais. R Start est la plus récente des cinq.`,
-      },
-      {
-        kicker: 'Obligations',
-        icon: 'argent',
-        title: 'Les fonds obligataires',
-        description:
-          'Le groupe gère aussi des fonds investis en obligations d’entreprises, c’est-à-dire en dette émise par des sociétés. Le fonctionnement, l’horizon de placement et les risques n’ont rien de commun avec ceux d’une SCPI.',
-      },
-      {
-        kicker: 'Épargne de long terme',
-        icon: 'calendrier',
-        title: 'L’assurance vie et le plan d’épargne retraite',
-        description:
-          'CORUM L’Épargne distribue un contrat d’assurance vie et un plan d’épargne retraite. Ce sont des enveloppes, avec leur propre fiscalité, leurs propres frais et leurs propres conditions de sortie.',
-      },
-    ],
-    risk: 'Chacune de ces solutions a ses propres risques et ses propres frais, décrits dans ses documents réglementaires. L’étendue de la gamme ne réduit aucun des risques de R Start : le capital investi y reste exposé à une perte.',
-  },
-
-  /*
-   * ZONE 4 de /a-propos, texte fourni par l'équipe le 14/09/2026 et repris MOT POUR MOT.
-   *
-   * À FAIRE VALIDER PAR LA CONFORMITÉ, signalé à l'équipe le jour même, et c'est le point le plus lourd
-   * de la page : « les SCPI du groupe CORUM ont toujours atteint ou dépassé leurs objectifs de
-   * performance » est une ALLÉGATION DE PERFORMANCE PASSÉE, portant sur quatre SCPI tierces, sans
-   * source, sans période, sans définition de l'objectif, et sans la mention que les performances
-   * passées ne préjugent pas des performances futures.
-   * Elle remplace un texte qui disait exactement l'inverse : « R Start n'a pas encore d'historique
-   * propre ; les résultats des autres SCPI CORUM ne préjugent pas des siens ». Ce texte-là restait
-   * dans l'en-tête de la note 3 de la page ; aucune note n'est plus affichée (NoteRef et LegalNotes
-   * coupés). EN VEILLE depuis le 16/09/2026 : la gamme en chiffres de corumRange.ts a pris la place
-   * de ce bloc, qui n'est plus rendu. check-compliance.mjs, qui lit les pages construites, ne voit
-   * donc plus cette phrase ; il la signalera de nouveau si le bloc revient.
-   */
-  range: {
-    title: `Des SCPI gérées depuis ${corumGroup.scpiSince}`,
-    description: `Depuis ${corumGroup.scpiSince}, les SCPI du groupe CORUM ont toujours atteint ou dépassé leurs objectifs de performance.`,
-    scpiNames: [...corumGroup.scpiNames],
-    /* Dates de création sous chaque tuile (16/09/2026). Voir la réserve de source dans facts.ts. */
-    scpiCreated,
-    scpiCreatedLabel: 'Créée en {year}',
-    currentBadge: 'Nouveau',
-  },
-
-  /**
-   * Titre du bloc facultatif de la section : `alignmentBody` en est le corps (brochure p. 4).
-   * EN VEILLE : le bloc a quitté l'accueil le 11/09/2026 et n'est rendu nulle part.
-   */
-  alignmentTitle: 'La rémunération de CORUM sur les ventes',
-  /** Avantage et contrepartie dans le même paragraphe, à la même taille (exigence AMF). */
-  alignmentBody: nb(
-    'Quand R Start revend un immeuble, CORUM ne touche une commission (dite « d’arbitrage ») que si l’ensemble des ventes est gagnant. Cette commission a des effets de seuil et peut capter une partie significative de la plus-value. CORUM peut aussi être rémunérée sur une plus-value alors même que la valeur de vos parts diminue.'
-  ),
-
   /** Bouton vers /a-propos (chiffres du groupe, gamme des autres SCPI et avis Trustpilot). */
   /* « Découvrir le groupe CORUM » depuis le 15/09/2026, ex-« En savoir plus sur CORUM » : même
      forme que « Découvrir notre approche », l'autre appel secondaire de l'accueil. */
@@ -243,5 +114,4 @@ export const corum = {
     href: externalLinks.corum,
     newTabHint: 'nouvelle fenêtre',
   },
-  disclaimer: corumGroup.disposalsDisclaimer,
 } satisfies CorumContent;

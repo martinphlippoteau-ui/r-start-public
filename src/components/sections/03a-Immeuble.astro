@@ -2,8 +2,8 @@
 /**
  * Section 3a, Immeuble (id « immeuble »). Respiration visuelle de la trame du 10/09/2026, entre
  * L'expérience derrière R Start (07, bande white) et Frais (03) : une photo d'immeuble pleine largeur,
- * sans titre, sans texte marketing ni avantage (donc aucun contre-poids risque à rendre), avec pour seule
- * légende la mention obligatoire (R Start n'a pas encore de patrimoine).
+ * sans titre, sans texte marketing ni avantage (donc aucun contre-poids risque à rendre), sans légende
+ * depuis le 15/09/2026 (voir media.ts).
  * Hors contrat de sections : SectionKey (src/content/types.ts) ne prévoit pas cette section, elle porte donc
  * son id ici et n'apparaît ni dans src/config/sections.ts ni dans le registre des notes.
  * LE VISUEL VIENT MAINTENANT DE media.hero.main (15/09/2026). Il était nommé en dur ici, si bien que la
@@ -14,12 +14,11 @@
  * cadre (object-cover). Motion (src/scripts/motion/*, attributs seulement) : le <picture> se dévoile par
  * clip-path (data-animate="clip", réservé aux médias) et flotte en parallaxe douce (modèle des photos de
  * 04-Strategy : enveloppe -top-[12%] h-[124%], data-parallax 0.08, déclencheur = cadre parent) sans jamais
- * découvrir le bord. La légende n'est pas animée. Sans JS ou en reduced-motion : image statique complète.
+ * découvrir le bord. Sans JS ou en reduced-motion : image statique complète.
  * Chargement lazy (loin du LCP), formats avif/webp, largeurs jusqu'à 2400 px pour les écrans denses.
  */
 import { Picture } from 'astro:assets';
-import Container from '@/components/ui/Container.astro';
-import { media, AFFICHER_LEGENDES } from '@/content/fr/media';
+import { media } from '@/content/fr/media';
 import { resolveImage } from '@/lib/images';
 
 const id = 'immeuble';
@@ -27,7 +26,6 @@ const id = 'immeuble';
 const label = 'Illustration';
 const image = await resolveImage(media.hero.main.src);
 const alt = media.hero.main.alt;
-const credit = media.hero.main.credit;
 /** Parallaxe douce d'un seul sens ; l'enveloppe surdimensionnée de ±12 % absorbe la course. */
 const PARALLAX = 0.08;
 const sizes = '100vw';
@@ -55,12 +53,5 @@ const sizes = '100vw';
         />
       </div>
     </div>
-    {
-      AFFICHER_LEGENDES && credit && (
-        <figcaption class="text-caption py-4 text-slate-700">
-          <Container size="wide">{credit}</Container>
-        </figcaption>
-      )
-    }
   </figure>
 </section>

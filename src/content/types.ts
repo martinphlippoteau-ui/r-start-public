@@ -176,8 +176,6 @@ export interface StrategyChapter {
    * moteurs est descendue dans la zone « Quoi », où elle ouvre le propos au lieu de fermer le précédent.
    */
   outro?: string;
-  /** Mention placée par la Conformité sous le chapitre (ui/NoteConformite.astro). */
-  disclaimer?: string;
 }
 
 /**
@@ -265,41 +263,6 @@ export interface StatItem {
 
 export interface CorumContent {
   title: string;
-  intro: string;
-  /** Contre-poids risque des chiffres du groupe. Aucun composant ne le rend, il reste EN VEILLE. */
-  statsRisk?: string;
-  range: {
-    title: string;
-    description: string;
-    scpiNames: string[];
-    /**
-     * Année de création par nom de SCPI, rendue sous chaque tuile. Une SCPI absente de l'objet n'a
-     * pas de ligne de date : la tuile se referme sur son seul nom, sans trou.
-     */
-    scpiCreated?: Record<string, string>;
-    /** Gabarit de la ligne de date, `{year}` remplacé par l'année (« Créée en 2012 »). */
-    scpiCreatedLabel?: string;
-    /** Pastille sur la tuile de R Start dans la gamme (« Nouveau ») ; absente : rien. */
-    currentBadge?: string;
-  };
-  /**
-   * Les familles de solutions d'épargne du groupe. Présent mais NON RENDU : la section
-   * #savoir-faire de /a-propos a été retirée le 14/09/2026, le contenu reste EN VEILLE dans corum.ts.
-   * `risk` est le contre-poids du bloc, à rendre avec lui et à la même taille, jamais animé.
-   */
-  expertise?: {
-    title: string;
-    intro: string;
-    items: { kicker: string; icon: string; title: string; description: string }[];
-    risk: string;
-  };
-  /**
-   * Titre du bloc sur la rémunération de CORUM lors des cessions. Présent mais NON RENDU : le bloc
-   * a quitté 07-Trust.astro le 11/09/2026, le texte reste EN VEILLE dans corum.ts.
-   */
-  alignmentTitle?: string;
-  /** Corps du même bloc, en veille avec lui : aucun composant ne le lit. */
-  alignmentBody?: string;
   /** Libellé du bouton vers la page À propos. */
   aboutLink?: string;
   /**
@@ -307,7 +270,6 @@ export interface CorumContent {
    * `newTabHint` est ce que les lecteurs d'écran annoncent, il n'est pas affiché.
    */
   siteLink?: { label: string; href: string; newTabHint: string };
-  disclaimer: string;
 }
 
 export interface RiskItem {

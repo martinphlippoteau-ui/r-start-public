@@ -51,24 +51,9 @@ export const riskPrefix = 'Risque : ';
  * Libellé VISIBLE qui ouvrait chaque contre-poids (décision du 11/09/2026) : il remplace le
  * pictogramme d'alerte. Le préfixe « Risque : » était lu par les lecteurs d'écran (riskPrefix) pour
  * que l'avertissement garde sa nature. Lecture stricte AMF à défendre : un avertissement présenté
- * comme un conseil. EN VEILLE depuis le 14/09/2026 comme RiskNote ; c'est aussi le libellé par
- * défaut de ui/NoteConformite.astro, qui n'a aujourd'hui aucune mention à rendre.
+ * comme un conseil. EN VEILLE depuis le 14/09/2026 comme RiskNote.
  */
 export const riskLabel = 'Bon à savoir :';
-
-/*
- * MENTION FOURNIE PAR LA CONFORMITÉ le 14/09/2026, reproduite MOT POUR MOT, ponctuation comprise.
- *
- * C'est la première des mentions que la Conformité a replacées elle-même après le retrait de tous
- * les « Bon à savoir » du site (voir src/components/ui/RiskNote.astro). Elle ne passait donc pas
- * par RiskNote, qui ne rend plus rien, mais par ui/NoteConformite.astro, à l'endroit exact que la
- * Conformité avait indiqué : sous les deux moteurs de /strategie. EN VEILLE : retirée de l'écran le
- * 16/09/2026 à la demande de l'équipe (strategy.ts dit comment la rétablir), elle n'est plus
- * affichée nulle part. Ne pas la reformuler, ne pas l'abréger ; la reposer au même endroit si elle
- * revient.
- */
-export const corumProductsDisclaimer =
-  'Les produits commercialisés par CORUM L’Épargne sont des investissements long terme qui n’offrent aucune garantie de rendement ou de performance et présentent un risque de perte en capital et de liquidité. Les revenus ne sont pas garantis et dépendent de l’évolution du marché immobilier et financier et du cours des devises.';
 
 /** Encadré brochure p.4 « Une innovation, pas une révolution », adapté au grand public (« Vos clients » → « Vous »). */
 export const innovationNotRevolution = {

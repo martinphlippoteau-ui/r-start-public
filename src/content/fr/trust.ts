@@ -101,10 +101,6 @@ export const notes: LegalNote[] = [
 ];
 
 export const trust = {
-  intro: nb(
-    'R Start s’inscrit dans un cadre réglementé. Visa, agrément, dépositaire, avis publics, chiffres du groupe : chaque élément a sa source et sa date. Aucun d’eux ne réduit les risques de l’investissement.'
-  ),
-
   amf: {
     title: 'Le cadre réglementaire',
     items: [
@@ -169,27 +165,13 @@ export const trust = {
     linkLabel: 'Lire les avis sur Trustpilot',
     /** Nom accessible des deux TrustBox (le contenu arrive dans une iframe servie par Trustpilot). */
     widgetLabel: `Avis Trustpilot sur ${company}`,
-    /**
-     * Portée des avis (ils ne parlent pas de R Start), qui était la légende du bandeau du hero.
-     * EN VEILLE : légende retirée le 15/09/2026 (« Enlever disclaimer »), rendue nulle part.
-     */
-    heroCaption: `Avis sur ${company}, distributeur de R Start.`,
     url: tp.url,
     externalLinkHint: 'nouvelle fenêtre',
-    /**
-     * Périmètre des avis puis contre-poids risque, prévus pour être affichés ensemble et à la même
-     * taille que la note. EN VEILLE : rendus nulle part, ni sur l'accueil ni avec le carrousel
-     * d'avis de /a-propos.
-     */
-    scope: nb(
-      `${tp.scope} Ils ne constituent pas une recommandation. Ils ne réduisent pas les risques de R Start : perte en capital, revenus non garantis, liquidité limitée.`
-    ),
   },
 
   stats: {
     /** Libellé du document de l'équipe (14/09/2026), ex-« Le groupe CORUM en chiffres ». */
     title: 'Le groupe CORUM en quelques chiffres',
     items: experienceStats,
-    risk: `Ces chiffres sont ceux du groupe CORUM, pas ceux de R Start. R Start a ouvert ses souscriptions le ${product.openingDate.label} et n’a pas d’historique propre. La taille du groupe ne préjuge ni de ses résultats, ni de la liquidité de ses parts.`,
   },
 } satisfies TrustContent;

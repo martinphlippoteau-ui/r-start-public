@@ -81,14 +81,12 @@ const { stats } = trust;
          * quitté l'accueil le 14/09 et reviennent ici. Ils sont rendus par le même composant `Stat`
          * et lus dans le même `trust.stats` que sur /a-propos : une seule source, deux rendus.
          *
-         * CE QU'IL FAUT SAVOIR CÔTÉ CONFORMITÉ : `trust.stats.risk` existe (« Ces chiffres sont ceux du
-         * groupe CORUM, pas ceux de R Start… ») et n'est rendu NI ICI NI SUR /a-propos, où il avait été
-         * retiré le 11/09 sur décision de l'équipe. Aucune des deux pages n'a d'équivalent : sur
-         * /a-propos, l'introduction de l'en-tête, réécrite le 14/09/2026, ne dit plus que cette
-         * expérience ne préjuge pas des résultats de R Start. Il ne reste, sur l'une comme sur
-         * l'autre, que la section Risques plus bas. Le bandeau n'est donc pas marqué
-         * [data-advantage], sans quoi le contrôle d'équilibre AMF réclamerait un contre-poids frère
-         * qui n'existe pas. Une ligne à ajouter pour le rendre, le texte est prêt.
+         * CE QU'IL FAUT SAVOIR CÔTÉ CONFORMITÉ : le bandeau s'affiche SANS CONTRE-POIDS, ici comme sur
+         * /a-propos. Le texte qui le nuançait (« Ces chiffres sont ceux du groupe CORUM, pas ceux de
+         * R Start… ») a quitté l'écran le 11/09 et le code le 22/09/2026 (archivé hors du dépôt,
+         * .claude/audits). Il ne reste, sur l'une comme sur l'autre page, que la section Risques plus
+         * bas. Le bandeau n'est donc pas marqué [data-advantage], sans quoi le contrôle d'équilibre AMF
+         * réclamerait un contre-poids frère qui n'existe pas.
          */
       }
       <div class="mt-section-sm">

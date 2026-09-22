@@ -13,14 +13,10 @@ import type { StrategyContent } from '@/content/types';
  * (la page n'a donc plus de bloc « Notes » : il n'aurait rien à déplier). Les chiffres correspondants
  * restent dans facts.ts, d'où les autres pages les tirent.
  *
- * LA MENTION DE RISQUE placée sous les deux moteurs le 14/09/2026 (`disclaimer`, texte de legal.ts
- * reproduit mot pour mot) N'EST PLUS À L'ÉCRAN depuis le 16/09/2026 : le commentaire posé à sa place,
- * plus bas, dit pourquoi et comment la rétablir. L'en-tête de la page n'en porte pas non plus, et le
- * corps n'est pas contrebalancé avantage par avantage : c'est la suite du retrait de tous
- * les « Bon à savoir » du site, la Conformité replaçant les siennes une par une. Aucun [data-advantage]
- * n'est posé ici, faute de quoi le garde-fou qui exige un contre-poids dans le même bloc réclamerait un
- * texte que la page ne prévoit pas. Rétablie, la mention passerait par ui/NoteConformite.astro, pas
- * par RiskNote.
+ * PAS DE MENTION DE RISQUE DANS CE CORPS : celle qui suivait les deux moteurs (mention de la
+ * Conformité du 14/09/2026) a quitté l'écran le 16/09/2026 et le code le 22/09/2026 ; son texte est
+ * archivé hors du dépôt (.claude/audits/archive-contenus-2026-09-22.json). Les risques sont portés par
+ * le bloc Risques que la page rend ensuite. Aucun [data-advantage] n'est posé ici.
  */
 
 export const strategy: StrategyContent = {
@@ -67,15 +63,6 @@ export const strategy: StrategyContent = {
     /* La phrase de méthode (« Les opportunités ne tombent pas du ciel… ») est descendue sous « Tout
        commence par le choix des immeubles » le 16/09/2026 : elle y annonce ce qui suit au lieu de
        fermer les deux moteurs. */
-    /*
-     * MENTION RETIRÉE DE L'ÉCRAN le 16/09/2026, demande de l'équipe. Elle reproduisait
-     * `legal.corumProductsDisclaimer` : « Les produits commercialisés par CORUM L'Épargne sont des
-     * investissements long terme qui n'offrent aucune garantie de rendement ou de performance et
-     * présentent un risque de perte en capital et de liquidité… »
-     * Le texte n'est pas supprimé, il vit toujours dans legal.ts. Ce qu'il disait est par ailleurs
-     * porté, sur cette même page, par le bloc Risques qui la ferme.
-     * Pour la rétablir : `disclaimer: corumProductsDisclaimer`.
-     */
   },
 
   /*

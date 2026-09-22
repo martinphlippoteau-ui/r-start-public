@@ -8,7 +8,9 @@
  * dossier Assets qui les précédaient ont été retirées. Ce changement défait la règle qui ouvrait ce
  * fichier, « photos réelles uniquement, aucun rendu 3D » : elle visait à ne pas faire passer une
  * image de synthèse pour un actif existant. Un dessin franchement dessiné ne pose pas ce risque, il
- * l'écarte plutôt. La mention sous l'image, elle, reste (voir `illustration` plus bas).
+ * l'écarte plutôt. La mention qui les accompagnait (« Illustration. R Start ne détient aucun des
+ * immeubles représentés. ») n'est plus affichée depuis le 15/09/2026 et a quitté le code le 22/09/2026
+ * (archivée hors du dépôt, .claude/audits) : les alt disent « Illustration », rien d'autre ne le dit.
  *
  * Ce qui tient toujours, et qui a servi à trier les quinze reçues :
  *  - aucun texte incrusté ni logo de tiers lisible ;
@@ -31,43 +33,16 @@ export interface MediaImage {
   src: string;
   /** Texte alternatif en français, ≤ 125 caractères. Vide pour un visuel purement décoratif. */
   alt: string;
-  /**
-   * Crédit ou mention affichée sous l'image, dans le même corps que les légendes (à rendre par
-   * l'intégrateur). Obligatoire sur les photos d'immeubles : R Start n'a pas encore de patrimoine.
-   */
-  credit?: string;
 }
-
-/**
- * INTERRUPTEUR DES LÉGENDES, posé le 15/09/2026 : « supprime toutes les légendes sous les images ».
- * Même geste que pour les notes légales (src/components/LegalNotes.astro) et les « Bon à savoir » :
- * RIEN N'EST EFFACÉ, seul l'affichage est coupé. Les textes restent dans ce fichier, le service
- * conformité les replacera où il l'entend.
- * Les trois rendus concernés : 03a-Immeuble, 01b-Difference et CorumRange.
- * Pour les rétablir : passer cette constante à `true`, et rien d'autre.
- */
-export const AFFICHER_LEGENDES = false;
-
-/**
- * Mention sous chaque visuel d'immeuble : aucun de ces bâtiments n'appartient à R Start.
- * LIBELLÉ CHANGÉ LE 15/09/2026, avec le lot d'illustrations. « Photo d'illustration » était devenu
- * faux : ce sont des dessins. La mention reste, car c'est elle qui empêche de lire ces visuels comme
- * un patrimoine détenu ; c'est sa raison d'être, pas la nature du fichier. À faire valider par la
- * conformité avant la mise en ligne publique.
- */
-const illustration = 'Illustration. R Start ne détient aucun des immeubles représentés.';
 
 export interface MediaContent {
   /** Application MyCORUM : photo d'un téléphone affichant l'application (bloc « Après la souscription »). */
   app: MediaImage;
-  /**
-   * Visuel de la bande pleine largeur (03a-Immeuble). `alt` a été retiré le 15/09/2026 : la solution
-   * de repli n'était plus lue depuis que le hero est passé aux aurores en dégradé.
-   */
+  /** Visuel de la bande pleine largeur (03a-Immeuble). */
   hero: { main: MediaImage };
   /** Bande pleine largeur de la page /a-propos, entre les deux chapitres. */
   corum: MediaImage;
-  documents?: MediaImage;
+  documents: MediaImage;
   /**
    * Pas d'image Open Graph photographique : diffusée seule sur les réseaux sociaux, une photo d'immeuble
    * ne peut pas porter la mention « Immeuble non détenu par R Start ». L'image OG est le visuel logo +
@@ -91,7 +66,6 @@ export const media = {
     main: {
       src: 'immeubles/rue-commerces-vitres.png',
       alt: 'Illustration : rue bordée d’immeubles à commerces vitrés, perspective vers un ciel clair',
-      credit: illustration,
     },
   },
   /*
@@ -113,13 +87,11 @@ export const media = {
   corum: {
     src: 'immeubles/rue-bureaux-eclaires.png',
     alt: 'Illustration : rue vue de haut, immeuble de bureaux vitré aux plateaux éclairés sur la gauche',
-    credit: illustration,
   },
   // 2304 × 1856, rapport 1,25, contre un cadre en `aspect-[4/3]` (1,33) : le recadrage se voit à
   // peine. Vue prise de haut, seule du lot à montrer une ville entière plutôt qu'une rue.
   documents: {
     src: 'immeubles/toits-depuis-balcon.png',
     alt: 'Illustration : vue depuis un balcon sur les toits d’une ville et une avenue en contrebas au lever du jour',
-    credit: illustration,
   },
 } as const satisfies MediaContent;

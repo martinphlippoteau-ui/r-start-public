@@ -21,11 +21,9 @@
  * ink enchaînerait deux pavés sombres sans coupure, et un test l'interdit sur toutes les sous-pages.
  * Le sombre est porté par les trois tuiles, puis par le bloc des risques que la page rend ensuite.
  *
- * AUCUNE MENTION DE RISQUE DANS CES DEUX SECTIONS aujourd'hui : celle qui suivait les deux moteurs
- * (`strategy.engines.disclaimer`, rendue par ui/NoteConformite.astro) a été retirée de l'écran le
- * 16/09/2026 à la demande de l'équipe, strategy.ts dit comment la rétablir. Le gabarit la rend dès que
- * le contenu la porte, et la canalisation s'efface alors (`pontVisible`). Les risques sont portés par
- * le bloc Risques que la page rend ensuite. Aucun [data-advantage] ni RiskNote ici.
+ * AUCUNE MENTION DE RISQUE DANS CES DEUX SECTIONS : les risques sont portés par le bloc Risques que la
+ * page rend ensuite. La mention placée sous les deux moteurs le 14/09/2026 a quitté l'écran le
+ * 16/09/2026, puis le code le 22/09/2026 avec le composant qui la rendait (NoteConformite).
  *
  * Motion (src/scripts/motion.ts, tout par attributs) : aucun rideau ici, la section suit directement
  * l'en-tête ; H2 du premier chapitre mot à mot (data-reveal-text), celui des volets en fade-up court ;
@@ -36,7 +34,6 @@
  * Aucune prop : la section n'appelle plus de note, elle n'a plus besoin du registre de la page.
  */
 import Container from '@/components/ui/Container.astro';
-import NoteConformite from '@/components/ui/NoteConformite.astro';
 import MarqueR from '@/components/ui/MarqueR.astro';
 import Picto from '@/components/ui/Picto.astro';
 import Section from '@/components/ui/Section.astro';
@@ -115,13 +112,6 @@ const departs = [
 /** Les trois amorces, du haut des tuiles au bas du titre. Même rang que leur montée : un seul fil. */
 const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang: i }));
 
-/*
- * GARDE-FOU. strategy.ts documente noir sur blanc comment redonner une chute ou une mention de
- * Conformité aux deux moteurs. Le jour où quelqu'un le fait, la canalisation se tracerait EN TRAVERS
- * de ce texte, puisqu'elle compte les deux marges de section pour atteindre le bas des cartes. Elle
- * disparaît alors, au lieu de mentir.
- */
-const pontVisible = !strategy.engines.outro && !strategy.engines.disclaimer;
 ---
 
 {/* 1. Les deux moteurs de performance */}
@@ -241,36 +231,6 @@ const pontVisible = !strategy.engines.outro && !strategy.engines.disclaimer;
         })
       }
     </ul>
-
-    {
-      /* Chute des deux moteurs (`engines.outro`), quand le contenu en porte une : détachée par un
-        filet plein largeur, dans la taille des introductions. */
-    }
-    {
-      /* La phrase de méthode fermait ce chapitre ; elle ouvre maintenant « Tout commence par le
-        choix des immeubles » (16/09/2026). Le rendu reste, conditionnel : si la Conformité ou
-        l'équipe redonnent une chute aux deux moteurs, elle s'affichera sans rien changer ici. */
-    }
-    {strategy.engines.outro && (
-      <p
-      class="text-lead mt-12 max-w-4xl border-t border-navy/15 pt-8 text-pretty text-slate-700 lg:mt-16"
-      data-animate="fade-up"
-      data-animate-y={String(QUIET_TITLE_Y)}
-    >
-      {strategy.engines.outro}
-    </p>
-    )}
-
-    {
-      /* Mention de la Conformité, jamais animée : un avertissement ne dépend pas d'un défilement pour
-        apparaître. Absente du contenu depuis le 16/09/2026, rien n'est rendu ; rétablie, elle
-        refermerait la zone, sous la chute s'il y en a une. */
-    }
-    {
-      strategy.engines.disclaimer && (
-        <NoteConformite text={strategy.engines.disclaimer} class="mt-8 max-w-4xl" />
-      )
-    }
   </Container>
 </Section>
 
@@ -314,31 +274,29 @@ const pontVisible = !strategy.engines.outro && !strategy.engines.disclaimer;
       /* La confluence occupe la bande vide qui sépare les deux sections, sans rien y ajouter : la boîte
         fait zéro pixel de haut et le tracé est en absolu. Hauteur de la section inchangée. */
     }
-    {pontVisible && (
-      <div class="pont pont--confluence" aria-hidden="true">
-        <svg viewBox="0 0 1000 300" preserveAspectRatio="none" fill="none" data-in-view="pont-en-vue">
-          {montees.map((m) => <path class="pont-fil" d={m.d} />)}
-          {departs.map((d) => <path class="pont-fil" d={d} />)}
-          {montees.map((m) => (
-            <path class="pont-flux pont-flux--montee" pathLength="100" d={m.d} style={`--rang:${m.rang}`} />
-          ))}
-          {departs.map((d) => <path class="pont-flux pont-flux--depart" pathLength="100" d={d} />)}
-        </svg>
-        {
-          /* Nœud et pointes en CSS, hors du viewBox : celui-ci est étiré horizontalement d'environ un
-            quart, un cercle y deviendrait un ovale et un chevron changerait de forme avec la largeur
-            de la fenêtre. Ce sont aussi eux qui portent le sens quand l'animation est coupée. */
-        }
-        <span class="pont-noeud" />
-        {
-          /* DIVISÉ PAR DIX : les abscisses sont en POUR MILLE, l'unité du viewBox de 1000 de large, et
-            `left` attend des pour cent. Sans la conversion, les chevrons partaient à deux mille pixels
-            du bord. */
-        }
-        <span class="pont-pointe" style={`--x:${MOTEUR_G / 10}%`} />
-        <span class="pont-pointe" style={`--x:${MOTEUR_D / 10}%`} />
-      </div>
-    )}
+    <div class="pont pont--confluence" aria-hidden="true">
+      <svg viewBox="0 0 1000 300" preserveAspectRatio="none" fill="none" data-in-view="pont-en-vue">
+        {montees.map((m) => <path class="pont-fil" d={m.d} />)}
+        {departs.map((d) => <path class="pont-fil" d={d} />)}
+        {montees.map((m) => (
+          <path class="pont-flux pont-flux--montee" pathLength="100" d={m.d} style={`--rang:${m.rang}`} />
+        ))}
+        {departs.map((d) => <path class="pont-flux pont-flux--depart" pathLength="100" d={d} />)}
+      </svg>
+      {
+        /* Nœud et pointes en CSS, hors du viewBox : celui-ci est étiré horizontalement d'environ un
+          quart, un cercle y deviendrait un ovale et un chevron changerait de forme avec la largeur
+          de la fenêtre. Ce sont aussi eux qui portent le sens quand l'animation est coupée. */
+      }
+      <span class="pont-noeud" />
+      {
+        /* DIVISÉ PAR DIX : les abscisses sont en POUR MILLE, l'unité du viewBox de 1000 de large, et
+          `left` attend des pour cent. Sans la conversion, les chevrons partaient à deux mille pixels
+          du bord. */
+      }
+      <span class="pont-pointe" style={`--x:${MOTEUR_G / 10}%`} />
+      <span class="pont-pointe" style={`--x:${MOTEUR_D / 10}%`} />
+    </div>
 
     {
       /*
@@ -373,16 +331,14 @@ const pontVisible = !strategy.engines.outro && !strategy.engines.disclaimer;
         pas être posées DANS le <ul> : la cascade `data-animate="stagger"` révèle tous ses enfants, elles
         compteraient pour une quatrième tuile, et un <ul> n'admet que des <li>. */
     }
-    {pontVisible && (
-      <div class="pont pont--tiges" aria-hidden="true">
-        <svg viewBox="0 0 1000 60" preserveAspectRatio="none" fill="none" data-in-view="pont-en-vue">
-          {tiges.map((t) => <path class="pont-fil" d={t.d} />)}
-          {tiges.map((t) => (
-            <path class="pont-flux pont-flux--tige" pathLength="100" d={t.d} style={`--rang:${t.rang}`} />
-          ))}
-        </svg>
-      </div>
-    )}
+    <div class="pont pont--tiges" aria-hidden="true">
+      <svg viewBox="0 0 1000 60" preserveAspectRatio="none" fill="none" data-in-view="pont-en-vue">
+        {tiges.map((t) => <path class="pont-fil" d={t.d} />)}
+        {tiges.map((t) => (
+          <path class="pont-flux pont-flux--tige" pathLength="100" d={t.d} style={`--rang:${t.rang}`} />
+        ))}
+      </svg>
+    </div>
 
     {
       /*

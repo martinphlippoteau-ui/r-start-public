@@ -476,8 +476,9 @@ export const trust = {
      *
      * CE QUE CE RÉGLAGE CHANGE, ET QUI DOIT ÊTRE SU. Le site n'affiche plus que des avis favorables :
      * c'est une SÉLECTION, faite par le paramétrage du widget, et non plus un flux non trié. Les textes
-     * qui l'accompagnaient ont donc été réécrits le même jour (trust.ts, `scope` et la note
-     * `confiance-trustpilot`) : ils affirmaient « toutes les notes, de une à cinq étoiles, avis négatifs
+     * qui l'accompagnaient ont donc été réécrits le même jour (portée des avis et note
+     * `confiance-trustpilot`, tous deux retirés de l'écran, la portée l'étant aussi du code le
+     * 22/09/2026) : ils affirmaient « toutes les notes, de une à cinq étoiles, avis négatifs
      * compris », ce qui serait devenu faux. L'article L111-7-2 du code de la consommation impose
      * d'informer sur les modalités de publication et de traitement des avis ; dire que le carrousel est
      * filtré est le minimum, et l'opportunité du filtre lui-même est une décision de l'équipe, à faire
@@ -503,8 +504,6 @@ export const trust = {
         },
       },
     },
-    scope:
-      'Avis publiés sur Trustpilot à propos de CORUM L’Épargne, distributeur de R Start. Ils ne portent ni sur R Start ni sur ses résultats futurs.',
   },
 } as const;
 

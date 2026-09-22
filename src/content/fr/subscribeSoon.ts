@@ -3,8 +3,6 @@
  * n'est pas configurée (PUBLIC_SUBSCRIBE_URL encore sur sa valeur de repli). Message informatif :
  * aucune allégation commerciale, donc aucun contre-poids risque à afficher. La seconde phrase
  * renvoie aux documents réglementaires, le réflexe attendu avant toute décision d'investissement.
- * Le bouton « Voir la documentation » n'est plus rendu depuis le 16/09/2026 : `documentsLabel` et
- * `documentsHref` sont EN VEILLE (voir components/SubscribeSoon.astro).
  */
 export const subscribeSoon = {
   eyebrow: 'Bientôt disponible',
@@ -14,7 +12,5 @@ export const subscribeSoon = {
     'La souscription en ligne à R Start n’est pas encore ouverte depuis cette page.',
     'D’ici là, prenez connaissance des documents réglementaires : ils décrivent le fonctionnement, les frais et les risques de la SCPI.',
   ],
-  documentsLabel: 'Voir la documentation',
-  documentsHref: '/documentation',
   closeLabel: 'Fermer',
 };

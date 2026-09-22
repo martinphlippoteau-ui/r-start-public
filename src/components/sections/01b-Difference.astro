@@ -30,7 +30,7 @@ import NoteRef from '@/components/ui/NoteRef.astro';
 import Section from '@/components/ui/Section.astro';
 import { sections } from '@/config/sections';
 import { difference } from '@/content/fr/difference';
-import { media, AFFICHER_LEGENDES } from '@/content/fr/media';
+import { media } from '@/content/fr/media';
 import { resolveImage } from '@/lib/images';
 
 const id = sections.difference.id;
@@ -40,9 +40,7 @@ const titleId = id + '-title';
  * `strategy`, déjà employé par la section Stratégie, ce qui faisait doublon sur le site. Celle-ci n'est
  * utilisée nulle part ailleurs. C'est un dessin depuis le passage aux illustrations, le 15/09/2026.
  * Purement décorative pour la conformité, elle n'énonce aucun avantage, elle n'entre donc dans aucun
- * couple avantage / risque. Son crédit dit que R Start n'a pas de patrimoine et que l'image ne
- * représente aucun immeuble détenu ; il n'est plus affiché depuis le 15/09/2026 (AFFICHER_LEGENDES,
- * media.ts), EN VEILLE comme toutes les légendes.
+ * couple avantage / risque. Sans légende depuis le 15/09/2026 (voir media.ts).
  */
 const photo = await resolveImage(media.documents.src);
 
@@ -219,12 +217,5 @@ const situations = (difference.situations ?? []).map((s) => {
       pictureAttributes={{ class: 'block h-full w-full' }}
       class="aspect-[4/3] h-auto w-full object-cover lg:aspect-auto lg:h-full"
     />
-    {
-      AFFICHER_LEGENDES && media.documents.credit && (
-        <figcaption class="text-caption px-5 pt-3 text-slate-700 sm:px-8 lg:absolute lg:right-5 lg:bottom-4 lg:rounded-full lg:bg-ink/70 lg:px-3 lg:py-1 lg:pt-1 lg:text-white/85">
-          {media.documents.credit}
-        </figcaption>
-      )
-    }
   </figure>
 </Section>

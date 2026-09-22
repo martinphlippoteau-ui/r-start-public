@@ -49,7 +49,6 @@ export interface PageHero {
 
 /** Bloc « Confiance » : cadre réglementaire, avis Trustpilot, chiffres clés CORUM. */
 export interface TrustContent {
-  intro: string;
   amf: {
     title: string;
     items: {
@@ -77,19 +76,14 @@ export interface TrustContent {
     title: string;
     linkLabel: string;
     url: string;
-    /** Précision : avis sur le distributeur CORUM L'Épargne, pas sur R Start. */
-    scope: string;
     /** Mention lue par les lecteurs d'écran sur le lien externe (ex. « nouvelle fenêtre »). */
     externalLinkHint?: string;
     /** Nom accessible des TrustBox officiels (contenu rendu par Trustpilot dans une iframe). */
     widgetLabel?: string;
-    /** Portée des avis, sous le bandeau du hero. Retirée le 15/09/2026, EN VEILLE (01-Hero). */
-    heroCaption?: string;
   };
   stats: {
     title: string;
     items: StatItem[];
-    risk: string;
   };
 }
 
