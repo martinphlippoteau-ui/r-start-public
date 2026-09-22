@@ -5,7 +5,7 @@
  *                      le cadre réglementaire (logo R Start, une phrase de trust.ts) et l'appel vers
  *                      corum.fr ;
  *  2. bande pleine largeur, hors section (décorative, sans titre : elle n'a donc pas d'ancre) ;
- *  3. #gamme   (white) « Nos autres SCPI en quelques chiffres » : une grille des quatre autres
+ *  3. #gamme   (paper) « Nos autres SCPI en quelques chiffres » : une grille des quatre autres
  *              SCPI du groupe et de leurs chiffres (corumRange.ts, ceux des pages produit de
  *              corum.fr), sans R Start ; chaque chiffre renvoie à sa note numérotée sous les
  *              cartes et un bouton « i » la déplie sur place (MesureGamme.astro, dépliage par
@@ -150,7 +150,7 @@ const QUIET_TITLE_Y = 12;
   </div>
 </figure>
 
-<Section id="gamme" tone="white" labelledBy="gamme-title">
+<Section id="gamme" tone="paper" labelledBy="gamme-title">
   <Container size="wide">
     {
       /*
@@ -176,52 +176,46 @@ const QUIET_TITLE_Y = 12;
 
     {
       /*
+       * CARTES CLAIRES (22/09/2026, demande de Martin : « pas en mode sombre », « au niveau ») :
+       * section paper et cartes blanches à ombre portée, LA RECETTE DES REPÈRES DE L'ACCUEIL
+       * (02-Highlights.astro), pour que la page ressemble au reste du site. Dans chaque carte, une
+       * <dl> : une ligne par mesure, l'intitulé au-dessus du chiffre, des filets entre les lignes.
        * UNE GRILLE, PLUS UN RAIL (16/09/2026 : « que les cards prennent la largeur de l'écran, sans
-       * scroll ») : quatre SCPI tiennent dans la largeur, le défilement ne servait qu'à cacher ce
-       * qui pouvait être montré. Les cartes n'ont pas de largeur propre, c'est la colonne qui la
-       * donne : quatre de front dès `lg`, deux sur tablette, une au téléphone. Aucun défilement
-       * horizontal à aucune largeur. Le script du rail (carrousel.ts) est dans l'historique git.
+       * scroll ») : quatre de front dès `xl` (à `lg`, 220 px par carte, les intitulés se
+       * repliaient sur trois lignes), deux dès `sm`, une au téléphone. Aucun défilement horizontal.
        */
     }
     <ul
       role="list"
       aria-label={corumRange.listLabel}
-      class="mt-10 grid gap-4 sm:grid-cols-2 sm:gap-5 lg:mt-14 lg:grid-cols-4"
+      class="mt-10 grid gap-4 sm:grid-cols-2 sm:gap-5 lg:mt-14 xl:grid-cols-4"
     >
       {
         corumRange.items.map((scpi, i) => (
-          <li class="flex flex-col rounded-3xl bg-ink p-6 text-white sm:p-7">
-            <p class="text-display-sm text-sand">{scpi.name}</p>
+          <li class="rounded-3xl bg-white p-6 shadow-card ring-1 ring-navy/5 sm:p-7">
+            <p class="text-display-sm text-navy">{scpi.name}</p>
             {
               /* La date en poids normal sous un nom en gras, et d'un cran plus petite : deux lignes de
-                même graisse se liraient comme deux noms. `white/70` sur le fond ink donne 7,7:1, bien
-                au-dessus du seuil exigé pour ce corps de texte. */
+                même graisse se liraient comme deux noms. */
             }
-            {scpi.created && <p class="text-caption mt-1 font-normal text-white/70">{scpi.created}</p>}
+            {scpi.created && <p class="text-caption mt-1 text-slate-700">{scpi.created}</p>}
 
             {
               /* LE TRI EN PREMIER (22/09/2026, demande de Martin), en display-md et non plus lg
-                (« diminue la taille du TRI »), son intitulé juste dessous : un grand nombre seul ne
-                dit pas ce qu'il mesure, et ces quatre-là ne mesurent pas la même chose (trois TRI
-                réalisés et un objectif). Renvoi et bouton « i » : MesureGamme.astro. */
+                (« diminue la taille du TRI ») ; les trois autres mesures en display-sm. Chaque
+                ligne : MesureGamme.astro (intitulé, renvois, bouton « i », chiffre, panneau). Les
+                filets viennent de `divide-y`, le premier du `border-t` de la liste. */
             }
-            <div class="mt-6">
-              <MesureGamme mesure={scpi.principale} id={`gamme-${i}-tri`} principale />
-            </div>
-
-            {
-              /* PLUS DE `mt-auto` sur le bloc du bas (22/09/2026) : depuis que les cartes portent
-                des panneaux dépliables, un panneau ouvert sur une carte allonge la rangée, et le
-                bloc du bas des trois autres s'en allait au fond, un trou au milieu. Les cartes
-                restent de même hauteur (grille), le vide est en bas. */
-            }
-            <ul role="list" class="mt-6 space-y-4 border-t border-white/15 pt-5">
+            <dl class="mt-5 divide-y divide-navy/10 border-t border-navy/10 [&>div]:py-4 [&>div:last-child]:pb-0">
+              <div>
+                <MesureGamme mesure={scpi.principale} id={`gamme-${i}-tri`} principale />
+              </div>
               {scpi.autres.map((m, j) => (
-                <li>
+                <div>
                   <MesureGamme mesure={m} id={`gamme-${i}-${j}`} />
-                </li>
+                </div>
               ))}
-            </ul>
+            </dl>
           </li>
         ))
       }

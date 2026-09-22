@@ -1,14 +1,16 @@
 ---
 /**
- * Une mesure d'une carte de la gamme (/a-propos, CorumRange.astro) : le chiffre, son intitulé,
- * ses RENVOIS vers les notes sous les cartes (« (1) », liens vers `#gamme-note-1`, comme sur les
- * pages produit de corum.fr) et un bouton « i » qui déplie ces mêmes notes sur place (le dépliage
- * est celui des repères de l'accueil, src/scripts/infoToggle.ts, chargé par CorumRange.astro).
- * Deux dispositions : `principale` (le TRI : le chiffre en grand, l'intitulé dessous) et la ligne
- * (l'intitulé, puis le chiffre dessous, puis la ligne de détail du prix de la part). EMPILÉES et
- * non côte à côte : dans une colonne de quatre, « Performance globale annuelle moyenne de 2020 à
- * 2025 » à gauche d'un chiffre prenait cinq lignes.
- * Fond ink : le bouton est en `info-bouton-sombre`, les liens de renvoi en teal-200.
+ * Une mesure d'une carte de la gamme (/a-propos, CorumRange.astro), une ligne de la <dl> de la
+ * carte : l'intitulé (<dt>) avec ses RENVOIS vers les notes sous les cartes (« (1) », liens vers
+ * `#gamme-note-1`, comme sur les pages produit de corum.fr) et un bouton « i » qui déplie ces mêmes
+ * notes sur place (le dépliage est celui des repères de l'accueil, src/scripts/infoToggle.ts,
+ * chargé par CorumRange.astro) ; puis le chiffre (<dd>), la ligne de détail du prix de la part et
+ * le panneau déplié. INTITULÉ AU-DESSUS DU CHIFFRE, comme les repères de l'accueil et le bloc
+ * « En bref » de corum.fr : côte à côte, dans une colonne de quatre, « Performance globale annuelle
+ * moyenne de 2020 à 2025 » prenait cinq lignes. `principale` (le TRI) ne change que la taille du
+ * chiffre, display-md au lieu de display-sm.
+ * Cartes CLAIRES (22/09/2026, « mets-les pas en mode sombre ») : mêmes couleurs que les repères de
+ * l'accueil, intitulés en slate-700, chiffres en marine, unité en teal-700.
  * Sans JavaScript : panneaux ouverts, bouton caché, renvois actifs (ancres natives).
  */
 import { corumRange, numeroNote, type MesureScpi, type NoteKey } from '@/content/fr/corumRange';
@@ -28,82 +30,66 @@ const textes = [...(mesure.notes ?? []), ...(mesure.detail?.notes ?? [])].map(
 );
 
 /*
- * INTITULÉ ET RENVOIS EN UNE SEULE CHAÎNE, rendue par `set:html`, et non en balises du gabarit :
- * Astro conserve les blancs du source, et Prettier sépare deux nœuds voisins d'un retour à la
- * ligne, donc d'une espace, donc d'une occasion de repli ; un renvoi seul en début de ligne ne se
- * lirait pas. Ici, rien entre le dernier mot et « (1) », et « (3)(5) » tiennent dans un seul
- * <span> insécable (`.renvoi`, global.css, qui les met aussi en exposant), le saut de ligne étant
- * permis entre « ) » et « ( ». Le texte est échappé ; les renvois ne contiennent que des nombres.
+ * INTITULÉ, RENVOIS ET BOUTON « i » EN UNE SEULE CHAÎNE, rendue par `set:html`, et non en balises
+ * du gabarit : Astro conserve les blancs du source, et Prettier sépare deux nœuds voisins d'un
+ * retour à la ligne, donc d'une espace, donc d'une occasion de repli. Le DERNIER MOT de l'intitulé,
+ * ses renvois et le bouton forment un groupe insécable : un renvoi ou un « i » seul en début de
+ * ligne ne se lisait pas (le saut est permis entre « ) » et « ( », et de part et d'autre d'un
+ * bouton en ligne, blanc ou pas). « (3)(5) » tiennent dans un seul <span> (`.renvoi`, global.css,
+ * qui les met aussi en exposant). Les textes sont échappés ; les renvois ne contiennent que des
+ * nombres.
  */
 const echapper = (texte: string): string =>
   texte.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-const avecRenvois = (texte: string, cles: readonly NoteKey[] | undefined): string => {
+const renvois = (cles: readonly NoteKey[] | undefined): string => {
   const liens = (cles ?? []).map((cle) => {
     const n = numeroNote(cle);
     return `<a href="#gamme-note-${n}" aria-label="${labels.note} ${n}">(${n})</a>`;
   });
-  return (
-    echapper(texte) + (liens.length > 0 ? `<span class="renvoi">${liens.join('')}</span>` : '')
-  );
+  return liens.length > 0 ? `<span class="renvoi">${liens.join('')}</span>` : '';
+};
+const bouton =
+  textes.length > 0
+    ? `<button type="button" data-info-bouton hidden aria-expanded="false" aria-controls="${id}" class="info-bouton ml-2 align-middle"><span aria-hidden="true">i</span><span class="visually-hidden">${echapper(labels.info)} : ${echapper(mesure.label)}</span></button>`
+    : '';
+/** Le texte, son dernier mot soudé à ce qui le suit (renvois, puis le bouton s'il y en a un). */
+const soude = (texte: string, cles: readonly NoteKey[] | undefined, suite = ''): string => {
+  const coupe = texte.lastIndexOf(' ') + 1;
+  return `${echapper(texte.slice(0, coupe))}<span class="whitespace-nowrap">${echapper(texte.slice(coupe))}${renvois(cles)}${suite}</span>`;
 };
 ---
 
+<dt
+  class="text-base leading-snug font-medium text-slate-700"
+  set:html={soude(mesure.label, mesure.notes, bouton)}
+/>
+<dd
+  class:list={[
+    'mt-1.5 leading-none text-navy tabular-nums',
+    principale ? 'text-display-md' : 'text-display-sm',
+  ]}
+>
+  {mesure.value}
+  <span class:list={[principale ? 'text-display-sm' : 'text-base font-semibold', 'text-teal-700']}>
+    {mesure.unit}
+  </span>
+</dd>
 {
-  principale && (
-    <p class="text-display-md leading-none text-white">
-      {mesure.value}
-      <span class="text-display-sm text-teal-200">{mesure.unit}</span>
-    </p>
-  )
-}
-{
-  /* Le bouton « i » est EN LIGNE derrière l'intitulé, pas dans une boîte flex : il y passait seul
-    à la ligne sous l'intitulé. */
-}
-<p class:list={['text-base leading-snug text-white/80', principale && 'mt-2']}>
-  <span set:html={avecRenvois(mesure.label, mesure.notes)} />
-  {
-    textes.length > 0 && (
-      <button
-        type="button"
-        data-info-bouton
-        hidden
-        aria-expanded="false"
-        aria-controls={id}
-        class="info-bouton info-bouton-sombre ml-2 align-middle"
-      >
-        <span aria-hidden="true">i</span>
-        <span class="visually-hidden">
-          {labels.info} : {mesure.label}
-        </span>
-      </button>
-    )
-  }
-</p>
-{
-  !principale && (
-    <p class="text-lead mt-1 font-semibold leading-none text-sand tabular-nums">
-      {mesure.value}
-      <span class="text-base text-teal-200">{mesure.unit}</span>
-    </p>
-  )
-}
-{
-  !principale && mesure.detail && (
-    <p
-      class="text-caption mt-1.5 text-white/70"
-      set:html={avecRenvois(mesure.detail.text, mesure.detail.notes)}
+  mesure.detail && (
+    <dd
+      class="text-caption mt-1.5 text-slate-700"
+      set:html={soude(mesure.detail.text, mesure.detail.notes)}
     />
   )
 }
 {
   textes.length > 0 && (
-    <div id={id} class="info-panneau">
+    <dd id={id} class="info-panneau">
       <div class="space-y-2">
         {textes.map((t) => (
-          <p class="text-caption leading-snug text-white/70">{t}</p>
+          <p class="text-caption leading-snug text-slate-700">{t}</p>
         ))}
       </div>
-    </div>
+    </dd>
   )
 }

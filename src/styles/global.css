@@ -1577,8 +1577,8 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
 }
 /* Renvois vers les notes de la gamme (/a-propos, MesureGamme.astro) : « (1) » en exposant, même
    recette que les ordinaux, décollé de l'intitulé par une marge (pas par une espace : elle
-   offrirait un repli) et insécable, pour que « (3)(5) » restent ensemble. Les liens sont soulignés
-   au survol. */
+   offrirait un repli) et insécable, pour que « (3)(5) » restent ensemble. Liens en teal-700 sur
+   les cartes blanches (4,9:1), soulignés au survol. */
 .renvoi {
   font-size: 0.62em;
   line-height: 0;
@@ -1590,7 +1590,7 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   margin-left: 0.2em;
 }
 .renvoi a {
-  color: var(--color-teal-200);
+  color: var(--color-teal-700);
   text-decoration: underline;
   text-decoration-color: transparent;
   text-underline-offset: 0.15em;
@@ -1601,7 +1601,7 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   text-decoration-color: currentColor;
 }
 .renvoi a:focus-visible {
-  outline: 2px solid #fff;
+  outline: 2px solid var(--color-navy);
   outline-offset: 2px;
 }
 
