@@ -36,8 +36,8 @@ export const strategyPage: { seo: PageSeo; hero: PageHero; cta: Cta } = {
     title: 'R Start : une approche inédite au service de la performance',
     /*
      * CHUTE AJOUTÉE LE 15/09/2026, texte fourni par l'équipe. L'en-tête n'avait qu'un titre.
-     * L'espace avant le deux-points est une INSÉCABLE (U+00A0) écrite à la main : ce fichier ne passe
-     * pas par le `nb()` de feesPage.ts, et sans elle « : nos choix » peut partir seul à la ligne.
+     * L'espace avant le deux-points est une INSÉCABLE (U+00A0) écrite à la main : ce fichier n'a pas
+     * de `nb()`, et sans elle « : nos choix » peut partir seul à la ligne.
      */
     punchline: 'On ouvre le capot\u00A0: nos choix qui font la différence',
   },

@@ -5,22 +5,22 @@
  *     CTA. Plus de ligne risques : elle a quitté tous les en-têtes de sous-page le 14/09/2026 ;
  *  2. le comparateur SCPI par SCPI (FeeComparator), titre hors écran, accroche (`hero.punchline`),
  *     tableau et, seul rescapé du grand ménage des sources, le bloc « Sources des données ».
- * Puis le Footer. La page n'a plus de bloc de notes.
- * Le 14/09/2026, l'équipe avait fourni le contenu de TROIS zones (« je veux ce contenu là ») ; la
- * troisième, le barème, a été retirée le 16/09/2026 (voir plus bas).
+ * Puis le Footer.
  *
- * CE QUI A QUITTÉ LA PAGE, et dont le contenu reste en veille dans feesPage.ts et comparator.ts :
+ * CE QUI A QUITTÉ LA PAGE, puis le code le 22/09/2026 (archivé hors du dépôt, .claude/audits) :
  * le 11/09/2026, l'incidence des coûts du DIC, la bascule pédagogique et le document de référence ;
  * le 14/09/2026, la bande des trois « 0 % », la frise de la commission de retrait, le mécanisme de
  * réserve en cas de moins-value, l'avertissement commission d'arbitrage (toujours reproduit sur
  * /documentation, où le contrôle l'exige), la FAQ des frais, le bloc d'appel final, les huit notes,
  * et, autour du comparateur, son périmètre, ses deux avertissements courts et l'encadré « Une
- * innovation, pas une révolution » ; le 16/09/2026, le barème et sa mention HT.
+ * innovation, pas une révolution » ; le 16/09/2026, le barème et sa mention HT (« supprimer tout ce
+ * qu'il y a après Un modèle de frais inédit* »). Les taux eux-mêmes restent dans le comparateur,
+ * ligne par ligne, et c'est lui qui porte le « 15 % » que scripts/check-compliance.mjs exige ici.
  *
  * Animations déclaratives sobres uniquement (data-animate clip / stagger / fade-up) ; aucun H1 et aucun
  * avertissement sous un data-animate.
- * Contenu : src/content/fr/feesPage.ts (`seo`, `hero`, `cta` ; le reste y est en veille) et
- * comparator.ts pour le comparateur. Aucun texte en dur.
+ * Contenu : src/content/fr/feesPage.ts (`seo`, `hero`, `cta`) et comparator.ts pour le comparateur.
+ * Aucun texte en dur.
  */
 import Base from '@/layouts/Base.astro';
 import SiteNav from '@/components/SiteNav.astro';
@@ -36,14 +36,6 @@ import { breadcrumbJsonLd, organizationJsonLd, webPageJsonLd } from '@/lib/seo';
 
 const page = pages.fees;
 const { seo, hero, cta } = feesPage;
-/*
- * `faq` n'est plus lu : la page a perdu sa section Questions le 14/09/2026, et sa donnée structurée
- * FAQPage le 18/09/2026 (on ne balise pas ce que le visiteur ne peut pas lire). Le contenu reste dans
- * feesPage.ts.
- * `labels`, `groups`, `htNote` et `htNoteLabel` ont quitté ce tri le 16/09/2026 avec le barème :
- * les quatre tableaux, leurs intitulés et la mention HT restent dans feesPage.ts, la page ne les
- * appelle plus.
- */
 
 const jsonLd = [
   organizationJsonLd(),
@@ -96,54 +88,10 @@ const jsonLd = [
     <FeeComparator id="comparateur" intro={hero.punchline} />
 
     {
-      /* La bande « trois 0 % + les frais réellement prélevés + leur contre-poids » (#zero-frais) a
-        été RETIRÉE le 14/09/2026 (demande de l'équipe) : le comparateur juste au-dessus montre déjà
-        ces mêmes taux, R Start et autres SCPI côte à côte, et le barème complet les détaillait
-        juste en dessous (retiré à son tour le 16/09/2026). La page les annonçait donc trois fois.
-        `zeroHighlights`, `counterweight` et `counterweightRates` restent dans feesPage.ts, prêts à
-        resservir. L'appel de la note sur la rémunération du distributeur, qui vivait dans ce bloc,
-        avait suivi jusqu'au bas de page ; il est parti le soir même avec le bloc de notes (voir
-        plus bas) : cette information réglementaire n'est plus affichée, son texte reste dans
-        feesPage.ts (`frais-page-distributeur`). */
-    }
-
-    {
-      /*
-       * BARÈME COMPLET RETIRÉ LE 16/09/2026, demande de l'équipe (« supprimer tout ce qu'il y a après
-       * Un modèle de frais inédit* »). La zone portait ce titre, les quatre tableaux de frais groupés
-       * par moment de prélèvement, la commission de retrait à paliers, et la mention HT de la
-       * Conformité. La page tient désormais en DEUX zones : l'en-tête et le comparateur.
-       *
-       * LE TITRE EST PARTI AVEC LE RESTE, et c'est un écart à la lettre de la demande : un titre seul
-       * sur un fond vide n'est pas un état livrable. À remettre en une ligne si l'équipe voulait le
-       * garder pour y poser autre chose.
-       *
-       * CE QUI NE DISPARAÎT PAS DU SITE : les taux eux-mêmes restent dans le comparateur juste
-       * au-dessus, ligne par ligne, et c'est lui qui porte maintenant le « 15 % » que
-       * scripts/check-compliance.mjs exige sur cette page. La mention HT et les quatre tableaux vivent
-       * toujours dans feesPage.ts, la page ne les appelle plus.
-       */
-    }
-
-    {
-      /*
-       * RETIRÉES le 14/09/2026, l'équipe ayant fourni le contenu exact de la page (« je veux ce
-       * contenu là ») : la page tenait alors en trois zones, l'en-tête, le comparateur et le barème
-       * (deux depuis le 16/09/2026, voir ci-dessus).
-       *
-       * Ce qui part avec elles :
-       *  - #moins-value, le mécanisme de réserve ET l'avertissement AMF sur la commission d'arbitrage.
-       *    CET AVERTISSEMENT N'EST PAS PERDU : il est reproduit in extenso sur /documentation, où
-       *    check-compliance.mjs continue de l'exiger, puce par puce ;
-       *  - #faq-frais, ses quatre questions ;
-       *  - #souscrire-frais, son appel et la mention HT (remontée sous le barème, partie avec
-       *    lui le 16/09/2026) ;
-       *  - le bloc « Notes et sources », ses huit notes et tous les appels qui y menaient.
-       * Les textes restent dans feesPage.ts et legal.ts, la page ne les appelle plus.
-       *
-       * L'appel de la page reste celui de l'en-tête, doublé par la pastille flottante qui prend le
-       * relais dès qu'il sort de l'écran.
-       */
+      /* Les blocs qui suivaient le comparateur (bande des trois « 0 % », barème, mécanisme de
+        réserve, FAQ, appel final, notes) ont quitté la page entre le 14 et le 16/09/2026 : voir
+        l'en-tête du fichier. L'appel de la page reste celui de l'en-tête, doublé par la pastille
+        flottante qui prend le relais dès qu'il sort de l'écran. */
     }
   </main>
 

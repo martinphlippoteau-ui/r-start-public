@@ -41,12 +41,6 @@ export const bulletinWarning =
 export const shortRiskLine =
   'Investissement immobilier de long terme, durée de placement recommandée de 10 ans. Risque de perte en capital, revenus non garantis, liquidité limitée, risque de change.';
 
-/** Encadré brochure p.4 « Une innovation, pas une révolution », adapté au grand public (« Vos clients » → « Vous »). */
-export const innovationNotRevolution = {
-  title: 'Une innovation, pas une révolution',
-  body: "R Start n'est pas une SCPI sans frais : ce modèle n'existe pas. R Start n'est pas non plus moins chère qu'une SCPI traditionnelle. Son modèle de frais est différent : si les reventes d'immeubles génèrent de fortes plus-values, les commissions peuvent dépasser ce qu'aurait coûté une commission de souscription classique. Vous ne connaissez pas votre coût total à la souscription.",
-};
-
 /** Éditeur du site et distributeur (communication commerciale). */
 export const publisher = {
   name: "CORUM L'Épargne",

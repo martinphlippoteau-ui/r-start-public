@@ -43,12 +43,6 @@ export interface Cta {
   href?: string;
 }
 
-/** Bloc avantage + contre-poids risque, toujours affichés côte à côte, même taille. */
-export interface AdvantageRisk {
-  advantage: string;
-  risk: string;
-}
-
 export interface HeroContent {
   eyebrow: string;
   /** H1 unique de la page. */
@@ -103,29 +97,6 @@ export interface HighlightsContent {
     /** Nom du bouton « i » pour les lecteurs d'écran, complété par le libellé de la carte. */
     info: string;
   };
-}
-
-export type FeeKind = 'entree' | 'investissement' | 'gestion' | 'transaction' | 'sortie';
-
-export interface FeeRow {
-  kind: FeeKind;
-  label: string;
-  /** Assiette de calcul (ex. « prélevés sur les loyers HT encaissés »). */
-  base: string;
-  /** Valeur affichée (ex. « 0 % », « 15 % », « 0 / 6 / 12 % »). */
-  value: string;
-  /**
-   * Variante courte de `value` pour les écrans étroits (ex. « 10 à 0 % » pour « 10 / 7 / 5 / 3 / 0 % »),
-   * qui remplaçait `value` sous 640 px afin que le taux tienne sur une ligne. PLUS RENDUE depuis le
-   * 16/09/2026 : le barème a quitté /frais, ses lignes restent EN VEILLE dans feesPage.ts.
-   */
-  valueShort?: string;
-  detail?: string;
-}
-
-export interface WithdrawalStep {
-  period: string;
-  rate: string;
 }
 
 /**

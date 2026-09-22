@@ -34,7 +34,7 @@ import { PENDING_DOCUMENT_KEYS } from '@/content/fr/pendingDocuments';
  *    au DIC) ;
  *  - simulation des frais ex-ante (V2, 27/03/2026) : affiche 1,12 % de frais de souscription et des montants
  *    d'épargne espérée issus des scénarios du DIC ; publiée dès livraison d'une version corrigée et validée.
- * PENDING_DOCUMENT_KEYS est la décision unique de publication : cette page et feesPage.ts la lisent.
+ * PENDING_DOCUMENT_KEYS est la décision unique de publication : cette page la lit.
  * Aucune donnée de performance. La brochure partenaires (B2B) n'est jamais publiée.
  */
 
@@ -97,7 +97,7 @@ const toItem = (d: {
 // lire : depuis le 18/09/2026 un document en attente n'est plus seulement sans lien, il n'est plus copié
 // dans public/documents (il y restait téléchargeable à son adresse directe).
 /** Un document de facts.ts est-il publié sur les pages v2 ? */
-export const isDocumentPublished = (key: string): boolean => !PENDING_DOCUMENT_KEYS.includes(key);
+const isDocumentPublished = (key: string): boolean => !PENDING_DOCUMENT_KEYS.includes(key);
 const isPublished = (d: { key: string }): boolean => isDocumentPublished(d.key);
 
 const dicPublished = isDocumentPublished('dic');

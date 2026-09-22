@@ -10,8 +10,7 @@ import { fees, risk, share } from '@/content/fr/facts';
  * avec `faqQuestions`.
  *
  * Vocabulaire (V2, §3) : à l'affichage, on écrit « frais sur les achats d'immeubles ». Le terme
- * réglementaire « frais d'acquisition » ne subsiste que dans le barème détaillé (fees.ts,
- * feesPage.ts) et dans facts.ts.
+ * réglementaire « frais d'acquisition » ne subsiste que dans facts.ts.
  *
  * Règles appliquées : aucune donnée de performance ; chaque avantage cité est contrebalancé par son
  * risque dans la même réponse, dans le corps même de la réponse ; aucun « 0 % »

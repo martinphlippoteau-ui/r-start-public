@@ -3,7 +3,6 @@
  * avec node, qui ne connaît pas l'alias « @/ » du projet. facts.ts et legal.ts sont dans le même cas.
  */
 import { fees, product } from './facts.ts';
-import { innovationNotRevolution } from './legal.ts';
 
 /**
  * Comparateur de frais, page /frais (11/09/2026, demande de l'équipe, inspiré des comparateurs
@@ -71,14 +70,14 @@ export type ComparatorRowKey =
   'subscription' | 'acquisition' | 'broker' | 'management' | 'works' | 'disposal' | 'withdrawal';
 
 /**
- * Hypothèse de lecture du tableau (12/09/2026, demande de l'équipe) : le souscripteur garde ses
- * parts au moins huit ans, la durée après laquelle R Start ne prélève plus de commission de
- * retrait. Elle devait être dite en clair (`holdingNotice`), parce qu'elle change la ligne
- * « retrait » de toutes les SCPI ; ce texte n'a JAMAIS été affiché. Le tableau l'applique
- * pourtant : le retrait de R Start s'y compare sur `rstartCompare` (0 %) et peut être marqué « taux
- * le plus bas de la ligne ».
+ * HYPOTHÈSE DE LECTURE DU TABLEAU, JAMAIS DITE À L'ÉCRAN (12/09/2026, demande de l'équipe) : le
+ * souscripteur garde ses parts au moins huit ans (facts.fees.withdrawal.zeroAfterYears), la durée
+ * après laquelle R Start ne prélève plus de commission de retrait. Elle change la ligne « retrait »
+ * de toutes les SCPI : le retrait de R Start s'y compare sur `rstartCompare` (0 %) et peut être
+ * marqué « taux le plus bas de la ligne ». La phrase qui devait la dire en clair n'a jamais été
+ * affichée et a quitté le code le 22/09/2026 (archivée hors du dépôt, .claude/audits) ; l'écart,
+ * lui, demeure, et c'est ici qu'il est consigné.
  */
-const HOLDING_YEARS = fees.withdrawal.zeroAfterYears;
 
 /** Fourchette d'un barème à paliers : « de 0 % à 12 % » se lit mieux que « 0 / 6 / 12 % ». */
 const range = (rates: readonly string[]): string => {
@@ -225,11 +224,10 @@ const ROWS: ComparatorRow[] = [
       rstart: range(fees.withdrawal.steps.map((s) => s.rate)),
       /*
        * Ce qui est COMPARÉ reste le taux au-delà de la durée retenue, soit 0 %, et non la
-       * fourchette : c'est l'hypothèse de lecture du tableau (une détention d'au moins huit ans).
-       * `holdingNotice` devait la dire en clair ; il n'est pas affiché, et la case peut donc être
-       * marquée « taux le plus bas » sur ce 0 % sans que l'écran dise sous quelle hypothèse. Sans
-       * ce champ, la case ne serait plus comparable du tout, un intervalle ne se départageant pas
-       * d'un taux unique.
+       * fourchette : c'est l'hypothèse de lecture du tableau (une détention d'au moins huit ans),
+       * que l'écran ne dit pas (voir plus haut) : la case peut donc être marquée « taux le plus
+       * bas » sur ce 0 % sans que l'hypothèse soit énoncée. Sans ce champ, la case ne serait plus
+       * comparable du tout, un intervalle ne se départageant pas d'un taux unique.
        */
       rstartCompare: withdrawalAfterHolding,
       /*
@@ -237,8 +235,7 @@ const ROWS: ComparatorRow[] = [
        * retiré le matin même, en une phrase (« au-delà de 8 ans de détention ; avant, le barème est
        * dégressif : 10 % < 4 ans, 7 % 5e-6e année… ») ; il revient ligne à ligne, taux en tête.
        * La comparaison, elle, se fait toujours sur le taux au-delà de huit ans (`rstartCompare`),
-       * hypothèse que `holdingNotice` devait dire et qui n'est pas affichée : le barème la rend
-       * lisible, il ne la change pas.
+       * hypothèse que l'écran ne dit pas : le barème la rend lisible, il ne la change pas.
        */
       rstartDetail: withdrawalSchedule,
     },
@@ -268,8 +265,8 @@ export const comparator = {
      que la colonne de droite oppose à R Start, là où « SCPI à comparer » ne disait pas laquelle.
      RACCOURCI le 14/09/2026 à la demande de l'équipe : la mention « dites “sans frais” » tombe. Ce
      que ces SCPI ont en commun (pas de commission de souscription, mais des frais d'acquisition)
-     devait rester dit par la première phrase du périmètre (`perimeter`) ; celui-ci a quitté l'écran
-     le soir même, et plus rien ne le dit autour du tableau. */
+     devait rester dit par la première phrase du périmètre ; celui-ci a quitté l'écran le soir même
+     (et le code le 22/09/2026), et plus rien ne le dit autour du tableau. */
   selectLabel: 'Autres SCPI',
   /** Affiché tant que la SCPI n'a pas été documentée du tout (aucune source). */
   pendingLabel: 'À compléter',
@@ -292,18 +289,6 @@ export const comparator = {
   /* Nom du bouton « i » pour les lecteurs d'écran, complété par le libellé de la ligne. */
   infoLabel: 'Expliquer',
   /**
-   * Hypothèse de lecture, prévue au-dessus du tableau : elle change la ligne « retrait ».
-   * EN VEILLE, et JAMAIS affichée : aucun gabarit ne l'a rendue. Le tableau applique pourtant cette
-   * hypothèse (voir HOLDING_YEARS et `rstartCompare`).
-   */
-  holdingNotice: `La ligne « frais de retrait anticipé » suppose une détention d’au moins ${HOLDING_YEARS} ans, la durée de placement recommandée de ${product.name}. Sortir plus tôt coûte davantage : le barème complet de chaque SCPI figure sous son taux.`,
-  /**
-   * Rappel sous le tableau : une case vide n'est pas un zéro. EN VEILLE : retiré de l'écran le
-   * 14/09/2026 (texte de la page fourni par l'équipe).
-   */
-  notPublishedNotice:
-    'Une ligne « non publié » signifie que le document consulté ne mentionne pas ce frais. Cela ne veut pas dire qu’il n’est pas prélevé.',
-  /**
    * Sources affichées sous le tableau, une par colonne : celle de R Start, et celle de la SCPI
    * choisie (SOURCE_EQUIPE pour les dix-neuf depuis le 15/09/2026). `sourceOthers` n'est plus qu'un
    * texte de repli : c'est lui que porte le HTML avant le script, et il reste seul affiché sans
@@ -315,38 +300,14 @@ export const comparator = {
   sourceRStart: `document d’informations clés du ${product.dicDate.label}, note d’information visée par l’AMF et brochure partenaires 2026.`,
   sourceOthers:
     'Frais des autres SCPI : à relever dans le document d’informations clés et la note d’information de chacune, avec leur date d’arrêté. Un taux change : la date fait foi.',
-  /**
-   * Périmètre du comparatif : il dit ce qui est comparé et ce qui ne l'est pas. Ce tableau compare
-   * des TAUX AFFICHÉS, SCPI par SCPI, ce n'est ni la moyenne de marché de la brochure, ni une
-   * comparaison de résultats. EN VEILLE : retiré de sous le tableau le 14/09/2026, alors que le
-   * tableau nomme ses SCPI ; l'exigence qui l'imposait est commentée dans
-   * scripts/check-compliance.mjs.
-   */
   /*
-   * La PREMIÈRE phrase qualifie « sans frais », et ce n'est pas une précaution de style : le contrôle de
-   * conformité interdit la formule absolue, qui laisserait croire qu'aucun frais n'est prélevé. Ces SCPI
-   * ne prennent pas de commission de souscription, elles se rémunèrent à l'achat des immeubles, et le
-   * tableau juste au-dessus le montre ligne par ligne.
+   * TROIS TEXTES ONT QUITTÉ L'ÉCRAN LE 14/09/2026 ET LE CODE LE 22/09/2026 (archivés hors du dépôt,
+   * .claude/audits) : le périmètre du comparatif (des taux affichés, pas des coûts réels ; les seules
+   * SCPI de la liste, pas le marché ; aucune comparaison de résultats), la base HT / TTC de chaque
+   * taux, et l'encadré « Une innovation, pas une révolution » de la brochure. Le tableau nomme
+   * dix-neuf sociétés de gestion sans plus rien dire de tout cela ; les exigences correspondantes
+   * de scripts/check-compliance.mjs sont parties avec les textes.
    */
-  perimeter:
-    'Une SCPI dite « sans frais » ne prélève pas de frais de souscription : elle se rémunère autrement, par des frais d’acquisition sur les immeubles qu’elle achète, que ce tableau détaille ligne par ligne. Ce tableau compare les taux de frais affichés dans les documents de chaque SCPI, lus sous une même hypothèse de durée de détention. Quand les deux taux d’une ligne sont directement comparables, le plus bas est mis en avant : cette mise en avant ne porte que sur cette ligne et ne dit rien du coût total, qui dépend de ce que la SCPI encaisse et de votre durée de détention. Il ne compare pas les résultats. Il ne porte pas sur l’ensemble du marché : seules les SCPI de la liste y figurent. R Start n’a pas d’historique et aucune donnée de performance n’est communiquée sur ce site.',
-  /**
-   * Base de comparaison HT / TTC. Sans elle, on opposerait un taux TTC à un taux HT sans le dire,
-   * ce que l'AMF a déjà reproché à la brochure. R Start étant exonérée de TVA, ses deux montants
-   * sont égaux.
-   * EN VEILLE : retirée de l'écran le 14/09/2026. Et PÉRIMÉE : écrite pour des relevés en bases
-   * mêlées, elle dit les taux « reproduits tels que publiés » et ceux de R Start TTC pour la
-   * cession et le retrait, quand le tableau n'affiche plus que des taux HT (SOURCE_EQUIPE). À
-   * réécrire avant tout retour.
-   */
-  vatNotice:
-    'Chaque taux est reproduit tel que la société de gestion le publie. Ceux de R Start sont hors taxes, sauf la commission de cession et la commission de retrait, exprimées toutes taxes comprises ; R Start étant exonérée de TVA, ses montants hors taxes et toutes taxes comprises sont égaux. Vérifiez la base retenue par chaque SCPI avant toute conclusion.',
-  /**
-   * Encadré de la brochure (p.4), fait pour accompagner tout comparatif de frais. EN VEILLE :
-   * retiré de sous le tableau le 14/09/2026, le comparateur s'affiche sans lui (exigence commentée
-   * dans scripts/check-compliance.mjs).
-   */
-  innovationBox: innovationNotRevolution,
 
   /** Les sept lignes, dans l'ordre du tableau fourni par l'équipe. */
   rows: ROWS,

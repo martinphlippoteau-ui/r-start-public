@@ -38,7 +38,7 @@ test.describe('Conformité', () => {
    * Retour AMF sur la brochure : un frais ne peut pas être affiché dans une police plus petite que les
    * autres frais présentés à côté de lui. Chaque groupe de frais porte le même `data-fee-block` ; toutes
    * les valeurs qu'il contient doivent partager la même taille de police rendue, sur les deux pages qui
-   * exposent des frais et dans la bascule pédagogique.
+   * exposent des frais.
    */
   /**
    * `requis` : la page DOIT exposer des valeurs de frais. L'accueil ne le fait plus depuis le 11/09/2026
@@ -81,23 +81,6 @@ test.describe('Conformité', () => {
       }
     });
   }
-
-  test('la bascule des frais affiche les deux modèles dans la même taille', async ({ page }) => {
-    await page.goto('/frais/');
-    const tabs = page.locator('[data-fee-tab]');
-    const count = await tabs.count();
-    test.skip(count < 2, 'comparatif masqué (SHOW_MARKET_COMPARISON à false)');
-    const sizes: number[] = [];
-    for (let i = 0; i < count; i += 1) {
-      await tabs.nth(i).click();
-      const visible = await page
-        .locator('[data-fee-panel]:not([hidden]) [data-fee-value]')
-        .evaluateAll((nodes) => nodes.map((n) => parseFloat(getComputedStyle(n).fontSize)));
-      expect(visible.length, 'panneau de comparatif sans valeur de frais').toBeGreaterThan(0);
-      sizes.push(...visible);
-    }
-    expect([...new Set(sizes)].length, `tailles relevées : ${sizes.join(', ')}`).toBe(1);
-  });
 
   /*
    * LE COMPTE EST VÉRIFIÉ SUR /documentation, PLUS SUR L'ACCUEIL, depuis le 16/09/2026.

@@ -13,9 +13,8 @@
  *    `risk`.
  *  - Minimum des versements programmés (PEI) : 50 € (adhésion PEI 04/2026) → affiché.
  *  - Cas d'exonération de la commission de retrait : confirmés par la note d'information ch. III
- *    § 6 (libellé exact à confirmer) → EN VEILLE, affichés nulle part depuis le 14/09/2026 : leurs
- *    derniers lecteurs (fees.ts, `withdrawalExemptions`) passent par RiskNote, qui ne rend plus
- *    rien, ou par des blocs retirés de /frais.
+ *    § 6 (libellé exact à confirmer) → affichés nulle part depuis le 14/09/2026 ; la phrase qui les
+ *    énumérait a quitté le code le 22/09/2026 avec les anciens blocs de /frais.
  *  - Chiffres groupe : corum.fr consulté le 08/09/2026 ; date de référence officielle à fournir par CORUM.
  */
 
@@ -132,29 +131,13 @@ export const fees = {
 } as const;
 
 /**
- * Comparatif pédagogique des frais, brochure partenaires 2026, page 6.
- * Moyennes de marché des SCPI « sans frais de souscription et avec frais d'acquisition », en regard du
- * modèle de R Start. Les valeurs de R Start ne sont PAS recopiées ici : elles viennent de `fees`
- * ci-dessus, seule source de vérité. La page 6 de la brochure abrège d'ailleurs les paliers de cession
- * de R Start (6 % puis 12 %) : le site affiche le barème complet de la page 4 et de la note
- * d'information (0 / 6 / 12 %).
- *
- * Publicité comparative encadrée (arbitrage du 10/09/2026) : la bascule pédagogique ne nommait
- * aucune SCPI tierce dans sa partie visible, le panel et la source vivant dans une note sous elle.
- * EN VEILLE : la bascule et sa note (« frais-page-comparatif ») ont quitté /frais le 11/09/2026, le
- * composant a été supprimé le 14/09/2026 (feesPage.ts, SHOW_MARKET_COMPARISON). Rien de cet objet
- * n'est affiché ; seul `panel` est encore lu, par scripts/check-compliance.mjs, pour contrôler ce
+ * Les neuf SCPI du panel de la brochure partenaires 2026 (page 6, moyennes de marché des SCPI « sans
+ * frais de souscription et avec frais d'acquisition »). La bascule pédagogique qui les comparait à
+ * R Start a quitté /frais le 11/09/2026, et ses moyennes le code le 22/09/2026 (archivées hors du
+ * dépôt, .claude/audits). Seul le panel reste : scripts/check-compliance.mjs le lit pour contrôler ce
  * que /frais nomme. Le comparateur qui a remplacé la bascule (comparator.ts) nomme, lui, ses SCPI.
- * L'intitulé de la colonne de marché reste celui de la brochure, « SCPI avec frais d'acquisition » :
- * ces SCPI ne prélèvent pas de commission de souscription, les appeler « SCPI avec frais d'entrée »
- * contredirait le 0 % affiché sur leur propre ligne de souscription.
  */
 export const marketComparison = {
-  columnLabel: 'SCPI avec frais d’acquisition',
-  /**
-   * Les neuf SCPI du panel, destinées à la seule note de périmètre de la bascule, jamais à sa
-   * partie visible. En veille avec elle ; lues par scripts/check-compliance.mjs (voir ci-dessus).
-   */
   panel: [
     'Novaxia NEO',
     'Iroko ZEN',
@@ -166,57 +149,6 @@ export const marketComparison = {
     'Eden',
     'Epsicap Explore',
   ],
-  perimeterLead:
-    'Périmètre de l’analyse : les données relatives aux SCPI sans frais de souscription et avec frais d’acquisition correspondent à des moyennes de marché calculées sur la base des notes d’information et des documents de souscription publics des SCPI suivantes',
-  perimeterTail:
-    'et de la note d’information de R Start, gérée par CORUM Asset Management. Ces moyennes ne décrivent aucune SCPI en particulier et ne portent pas sur l’ensemble du marché.',
-  /** Note de bas de tableau de la brochure p.6 (astérisque des frais d'agent immobilier). */
-  brokerFootnote:
-    'Frais d’agent immobilier (brokerage) appliqués par deux des neuf SCPI du panel, Iroko et Elevation Tertium.',
-  source:
-    'Brochure partenaires R Start 2026, page 6 ; moyennes arrêtées à la date de cette brochure.',
-  /**
-   * Moyennes de marché, dans l'ordre du parcours de l'épargnant. `timing` reprend le moment du
-   * prélèvement indiqué par la brochure ; aucune valeur de R Start dans cet objet.
-   */
-  averages: {
-    subscription: {
-      label: '0 %',
-      base: 'prélevés sur le montant investi',
-      timing: 'Frais unique à l’entrée',
-    },
-    acquisition: {
-      label: '4 %',
-      base: 'prélevés sur le prix d’achat',
-      timing: 'Frais récurrent à chaque acquisition',
-    },
-    // Brochure p.6 : « 0 - 5 % », borne basse et borne haute du panel.
-    broker: {
-      label: '0 à 5 %',
-      base: 'prélevés sur le prix d’acquisition de l’immeuble en cas d’achat sans intermédiaire',
-      timing: 'Frais récurrent',
-    },
-    management: {
-      label: '14 %',
-      base: 'prélevés sur les loyers encaissés',
-      timing: 'Frais récurrent',
-    },
-    works: {
-      label: '4 %',
-      base: 'prélevés sur le montant total des travaux',
-      timing: 'Frais ponctuels',
-    },
-    disposal: {
-      label: '2,5 %',
-      base: 'prélevés sur le prix de vente de l’immeuble',
-      timing: 'Frais ponctuels',
-    },
-    withdrawal: {
-      label: '5 %',
-      base: 'prélevés sur la valeur de retrait, en cas de sortie avant 3 ou 5 ans selon la SCPI',
-      timing: 'Frais unique à la sortie',
-    },
-  },
 } as const;
 
 /**

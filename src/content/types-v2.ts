@@ -3,17 +3,7 @@
  * Fichier séparé de types.ts, à l'origine pour ne pas interférer avec le lot design. La fusion annoncée
  * alors n'a pas été faite : les deux fichiers coexistent, celui-ci n'importe de l'autre que des types.
  */
-import type {
-  AdvantageRisk,
-  Cta,
-  DocumentItem,
-  FaqItem,
-  FeeKind,
-  FeeRow,
-  StatItem,
-  StepItem,
-  WithdrawalStep,
-} from '@/content/types';
+import type { Cta, DocumentItem, FaqItem, StatItem, StepItem } from '@/content/types';
 
 export interface PageSeo {
   /** ≤ 60 caractères, contient « R Start » et « CORUM ». */
@@ -105,158 +95,10 @@ export interface DifferenceContent {
   secondaryCta?: { label: string; href: string };
 }
 
-/**
- * Une étape du parcours de l'épargnant dans la bascule des frais (§3 bis du plan) : ce que l'on paie à
- * la souscription, à l'achat des immeubles, pendant la détention, à la vente d'un immeuble et à la
- * sortie. Le même parcours est rejoué des deux côtés de la bascule, dans le même ordre.
- */
-export interface FeeJourneyStep {
-  /** Moment du parcours, identique des deux côtés (ex. « À la souscription »). */
-  moment: string;
-  /** Nom du frais tel qu'affiché (ex. « Frais sur les achats d'immeubles »). */
-  label: string;
-  /**
-   * Valeur affichée (ex. « 4 % », « 0 / 6 / 12 % »). Toutes les valeurs de frais de la bascule sont
-   * rendues dans la même taille de police, des deux côtés : exigence AMF.
-   */
-  value: string;
-  /** Assiette du prélèvement (ex. « prélevés sur le prix d'achat »). */
-  base: string;
-  /** Moment et fréquence du prélèvement (ex. « Frais unique à l'entrée »). */
-  timing: string;
-  /** Précision facultative affichée sous la valeur (ex. le détail des paliers). */
-  detail?: string;
-}
-
-/** Une position de la bascule : un intitulé, une phrase de synthèse et le parcours complet. */
-export interface FeeComparisonSide {
-  /** Identifiant technique (ancre, id des onglets) : « marche » ou « rstart ». */
-  key: string;
-  /** Intitulé du bouton (ex. « SCPI avec frais d'acquisition »). Aucun nom de concurrent. */
-  label: string;
-  /** Phrase de synthèse de la position, sans avantage isolé. */
-  summary: string;
-  steps: FeeJourneyStep[];
-}
-
-/**
- * Bascule pédagogique des frais de la page /frais (brochure partenaires 2026, p.6). PLUS RENDUE :
- * son composant a été supprimé le 14/09/2026, le contenu reste EN VEILLE dans feesPage.ts (voir
- * SHOW_MARKET_COMPARISON). Garde-fous à tenir si elle revient : aucune SCPI tierce nommée dans la
- * partie visible (`perimeter` ne nomme pas le panel), une seule taille de police pour toutes les
- * valeurs de frais, et l'encadré « Une innovation, pas une révolution » (legal.ts) reproduit à
- * l'identique sous la bascule.
- */
-export interface FeeComparison {
-  enabled: boolean;
-  eyebrow?: string;
-  title: string;
-  intro: string;
-  /** aria-label du groupe de boutons de la bascule. */
-  switchLabel: string;
-  /** [position de marché, position R Start] ; la première est affichée par défaut. */
-  sides: [FeeComparisonSide, FeeComparisonSide];
-  /** En-têtes de colonnes de la lecture sans JavaScript (moment, frais, valeur). */
-  columns: { moment: string; fee: string; value: string };
-  /** Phrase de périmètre, sous la bascule. Elle ne nomme pas les SCPI du panel. */
-  perimeter: string;
-  /** Note de bas de tableau (frais d'agent immobilier) ; affichée avec le périmètre. */
-  footnote?: string;
-  /** Contre-poids risque, dans la même taille que le reste du bloc. */
-  risk: string;
-  /** Encadré « Une innovation, pas une révolution », reproduit à l'identique depuis legal.ts. */
-  innovationBox: { title: string; body: string };
-}
-
-export interface FeeGroup {
-  title: string;
-  intro?: string;
-  rows: FeeRow[];
-}
-
-/**
- * Micro-textes des anciens blocs de /frais (aria-label, en-têtes de colonnes, surtitres, libellés
- * de fichier). PLUS LUS depuis le 16/09/2026 : src/pages/frais.astro n'appelle plus ces blocs, et
- * ces libellés restent EN VEILLE dans feesPage.ts avec eux.
- */
-export interface FeesPageLabels {
-  /** aria-label de la liste des trois « 0 % » (ex. « Les trois frais à 0 % »). */
-  zeroHighlights: string;
-  /** En-têtes de colonnes des tableaux de frais. */
-  columns: { fee: string; base: string; value: string; detail: string };
-  /** Libellé de la nature de chaque frais (FeeRow.kind), affiché en pastille dans les tableaux. */
-  kinds: Record<FeeKind, string>;
-  /** aria-label de la frise des paliers de la commission de retrait. */
-  steps: string;
-  /** En-têtes des deux colonnes de l'incidence des coûts (durée, incidence annuelle). */
-  costColumns: { period: string; impact: string };
-  /** Surtitres des blocs de la page. */
-  eyebrows: {
-    schedule: string;
-    withdrawal: string;
-    lossMechanism: string;
-    costImpact: string;
-    document: string;
-    faq: string;
-  };
-  /** Libellé du type de fichier du document de référence (ex. « PDF »). */
-  fileTypeLabel: string;
-  /** Unité du poids affiché après le nombre (ex. « ko »). */
-  sizeUnit: string;
-  /** Mention lue par les lecteurs d'écran sur les liens ouvrant un nouvel onglet (ex. « nouvelle fenêtre »). */
-  newTabHint: string;
-  /** aria-label de la liste des questions de la FAQ. */
-  faqList: string;
-}
-
-/**
- * Contenu de /frais. La page ne lit plus que `seo`, `hero` et `cta` (src/pages/frais.astro) : le
- * reste est EN VEILLE, gardé exprès et non affiché (blocs retirés entre le 11 et le 16/09/2026). Les
- * commentaires des champs décrivent le rendu qu'ils avaient et retrouveraient.
- */
+/** Contenu de /frais : l'en-tête et le CTA ; le comparateur a le sien dans comparator.ts. */
 export interface FeesPageContent {
   seo: PageSeo;
   hero: PageHero;
-  /** Micro-textes des blocs en veille (voir FeesPageLabels). */
-  labels?: FeesPageLabels;
-  zeroHighlights: { value: string; label: string; base: string }[];
-  counterweight: AdvantageRisk;
-  /**
-   * Frais réellement prélevés (gestion, cessions, retrait), affichés à la même taille que les trois
-   * « 0 % » ci-dessus : exigence AMF de taille de police uniforme pour tous les frais.
-   */
-  counterweightRates: { value: string; label: string }[];
-  groups: FeeGroup[];
-  withdrawal: {
-    title: string;
-    intro: string;
-    steps: WithdrawalStep[];
-    exemptionsTitle: string;
-    exemptions: string[];
-    note: string;
-  };
-  /** Mécanisme de réserve en cas de moins-value (brochure p.4). */
-  lossMechanism: { title: string; body: string[]; risk: string };
-  arbitrageWarning: { title: string; bullets: string[] };
-  innovationBox: { title: string; body: string };
-  /** Incidence des coûts du DIC (coûts, jamais de rendement). */
-  costImpact: {
-    title: string;
-    intro: string;
-    rows: { period: string; impact: string }[];
-    note: string;
-    risk: string;
-  };
-  /**
-   * Bascule pédagogique des frais (brochure p.6), en veille (voir FeeComparison). Son `enabled`
-   * n'est lu par rien : il ne la retire ni ne la rétablit.
-   */
-  marketComparison: FeeComparison;
-  simulationDoc: DocumentItem;
-  faq: { title: string; items: FaqItem[] };
-  htNote: string;
-  /** Titre de la note HT/TTC (« Bon à savoir : »), écrit en dur. */
-  htNoteLabel?: string;
   cta: Cta;
 }
 

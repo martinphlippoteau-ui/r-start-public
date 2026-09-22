@@ -602,41 +602,18 @@ async function checkSubPages() {
         errors.push(file + ' : aucune citation marquée data-press-quote (contrôle inopérant)');
     }
     if (p === 'frais') {
-      // SCPI nommées sur /frais. Écrit pour la bascule des frais (en veille depuis le 11/09/2026),
-      // le contrôle vise aujourd'hui le comparateur, qui nomme des SCPI du panel. Il n'exige plus
-      // que la source : le périmètre et l'encadré « Une innovation, pas une révolution », qui
-      // accompagnaient la comparaison, ont quitté l'écran le 14/09/2026 (exigences commentées
-      // ci-dessous).
+      // SCPI nommées sur /frais : le comparateur nomme des SCPI du panel. Nommer une autre SCPI
+      // obligeait à trois choses : dire ce que la comparaison compare, d'où viennent les chiffres,
+      // et rappeler que R Start n'est pas une SCPI sans frais. Le contrôle n'exige plus que la
+      // source. LES DEUX AUTRES EXIGENCES SONT PARTIES avec leurs textes : le périmètre du
+      // comparatif (des taux affichés, pas des coûts réels ; les seules SCPI de la liste, pas le
+      // marché) et l'encadré « Une innovation, pas une révolution » (R Start n'est pas une SCPI sans
+      // frais, n'est pas moins chère, coût total inconnu à la souscription) ont quitté l'écran le
+      // 14/09/2026 (« je veux ce contenu là ») et le code le 22/09/2026. Le tableau nomme dix-neuf
+      // sociétés de gestion sans plus rien dire de tout cela.
       const lower = text.toLowerCase();
       const named = marketComparison.panel.filter((n) => lower.includes(norm(n).toLowerCase()));
       if (named.length) {
-        // Nommer une autre SCPI oblige à trois choses : dire ce que la comparaison compare, d'où
-        // viennent les chiffres, et rappeler que R Start n'est pas une SCPI sans frais. Le périmètre
-        // accepté est celui du comparateur SCPI par SCPI (comparator.ts) OU celui des moyennes de
-        // marché de la brochure, selon la comparaison présente sur la page.
-        /*
-         * DEUX EXIGENCES NEUTRALISÉES le 14/09/2026, l'équipe ayant fourni le contenu exact de /frais
-         * (« je veux ce contenu là »). Elles sont COMMENTÉES, pas supprimées : une ligne à décommenter.
-         *
-         * CE QUI A DISPARU DU SITE AVEC ELLES, et ne se trouve plus nulle part ailleurs :
-         *  - le périmètre du comparatif : ce que le tableau compare (des taux affichés, pas des coûts
-         *    réels), et le fait qu'il ne porte pas sur l'ensemble du marché mais sur les seules SCPI de
-         *    la liste. Le tableau nomme dix-sept sociétés de gestion ;
-         *  - l'encadré « Une innovation, pas une révolution », reproduit de la brochure page 4, seul
-         *    endroit du site à écrire que R Start n'est pas une SCPI sans frais, qu'elle n'est pas moins
-         *    chère qu'une SCPI traditionnelle, et que le coût total n'est pas connu à la souscription.
-         * Les deux textes restent dans comparator.ts et legal.ts. Rien n'est perdu dans le code, tout
-         * l'est à l'écran.
-         */
-        // const perimetres = [
-        //   comparator.perimeter.slice(0, 80),
-        //   marketComparison.perimeterLead.slice(0, 80),
-        // ];
-        // if (!perimetres.some((ph) => text.toLowerCase().includes(norm(ph).toLowerCase())))
-        //   errors.push(file + ' : mention absente, périmètre du comparatif');
-        // requirePhrase(text, legal.innovationNotRevolution.title,
-        //   'encadré « Une innovation, pas une révolution »', file);
-
         /*
          * Sources du comparatif : contrôle RESSERRÉ le 14/09/2026. Il cherchait la chaîne « Sources : »
          * n'importe où dans la page, et c'était le bloc « Notes et sources », en bas, qui la fournissait,

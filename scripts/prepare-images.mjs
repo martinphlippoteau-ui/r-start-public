@@ -136,7 +136,7 @@ async function main() {
         /* Le NOM du dossier source, pas son chemin : le manifeste est versionné, et il publiait le
            chemin absolu du poste qui l'avait généré (nom d'utilisateur compris). */
         generatedFrom: path.basename(ASSETS),
-        /* Seule liste lue par le site (documentation.ts, feesPage.ts) : les logos et fichiers de
+        /* Seule liste lue par le site (documentation.ts) : les logos et fichiers de
            public/ sont copiés sans être listés, rien ne lisait leur liste (22/09/2026). */
         documents,
       },
