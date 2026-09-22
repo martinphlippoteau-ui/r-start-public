@@ -3,17 +3,17 @@
  * Page « La presse en parle », Le verdict de la presse spécialisée (id « citations-presse »).
  * Fond paper, entre le PageHero sombre et la revue de presse. Trois citations mises en avant, chacune
  * dans une <figure> : le propos en <blockquote>, puis le média et la date en <figcaption>.
- * Les citations sont des propos de tiers : elles portent `data-press-quote` (exclues du contrôle des
- * formulations interdites de scripts/check-compliance.mjs, car couvertes par l'avertissement de la
- * revue de presse), et l'introduction rappelle qu'elles n'engagent que leurs auteurs.
+ * Les citations sont des propos de tiers : elles portent `data-press-quote`, ce qui les exclut du
+ * contrôle des formulations interdites de scripts/check-compliance.mjs. L'introduction qui rappelait
+ * qu'elles n'engagent que leurs auteurs a été retirée le 16/09/2026, comme l'avertissement de la revue
+ * (voir Coverage.astro).
  * Aucun logo de média : les noms sont en typographie (aucune licence).
  * Animation : révélation en cascade de la grille seulement.
  * Contenu : src/content/fr/press.ts (quotes, labels).
  */
 import Container from '@/components/ui/Container.astro';
 import Section from '@/components/ui/Section.astro';
-import NoteRef from '@/components/ui/NoteRef.astro';
-import { notes, press } from '@/content/fr/press';
+import { press } from '@/content/fr/press';
 
 const id = 'citations-presse';
 const { quotes } = press;
@@ -24,16 +24,6 @@ const labels = press.labels ?? {};
   <Container size="wide">
     <header class="max-w-4xl">
       <h2 id={id + '-title'} class="text-display-md text-ink">{quotes.title}</h2>
-      {
-        quotes.intro && (
-          <p class="text-lead mt-5 text-pretty text-slate-700 sm:mt-6">
-            {quotes.intro}
-            <span class="whitespace-nowrap">
-              <NoteRef id="presse-citations" notes={notes} />
-            </span>
-          </p>
-        )
-      }
     </header>
 
     <ul

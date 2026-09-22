@@ -536,8 +536,8 @@ export const press = {
    * Revue de presse « La presse en parle » : onze articles. Les neuf premiers sont la sélection livrée
    * par CORUM le 10/09/2026, dans l'ordre de la sélection ; les deux derniers ont été ajoutés par
    * l'équipe le 14/09/2026. Titres et dates reproduits tels que fournis ou relevés sur la page ; ce
-   * sont des citations de tiers, jamais des formulations du site. `coverageDisclaimer`, qui les
-   * couvrait, n'est plus affiché depuis le 16/09/2026 (en veille, voir plus bas).
+   * sont des citations de tiers, jamais des formulations du site. L'avertissement qui les couvrait a
+   * été retiré le 16/09/2026 (voir press.ts).
    * `url` n'est renseignée QUE POUR LES ADRESSES OUVERTES ET VÉRIFIÉES, titre de page à l'appui. Un
    * article sans adresse s'affichait avec son média et sa date, sans lien (arbitrage du
    * 10/09/2026) ; depuis le 14/09/2026 il n'est plus repris du tout (filtre de press.ts), et
@@ -641,31 +641,9 @@ export const press = {
     },
   ],
   /**
-   * Articles identifiés le 08/09/2026 mais hors de la sélection livrée le 10/09/2026 : adresses
-   * conservées pour ne pas les reperdre, jamais affichées (MeilleureSCPI.com et Idéal Investisseur
-   * publient par ailleurs des avis de plateforme de distribution, pas des articles d'information).
-   */
-  coverageArchive: [
-    {
-      media: 'Pierre Papier',
-      title: 'Corum propose un nouveau modèle de frais avec la SCPI R Start',
-      url: 'https://www.pierrepapier.fr/scpi/corum-propose-un-nouveau-modele-de-frais-avec-la-scpi-r-start/',
-    },
-    {
-      media: 'Idéal Investisseur',
-      title: 'SCPI R Start : analyse complète',
-      url: 'https://www.ideal-investisseur.fr/scpi-avis/corum-r-start-10164.html',
-    },
-    {
-      media: 'Rock-n-Data',
-      title: 'SCPI R Start : Corum lance son offre sans frais',
-      url: 'https://www.rock-n-data.io/fr/scpi-r-start-corum-lance-son-offre-sans-frais/',
-    },
-  ],
-  /**
    * Trois citations mises en avant, livrées par CORUM le 10/09/2026 avec leur média et leur date.
-   * Reproduites mot pour mot : ce sont des propos de tiers. `coverageDisclaimer`, qui les couvrait,
-   * n'est plus affiché depuis le 16/09/2026 : seule la mention du pied de page les accompagne.
+   * Reproduites mot pour mot : ce sont des propos de tiers. L'avertissement qui les couvrait a été
+   * retiré le 16/09/2026 : seule la mention du pied de page les accompagne.
    */
   quotes: [
     {
@@ -684,14 +662,6 @@ export const press = {
       date: { label: 'Mai 2026', iso: '2026-05' },
     },
   ],
-  /**
-   * Avertissement de fin de page, livré par CORUM le 10/09/2026 ; reproduit à l'identique.
-   * EN VEILLE : retiré de /presse le 16/09/2026 (demande de l'équipe), gardé ici. Seul le contrôle
-   * de l'accueil de scripts/check-compliance.mjs le lit encore, et il dort (#presse-en-parle
-   * absente).
-   */
-  coverageDisclaimer:
-    'Les articles référencés sur cette page sont des publications indépendantes. Ils n’engagent pas CORUM Asset Management et ne constituent pas un conseil en investissement. Les informations publiées par la presse reflètent le contexte du lancement de R Start en mai 2026. Investir dans une SCPI comporte des risques, notamment de perte en capital. Les performances passées ne préjugent pas des performances futures.',
 } as const;
 
 /** Documents complémentaires (périmètre v2), en plus de `documents`. Fichiers vérifiés (intègres) le 08/09/2026. */

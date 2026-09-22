@@ -1,24 +1,16 @@
 ---
 /**
- * Page « La presse en parle », La revue de presse (id « revue-de-presse », fond white), prévue pour
- * être suivie de son avertissement dans une section à part (id « avertissement-presse », fond ink,
- * refonte du 13/09/2026). La revue faisait 2 909 px sur téléphone, pour neuf articles : les cartes
- * sont désormais de simples lignes séparées d'un filet sous `sm` (média, titre, date), et ne
- * reprennent leur forme de carte qu'à partir de deux colonnes. L'avertissement, qui fermait la
- * section dans un encadré, a sa propre bande sombre : il se lit comme une fin de chapitre et non
- * comme un post-scriptum.
- * INTRODUCTION ET AVERTISSEMENT RETIRÉS LE 16/09/2026, demande de l'équipe (press.ts dit comment
- * les rétablir). L'introduction rappelait, dans le même bloc, que R Start n'est pas une SCPI sans
- * frais ; l'avertissement de fin reprenait facts.press.coverageDisclaimer, en veille. Le paragraphe
- * d'introduction reste dans le gabarit, vide ; la bande d'avertissement n'est plus rendue. Les deux
- * étaient en texte normal, jamais animés. Reste la liste : média (surtitre), titre de l'article,
- * date.
- *  - article dont l'adresse est vérifiée : le titre est un lien externe (nouvel onglet, rel noopener
- *    noreferrer, mention « nouvelle fenêtre » portée par aria-describedby vers un span caché commun),
- *    étendu à toute la ligne par ::after ;
- *  - article sans adresse : le titre s'affiche sans lien, avec son média et sa date (arbitrage du
- *    10/09/2026). Branche inerte depuis le 14/09/2026 : press.ts ne transmet plus que les articles
- *    qui ont une adresse, les autres attendent la leur dans facts.ts.
+ * Page « La presse en parle », la revue de presse (id « revue-de-presse », fond white). Refonte du
+ * 13/09/2026 : la revue faisait 2 909 px sur téléphone, pour neuf articles ; les cartes sont
+ * désormais de simples lignes séparées d'un filet sous `sm` (média, titre, date), et ne reprennent
+ * leur forme de carte qu'à partir de deux colonnes.
+ * INTRODUCTION ET AVERTISSEMENT RETIRÉS LE 16/09/2026, demande de l'équipe. L'introduction rappelait,
+ * dans le même bloc, que R Start n'est pas une SCPI sans frais ; l'avertissement fermait la page dans
+ * sa propre bande sombre (id « avertissement-presse »). Leur gabarit et leurs textes ont quitté le
+ * code le 22/09/2026 (archivés hors du dépôt, .claude/audits).
+ * Chaque article a une adresse vérifiée (press.ts écarte les autres) : le titre est un lien externe
+ * (nouvel onglet, rel noopener noreferrer, mention « nouvelle fenêtre » portée par aria-describedby
+ * vers un span caché commun), étendu à toute la ligne par ::after.
  * Les titres sont des citations de tiers : ils portent `data-press-quote`, ce qui les exclut du
  * contrôle des formulations interdites de scripts/check-compliance.mjs. L'avertissement qui les
  * couvrait est retiré : le contrôle le signale à chaque exécution, et seul le pied de page les
@@ -29,35 +21,24 @@
  */
 import Container from '@/components/ui/Container.astro';
 import Section from '@/components/ui/Section.astro';
-import NoteRef from '@/components/ui/NoteRef.astro';
-import { notes, press } from '@/content/fr/press';
+import { press } from '@/content/fr/press';
 
 const id = 'revue-de-presse';
-const disclaimerId = 'avertissement-presse';
 const { coverage } = press;
 const labels = press.labels ?? {};
 
 /** Mention lue par les lecteurs d'écran après le titre de chaque lien (ex. « nouvelle fenêtre »). */
 const linkHint = labels.newTabHint ?? '';
 const linkHintId = `${id}-link-hint`;
-const hasLinks = coverage.items.some((item) => item.url);
-
-/** Classes communes aux titres, liés ou non : même taille des deux côtés. */
-const titleClass = 'text-lg font-semibold leading-snug tracking-tight text-ink sm:text-2xl';
 ---
 
 <Section id={id} tone="white">
   <Container size="wide">
     <header class="max-w-4xl">
       <h2 id={id + '-title'} class="text-display-md text-ink">{coverage.title}</h2>
-      <p class="text-lead mt-5 text-pretty text-slate-700 sm:mt-6">
-        {coverage.intro}<span class="whitespace-nowrap"
-          ><NoteRef id="presse-revue" notes={notes} /></span
-        >
-      </p>
     </header>
     {
-      hasLinks && linkHint && (
+      linkHint && (
         <span id={linkHintId} hidden>
           {linkHint}
         </span>
@@ -78,40 +59,34 @@ const titleClass = 'text-lg font-semibold leading-snug tracking-tight text-ink s
         coverage.items.map((item) => (
           <li class="group relative flex flex-col gap-2 border-b border-navy/10 py-5 transition-shadow duration-300 focus-within:shadow-card sm:gap-4 sm:rounded-3xl sm:border-0 sm:bg-paper sm:p-8 sm:ring-1 sm:ring-navy/5 sm:hover:shadow-card">
             <p class="text-eyebrow text-teal-700">{item.media}</p>
-            <h3 class={titleClass}>
-              {item.url ? (
-                <a
-                  href={item.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-describedby={linkHint ? linkHintId : undefined}
-                  data-press-quote
-                  class="text-ink no-underline after:absolute after:inset-0 sm:after:rounded-3xl group-hover:text-navy focus-visible:shadow-none focus-visible:outline-none focus-visible:after:outline-3 focus-visible:after:outline-offset-2 focus-visible:after:outline-navy"
-                >
-                  {item.title}
-                </a>
-              ) : (
-                <span data-press-quote>{item.title}</span>
-              )}
+            <h3 class="text-lg font-semibold leading-snug tracking-tight text-ink sm:text-2xl">
+              <a
+                href={item.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-describedby={linkHint ? linkHintId : undefined}
+                data-press-quote
+                class="text-ink no-underline after:absolute after:inset-0 sm:after:rounded-3xl group-hover:text-navy focus-visible:shadow-none focus-visible:outline-none focus-visible:after:outline-3 focus-visible:after:outline-offset-2 focus-visible:after:outline-navy"
+              >
+                {item.title}
+              </a>
             </h3>
             <p class="mt-auto flex items-center justify-between gap-4 pt-1 text-base text-slate-700 sm:pt-2">
               <span>
-                {item.dateIso ? <time datetime={item.dateIso}>{item.date}</time> : item.date}
+                <time datetime={item.dateIso}>{item.date}</time>
               </span>
-              {item.url && (
-                <svg
-                  aria-hidden="true"
-                  class="size-5 shrink-0 text-navy transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 motion-reduce:transition-none"
-                  viewBox="0 0 20 20"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.6"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path d="M7 4h9v9M16 4 4 16" />
-                </svg>
-              )}
+              <svg
+                aria-hidden="true"
+                class="size-5 shrink-0 text-navy transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 motion-reduce:transition-none"
+                viewBox="0 0 20 20"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.6"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M7 4h9v9M16 4 4 16" />
+              </svg>
             </p>
           </li>
         ))
@@ -119,22 +94,3 @@ const titleClass = 'text-lg font-semibold leading-snug tracking-tight text-ink s
     </ul>
   </Container>
 </Section>
-
-{
-  /* Avertissement (texte normal, jamais animé), dans sa propre bande : il fermait le chapitre.
-    RENDU CONDITIONNEL depuis le 16/09/2026 : l'équipe a retiré son texte (press.ts, `coverage`), la
-    bande ne doit donc plus apparaître, ni vide ni avec son seul titre. Elle revient d'elle-même le
-    jour où `disclaimer` est renseigné. */
-}
-{coverage.disclaimer && (
-  <Section id={disclaimerId} tone="ink" spacing="compact">
-    <Container size="wide">
-      <div class="max-w-4xl">
-        <h2 id={disclaimerId + '-title'} class="text-display-sm text-sand">
-          {coverage.disclaimerTitle}
-        </h2>
-        <p class="text-lead mt-5 text-white">{coverage.disclaimer}</p>
-      </div>
-    </Container>
-  </Section>
-)}

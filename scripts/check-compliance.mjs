@@ -11,7 +11,7 @@ import { fileURLToPath } from 'node:url';
 import * as legal from '../src/content/fr/legal.ts';
 /* `product` a quitté cet import le 15/09/2026 avec la neutralisation des deux contrôles de
    périmètre plus bas : à remettre en même temps qu'eux. */
-import { marketComparison, press as pressFacts, risk } from '../src/content/fr/facts.ts';
+import { marketComparison, risk } from '../src/content/fr/facts.ts';
 import { comparator } from '../src/content/fr/comparator.ts';
 import { lignesOg } from './og-lignes.mjs';
 
@@ -371,31 +371,6 @@ async function checkIndex() {
 
   checkHeroClaims(text, file);
 
-  // « La presse en parle » : la section a quitté l'accueil le 11/09/2026, puis son composant
-  // (08b-Press.astro) et son contenu (pressHome.ts) ont été SUPPRIMÉS le 15/09/2026. Ce contrôle ne peut
-  // donc plus se déclencher aujourd'hui. Il est gardé tel quel : il est le filet qui attend le retour
-  // d'une revue de presse sur l'accueil, et il exigera alors l'avertissement de couverture et des
-  // citations de tiers marquées data-press-quote. Plus exigeant que /presse, qui ne réclame plus
-  // l'avertissement depuis le 16/09/2026. Rien à corriger tant qu'il dort.
-  const pressMatch = html.match(/<section[^>]*id="presse-en-parle"[^>]*>[\s\S]*?<\/section>/i);
-  if (pressMatch) {
-    const press = pressMatch[0];
-    requirePhrase(
-      toText(press),
-      pressFacts.coverageDisclaimer.slice(0, 120),
-      'avertissement de la revue de presse (#presse-en-parle)',
-      file
-    );
-    const quotes = press.match(/<blockquote\b[^>]*>/gi) || [];
-    const unmarked = quotes.filter((q) => !/\sdata-press-quote\b/i.test(q));
-    // À passer en erreur le jour où une revue de presse revient sur l'accueil : le composant devra
-    // alors poser data-press-quote sur chaque citation, comme le fait déjà /presse.
-    if (unmarked.length)
-      warnings.push(
-        `${file} : ${unmarked.length} <blockquote> de #presse-en-parle sans data-press-quote`
-      );
-  }
-
   // Notes orphelines : chaque note du registre de l'accueil (li id="notes-N" de la section #notes)
   // doit être appelée au moins une fois (href="#notes-N"). notes.ts n'est pas importable ici (alias
   // `@/`) : on lit les ancres rendues.
@@ -663,9 +638,9 @@ async function checkSubPages() {
        *
        * L'ÉQUIPE L'A RETIRÉ, avec l'introduction de la revue qui portait le contre-poids sur les frais.
        * Il ne reste, autour des citations, que la mention obligatoire du pied de page. La règle est
-       * donc levée en connaissance de cause, et le rapport le redit à chaque exécution.
-       * Pour rétablir : remettre `disclaimer` dans press.ts (`coverage`) et repasser ce contrôle en
-       * erreur.
+       * donc levée en connaissance de cause, et le rapport le redit à chaque exécution. Le texte a
+       * quitté le code le 22/09/2026 (archivé hors du dépôt, .claude/audits) : s'il revient, repasser
+       * ce contrôle en erreur.
        */
       warnings.push(
         file +

@@ -356,12 +356,13 @@ export interface DocumentationContent {
  * réécrit, et il est couvert par l'avertissement de fin de page. `url` est vide tant que l'adresse de
  * l'article n'a pas été vérifiée : l'article s'affiche alors avec son média et sa date, sans lien.
  */
+/** Article de la revue de presse : toujours relié à sa publication (press.ts écarte les autres). */
 export interface PressArticle {
   media: string;
   title: string;
-  date?: string;
-  dateIso?: string;
-  url?: string;
+  date: string;
+  dateIso: string;
+  url: string;
 }
 
 /** Citation de presse mise en avant : propos d'un tiers, avec son média et sa date. */
@@ -402,16 +403,8 @@ export interface PressLabels {
 export interface PressContent {
   seo: PageSeo;
   hero: PageHero;
-  quotes: { title: string; intro?: string; items: PressQuote[] };
-  coverage: {
-    title: string;
-    intro: string;
-    items: PressArticle[];
-    /** Avertissement rendu dans sa propre bande après la revue. Absent : la bande n'est pas rendue. */
-    disclaimer?: string;
-    /** Titre de cette bande. */
-    disclaimerTitle?: string;
-  };
+  quotes: { title: string; items: PressQuote[] };
+  coverage: { title: string; items: PressArticle[] };
   /** Appel à l'action de la page : en-tête et pastille flottante. */
   cta: Cta;
   /** Zone 4, « Vous êtes journaliste ? » (Contacts.astro). `source` n'est plus affichée. */

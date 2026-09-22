@@ -5,8 +5,8 @@ import { press as pressFacts } from '@/content/fr/facts';
 /**
  * Page /presse, « La presse en parle » (grand public, arbitrage du 10/09/2026).
  * Trois citations mises en avant, la revue des articles reliés avec leur média et leur date, puis
- * les contacts presse (zone 4, `contacts`). L'avertissement livré par CORUM n'est plus rendu depuis
- * le 16/09/2026 (voir `coverage`). La salle de presse (/salle-de-presse), qui portait les
+ * les contacts presse (zone 4, `contacts`). L'avertissement livré par CORUM a été retiré le
+ * 16/09/2026 (voir `coverage`). La salle de presse (/salle-de-presse), qui portait les
  * communiqués et le kit média, a été désactivée le 15/09/2026 puis supprimée le 22/09/2026, avec
  * pressRoom.ts : les contacts, sa seule partie vivante, sont venus ici.
  *
@@ -84,9 +84,6 @@ const rawNotes: LegalNote[] = [
 /** Notes de la page, typographiées (espace insécable avant : ; ? ! % €). */
 export const notes: LegalNote[] = rawNotes.map((n) => ({ ...n, text: nb(n.text) }));
 
-/* ANNOTÉ, et non `satisfies` seul : `satisfies` conserve le type du littéral, et l'avertissement de la
-   revue de presse ayant été retiré le 16/09/2026, le composant ne voyait plus la propriété du tout.
-   L'annotation lui donne le type complet, champs facultatifs compris. */
 export const press: PressContent = {
   seo: {
     /** ≤ 60 caractères. Contient « R Start » et « CORUM ». */
@@ -115,10 +112,8 @@ export const press: PressContent = {
   quotes: {
     /* Zone 2, titre du 15/09/2026. Les trois citations ne bougent pas : « Garder les 3 exemples ». */
     title: 'Le verdict des journalistes',
-    /* INTRODUCTION SUPPRIMÉE le 16/09/2026, demande de l'équipe. Elle disait que les citations sont des
-       extraits d'articles de tiers, qu'elles n'engagent que leurs auteurs et ne portent sur aucun
-       résultat de R Start. Chaque citation porte toujours le nom de son média et sa date. */
-    intro: '',
+    /* Plus d'introduction depuis le 16/09/2026 (demande de l'équipe) : elle disait que les citations
+       n'engagent que leurs auteurs. Chaque citation porte toujours le nom de son média et sa date. */
     items: quotes,
   },
 
@@ -126,25 +121,15 @@ export const press: PressContent = {
     /* Zone 3, titre du 15/09/2026, ex-« La revue de presse ». */
     title: 'Revue de presse',
     /*
-     * INTRODUCTION SUPPRIMÉE le 16/09/2026, demande de l'équipe. Elle annonçait le nombre d'articles et
-     * leur nature, puis rappelait les frais réellement prélevés — « R Start n'est pas une SCPI sans
-     * frais » — en contre-poids des titres de presse qui, eux, emploient la formule.
-     * CE CONTRE-POIDS ÉTAIT LÀ POUR ÇA. Les titres des articles sont reproduits tels quels et certains
-     * disent « sans frais » ; c'est cette phrase qui les qualifiait dans le même bloc. Elle part à la
-     * demande de l'équipe, en connaissance de cause. Les frais restent décrits sur /frais et sur
-     * l'accueil, et la mention obligatoire du pied de page vaut pour toute la page.
-     * Pour la rétablir : reprendre le gabarit dans l'historique de ce fichier.
+     * INTRODUCTION ET AVERTISSEMENT SUPPRIMÉS le 16/09/2026, demande de l'équipe, en connaissance de
+     * cause. L'introduction rappelait les frais réellement prélevés, « R Start n'est pas une SCPI sans
+     * frais », en contre-poids des titres de presse qui, eux, emploient la formule ; l'avertissement,
+     * sous le titre « À lire avec cette revue de presse », disait que les articles n'engagent pas la
+     * société de gestion et ne valent pas conseil. Les frais restent décrits sur /frais et sur
+     * l'accueil, et la mention obligatoire du pied de page vaut pour toute la page. Les deux textes
+     * ont quitté le code le 22/09/2026 (archivés hors du dépôt, .claude/audits).
      */
-    intro: '',
     items: articles,
-    /*
-     * BLOC D'AVERTISSEMENT SUPPRIMÉ le 16/09/2026, demande de l'équipe. Sous le titre « À lire avec
-     * cette revue de presse », il rappelait que les articles sont des publications indépendantes qui
-     * n'engagent pas la société de gestion et ne valent pas conseil en investissement, que les
-     * informations reflètent le contexte du lancement, et que l'investissement comporte un risque de
-     * perte en capital. Le texte lui-même reste dans facts.ts (`press.coverageDisclaimer`).
-     * Pour le rétablir : `disclaimer: pressFacts.coverageDisclaimer` et son titre.
-     */
   },
 
   /* Appel à l'action de la page (13/09/2026) : elle n'en portait aucun, on lisait la revue de presse et
