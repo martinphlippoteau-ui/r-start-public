@@ -7,8 +7,8 @@ import { nb } from '@/lib/texte';
  * Section « FAQ » des pages courtes et page /faq. Les questions servent aussi de base au JSON-LD
  * FAQPage, limité aux questions visibles (src/lib/seo.ts).
  *
- * Vingt-deux questions en six rubriques, contenu fourni par l'équipe le 16/09/2026 et repris mot
- * pour mot : les chiffres y sont écrits en toutes lettres, et le garde-fou en bas de fichier arrête
+ * Vingt-cinq questions en six rubriques, contenu fourni par l'équipe le 16/09/2026 et repris mot
+ * pour mot (la question sur les moins-values, texte de Martin, ajoutée le 23/09/2026) : les chiffres y sont écrits en toutes lettres, et le garde-fou en bas de fichier arrête
  * le build s'ils ne correspondent plus à facts.ts. Trois tableaux à deux colonnes (barème des
  * frais, commission sur les plus-values, commission de retrait) pour que les chiffres se lisent en
  * colonnes et tiennent sur un téléphone. Le contenu porte ses propres réserves dans le corps des
@@ -92,6 +92,15 @@ const rawItems: FaqContent['items'] = [
       ],
     },
     tableAfter: ['Ainsi, CORUM gagne davantage seulement quand vous gagnez davantage.'],
+  },
+  {
+    /* Après la commission sur les plus-values, dont elle est le revers (23/09/2026, texte de Martin) ;
+       le comparateur porte le même mécanisme dans son bandeau (comparator.lossNote). */
+    category: RUB.frais,
+    question: 'CORUM perçoit-elle une commission en cas de moins-value ?',
+    answer: [
+      'Si la revente d’un immeuble se solde par une perte (une « moins-value »), celle-ci est mise de côté dans une réserve dédiée. Tant que cette réserve n’a pas été entièrement compensée par de futures plus-values, CORUM ne perçoit aucune commission sur les ventes. Autrement dit, CORUM ne se rémunère sur les reventes que lorsque le bilan global de l’ensemble des ventes est positif. Le détail de ce mécanisme figure au chapitre III, section 4 de la note d’information de R Start.',
+    ],
   },
   {
     category: RUB.frais,
