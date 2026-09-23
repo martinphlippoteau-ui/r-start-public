@@ -16,6 +16,22 @@ import { nb } from '../../lib/texte.ts';
  * jusqu'à la note d'information ou au DIC dont il sort, et un taux qui change ne se vérifie pas. Le
  * tableau nomme dix-neuf sociétés de gestion sans plus rien dire de son périmètre (voir la note
  * après `sourceText`).
+ *
+ * MISE À JOUR DU 23/09/2026 (tableau de Martin « Comparatif des frais - R START vs concurrents »,
+ * relevé par l'équipe dans les DIC, notes d'information et statuts) : Cœur d'Europe (travaux et vente
+ * d'immeubles 6 %), Osmo Énergie (entrée 12 %), Alta Convictions (achat d'immeubles 0 % sur la
+ * collecte, 1,25 % en réemploi), Iroko Zen (agent immobilier : en l'absence d'intermédiaire). Les
+ * quinze autres étaient déjà à jour. Documents relevés, dans l'ordre de la liste : Iroko Zen, note
+ * d'information ; Transitions Europe, note d'information ; Comète, note d'information du
+ * 07/07/2026 ; Épargne Pierre Europe, note d'information du 26/06/2026 ; Iroko Atlas, note
+ * d'information ; EDR Europa, note d'information de juin 2026 ; Cristal Life, note d'information et
+ * statuts du 15/01/2026 ; Sofidynamic, note d'information de juillet 2026 ; Wemo One, DIC du
+ * 19/06/2026 ; Remake Live, note d'information ; Cœur d'Europe, note d'information ; Osmo Énergie,
+ * note d'information ; Allianz Diverscity, note d'information du 30/04/2026 ; Epsicap Nano, note
+ * d'information de mai 2026 ; Alta Convictions, note d'information de juin 2026 ; Volt Europe,
+ * note d'information du 29/05/2026 ; Immo France Territoires, statuts ; PPG PremEurope, page
+ * produit de la société de gestion ; Atream Atwin, statuts du 02/07/2026. Les frais du marché
+ * secondaire (colonne « Note » du tableau) ne figurent pas dans les sept lignes du comparateur.
  */
 
 /** Une SCPI du comparateur. `values` vide = données à relever ; la ligne s'affiche « à compléter ». */
@@ -258,6 +274,7 @@ export const comparator = {
         withdrawal: '5 %',
       },
       details: {
+        broker: 'en l’absence d’intermédiaire',
         disposal: 'si la plus-value dépasse 5 %',
         withdrawal: 'avant 6 ans de détention ; 0 % au-delà',
       },
@@ -429,8 +446,8 @@ export const comparator = {
         acquisition: '0 %',
         broker: '0 %',
         management: '10 %',
-        works: '5 %',
-        disposal: '5 %',
+        works: '6 %',
+        disposal: '6 %',
         withdrawal: '0 %',
       },
       source: SOURCE_EQUIPE,
@@ -439,7 +456,7 @@ export const comparator = {
       name: 'Osmo Énergie',
       manager: 'Mata Capital IM',
       values: {
-        subscription: '10 %',
+        subscription: '12 %',
         acquisition: '1 %',
         broker: '0 %',
         management: '9 %',
@@ -489,12 +506,16 @@ export const comparator = {
       manager: 'Altarea IM',
       values: {
         subscription: '8,45 %',
-        acquisition: '1,25 %',
+        acquisition: '0 %',
         broker: '0 %',
         management: '11,45 %',
         works: '3 %',
         disposal: '2,50 %',
         withdrawal: '0 %',
+      },
+      details: {
+        acquisition:
+          '0 % sur les acquisitions financées par la collecte, 1,25 % en cas de réemploi du produit de cessions',
       },
       source: SOURCE_EQUIPE,
     },

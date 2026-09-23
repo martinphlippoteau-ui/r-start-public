@@ -251,10 +251,12 @@ export const corumGroup = {
    * Chiffres groupe : corum.fr (« Qui sommes-nous »), consulté le 08/09/2026, recoupés avec la
    * brochure 2026. Aucune date d'arrêté officielle n'existe dans les documents cités : `statsDate`
    * est une date de consultation. Dès que CORUM communique la date d'arrêté, l'écrire ici.
+   * ÉPARGNE GÉRÉE : 10 Md€ depuis le 23/09/2026, chiffre donné par Martin ; corum.fr affichait
+   * encore « près de 9,6 milliards d'euros » ce jour-là.
    */
   stats: [
     {
-      value: '9,6 Md€',
+      value: '10 Md€',
       prefix: '',
       label: "d'épargne gérée par le groupe",
     },
@@ -263,8 +265,8 @@ export const corumGroup = {
     { value: '2 500', prefix: '', label: 'partenaires professionnels' },
     { value: '250', prefix: '', label: 'collaborateurs dans 7 pays' },
   ],
-  /** Date de consultation de corum.fr, pas date d'arrêté des chiffres. */
-  statsDate: { label: '8 septembre 2026' },
+  /** Date de consultation de corum.fr (et du chiffre d'épargne gérée), pas date d'arrêté. */
+  statsDate: { label: '23 septembre 2026' },
   /**
    * Ancienneté du groupe dans l'immobilier d'entreprise : brochure partenaires 2026, p.7 (« 15 ans
    * d'expertise »), cohérente avec l'agrément AMF du 14 avril 2011. La formule « objectifs tenus »
