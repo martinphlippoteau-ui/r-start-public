@@ -1,20 +1,24 @@
 /**
  * Campagnes : capter à l'arrivée, garder le temps de la visite, transmettre au tunnel.
- * POURQUOI. Le lien du tunnel porte des paramètres de campagne ÉCRITS EN DUR
- * (`utm_source=site-r-start`) en repli : sans ce module, un visiteur venu d'une campagne repartait
- * vers le tunnel étiqueté comme venant du site, et la campagne qui avait payé le clic n'était
- * jamais créditée. CE QUI EST GARDÉ : les cinq `utm_*` et `gclid`, en sessionStorage, le temps de
- * la visite (choix de l'équipe). PREMIÈRE CAMPAGNE GAGNANTE : un lien nu rencontré ensuite n'efface
- * pas la campagne d'origine ; le dernier clic interne ne veut rien dire.
+ * POURQUOI. Le lien du tunnel porte une campagne de repli ÉCRITE EN DUR (src/config/site.ts) :
+ * sans ce module, un visiteur venu d'une campagne repartait vers le tunnel étiqueté « accès
+ * direct », et la campagne qui avait payé le clic n'était jamais créditée.
+ * CE QUE LE TUNNEL LIT (recherche Jira/Confluence du 23/09/2026, page CRM « Fonctionnement des UTM
+ * dans le CRM ») : `utm_source` → Partner, `utm_medium` → Media, `utm_campaign` → Campaign, sur le
+ * contact et l'opportunité, À CONDITION QUE LA VALEUR EXISTE dans le référentiel du CRM ; une
+ * valeur inconnue est ignorée. `utm_content`, `utm_term` et `gclid` ne sont lus par personne côté
+ * CRM : ils restent pour la mesure d'audience du tunnel. L'identifiant client de GA4 (`cid`), que
+ * ce module envoyait, n'était lu par personne non plus : retiré le 23/09/2026.
+ * CE QUI EST GARDÉ : les cinq `utm_*` et `gclid`, en sessionStorage, le temps de la visite (choix
+ * de l'équipe). PREMIÈRE CAMPAGNE GAGNANTE : un lien nu rencontré ensuite n'efface pas la campagne
+ * d'origine ; le dernier clic interne ne veut rien dire. ARRIVÉE DEPUIS GOOGLE SANS PARAMÈTRE : la
+ * convention de corum.fr, `google / organic / fr_g_organic`, trois valeurs connues du CRM.
  * CE QUI EST TRANSMIS : les paramètres d'origine, sauf `utm_content`, qui reste la POSITION DU CTA
- * (la seule chose que le site sait et que la campagne ignore), plus l'identifiant client de GA4,
- * pour rapprocher une souscription de sa visite sans qu'aucune donnée personnelle ne transite par
- * le site. LES DEUX IDENTIFIANTS NE PARTENT QU'AVEC L'ACCORD EN VIGUEUR : l'identifiant client et
- * `gclid` désignent un navigateur ou un clic, pas une campagne. Lire le cookie `_ga` ne suffit pas,
- * il existe encore après un retrait. L'ÉTIQUETAGE SE REFAIT AU CLIC : le consentement donné sur la
- * page même crée `_ga` après coup, et un retrait doit RETIRER l'identifiant d'un lien déjà
- * étiqueté. Uniquement sur les liens SORTANTS : tunnel fermé, il n'y a rien à étiqueter. SANS
- * JAVASCRIPT, le lien garde son repli en dur : correct, moins précis.
+ * (la seule chose que le site sait et que la campagne ignore). `gclid` NE PART QU'AVEC L'ACCORD EN
+ * VIGUEUR : il désigne un clic, pas une campagne. L'ÉTIQUETAGE SE REFAIT AU CLIC : un retrait de
+ * consentement doit RETIRER l'identifiant d'un lien déjà étiqueté. Uniquement sur les liens
+ * SORTANTS : tunnel fermé, il n'y a rien à étiqueter. SANS JAVASCRIPT, le lien garde son repli en
+ * dur : correct, moins précis.
  */
 
 import { consentCookie } from '@/content/fr/consent';
@@ -46,10 +50,6 @@ const consentementDonne = (): boolean => {
   return new RegExp('(?:^|; )' + consentCookie.name + '=granted(?:;|$)').test(document.cookie);
 };
 
-/** Nom du paramètre qui porte l'identifiant client vers le tunnel. À ALIGNER AVEC CORUM : le tunnel
-    doit le lire sous ce nom exact. Une seule ligne à changer. */
-const PARAM_IDENTIFIANT = 'cid';
-
 type Campagne = Partial<Record<(typeof CLES)[number], string>>;
 
 /** Ce qui est relu du stockage passe par le même filtre que ce qui vient de l'adresse. */
@@ -69,8 +69,27 @@ const lireRangement = (): Campagne => {
   }
 };
 
-/** Campagne de la visite : celle déjà retenue, sinon celle de l'adresse. Écrite seulement quand
-    l'adresse en porte une : une page sans paramètre n'efface pas la campagne d'entrée. */
+/** Arrivée depuis un résultat naturel de Google, sans paramètre : la convention de corum.fr
+    (Confluence CRM « Fonctionnement des UTM dans le CRM »). Les trois valeurs existent dans le CRM. */
+const ORGANIQUE: Campagne = {
+  utm_source: 'google',
+  utm_medium: 'organic',
+  utm_campaign: 'fr_g_organic',
+};
+
+/** Le référent est-il un domaine Google ? La politique de référent du site (`strict-origin-when-
+    cross-origin`) laisse passer l'origine, c'est tout ce qu'il faut. */
+const referentGoogle = (): boolean => {
+  try {
+    return /(^|\.)google\.[a-z.]+$/.test(new URL(document.referrer).hostname);
+  } catch {
+    return false;
+  }
+};
+
+/** Campagne de la visite : celle déjà retenue, sinon celle de l'adresse, sinon « organique » quand
+    le référent est Google. Écrite seulement quand il y a quelque chose à retenir : une page sans
+    paramètre n'efface pas la campagne d'entrée. */
 export const campagne = (): Campagne => {
   const retenue = lireRangement();
   if (Object.keys(retenue).length) return retenue;
@@ -82,7 +101,10 @@ export const campagne = (): Campagne => {
     const valeur = nettoyer(params.get(cle));
     if (valeur) trouvee[cle] = valeur;
   }
-  if (!Object.keys(trouvee).length) return {};
+  if (!Object.keys(trouvee).length) {
+    if (!referentGoogle()) return {};
+    Object.assign(trouvee, ORGANIQUE);
+  }
 
   try {
     sessionStorage.setItem(RANGEMENT, JSON.stringify(trouvee));
@@ -90,14 +112,6 @@ export const campagne = (): Campagne => {
     /* stockage indisponible (navigation privée) : la campagne vaudra pour cette page seulement */
   }
   return trouvee;
-};
-
-/** Identifiant client de GA4, lu dans le cookie `_ga` (`GA1.1.<id>.<horodatage>`, les deux derniers
-    segments). Vide sans consentement EN VIGUEUR : la seule présence du cookie ne prouve rien. */
-export const identifiantClient = (): string => {
-  if (!consentementDonne()) return '';
-  const m = document.cookie.match(/(?:^|;\s*)_ga=GA\d+\.\d+\.(\d+\.\d+)/);
-  return m?.[1] ?? '';
 };
 
 /** Un lien qui sort du site : c'est là, et là seulement, qu'il y a quelque chose à étiqueter. */
@@ -109,9 +123,8 @@ const estSortant = (a: HTMLAnchorElement): boolean => {
   }
 };
 
-/** Étiquette un lien de souscription sortant : campagne d'origine, position du CTA, identifiant
-    client. Idempotent. */
-const etiqueter = (a: HTMLAnchorElement, origine: Campagne, cid: string): void => {
+/** Étiquette un lien de souscription sortant : campagne d'origine et position du CTA. Idempotent. */
+const etiqueter = (a: HTMLAnchorElement, origine: Campagne): void => {
   if (!estSortant(a)) return;
   let url: URL;
   try {
@@ -129,22 +142,16 @@ const etiqueter = (a: HTMLAnchorElement, origine: Campagne, cid: string): void =
   }
   const position = a.dataset.ctaPosition;
   if (position) url.searchParams.set('utm_content', position);
-  /* Posé s'il y en a un, RETIRÉ sinon : un lien étiqueté pendant l'accord ne garde pas son identifiant
-     après un retrait. */
-  if (cid) url.searchParams.set(PARAM_IDENTIFIANT, cid);
-  else url.searchParams.delete(PARAM_IDENTIFIANT);
-
   a.href = url.toString();
 };
 
 const init = (): void => {
   const origine = campagne();
-  const cid = identifiantClient();
-  /* Rien à transmettre et rien à identifier : on ne touche à aucun lien. */
-  if (Object.keys(origine).length || cid) {
+  /* Rien à transmettre : on ne touche à aucun lien. */
+  if (Object.keys(origine).length) {
     document
       .querySelectorAll<HTMLAnchorElement>('a[data-cta="souscrire"]')
-      .forEach((a) => etiqueter(a, origine, cid));
+      .forEach((a) => etiqueter(a, origine));
   }
 
   /* AU CLIC, en phase de capture : le lien part avec le consentement du moment. `pointerdown`
@@ -154,7 +161,7 @@ const init = (): void => {
     const a = (e.target as HTMLElement | null)?.closest<HTMLAnchorElement>(
       'a[data-cta="souscrire"]'
     );
-    if (a) etiqueter(a, campagne(), identifiantClient());
+    if (a) etiqueter(a, campagne());
   };
   document.addEventListener('pointerdown', auMoment, true);
   document.addEventListener('click', auMoment, true);

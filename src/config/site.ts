@@ -62,17 +62,42 @@ export function ctaHref(position: CtaPosition): string {
 }
 
 /**
- * Construit l'URL du tunnel pour un CTA donné. Ajoute des paramètres UTM uniquement si l'URL
- * fournie n'en contient pas déjà (pour ne pas écraser un code partenaire).
+ * ORIGINE DÉCLARÉE AU TUNNEL (23/09/2026). Le paramètre `from` alimente le champ « Subscription
+ * origin » de la souscription dans le CRM (Confluence PM « KPIs for digital fundraising »). Valeurs
+ * admises : website, nps, pps, scpi_simulator, life_simulator, credit_simulator, warm_tunnel,
+ * unbounce, email, legacypps. Aucune n'est propre à R Start : `website`, comme les boutons de
+ * corum.fr, tant qu'une valeur dédiée n'existe pas côté tunnel ET côté CRM. Une ligne à changer.
+ */
+const SUBSCRIBE_FROM = 'website';
+
+/**
+ * CAMPAGNE DE REPLI d'une visite sans campagne d'entrée : la convention de corum.fr pour un accès
+ * direct (Confluence CRM « Fonctionnement des UTM dans le CRM », juillet 2026). Le CRM ne retient une
+ * valeur UTM que si elle existe dans son référentiel (`utm_source` → Partner, `utm_medium` → Media,
+ * `utm_campaign` → Campaign) : `site-r-start` et `cta`, choisis avant de le savoir, n'y existaient
+ * pas et tombaient dans le vide. `fr_direct_direct` suit le modèle `nl_direct_direct` documenté ;
+ * à confirmer dans le référentiel avant l'ouverture.
+ */
+const UTM_DIRECT = {
+  utm_source: 'direct',
+  utm_medium: 'direct',
+  utm_campaign: 'fr_direct_direct',
+} as const;
+
+/**
+ * Construit l'URL du tunnel pour un CTA donné. Pose l'origine `from` si l'adresse n'en porte pas,
+ * et la campagne de repli uniquement si l'adresse ne contient déjà aucun UTM (pour ne pas écraser
+ * un code partenaire). src/scripts/campagne.ts remplace ce repli au clic par la campagne d'entrée
+ * de la visite, quand il y en a une.
  */
 export function subscribeHref(position: CtaPosition): string {
   /* Pas de `try` : l'adresse est validée à la construction de `site` dès que la souscription est
      ouverte (voir plus bas). Avant, une adresse mal formée était publiée TELLE QUELLE sur tous les
      boutons. */
   const url = new URL(site.subscribeUrl);
+  if (!url.searchParams.has('from')) url.searchParams.set('from', SUBSCRIBE_FROM);
   if (!/utm_/i.test(url.search)) {
-    url.searchParams.set('utm_source', 'site-r-start');
-    url.searchParams.set('utm_medium', 'cta');
+    for (const [cle, valeur] of Object.entries(UTM_DIRECT)) url.searchParams.set(cle, valeur);
     url.searchParams.set('utm_content', position);
   }
   return url.toString();

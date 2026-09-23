@@ -540,7 +540,7 @@ test.describe('Qualité', () => {
   /* LE CONSENT MODE ARRIVE À GTM SOUS LA FORME QU'IL ATTEND : un objet Arguments, pas un tableau
      (consent.ts dit pourquoi). Le test suit les trois temps, dont le retrait après accord.
      UN RETRAIT QUI RETIRE VRAIMENT : les cookies `_ga` survivaient treize mois à un refus donné
-     après un accord, et l'identifiant client continuait de partir vers le tunnel. Le lien du tunnel
+     après un accord, et l'identifiant de clic continuait de partir vers le tunnel. Le lien du tunnel
      est simulé : tant que la souscription est fermée, les CTA sont internes et n'ont rien à
      étiqueter. */
   test('un retrait de consentement efface les cookies de mesure et retire les identifiants des liens', async ({
@@ -572,14 +572,12 @@ test.describe('Qualité', () => {
       });
 
     const avec = await lienDuTunnel();
-    expect(avec, 'avec accord : l’identifiant client part').toContain('cid=123456789.1700000000');
-    expect(avec).toContain('gclid=clic123');
+    expect(avec, 'avec accord : l’identifiant de clic part').toContain('gclid=clic123');
 
     await page.locator('[data-consent-open]').first().click();
     await page.locator('[data-consent-refuse]').click();
     const sans = await lienDuTunnel();
-    expect(sans, 'après retrait : plus d’identifiant client').not.toContain('cid=');
-    expect(sans, 'ni d’identifiant de clic').not.toContain('gclid=');
+    expect(sans, 'après retrait : plus d’identifiant de clic').not.toContain('gclid=');
     expect(sans, 'la campagne, elle, reste').toContain('utm_source=essai');
     const restants = (await context.cookies()).map((c) => c.name).filter((n) => n.startsWith('_ga'));
     expect(restants, 'les cookies de mesure sont effacés').toEqual([]);
@@ -1040,6 +1038,29 @@ test.describe('Qualité', () => {
     expect(premier?.campagne_source, 'la campagne accompagne chaque événement').toBe('linkedin');
     expect(premier?.campagne_nom).toBe('lancement-2026');
     expect(premier?.page_type).toBe('frais');
+  });
+
+  /* ARRIVÉE DEPUIS GOOGLE SANS PARAMÈTRE : la convention de corum.fr, dont les trois valeurs existent
+     dans le référentiel du CRM (src/scripts/campagne.ts). Elle vaut pour la visite, comme une
+     campagne d'entrée, et accompagne les événements. */
+  test('une arrivée depuis Google sans paramètre vaut la campagne « organique » de corum.fr', async ({
+    page,
+  }) => {
+    await page.goto('/', { referer: 'https://www.google.com/' });
+    const lue = () =>
+      page.evaluate(() => JSON.parse(sessionStorage.getItem('rstart_campagne') ?? '{}'));
+    expect(await lue()).toEqual({
+      utm_source: 'google',
+      utm_medium: 'organic',
+      utm_campaign: 'fr_g_organic',
+    });
+
+    await page.goto('/frais/');
+    expect(await lue(), 'une page interne ne l’efface pas').toMatchObject({ utm_source: 'google' });
+    await page.locator('[data-comparator-select]').selectOption({ index: 1 });
+    const [premier] = await evenements(page);
+    expect(premier?.campagne_source).toBe('google');
+    expect(premier?.campagne_nom).toBe('fr_g_organic');
   });
 
   test('les événements du plan de taggage partent bien', async ({ page }) => {
