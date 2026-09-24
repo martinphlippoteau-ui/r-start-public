@@ -42,11 +42,15 @@ export interface MediaContent {
 }
 
 export const media = {
-  // 338 × 536, PNG détouré (fond transparent), fourni par l'équipe le 11/09/2026. À REDEMANDER EN
-  // PLUS GRAND : à 338 px de large, le visuel est déjà à sa taille native sur grand écran.
+  // 397 × 769 (rapport 1,94), PNG DÉTOURÉ (fond transparent), fourni par Martin le 24/09/2026 :
+  // illustration d'un téléphone de face affichant le logo R Start. La source (1000 × 1000) portait
+  // le téléphone dans son tiers gauche et, à droite, des immeubles et un ciel présents dans les
+  // couleurs mais à alpha zéro, donc invisibles ; recadrée au dépôt sur les pixels visibles (sharp)
+  // pour que le téléphone se centre. Pour montrer les immeubles, il faudrait réexporter le fichier
+  // avec ce fond opaque.
   app: {
-    src: 'app/iphone-app-corum.png',
-    alt: 'Téléphone affichant l’écran d’accueil de l’application, logo R Start sur fond sombre',
+    src: 'app/iphone-app-r-start.png',
+    alt: 'Illustration : téléphone affichant le logo R Start sur un écran bleu-vert',
   },
   hero: {
     // 2400 × 1018, rapport 2,36. La bande de 03a-Immeuble fait entre 2,0 et 2,7 selon l'écran : ce

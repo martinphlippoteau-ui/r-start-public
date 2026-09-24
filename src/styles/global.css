@@ -971,9 +971,8 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   }
 }
 
-/* Photo de téléphone (AppMyCorum.astro) : un PNG DÉTOURÉ qui porte déjà sa perspective et son
-   ombre, aucune pose 3D en CSS (elle penchait le téléphone deux fois et le faisait déborder de
-   sa carte). */
+/* Illustration du téléphone (AppMyCorum.astro) : un PNG DÉTOURÉ, aucune pose 3D en CSS (elle
+   penchait le téléphone deux fois et le faisait déborder de sa carte). */
 .phone-shot {
   height: auto;
 }

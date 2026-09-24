@@ -36,10 +36,10 @@ import { subscribe } from '@/content/fr/subscribe';
  * Le visuel est un PNG DÉTOURÉ du téléphone affichant R Start (un parcours 100 % en ligne se
  * raconte mieux avec l'écran qu'avec une terrasse) : il n'a pas de fond, donc ni cadre, ni masque
  * de fondu, ni recadrage, ses bords sont la silhouette du téléphone et un masque y mordrait.
- * Largeur bornée à 19 rem sur grand écran pour que le BAS DES BADGES tombe sur la dernière étape :
- * le visuel mesure 1,586 fois sa largeur, plus 16 px d'écart et 46 px de badges, à caler sur les
- * 559 px que couvrent les quatre étapes. Le téléphone démarre un peu plus bas que l'étape 1 : le
- * fichier porte 10,6 % de marge transparente en haut. La source ne fait que 338 px de large.
+ * Sur grand écran, la figure garde 19 rem, largeur minimale pour que les DEUX BADGES tiennent sur
+ * une ligne (134 + 146 px et 12 px d'écart), et le téléphone seul est borné à 16 rem : il mesure
+ * 1,94 fois sa largeur (397 × 769), soit 497 px, plus 16 px d'écart et 46 px de badges, pour que
+ * le bas des badges tombe au niveau du bouton de souscription qui clôt les étapes.
  */
 const photo = await resolveImage(media.app.src);
 /** Les deux magasins, dans l'ordre du contenu (App Store puis Google Play). */
@@ -169,13 +169,13 @@ const STEP_STAGGER = 0.06;
         <Picture
           src={photo}
           alt={media.app.alt}
-          widths={[338, 676]}
-          sizes="(min-width: 64rem) 24rem, 18rem"
+          widths={[256, 320, 397]}
+          sizes="(min-width: 64rem) 16rem, 20rem"
           formats={['avif', 'webp']}
           loading="lazy"
           decoding="async"
           pictureAttributes={{ class: 'block' }}
-          class="mx-auto h-auto w-full"
+          class="mx-auto h-auto w-full lg:max-w-[16rem]"
         />
 
         {
