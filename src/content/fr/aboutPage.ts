@@ -18,7 +18,8 @@ export const aboutPage: { seo: PageSeo; hero: PageHero; cta: Cta } = {
   hero: {
     /* Titre du 16/09/2026, texte de l'équipe. */
     title: 'R Start\u00A0: une innovation signée CORUM',
-    intro: `R Start s’appuie sur ${corumGroup.experienceLabel} d’expertise du groupe CORUM dans l’investissement immobilier.`,
+    /* Sans point final (24/09/2026, Martin : aucun point final dans les en-têtes). */
+    intro: `R Start s’appuie sur ${corumGroup.experienceLabel} d’expertise du groupe CORUM dans l’investissement immobilier`,
     /* Plus de ligne risques dans l'en-tête (14/09/2026, « supprime les bon à savoir de tous les
        hero sauf celui de la home ») ; restent les mentions du contenu et le pied de page. */
   },

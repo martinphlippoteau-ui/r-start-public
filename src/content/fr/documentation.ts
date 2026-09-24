@@ -140,8 +140,9 @@ export const documentation = {
   hero: {
     title: 'Documentation',
     intro: nb(
-      `Les documents de R Start, au même endroit : documents réglementaires et formulaires. Ce sont eux qui font foi. Lisez le DIC${dicPublished ? '' : ', disponible sur corum.fr,'} et la note d’information avant toute décision.`
+      `Les documents de R Start, au même endroit : documents réglementaires et formulaires. Ce sont eux qui font foi. Lisez le DIC${dicPublished ? '' : ', disponible sur corum.fr,'} et la note d’information avant toute décision`
     ),
+    /* Sans point final (24/09/2026, Martin : aucun point final dans les en-têtes). */
     /* Plus de ligne risques dans l'en-tête (14/09/2026, « supprime les bon à savoir de tous les
        hero sauf celui de la home ») ; restent les mentions du contenu et le pied de page. */
   },

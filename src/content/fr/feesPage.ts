@@ -32,8 +32,9 @@ export const feesPage = {
     /* Le titre dit ce que la page EST et reprend l'intitulé du menu (16/09/2026, texte de
        l'équipe). Plus aucun « gagnant-gagnant » sur cette page depuis. */
     title: nb('Comparateur de frais SCPI'),
+    /* Sans point final (24/09/2026, Martin : aucun point final dans les en-têtes). */
     intro: nb(
-      'R Start est la seule SCPI qui ne prélève ni frais de souscription, ni frais d’acquisition sur les achats d’immeubles.'
+      'R Start est la seule SCPI qui ne prélève ni frais de souscription, ni frais d’acquisition sur les achats d’immeubles'
     ),
     /* Chute du 15/09/2026, texte de l'équipe : elle ne promet rien et envoie au comparateur, que
        frais.astro lui fait introduire (elle n'est pas rendue dans l'en-tête). */

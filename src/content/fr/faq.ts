@@ -327,7 +327,8 @@ export const faq = {
   searchCountOne: '1 question trouvée',
   searchEmpty: 'Aucune question ne correspond. Essayez un autre mot.',
   /** En-tête de la page /faq, distinct de celui de la section courte. */
-  pageTitle: 'Toutes vos questions sur la SCPI R Start.',
+  /* Sans point final (24/09/2026, Martin : aucun point final dans les en-têtes). */
+  pageTitle: 'Toutes vos questions sur la SCPI R Start',
   /* Meta description de /faq, même forme que les autres pages : les sujets, puis le rappel de
      risque. Obligatoire : une chaîne vide passerait le `??` de la mise en page. */
   pageDescription:
