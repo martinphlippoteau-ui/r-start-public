@@ -262,6 +262,13 @@ const ctaMobile = 'max-sm:px-6 max-sm:py-3 max-sm:text-base';
         }
         <div {...copyScrubDown} class="mx-auto mt-6 w-full max-w-md sm:mt-10">
           <div data-intro="6">
+            {
+              /* Le distributeur (24/09/2026, demande de Martin : « au-dessus de Trustpilot »), dans
+                le même bloc que le bandeau, qui entre et s'efface avec lui. */
+            }
+            {hero.distributor && (
+              <p class="mb-4 text-base text-white/80 sm:text-lg">{hero.distributor}</p>
+            )}
             <TrustBox template="horizontal" theme="dark" label={trust.trustpilot.widgetLabel!} />
           </div>
         </div>
