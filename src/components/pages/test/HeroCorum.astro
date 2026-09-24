@@ -19,14 +19,15 @@ import TrustBox from '@/components/ui/TrustBox.astro';
 import { hero } from '@/content/fr/hero';
 import { trust, experienceStats } from '@/content/fr/trust';
 
-const DISTRIBUEE = 'Distribuée par CORUM L’Épargne';
+/* Formulation de Martin (24/09/2026), reprise telle quelle partout où la phrase est écrite. */
+const DISTRIBUEE = 'La SCPI R Start est distribuée par CORUM L’Épargne';
 const experience = experienceStats[0]?.value ?? '';
 const epargne = experienceStats[1]?.value ?? '';
 
 const VARIANTES: { titre: string; note: string }[] = [
   {
     titre: 'Une ligne sous l’accroche',
-    note: 'Le hero ne change pas ; « Distribuée par CORUM L’Épargne » en petit, sous l’accroche. Texte seul.',
+    note: 'Le hero ne change pas ; « La SCPI R Start est distribuée par CORUM L’Épargne » en petit, sous l’accroche. Texte seul.',
   },
   {
     titre: 'La signature sous le logo',
@@ -38,7 +39,7 @@ const VARIANTES: { titre: string; note: string }[] = [
   },
   {
     titre: 'La pastille de distribution',
-    note: 'Sous les boutons, une pastille claire « Distribuée par » avec le logo, comme un cachet.',
+    note: 'Sous les boutons, une pastille claire « La SCPI R Start est distribuée par » suivie du logo, comme un cachet.',
   },
   {
     titre: 'Le surtitre « CORUM L’Épargne présente »',
@@ -123,7 +124,7 @@ const taglineClass =
             {/* 4. Pastille de distribution */}
             {n === 4 && (
               <p class="mt-6 inline-flex items-center gap-3 rounded-full bg-white py-2 pr-4 pl-5 text-sm font-semibold text-navy">
-                Distribuée par
+                La SCPI R Start est distribuée par
                 <Image src={corumLogo} alt="CORUM L’Épargne" height={20} loading="lazy" decoding="async" class="h-5 w-auto" />
               </p>
             )}
