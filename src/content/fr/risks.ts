@@ -68,6 +68,10 @@ export const risks: RisksContent = {
      risques partout où la section l'est : accueil, /strategie, /a-propos. */
   notice:
     'Les produits commercialisés par CORUM L’Épargne sont des investissements long terme qui n’offrent aucune garantie de rendement ou de performance et présentent un risque de perte en capital et de liquidité. Les revenus ne sont pas garantis et dépendront des marchés immobilier et financier et du cours des devises.',
+  /* Sur /strategie seulement (24/09/2026, Martin : « dans le bandeau des risques plutôt » que sous
+     les deux cartes moteurs, où elle était depuis le même jour). Sur /a-propos, la gamme porte déjà
+     la sienne ; l'accueil n'en affiche pas. */
+  pastPerformance: 'Les performances passées ne préjugent pas des performances futures.',
 
   warningsTitle: 'Les avertissements réglementaires',
   bulletinWarningTitle: 'Avertissement du bulletin de souscription',

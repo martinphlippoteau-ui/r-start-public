@@ -8,11 +8,11 @@ import type { StrategyContent } from '@/content/types';
  * CE QU'IL FAUT SAVOIR CÔTÉ CONFORMITÉ : la page ne dit plus le mot d'ordre et ses contre-poids, la
  * zone du DIC (pays du Conseil de l'Europe et Canada, l'inverse de « partout dans le monde », voir
  * `where`), les types d'actifs du DIC, l'effet de levier ni les notes de sources ; les chiffres
- * restent dans facts.ts. UNE SEULE MENTION DANS CE CORPS : « Les performances passées ne préjugent
- * pas des performances futures. » sous les deux moteurs (`engines.outro`, 24/09/2026, demande de
- * Martin). La mention de risque qui suivait les moteurs a quitté l'écran le 16/09/2026 et le code
- * le 22/09/2026 (archivée hors du dépôt, .claude/audits) ; les risques sont portés par le bloc
- * Risques que la page rend ensuite.
+ * restent dans facts.ts. AUCUNE MENTION DANS CE CORPS : la mention de risque qui suivait les
+ * moteurs a quitté l'écran le 16/09/2026 et le code le 22/09/2026 (archivée hors du dépôt,
+ * .claude/audits) ; « Les performances passées ne préjugent pas… », posée sous les deux moteurs le
+ * 24/09/2026, est passée le même jour dans le bloc Risques que la page rend ensuite
+ * (risks.pastPerformance), qui porte tout.
  */
 
 export const strategy: StrategyContent = {
@@ -32,8 +32,8 @@ export const strategy: StrategyContent = {
     items: [
       /* `benefit` (17/09/2026, texte de l'équipe mot pour mot) : « tous les mois » est exact
          (facts.ts, `frequency`), « potentiels » indispensable, les revenus n'étant pas garantis. */
-      /* `sequence` (24/09/2026, Martin : « 01 D'abord les loyers », « 02 Et ensuite ») : l'ordre
-         des deux moteurs, à la suite du numéro. `rest` : texte de Martin du 24/09/2026, mot pour mot. */
+      /* `sequence` (24/09/2026, Martin : « D'abord », « Et ensuite », sans les numéros 01 et 02
+         retirés le même jour) : l'ordre des deux moteurs. `rest` : texte de Martin, mot pour mot. */
       {
         sequence: 'D’abord',
         lead: 'Les loyers',
@@ -50,8 +50,6 @@ export const strategy: StrategyContent = {
         rest: 'R Start met au cœur de sa démarche la recherche de plus-values sur les ventes d’immeubles. Ces plus-values sont redistribuées aux épargnants sous forme de dividendes après frais. C’est la deuxième source de revenus potentiels pour les clients de la SCPI R Start.',
       },
     ],
-    /* Sous les deux cartes (24/09/2026, demande de Martin). */
-    outro: 'Les performances passées ne préjugent pas des performances futures.',
   },
 
   /* En-tête des trois volets (16/09/2026, texte de l'équipe). « pour les alimenter » renvoie aux

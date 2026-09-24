@@ -17,10 +17,10 @@
  * sous-pages. LES CARTES AUSSI SONT CLAIRES depuis le 22/09/2026 (demande de Martin ; elles
  * étaient ink) : blanches, à ombre et filet, la recette des repères de l'accueil, les dessins
  * re-teintés en marine par les variables `--illus-*` (global.css). Le seul bloc sombre est celui
- * des Risques, que la page rend ensuite et qui porte les risques. UNE SEULE MENTION DANS CES DEUX
- * SECTIONS : « Les performances passées ne préjugent pas… » sous les deux cartes moteurs
- * (`engines.outro`, 24/09/2026, demande de Martin) ; la mention de risque d'avant a quitté l'écran
- * le 16/09/2026 et le code le 22/09/2026 avec le composant NoteConformite.
+ * des Risques, que la page rend ensuite et qui porte les risques : AUCUNE MENTION DANS CES DEUX
+ * SECTIONS (la mention de risque a quitté l'écran le 16/09/2026 et le code le 22/09/2026 avec le
+ * composant NoteConformite ; « Les performances passées ne préjugent pas… », sous les moteurs le
+ * temps d'une journée le 24/09/2026, est dans le bloc Risques).
  *
  * Motion (src/scripts/motion.ts, tout par attributs) : aucun rideau ici, la section suit
  * directement l'en-tête ; H2 du premier chapitre mot à mot (data-reveal-text), celui des volets en
@@ -132,13 +132,12 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
       {
         /* Dessins animés à la place des photos (16/09/2026) : une photo montre un décor, le dessin
           montre le MÉCANISME, et la différence entre les deux moteurs se lit sans passer par les
-          textes. Même grammaire que les trois volets (16/09/2026, demande de l'équipe) : le numéro
-          est un surtitre, à la place exacte qu'occupe « SÉLECTIVE » sur les volets. */
+          textes. Même grammaire que les trois volets (16/09/2026, demande de l'équipe) : le mot
+          d'ordre est un surtitre, à la place exacte qu'occupe « SÉLECTIVE » sur les volets. */
       }
       {
         strategy.engines.items.map((item, i) => {
-          const numero = String(i + 1).padStart(2, '0');
-          const cible = 'detail-moteur-' + numero;
+          const cible = 'detail-moteur-' + String(i + 1).padStart(2, '0');
           /* Même perspective que les volets : sans elle, le retournement n'est qu'un écrasement. */
           return (
             <li class="[perspective:1400px]">
@@ -147,13 +146,10 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
                 class="carte-recto relative flex min-h-[24rem] flex-col overflow-hidden rounded-3xl bg-white p-6 text-ink shadow-card ring-1 ring-navy/5 sm:min-h-[26rem] sm:p-8"
               >
                 {
-                  /* Numéro puis mot d'ordre (24/09/2026, Martin : « 01 D'abord », « 02 Et
-                    ensuite ») : seul le numéro reste masqué aux lecteurs d'écran, le mot se lit. */
+                  /* Mot d'ordre seul (24/09/2026, Martin : « D'abord », « Et ensuite », puis « enlever
+                    les numéros 01 et 02 » le même jour), à la place exacte du surtitre des volets. */
                 }
-                <p class="text-eyebrow text-teal-700 tabular-nums">
-                  <span aria-hidden="true">{numero}</span>
-                  {item.sequence && <span> {item.sequence}</span>}
-                </p>
+                {item.sequence && <p class="text-eyebrow text-teal-700">{item.sequence}</p>}
                 <p class="text-display-sm mt-3 text-navy">{item.lead}</p>
                 {
                   /* Ce que le moteur apporte, sous le titre (17/09/2026, demande de l'équipe).
@@ -210,10 +206,7 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
               }
               <div data-carte-detail-hote>
                 <div id={cible} data-carte-detail class="mt-5 space-y-4">
-                  <p class="text-eyebrow text-teal-700 tabular-nums">
-                    {numero}
-                    {item.sequence && <span> {item.sequence}</span>}
-                  </p>
+                  {item.sequence && <p class="text-eyebrow text-teal-700">{item.sequence}</p>}
                   <p class="text-display-sm text-navy">{item.lead}</p>
                   {item.rest && <p class="text-base leading-relaxed text-slate-700">{item.rest}</p>}
                 </div>
@@ -223,26 +216,6 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
         })
       }
     </ul>
-    {
-      /* Mention sous les deux cartes (24/09/2026, demande de Martin ; « en plus gros » le même
-        jour : 18 px). HAUTEUR FIXE, 3,25 rem : 1,5 rem de marge haute (`mt-6`) et une ligne de
-        1,75 rem (`leading-7`), reprise par `--pont-note`
-        dans la CSS de la canalisation, qui doit toujours arriver au bas des CARTES et non de cette
-        ligne. Une ligne, jamais deux : au-dessus de 1024 px, où la canalisation se dessine, la
-        phrase tient largement. À 18 px elle CROISE les deux conduites (au centre des colonnes, à
-        25 % et 75 %) dès que l'écran est plus étroit que 1300 px : sur grand écran, celle-ci n'est
-        qu'un gabarit invisible (`lg:invisible` garde sa place) et c'est sa copie, posée dans la
-        section des volets APRÈS le tracé (`.note-moteurs`), qui s'affiche, sur fond papier : le
-        trait passe derrière elle et s'interrompt, comme il s'interrompt derrière le titre des
-        volets. Une seule des deux est dans l'arbre d'accessibilité à toute largeur. */
-    }
-    {
-      strategy.engines.outro && (
-        <p class="mt-6 text-center text-lg leading-7 text-ink lg:invisible">
-          {strategy.engines.outro}
-        </p>
-      )
-    }
   </Container>
 </Section>
 
@@ -290,17 +263,6 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
       }
       <span class="pont-noeud" />
     </div>
-    {
-      /* La mention sous les cartes moteurs, copie affichée sur grand écran (voir le gabarit dans la
-        section des moteurs) : hors du bloc `aria-hidden` de la canalisation, pour rester lue. */
-    }
-    {
-      strategy.engines.outro && (
-        <div class="note-moteurs-hote">
-          <p class="note-moteurs text-center text-lg leading-7 text-ink">{strategy.engines.outro}</p>
-        </div>
-      )
-    }
 
     {
       /* En-tête propre au bloc, désigné par `labelledBy` ; les titres de volet sont des H3, trois
@@ -457,31 +419,6 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
    * entre les moteurs et les volets, puis le `mt-chapter` sous le titre. Aucun pixel ajouté à la page,
    * la hauteur de la section est identique avec et sans.
    */
-  /* La copie de la mention : rien sous `lg` (le gabarit en flux s'affiche), au-dessus une boîte de
-     hauteur nulle en tête du Container, et la phrase en absolu, son bas exactement où est celui du
-     gabarit : la marge basse de la section des moteurs plus la marge haute de celle-ci. Fond papier
-     et marges latérales : c'est ce qui interrompt le trait. */
-  .note-moteurs-hote {
-    display: none;
-  }
-  @media (min-width: 64rem) {
-    .note-moteurs-hote {
-      display: block;
-      position: relative;
-      height: 0;
-    }
-    .note-moteurs {
-      position: absolute;
-      left: 50%;
-      bottom: calc(var(--spacing-section) + var(--spacing-section-sm));
-      margin: 0;
-      padding-inline: 1rem;
-      transform: translateX(-50%);
-      white-space: nowrap;
-      background: var(--color-paper);
-    }
-  }
-
   .pont {
     /* Sous `lg`, les cinq cartes sont empilées en une seule colonne : trois traits qui convergeraient
        vers deux n'auraient plus rien à relier, et surtout rien à tenter à 390 px. Rendu supprimé, pas
@@ -495,16 +432,13 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
       /* Boîte de HAUTEUR NULLE : elle ne sert que de repère, elle ne pousse rien. */
       position: relative;
       --pont-cycle: 8s;
-      /* La mention sous les cartes moteurs : `mt-6` + une ligne `leading-7` (voir le paragraphe
-         dans la section des moteurs). Changer l'un sans l'autre décolle les chevrons des cartes. */
-      --pont-note: 3.25rem;
       /*
        * HAUTEUR DE LA BANDE, écrite UNE SEULE FOIS parce que deux règles en dépendent : le tracé et
        * le nœud à mi-hauteur. C'est la marge basse de la section des moteurs plus la marge haute
-       * (`pt-section-sm`) de celle des volets, plus la mention sous les cartes : les conduites
-       * arrivent AU BORD des cartes (24/09/2026), plus un rem en dessous comme avant les chevrons.
+       * (`pt-section-sm`) de celle des volets : les conduites arrivent AU BORD des cartes
+       * (24/09/2026), plus un rem en dessous comme avant les chevrons.
        */
-      --pont-bande: calc(var(--spacing-section) + var(--spacing-section-sm) + var(--pont-note));
+      --pont-bande: calc(var(--spacing-section) + var(--spacing-section-sm));
     }
     .pont svg {
       position: absolute;

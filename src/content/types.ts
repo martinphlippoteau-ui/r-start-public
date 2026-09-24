@@ -101,11 +101,10 @@ export interface StrategyChapter {
    * `lead` porte l'accent (gras du document), `rest` la suite de la phrase. `icon` met une puce en
    * pictogramme à la place du point (clé de ui/Picto.astro). `benefit` : ce que le moteur apporte à
    * l'épargnant, en une ligne sous le titre de la carte, côté recto. `sequence` : mot d'ordre
-   * chronologique des moteurs (« D'abord », « Et ensuite »), rendu à la suite du numéro.
+   * chronologique des moteurs (« D'abord », « Et ensuite »), leur surtitre.
    */
   items: { lead: string; rest?: string; icon?: PictoKey; benefit?: string; sequence?: string }[];
-  /** Phrase qui referme le chapitre, sous la liste. Pour les moteurs, c'est la mention sur les
-      performances passées (24/09/2026), rendue sous les deux cartes. */
+  /** Phrase qui referme le chapitre, sous la liste. Les moteurs n'en ont pas. */
   outro?: string;
 }
 
@@ -193,6 +192,9 @@ export interface RisksContent {
   items: RiskItem[];
   /** Paragraphe qui referme la grille des quatre risques (24/09/2026, texte de Martin). */
   notice?: string;
+  /** « Les performances passées ne préjugent pas… », rendue seulement là où la page le demande
+      (08-Risks.astro `pastPerformance`) : /strategie depuis le 24/09/2026. */
+  pastPerformance?: string;
   /** Titre (H2) de la section qui regroupe les avertissements reproduits in extenso (/documentation). */
   warningsTitle?: string;
   /** Avertissement du bulletin de souscription, in extenso. */
