@@ -54,6 +54,10 @@ interface Props {
    * quand /faq est entrée dans la liste.
    */
   revealTitle?: boolean;
+  /** Premier plan sur la voisine sombre (ui/Section.astro `plan`, 24/09/2026). `haut` par défaut :
+      la FAQ suit toujours un bloc sombre (les Risques sur l'accueil et /strategie, l'en-tête sur
+      /faq). */
+  plan?: 'haut' | 'bas' | 'haut-bas';
 }
 const {
   items: rendus = faq.items,
@@ -62,6 +66,7 @@ const {
   title = faq.title,
   tone = 'paper',
   revealTitle = true,
+  plan = 'haut',
 } = Astro.props as Props;
 
 const id = sections.faq.id;
@@ -87,7 +92,7 @@ const items = rendus.map((item) => {
 });
 ---
 
-<Section id={id} tone={tone}>
+<Section id={id} tone={tone} plan={plan}>
   <Container size="wide">
     {
       /* En-tête PLEINE LARGEUR, hors de la grille : dans une colonne de cinq douzièmes, le titre ne

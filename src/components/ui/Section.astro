@@ -4,11 +4,20 @@
  * tone : 'paper' (clair), 'white', 'ink' (sombre) ; spacing : 'default' (py-section), 'compact'
  * (py-section-sm), 'none' (la section gère ses marges). Les attributs `data-*` sont transmis à la
  * balise <section> (vocabulaire motion : data-in-view, data-curtain…).
+ * PREMIER PLAN (24/09/2026, demande de Martin : « les sections à fond bleu comme sous les
+ * autres », essayé sur /strategie puis étendu partout) : `plan` pose une section CLAIRE par-dessus
+ * sa voisine sombre, du côté indiqué, coins arrondis et ombre (`.plan-haut` / `.plan-bas`,
+ * global.css) ; `sous` se pose sur la section SOMBRE recouverte, du côté indiqué, pour que son
+ * contenu reste hors de la zone recouverte (`.sous-haut` / `.sous-bas`). Les deux se répondent :
+ * une section `plan="bas"` appelle un `sous="haut"` sur la suivante. Jamais de `plan` entre deux
+ * sections claires.
  */
 interface Props {
   id: string;
   tone?: 'paper' | 'white' | 'ink';
   spacing?: 'default' | 'compact' | 'none';
+  plan?: 'haut' | 'bas' | 'haut-bas';
+  sous?: 'haut' | 'bas' | 'haut-bas';
   class?: string;
   labelledBy?: string;
   [key: `data-${string}`]: string | undefined;
@@ -17,10 +26,14 @@ const {
   id,
   tone = 'paper',
   spacing = 'default',
+  plan,
+  sous,
   class: className = '',
   labelledBy,
   ...rest
 } = Astro.props;
+const cotes = (v: string | undefined, prefixe: string): string[] =>
+  v ? v.split('-').map((c) => `${prefixe}-${c}`) : [];
 const tones = {
   paper: 'bg-paper text-ink',
   white: 'bg-white text-ink',
@@ -33,7 +46,14 @@ const spacings = { default: 'py-section', compact: 'py-section-sm', none: '' };
   id={id}
   data-section={id}
   aria-labelledby={labelledBy ?? id + '-title'}
-  class:list={['relative', spacings[spacing], tones[tone], className]}
+  class:list={[
+    'relative',
+    spacings[spacing],
+    tones[tone],
+    ...cotes(plan, 'plan'),
+    ...cotes(sous, 'sous'),
+    className,
+  ]}
   {...rest}
 >
   <slot />

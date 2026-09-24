@@ -38,7 +38,8 @@ const QUIET_TITLE_Y = 12;
 ---
 
 {/* 1. Le groupe CORUM en chiffres */}
-<Section id="corum" tone="white" labelledBy="chiffres-title">
+{/* `plan="haut"` (24/09/2026) : au premier plan de l'en-tête sombre. */}
+<Section id="corum" tone="white" labelledBy="chiffres-title" plan="haut">
   <Container size="wide">
     <h2 id="chiffres-title" class="text-display-md max-w-4xl" data-animate="fade-up">
       {stats.title}
@@ -150,7 +151,8 @@ const QUIET_TITLE_Y = 12;
   </div>
 </figure>
 
-<Section id="gamme" tone="paper" labelledBy="gamme-title">
+{/* `plan="bas"` (24/09/2026) : au premier plan du bloc sombre des Risques qui suit. */}
+<Section id="gamme" tone="paper" labelledBy="gamme-title" plan="bas">
   <Container size="wide">
     {
       /*

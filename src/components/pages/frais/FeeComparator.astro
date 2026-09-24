@@ -39,8 +39,11 @@ interface Props {
    */
   heading?: string;
   intro?: string;
+  /** Premier plan (ui/Section.astro `plan`, 24/09/2026) : `bas` sur l'accueil, où la section suit
+      les points forts (clairs) et précède sa bande sombre ; `haut-bas` sur /frais, sous l'en-tête. */
+  plan?: 'bas' | 'haut-bas';
 }
-const { id, heading, intro } = Astro.props as Props;
+const { id, heading, intro, plan = 'bas' } = Astro.props as Props;
 const titleId = id + '-title';
 const selectId = id + '-select';
 const { rows } = comparator;
@@ -60,7 +63,7 @@ const data = scpis.map((s) => ({
 }));
 ---
 
-<Section id={id} tone="white" labelledBy={titleId} class="pt-8 sm:pt-10 lg:pt-14">
+<Section id={id} tone="white" labelledBy={titleId} plan={plan} class="pt-8 sm:pt-10 lg:pt-14">
   <Container size="wide">
     {
       /* Un seul H2 : le même titre de section, visible ou non. Avec `heading`, c'est le texte de

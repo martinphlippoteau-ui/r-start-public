@@ -8,15 +8,11 @@
  * reproduits in extenso (bulletin de souscription, DIC, commission d'arbitrage) ont quitté cette
  * section le 11/09/2026 à la demande de l'équipe : ils sont sur /documentation, à côté des
  * documents dont ils sont extraits (components/pages/documentation/MandatoryWarnings.astro).
- * Motion (src/scripts/motion.ts) :
- *  - transition de chapitre en rideau (`data-curtain` sur la section) : la section précédente
- *    (« Souscrire » sur l'accueil, 04-Strategy sur /strategie) est épinglée quand son bas atteint
- *    le milieu de l'écran (`bottom center`, voir plus bas) pendant que cette section monte
- *    par-dessus (coins arrondis et ombre posés par la CSS `[data-curtain]`). La section recouverte
- *    recule (scale 0,96, opacité 0,6) : elle ne contient aucun élément protégé ;
- *  - rien d'autre ne bouge, ni le H2 ni les quatre risques : le contre-poids global de la page est
- *    en place d'emblée.
- * Sans JS ou en reduced-motion : aucun pin, aucun rideau, tout est visible et stable.
+ * PLAN (24/09/2026, demande de Martin) : le bloc passe SOUS les sections claires qui l'entourent
+ * (`sousPlan`, ui/Section.astro), qui mordent dessus avec leurs coins arrondis et leur ombre. Le
+ * rideau (`data-curtain`, la section montant par-dessus la précédente épinglée) est coupé partout
+ * depuis ce jour : il faisait l'inverse. Rien ne bouge, ni le H2 ni les quatre risques : le
+ * contre-poids global de la page est en place d'emblée.
  * Contenu : src/content/fr/risks.ts (textes réglementaires reproduits à l'identique depuis legal.ts).
  */
 import Container from '@/components/ui/Container.astro';
@@ -33,9 +29,15 @@ const id = sections.risks.id;
  * de chapitre, pas une ligne de contenu.
  */
 interface Props {
+  /** Rideau COUPÉ PARTOUT depuis le 24/09/2026 (demande de Martin : les sections sombres passent
+      SOUS les claires) : il faisait monter ce bloc sombre par-dessus la section claire précédente.
+      Le réglage reste, à `false`, au cas où. */
   rideau?: boolean;
+  /** Côtés recouverts par les sections claires voisines au premier plan (ui/Section.astro `sous`).
+      Les deux par défaut : le bloc est toujours entre deux sections claires. */
+  sousPlan?: 'haut' | 'bas' | 'haut-bas';
 }
-const { rideau = true } = Astro.props as Props;
+const { rideau = false, sousPlan = 'haut-bas' } = Astro.props as Props;
 
 ---
 
@@ -57,7 +59,13 @@ const { rideau = true } = Astro.props as Props;
     risques et disclaimers verticalement, pas sur la police, sur les espaces vides ») : marges de
     section compactes, liste et filets resserrés. Corps de texte inchangé. */
 }
-<Section id={id} tone="ink" spacing="compact" data-curtain={rideau ? 'bottom center' : undefined}>
+<Section
+  id={id}
+  tone="ink"
+  spacing="compact"
+  sous={sousPlan}
+  data-curtain={rideau ? 'bottom center' : undefined}
+>
   <Container size="wide" class="relative">
     {
       /* TOUT LE BLOC EN SABLE (16/09/2026, demande de l'équipe) : le titre par la classe passée à

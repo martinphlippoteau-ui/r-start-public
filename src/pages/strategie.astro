@@ -35,7 +35,13 @@ const jsonLd = [
 <Base title={seo.title} description={seo.description} path={page.path} jsonLd={jsonLd}>
   <SiteNav />
   <main id="contenu">
-    <PageHero title={hero.title} punchline={hero.punchline}>
+    {
+      /* PREMIER PLAN (24/09/2026, Martin : « les sections à fond bleu comme sous les autres »),
+        essayé ici puis étendu à tout le site : les sections claires passent au premier plan des
+        sombres, coins arrondis et ombre (ui/Section.astro `plan` / `sous`). L'en-tête et les
+        Risques sont recouverts. */
+    }
+    <PageHero title={hero.title} punchline={hero.punchline} sousPlan>
       <Breadcrumb slot="breadcrumb" key="strategy" tone="dark" />
       <Button slot="cta" position={strategyPage.cta.position} variant="light" size="lg">
         {strategyPage.cta.label}
@@ -46,9 +52,9 @@ const jsonLd = [
     {
       /* Bloc des risques de l'accueil, rendu TEL QUEL en fin de page (14/09/2026, demande de
         l'équipe : « ajoute le même bloc de risques à la fin que sur la homepage ») : même
-        composant, même contenu, la seule façon qu'ils ne divergent jamais d'une page à l'autre. Il
-        porte son rideau de chapitre : la section qui le précède, « Comment », est sur fond clair,
-        et le bloc sombre monte par-dessus, comme sur l'accueil. */
+        composant, même contenu, la seule façon qu'ils ne divergent jamais d'une page à l'autre.
+        Depuis le 24/09/2026 il passe SOUS les sections claires qui l'entourent (volets avant, FAQ
+        après), plus de rideau. */
     }
     <Risks />
     {

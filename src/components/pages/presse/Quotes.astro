@@ -20,7 +20,8 @@ const { quotes } = press;
 const labels = press.labels ?? {};
 ---
 
-<Section id={id} tone="paper">
+{/* `plan="haut"` (24/09/2026) : au premier plan de l'en-tête sombre. */}
+<Section id={id} tone="paper" plan="haut">
   <Container size="wide">
     <header class="max-w-4xl">
       <h2 id={id + '-title'} class="text-display-md text-ink">{quotes.title}</h2>

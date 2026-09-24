@@ -23,7 +23,8 @@ interface Props {
 const { id, title } = Astro.props;
 ---
 
-<Section id={id} tone="ink" spacing="none" class="py-8 sm:py-10">
+{/* Bande sombre recouverte des deux côtés par les sections claires voisines (24/09/2026). */}
+<Section id={id} tone="ink" spacing="none" sous="haut-bas" class="py-8 sm:py-10">
   <Container size="wide">
     <h2 id={id + '-title'} class="text-sm font-bold tracking-[0.16em] text-sand uppercase">{title}</h2>
     {/* Pleine largeur du conteneur, comme le comparateur au-dessus (22/09/2026, demande de Martin) :

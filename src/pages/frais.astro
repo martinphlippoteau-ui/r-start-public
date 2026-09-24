@@ -54,6 +54,7 @@ const jsonLd = [
     <PageHero
       title={hero.title}
       intro={hero.intro}
+      sousPlan
     >
       <Breadcrumb slot="breadcrumb" key="fees" tone="dark" />
       <Button slot="cta" position={cta.position} variant="light" size="lg">{cta.label}</Button>
@@ -75,7 +76,7 @@ const jsonLd = [
     }
     {/* L'accroche « Comparez chaque ligne… » introduit le comparateur (16/09/2026), où elle dit ce
       qu'on va faire au moment de le faire ; le texte vit dans feesPage.ts (`hero.punchline`). */}
-    <FeeComparator id="comparateur" intro={hero.punchline} />
+    <FeeComparator id="comparateur" intro={hero.punchline} plan="haut-bas" />
 
     {
       /* Rien après le comparateur (voir l'en-tête du fichier) : l'appel de la page reste celui de
@@ -90,6 +91,6 @@ const jsonLd = [
       visait une ancre absente et n'apparaissait jamais. */
   }
   <StickyCta label={cta.label} position={cta.position} from="#comparateur" />
-  <Footer />
+  <Footer plan />
 </Base>
 

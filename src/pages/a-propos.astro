@@ -45,7 +45,7 @@ const jsonLd = [
   <TrustpilotScript slot="head" />
   <SiteNav />
   <main id="contenu">
-    <PageHero title={hero.title} intro={hero.intro}>
+    <PageHero title={hero.title} intro={hero.intro} sousPlan>
       <Breadcrumb slot="breadcrumb" key="about" tone="dark" />
       <Button slot="cta" position={aboutPage.cta.position} variant="light" size="lg">
         {aboutPage.cta.label}
@@ -66,7 +66,7 @@ const jsonLd = [
     }
     {/* `rideau={false}` : la transition en rideau est un effet GSAP, et cette page doit rester sans
       GSAP (tests/performance.spec.ts). Le contenu du bloc est identique. */}
-    <Risks rideau={false} />
+    <Risks />
     {
       /* Les avis Trustpilot ferment la page (15/09/2026, demande de l'équipe : « mettre les avis
         trustpilot dans la page à propos tout en bas ») : la page dit qui gère R Start, les avis
@@ -74,7 +74,7 @@ const jsonLd = [
         Start. `paper` après le bloc Risques (ink) : le carrousel pose ses propres cartes
         blanches. `niveau={2}` : le bloc est seul dans sa section et en porte le titre. */
     }
-    <Section id="avis" tone="paper" labelledBy="avis-title">
+    <Section id="avis" tone="paper" labelledBy="avis-title" plan="haut">
       <Container size="wide">
         <TrustpilotReviews titleId="avis-title" />
       </Container>

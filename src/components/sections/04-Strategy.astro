@@ -101,6 +101,16 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
 
 ---
 
+{
+  /* PREMIER PLAN (essai du 24/09/2026) : les DEUX sections dans une seule enveloppe `.plan-haut
+    .plan-bas` (global.css), une dalle claire qui mord sur l'en-tête sombre (qui reçoit `sousPlan`)
+    et sur les Risques (`sousPlan="haut"`). Une enveloppe et non `plan` sur chaque section : deux
+    boîtes voisines, c'est une jonction, et l'ombre de contact de la seconde, peinte après la
+    première, y dessinait une ligne. `overflow-hidden` : c'est lui qui arrondit les coins des
+    fonds papier des sections ; la canalisation, qui déborde de la section des volets vers celle des
+    moteurs, reste à l'intérieur de l'enveloppe. */
+}
+<div class="plan-haut plan-bas overflow-hidden">
 {/* 1. Les deux moteurs de performance */}
 <Section id={id} tone="paper" class="overflow-hidden">
   <Container size="wide">
@@ -215,16 +225,23 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
       }
     </ul>
     {
-      /* Mention sous les deux cartes (24/09/2026, demande de Martin). HAUTEUR FIXE, 3 rem : 1,5 rem
-        de marge haute (`mt-6`) et une ligne de 1,5 rem (`leading-6`), reprise par `--pont-note`
+      /* Mention sous les deux cartes (24/09/2026, demande de Martin ; « en plus gros » le même
+        jour : 18 px). HAUTEUR FIXE, 3,25 rem : 1,5 rem de marge haute (`mt-6`) et une ligne de
+        1,75 rem (`leading-7`), reprise par `--pont-note`
         dans la CSS de la canalisation, qui doit toujours arriver au bas des CARTES et non de cette
-        ligne. Centrée : les deux conduites montent au centre des colonnes, à 25 % et 75 %, et une
-        ligne de cette longueur centrée n'en croise aucune. Une ligne, jamais deux : au-dessus de
-        1024 px, où la canalisation se dessine, la phrase tient largement. */
+        ligne. Une ligne, jamais deux : au-dessus de 1024 px, où la canalisation se dessine, la
+        phrase tient largement. À 18 px elle CROISE les deux conduites (au centre des colonnes, à
+        25 % et 75 %) dès que l'écran est plus étroit que 1300 px : sur grand écran, celle-ci n'est
+        qu'un gabarit invisible (`lg:invisible` garde sa place) et c'est sa copie, posée dans la
+        section des volets APRÈS le tracé (`.note-moteurs`), qui s'affiche, sur fond papier : le
+        trait passe derrière elle et s'interrompt, comme il s'interrompt derrière le titre des
+        volets. Une seule des deux est dans l'arbre d'accessibilité à toute largeur. */
     }
     {
       strategy.engines.outro && (
-        <p class="mt-6 text-center text-sm leading-6 text-slate-700">{strategy.engines.outro}</p>
+        <p class="mt-6 text-center text-lg leading-7 text-ink lg:invisible">
+          {strategy.engines.outro}
+        </p>
       )
     }
   </Container>
@@ -267,19 +284,24 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
         {departs.map((d) => <path class="pont-flux pont-flux--depart" pathLength="100" d={d} />)}
       </svg>
       {
-        /* Nœud et pointes en CSS, hors du viewBox : celui-ci est étiré horizontalement d'environ un
-          quart, un cercle y deviendrait un ovale et un chevron changerait de forme avec la largeur
-          de la fenêtre. Ce sont aussi eux qui portent le sens quand l'animation est coupée. */
+        /* Nœud en CSS, hors du viewBox : celui-ci est étiré horizontalement d'environ un quart, un
+          cercle y deviendrait un ovale. PLUS DE CHEVRONS à l'arrivée (24/09/2026, Martin : « ne
+          fais pas finir par des flèches mais sous les cards ») : les conduites filent jusqu'au bord
+          des cartes et semblent passer dessous ; c'est le nœud et l'impulsion qui portent le sens. */
       }
       <span class="pont-noeud" />
-      {
-        /* DIVISÉ PAR DIX : les abscisses sont en POUR MILLE, l'unité du viewBox de 1000 de large, et
-          `left` attend des pour cent. Sans la conversion, les chevrons partaient à deux mille pixels
-          du bord. */
-      }
-      <span class="pont-pointe" style={`--x:${MOTEUR_G / 10}%`} />
-      <span class="pont-pointe" style={`--x:${MOTEUR_D / 10}%`} />
     </div>
+    {
+      /* La mention sous les cartes moteurs, copie affichée sur grand écran (voir le gabarit dans la
+        section des moteurs) : hors du bloc `aria-hidden` de la canalisation, pour rester lue. */
+    }
+    {
+      strategy.engines.outro && (
+        <div class="note-moteurs-hote">
+          <p class="note-moteurs text-center text-lg leading-7 text-ink">{strategy.engines.outro}</p>
+        </div>
+      )
+    }
 
     {
       /* En-tête propre au bloc, désigné par `labelledBy` ; les titres de volet sont des H3, trois
@@ -428,6 +450,7 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
     </ul>
   </Container>
 </Section>
+</div>
 
 <style>
   /*
@@ -435,6 +458,31 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
    * entre les moteurs et les volets, puis le `mt-chapter` sous le titre. Aucun pixel ajouté à la page,
    * la hauteur de la section est identique avec et sans.
    */
+  /* La copie de la mention : rien sous `lg` (le gabarit en flux s'affiche), au-dessus une boîte de
+     hauteur nulle en tête du Container, et la phrase en absolu, son bas exactement où est celui du
+     gabarit : la marge basse de la section des moteurs plus la marge haute de celle-ci. Fond papier
+     et marges latérales : c'est ce qui interrompt le trait. */
+  .note-moteurs-hote {
+    display: none;
+  }
+  @media (min-width: 64rem) {
+    .note-moteurs-hote {
+      display: block;
+      position: relative;
+      height: 0;
+    }
+    .note-moteurs {
+      position: absolute;
+      left: 50%;
+      bottom: calc(var(--spacing-section) + var(--spacing-section-sm));
+      margin: 0;
+      padding-inline: 1rem;
+      transform: translateX(-50%);
+      white-space: nowrap;
+      background: var(--color-paper);
+    }
+  }
+
   .pont {
     /* Sous `lg`, les cinq cartes sont empilées en une seule colonne : trois traits qui convergeraient
        vers deux n'auraient plus rien à relier, et surtout rien à tenter à 390 px. Rendu supprimé, pas
@@ -448,18 +496,16 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
       /* Boîte de HAUTEUR NULLE : elle ne sert que de repère, elle ne pousse rien. */
       position: relative;
       --pont-cycle: 8s;
-      /* La mention sous les cartes moteurs : `mt-6` + une ligne `leading-6` (voir le paragraphe
+      /* La mention sous les cartes moteurs : `mt-6` + une ligne `leading-7` (voir le paragraphe
          dans la section des moteurs). Changer l'un sans l'autre décolle les chevrons des cartes. */
-      --pont-note: 3rem;
+      --pont-note: 3.25rem;
       /*
-       * HAUTEUR DE LA BANDE, écrite UNE SEULE FOIS parce que trois règles en dépendent : le tracé,
-       * le nœud à mi-hauteur et les chevrons tout en haut. C'est la marge basse de la section des
-       * moteurs plus la marge haute (`pt-section-sm`) de celle des volets, plus la mention sous les
-       * cartes, moins un rem pour dégager l'ombre portée des cartes, qui descend sous leur bord.
+       * HAUTEUR DE LA BANDE, écrite UNE SEULE FOIS parce que deux règles en dépendent : le tracé et
+       * le nœud à mi-hauteur. C'est la marge basse de la section des moteurs plus la marge haute
+       * (`pt-section-sm`) de celle des volets, plus la mention sous les cartes : les conduites
+       * arrivent AU BORD des cartes (24/09/2026), plus un rem en dessous comme avant les chevrons.
        */
-      --pont-bande: calc(
-        var(--spacing-section) + var(--spacing-section-sm) + var(--pont-note) - 1rem
-      );
+      --pont-bande: calc(var(--spacing-section) + var(--spacing-section-sm) + var(--pont-note));
     }
     .pont svg {
       position: absolute;
@@ -479,15 +525,18 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
       height: var(--spacing-chapter);
     }
 
-    /* DISCRÉTION : le filet est à peine plus marqué que les séparateurs de la page, et l'impulsion
-       n'est qu'un court segment. Vu de loin, on voit une conduite ; on ne la lit que si on la cherche. */
+    /* ÉLARGIS (24/09/2026, Martin) : trait de 3 à 22 % contre 1,5 à 13 % ; l'impulsion reste un
+       court segment. `non-scaling-stroke` : le viewBox est étiré, sans lui le trait serait plus
+       épais dans un sens que dans l'autre. */
     .pont-fil {
-      stroke: rgb(2 75 103 / 0.13);
-      stroke-width: 1.5;
+      stroke: rgb(2 75 103 / 0.22);
+      stroke-width: 3;
+      vector-effect: non-scaling-stroke;
     }
     .pont-flux {
       stroke: var(--color-teal-400);
-      stroke-width: 2;
+      stroke-width: 3.5;
+      vector-effect: non-scaling-stroke;
       stroke-linecap: round;
       stroke-opacity: 0.7;
       /* `pathLength="100"` normalise chaque tracé : la même impulsion met le même temps sur une courbe
@@ -498,8 +547,7 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
       stroke-dashoffset: 14;
     }
 
-    .pont-noeud,
-    .pont-pointe {
+    .pont-noeud {
       position: absolute;
       pointer-events: none;
     }
@@ -519,24 +567,13 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
       background: rgb(2 75 103 / 0.3);
       transform: translate(-50%, 50%);
     }
-    /* Les deux pointes marquent l'arrivée, et disent le sens quand rien ne bouge. Un carré tourné d'un
-       huitième de tour, deux bords seulement : le chevron le plus court à écrire. */
-    .pont-pointe {
-      left: var(--x);
-      top: calc(-1 * var(--pont-bande));
-      width: 0.6rem;
-      height: 0.6rem;
-      border-top: 2.5px solid rgb(2 75 103 / 0.38);
-      border-left: 2.5px solid rgb(2 75 103 / 0.38);
-      transform: translate(-50%, 0) rotate(45deg);
-    }
   }
 
   /*
    * LES ANIMATIONS SONT POSÉES SEULEMENT SI LE MOUVEMENT EST ACCEPTÉ, au lieu d'être annulées
    * ensuite : en `reduce`, rien n'est déclaré, donc rien à défaire. Il reste alors le dessin
-   * complet (trois amorces, trois montées, un nœud, deux conduites, deux pointes vers le haut) et
-   * le sens est porté par la forme, pas par le mouvement.
+   * complet (trois amorces, trois montées, un nœud, deux conduites) et le sens est porté par la
+   * forme, pas par le mouvement.
    */
   @media (min-width: 64rem) and (prefers-reduced-motion: no-preference) {
     .pont-flux {

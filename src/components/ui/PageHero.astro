@@ -29,8 +29,12 @@ interface Props {
    * deux fois la même chose.
    */
   asideOnLarge?: boolean;
+  /** La section suivante est au premier plan (ui/Section.astro `plan="haut"`) : l'en-tête
+      s'agrandit de `--relief` par le bas (`.sous-bas`, global.css) pour la zone qu'elle recouvre.
+      24/09/2026, toutes les pages à en-tête sauf /documentation, où la barre d'ancres s'intercale. */
+  sousPlan?: boolean;
 }
-const { title, intro, punchline, asideOnLarge = false } = Astro.props;
+const { title, intro, punchline, asideOnLarge = false, sousPlan = false } = Astro.props;
 /** Ancre de l'en-tête, la même sur toutes les pages (les tests la visent). */
 const id = 'en-tete';
 const titleId = id + '-title';
@@ -53,6 +57,7 @@ const hasAside = Astro.slots.has('aside');
        à la page. */
     'pt-[calc(var(--spacing-nav-total)+0.75rem)] pb-10 sm:pt-[calc(var(--spacing-nav-total)+3.5rem)] sm:pb-20',
     'lg:pt-[calc(var(--spacing-nav-total)+2rem)] lg:pb-12',
+    sousPlan && 'sous-bas',
   ]}
 >
   <Container size="wide" class="relative">
