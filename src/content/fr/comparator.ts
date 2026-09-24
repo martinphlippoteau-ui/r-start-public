@@ -244,7 +244,9 @@ export const comparator = {
    * autres SCPI, dont la source est la même pour les dix-neuf (SOURCE_EQUIPE, aussi portée par
    * chaque SCPI pour dire qu'elle a été documentée). Sans la brochure partenaires.
    */
-  sourceLabel: 'Sources de données',
+  /* Datée (24/09/2026, demande de Martin) : la date du relevé des taux des autres SCPI, à mettre à
+     jour à chaque vérification du tableau. Le gabarit ajoute les deux-points. */
+  sourceLabel: 'Sources de données au 24 septembre 2026',
   sourceText: `${product.name}, CORUM Asset Management : document d’informations clés du ${product.dicDate.label} et note d’information visée par l’AMF. Pour les autres, l’analyse est ${SOURCE_EQUIPE}`,
   /*
    * TROIS TEXTES ONT QUITTÉ L'ÉCRAN LE 14/09/2026 ET LE CODE LE 22/09/2026 (archivés hors du dépôt,
