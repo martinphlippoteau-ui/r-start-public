@@ -23,8 +23,11 @@ interface Props {
 const { id, title } = Astro.props;
 ---
 
-{/* Bande sombre recouverte par le bas par la section claire qui suit (24/09/2026). */}
-<Section id={id} tone="ink" spacing="none" sous="bas" class="py-8 sm:py-10">
+{
+  /* PAS DE PREMIER PLAN ICI (24/09/2026, Martin : « le fais pas pour les blocs Points essentiels
+    à connaître ») : bords droits des deux côtés, la section qui suit ne mord pas dessus. */
+}
+<Section id={id} tone="ink" spacing="none" class="py-8 sm:py-10">
   <Container size="wide">
     <h2 id={id + '-title'} class="text-sm font-bold tracking-[0.16em] text-sand uppercase">{title}</h2>
     {/* Pleine largeur du conteneur, comme le comparateur au-dessus (22/09/2026, demande de Martin) :

@@ -1667,7 +1667,9 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
    défaut) : son contenu ne bouge pas, seule la zone recouverte est du vide, et ça vaut quel que
    soit son rythme vertical (py-section, py-section-sm ou marges propres). Rayons identiques à ceux
    du rideau. OMBRE EN DEUX COUCHES (« un peu plus de profondeur ») : une large et douce qui pose la
-   dalle, une courte au ras du bord qui la décolle ; les deux ne se voient que sur le fond sombre. */
+   dalle, une courte au ras du bord qui la décolle ; les deux ne se voient que sur le fond sombre.
+   Les bandes « Points essentiels à connaître » (ui/EssentialsBand.astro) n'en font pas partie
+   (Martin, le même jour) : bords droits des deux côtés. */
 :root {
   --relief: 1.5rem;
   @media (width >= 40rem) {

@@ -20,13 +20,6 @@ import { footer } from '@/content/fr/footer';
 import { withBase } from '@/lib/href';
 
 const hint = footer.externalLinkHint;
-interface Props {
-  /** Premier plan sur un bloc sombre qui précède (ui/Section.astro `plan`, 24/09/2026) : /frais,
-      où le pied de page suit la bande des points essentiels. Le filet gris du haut n'a alors plus
-      de sens sur une dalle aux coins arrondis, c'est l'ombre qui sépare. */
-  plan?: boolean;
-}
-const { plan = false } = Astro.props as Props;
 /**
  * Alléger le pied de page sans rien retirer : les blocs légaux (identité, RGPD, médiation,
  * hébergeur) sont dans un <details>, le texte reste dans le document, seul son affichage est
@@ -42,10 +35,7 @@ const collapsible = footer.legalBlocks ?? [];
 const topLabel = footer.backToTopLabel;
 ---
 
-<footer
-  class:list={['relative bg-white text-ink', plan ? 'plan-haut' : 'border-t border-mist']}
-  data-in-view="is-in-view"
->
+<footer class="relative border-t border-mist bg-white text-ink" data-in-view="is-in-view">
   {
     /* Filet de marque : il ferme la page. Décoratif, donc aria-hidden ; le dégradé glisse lentement
       et s'arrête net en reduced-motion (l'animation est déclarée dans la media query). */
