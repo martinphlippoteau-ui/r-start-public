@@ -22,7 +22,9 @@ export const corum = {
   /* Appel sous les chiffres du groupe, sur /a-propos. Il sort du site, vers corum.fr, seul appel du
      site à le faire depuis le corps d'une page : d'où la mention de nouvelle fenêtre. */
   siteLink: {
-    label: 'Découvrir CORUM',
+    /* « CORUM L'Épargne » en toutes lettres (24/09/2026, demande de Martin) : c'est le distributeur
+       que le lien fait découvrir, corum.fr étant son site. */
+    label: 'Découvrir CORUM L’Épargne',
     href: externalLinks.corum,
     newTabHint: 'nouvelle fenêtre',
   },
