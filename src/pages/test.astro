@@ -2,7 +2,8 @@
 /**
  * Page d'essai interne, /test : HORS MENU, hors plan du site, `noindex` (tests/qualite.spec.ts le
  * vérifie). Depuis le 24/09/2026 elle ne porte plus que les variantes du hero de l'accueil avec
- * CORUM L'Épargne (HeroCorum.astro) : l'essai typographique du 15/09/2026 (titres avec « R Start »
+ * CORUM L'Épargne (HeroCorum.astro) et, depuis le même jour, les cinq pistes d'animation des cartes
+ * Loyers et Plus-values (MoteursEssais.astro) : l'essai typographique du 15/09/2026 (titres avec « R Start »
  * en seconde fonte, rôles de bouton) a été retiré à la demande de Martin, avec ses deux fontes
  * candidates (Source Serif 4, EB Garamond). À supprimer une fois les essais tranchés.
  */
@@ -10,6 +11,7 @@ import Base from '@/layouts/Base.astro';
 import SiteNav from '@/components/SiteNav.astro';
 import Footer from '@/components/Footer.astro';
 import HeroCorum from '@/components/pages/test/HeroCorum.astro';
+import MoteursEssais from '@/components/pages/test/MoteursEssais.astro';
 import TrustpilotScript from '@/components/TrustpilotScript.astro';
 ---
 
@@ -19,6 +21,8 @@ import TrustpilotScript from '@/components/TrustpilotScript.astro';
   <SiteNav />
   <main id="contenu">
     <HeroCorum />
+    {/* Essai du 24/09/2026 : cinq pistes d'animation pour les cartes Loyers et Plus-values. */}
+    <MoteursEssais />
   </main>
   <Footer />
 </Base>
