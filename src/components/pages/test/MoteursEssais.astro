@@ -2,12 +2,17 @@
 /**
  * ESSAI (24/09/2026, demande de Martin : « cinq voies pour changer les animations des cartes Loyers
  * et Plus-values ; pas de courbe qui monte, l'AMF n'aime pas ça »). Rendu SUR /test SEULEMENT.
- * Cinq pistes, chacune avec ses deux dessins, dans la grammaire des cartes de /strategie
- * (StrategySelect.astro en tête : 236 × 100, trait marine, cycle de 8 s, état de repos = image
- * complète). AUCUNE COURBE, AUCUN AXE, RIEN QUI MONTE : chaque piste raconte un MÉCANISME (le
- * rythme, la remise, l'étiquette, le moment, la répartition), jamais un résultat. Les dessins
- * lisent la palette du recto (`.carte-recto`, global.css). Pas de `data-in-view` : sur cette page
- * d'essai, les dessins tournent sans le moteur de mouvement. À SUPPRIMER une fois tranché.
+ * Cinq pistes ont été montrées le jour même (calendrier, clés, étiquettes, horloge, répartition) ;
+ * Martin a retenu LA RÉPARTITION, avec des LOCATAIRES à la place de l'immeuble sur la carte des
+ * loyers, et fait supprimer le reste. Grammaire des cartes de /strategie (StrategySelect.astro en
+ * tête : 236 × 100, trait marine, cycle de 8 s, état de repos = image complète). AUCUNE COURBE,
+ * AUCUN AXE, RIEN QUI MONTE : le dessin raconte un mécanisme, la répartition, jamais un résultat.
+ * CE QU'IL DIT. Loyers : trois locataires (les entreprises) versent chacun leur loyer, les trois
+ * se rejoignent en une somme qui gagne R Start, qui la partage entre trois épargnants.
+ * Plus-values : l'immeuble reçoit son panneau « Vendu », un seul versement gagne R Start, qui le
+ * partage de même. Les dessins lisent la palette du recto (`.carte-recto`, global.css). Pas de
+ * `data-in-view` : sur cette page d'essai, les dessins tournent sans le moteur de mouvement. À
+ * REPORTER dans EngineRent.astro et EngineGain.astro, puis à supprimer avec la page.
  */
 import Container from '@/components/ui/Container.astro';
 import Section from '@/components/ui/Section.astro';
@@ -16,244 +21,99 @@ import { fenetres } from '@/lib/immeuble';
 const MARQUE =
   'M68.21.17C36.7,3.24,5.47,23.07,2.44,29.88c-11.59,26.1,21.48,52.52,27.22,55.34,21.52,10.59,48.04-1.99,59.51-27.5C93.5,48.09,104.2-3.34,68.21.17ZM64.76,69.76c-1.25,0-2.36-.57-3.09-1.47l-2.84-3.52c-4.06-4.98-10.05-12.1-12.26-13.54-1.92-1.22-4.48-1.84-7.59-1.84l-7.96.02c-2.02,0-3.66-1.64-3.66-3.66s1.64-3.66,3.66-3.66h18.33c3.05-.01,5.54-2.14,5.54-4.76s-2.49-4.74-5.54-4.74h-18.34c-2.02,0-3.66-1.63-3.66-3.65s1.64-3.66,3.66-3.66h18.34c7.58,0,13.73,5.4,13.73,12.05,0,4.74-3.2,9.03-8.07,10.97,3.22,3.36,7.64,8.61,11.3,13.08l1.52,1.86c.57.69.91,1.57.91,2.54,0,2.2-1.79,3.99-3.99,3.99Z';
 
-/** L'immeuble commun : cadre et grille (src/lib/immeuble.ts). */
+/** L'immeuble vendu (carte des plus-values) : cadre et grille (src/lib/immeuble.ts). */
 const CADRE = { x: 22, y: 26, w: 56, h: 60 };
 const FEN = fenetres(CADRE, { colonnes: 3, rangees: 4, taille: 8, ecart: 4 });
-/** Douze cases d'un calendrier, 4 × 3. */
-const CAL = { x: 22, y: 28, w: 60, h: 56 };
-const CASES = fenetres({ ...CAL, y: CAL.y + 8, h: CAL.h - 8 }, { colonnes: 4, rangees: 3, taille: 9, ecart: 4 });
-/** Trois épargnants, à droite, pour la piste « répartition ». */
-const EPARGNANTS = [30, 56, 82];
-
-const PISTES: { titre: string; note: string }[] = [
-  {
-    titre: 'Le calendrier',
-    note: 'Loyers : les douze mois se cochent l’un après l’autre et chacun envoie un versement à R Start. Plus-values : l’immeuble reçoit son panneau « Vendu », un seul versement part. Le rythme d’un côté, la date de l’autre.',
-  },
-  {
-    titre: 'Les clés',
-    note: 'Loyers : les locataires tournent leurs clés dans les portes de l’immeuble, chaque tour de clé libère un versement. Plus-values : la clé de l’immeuble passe à l’acheteur, puis le versement part. La remise en main propre.',
-  },
-  {
-    titre: 'Les étiquettes',
-    note: 'Loyers : des étiquettes « Loyer » sortent de l’immeuble en file régulière. Plus-values : l’immeuble porte d’abord l’étiquette « Achat », puis « Vente » ; un seul versement à la vente. Deux mots, pas de courbe.',
-  },
-  {
-    titre: 'L’horloge',
-    note: 'Loyers : une horloge tourne, chaque tour complet envoie un versement. Plus-values : l’aiguille tourne et s’arrête au bon moment, l’immeuble est vendu, le versement part. Le temps comme seul sujet.',
-  },
-  {
-    titre: 'La répartition',
-    note: 'Loyers : l’immeuble envoie un versement à R Start, qui le partage entre trois épargnants. Plus-values : l’immeuble vendu envoie un versement, R Start le partage de même. Ce qu’on dit vraiment : les revenus reviennent aux épargnants.',
-  },
-];
+/** Trois locataires à gauche, trois épargnants à droite, aux mêmes hauteurs. */
+const RANGS = [30, 56, 82];
 ---
 
 <Section id="moteurs-essais" tone="paper">
   <Container size="wide">
     <p class="text-eyebrow text-teal-700">Essai du 24/09/2026</p>
-    <h2 id="moteurs-essais-title" class="text-display-md mt-3 text-ink">
-      Les deux moteurs sans courbe qui monte : cinq pistes
-    </h2>
+    <h1 id="moteurs-essais-title" class="text-display-md mt-3 text-ink">
+      Les deux moteurs : la répartition
+    </h1>
     <p class="mt-4 max-w-3xl text-lg text-slate-700">
-      Chaque piste raconte un mécanisme, jamais un résultat : aucun axe, aucune échelle, rien qui
-      monte. Même grammaire que les cartes actuelles, cycle de huit secondes.
+      Piste retenue par Martin. Loyers : trois locataires versent, R Start partage entre trois
+      épargnants. Plus-values : l’immeuble vendu verse une fois, R Start partage de même. Aucun axe,
+      aucune échelle, rien qui monte.
     </p>
-    <ol class="mt-6 max-w-3xl space-y-2 text-base text-ink">
-      {PISTES.map((p, i) => (
-        <li>
-          <a href={`#piste-${i + 1}`} class="font-semibold">{`${i + 1}. ${p.titre}`}</a>
-        </li>
-      ))}
-    </ol>
+    <ul role="list" class="mt-8 grid gap-8 sm:grid-cols-2 lg:gap-12">
+      {
+        ['Les loyers', 'Les plus-values'].map((titre, k) => (
+          <li>
+            <article class="carte-recto relative flex min-h-[20rem] flex-col rounded-3xl bg-white p-6 text-ink shadow-card ring-1 ring-navy/5 sm:p-8">
+              <p class="text-eyebrow text-teal-700">{k === 0 ? 'D’abord' : 'Et ensuite'}</p>
+              <p class="text-display-sm mt-3 text-navy">{titre}</p>
+              <div class="flex w-full flex-1 items-center py-6" style={`--illus-decalage:${k * 0.35}s`}>
+                <figure class="essai-figure" aria-hidden="true">
+                  <svg viewBox="0 0 236 100" fill="none" class="essai-svg">
+                    {k === 0 ? (
+                      <>
+                        {/* Trois locataires : tête et épaules, chacun derrière sa porte (un cadre). */}
+                        {RANGS.map((y, e) => (
+                          <g class="locataire" style={`--e:${e}`}>
+                            <rect x="26" y={y - 12} width="26" height="24" rx="4" class="cadre" />
+                            <circle cx="39" cy={y - 3} r="4" class="cadre" />
+                            <path d={`M31 ${y + 10}c0-5 3.5-8 8-8s8 3 8 8`} class="cadre" />
+                          </g>
+                        ))}
+                        {RANGS.map((y) => (
+                          <path d={`M56 ${y}C78 ${y} 82 56 92 56`} class="chemin" />
+                        ))}
+                        {RANGS.map((y, e) => (
+                          <circle cx="56" cy={y} r="2.4" class="piece loyer" style={`--e:${e};--dy:${56 - y}px`} />
+                        ))}
+                        <circle cx="92" cy="56" r="3.2" class="piece somme" />
+                      </>
+                    ) : (
+                      <>
+                        <rect x={CADRE.x} y={CADRE.y} width={CADRE.w} height={CADRE.h} rx="5" class="cadre" />
+                        {FEN.map((f) => (
+                          <rect x={f.x} y={f.y} width={f.w} height={f.h} rx="1.5" class="fenetre" />
+                        ))}
+                        <g class="panneau">
+                          <rect x="30" y="14" width="40" height="16" rx="4" class="panneau-fond" />
+                          <text x="50" y="22.5" class="etiquette">Vendu</text>
+                        </g>
+                        <circle cx="90" cy="56" r="3.2" class="piece vente" />
+                      </>
+                    )}
+                    {/* Le tronçon commun : vers la marque, puis les trois chemins vers les épargnants. */}
+                    <path d="M92 56h40" class="chemin" />
+                    {RANGS.map((y) => (
+                      <path d={`M146 56C170 56 176 ${y} 200 ${y}`} class="chemin" />
+                    ))}
+                    {RANGS.map((y, e) => (
+                      <>
+                        <circle cx="146" cy="56" r="2.4" class={`piece part ${k === 0 ? 'part-loyers' : 'part-vente'}`} style={`--e:${e};--dy:${y - 56}px`} />
+                        <circle cx="206" cy={y} r="5" class={`cadre epargnant ${k === 0 ? 'epargnant-loyers' : 'epargnant-vente'}`} style={`--e:${e}`} />
+                      </>
+                    ))}
+                    {/* La marque R Start relaie : elle reçoit, s'assombrit un instant, partage. */}
+                    <svg x="118" y="46" width="22" height="21" viewBox="0 0 94.08 88.98" class={`marque ${k === 0 ? 'marque-loyers' : 'marque-vente'}`}>
+                      <path d={MARQUE} />
+                    </svg>
+                  </svg>
+                </figure>
+              </div>
+            </article>
+          </li>
+        ))
+      }
+    </ul>
   </Container>
 </Section>
-
-{
-  PISTES.map((p, i) => {
-    const n = i + 1;
-    return (
-      <Section id={`piste-${n}`} tone={n % 2 ? 'white' : 'paper'} class="pt-section-sm">
-        <Container size="wide">
-          <h2 id={`piste-${n}-title`} class="text-display-sm text-ink">{`Piste ${n} : ${p.titre}`}</h2>
-          <p class="mt-3 max-w-3xl text-base text-slate-700">{p.note}</p>
-          <ul role="list" class="mt-8 grid gap-8 sm:grid-cols-2 lg:gap-12">
-            {['Les loyers', 'Les plus-values'].map((titre, k) => (
-              <li>
-                <article class="carte-recto relative flex min-h-[20rem] flex-col rounded-3xl bg-white p-6 text-ink shadow-card ring-1 ring-navy/5 sm:p-8">
-                  <p class="text-eyebrow text-teal-700">{k === 0 ? 'D’abord' : 'Et ensuite'}</p>
-                  <p class="text-display-sm mt-3 text-navy">{titre}</p>
-                  <div class="flex w-full flex-1 items-center py-6" style={`--illus-decalage:${k * 0.35}s`}>
-                    <figure class={`essai-figure essai-p${n}${k === 0 ? 'l' : 'v'}`} aria-hidden="true">
-                      <svg viewBox="0 0 236 100" fill="none" class="essai-svg">
-                        {/* ---------- Piste 1 : le calendrier ---------- */}
-                        {n === 1 && k === 0 && (
-                          <>
-                            <rect x={CAL.x} y={CAL.y} width={CAL.w} height={CAL.h} rx="5" class="cadre" />
-                            <path d={`M${CAL.x} ${CAL.y + 8}h${CAL.w}`} class="fil" />
-                            {CASES.map((c, j) => (
-                              <rect x={c.x} y={c.y} width={c.w} height={c.h} rx="1.5" class="case" style={`--phase:${j}`} />
-                            ))}
-                            <path d="M92 56h94" class="chemin" />
-                            {[0, 1, 2].map((r) => (
-                              <circle cx="90" cy="56" r="3.2" class="piece vol" style={`--rang:${r}`} />
-                            ))}
-                          </>
-                        )}
-                        {n === 1 && k === 1 && (
-                          <>
-                            <rect x={CADRE.x} y={CADRE.y} width={CADRE.w} height={CADRE.h} rx="5" class="cadre" />
-                            {FEN.map((f) => <rect x={f.x} y={f.y} width={f.w} height={f.h} rx="1.5" class="fenetre" />)}
-                            <g class="panneau">
-                              <rect x="30" y="14" width="40" height="16" rx="4" class="panneau-fond" />
-                              <text x="50" y="22.5" class="etiquette">Vendu</text>
-                            </g>
-                            <path d="M92 56h94" class="chemin" />
-                            <circle cx="90" cy="56" r="3.2" class="piece vol-unique" />
-                          </>
-                        )}
-                        {/* ---------- Piste 2 : les clés ---------- */}
-                        {n === 2 && k === 0 && (
-                          <>
-                            <rect x={CADRE.x} y={CADRE.y} width={CADRE.w} height={CADRE.h} rx="5" class="cadre" />
-                            {FEN.slice(0, 6).map((f) => <rect x={f.x} y={f.y} width={f.w} height={f.h} rx="1.5" class="fenetre" />)}
-                            {[0, 1, 2].map((d) => (
-                              <g style={`--rang:${d}`}>
-                                <rect x={31 + d * 16} y="60" width="12" height="20" rx="2" class="porte" />
-                                <g class="cle" style={`transform-origin:${37 + d * 16}px 70px`}>
-                                  <circle cx={37 + d * 16} cy="70" r="2.6" class="cle-tete" />
-                                  <path d={`M${37 + d * 16} 72.6v5`} class="cle-tige" />
-                                </g>
-                              </g>
-                            ))}
-                            <path d="M92 56h94" class="chemin" />
-                            {[0, 1, 2].map((r) => (
-                              <circle cx="90" cy="56" r="3.2" class="piece vol-cle" style={`--rang:${r}`} />
-                            ))}
-                          </>
-                        )}
-                        {n === 2 && k === 1 && (
-                          <>
-                            <rect x={CADRE.x} y={CADRE.y} width={CADRE.w} height={CADRE.h} rx="5" class="cadre" />
-                            {FEN.map((f) => <rect x={f.x} y={f.y} width={f.w} height={f.h} rx="1.5" class="fenetre" />)}
-                            {/* L'acheteur : tête et épaules. */}
-                            <g class="acheteur">
-                              <circle cx="128" cy="48" r="7" class="cadre" />
-                              <path d="M114 74c0-9 6-13 14-13s14 4 14 13" class="cadre" />
-                            </g>
-                            <g class="grande-cle">
-                              <circle cx="0" cy="0" r="5" class="cle-tete" />
-                              <path d="M4.5 0h14M13 0v4M17.5 0v3" class="cle-tige" />
-                            </g>
-                            <path d="M146 56h40" class="chemin" />
-                            <circle cx="144" cy="56" r="3.2" class="piece vol-remise" />
-                          </>
-                        )}
-                        {/* ---------- Piste 3 : les étiquettes ---------- */}
-                        {n === 3 && k === 0 && (
-                          <>
-                            <rect x={CADRE.x} y={CADRE.y} width={CADRE.w} height={CADRE.h} rx="5" class="cadre" />
-                            {FEN.map((f) => <rect x={f.x} y={f.y} width={f.w} height={f.h} rx="1.5" class="fenetre" />)}
-                            <path d="M92 56h94" class="chemin" />
-                            {/* Deux étiquettes en vol, pas trois : à trois elles se touchaient. */}
-                            {[0, 1].map((r) => (
-                              <g class="etiquette-vol" style={`--rang:${r}`}>
-                                <rect x="80" y="49" width="30" height="14" rx="7" class="panneau-fond" />
-                                <text x="95" y="56.5" class="etiquette">Loyer</text>
-                              </g>
-                            ))}
-                          </>
-                        )}
-                        {n === 3 && k === 1 && (
-                          <>
-                            <rect x={CADRE.x} y={CADRE.y} width={CADRE.w} height={CADRE.h} rx="5" class="cadre" />
-                            {FEN.map((f) => <rect x={f.x} y={f.y} width={f.w} height={f.h} rx="1.5" class="fenetre" />)}
-                            <g class="tag-achat">
-                              <rect x="30" y="14" width="40" height="16" rx="4" class="panneau-fond" />
-                              <text x="50" y="22.5" class="etiquette">Achat</text>
-                            </g>
-                            <g class="tag-vente">
-                              <rect x="30" y="14" width="40" height="16" rx="4" class="panneau-fond" />
-                              <text x="50" y="22.5" class="etiquette">Vente</text>
-                            </g>
-                            <path d="M92 56h94" class="chemin" />
-                            <circle cx="90" cy="56" r="3.2" class="piece vol-unique" />
-                          </>
-                        )}
-                        {/* ---------- Piste 4 : l'horloge ---------- */}
-                        {n === 4 && k === 0 && (
-                          <>
-                            <circle cx="52" cy="56" r="26" class="cadre" />
-                            {[0, 90, 180, 270].map((a) => (
-                              <path d="M52 32v4" class="fil" style={`transform-origin:52px 56px;transform:rotate(${a}deg)`} />
-                            ))}
-                            <path d="M52 56v-18" class="aiguille" style="transform-origin:52px 56px" />
-                            <circle cx="52" cy="56" r="2" class="piece" />
-                            <path d="M92 56h94" class="chemin" />
-                            <circle cx="90" cy="56" r="3.2" class="piece vol-unique" />
-                          </>
-                        )}
-                        {n === 4 && k === 1 && (
-                          <>
-                            <rect x={CADRE.x} y={CADRE.y} width={CADRE.w} height={CADRE.h} rx="5" class="cadre" />
-                            {FEN.map((f) => <rect x={f.x} y={f.y} width={f.w} height={f.h} rx="1.5" class="fenetre" />)}
-                            <circle cx="122" cy="56" r="16" class="cadre" />
-                            <path d="M122 56v-11" class="aiguille-arret" style="transform-origin:122px 56px" />
-                            <circle cx="122" cy="56" r="1.6" class="piece" />
-                            <g class="panneau">
-                              <rect x="30" y="14" width="40" height="16" rx="4" class="panneau-fond" />
-                              <text x="50" y="22.5" class="etiquette">Vendu</text>
-                            </g>
-                            <path d="M146 56h40" class="chemin" />
-                            <circle cx="144" cy="56" r="3.2" class="piece vol-remise" />
-                          </>
-                        )}
-                        {/* ---------- Piste 5 : la répartition ---------- */}
-                        {n === 5 && (
-                          <>
-                            <rect x={CADRE.x} y={CADRE.y} width={CADRE.w} height={CADRE.h} rx="5" class="cadre" />
-                            {FEN.map((f) => <rect x={f.x} y={f.y} width={f.w} height={f.h} rx="1.5" class="fenetre" />)}
-                            {k === 1 && (
-                              <g class="panneau">
-                                <rect x="30" y="14" width="40" height="16" rx="4" class="panneau-fond" />
-                                <text x="50" y="22.5" class="etiquette">Vendu</text>
-                              </g>
-                            )}
-                            <path d="M92 56h40" class="chemin" />
-                            {EPARGNANTS.map((y) => (
-                              <path d={`M146 56C170 56 176 ${y} 200 ${y}`} class="chemin" />
-                            ))}
-                            <circle cx="90" cy="56" r="3.2" class={`piece ${k === 0 ? 'vol-court' : 'vol-court-unique'}`} />
-                            {EPARGNANTS.map((y, e) => (
-                              <>
-                                <circle cx="146" cy="56" r="2.4" class={`piece part ${k === 0 ? '' : 'part-unique'}`} style={`--e:${e};--dy:${y - 56}px`} />
-                                <circle cx="206" cy={y} r="5" class="cadre epargnant" style={`--e:${e}`} />
-                              </>
-                            ))}
-                          </>
-                        )}
-                        {/* La marque R Start reçoit, sauf sur la répartition où elle relaie. */}
-                        <svg x={n === 5 ? 118 : 190} y={n === 5 ? 46 : 40} width={n === 5 ? 22 : 32} height={n === 5 ? 21 : 30} viewBox="0 0 94.08 88.98" class={`marque ${n === 5 ? 'marque-relais' : ''}`}>
-                          <path d={MARQUE} />
-                        </svg>
-                      </svg>
-                    </figure>
-                  </div>
-                </article>
-              </li>
-            ))}
-          </ul>
-        </Container>
-      </Section>
-    );
-  })
-}
 
 <style>
   .essai-figure {
     margin: 0;
     width: 100%;
+    /* Les loyers tournent sur 4 s (deux versements par cycle de 8 s : régulier) ; la vente, une
+       fois par cycle. */
     --cycle: 8s;
+    --tour: 4s;
     --decal: var(--illus-decalage, 0s);
   }
   .essai-svg {
@@ -265,36 +125,15 @@ const PISTES: { titre: string; note: string }[] = [
     stroke: rgb(var(--illus-trait-rgb) / 0.38);
     stroke-width: 1.6;
   }
-  .fil {
-    stroke: rgb(var(--illus-trait-rgb) / 0.3);
-    stroke-width: 1.2;
-    stroke-linecap: round;
-  }
   .chemin {
     stroke: rgb(var(--illus-trait-rgb) / 0.22);
     stroke-width: 1.2;
     stroke-dasharray: 3 7;
     stroke-linecap: round;
   }
-  .fenetre,
-  .case {
+  .fenetre {
     fill: var(--illus-trait);
     opacity: 0.5;
-  }
-  .porte {
-    stroke: rgb(var(--illus-trait-rgb) / 0.38);
-    stroke-width: 1.4;
-    fill: var(--illus-fond);
-  }
-  .cle-tete {
-    fill: var(--illus-fond);
-    stroke: var(--illus-trait);
-    stroke-width: 1.4;
-  }
-  .cle-tige {
-    stroke: var(--illus-trait);
-    stroke-width: 1.6;
-    stroke-linecap: round;
   }
   .piece {
     fill: var(--illus-trait);
@@ -314,149 +153,89 @@ const PISTES: { titre: string; note: string }[] = [
     text-anchor: middle;
     dominant-baseline: central;
   }
-  .aiguille,
-  .aiguille-arret {
-    stroke: var(--illus-trait);
-    stroke-width: 2;
-    stroke-linecap: round;
-  }
   .marque {
     fill: var(--illus-trait);
   }
-  .epargnant {
+  .epargnant,
+  .locataire {
     fill: var(--illus-fond);
     transform-box: fill-box;
     transform-origin: center;
   }
-  /* Repos = image complète : tout est posé, la grande clé chez l'acheteur, la seconde étiquette
-     devant la première. */
-  .grande-cle {
-    transform: translate(128px, 56px);
-  }
-  .tag-achat {
-    opacity: 0;
+  /* Repos = image complète : locataires et épargnants en place, le panneau posé, les versements
+     arrivés (les loyers chez la marque, les parts chez les épargnants), les pièces en vol effacées. */
+  .loyer {
+    transform: translate(36px, var(--dy));
   }
   .part {
     transform: translate(54px, var(--dy));
   }
-  .vol,
-  .vol-cle {
-    transform: translateX(calc(14px + var(--rang) * 34px));
-  }
-  .etiquette-vol {
-    transform: translateX(calc(var(--rang) * 42px));
-  }
-  .vol-unique,
-  .vol-remise,
-  .vol-court,
-  .vol-court-unique {
+  .somme,
+  .vente {
     opacity: 0;
   }
 
   @media (prefers-reduced-motion: no-preference) {
-    /* Piste 1 : douze cases, chacune à son mois ; trois versements en vol à intervalles égaux. */
-    .case {
-      animation: essai-case var(--cycle) infinite both;
-      animation-delay: calc(var(--decal) + var(--phase) * (var(--cycle) / 12));
+    /* Loyers : trois versements partent à un souffle d'écart (0,12 s), se rejoignent, la somme
+       gagne la marque, qui partage ; les épargnants répondent d'un battement. */
+    .locataire {
+      animation: essai-battement var(--tour) infinite both;
+      animation-delay: calc(var(--decal) + var(--e) * 0.12s);
     }
-    .vol {
-      animation: essai-vol 4s linear infinite both, essai-naissance 4s infinite both;
-      animation-delay: calc(var(--decal) + var(--rang) * -1.333s);
+    .loyer {
+      animation: essai-loyer var(--tour) infinite both;
+      animation-delay: calc(var(--decal) + var(--e) * 0.12s);
     }
-    /* Une seule pièce par cycle : panneau à 30 %, vol de 40 à 70 %. */
+    .somme {
+      animation: essai-somme var(--tour) infinite both;
+      animation-delay: var(--decal);
+    }
+    .marque-loyers {
+      animation: essai-relais var(--tour) infinite both;
+      animation-delay: calc(var(--decal) + 1.9s);
+    }
+    .part-loyers {
+      animation: essai-part var(--tour) infinite both;
+      animation-delay: calc(var(--decal) + 2s);
+    }
+    .epargnant-loyers {
+      animation: essai-battement var(--tour) infinite both;
+      animation-delay: calc(var(--decal) + 3.2s + var(--e) * 0.08s);
+    }
+    /* Plus-values : panneau à 30 % du cycle, un versement de 40 à 50 %, partage de 50 à 68 %. */
     .panneau {
       animation: essai-panneau var(--cycle) infinite both;
       animation-delay: var(--decal);
     }
-    .vol-unique {
-      animation: essai-vol-unique var(--cycle) infinite both;
+    .vente {
+      animation: essai-vente var(--cycle) infinite both;
       animation-delay: var(--decal);
     }
-    /* Piste 2 : chaque clé tourne à son tour (0, 33, 66 %), et libère sa pièce. */
-    .cle {
-      animation: essai-cle var(--cycle) infinite both;
-      animation-delay: calc(var(--decal) + var(--rang) * (var(--cycle) / 3));
+    .marque-vente {
+      animation: essai-relais var(--cycle) infinite both;
+      animation-delay: calc(var(--decal) + 3.9s);
     }
-    .vol-cle {
-      animation: essai-vol-cle var(--cycle) infinite both;
-      animation-delay: calc(var(--decal) + var(--rang) * (var(--cycle) / 3));
-    }
-    .grande-cle {
-      animation: essai-grande-cle var(--cycle) infinite both;
-      animation-delay: var(--decal);
-    }
-    .acheteur {
-      animation: essai-acheteur var(--cycle) infinite both;
-      animation-delay: var(--decal);
-    }
-    .vol-remise {
-      animation: essai-vol-remise var(--cycle) infinite both;
-      animation-delay: var(--decal);
-    }
-    /* Piste 3 : file d'étiquettes ; « Achat » puis « Vente ». */
-    .etiquette-vol {
-      animation: essai-etiquette 4s linear infinite both, essai-naissance 4s infinite both;
-      animation-delay: calc(var(--decal) + var(--rang) * -2s);
-    }
-    .tag-achat {
-      animation: essai-tag-achat var(--cycle) infinite both;
-      animation-delay: var(--decal);
-    }
-    .tag-vente {
-      animation: essai-tag-vente var(--cycle) infinite both;
-      animation-delay: var(--decal);
-    }
-    /* Piste 4 : l'aiguille fait un tour par cycle ; l'autre s'arrête au bon moment. */
-    .aiguille {
-      animation: essai-tour var(--cycle) linear infinite;
-      animation-delay: var(--decal);
-    }
-    .aiguille-arret {
-      animation: essai-tour-arret var(--cycle) infinite both;
-      animation-delay: var(--decal);
-    }
-    /* Piste 5 : un versement jusqu'à la marque, qui le partage en trois. */
-    .vol-court {
-      animation: essai-vol-court 4s infinite both;
-      animation-delay: var(--decal);
-    }
-    .vol-court-unique {
-      animation: essai-vol-court var(--cycle) infinite both;
-      animation-delay: var(--decal);
-    }
-    .part {
-      animation: essai-part 4s infinite both;
-      animation-delay: calc(var(--decal) + 2s);
-    }
-    .part-unique {
+    .part-vente {
       animation: essai-part var(--cycle) infinite both;
-      animation-delay: calc(var(--decal) + 2s);
+      animation-delay: calc(var(--decal) + 4s);
     }
-    .epargnant {
-      animation: essai-epargnant 4s infinite both;
-      animation-delay: calc(var(--decal) + 3.2s + var(--e) * 0.08s);
-    }
-    .marque-relais {
-      animation: essai-relais 4s infinite both;
-      animation-delay: calc(var(--decal) + 1.9s);
+    .epargnant-vente {
+      animation: essai-battement var(--cycle) infinite both;
+      animation-delay: calc(var(--decal) + 5.2s + var(--e) * 0.08s);
     }
   }
 
-  @keyframes essai-case {
-    0% { opacity: 0.16; animation-timing-function: var(--ease-out-expo); }
-    6% { opacity: 0.7; animation-timing-function: linear; }
-    80% { opacity: 0.7; }
-    100% { opacity: 0.16; }
+  @keyframes essai-loyer {
+    0% { opacity: 0; transform: translate(0, 0) scale(0.3); animation-timing-function: var(--ease-out-expo); }
+    6% { opacity: 1; transform: translate(3px, 0) scale(1); animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1); }
+    24% { opacity: 1; transform: translate(36px, var(--dy)) scale(1); animation-timing-function: cubic-bezier(0.7, 0, 0.84, 0); }
+    28%, 100% { opacity: 0; transform: translate(36px, var(--dy)) scale(0.3); }
   }
-  @keyframes essai-vol {
-    from { transform: translateX(0); }
-    to { transform: translateX(98px); }
-  }
-  @keyframes essai-naissance {
-    0% { opacity: 0; animation-timing-function: var(--ease-out-expo); }
-    9% { opacity: 1; animation-timing-function: linear; }
-    86% { opacity: 1; animation-timing-function: cubic-bezier(0.7, 0, 0.84, 0); }
-    100% { opacity: 0; }
+  @keyframes essai-somme {
+    0%, 26% { opacity: 0; transform: translateX(0) scale(0.3); animation-timing-function: var(--ease-out-expo); }
+    30% { opacity: 1; transform: translateX(2px) scale(1); animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1); }
+    44% { opacity: 1; transform: translateX(34px) scale(1); animation-timing-function: cubic-bezier(0.7, 0, 0.84, 0); }
+    50%, 100% { opacity: 0; transform: translateX(40px) scale(0.3); }
   }
   @keyframes essai-panneau {
     0%, 28% { opacity: 0; transform: translateY(6px); animation-timing-function: var(--ease-out-expo); }
@@ -464,70 +243,11 @@ const PISTES: { titre: string; note: string }[] = [
     84% { opacity: 1; animation-timing-function: cubic-bezier(0.7, 0, 0.84, 0); }
     94%, 100% { opacity: 0; transform: translateY(0); }
   }
-  @keyframes essai-vol-unique {
-    0%, 40% { opacity: 0; transform: translateX(0) scale(0.3); animation-timing-function: var(--ease-out-expo); }
-    45% { opacity: 1; transform: translateX(8px) scale(1); animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1); }
-    68% { opacity: 1; transform: translateX(90px) scale(1); animation-timing-function: cubic-bezier(0.7, 0, 0.84, 0); }
-    72%, 100% { opacity: 0; transform: translateX(98px) scale(0.3); }
-  }
-  @keyframes essai-cle {
-    0%, 4% { transform: rotate(0deg); animation-timing-function: var(--ease-out-expo); }
-    14% { transform: rotate(90deg); }
-    24% { transform: rotate(90deg); animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1); }
-    30%, 100% { transform: rotate(0deg); }
-  }
-  @keyframes essai-vol-cle {
-    0%, 12% { opacity: 0; transform: translateX(0) scale(0.3); animation-timing-function: var(--ease-out-expo); }
-    16% { opacity: 1; transform: translateX(8px) scale(1); animation-timing-function: linear; }
-    30% { opacity: 1; transform: translateX(90px) scale(1); animation-timing-function: cubic-bezier(0.7, 0, 0.84, 0); }
-    33%, 100% { opacity: 0; transform: translateX(98px) scale(0.3); }
-  }
-  @keyframes essai-grande-cle {
-    0%, 10% { transform: translate(86px, 56px); animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1); }
-    38% { transform: translate(128px, 56px); }
-    100% { transform: translate(128px, 56px); }
-  }
-  @keyframes essai-acheteur {
-    0%, 36% { opacity: 0.35; }
-    42% { opacity: 1; }
-    100% { opacity: 1; }
-  }
-  @keyframes essai-vol-remise {
-    0%, 46% { opacity: 0; transform: translateX(0) scale(0.3); animation-timing-function: var(--ease-out-expo); }
-    50% { opacity: 1; transform: translateX(4px) scale(1); animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1); }
-    70% { opacity: 1; transform: translateX(36px) scale(1); animation-timing-function: cubic-bezier(0.7, 0, 0.84, 0); }
-    74%, 100% { opacity: 0; transform: translateX(44px) scale(0.3); }
-  }
-  @keyframes essai-etiquette {
-    from { transform: translateX(0); }
-    to { transform: translateX(84px); }
-  }
-  @keyframes essai-tag-achat {
-    0% { opacity: 0; transform: translateY(6px); animation-timing-function: var(--ease-out-expo); }
-    8% { opacity: 1; transform: translateY(0); }
-    44% { opacity: 1; animation-timing-function: cubic-bezier(0.7, 0, 0.84, 0); }
-    50%, 100% { opacity: 0; transform: translateY(0); }
-  }
-  @keyframes essai-tag-vente {
-    0%, 50% { opacity: 0; transform: translateY(6px); animation-timing-function: var(--ease-out-expo); }
-    58% { opacity: 1; transform: translateY(0); }
-    90% { opacity: 1; animation-timing-function: cubic-bezier(0.7, 0, 0.84, 0); }
-    100% { opacity: 0; }
-  }
-  @keyframes essai-tour {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-  }
-  @keyframes essai-tour-arret {
-    0% { transform: rotate(0deg); animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1); }
-    30% { transform: rotate(360deg); }
-    100% { transform: rotate(360deg); }
-  }
-  @keyframes essai-vol-court {
-    0% { opacity: 0; transform: translateX(0) scale(0.3); animation-timing-function: var(--ease-out-expo); }
-    8% { opacity: 1; transform: translateX(6px) scale(1); animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1); }
-    44% { opacity: 1; transform: translateX(36px) scale(1); animation-timing-function: cubic-bezier(0.7, 0, 0.84, 0); }
-    50%, 100% { opacity: 0; transform: translateX(42px) scale(0.3); }
+  @keyframes essai-vente {
+    0%, 38% { opacity: 0; transform: translateX(0) scale(0.3); animation-timing-function: var(--ease-out-expo); }
+    41% { opacity: 1; transform: translateX(4px) scale(1); animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1); }
+    48% { opacity: 1; transform: translateX(36px) scale(1); animation-timing-function: cubic-bezier(0.7, 0, 0.84, 0); }
+    51%, 100% { opacity: 0; transform: translateX(42px) scale(0.3); }
   }
   @keyframes essai-part {
     0% { opacity: 0; transform: translate(0, 0) scale(0.3); animation-timing-function: var(--ease-out-expo); }
@@ -535,7 +255,7 @@ const PISTES: { titre: string; note: string }[] = [
     28% { opacity: 1; transform: translate(54px, var(--dy)) scale(1); animation-timing-function: cubic-bezier(0.7, 0, 0.84, 0); }
     34%, 100% { opacity: 0; transform: translate(58px, var(--dy)) scale(0.3); }
   }
-  @keyframes essai-epargnant {
+  @keyframes essai-battement {
     0%, 4% { transform: scale(1); animation-timing-function: var(--ease-out-expo); }
     10% { transform: scale(1.25); animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1); }
     30%, 100% { transform: scale(1); }
