@@ -50,7 +50,7 @@ export interface HeroContent {
   primaryCta: Cta;
   /** Lien interne vers /frais : ce n'est pas un CTA de souscription, il ne porte pas de `position`. */
   secondaryCta: { label: string; href: string };
-  /** Le distributeur, en une phrase au-dessus du bandeau Trustpilot (24/09/2026). */
+  /** Le distributeur, en une phrase sous le bandeau Trustpilot (24/09/2026). */
   distributor?: string;
   /** Invitation à descendre, au bas du hero : la flèche n'a pas de texte visible, ce libellé la nomme. */
   scrollHint?: { label: string };
