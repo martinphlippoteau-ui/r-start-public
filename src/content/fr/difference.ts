@@ -27,20 +27,22 @@ export const difference = {
   lead: 'Quand vous détenez des parts de la SCPI R Start, on ne vous prélève des frais que dans deux situations :',
   /** Les deux situations, en liste. `strong` est le mot mis en valeur par le gabarit. */
   situations: [
-    /* « reversés sous forme de dividendes potentiels » depuis le 22/09/2026 (demande de Martin),
-       ex-« qu'elle vous redistribue » : la formule dit que les revenus ne sont pas acquis. */
-    {
-      text: 'Quand elle encaisse des loyers qui sont reversés sous forme de dividendes potentiels',
-      strong: 'loyers',
-    },
+    /* Textes de Martin du 24/09/2026 : la première situation redevient « Quand elle encaisse des
+       loyers » ; « reversés sous forme de dividendes potentiels » (22/09/2026) passe dans `outro`,
+       pour les deux situations à la fois. */
+    { text: 'Quand elle encaisse des loyers', strong: 'loyers' },
     {
       text: 'Quand elle réalise une plus-value sur la vente d’immeubles',
       strong: 'plus-value',
     },
   ],
+  /* Sous la liste (24/09/2026, Martin, mot pour mot) : « potentiels » dit que les revenus ne sont
+     pas acquis. */
+  outro: 'Les loyers et les plus-values vous sont versés sous forme de dividendes potentiels.',
   counterweight: {
     /**
-     * Conclusion de l'équipe, mot pour mot (11/09/2026). À DÉFENDRE EN COMPLIANCE : voir l'en-tête.
+     * Conclusion de l'équipe, mot pour mot (11/09/2026), MISE EN VALEUR (24/09/2026, Martin : « à
+     * mettre bien en valeur ») par le gabarit, en encadré. À DÉFENDRE EN COMPLIANCE : voir l'en-tête.
      */
     pedagogy: [
       nb(

@@ -115,10 +115,18 @@ const situations = (difference.situations ?? []).map((s) => {
           }
         </ul>
 
+        {/* Où vont les loyers et les plus-values (24/09/2026), dans le corps du texte. */}
+        {difference.outro && <p class="mt-4">{difference.outro}</p>}
+
         {
-          /* Conclusion de l'équipe. */
+          /* Conclusion de l'équipe, EN ENCADRÉ (24/09/2026, Martin : « à mettre bien en valeur ») :
+            carte blanche à ombre et filet, la recette des repères de l'accueil, corps de titre de
+            carte en marine. Même corps que les titres de carte, pas plus : un avantage qui
+            dépasserait le poids du bloc Risques ferait tiquer l'AMF. */
           difference.counterweight.pedagogy?.map((phrase) => (
-            <p class="mt-5 font-semibold">{phrase}</p>
+            <p class="text-display-sm mt-8 rounded-2xl bg-white px-6 py-5 text-navy shadow-card ring-1 ring-navy/5">
+              {phrase}
+            </p>
           ))
         }
 

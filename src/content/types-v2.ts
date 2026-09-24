@@ -59,6 +59,8 @@ export interface DifferenceContent {
   lead?: string;
   /** Les deux situations où des frais sont prélevés. `strong` est le mot mis en valeur dans `text`. */
   situations?: { text: string; strong?: string }[];
+  /** Phrase qui suit la liste des deux situations (24/09/2026) : où vont les loyers et les plus-values. */
+  outro?: string;
   /**
    * Conclusion de l'équipe, sous les deux situations (« nous, on ne touche rien tant que vous
    * n'avez pas gagné d'argent »). Son contre-poids chiffré (frais de gestion prélevés sur les

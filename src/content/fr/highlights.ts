@@ -49,7 +49,8 @@ export const highlights: HighlightsContent = {
       /* « Stratégie d'investissement » depuis le 22/09/2026 (demande de Martin), ex-« Approche ». */
       label: 'Stratégie d’investissement',
       value: 'Diversifiée',
-      info: 'R Start investit dans tous secteurs, toutes zones géographiques et tous types d’immeubles pour ne pas dépendre d’une seule source de performance.',
+      /* Texte de Martin du 24/09/2026, mot pour mot (points de suspension en un caractère). */
+      info: 'R Start peut investir dans tous secteurs professionnels (bureaux, commerces, santé, logistique, hôtellerie…), en Europe et au-delà, afin de ne pas dépendre d’une seule source de performance.',
     },
     {
       /*
