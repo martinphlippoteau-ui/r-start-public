@@ -6,8 +6,9 @@
  * indicateurs sur les pages produit »), corum.fr/nos-scpi/corum-origin, corum-xl, eurion et
  * corum-usa, relues le 22/09/2026. Chaque carte reprend le bloc « En bref » de sa page, dans le
  * même ordre : le TRI depuis la création (un OBJECTIF pour CORUM USA, trop jeune), le prix de la
- * part et sa ligne de frais, la performance globale annuelle 2025, puis la performance moyenne
- * 2020-2025 (CORUM USA, créée en 2023, affiche à la place son rendement 2025). L'INDICATEUR DE
+ * part et sa ligne de frais, puis la performance globale annuelle 2025 (CORUM USA, créée en 2023,
+ * affiche en plus son rendement 2025). LA PERFORMANCE MOYENNE 2020-2025 des trois autres SCPI,
+ * reprise de corum.fr, a été RETIRÉE des cartes le 24/09/2026 (demande de Martin). L'INDICATEUR DE
  * RISQUE (3 ou 4 sur 7) et le « minimum d'investissement » du document de l'équipe du 16/09/2026
  * ne sont plus sur les cartes : les pages produit ne les y montrent pas. Le TRI de CORUM Eurion
  * passe de 6,50 % (document de l'équipe) à 6,49 % (corum.fr).
@@ -80,7 +81,6 @@ const creee = (nom: string): string | undefined => {
 const TRI = 'Taux de rendement interne (TRI) depuis la création';
 const PRIX = 'Prix de la part';
 const PGA = 'Performance globale annuelle 2025';
-const PGA_MOYENNE = 'Performance globale annuelle moyenne de 2020 à 2025';
 const RENDEMENT = 'Rendement 2025';
 const frais = (taux: string): MesureScpi['detail'] => ({
   text: nb(`Frais et commission de souscription de ${taux} % TTI inclus`),
@@ -100,7 +100,6 @@ const ITEMS: ScpiGamme[] = [
     autres: [
       { value: nb('1 135'), unit: '€', label: PRIX, detail: frais('11,96') },
       { value: '6,50', unit: '%', label: PGA, notes: ['pga'] },
-      { value: '7,11', unit: '%', label: PGA_MOYENNE, notes: ['pga'] },
     ],
     distribution: { year: 2025, value: '6,50' },
   },
@@ -111,7 +110,6 @@ const ITEMS: ScpiGamme[] = [
     autres: [
       { value: '195', unit: '€', label: PRIX, detail: frais('12') },
       { value: '5,30', unit: '%', label: PGA, notes: ['pga'] },
-      { value: '6,15', unit: '%', label: PGA_MOYENNE, notes: ['pga'] },
     ],
     distribution: { year: 2025, value: '5,30' },
   },
@@ -122,7 +120,6 @@ const ITEMS: ScpiGamme[] = [
     autres: [
       { value: '215', unit: '€', label: PRIX, detail: frais('12') },
       { value: '5,73', unit: '%', label: PGA, notes: ['pga'] },
-      { value: '7,89', unit: '%', label: PGA_MOYENNE, notes: ['pga'] },
     ],
     distribution: { year: 2025, value: '5,73' },
   },
