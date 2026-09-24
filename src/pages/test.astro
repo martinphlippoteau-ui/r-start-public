@@ -19,6 +19,8 @@ import Container from '@/components/ui/Container.astro';
 import Section from '@/components/ui/Section.astro';
 import Button from '@/components/ui/Button.astro';
 import IconExterne from '@/components/ui/IconExterne.astro';
+import HeroCorum from '@/components/pages/test/HeroCorum.astro';
+import TrustpilotScript from '@/components/TrustpilotScript.astro';
 
 /**
  * Le système de boutons retenu (17/09/2026, tranché par l'équipe) : quatre rôles (global.css, « Les
@@ -47,13 +49,18 @@ const TITRES: { niveau: 1 | 2; avant: string; apres: string }[] = [
   path="/test"
   noindex
 >
+  {/* Le bandeau Trustpilot des variantes du hero (HeroCorum.astro) a besoin du script, comme l'accueil. */}
+  <TrustpilotScript slot="head" />
   <main id="contenu">
+    {/* Essai du 24/09/2026 : cinq variantes du hero avec CORUM L'Épargne (à supprimer une fois tranché). */}
+    <HeroCorum />
     <Section id="essai" tone="paper">
       <Container size="wide">
         <p class="text-eyebrow text-teal-700">Page d’essai interne</p>
-        <h1 id="essai-title" class="text-display-md mt-3 text-ink">
+        {/* H2 depuis le 24/09/2026 : le H1 de la page est celui de l'essai du hero (HeroCorum.astro), en tête. */}
+        <h2 id="essai-title" class="text-display-md mt-3 text-ink">
           Mettre « R Start » en avant dans les titres
-        </h1>
+        </h2>
         <p class="text-lead mt-5 max-w-3xl text-slate-700">
           Les neuf titres du site qui nomment R Start, aux tailles réelles. Les réglages
           s’appliquent en direct à tout ce qui suit.
