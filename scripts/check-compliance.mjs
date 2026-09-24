@@ -179,8 +179,9 @@ function checkHeroClaims(text, file) {
       'allégation de rang « première SCPI » sans périmètre de marché (le périmètre est en note)',
     ],
     [/objectifs? tenus?/gi, '« objectifs tenus » (allégation de performance)'],
-    /* /strategie : « … plus systématique que d'autres SCPI », comparaison sans périmètre ni source,
-       suivie comme « la seule SCPI ». Le motif vise la COMPARAISON, pas « systématique » seul. */
+    /* « … plus systématique que d'autres SCPI » : comparaison sans périmètre ni source, portée par
+       /strategie du 16 au 24/09/2026 (texte de la carte plus-values réécrit par Martin). Le motif
+       reste en garde-fou ; il vise la COMPARAISON, pas « systématique » seul. */
     [
       /(plus|davantage|moins)\s+(syst[ée]matique|souvent|fr[ée]quemment)[^.]{0,40}\bque\s+d['’]autres\s+SCPI/gi,
       'comparaison avec les autres SCPI (« plus systématique que d’autres SCPI ») sans périmètre ni source',

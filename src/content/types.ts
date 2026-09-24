@@ -98,9 +98,10 @@ export interface StrategyChapter {
   /**
    * `lead` porte l'accent (gras du document), `rest` la suite de la phrase. `icon` met une puce en
    * pictogramme à la place du point (clé de ui/Picto.astro). `benefit` : ce que le moteur apporte à
-   * l'épargnant, en une ligne sous le titre de la carte, côté recto.
+   * l'épargnant, en une ligne sous le titre de la carte, côté recto. `sequence` : mot d'ordre
+   * chronologique des moteurs (« D'abord », « Et ensuite »), rendu à la suite du numéro.
    */
-  items: { lead: string; rest?: string; icon?: PictoKey; benefit?: string }[];
+  items: { lead: string; rest?: string; icon?: PictoKey; benefit?: string; sequence?: string }[];
   /** Phrase qui referme le chapitre, sous la liste. Les moteurs n'en ont pas. */
   outro?: string;
 }

@@ -21,11 +21,11 @@ export const strategyPage: { seo: PageSeo; hero: PageHero; cta: Cta } = {
    * présent partout.
    */
   hero: {
-    /* Titre du 16/09/2026, texte de l'équipe. */
-    title: 'R Start : une approche inédite au service de la performance',
-    /* Chute du 15/09/2026, texte de l'équipe. L'espace avant le deux-points est une INSÉCABLE
+    /* Titre du 24/09/2026 (Martin), raccourci : « au service de la performance » retiré. */
+    title: 'R Start : une approche inédite',
+    /* Chute du 24/09/2026 (Martin). L'espace avant le point d'exclamation est une INSÉCABLE
        (U+00A0) écrite à la main : ce fichier n'a pas de `nb()`. */
-    punchline: 'On ouvre le capot\u00A0: nos choix qui font la différence',
+    punchline: 'On ouvre le capot\u00A0!',
   },
   cta: { label: 'Souscrire en ligne', position: 'strategie' },
 };

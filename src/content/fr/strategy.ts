@@ -18,29 +18,34 @@ export const strategy: StrategyContent = {
   dialogOpen: 'En savoir plus',
   dialogClose: 'Fermer',
   engines: {
-    /* Texte de l'équipe (16/09/2026). Chiffre et non lettre, comme « 4 étapes pour souscrire » : un
-       titre se balaie, un chiffre s'y repère plus vite. */
-    title: 'R Start : 2 moteurs au service de la performance',
+    /* Texte de l'équipe (16/09/2026), « R Start : » retiré le 24/09/2026 (Martin : titre sur une
+       seule ligne). Chiffre et non lettre, comme « 4 étapes pour souscrire » : un titre se balaie,
+       un chiffre s'y repère plus vite. */
+    title: '2 moteurs au service de la performance',
     /*
-     * Textes de l'équipe (16/09/2026), deux retouches et rien d'autre : « la cherche » corrigé en
-     * « la recherche », un point final ajouté à la carte des loyers. « de façon plus systématique
-     * que d'autres SCPI » est une COMPARAISON avec le marché, sans périmètre ni source :
-     * check-compliance.mjs la signale comme allégation à défendre, et c'est voulu tant que CORUM
-     * n'a pas fourni la base de la comparaison.
+     * Textes descriptifs (`rest`) et bénéfice des plus-values réécrits par Martin le 24/09/2026,
+     * mot pour mot. La comparaison « de façon plus systématique que d'autres SCPI » du texte du
+     * 16/09/2026, que check-compliance.mjs signalait, n'y figure plus.
      */
     items: [
       /* `benefit` (17/09/2026, texte de l'équipe mot pour mot) : « tous les mois » est exact
          (facts.ts, `frequency`), « potentiels » indispensable, les revenus n'étant pas garantis. */
+      /* `sequence` (24/09/2026, Martin : « 01 D'abord les loyers », « 02 Et ensuite ») : l'ordre
+         des deux moteurs, à la suite du numéro. `rest` : texte de Martin du 24/09/2026, mot pour mot. */
       {
+        sequence: 'D’abord',
         lead: 'Les loyers',
         benefit: 'Pour vous : des revenus potentiels tous les mois',
-        rest: 'Comme toute SCPI de rendement, R Start distribue à ses épargnants des revenus potentiels (appelés « dividendes ») issus des loyers facturés aux entreprises locataires de ses immeubles.',
+        rest: 'R Start distribue tous les mois des revenus potentiels (appelés « dividendes »). Ils sont issus des loyers facturés aux entreprises locataires de ses immeubles. C’est la première source de revenus potentiels pour les clients de la SCPI R Start.',
       },
       {
+        sequence: 'Et ensuite',
         lead: 'Les plus-values',
-        benefit: 'Pour vous : des revenus potentiels à chaque vente d’immeuble',
-        rest:
-          'R Start met au cœur de sa démarche la recherche de plus-values sur les ventes d’immeubles. C’est une particularité de cette SCPI. En clair, R Start vise à dégager des plus-values sur vente d’immeubles de façon plus systématique que d’autres SCPI. Les plus-values réalisées sont redistribuées aux épargnants sous forme de dividendes. C’est la deuxième source de revenus potentiels pour les clients de la SCPI R Start.',
+        benefit: 'Pour vous : des revenus potentiels à la revente des immeubles',
+        /* Textes de Martin du 24/09/2026, mot pour mot (le point final du bénéfice retiré, comme sur
+           la carte des loyers). La comparaison « plus systématique que d'autres SCPI » est partie
+           avec l'ancien texte. */
+        rest: 'R Start met au cœur de sa démarche la recherche de plus-values sur les ventes d’immeubles. Ces plus-values sont redistribuées aux épargnants sous forme de dividendes après frais. C’est la deuxième source de revenus potentiels pour les clients de la SCPI R Start.',
       },
     ],
   },

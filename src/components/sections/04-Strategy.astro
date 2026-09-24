@@ -102,7 +102,11 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
 {/* 1. Les deux moteurs de performance */}
 <Section id={id} tone="paper" class="overflow-hidden">
   <Container size="wide">
-    <header class="max-w-5xl">
+    {
+      /* PLEINE LARGEUR, comme le titre des volets (24/09/2026, Martin : « titre sur une seule
+        ligne ») : sans `max-w-5xl`, il tient sur une ligne dès 1024 px ; en dessous il se coupe. */
+    }
+    <header>
       <h2 id={id + '-title'} class="text-display-lg text-ink" data-reveal-text>
         {strategy.engines.title}
       </h2>
@@ -131,7 +135,14 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
               <article
                 class="carte-recto relative flex min-h-[24rem] flex-col overflow-hidden rounded-3xl bg-white p-6 text-ink shadow-card ring-1 ring-navy/5 sm:min-h-[26rem] sm:p-8"
               >
-                <p class="text-eyebrow text-teal-700 tabular-nums" aria-hidden="true">{numero}</p>
+                {
+                  /* Numéro puis mot d'ordre (24/09/2026, Martin : « 01 D'abord », « 02 Et
+                    ensuite ») : seul le numéro reste masqué aux lecteurs d'écran, le mot se lit. */
+                }
+                <p class="text-eyebrow text-teal-700 tabular-nums">
+                  <span aria-hidden="true">{numero}</span>
+                  {item.sequence && <span> {item.sequence}</span>}
+                </p>
                 <p class="text-display-sm mt-3 text-navy">{item.lead}</p>
                 {
                   /* Ce que le moteur apporte, sous le titre (17/09/2026, demande de l'équipe).
@@ -188,7 +199,10 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
               }
               <div data-carte-detail-hote>
                 <div id={cible} data-carte-detail class="mt-5 space-y-4">
-                  <p class="text-eyebrow text-teal-700 tabular-nums">{numero}</p>
+                  <p class="text-eyebrow text-teal-700 tabular-nums">
+                    {numero}
+                    {item.sequence && <span> {item.sequence}</span>}
+                  </p>
                   <p class="text-display-sm text-navy">{item.lead}</p>
                   {item.rest && <p class="text-base leading-relaxed text-slate-700">{item.rest}</p>}
                 </div>
