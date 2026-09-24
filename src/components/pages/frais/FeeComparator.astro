@@ -235,19 +235,17 @@ const data = scpis.map((s) => ({
                 <td role="cell" class="px-3 py-5 text-center align-top sm:px-5">
                   {row.rstartTiers ? (
                     <>
-                      {/* MÊME PRÉSENTATION QUE R START sur les lignes à paliers (22/09/2026, « comme
-                        ça on a une harmonisation ») : la même grille de largeur fixe, le taux à
-                        gauche et sa précision à côté. Le script remplit les deux cases par leur
-                        index, comme ailleurs. */}
-                      <span class="ml-auto grid w-[16rem] max-w-full grid-cols-[auto_1fr] items-baseline gap-x-2 text-left">
-                        <span data-comparator-cell={String(i)} class="text-display-sm text-slate-700">
-                          {comparator.pendingLabel}
-                        </span>
-                        <span
-                          data-comparator-detail={String(i)}
-                          class="text-caption text-slate-700"
-                        />
+                      {/* CENTRÉ (24/09/2026, Martin : « centre tous les chiffres des concurrents frais de vente
+                        d'immeubles et frais de sortie anticipée ») : le taux du concurrent puis son
+                        détail l'un sous l'autre, au centre de la case comme sur les autres lignes ;
+                        la grille alignée sur celle de R Start (22/09/2026) est abandonnée. */}
+                      <span data-comparator-cell={String(i)} class="text-display-sm text-slate-700">
+                        {comparator.pendingLabel}
                       </span>
+                      <span
+                        data-comparator-detail={String(i)}
+                        class="text-caption mx-auto mt-1 block max-w-[16rem] text-slate-700 empty:hidden"
+                      />
                       <span data-comparator-best="right" class="visually-hidden" hidden>
                         {comparator.bestLabel}
                       </span>
@@ -396,11 +394,11 @@ const data = scpis.map((s) => ({
       /*
        * Taux le plus bas de la ligne. Il faut que LES DEUX cases donnent un pourcentage unique : un
        * barème à paliers (vente d'immeubles, sortie anticipée) ne se compare jamais (22/09/2026,
-       * demande de Martin), son texte n'étant pas un taux unique. LA RÈGLE
-       * (16/09/2026, l'équipe : « si un concurrent est à 0 % aussi il faut le mettre en valeur ») :
-       * EST MARQUÉ TOUT TAUX À 0 %, ET SINON LE PLUS BAS DES DEUX. Le libellé lu par les lecteurs
-       * d'écran dit « taux le plus bas de la ligne », il serait inexact de le réserver à une
-       * colonne quand les deux portent le même zéro.
+       * demande de Martin), son texte n'étant pas un taux unique. LA RÈGLE (24/09/2026, Martin :
+       * « si c'est égal, c'est mis en valeur aussi », qui généralise celle du 16/09/2026 sur le
+       * zéro partagé) : EST MARQUÉ LE PLUS BAS DES DEUX, ET LES DEUX QUAND ILS SONT ÉGAUX. Le
+       * libellé lu par les lecteurs d'écran dit « taux le plus bas de la ligne », il serait inexact
+       * de le réserver à une colonne quand les deux portent le même taux.
        */
       const seul = (t: string | null | undefined) => {
         if (!t) return null;
@@ -416,8 +414,8 @@ const data = scpis.map((s) => ({
         const g = seul(ligne.gauche?.textContent);
         const d = seul(scpi.values[i]);
         const comparable = g !== null && d !== null;
-        const gagneGauche = comparable && (g < d || g === 0);
-        const gagneDroite = comparable && (d < g || d === 0);
+        const gagneGauche = comparable && g <= d;
+        const gagneDroite = comparable && d <= g;
         if (ligne.marqueGauche) ligne.marqueGauche.hidden = !gagneGauche;
         if (ligne.marqueDroite) ligne.marqueDroite.hidden = !gagneDroite;
         /*
