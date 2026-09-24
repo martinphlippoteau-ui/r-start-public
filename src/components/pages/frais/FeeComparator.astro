@@ -39,11 +39,11 @@ interface Props {
    */
   heading?: string;
   intro?: string;
-  /** Premier plan (ui/Section.astro `plan`, 24/09/2026) : `bas` sur l'accueil, où la section suit
-      les points forts (clairs) et précède sa bande sombre ; `haut-bas` sur /frais, sous l'en-tête. */
-  plan?: 'bas' | 'haut-bas';
+  /** Premier plan (ui/Section.astro `plan`, 24/09/2026) sur /frais, où la section suit l'en-tête
+      sombre ; rien sur l'accueil, où elle suit les points forts, clairs. */
+  plan?: 'haut';
 }
-const { id, heading, intro, plan = 'bas' } = Astro.props as Props;
+const { id, heading, intro, plan } = Astro.props as Props;
 const titleId = id + '-title';
 const selectId = id + '-select';
 const { rows } = comparator;

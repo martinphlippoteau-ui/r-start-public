@@ -102,15 +102,14 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
 ---
 
 {
-  /* PREMIER PLAN (essai du 24/09/2026) : les DEUX sections dans une seule enveloppe `.plan-haut
-    .plan-bas` (global.css), une dalle claire qui mord sur l'en-tête sombre (qui reçoit `sousPlan`)
-    et sur les Risques (`sousPlan="haut"`). Une enveloppe et non `plan` sur chaque section : deux
-    boîtes voisines, c'est une jonction, et l'ombre de contact de la seconde, peinte après la
-    première, y dessinait une ligne. `overflow-hidden` : c'est lui qui arrondit les coins des
-    fonds papier des sections ; la canalisation, qui déborde de la section des volets vers celle des
-    moteurs, reste à l'intérieur de l'enveloppe. */
+  /* PREMIER PLAN (24/09/2026) : les DEUX sections dans une seule enveloppe `.plan-haut`
+    (global.css), une dalle claire qui mord sur l'en-tête sombre (qui reçoit `sousPlan`) ; en bas,
+    elle s'arrête à plat sur les Risques. Une enveloppe et non `plan` sur la première section :
+    l'arrondi et l'ombre valent pour la dalle entière. `overflow-hidden` : c'est lui qui arrondit
+    les coins des fonds papier des sections ; la canalisation, qui déborde de la section des volets
+    vers celle des moteurs, reste à l'intérieur de l'enveloppe. */
 }
-<div class="plan-haut plan-bas overflow-hidden">
+<div class="plan-haut overflow-hidden">
 {/* 1. Les deux moteurs de performance */}
 <Section id={id} tone="paper" class="overflow-hidden">
   <Container size="wide">

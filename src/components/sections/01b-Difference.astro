@@ -51,11 +51,7 @@ const situations = (difference.situations ?? []).map((s) => {
     hero contient le H1 : le moteur se limite à épingler et recouvrir, sans recul ni fondu
     (scroll.ts). Sous 64 rem, aucun épinglage : défilement normal. */
 }
-{
-  /* `plan="bas"` (24/09/2026) : la section mord aussi sur la bande sombre « Points essentiels » qui
-    la suit ; son bord haut, c'est le rideau qui l'arrondit. */
-}
-<Section id={id} tone="paper" plan="bas" data-curtain="" class="overflow-hidden">
+<Section id={id} tone="paper" data-curtain="" class="overflow-hidden">
   <Container size="wide">
     {
       /* DEUX MOITIÉS (17/09/2026, demande de l'équipe : « ce bloc en deux parties, texte à gauche

@@ -5,19 +5,18 @@
  * (py-section-sm), 'none' (la section gère ses marges). Les attributs `data-*` sont transmis à la
  * balise <section> (vocabulaire motion : data-in-view, data-curtain…).
  * PREMIER PLAN (24/09/2026, demande de Martin : « les sections à fond bleu comme sous les
- * autres », essayé sur /strategie puis étendu partout) : `plan` pose une section CLAIRE par-dessus
- * sa voisine sombre, du côté indiqué, coins arrondis et ombre (`.plan-haut` / `.plan-bas`,
- * global.css) ; `sous` se pose sur la section SOMBRE recouverte, du côté indiqué, pour que son
- * contenu reste hors de la zone recouverte (`.sous-haut` / `.sous-bas`). Les deux se répondent :
- * une section `plan="bas"` appelle un `sous="haut"` sur la suivante. Jamais de `plan` entre deux
- * sections claires.
+ * autres », essayé sur /strategie puis étendu partout) : `plan="haut"` pose une section CLAIRE
+ * par-dessus le bloc sombre qui la PRÉCÈDE, coins arrondis en haut et ombre (`.plan-haut`,
+ * global.css) ; `sous="bas"` se pose sur le bloc SOMBRE ainsi recouvert, pour que son contenu
+ * reste hors de la zone recouverte (`.sous-bas`). Un seul sens : le haut d'un bloc sombre est un
+ * bord droit (Martin : « le radius que sur la partie basse des sections bleues »).
  */
 interface Props {
   id: string;
   tone?: 'paper' | 'white' | 'ink';
   spacing?: 'default' | 'compact' | 'none';
-  plan?: 'haut' | 'bas' | 'haut-bas';
-  sous?: 'haut' | 'bas' | 'haut-bas';
+  plan?: 'haut';
+  sous?: 'bas';
   class?: string;
   labelledBy?: string;
   [key: `data-${string}`]: string | undefined;
@@ -32,8 +31,6 @@ const {
   labelledBy,
   ...rest
 } = Astro.props;
-const cotes = (v: string | undefined, prefixe: string): string[] =>
-  v ? v.split('-').map((c) => `${prefixe}-${c}`) : [];
 const tones = {
   paper: 'bg-paper text-ink',
   white: 'bg-white text-ink',
@@ -50,8 +47,8 @@ const spacings = { default: 'py-section', compact: 'py-section-sm', none: '' };
     'relative',
     spacings[spacing],
     tones[tone],
-    ...cotes(plan, 'plan'),
-    ...cotes(sous, 'sous'),
+    plan && 'plan-haut',
+    sous && 'sous-bas',
     className,
   ]}
   {...rest}

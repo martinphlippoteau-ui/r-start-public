@@ -1658,15 +1658,16 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
 
 /* --- Premier plan (24/09/2026, demande de Martin, essayé sur /strategie puis étendu à tout le
    site ; ui/Section.astro `plan` et `sous`) ---
-   Une section CLAIRE (ou une bande image) posée par-dessus ses voisines sombres : elle mord de
-   `--relief` sur la voisine, coins arrondis de ce côté, ombre portée sur le fond sombre. La voisine
-   sombre (`.sous-*`) s'agrandit de `--relief` du même côté par une BORDURE TRANSPARENTE, peinte de
-   son fond (background-clip par défaut) : son contenu ne bouge pas, seule la zone recouverte est du
-   vide, et ça vaut quel que soit son rythme vertical (py-section, py-section-sm ou marges propres).
-   Rayons identiques à ceux du rideau. OMBRE EN DEUX COUCHES (« un peu plus de profondeur ») : une
-   large et douce qui pose la dalle, une courte au ras du bord qui la décolle ; les deux ne se
-   voient que sur le fond sombre. Deux sections claires voisines : pas de `plan` entre elles, ou
-   une seule enveloppe (04-Strategy.astro), sinon l'ombre de contact de la seconde trace une ligne. */
+   Une section CLAIRE (ou une bande image) qui SUIT un bloc sombre se pose par-dessus : elle mord
+   de `--relief` sur lui, coins arrondis en haut, ombre portée sur le fond sombre. UN SEUL SENS
+   (Martin, le même jour : « le radius que sur la partie basse des sections bleues, pas sur le
+   haut ») : un bloc sombre commence par un bord droit sous la section claire qui le précède, et
+   finit sous la dalle arrondie de celle qui le suit. Le bloc sombre (`.sous-bas`) s'agrandit de
+   `--relief` par le bas par une BORDURE TRANSPARENTE, peinte de son fond (background-clip par
+   défaut) : son contenu ne bouge pas, seule la zone recouverte est du vide, et ça vaut quel que
+   soit son rythme vertical (py-section, py-section-sm ou marges propres). Rayons identiques à ceux
+   du rideau. OMBRE EN DEUX COUCHES (« un peu plus de profondeur ») : une large et douce qui pose la
+   dalle, une courte au ras du bord qui la décolle ; les deux ne se voient que sur le fond sombre. */
 :root {
   --relief: 1.5rem;
   @media (width >= 40rem) {
@@ -1675,32 +1676,14 @@ body:has(#consent-banner:not([hidden])) [data-sticky-cta] {
   --ombre-plan-haut:
     0 -18px 44px -12px rgb(6 24 33 / 0.5),
     0 -2px 6px -1px rgb(6 24 33 / 0.35);
-  --ombre-plan-bas:
-    0 18px 44px -12px rgb(6 24 33 / 0.5),
-    0 2px 6px -1px rgb(6 24 33 / 0.35);
-}
-.plan-haut,
-.plan-bas {
-  position: relative;
-  z-index: 2;
 }
 .plan-haut {
+  position: relative;
+  z-index: 2;
   margin-top: calc(-1 * var(--relief));
   border-start-start-radius: var(--relief);
   border-start-end-radius: var(--relief);
   box-shadow: var(--ombre-plan-haut);
-}
-.plan-bas {
-  margin-bottom: calc(-1 * var(--relief));
-  border-end-start-radius: var(--relief);
-  border-end-end-radius: var(--relief);
-  box-shadow: var(--ombre-plan-bas);
-}
-.plan-haut.plan-bas {
-  box-shadow: var(--ombre-plan-haut), var(--ombre-plan-bas);
-}
-.sous-haut {
-  border-top: var(--relief) solid transparent;
 }
 .sous-bas {
   border-bottom: var(--relief) solid transparent;

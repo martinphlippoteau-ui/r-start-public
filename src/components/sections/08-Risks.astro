@@ -8,8 +8,9 @@
  * reproduits in extenso (bulletin de souscription, DIC, commission d'arbitrage) ont quitté cette
  * section le 11/09/2026 à la demande de l'équipe : ils sont sur /documentation, à côté des
  * documents dont ils sont extraits (components/pages/documentation/MandatoryWarnings.astro).
- * PLAN (24/09/2026, demande de Martin) : le bloc passe SOUS les sections claires qui l'entourent
- * (`sousPlan`, ui/Section.astro), qui mordent dessus avec leurs coins arrondis et leur ombre. Le
+ * PLAN (24/09/2026, demande de Martin) : le bloc passe SOUS la section claire qui le suit
+ * (`sousPlan`, ui/Section.astro), qui mord dessus avec ses coins arrondis et son ombre ; son bord
+ * haut reste droit sous la section qui le précède. Le
  * rideau (`data-curtain`, la section montant par-dessus la précédente épinglée) est coupé partout
  * depuis ce jour : il faisait l'inverse. Rien ne bouge, ni le H2 ni les quatre risques : le
  * contre-poids global de la page est en place d'emblée.
@@ -33,11 +34,10 @@ interface Props {
       SOUS les claires) : il faisait monter ce bloc sombre par-dessus la section claire précédente.
       Le réglage reste, à `false`, au cas où. */
   rideau?: boolean;
-  /** Côtés recouverts par les sections claires voisines au premier plan (ui/Section.astro `sous`).
-      Les deux par défaut : le bloc est toujours entre deux sections claires. */
-  sousPlan?: 'haut' | 'bas' | 'haut-bas';
+  /** Recouvert par le bas par la section claire qui suit (ui/Section.astro `sous`), toujours. */
+  sousPlan?: 'bas';
 }
-const { rideau = false, sousPlan = 'haut-bas' } = Astro.props as Props;
+const { rideau = false, sousPlan = 'bas' } = Astro.props as Props;
 
 ---
 
