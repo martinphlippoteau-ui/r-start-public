@@ -7,11 +7,19 @@
  * le 22/09/2026. Grille 24 × 24, trait de 1,5 pour la forme et 1,25 à 55 % d'opacité pour les
  * détails : ce second niveau évite l'effet « gros trait » d'une épaisseur unique. `currentColor` :
  * la couleur vient de la classe reçue. Formes archi-connues (billet, calendrier, immeubles, globe,
- * loupe) : un pictogramme se reconnaît, il ne s'interprète pas. Clés : argent, calendrier, equipe,
- * exploration, analyse. Toujours décoratif (aria-hidden), le texte voisin porte le sens ; aucun
+ * loupe, courbe qui monte) : un pictogramme se reconnaît, il ne s'interprète pas. Clés : argent,
+ * calendrier, equipe, exploration, analyse, croissance. Toujours décoratif (aria-hidden), le texte
+ * voisin porte le sens ; aucun
  * attribut motion ici, l'animation se pose sur l'enveloppe.
  */
-export const PICTO_KEYS = ['argent', 'calendrier', 'equipe', 'exploration', 'analyse'] as const;
+export const PICTO_KEYS = [
+  'argent',
+  'calendrier',
+  'equipe',
+  'exploration',
+  'analyse',
+  'croissance',
+] as const;
 export type PictoKey = (typeof PICTO_KEYS)[number];
 
 interface Props {
@@ -88,6 +96,11 @@ const glyphs: Record<PictoKey, { trait: string; detail?: string }> = {
       '<path d="M6.6 7h.01M9.6 7h.01M6.6 11h.01M9.6 11h.01M6.6 15h.01M9.6 15h.01"/>',
       '<path d="M20.1 18.1 22.4 20.4"/>',
     ].join(''),
+  },
+  // Courbe qui monte, avec un creux, et sa flèche : la plus-value (24/09/2026). Ni axe ni graduation.
+  croissance: {
+    trait: ['<path d="M3 17.5 8 11.5l4 3.5L21 6.5"/>', '<path d="M15.5 6.5H21V12"/>'].join(''),
+    detail: '<path d="M3 21h18"/>',
   },
 };
 

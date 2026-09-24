@@ -64,6 +64,10 @@ export const risks: RisksContent = {
      * subsiste que sur /a-propos, sous la gamme en chiffres.
      */
   ],
+  /* Paragraphe de clôture (24/09/2026, texte de Martin, mot pour mot), rendu sous les quatre
+     risques partout où la section l'est : accueil, /strategie, /a-propos. */
+  notice:
+    'Les produits commercialisés par CORUM L’Épargne sont des investissements long terme qui n’offrent aucune garantie de rendement ou de performance et présentent un risque de perte en capital et de liquidité. Les revenus ne sont pas garantis et dépendront des marchés immobilier et financier et du cours des devises.',
 
   warningsTitle: 'Les avertissements réglementaires',
   bulletinWarningTitle: 'Avertissement du bulletin de souscription',

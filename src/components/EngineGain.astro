@@ -10,10 +10,11 @@
  * prix qui monte, révélée de gauche à droite avec la surface qu'elle couvre, la marque R Start à
  * son extrémité ; au sommet, la marque se retourne comme une pièce et la pastille « € » s'ouvre sur
  * l'autre face : la vente. SES LIMITES, tenues à la lettre : AUCUN CHIFFRE, aucun axe gradué,
- * aucune échelle, aucune date, aucune durée. La courbe monte sans à-coup ni creux : elle nomme le
- * mécanisme que le texte de la carte décrit, elle ne dessine ni un historique ni une promesse. Le
- * bloc Risques de la page porte l'avertissement correspondant. Le signe « € » est un symbole, pas
- * un montant.
+ * aucune échelle, aucune date, aucune durée. La courbe MONTE ET DESCEND (24/09/2026, Martin : « je
+ * veux qu'il y ait des hausses et des baisses ») : deux creux sur une tendance qui finit plus haut
+ * qu'elle ne part ; elle montrait auparavant une montée sans creux. Elle nomme le mécanisme que le
+ * texte de la carte décrit, elle ne dessine ni un historique ni une promesse. Le bloc Risques de la
+ * page porte l'avertissement correspondant. Le signe « € » est un symbole, pas un montant.
  * LA RÉVÉLATION EST UN DÉCOUPAGE (`clip-path: inset`) qui avance à vitesse constante, sur la courbe
  * ET sa surface ensemble : les deux ont toujours le même bord. La marque est portée par
  * `offset-path`, dont la vitesse est celle du CHEMIN, pas de l'abscisse : pour rester au bord du
@@ -28,14 +29,19 @@ const CADRE = { x: 18, y: 30, w: 48, h: 54 };
 const FENETRES = fenetres(CADRE, { colonnes: 3, rangees: 4, taille: 7, ecart: 4 });
 const SOL = 84;
 
-/* La courbe : quatre cubiques raccordées tangentes à tangentes (aucun angle), du point d'achat au
-   sommet, sans creux, la pente variant juste assez pour ne pas être une droite. */
+/* La courbe : cinq cubiques raccordées tangentes à tangentes (aucun angle), du point d'achat au
+   sommet : hausse, baisse, hausse, baisse, hausse. Chaque raccord est un sommet ou un creux à
+   tangente horizontale (ses deux points de contrôle voisins sur sa propre ordonnée), les creux
+   restent au-dessus du point d'achat et chaque sommet dépasse le précédent. L'ABSCISSE NE RECULE
+   JAMAIS, points de contrôle compris : le découpage avance en x et l'échantillonnage ci-dessous
+   cherche la première abscisse atteinte. */
 type Pt = [number, number];
 const SEGMENTS: [Pt, Pt, Pt, Pt][] = [
-  [[84, 76], [96, 75], [104, 71], [116, 66]],
-  [[116, 66], [128, 61], [134, 60], [142, 54]],
-  [[142, 54], [150, 48], [160, 45], [172, 40]],
-  [[172, 40], [184, 35], [192, 30], [204, 26]],
+  [[84, 76], [92, 74], [100, 58], [108, 58]],
+  [[108, 58], [116, 58], [119, 68], [126, 68]],
+  [[126, 68], [134, 68], [144, 44], [152, 44]],
+  [[152, 44], [160, 44], [163, 52], [170, 52]],
+  [[170, 52], [178, 52], [190, 30], [204, 26]],
 ];
 const DEPART = SEGMENTS[0]![0];
 const SOMMET = SEGMENTS[SEGMENTS.length - 1]![3];

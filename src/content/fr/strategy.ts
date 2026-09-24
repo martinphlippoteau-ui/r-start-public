@@ -8,9 +8,11 @@ import type { StrategyContent } from '@/content/types';
  * CE QU'IL FAUT SAVOIR CÔTÉ CONFORMITÉ : la page ne dit plus le mot d'ordre et ses contre-poids, la
  * zone du DIC (pays du Conseil de l'Europe et Canada, l'inverse de « partout dans le monde », voir
  * `where`), les types d'actifs du DIC, l'effet de levier ni les notes de sources ; les chiffres
- * restent dans facts.ts. PAS DE MENTION DE RISQUE DANS CE CORPS : celle qui suivait les deux
- * moteurs a quitté l'écran le 16/09/2026 et le code le 22/09/2026 (archivée hors du dépôt,
- * .claude/audits) ; les risques sont portés par le bloc Risques que la page rend ensuite.
+ * restent dans facts.ts. UNE SEULE MENTION DANS CE CORPS : « Les performances passées ne préjugent
+ * pas des performances futures. » sous les deux moteurs (`engines.outro`, 24/09/2026, demande de
+ * Martin). La mention de risque qui suivait les moteurs a quitté l'écran le 16/09/2026 et le code
+ * le 22/09/2026 (archivée hors du dépôt, .claude/audits) ; les risques sont portés par le bloc
+ * Risques que la page rend ensuite.
  */
 
 export const strategy: StrategyContent = {
@@ -48,6 +50,8 @@ export const strategy: StrategyContent = {
         rest: 'R Start met au cœur de sa démarche la recherche de plus-values sur les ventes d’immeubles. Ces plus-values sont redistribuées aux épargnants sous forme de dividendes après frais. C’est la deuxième source de revenus potentiels pour les clients de la SCPI R Start.',
       },
     ],
+    /* Sous les deux cartes (24/09/2026, demande de Martin). */
+    outro: 'Les performances passées ne préjugent pas des performances futures.',
   },
 
   /* En-tête des trois volets (16/09/2026, texte de l'équipe). « pour les alimenter » renvoie aux
@@ -64,13 +68,13 @@ export const strategy: StrategyContent = {
      */
     eyebrow: 'Sélective',
     title: 'Tout commence par le choix des immeubles',
-    /* Phrase de méthode (16/09/2026) : elle ouvre le propos au lieu de fermer les deux moteurs. */
-    intro:
-      'Les opportunités ne tombent pas du ciel : nous suivons une méthode d’investissement précise pour dénicher les bons immeubles, loués par les bonnes entreprises, et générer du rendement potentiel.',
-    lead: 'L’équipe cible des immeubles avec à la fois :',
+    /* Texte de Martin du 24/09/2026, mot pour mot : la phrase de méthode du 16/09/2026 (« Les
+       opportunités ne tombent pas du ciel… ») n'y figure plus, les deux puces deviennent des
+       pictogrammes (billet pour le rendement locatif, courbe qui monte pour la plus-value). */
+    lead: 'Les équipes d’investissement ciblent des immeubles avec à la fois :',
     items: [
-      { lead: 'Un fort potentiel de rendement locatif ;' },
-      { lead: 'Et un fort potentiel de plus-value.' },
+      { lead: 'un fort potentiel de rendement locatif', icon: 'argent' },
+      { lead: 'et un fort potentiel de plus-value', icon: 'croissance' },
     ],
     outro:
       'Il s’agit principalement d’immeubles de taille intermédiaire, un secteur où la concurrence est relativement limitée.',
@@ -78,36 +82,38 @@ export const strategy: StrategyContent = {
 
   where: {
     eyebrow: 'Diversifiée',
-    /* Contenu fourni par l'équipe le 16/09/2026. */
-    title: 'Viser large pour viser juste.',
-    intro: 'R Start diversifiera ses acquisitions :',
+    /* Texte de Martin du 24/09/2026, mot pour mot. */
+    title: 'Viser large pour viser juste',
+    intro: 'Les équipes d’investissement diversifient les achats :',
     /* Pictogrammes sur les deux items (16/09/2026, demande de l'équipe) : une puce dessinée à la
-       place du point. « PARTOUT DANS LE MONDE », ET CE QUI RESTE À TRANCHER : le DIC du 20/05/2026
-       borne la zone aux pays du Conseil de l'Europe et au Canada (facts.strategy.zoneDetail). Le
-       site dit « Monde » depuis le 14/09/2026, décision de l'équipe, sans écrire la zone réelle
-       nulle part. */
+       place du point. « EN EUROPE ET AU-DELÀ » (24/09/2026, Martin) remplace « partout dans le
+       monde » (14/09/2026) : plus proche de la zone du DIC du 20/05/2026, pays du Conseil de
+       l'Europe et Canada (facts.strategy.zoneDetail), toujours sans l'écrire. */
     items: [
-      { lead: 'partout dans le monde', icon: 'exploration' },
-      { lead: 'dans tous les secteurs', icon: 'equipe' },
+      { lead: 'en Europe et au-delà', icon: 'exploration' },
+      { lead: 'dans tous les secteurs professionnels', icon: 'equipe' },
     ],
-    outro: 'Un seul mot d’ordre : identifier une opportunité',
+    outro: 'Un seul mot d’ordre : identifier une opportunité.',
   },
 
   /** Volet « Opportuniste » (zone 5 du document de l'équipe). */
   how: {
     eyebrow: 'Opportuniste',
     title: 'Les bons immeubles, au bon prix',
-    intro: 'La base de notre travail ?',
+    /* Texte de Martin du 24/09/2026, mot pour mot : deux points au lieu de trois (« Travailler à
+       leur donner plus de valeur au fil des années » n'y figure plus). Pictogrammes comme sur les
+       deux autres tuiles : loupe pour le repérage, calendrier pour le moment de la vente. */
+    intro: 'Les équipes d’investissement cherchent à :',
     items: [
       {
-        lead: 'Repérer des immeubles moins chers que leur vraie valeur et les acheter aux meilleures conditions ;',
+        lead: 'repérer des immeubles moins chers que leur vraie valeur et les acheter aux meilleures conditions',
+        icon: 'analyse',
       },
-      { lead: 'Travailler à leur donner plus de valeur au fil des années ;' },
       {
-        lead: 'Choisir le bon moment pour vendre un immeuble afin d’en tirer la plus-value la plus intéressante possible.',
+        lead: 'choisir le bon moment pour vendre un immeuble afin d’en tirer la plus-value la plus intéressante possible',
+        icon: 'calendrier',
       },
     ],
-    outro:
-      'Bien acheter ne suffit pas. Ce qui crée de la valeur, c’est aussi de savoir bien gérer et bien vendre !',
+    outro: 'Bien acheter ne suffit pas. Il faut aussi savoir bien vendre.',
   },
 };

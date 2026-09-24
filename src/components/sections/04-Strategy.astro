@@ -17,8 +17,10 @@
  * sous-pages. LES CARTES AUSSI SONT CLAIRES depuis le 22/09/2026 (demande de Martin ; elles
  * étaient ink) : blanches, à ombre et filet, la recette des repères de l'accueil, les dessins
  * re-teintés en marine par les variables `--illus-*` (global.css). Le seul bloc sombre est celui
- * des Risques, que la page rend ensuite et qui porte les risques : AUCUNE MENTION DE RISQUE DANS CES DEUX SECTIONS
- * (retirée de l'écran le 16/09/2026, du code le 22/09/2026 avec le composant NoteConformite).
+ * des Risques, que la page rend ensuite et qui porte les risques. UNE SEULE MENTION DANS CES DEUX
+ * SECTIONS : « Les performances passées ne préjugent pas… » sous les deux cartes moteurs
+ * (`engines.outro`, 24/09/2026, demande de Martin) ; la mention de risque d'avant a quitté l'écran
+ * le 16/09/2026 et le code le 22/09/2026 avec le composant NoteConformite.
  *
  * Motion (src/scripts/motion.ts, tout par attributs) : aucun rideau ici, la section suit
  * directement l'en-tête ; H2 du premier chapitre mot à mot (data-reveal-text), celui des volets en
@@ -212,6 +214,19 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
         })
       }
     </ul>
+    {
+      /* Mention sous les deux cartes (24/09/2026, demande de Martin). HAUTEUR FIXE, 3 rem : 1,5 rem
+        de marge haute (`mt-6`) et une ligne de 1,5 rem (`leading-6`), reprise par `--pont-note`
+        dans la CSS de la canalisation, qui doit toujours arriver au bas des CARTES et non de cette
+        ligne. Centrée : les deux conduites montent au centre des colonnes, à 25 % et 75 %, et une
+        ligne de cette longueur centrée n'en croise aucune. Une ligne, jamais deux : au-dessus de
+        1024 px, où la canalisation se dessine, la phrase tient largement. */
+    }
+    {
+      strategy.engines.outro && (
+        <p class="mt-6 text-center text-sm leading-6 text-slate-700">{strategy.engines.outro}</p>
+      )
+    }
   </Container>
 </Section>
 
@@ -381,7 +396,7 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
                 <div id={'detail-' + ancre} data-carte-detail class="mt-5 space-y-4">
                   <p class="text-eyebrow text-teal-700">{zone.eyebrow}</p>
                   <p class="text-display-sm text-navy">{zone.title}</p>
-                  <p class="text-base leading-snug text-slate-700">{zone.intro}</p>
+                  {zone.intro && <p class="text-base leading-snug text-slate-700">{zone.intro}</p>}
                   {zone.lead && <p class="text-base font-semibold text-ink">{zone.lead}</p>}
 
                   <ul role="list" class="space-y-3">
@@ -433,13 +448,18 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
       /* Boîte de HAUTEUR NULLE : elle ne sert que de repère, elle ne pousse rien. */
       position: relative;
       --pont-cycle: 8s;
+      /* La mention sous les cartes moteurs : `mt-6` + une ligne `leading-6` (voir le paragraphe
+         dans la section des moteurs). Changer l'un sans l'autre décolle les chevrons des cartes. */
+      --pont-note: 3rem;
       /*
        * HAUTEUR DE LA BANDE, écrite UNE SEULE FOIS parce que trois règles en dépendent : le tracé,
        * le nœud à mi-hauteur et les chevrons tout en haut. C'est la marge basse de la section des
-       * moteurs plus la marge haute (`pt-section-sm`) de celle des volets, moins un rem pour
-       * dégager l'ombre portée des cartes, qui descend sous leur bord.
+       * moteurs plus la marge haute (`pt-section-sm`) de celle des volets, plus la mention sous les
+       * cartes, moins un rem pour dégager l'ombre portée des cartes, qui descend sous leur bord.
        */
-      --pont-bande: calc(var(--spacing-section) + var(--spacing-section-sm) - 1rem);
+      --pont-bande: calc(
+        var(--spacing-section) + var(--spacing-section-sm) + var(--pont-note) - 1rem
+      );
     }
     .pont svg {
       position: absolute;

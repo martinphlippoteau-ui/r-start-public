@@ -3,7 +3,8 @@
  * Section 8, Risques (id « risques »). Contre-poids global de la page : section pleine sur fond ink
  * avec le même poids typographique que les sections avantages (H2 text-display-lg, sans intro ni
  * surtitre), tout en sable. Rendue sur l'accueil, sur /strategie et, sans rideau, sur /a-propos.
- * Quatre risques en grille (titre text-display-sm, description text-base). Les avertissements
+ * Quatre risques en grille (titre text-display-sm, description text-base), puis un paragraphe de
+ * clôture (`notice`, 24/09/2026, demande de Martin) dans le même corps. Les avertissements
  * reproduits in extenso (bulletin de souscription, DIC, commission d'arbitrage) ont quitté cette
  * section le 11/09/2026 à la demande de l'équipe : ils sont sur /documentation, à côté des
  * documents dont ils sont extraits (components/pages/documentation/MandatoryWarnings.astro).
@@ -88,5 +89,16 @@ const { rideau = true } = Astro.props as Props;
         ))
       }
     </ul>
+    {
+      /* Paragraphe de clôture (24/09/2026, demande de Martin) : même corps et même couleur que les
+        descriptions, même filet que les risques au-dessus, sur toute la largeur de la grille. */
+    }
+    {
+      risks.notice && (
+        <p class="mt-6 border-t border-white/25 pt-5 text-base leading-snug text-sand lg:mt-8">
+          {risks.notice}
+        </p>
+      )
+    }
   </Container>
 </Section>

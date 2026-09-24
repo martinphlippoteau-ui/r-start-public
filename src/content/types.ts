@@ -102,7 +102,8 @@ export interface StrategyChapter {
    * chronologique des moteurs (« D'abord », « Et ensuite »), rendu à la suite du numéro.
    */
   items: { lead: string; rest?: string; icon?: PictoKey; benefit?: string; sequence?: string }[];
-  /** Phrase qui referme le chapitre, sous la liste. Les moteurs n'en ont pas. */
+  /** Phrase qui referme le chapitre, sous la liste. Pour les moteurs, c'est la mention sur les
+      performances passées (24/09/2026), rendue sous les deux cartes. */
   outro?: string;
 }
 
@@ -188,6 +189,8 @@ export interface RisksContent {
   /** Facultative : celle de l'accueil a été retirée le 15/09/2026 à la demande de l'équipe. */
   intro?: string;
   items: RiskItem[];
+  /** Paragraphe qui referme la grille des quatre risques (24/09/2026, texte de Martin). */
+  notice?: string;
   /** Titre (H2) de la section qui regroupe les avertissements reproduits in extenso (/documentation). */
   warningsTitle?: string;
   /** Avertissement du bulletin de souscription, in extenso. */
