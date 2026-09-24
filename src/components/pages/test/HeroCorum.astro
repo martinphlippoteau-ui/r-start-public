@@ -5,7 +5,8 @@
  * DISTRIBUTEUR de R Start, pas son concepteur (CORUM Asset Management) : elle n'« invente » donc
  * jamais, elle distribue ou présente. Version statique du hero (01-Hero.astro : mêmes classes de
  * texte, même logo, mêmes boutons, même bandeau Trustpilot), sans aurore, sans entrée animée ni
- * défilement lié : c'est la place de CORUM L'Épargne qu'on juge, pas le mouvement. Le logo CORUM
+ * défilement lié : c'est la place de CORUM L'Épargne qu'on juge, pas le mouvement. Cinq variantes
+ * au départ, quatre depuis le retrait de la pastille de distribution. Le logo CORUM
  * L'Épargne n'existe qu'en couleur : posé sur pastille blanche là où il apparaît. À SUPPRIMER avec
  * la page /test une fois le choix fait et reporté dans 01-Hero.astro.
  */
@@ -24,24 +25,26 @@ const DISTRIBUEE = 'La SCPI R Start est distribuée par CORUM L’Épargne';
 const experience = experienceStats[0]?.value ?? '';
 const epargne = experienceStats[1]?.value ?? '';
 
-const VARIANTES: { titre: string; note: string }[] = [
+type Cle = 'ligne' | 'signature' | 'confiance' | 'surtitre';
+/* La pastille de distribution (ex-variante 4) a été retirée le 24/09/2026 à la demande de Martin. */
+const VARIANTES: { cle: Cle; titre: string; note: string }[] = [
   {
+    cle: 'ligne',
     titre: 'Une ligne sous l’accroche',
     note: 'Le hero ne change pas ; « La SCPI R Start est distribuée par CORUM L’Épargne » en petit, sous l’accroche. Texte seul.',
   },
   {
+    cle: 'signature',
     titre: 'La signature sous le logo',
     note: 'Sous le logo R Start, « distribuée par » et le logo CORUM L’Épargne. « CORUM invente » reste au-dessus : le groupe invente, CORUM L’Épargne distribue.',
   },
   {
+    cle: 'confiance',
     titre: 'La ligne de confiance',
     note: 'En bas, sous les étoiles Trustpilot, CORUM L’Épargne comme caution, avec les chiffres du groupe pris dans les faits du site.',
   },
   {
-    titre: 'La pastille de distribution',
-    note: 'Sous les boutons, une pastille claire « La SCPI R Start est distribuée par » suivie du logo, comme un cachet.',
-  },
-  {
+    cle: 'surtitre',
     titre: 'Le surtitre « CORUM L’Épargne présente »',
     note: 'Le surtitre change de sujet : ce n’est plus le groupe qui invente, c’est le distributeur qui présente. Rien d’autre ne bouge.',
   },
@@ -56,7 +59,7 @@ const taglineClass =
   <Container size="wide">
     <p class="text-eyebrow text-teal-700">Essai du 24/09/2026</p>
     <h1 id="hero-corum-title" class="text-display-md mt-3 text-ink">
-      Le hero de l’accueil avec CORUM L’Épargne : cinq variantes
+      Le hero de l’accueil avec CORUM L’Épargne : quatre variantes
     </h1>
     <p class="mt-4 max-w-3xl text-lg text-slate-700">
       CORUM L’Épargne distribue R Start, CORUM Asset Management la conçoit et la gère : dans
@@ -78,6 +81,7 @@ const taglineClass =
   VARIANTES.map((v, i) => {
     const n = i + 1;
     const id = `hero-${n}`;
+    const { cle } = v;
     return (
       <Section id={id} tone="ink" spacing="none" class="brand-halo grain overflow-hidden">
         <Container size="wide" class="relative pt-10 pb-16 sm:pt-12 sm:pb-20">
@@ -88,7 +92,7 @@ const taglineClass =
           <div class="mx-auto mt-10 flex max-w-4xl flex-col items-center text-center">
             {/* Surtitre */}
             <p class={eyebrowClass + ' mb-5 sm:mb-8'}>
-              {n === 5 ? 'CORUM L’Épargne présente' : hero.eyebrow}
+              {cle === 'surtitre' ? 'CORUM L’Épargne présente' : hero.eyebrow}
             </p>
 
             {/* Logo R Start, à la place réservée du hero */}
@@ -99,7 +103,7 @@ const taglineClass =
             </div>
 
             {/* 2. Signature sous le logo */}
-            {n === 2 && (
+            {cle === 'signature' && (
               <p class="mt-5 flex items-center gap-3 text-sm font-semibold tracking-[0.08em] text-white/80 uppercase">
                 distribuée par
                 <span class="inline-flex items-center rounded-full bg-white px-4 py-2">
@@ -111,7 +115,7 @@ const taglineClass =
             <p class={taglineClass}>{hero.tagline}</p>
 
             {/* 1. Ligne sous l'accroche */}
-            {n === 1 && <p class="mt-4 text-base text-white/80 sm:text-lg">{DISTRIBUEE}</p>}
+            {cle === 'ligne' && <p class="mt-4 text-base text-white/80 sm:text-lg">{DISTRIBUEE}</p>}
 
             {/* Boutons */}
             <div class="mt-6 flex w-full flex-col items-stretch gap-2 sm:mt-12 sm:w-auto sm:flex-row sm:items-center sm:justify-center sm:gap-3">
@@ -121,21 +125,13 @@ const taglineClass =
               </Button>
             </div>
 
-            {/* 4. Pastille de distribution */}
-            {n === 4 && (
-              <p class="mt-6 inline-flex items-center gap-3 rounded-full bg-white py-2 pr-4 pl-5 text-sm font-semibold text-navy">
-                La SCPI R Start est distribuée par
-                <Image src={corumLogo} alt="CORUM L’Épargne" height={20} loading="lazy" decoding="async" class="h-5 w-auto" />
-              </p>
-            )}
-
             {/* Trustpilot */}
             <div class="mx-auto mt-6 w-full max-w-md sm:mt-10">
               <TrustBox template="horizontal" theme="dark" label={trust.trustpilot.widgetLabel!} />
             </div>
 
             {/* 3. Ligne de confiance */}
-            {n === 3 && (
+            {cle === 'confiance' && (
               <p class="mt-5 max-w-2xl text-base text-white/80">
                 {DISTRIBUEE}. Le groupe CORUM : {experience} d’expertise, {epargne} d’épargne gérée.
               </p>
