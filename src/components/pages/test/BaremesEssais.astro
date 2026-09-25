@@ -1,0 +1,182 @@
+---
+/**
+ * ESSAI (25/09/2026, demande de Martin : « dix propositions » pour afficher les deux barèmes à
+ * paliers du comparateur, frais de sortie anticipée et frais sur vente d'immeubles). Rendu SUR
+ * /test SEULEMENT. LES PALIERS VIENNENT DU COMPARATEUR (comparator.ts, `rstartTiers`), taux et
+ * conditions tels quels : ici on ne joue que la forme. Aucune comparaison, aucun chiffre ajouté.
+ * Les hauteurs de barres et les teintes des propositions 3 et 8 sont proportionnelles au taux
+ * affiché, rien d'autre. À supprimer une fois tranché.
+ */
+import Container from '@/components/ui/Container.astro';
+import Section from '@/components/ui/Section.astro';
+import { comparator } from '@/content/fr/comparator';
+
+const BAREMES = comparator.rows.filter((r) => r.rstartTiers).map((r) => ({
+  label: r.label,
+  basis: r.basis,
+  tiers: r.rstartTiers!,
+}));
+/** Le nombre derrière « 12 % » : seulement pour proportionner une barre ou une teinte. */
+const taux = (rate: string): number => parseFloat(rate.replace(',', '.')) || 0;
+const maxi = (tiers: readonly { rate: string }[]): number => Math.max(...tiers.map((t) => taux(t.rate)), 1);
+
+const PROPOSITIONS: { titre: string; note: string }[] = [
+  { titre: 'Le tableau', note: 'Deux colonnes, condition puis taux, un filet entre les paliers. Le plus sobre.' },
+  { titre: 'La frise', note: 'Les paliers en segments côte à côte, le taux au-dessus, la condition dessous, dans l’ordre de la brochure.' },
+  { titre: 'L’escalier', note: 'Une barre par palier, hauteur proportionnelle au taux, le taux en tête, la condition au pied.' },
+  { titre: 'Les pastilles', note: 'Chaque taux dans une pastille, le 0 % en pastille pleine, la condition dessous.' },
+  { titre: 'Les cartes', note: 'Une petite carte par palier, le taux en gros, la condition en petit, en grille.' },
+  { titre: 'La phrase', note: 'Le barème en une phrase, les taux en gras : lisible d’un trait.' },
+  { titre: 'Le dégradé', note: 'La liste actuelle, mais la case du taux se teinte d’autant plus que le taux monte.' },
+  { titre: 'Le meilleur d’abord', note: 'Le premier palier en avant, les autres repliés derrière « Voir le barème ».' },
+  { titre: 'La colonne', note: 'Un fil vertical, un point par palier, le taux à gauche et la condition à droite.' },
+  { titre: 'Les puces alignées', note: 'La liste actuelle resserrée : taux à droite alignés en colonne, conditions à gauche, en un seul bloc.' },
+];
+---
+
+<Section id="baremes-essais" tone="paper">
+  <Container size="wide">
+    <p class="text-eyebrow text-teal-700">Essai du 25/09/2026</p>
+    <h1 id="baremes-essais-title" class="text-display-md mt-3 text-ink">Les barèmes à paliers : dix façons de les afficher</h1>
+    <p class="mt-4 max-w-3xl text-lg text-slate-700">
+      Frais de sortie anticipée et frais sur vente d’immeubles, paliers du comparateur tels quels. Seule la
+      forme change.
+    </p>
+    <ol class="mt-6 max-w-3xl columns-2 space-y-1 text-base text-ink">
+      {PROPOSITIONS.map((p, i) => <li><a href={`#proposition-${i + 1}`} class="font-semibold">{`${i + 1}. ${p.titre}`}</a></li>)}
+    </ol>
+  </Container>
+</Section>
+
+{
+  PROPOSITIONS.map((p, i) => {
+    const n = i + 1;
+    return (
+      <Section id={`proposition-${n}`} tone={n % 2 ? 'white' : 'paper'} class="pt-section-sm">
+        <Container size="wide">
+          <h2 id={`proposition-${n}-title`} class="text-display-sm text-ink">{`Proposition ${n} : ${p.titre}`}</h2>
+          <p class="mt-3 max-w-3xl text-base text-slate-700">{p.note}</p>
+          <div class="mt-8 grid gap-6 lg:grid-cols-2">
+            {BAREMES.map((b) => (
+              <article class="rounded-3xl bg-white p-6 text-ink shadow-card ring-1 ring-navy/5 sm:p-8">
+                <p class="text-lg font-medium text-ink">{b.label}</p>
+                <p class="text-caption mt-1 text-slate-700">{b.basis}</p>
+                <div class="mt-5">
+                  {n === 1 && (
+                    <table class="w-full text-base">
+                      <tbody>
+                        {b.tiers.map((t) => (
+                          <tr class="border-t border-navy/10">
+                            <td class="py-2.5 pr-4 text-slate-700">{t.when}</td>
+                            <td class="text-display-sm py-2.5 text-right text-navy tabular-nums">{t.rate}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  )}
+                  {n === 2 && (
+                    <ol class="flex gap-1">
+                      {b.tiers.map((t, k) => (
+                        <li class="flex-1 text-center">
+                          <p class="text-display-sm text-navy tabular-nums">{t.rate}</p>
+                          <div class={`mt-2 h-2 ${k === 0 ? 'rounded-l-full' : ''} ${k === b.tiers.length - 1 ? 'rounded-r-full' : ''}`} style={`background: color-mix(in srgb, var(--color-navy) ${20 + (80 * taux(t.rate)) / maxi(b.tiers)}%, var(--color-teal-100))`} />
+                          <p class="text-caption mt-2 text-slate-700">{t.when}</p>
+                        </li>
+                      ))}
+                    </ol>
+                  )}
+                  {n === 3 && (
+                    <ol class="flex items-end gap-3" style="height: 11rem">
+                      {b.tiers.map((t) => (
+                        <li class="flex flex-1 flex-col items-center justify-end self-stretch">
+                          <p class="text-display-sm text-navy tabular-nums">{t.rate}</p>
+                          <div class="mt-1 w-full rounded-t-lg bg-teal-100" style={`height: ${12 + (72 * taux(t.rate)) / maxi(b.tiers)}px`} />
+                          <p class="text-caption mt-2 h-8 text-center text-slate-700">{t.when}</p>
+                        </li>
+                      ))}
+                    </ol>
+                  )}
+                  {n === 4 && (
+                    <ol class="flex flex-wrap gap-4">
+                      {b.tiers.map((t) => (
+                        <li class="flex w-24 flex-col items-center text-center">
+                          <span class={`inline-flex size-16 items-center justify-center rounded-full text-lg font-bold tabular-nums ${taux(t.rate) === 0 ? 'bg-navy text-white' : 'bg-white text-navy ring-2 ring-navy/15'}`}>{t.rate}</span>
+                          <p class="text-caption mt-2 text-slate-700">{t.when}</p>
+                        </li>
+                      ))}
+                    </ol>
+                  )}
+                  {n === 5 && (
+                    <ol class="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                      {b.tiers.map((t) => (
+                        <li class="rounded-2xl bg-paper p-4">
+                          <p class="text-display-sm text-navy tabular-nums">{t.rate}</p>
+                          <p class="text-caption mt-1 text-slate-700">{t.when}</p>
+                        </li>
+                      ))}
+                    </ol>
+                  )}
+                  {n === 6 && (
+                    <p class="text-base leading-relaxed text-ink">
+                      {b.tiers.map((t, k) => (
+                        <>
+                          <strong class="font-semibold text-navy tabular-nums">{t.rate}</strong>{' '}
+                          <span class="text-slate-700">{t.when.charAt(0).toLowerCase() + t.when.slice(1)}</span>
+                          {k < b.tiers.length - 1 ? ' · ' : '.'}
+                        </>
+                      ))}
+                    </p>
+                  )}
+                  {n === 7 && (
+                    <ol class="space-y-2">
+                      {b.tiers.map((t) => (
+                        <li class="flex items-center gap-3">
+                          <span class="inline-flex w-20 justify-center rounded-lg px-2 py-1.5 text-lg font-bold tabular-nums" style={`background: color-mix(in srgb, var(--color-navy) ${8 + (92 * taux(t.rate)) / maxi(b.tiers)}%, white); color: ${taux(t.rate) / maxi(b.tiers) > 0.45 ? 'white' : 'var(--color-navy)'}`}>{t.rate}</span>
+                          <span class="text-base text-slate-700">{t.when}</span>
+                        </li>
+                      ))}
+                    </ol>
+                  )}
+                  {n === 8 && (
+                    <div>
+                      <p class="text-display-sm text-navy tabular-nums">{b.tiers[0]!.rate} <span class="text-caption font-normal text-slate-700">{b.tiers[0]!.when}</span></p>
+                      <details class="mt-3 text-base">
+                        <summary class="cursor-pointer font-semibold text-navy">Voir le barème</summary>
+                        <ol class="mt-3 space-y-2">
+                          {b.tiers.slice(1).map((t) => (
+                            <li class="flex items-baseline gap-3"><span class="w-14 text-lg font-bold text-navy tabular-nums">{t.rate}</span><span class="text-slate-700">{t.when}</span></li>
+                          ))}
+                        </ol>
+                      </details>
+                    </div>
+                  )}
+                  {n === 9 && (
+                    <ol class="relative ml-20 border-l-2 border-navy/15 pl-6">
+                      {b.tiers.map((t) => (
+                        <li class="relative py-2">
+                          <span aria-hidden="true" class="absolute top-1/2 -left-[31px] size-3 -translate-y-1/2 rounded-full bg-teal-700 ring-4 ring-white" />
+                          <span class="absolute top-1/2 -left-[5.75rem] w-14 -translate-y-1/2 text-right text-lg font-bold text-navy tabular-nums">{t.rate}</span>
+                          <span class="text-base text-slate-700">{t.when}</span>
+                        </li>
+                      ))}
+                    </ol>
+                  )}
+                  {n === 10 && (
+                    <ol class="divide-y divide-navy/10 rounded-2xl bg-paper px-4">
+                      {b.tiers.map((t) => (
+                        <li class="flex items-center justify-between gap-4 py-2.5">
+                          <span class="text-base text-slate-700">{t.when}</span>
+                          <span class="text-lg font-bold text-navy tabular-nums">{t.rate}</span>
+                        </li>
+                      ))}
+                    </ol>
+                  )}
+                </div>
+              </article>
+            ))}
+          </div>
+        </Container>
+      </Section>
+    );
+  })
+}
