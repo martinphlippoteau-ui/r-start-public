@@ -238,7 +238,7 @@ const rawItems: FaqContent['items'] = [
     category: RUB.pratique,
     question: 'Comment sont imposés les revenus potentiels de R Start ?',
     answer: [
-      'Les loyers versés sont imposés comme des revenus fonciers, comme pour toute SCPI. Les plus-values potentielles versées lors des reventes d’immeubles relèvent du régime des plus-values immobilières des particuliers.',
+      'Les loyers versés sont imposés comme des revenus fonciers. Les plus-values potentielles versées lors des reventes d’immeubles relèvent du régime des plus-values immobilières des particuliers.',
     ],
   },
   {
