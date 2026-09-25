@@ -78,6 +78,9 @@ export const erreurs = {
     { label: 'Accueil', href: '/' },
     ...menuPages.filter((p) => p.path !== '/').map((p) => ({ label: p.navLabel ?? p.label, href: p.path })),
   ],
+  /** Le champ de recherche de la page (libellé lu par les lecteurs d'écran, texte indicatif). */
   searchLabel: 'Rechercher sur le site',
+  searchPlaceholder: 'Frais, stratégie, souscription…',
+  searchSubmit: 'Rechercher',
   retryLabel: 'Réessayer',
 };

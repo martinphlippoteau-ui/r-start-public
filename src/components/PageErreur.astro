@@ -2,9 +2,12 @@
 /**
  * Gabarit commun des pages d'erreur (src/pages/404, 403, 500, 503). Contenu et raisons SEO :
  * src/content/fr/erreurs.ts. `noindex` (Seo.astro rend alors `noindex, follow` et aucune balise
- * canonique) ; hors sitemap (astro.config.mjs). Le bouton de recherche ouvre la recherche de la
- * barre de navigation : il arrive caché et le script le révèle, sans script il ne servirait à rien.
- * « Réessayer » (500, 503) recharge la page ; sans script, le lien « Accueil » reste.
+ * canonique) ; hors sitemap (astro.config.mjs). LE MOTEUR DE RECHERCHE À LA PLACE DU BOUTON
+ * (25/09/2026, demande de Martin) : un champ dans la page ; dès qu'on y tape ou qu'on le valide, il
+ * ouvre la recherche de la barre de navigation avec le texte déjà saisi, qui affiche ses résultats
+ * à chaque frappe (src/scripts/recherche/panneau.ts). Le champ arrive caché et le script le révèle :
+ * sans script, la recherche ne marche pas, il ne servirait à rien. « Réessayer » (500, 503)
+ * recharge la page ; sans script, le lien « Accueil » reste.
  */
 import Base from '@/layouts/Base.astro';
 import SiteNav from '@/components/SiteNav.astro';
@@ -34,18 +37,41 @@ const reessayer = code === '500' || code === '503';
       <h1 class="text-display-md mt-4">{page.title}</h1>
       <p class="text-lead mt-4 text-slate-700">{page.intro}</p>
 
-      <div class="mt-8 flex flex-wrap gap-3">
-        {
-          reessayer && (
+      <form role="search" data-erreur-recherche hidden class="mt-8">
+        <label for="erreur-recherche" class="visually-hidden">{erreurs.searchLabel}</label>
+        <div class="relative">
+          <svg viewBox="0 0 20 20" fill="none" aria-hidden="true" class="pointer-events-none absolute top-1/2 left-5 size-5 -translate-y-1/2 text-navy">
+            <circle cx="9" cy="9" r="6" stroke="currentColor" stroke-width="1.8" />
+            <path d="m13.5 13.5 4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+          </svg>
+          <input
+            id="erreur-recherche"
+            type="search"
+            autocomplete="off"
+            placeholder={erreurs.searchPlaceholder}
+            class="w-full rounded-full border border-navy/20 bg-white py-4 pr-16 pl-13 text-lg text-ink shadow-card placeholder:text-slate-500 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-navy"
+          />
+          <button
+            type="submit"
+            class="absolute top-1/2 right-2 inline-flex size-11 -translate-y-1/2 items-center justify-center rounded-full bg-navy text-white transition-colors hover:bg-ink focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-navy"
+          >
+            <span class="visually-hidden">{erreurs.searchSubmit}</span>
+            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="size-4">
+              <path d="M3 8h9M8.5 4.5 12 8l-3.5 3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
+        </div>
+      </form>
+
+      {
+        reessayer && (
+          <div class="mt-6">
             <button type="button" data-erreur-reessayer hidden class="btn btn-motion btn-primary btn-md">
               {erreurs.retryLabel}
             </button>
-          )
-        }
-        <button type="button" data-erreur-recherche hidden class="btn btn-motion btn-secondary btn-md">
-          {erreurs.searchLabel}
-        </button>
-      </div>
+          </div>
+        )
+      }
 
       <nav aria-label={erreurs.linksLabel} class="mt-8">
         <ul class="flex flex-wrap gap-3" role="list">
@@ -66,11 +92,26 @@ const reessayer = code === '500' || code === '503';
 </Base>
 
 <script>
-  const recherche = document.querySelector<HTMLButtonElement>('[data-erreur-recherche]');
+  /* Le champ de la page passe la main au panneau de recherche de la barre, texte compris. */
+  const formulaire = document.querySelector<HTMLFormElement>('[data-erreur-recherche]');
+  const saisie = formulaire?.querySelector<HTMLInputElement>('input');
   const loupe = document.querySelector<HTMLButtonElement>('[data-recherche-ouvrir]');
-  if (recherche && loupe) {
-    recherche.hidden = false;
-    recherche.addEventListener('click', () => loupe.click());
+  const champ = document.querySelector<HTMLInputElement>('[data-recherche-champ]');
+  if (formulaire && saisie && loupe && champ) {
+    formulaire.hidden = false;
+    const relayer = (): void => {
+      if (loupe.getAttribute('aria-expanded') !== 'true') loupe.click();
+      champ.value = saisie.value;
+      champ.dispatchEvent(new Event('input', { bubbles: true }));
+      const fin = champ.value.length;
+      requestAnimationFrame(() => champ.setSelectionRange(fin, fin));
+      saisie.value = '';
+    };
+    saisie.addEventListener('input', relayer);
+    formulaire.addEventListener('submit', (e) => {
+      e.preventDefault();
+      relayer();
+    });
   }
   const reessayer = document.querySelector<HTMLButtonElement>('[data-erreur-reessayer]');
   if (reessayer) {
