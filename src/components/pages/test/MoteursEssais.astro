@@ -10,7 +10,8 @@
  * CE QU'IL DIT. Loyers : trois locataires (les entreprises) versent chacun leur loyer, les trois
  * se rejoignent en une somme qui gagne R Start, qui la partage entre trois épargnants.
  * Plus-values : l'immeuble reçoit son panneau « Vendu », un seul versement gagne R Start, qui le
- * partage de même. Les dessins lisent la palette du recto (`.carte-recto`, global.css). Pas de
+ * partage de même. Les trois épargnants sont des personnes, comme les locataires (25/09/2026,
+ * Martin). Les dessins lisent la palette du recto (`.carte-recto`, global.css). Pas de
  * `data-in-view` : sur cette page d'essai, les dessins tournent sans le moteur de mouvement. À
  * REPORTER dans EngineRent.astro et EngineGain.astro, puis à supprimer avec la page.
  */
@@ -88,7 +89,11 @@ const RANGS = [30, 56, 82];
                     {RANGS.map((y, e) => (
                       <>
                         <circle cx="146" cy="56" r="2.4" class={`piece part ${k === 0 ? 'part-loyers' : 'part-vente'}`} style={`--e:${e};--dy:${y - 56}px`} />
-                        <circle cx="206" cy={y} r="5" class={`cadre epargnant ${k === 0 ? 'epargnant-loyers' : 'epargnant-vente'}`} style={`--e:${e}`} />
+                        {/* Les épargnants en personnes (25/09/2026, Martin), tête et épaules comme les locataires. */}
+                        <g class={`epargnant ${k === 0 ? 'epargnant-loyers' : 'epargnant-vente'}`} style={`--e:${e}`}>
+                          <circle cx="208" cy={y - 4} r="3.5" class="cadre" />
+                          <path d={`M201 ${y + 8}c0-4.5 3-7 7-7s7 2.5 7 7`} class="cadre" />
+                        </g>
                       </>
                     ))}
                     {/* La marque R Start relaie : elle reçoit, s'assombrit un instant, partage. */}
