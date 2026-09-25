@@ -7,10 +7,9 @@
  * loyers, et fait supprimer le reste. Grammaire des cartes de /strategie (StrategySelect.astro en
  * tête : 236 × 100, trait marine, cycle de 8 s, état de repos = image complète). AUCUNE COURBE,
  * AUCUN AXE, RIEN QUI MONTE : le dessin raconte un mécanisme, la répartition, jamais un résultat.
- * CE QU'IL DIT. Loyers : l'immeuble et, à ses trois étages, les entreprises locataires (enseigne
- * et porte, jamais un visage : « ce sont des entreprises dans les immeubles », 25/09/2026) ;
- * chacune verse son loyer, les trois se rejoignent en une somme qui gagne R Start, qui la partage
- * entre trois épargnants.
+ * CE QU'IL DIT. Loyers : trois entreprises locataires, chacune un immeuble et son équipe devant
+ * (25/09/2026, d'après l'exemple de Martin) ; chacune verse son loyer, les trois se rejoignent en
+ * une somme qui gagne R Start, qui la partage entre trois épargnants.
  * Plus-values : l'immeuble reçoit son panneau « Vendu », un seul versement gagne R Start, qui le
  * partage de même. Les trois épargnants sont des personnes, comme les locataires (25/09/2026,
  * Martin). Les dessins lisent la palette du recto (`.carte-recto`, global.css). Pas de
@@ -30,9 +29,8 @@ const MARQUE_FOND = MARQUE.slice(0, MARQUE.indexOf('Z') + 1);
 /** L'immeuble vendu (carte des plus-values) : cadre et grille (src/lib/immeuble.ts). */
 const CADRE = { x: 22, y: 26, w: 56, h: 60 };
 const FEN = fenetres(CADRE, { colonnes: 3, rangees: 4, taille: 8, ecart: 4 });
-/** Trois épargnants à droite ; trois étages d'entreprises dans l'immeuble à gauche. */
+/** Trois entreprises à gauche, trois épargnants à droite, aux mêmes hauteurs. */
 const RANGS = [30, 56, 82];
-const ETAGES = [36, 56, 76];
 ---
 
 <Section id="moteurs-essais" tone="paper">
@@ -58,22 +56,25 @@ const ETAGES = [36, 56, 76];
                   <svg viewBox="0 0 236 100" fill="none" class="essai-svg">
                     {k === 0 ? (
                       <>
-                        {/* L'immeuble, et à ses trois étages les ENTREPRISES locataires (25/09/2026,
-                          Martin : « ce sont des entreprises dans les immeubles ») : chacune une
-                          enseigne et une porte, pas un visage. */}
-                        <rect x={CADRE.x} y={CADRE.y} width={CADRE.w} height={CADRE.h} rx="5" class="cadre" />
-                        {ETAGES.map((y, e) => (
+                        {/* Trois ENTREPRISES locataires (25/09/2026, Martin, d'après son exemple) : un
+                          immeuble derrière, une équipe de trois personnes devant. */}
+                        {RANGS.map((y, e) => (
                           <g class="locataire" style={`--e:${e}`}>
-                            <rect x="30" y={y - 8} width="40" height="16" rx="2.5" class="porte-fine" />
-                            <rect x="34" y={y - 5} width="20" height="2.5" rx="1.25" class="enseigne" />
-                            <rect x="60" y={y - 1} width="6" height="9" rx="1" class="enseigne" />
+                            <rect x="28" y={y - 12} width="22" height="15" rx="2" class="cadre" />
+                            <path d={`M32 ${y - 8}h8M32 ${y - 5}h8`} class="trait-fin" />
+                            <circle cx="33" cy={y + 3} r="2.6" class="cadre-plein" />
+                            <circle cx="45" cy={y + 3} r="2.6" class="cadre-plein" />
+                            <circle cx="39" cy={y + 2} r="3" class="cadre-plein" />
+                            <path d={`M27 ${y + 12}c0-3.5 2.5-5.5 6-5.5s6 2 6 5.5`} class="cadre-plein" />
+                            <path d={`M39 ${y + 12}c0-3.5 2.5-5.5 6-5.5s6 2 6 5.5`} class="cadre-plein" />
+                            <path d={`M32 ${y + 12}c0-4 3-6.5 7-6.5s7 2.5 7 6.5`} class="cadre-plein" />
                           </g>
                         ))}
-                        {ETAGES.map((y) => (
-                          <path d={`M78 ${y}C84 ${y} 86 56 92 56`} class="chemin" />
+                        {RANGS.map((y) => (
+                          <path d={`M56 ${y}C78 ${y} 82 56 92 56`} class="chemin" />
                         ))}
-                        {ETAGES.map((y, e) => (
-                          <circle cx="78" cy={y} r="2.4" class="piece loyer" style={`--e:${e};--dy:${56 - y}px`} />
+                        {RANGS.map((y, e) => (
+                          <circle cx="56" cy={y} r="2.4" class="piece loyer" style={`--e:${e};--dy:${56 - y}px`} />
                         ))}
                         <circle cx="92" cy="56" r="3.2" class="piece somme" />
                       </>
@@ -183,15 +184,18 @@ const ETAGES = [36, 56, 76];
   /* Repos = image complète : locataires et épargnants en place, le panneau posé, les versements
      arrivés (les loyers chez la marque, les parts chez les épargnants), les pièces en vol effacées. */
   .loyer {
-    transform: translate(14px, var(--dy));
+    transform: translate(36px, var(--dy));
   }
-  .porte-fine {
+  .trait-fin {
     stroke: rgb(var(--illus-trait-rgb) / 0.3);
     stroke-width: 1.2;
+    stroke-linecap: round;
   }
-  .enseigne {
-    fill: var(--illus-trait);
-    opacity: 0.5;
+  /* Les personnes de l'équipe : fond blanc pour passer DEVANT l'immeuble. */
+  .cadre-plein {
+    fill: var(--illus-fond);
+    stroke: rgb(var(--illus-trait-rgb) / 0.55);
+    stroke-width: 1.4;
   }
   .part {
     transform: translate(54px, var(--dy));
@@ -255,8 +259,8 @@ const ETAGES = [36, 56, 76];
   @keyframes essai-loyer {
     0% { opacity: 0; transform: translate(0, 0) scale(0.3); animation-timing-function: var(--ease-out-expo); }
     6% { opacity: 1; transform: translate(3px, 0) scale(1); animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1); }
-    24% { opacity: 1; transform: translate(14px, var(--dy)) scale(1); animation-timing-function: cubic-bezier(0.7, 0, 0.84, 0); }
-    28%, 100% { opacity: 0; transform: translate(14px, var(--dy)) scale(0.3); }
+    24% { opacity: 1; transform: translate(36px, var(--dy)) scale(1); animation-timing-function: cubic-bezier(0.7, 0, 0.84, 0); }
+    28%, 100% { opacity: 0; transform: translate(36px, var(--dy)) scale(0.3); }
   }
   @keyframes essai-somme {
     0%, 26% { opacity: 0; transform: translateX(0) scale(0.3); animation-timing-function: var(--ease-out-expo); }
