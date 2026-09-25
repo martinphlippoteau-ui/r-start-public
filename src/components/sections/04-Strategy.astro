@@ -392,9 +392,10 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
                 </div>
                 {
                   /* Au pied, le volet précédent et le suivant : des liens d'ancre (lisibles sans
-                    script), que le script intercepte. Libellés de navigation, pas du contenu. */
+                    script), que le script intercepte. Libellés de navigation, pas du contenu. Un
+                    simple bloc, pas un <nav> : trois repères de même nom, la validation les refuse. */
                 }
-                <nav aria-label="Autres volets" class="mt-8 flex flex-wrap items-center justify-between gap-4 border-t border-navy/10 pt-5 text-sm font-semibold">
+                <div class="mt-8 flex flex-wrap items-center justify-between gap-4 border-t border-navy/10 pt-5 text-sm font-semibold">
                   {z > 0 ? (
                     <a href={'#volet-' + [ids.what, ids.where, ids.how][z - 1]} data-volet-vers class="link-underline inline-flex items-center gap-2 text-navy">
                       <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="size-4"><path d="M13 8H4M7.5 4.5 4 8l3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
@@ -409,7 +410,7 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
                       <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="size-4"><path d="M3 8h9M8.5 4.5 12 8l-3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
                     </a>
                   )}
-                </nav>
+                </div>
               </section>
             );
           })
