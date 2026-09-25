@@ -40,7 +40,7 @@ export const subscribe: SubscribeContent = {
   app: {
     title: 'Suivez votre épargne dans MyCORUM',
     description:
-      'L’application de CORUM L’Épargne, sur iPhone et Android, permet de consulter vos parts, vos versements et vos documents, de programmer des versements et de gérer le réinvestissement de vos revenus.',
+      'L’application de CORUM L’Épargne, sur iPhone et Android, permet de consulter vos parts, vos versements et vos documents, de programmer des versements et de gérer le réinvestissement de vos revenus potentiels.',
     storesLabel: 'Télécharger l’application MyCORUM',
     stores: [
       { label: 'Télécharger sur l’App Store', href: externalLinks.myCorumAppStore },

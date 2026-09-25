@@ -177,7 +177,7 @@ const rawItems: FaqContent['items'] = [
       'R Start affiche un niveau de risque de 4 sur 7 (contre 3 pour CORUM Origin ou Eurion, par exemple). Pourquoi un peu plus élevé ?',
     ],
     bullets: [
-      'une partie de ses revenus provient de plus-values, moins prévisibles que les loyers ;',
+      'une partie de ses revenus potentiels provient de plus-values, moins prévisibles que les loyers ;',
       'elle peut investir hors zone euro, ce qui expose à l’évolution des monnaies étrangères ;',
       'sa gestion est active, avec des achats et reventes plus fréquents, donc plus sensible aux mouvements du marché immobilier.',
     ],
@@ -222,14 +222,14 @@ const rawItems: FaqContent['items'] = [
     category: RUB.pratique,
     question: 'À partir de quand touche-t-on les premiers revenus (délai de jouissance) ?',
     answer: [
-      'Vos parts commencent à produire des revenus le 1ᵉʳ jour du 6ᵉ mois suivant votre souscription. Ce délai est le même que pour les autres SCPI CORUM.',
+      'Vos parts commencent à produire des revenus potentiels le 1ᵉʳ jour du 6ᵉ mois suivant votre souscription. Ce délai est le même que pour les autres SCPI CORUM.',
     ],
   },
   {
     category: RUB.pratique,
     question: 'À quelle fréquence les revenus sont-ils versés ?',
     answer: [
-      'Les revenus issus des loyers ont vocation à être versés chaque mois. Les plus-values, elles, à être versées ponctuellement, au moment de la revente d’immeubles.',
+      'Les revenus potentiels issus des loyers ont vocation à être versés chaque mois. Les plus-values, elles, à être versées ponctuellement, au moment de la revente d’immeubles.',
     ],
   },
   {
@@ -243,7 +243,7 @@ const rawItems: FaqContent['items'] = [
     category: RUB.pratique,
     question: 'Peut-on mettre en place des options sur R Start ?',
     answer: [
-      'Oui. Vous pouvez choisir le réinvestissement automatique de vos revenus et les versements programmés.',
+      'Oui. Vous pouvez choisir le réinvestissement automatique de vos revenus potentiels et les versements programmés.',
     ],
   },
 ];

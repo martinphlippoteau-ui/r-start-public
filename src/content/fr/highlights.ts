@@ -81,7 +81,7 @@ export const highlights: HighlightsContent = {
       value: nb(income.enjoymentShort),
       /* Explication dépliable (16/09/2026, texte de l'équipe). « 1er jour du 6e mois » dit QUAND,
          pas POURQUOI : c'est le temps qu'il faut à la SCPI pour investir l'argent collecté. */
-      info: 'Période d’attente entre votre investissement et le moment où vous commencez à percevoir des revenus. Le délai de jouissance correspond au temps nécessaire à la SCPI pour investir l’argent collecté.',
+      info: 'Période d’attente entre votre investissement et le moment où vous commencez à percevoir des revenus potentiels. Le délai de jouissance correspond au temps nécessaire à la SCPI pour investir l’argent collecté.',
     },
     /* Pas de ligne « 100 % Digital » (14/09/2026, demande de l'équipe) : « Souscription : 100 % en
        ligne », juste en dessous, dit la même chose à sa place. */
