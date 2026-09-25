@@ -827,7 +827,9 @@ test.describe('Qualité', () => {
       await page.goto(chemin);
       const releve = await page.evaluate(() => {
         const ecran = window.innerHeight;
-        return [...document.querySelectorAll('main > section')].map((s) => {
+        /* `main > div > section` : sur /strategie, les deux sections de la stratégie sont dans
+           l'enveloppe du premier plan (04-Strategy.astro, 24/09/2026). */
+        return [...document.querySelectorAll('main > section, main > div > section')].map((s) => {
           const titre = document.getElementById(s.getAttribute('aria-labelledby') ?? '');
           return {
             id: s.id,
@@ -863,7 +865,9 @@ test.describe('Qualité', () => {
           return (0.2126 * r + 0.7152 * v + 0.0722 * b) / 255;
         };
         const entete = document.querySelector('#en-tete');
-        const premiere = document.querySelector('main > section:not(#en-tete)');
+        const premiere = document.querySelector(
+          'main > section:not(#en-tete), main > div > section:not(#en-tete)'
+        );
         if (!entete || !premiere) return null;
         return { entete: clarte(entete), premiere: clarte(premiere), id: premiere.id };
       });
