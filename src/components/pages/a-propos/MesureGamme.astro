@@ -59,8 +59,13 @@ const soude = (texte: string, cles: readonly NoteKey[] | undefined, suite = ''):
 };
 ---
 
+{
+  /* 14 px (25/09/2026, Martin : « Objectif de taux de rendement interne sur 10 ans » doit tenir sur
+    deux lignes ; en 16 px il en prenait trois dans une carte de quatre). Même corps pour tous les
+    intitulés de mesure : un intitulé plus petit que son voisin se lirait comme un rang. */
+}
 <dt
-  class="text-base leading-snug font-medium text-slate-700"
+  class="text-sm leading-snug font-medium text-slate-700"
   set:html={soude(mesure.label, mesure.notes, bouton)}
 />
 <dd

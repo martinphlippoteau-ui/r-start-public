@@ -296,8 +296,9 @@ test.describe('Simulateur : aucun taux n’est supposé à R Start', () => {
   /* LE REPÈRE « SCPI CORUM » NE PEUT PAS DIVERGER DE /a-propos : le test refait la moyenne à partir
      des quatre taux qu'un visiteur y lit. Depuis le 22/09/2026 les cartes reprennent les pages
      produit de corum.fr : trois affichent la performance globale annuelle 2025 (égale au taux de
-     distribution, prix de souscription inchangé en 2025), CORUM USA son rendement 2025 ; le test
-     lit la ligne « Rendement 2025 » quand elle existe, sinon « Performance globale annuelle
+     distribution, prix de souscription inchangé en 2025), CORUM USA aussi depuis le 25/09/2026
+     (son rendement 2025, de même valeur, a quitté la carte) ; le test lit la ligne « Rendement
+     2025 » si elle revenait, sinon « Performance globale annuelle
      2025 » : le premier « n,nn % » qui suit l'intitulé (entre les deux, les renvois « (3) » et le
      libellé masqué du bouton « i »). Une carte par SCPI (les `li` de la liste nommée), et non
      tout `li` : les mesures sont elles-mêmes des `li`. */

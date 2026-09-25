@@ -6,9 +6,9 @@
  * indicateurs sur les pages produit »), corum.fr/nos-scpi/corum-origin, corum-xl, eurion et
  * corum-usa, relues le 22/09/2026. Chaque carte reprend le bloc « En bref » de sa page, dans le
  * même ordre : le TRI depuis la création (un OBJECTIF pour CORUM USA, trop jeune), le prix de la
- * part et sa ligne de frais, puis la performance globale annuelle 2025 (CORUM USA, créée en 2023,
- * affiche en plus son rendement 2025). LA PERFORMANCE MOYENNE 2020-2025 des trois autres SCPI,
- * reprise de corum.fr, a été RETIRÉE des cartes le 24/09/2026 (demande de Martin). L'INDICATEUR DE
+ * part et sa ligne de frais, puis la performance globale annuelle 2025. LA PERFORMANCE MOYENNE
+ * 2020-2025 des trois autres SCPI et le RENDEMENT 2025 de CORUM USA, repris de corum.fr, ont été
+ * RETIRÉS des cartes les 24 et 25/09/2026 (demandes de Martin). L'INDICATEUR DE
  * RISQUE (3 ou 4 sur 7) et le « minimum d'investissement » du document de l'équipe du 16/09/2026
  * ne sont plus sur les cartes : les pages produit ne les y montrent pas. Le TRI de CORUM Eurion
  * passe de 6,50 % (document de l'équipe) à 6,49 % (corum.fr).
@@ -33,16 +33,15 @@
  *
  * `distribution` (taux de distribution 2025, par SCPI) est lu par simulator.ts, qui en fait la
  * moyenne (repère « SCPI CORUM ») : il vaut la performance globale annuelle 2025 affichée, le prix
- * de souscription n'ayant pas bougé en 2025 (définition de la note « pga »), et le rendement 2025
- * de CORUM USA. tests/simulateur.spec.ts vérifie que la moyenne du simulateur est celle des
- * chiffres lus sur les cartes.
+ * de souscription n'ayant pas bougé en 2025 (définition de la note « pga »). tests/simulateur.spec.ts
+ * vérifie que la moyenne du simulateur est celle des chiffres lus sur les cartes.
  */
 
 import { scpiCreated } from '@/content/fr/facts';
 import { nb } from '@/lib/texte';
 
 /** Les notes sous les cartes ; l'ordre de `NOTES` donne leur numéro de renvoi. */
-export type NoteKey = 'tri' | 'tti' | 'pga' | 'rendement' | 'usa2025';
+export type NoteKey = 'tri' | 'tti' | 'pga' | 'usa2025';
 
 /** Une mesure affichée sur une carte : le nombre, son unité, ce qu'elle mesure, et ses renvois. */
 export interface MesureScpi {
@@ -81,7 +80,6 @@ const creee = (nom: string): string | undefined => {
 const TRI = 'Taux de rendement interne (TRI) depuis la création';
 const PRIX = 'Prix de la part';
 const PGA = 'Performance globale annuelle 2025';
-const RENDEMENT = 'Rendement 2025';
 const frais = (taux: string): MesureScpi['detail'] => ({
   text: nb(`Frais et commission de souscription de ${taux} % TTI inclus`),
   notes: ['tti'],
@@ -137,7 +135,6 @@ const ITEMS: ScpiGamme[] = [
     autres: [
       { value: '200', unit: '€', label: PRIX, detail: frais('12') },
       { value: '7,70', unit: '%', label: PGA, notes: ['pga', 'usa2025'] },
-      { value: '7,70', unit: '%', label: RENDEMENT, notes: ['rendement', 'usa2025'] },
     ],
     distribution: { year: 2025, value: '7,70' },
   },
@@ -156,14 +153,6 @@ const NOTES: readonly { key: NoteKey; text: string }[] = [
     key: 'pga',
     text: nb(
       'Taux de performance globale annuelle, défini comme le rendement versé augmenté ou diminué de la différence entre le prix de souscription au 1er janvier de l’année n+1 et le prix de souscription au 1er janvier de l’année n, divisé par le prix de souscription au 1er janvier de l’année N de la part.'
-    ),
-  },
-  {
-    /* Version de la page CORUM Origin, la seule à préciser la quote-part de plus-values 2025 ; les
-       trois autres pages s'arrêtent avant la parenthèse. */
-    key: 'rendement',
-    text: nb(
-      'Rendement : taux de distribution, défini comme le dividende brut, avant prélèvements français et étrangers (payés par la SCPI pour le compte de l’associé), versé au titre de l’année N (y compris les acomptes exceptionnels et quote-part de plus-values distribuées, 0,57 % pour CORUM Origin en 2025) divisé par le prix de souscription au 1er janvier de l’année N de la part.'
     ),
   },
   {
