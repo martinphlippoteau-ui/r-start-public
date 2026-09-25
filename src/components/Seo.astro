@@ -31,12 +31,24 @@ const ogImageUrl = new URL(withBase(site.ogImagePath), site.url + '/').toString(
 
 <title>{title}</title>
 <meta name="description" content={description} />
-<link rel="canonical" href={canonical} />
-<link rel="alternate" hreflang="fr" href={canonical} />
-<link rel="alternate" hreflang="x-default" href={canonical} />
+{
+  /* PAS DE CANONIQUE SUR UNE PAGE EN `noindex` (25/09/2026) : une page d'erreur ou /cookies n'a pas
+     d'adresse de référence à déclarer, et « noindex » + canonique vers soi-même envoie deux signaux
+     contraires. `noindex, follow` : la page n'entre pas dans l'index mais ses liens sont suivis
+     (les pages d'erreur renvoient vers tout le menu). La prévisualisation reste en `nofollow`. */
+  !noindex && (
+    <>
+      <link rel="canonical" href={canonical} />
+      <link rel="alternate" hreflang="fr" href={canonical} />
+      <link rel="alternate" hreflang="x-default" href={canonical} />
+    </>
+  )
+}
 <meta
   name="robots"
-  content={noindex || preview ? 'noindex, nofollow' : 'index, follow, max-image-preview:large'}
+  content={
+    preview ? 'noindex, nofollow' : noindex ? 'noindex, follow' : 'index, follow, max-image-preview:large'
+  }
 />
 
 <meta property="og:type" content="website" />

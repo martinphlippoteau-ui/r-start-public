@@ -272,6 +272,20 @@ test.describe('Qualité', () => {
   /* DONNÉES STRUCTURÉES ET ANCRES : la réponse balisée reprend TOUT ce que la page affiche (le
      tableau des frais manquait) ; /frais ne balise pas une FAQ que personne ne peut lire ; les
      ancres des pages légales plient les accents au lieu de les remplacer par des tirets. */
+  /* PAGES D'ERREUR (25/09/2026) : jamais dans l'index mais leurs liens suivis, sans canonique, hors
+     du plan du site, et toutes renvoient à l'accueil. Le vrai code HTTP dépend de l'hébergeur. */
+  test('pages d’erreur : noindex, follow, sans canonique, hors sitemap', async ({ page, request }) => {
+    const plan = await (await request.get('/sitemap-0.xml')).text();
+    for (const chemin of ['/404.html', '/403/', '/500.html', '/503/']) {
+      await page.goto(chemin);
+      await expect(page.locator('meta[name="robots"]'), chemin).toHaveAttribute('content', 'noindex, follow');
+      await expect(page.locator('link[rel="canonical"]'), chemin).toHaveCount(0);
+      await expect(page.locator('h1'), chemin).toHaveCount(1);
+      await expect(page.locator('main a[href$="/"]').first(), chemin).toBeVisible();
+      expect(plan, chemin).not.toContain(chemin.replace(/\/$/, '').replace('.html', ''));
+    }
+  });
+
   test('données structurées fidèles à la page, ancres légales lisibles', async ({
     page,
   }) => {

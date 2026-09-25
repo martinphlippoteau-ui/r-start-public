@@ -36,11 +36,9 @@ export default defineConfig({
     recherche(),
     sitemap({
       filter: (page) =>
-        !page.includes('/404') &&
-        !page.includes('/cookies') &&
-        /* Page d'essai typographique, hors menu et provisoire (15/09/2026) : elle n'a rien à faire
-           dans le plan du site, et elle sera supprimée une fois la fonte choisie. */
-        !page.includes('/test'),
+        /* Pages d'erreur (25/09/2026) et /cookies, en noindex : hors du plan du site. */
+        !/\/(403|404|500|503)(\/|\.html)?$/.test(page) &&
+        !page.includes('/cookies'),
       changefreq: 'weekly',
       priority: 0.8,
     }),

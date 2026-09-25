@@ -1,0 +1,80 @@
+---
+/**
+ * Gabarit commun des pages d'erreur (src/pages/404, 403, 500, 503). Contenu et raisons SEO :
+ * src/content/fr/erreurs.ts. `noindex` (Seo.astro rend alors `noindex, follow` et aucune balise
+ * canonique) ; hors sitemap (astro.config.mjs). Le bouton de recherche ouvre la recherche de la
+ * barre de navigation : il arrive caché et le script le révèle, sans script il ne servirait à rien.
+ * « Réessayer » (500, 503) recharge la page ; sans script, le lien « Accueil » reste.
+ */
+import Base from '@/layouts/Base.astro';
+import SiteNav from '@/components/SiteNav.astro';
+import Footer from '@/components/Footer.astro';
+import Container from '@/components/ui/Container.astro';
+import { erreurs, type CodeErreur } from '@/content/fr/erreurs';
+import { withBase } from '@/lib/href';
+
+interface Props {
+  code: CodeErreur;
+}
+const { code } = Astro.props as Props;
+const page = erreurs.pages[code];
+const reessayer = code === '500' || code === '503';
+---
+
+<Base title={page.seo.title} description={page.seo.description} path={`/${code}`} noindex>
+  <SiteNav />
+  {
+    /* La navigation flottante recouvre le haut de la page : sa hauteur est réservée ici. */
+  }
+  <main id="contenu" class="pt-nav-total bg-paper">
+    <Container size="narrow" class="flex min-h-[60svh] flex-col justify-center py-16 sm:py-24">
+      <p class="text-eyebrow text-teal-700">
+        <span class="visually-hidden">{erreurs.codeLabel} </span>{code}
+      </p>
+      <h1 class="text-display-md mt-4">{page.title}</h1>
+      <p class="text-lead mt-4 text-slate-700">{page.intro}</p>
+
+      <div class="mt-8 flex flex-wrap gap-3">
+        {
+          reessayer && (
+            <button type="button" data-erreur-reessayer hidden class="btn btn-motion btn-primary btn-md">
+              {erreurs.retryLabel}
+            </button>
+          )
+        }
+        <button type="button" data-erreur-recherche hidden class="btn btn-motion btn-secondary btn-md">
+          {erreurs.searchLabel}
+        </button>
+      </div>
+
+      <nav aria-label={erreurs.linksLabel} class="mt-8">
+        <ul class="flex flex-wrap gap-3" role="list">
+          {
+            erreurs.links.map((link) => (
+              <li>
+                <a href={withBase(link.href)} class="btn btn-motion btn-secondary btn-md">
+                  {link.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+    </Container>
+  </main>
+  <Footer />
+</Base>
+
+<script>
+  const recherche = document.querySelector<HTMLButtonElement>('[data-erreur-recherche]');
+  const loupe = document.querySelector<HTMLButtonElement>('[data-recherche-ouvrir]');
+  if (recherche && loupe) {
+    recherche.hidden = false;
+    recherche.addEventListener('click', () => loupe.click());
+  }
+  const reessayer = document.querySelector<HTMLButtonElement>('[data-erreur-reessayer]');
+  if (reessayer) {
+    reessayer.hidden = false;
+    reessayer.addEventListener('click', () => location.reload());
+  }
+</script>
