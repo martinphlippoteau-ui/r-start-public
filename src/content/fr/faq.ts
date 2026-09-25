@@ -114,7 +114,7 @@ const rawItems: FaqContent['items'] = [
       'Si vous revendez vos parts avant 8 ans, des frais de retrait s’appliquent. Ils sont dégressifs : plus vous conservez vos parts longtemps, plus ils baissent.',
     ],
     table: {
-      head: ['Retrait des parts', 'Frais de retrait'],
+      head: ['Retrait des parts', 'Frais de retrait (TTC)'],
       rows: [
         ['Avant 4 ans', '10 %'],
         ['Avant 6 ans', '7 %'],
