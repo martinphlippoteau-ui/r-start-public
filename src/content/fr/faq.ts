@@ -144,9 +144,11 @@ const rawItems: FaqContent['items'] = [
   },
   {
     category: RUB.investir,
+    /* « En Europe et au-delà » (25/09/2026, Martin : aligner sur la formulation validée du volet
+       Diversifiée et de la carte « Stratégie d'investissement »), ex-« dans la zone euro comme en dehors ». */
     question: 'Dans quels pays R Start investit-elle ?',
     answer: [
-      'R Start peut investir dans la zone euro comme en dehors. Cela permet de saisir des opportunités sur un maximum de marchés. Investir hors zone euro implique parfois d’autres monnaies (livre sterling, couronne norvégienne, dollar canadien…). Les opportunités aux États-Unis, elles, restent réservées à CORUM USA.',
+      'R Start peut investir en Europe et au-delà. Cela permet de saisir des opportunités sur un maximum de marchés. Investir hors zone euro implique parfois d’autres monnaies (livre sterling, couronne norvégienne, dollar canadien…). Les opportunités aux États-Unis, elles, restent réservées à CORUM USA.',
     ],
   },
   {
