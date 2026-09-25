@@ -7,7 +7,9 @@
  * Interdits (signaux marchands trompeurs sur un produit financier) : Product, Offer, AggregateRating.
  * Appelé par les pages, l'accueil compris, qui passent le résultat à Base.astro (prop `jsonLd`).
  */
-import publisherLogo from '@/assets/logos/corum-lepargne-couleur.svg';
+/* PNG et non SVG (audit SEO du 25/09/2026) : Google n'accepte pas de logo SVG dans les données
+   structurées. 600 × 267 px, fond blanc, généré depuis le SVG du pied de page. */
+import publisherLogo from '@/assets/logos/corum-lepargne-couleur.png';
 import { breadcrumb, type PageKey } from '@/config/pages';
 import { site } from '@/config/site';
 import { externalLinks, product } from '@/content/fr/facts';

@@ -8,11 +8,13 @@ import type { PageHero, PageSeo } from '@/content/types-v2';
 export const strategyPage: { seo: PageSeo; hero: PageHero; cta: Cta } = {
   seo: {
     /** ≤ 60 caractères. */
-    title: 'Stratégie R Start, SCPI CORUM : investir dans le monde',
+    /* « En Europe et au-delà » (25/09/2026, audit SEO, décision de Martin) : aligné sur la page et sur
+       le volet Diversifiée, ex-« investir dans le monde ». */
+    title: 'Stratégie R Start, SCPI CORUM : en Europe et au-delà',
     /** 140-155 caractères, avec rappel de risque. */
     description:
       /* Un résultat de recherche ne doit pas promettre un chapitre que la page ne contient plus. */
-      'Stratégie de R Start, SCPI CORUM : deux moteurs, les loyers et les plus-values, partout dans le monde. Revenus non garantis, risque de perte en capital.',
+      'Stratégie de R Start, SCPI CORUM : deux moteurs, les loyers et les plus-values, en Europe et au-delà. Revenus non garantis, risque de perte en capital.',
   },
   /*
    * En-tête sans introduction (14/09/2026, contenu de l'équipe « ni plus ni moins ») ni ligne

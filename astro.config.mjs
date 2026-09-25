@@ -41,6 +41,9 @@ export default defineConfig({
         !page.includes('/cookies'),
       changefreq: 'weekly',
       priority: 0.8,
+      /* Date de mise à jour (audit SEO du 25/09/2026) : celle du build, la même pour toutes les pages ;
+         elle invite les moteurs à revenir après chaque mise en ligne. */
+      lastmod: new Date(),
     }),
   ],
   env: {

@@ -35,8 +35,10 @@ const jsonLd = [
 ];
 ---
 
+{/* « | R Start » dans le titre de l'onglet et des résultats de recherche (audit SEO du 25/09/2026) ;
+  le H1 garde le titre seul. */}
 <Base
-  title={page.title}
+  title={`${page.title} | R Start`}
   description={page.description}
   path={page.path}
   noindex={noindex}
