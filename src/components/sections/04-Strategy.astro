@@ -3,11 +3,12 @@
  * Stratégie d'investissement : DEUX sections, rendues uniquement par /strategie.
  *  1. #strategie (paper) les deux moteurs de performance : deux cartes qui se retournent, chacune
  *                        illustrée par son dessin animé (EngineRent, EngineGain) ;
- *  2. #quoi      (paper) « Une approche en 3 volets pour les alimenter » : trois tuiles blanches,
- *                        Sélective, Diversifiée et Opportuniste (ex-Quoi, Où et Comment, d'où les
- *                        ancres #quoi, #ou, #comment), chacune avec son dessin (StrategySelect,
- *                        StrategyDiversify, StrategyTiming) et son détail au dos de la carte. Une
- *                        canalisation les relie aux deux moteurs sur grand écran.
+ *  2. #quoi      (paper) « Une approche en 3 volets pour les alimenter » : Sélective, Diversifiée
+ *                        et Opportuniste (ex-Quoi, Où et Comment) EN ONGLETS depuis le 25/09/2026,
+ *                        une liste à gauche et un panneau à droite (dessin StrategySelect,
+ *                        StrategyDiversify ou StrategyTiming, et tout le texte) ; ancres
+ *                        #volet-quoi, #volet-ou, #volet-comment. Une canalisation relie le bloc aux
+ *                        deux moteurs sur grand écran.
  *
  * Texte fourni par l'équipe le 14/09/2026, « ni plus ni moins » ; le 16/09/2026 les trois derniers
  * chapitres ont fusionné en tuiles à détail, photos, globe et carte ont cédé la place aux dessins.
@@ -24,7 +25,7 @@
  *
  * Motion (src/scripts/motion.ts, tout par attributs) : aucun rideau ici, la section suit
  * directement l'en-tête ; H2 du premier chapitre mot à mot (data-reveal-text), celui des volets en
- * fade-up court ; les trois tuiles entrent en cascade, en bascule (`data-animate-child="tilt"`) ;
+ * fade-up court ; le bloc des volets entre en fondu (les tuiles en bascule sont parties le 25/09) ;
  * la canalisation ne s'anime qu'à l'écran (`data-in-view`). Ni `data-draw` ni parallaxe. Les
  * dessins s'animent dans leurs composants. Contenu : src/content/fr/strategy.ts. Aucune prop.
  */
@@ -222,16 +223,14 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
 {/* 2. Les trois volets : Sélective, Diversifiée, Opportuniste (ex-Quoi, Où, Comment) */}
 {
   /*
-   * TUILES À DÉTAIL (16/09/2026, demande de l'équipe : « j'aime bien le format de card sur le site
-   * d'Apple qui ouvre une popup pour le contenu ») : trois tuiles qui se lisent d'un coup d'œil, le
-   * détail au dos, à la demande (src/scripts/carteRetournee.ts), sans un mot ajouté ni retiré.
-   * SANS JAVASCRIPT, TOUT RESTE LISIBLE : le détail est écrit dans le flux, sous sa tuile, et le
-   * bouton d'ouverture arrive `hidden`. Le script le déplace au DOS de la carte et révèle le
-   * bouton : la seule façon de cacher un texte derrière un mouvement sans le perdre pour qui
-   * n'exécute pas de script.
-   * BLANCHES depuis le 22/09/2026 (demande de Martin), comme les deux moteurs ; elles étaient ink
-   * (« dessins au trait clair, il leur faut un fond sombre ») : les dessins lisent depuis leur
-   * palette dans les variables `--illus-*`, trait marine sur fond blanc.
+   * VOLETS EN ONGLETS (25/09/2026, demande de Martin, d'après une maquette : « une liste à gauche,
+   * le volet actif surligné, un grand panneau à droite ») : à gauche les trois volets, à droite
+   * le panneau du volet choisi, son dessin et TOUT son texte, celui validé par la conformité
+   * (strategy.ts), sans un mot ajouté ni retiré. Ils remplacent les tuiles à détail au dos
+   * (16/09/2026) : plus rien à retourner, le texte est là. SANS JAVASCRIPT, TOUT RESTE LISIBLE :
+   * les trois panneaux sont écrits l'un sous l'autre, la liste est une liste de liens d'ancre ;
+   * src/scripts/volets.ts pose les rôles d'onglets et n'en montre qu'un. Panneaux BLANCS comme les
+   * moteurs (22/09/2026), les dessins lisent la palette `--illus-*`.
    */
 }
 {
@@ -298,122 +297,116 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
     </div>
 
     {
-      /* Entrée en bascule (`tilt`), 0,16 s de décalage (16/09/2026, « j'aimerais que ce soit plus
-        spectaculaire ») : les trois arrivent l'une après l'autre. CETTE PAGE EST SERVIE PAR LE
-        MOTEUR GSAP, pas par le moteur léger : ses titres mot à mot et le rideau des Risques
-        l'exigent (tests/performance.spec.ts la sort de la liste des pages sans GSAP) ; les deux
-        moteurs lisent `data-animate-child` depuis le 18/09/2026, avant la bascule n'était jamais
-        jouée ici. `prefers-reduced-motion` coupe tout dans le moteur lui-même. */
+      /* Une seule entrée en fondu pour le bloc (l'entrée en bascule des tuiles, 16/09/2026, est
+        partie avec elles). CETTE PAGE EST SERVIE PAR LE MOTEUR GSAP (titres mot à mot), voir
+        tests/performance.spec.ts. */
     }
-    <ul
-      role="list"
-      class="mt-chapter grid gap-4 sm:gap-5 lg:grid-cols-3"
-      data-animate="stagger"
-      data-animate-child="tilt"
-      data-animate-stagger="0.16"
-      data-animate-y="44"
+    <div
+      class="mt-chapter lg:grid lg:grid-cols-12 lg:items-start lg:gap-10"
+      data-volets
+      data-animate="fade-up"
+      data-animate-y="24"
     >
       {
-        [strategy.what, strategy.where, strategy.how].map((zone, z) => {
-          const ancre = [ids.what, ids.where, ids.how][z];
-          /* La PERSPECTIVE est portée par le <li> et non par la carte : une `perspective` posée sur
-             l'élément qui tourne lui-même n'a aucun effet, le point de fuite doit venir du parent.
-             Sans elle, le retournement n'est qu'une compression horizontale. */
-          return (
-            <li class="[perspective:1400px]">
-              {
-                /* L'ENVELOPPE `.carte-face` EST CE QUI TOURNE, et non l'article : la carte a un
-                  DOS, il faut deux faces dans un même élément en `preserve-3d`, chacune masquée
-                  quand elle présente son envers. */
-              }
-            <div class="carte-face relative h-full">
-              <article class="carte-recto relative flex min-h-[24rem] flex-col overflow-hidden rounded-3xl bg-white p-6 text-ink shadow-card ring-1 ring-navy/5 sm:min-h-[28rem] sm:p-8">
-                {zone.eyebrow && <p class="text-eyebrow text-teal-700">{zone.eyebrow}</p>}
-                <h3 id={ancre + '-title'} class="text-display-sm mt-3 max-w-[16rem] text-navy">
-                  {zone.title}
-                </h3>
-
-                {
-                  /* Une illustration par tuile, même grammaire (en tête de StrategySelect.astro) :
-                    SVG au trait marine sur fond blanc, en boucle lente, en pause hors écran, complet
-                    en `prefers-reduced-motion`. Le globe en canvas est parti le 16/09/2026 (il ne
-                    montrait que la géographie, la tuile parle aussi de secteurs ; fichier supprimé
-                    le 19/09/2026). Format paysage (160 × 120) pleine largeur, `flex-1` centre le
-                    dessin dans tout l'espace qui reste. */
-                }
-                <div class="flex w-full flex-1 items-center py-5" style={`--illus-decalage:${z * 0.35}s`}>
-                  {z === 0 && <StrategySelect />}
-                  {z === 1 && <StrategyDiversify />}
-                  {z === 2 && <StrategyTiming />}
-                </div>
-
-                {
-                  /* « En savoir plus » en toutes lettres (16/09/2026, demande de l'équipe) : un
-                    « + » rond n'avait de libellé que pour les lecteurs d'écran. Le titre de la
-                    tuile reste lu hors écran : pour un lecteur d'écran qui parcourt les boutons
-                    hors contexte, trois « En savoir plus » identiques seraient indiscernables. */
-                }
-                <button
-                  type="button"
-                  data-carte-ouvrir
-                  hidden
-                  aria-controls={'detail-' + ancre}
-                  data-carte-fermer={strategy.dialogClose}
-                  class="carte-savoir btn btn-motion btn-secondary btn-sm mt-auto self-start"
-                >
-                  <span>{strategy.dialogOpen}</span>
-                  <span class="visually-hidden"> : {zone.title}</span>
-                  <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="carte-savoir-fleche">
-                    <path d="M3 8h9M8.5 4.5 12 8l-3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
-                  </svg>
-                </button>
-              </article>
-              {/* Dos de la carte : même mécanique que les moteurs, voir plus haut. */}
-              <div class="carte-verso">
-                <MarqueR class="carte-verso-marque w-12 text-navy/10" />
-              </div>
-            </div>
-
-              {/* Hôte du détail : lu dans le flux sans script, vidé puis masqué par le script. */}
-              <div data-carte-detail-hote>
-                <div id={'detail-' + ancre} data-carte-detail class="mt-5 space-y-4">
-                  <p class="text-eyebrow text-teal-700">{zone.eyebrow}</p>
-                  <p class="text-display-sm text-navy">{zone.title}</p>
-                  {zone.intro && <p class="text-base leading-snug text-slate-700">{zone.intro}</p>}
-                  {zone.lead && <p class="text-base font-semibold text-ink">{zone.lead}</p>}
-
-                  <ul role="list" class="space-y-3">
-                    {zone.items.map((item) => (
-                      <li class="flex items-start gap-3">
-                        {item.icon ? (
-                          <Picto name={item.icon} class="mt-0.5 size-6 text-teal-700" />
-                        ) : (
-                          <span
-                            aria-hidden="true"
-                            class="mt-2 size-2 shrink-0 rounded-full bg-teal-700"
-                          />
-                        )}
-                        <p class="text-base leading-snug text-ink">
-                          {item.lead}
-                          {item.rest && <span class="mt-1 block text-slate-700">{item.rest}</span>}
-                        </p>
-                      </li>
-                    ))}
-                  </ul>
-
-                  <p class="text-base leading-snug text-slate-700">{zone.outro}</p>
-                </div>
-              </div>
-            </li>
-          );
-        })
+        /* La liste : un lien par volet, le mot d'ordre en gras et le titre dessous (masqué sous
+          `lg`, où la liste est une rangée de pastilles). Le volet actif est surligné en sable ; la
+          pastille de couleur numérote sans chiffre, trois teintes du site. */
       }
-    </ul>
+      <nav data-volets-liste aria-label={strategy.tilesTitle} class="lg:col-span-4">
+        <ul role="list" class="scrollbar-none flex gap-2 overflow-x-auto max-lg:-mx-4 max-lg:px-4 lg:flex-col lg:gap-3">
+          {
+            [strategy.what, strategy.where, strategy.how].map((zone, z) => {
+              const ancre = [ids.what, ids.where, ids.how][z];
+              return (
+                <li class="shrink-0 lg:shrink">
+                  <a
+                    id={'onglet-' + ancre}
+                    href={'#volet-' + ancre}
+                    data-volet-onglet
+                    aria-selected={z === 0 ? 'true' : 'false'}
+                    class="volet-onglet flex items-center gap-3 rounded-2xl px-4 py-3 text-ink no-underline transition-colors hover:bg-white lg:px-5 lg:py-4"
+                    style={`--volet-point:${['var(--color-teal-400)', 'var(--color-teal-700)', 'var(--color-navy)'][z]}`}
+                  >
+                    <span aria-hidden="true" class="volet-point size-2.5 shrink-0 rounded-full" />
+                    <span>
+                      <span class="block text-base font-semibold whitespace-nowrap sm:text-lg">{zone.eyebrow}</span>
+                      <span class="mt-0.5 hidden text-sm text-slate-700 lg:block">{zone.title}</span>
+                    </span>
+                  </a>
+                </li>
+              );
+            })
+          }
+        </ul>
+      </nav>
+
+      {/* Les panneaux : le dessin et tout le texte du volet. Ids `volet-*` : la section porte déjà `quoi`. */}
+      <div class="mt-6 lg:col-span-8 lg:mt-0">
+        {
+          [strategy.what, strategy.where, strategy.how].map((zone, z) => {
+            const ancre = [ids.what, ids.where, ids.how][z];
+            return (
+              <section
+                id={'volet-' + ancre}
+                data-volet-panneau
+                class="carte-recto rounded-3xl bg-white p-6 text-ink shadow-card ring-1 ring-navy/5 not-first:mt-6 sm:p-8 lg:p-10"
+              >
+                <div class="grid gap-8 lg:grid-cols-[1fr_15rem] lg:items-center lg:gap-10">
+                  <div>
+                    {zone.eyebrow && <p class="text-eyebrow text-teal-700">{zone.eyebrow}</p>}
+                    <h3 id={ancre + '-title'} class="text-display-sm mt-3 text-navy">
+                      {zone.title}
+                    </h3>
+                    <div class="mt-5 space-y-4">
+                      {zone.intro && <p class="text-base leading-snug text-slate-700">{zone.intro}</p>}
+                      {zone.lead && <p class="text-base font-semibold text-ink">{zone.lead}</p>}
+                      <ul role="list" class="space-y-3">
+                        {zone.items.map((item) => (
+                          <li class="flex items-start gap-3">
+                            {item.icon ? (
+                              <Picto name={item.icon} class="mt-0.5 size-6 text-teal-700" />
+                            ) : (
+                              <span aria-hidden="true" class="mt-2 size-2 shrink-0 rounded-full bg-teal-700" />
+                            )}
+                            <p class="text-base leading-snug text-ink">
+                              {item.lead}
+                              {item.rest && <span class="mt-1 block text-slate-700">{item.rest}</span>}
+                            </p>
+                          </li>
+                        ))}
+                      </ul>
+                      <p class="text-base leading-snug text-slate-700">{zone.outro}</p>
+                    </div>
+                  </div>
+                  {
+                    /* Le dessin du volet (grammaire en tête de StrategySelect.astro), à droite du texte
+                      sur grand écran, dessous sinon. */
+                  }
+                  <div class="mx-auto w-full max-w-[18rem] lg:max-w-none" style={`--illus-decalage:${z * 0.35}s`}>
+                    {z === 0 && <StrategySelect />}
+                    {z === 1 && <StrategyDiversify />}
+                    {z === 2 && <StrategyTiming />}
+                  </div>
+                </div>
+              </section>
+            );
+          })
+        }
+      </div>
+    </div>
   </Container>
 </Section>
 </div>
 
 <style>
+  /* Les onglets des volets : la pastille prend la teinte du volet ; l'actif est surligné en sable. */
+  .volet-point {
+    background: var(--volet-point);
+  }
+  .volet-onglet[aria-selected='true'] {
+    background: color-mix(in srgb, var(--color-sand) 60%, transparent);
+  }
+
   /*
    * LA CANALISATION. Deux tracés en absolu dans des bandes DÉJÀ VIDES : les deux marges de section
    * entre les moteurs et les volets, puis le `mt-chapter` sous le titre. Aucun pixel ajouté à la page,
@@ -616,6 +609,8 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
 </style>
 
 <script>
-  /* Cartes qui se retournent : le détail arrive dans le flux, le script le déplace au dos de la carte. */
+  /* Cartes des moteurs qui se retournent : le détail arrive dans le flux, le script le déplace au dos. */
   import '@/scripts/carteRetournee';
+  /* Les trois volets en onglets (25/09/2026). */
+  import '@/scripts/volets';
 </script>
