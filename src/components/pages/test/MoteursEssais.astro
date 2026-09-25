@@ -197,8 +197,9 @@ const ETAGES = [36, 56, 76];
   @media (prefers-reduced-motion: no-preference) {
     /* Loyers : trois versements partent à un souffle d'écart (0,12 s), se rejoignent, la somme
        gagne la marque, qui partage ; les épargnants répondent d'un battement. */
+    /* Un souffle seulement pour les étages (6 %) : à 25 %, ils débordaient de l'immeuble. */
     .locataire {
-      animation: essai-battement var(--tour) infinite both;
+      animation: essai-souffle var(--tour) infinite both;
       animation-delay: calc(var(--decal) + var(--e) * 0.12s);
     }
     .loyer {
@@ -277,6 +278,11 @@ const ETAGES = [36, 56, 76];
   @keyframes essai-battement {
     0%, 4% { transform: scale(1); animation-timing-function: var(--ease-out-expo); }
     10% { transform: scale(1.25); animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1); }
+    30%, 100% { transform: scale(1); }
+  }
+  @keyframes essai-souffle {
+    0%, 4% { transform: scale(1); animation-timing-function: var(--ease-out-expo); }
+    10% { transform: scale(1.06); animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1); }
     30%, 100% { transform: scale(1); }
   }
   @keyframes essai-relais {
