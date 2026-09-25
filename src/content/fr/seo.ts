@@ -19,9 +19,10 @@ import { lowerFirst } from '@/lib/texte';
 export const seo = {
   /** ≤ 60 caractères, « R Start » et « CORUM » compris. « Frais d’entrée » : vocabulaire du DIC. Le
       0 % est contrebalancé ici par les 15 % de gestion et, dans la description, par le risque. */
-  /* « SCPI sans frais d’entrée » (25/09/2026, audit SEO, décision de Martin) : la requête telle que
-     les internautes la tapent (590 recherches par mois, difficulté 18/100, Semrush). */
-  title: 'R Start, la SCPI CORUM sans frais d’entrée, 15 % de gestion',
+  /* Accroche du hero, sans « sur les immeubles » pour tenir sous 70 caractères (25/09/2026, choix
+     de Martin parmi trois) : 62 caractères. Le contre-poids (15 % de gestion, risque) est porté
+     par la description. */
+  title: 'R Start, la première SCPI sans frais d’entrée ni frais d’achat',
   /**
    * 140 à 155 caractères, avec rappel de risque. Le « 0 % » y est toujours accompagné des 15 % de gestion
    * et des commissions sur cessions et retraits (frais complets : le snippet est diffusé hors contexte).
