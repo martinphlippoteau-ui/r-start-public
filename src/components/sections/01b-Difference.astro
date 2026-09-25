@@ -120,11 +120,12 @@ const situations = (difference.situations ?? []).map((s) => {
 
         {
           /* Conclusion de l'équipe, EN ENCADRÉ (24/09/2026, Martin : « à mettre bien en valeur ») :
-            carte blanche à ombre et filet, la recette des repères de l'accueil, corps de titre de
-            carte en marine. Même corps que les titres de carte, pas plus : un avantage qui
-            dépasserait le poids du bloc Risques ferait tiquer l'AMF. */
+            carte blanche à ombre et filet, la recette des repères de l'accueil, 20 px semi-gras
+            en marine (« un peu plus petit » que le corps des titres de carte, Martin, 25/09/2026).
+            Jamais plus gros que les titres de carte : un avantage qui dépasserait le poids du
+            bloc Risques ferait tiquer l'AMF. */
           difference.counterweight.pedagogy?.map((phrase) => (
-            <p class="text-display-sm mt-8 rounded-2xl bg-white px-6 py-5 text-navy shadow-card ring-1 ring-navy/5">
+            <p class="mt-8 rounded-2xl bg-white px-6 py-5 text-xl leading-snug font-semibold text-navy shadow-card ring-1 ring-navy/5">
               {phrase}
             </p>
           ))
