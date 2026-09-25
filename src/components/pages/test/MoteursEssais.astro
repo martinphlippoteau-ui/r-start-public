@@ -7,9 +7,9 @@
  * loyers, et fait supprimer le reste. Grammaire des cartes de /strategie (StrategySelect.astro en
  * tête : 236 × 100, trait marine, cycle de 8 s, état de repos = image complète). AUCUNE COURBE,
  * AUCUN AXE, RIEN QUI MONTE : le dessin raconte un mécanisme, la répartition, jamais un résultat.
- * CE QU'IL DIT. Loyers : trois entreprises locataires, chacune un immeuble et son équipe devant
- * (25/09/2026, d'après l'exemple de Martin) ; chacune verse son loyer, les trois se rejoignent en
- * une somme qui gagne R Start, qui la partage entre trois épargnants.
+ * CE QU'IL DIT. Loyers : UN locataire, un immeuble et son équipe devant (25/09/2026, d'après
+ * l'exemple de Martin), légendé « Locataires » ; son loyer gagne R Start, qui le partage entre
+ * trois épargnants en personnes, légendés « Épargnants ».
  * Plus-values : l'immeuble reçoit son panneau « Vendu », un seul versement gagne R Start, qui le
  * partage de même. Les trois épargnants sont des personnes, comme les locataires (25/09/2026,
  * Martin). Les dessins lisent la palette du recto (`.carte-recto`, global.css). Pas de
@@ -29,8 +29,7 @@ const MARQUE_FOND = MARQUE.slice(0, MARQUE.indexOf('Z') + 1);
 /** L'immeuble vendu (carte des plus-values) : cadre et grille (src/lib/immeuble.ts). */
 const CADRE = { x: 22, y: 26, w: 56, h: 60 };
 const FEN = fenetres(CADRE, { colonnes: 3, rangees: 4, taille: 8, ecart: 4 });
-/** Trois entreprises à gauche, trois épargnants à droite, aux mêmes hauteurs. Vingt-huit unités
-    d'écart : l'icône d'entreprise fait vingt-deux de haut, il reste six entre deux. */
+/** Les trois épargnants, à droite. */
 const RANGS = [28, 56, 84];
 ---
 
@@ -41,8 +40,8 @@ const RANGS = [28, 56, 84];
       Les deux moteurs : la répartition
     </h1>
     <p class="mt-4 max-w-3xl text-lg text-slate-700">
-      Piste retenue par Martin. Loyers : les entreprises locataires de l’immeuble versent, R Start
-      partage entre trois épargnants. Plus-values : l’immeuble vendu verse une fois, R Start partage de même. Aucun axe,
+      Piste retenue par Martin. Loyers : le locataire verse, R Start partage entre trois
+      épargnants. Plus-values : l’immeuble vendu verse une fois, R Start partage de même. Aucun axe,
       aucune échelle, rien qui monte.
     </p>
     <ul role="list" class="mt-8 grid gap-8 sm:grid-cols-2 lg:gap-12">
@@ -57,27 +56,21 @@ const RANGS = [28, 56, 84];
                   <svg viewBox="0 0 236 100" fill="none" class="essai-svg">
                     {k === 0 ? (
                       <>
-                        {/* Trois ENTREPRISES locataires (25/09/2026, Martin, d'après son exemple) : un
-                          immeuble derrière, une équipe de trois personnes devant. */}
-                        {RANGS.map((y, e) => (
-                          <g class="locataire" style={`--e:${e}`}>
-                            <rect x="29" y={y - 11} width="20" height="13" rx="2" class="cadre" />
-                            <path d={`M33 ${y - 7.5}h7M33 ${y - 4.5}h7`} class="trait-fin" />
-                            <circle cx="33.5" cy={y + 3} r="2.4" class="cadre-plein" />
-                            <circle cx="44.5" cy={y + 3} r="2.4" class="cadre-plein" />
-                            <circle cx="39" cy={y + 2} r="2.8" class="cadre-plein" />
-                            <path d={`M28 ${y + 11}c0-3 2.5-5 5.5-5s5.5 2 5.5 5`} class="cadre-plein" />
-                            <path d={`M39 ${y + 11}c0-3 2.5-5 5.5-5s5.5 2 5.5 5`} class="cadre-plein" />
-                            <path d={`M32.5 ${y + 11}c0-3.5 3-6 6.5-6s6.5 2.5 6.5 6`} class="cadre-plein" />
-                          </g>
-                        ))}
-                        {RANGS.map((y) => (
-                          <path d={`M56 ${y}C78 ${y} 82 56 92 56`} class="chemin" />
-                        ))}
-                        {RANGS.map((y, e) => (
-                          <circle cx="56" cy={y} r="2.4" class="piece loyer" style={`--e:${e};--dy:${56 - y}px`} />
-                        ))}
-                        <circle cx="92" cy="56" r="3.2" class="piece somme" />
+                        {/* UN SEUL locataire (25/09/2026, Martin) : un immeuble derrière, son équipe
+                          devant, d'après son exemple ; légende « Locataires » dessous. */}
+                        <g class="locataire">
+                          <rect x="22" y="26" width="34" height="24" rx="3" class="cadre" />
+                          <path d="M28 32h12M28 37h12M28 42h12" class="trait-fin" />
+                          <circle cx="29" cy="55" r="4.2" class="cadre-plein" />
+                          <circle cx="49" cy="55" r="4.2" class="cadre-plein" />
+                          <circle cx="39" cy="53" r="5" class="cadre-plein" />
+                          <path d="M19 70c0-5.5 4.5-9 10-9s10 3.5 10 9" class="cadre-plein" />
+                          <path d="M39 70c0-5.5 4.5-9 10-9s10 3.5 10 9" class="cadre-plein" />
+                          <path d="M27 70c0-6.5 5.5-11 12-11s12 4.5 12 11" class="cadre-plein" />
+                        </g>
+                        <text x="39" y="86" class="libelle">Locataires</text>
+                        <path d="M62 56h30" class="chemin" />
+                        <circle cx="60" cy="56" r="3.2" class="piece loyer-unique" />
                       </>
                     ) : (
                       <>
@@ -107,6 +100,7 @@ const RANGS = [28, 56, 84];
                         </g>
                       </>
                     ))}
+                    <text x="208" y="99" class="libelle">Épargnants</text>
                     {/* La marque R Start relaie : elle reçoit, s'assombrit un instant, partage. */}
                     <svg x="118" y="46" width="22" height="21" viewBox="0 0 94.08 88.98" class={`marque ${k === 0 ? 'marque-loyers' : 'marque-vente'}`}>
                       <path d={MARQUE_FOND} class="marque-fond" />
@@ -184,8 +178,14 @@ const RANGS = [28, 56, 84];
   }
   /* Repos = image complète : locataires et épargnants en place, le panneau posé, les versements
      arrivés (les loyers chez la marque, les parts chez les épargnants), les pièces en vol effacées. */
-  .loyer {
-    transform: translate(36px, var(--dy));
+  .libelle {
+    fill: rgb(var(--illus-trait-rgb) / 0.7);
+    font-family: inherit;
+    font-size: 6.5px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-anchor: middle;
   }
   .trait-fin {
     stroke: rgb(var(--illus-trait-rgb) / 0.3);
@@ -201,7 +201,7 @@ const RANGS = [28, 56, 84];
   .part {
     transform: translate(54px, var(--dy));
   }
-  .somme,
+  .loyer-unique,
   .vente {
     opacity: 0;
   }
@@ -209,17 +209,13 @@ const RANGS = [28, 56, 84];
   @media (prefers-reduced-motion: no-preference) {
     /* Loyers : trois versements partent à un souffle d'écart (0,12 s), se rejoignent, la somme
        gagne la marque, qui partage ; les épargnants répondent d'un battement. */
-    /* Un souffle seulement pour les étages (6 %) : à 25 %, ils débordaient de l'immeuble. */
+    /* Le locataire bat d'un souffle au départ du loyer ; le loyer file jusqu'à la marque. */
     .locataire {
       animation: essai-souffle var(--tour) infinite both;
-      animation-delay: calc(var(--decal) + var(--e) * 0.12s);
+      animation-delay: var(--decal);
     }
-    .loyer {
-      animation: essai-loyer var(--tour) infinite both;
-      animation-delay: calc(var(--decal) + var(--e) * 0.12s);
-    }
-    .somme {
-      animation: essai-somme var(--tour) infinite both;
+    .loyer-unique {
+      animation: essai-loyer-unique var(--tour) infinite both;
       animation-delay: var(--decal);
     }
     .marque-loyers {
@@ -257,17 +253,11 @@ const RANGS = [28, 56, 84];
     }
   }
 
-  @keyframes essai-loyer {
-    0% { opacity: 0; transform: translate(0, 0) scale(0.3); animation-timing-function: var(--ease-out-expo); }
-    6% { opacity: 1; transform: translate(3px, 0) scale(1); animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1); }
-    24% { opacity: 1; transform: translate(36px, var(--dy)) scale(1); animation-timing-function: cubic-bezier(0.7, 0, 0.84, 0); }
-    28%, 100% { opacity: 0; transform: translate(36px, var(--dy)) scale(0.3); }
-  }
-  @keyframes essai-somme {
-    0%, 26% { opacity: 0; transform: translateX(0) scale(0.3); animation-timing-function: var(--ease-out-expo); }
-    30% { opacity: 1; transform: translateX(2px) scale(1); animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1); }
-    44% { opacity: 1; transform: translateX(34px) scale(1); animation-timing-function: cubic-bezier(0.7, 0, 0.84, 0); }
-    50%, 100% { opacity: 0; transform: translateX(40px) scale(0.3); }
+  @keyframes essai-loyer-unique {
+    0% { opacity: 0; transform: translateX(0) scale(0.3); animation-timing-function: var(--ease-out-expo); }
+    6% { opacity: 1; transform: translateX(3px) scale(1); animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1); }
+    44% { opacity: 1; transform: translateX(66px) scale(1); animation-timing-function: cubic-bezier(0.7, 0, 0.84, 0); }
+    50%, 100% { opacity: 0; transform: translateX(72px) scale(0.3); }
   }
   @keyframes essai-panneau {
     0%, 28% { opacity: 0; transform: translateY(6px); animation-timing-function: var(--ease-out-expo); }
