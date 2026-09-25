@@ -35,12 +35,12 @@ const collapsible = footer.legalBlocks ?? [];
 const topLabel = footer.backToTopLabel;
 ---
 
-<footer class="relative border-t border-mist bg-white text-ink" data-in-view="is-in-view">
+<footer class="relative border-t border-mist bg-white text-ink">
   {
     /* Filet de marque : il ferme la page. Décoratif, donc aria-hidden ; le dégradé glisse lentement
       et s'arrête net en reduced-motion (l'animation est déclarée dans la media query). */
   }
-  <span aria-hidden="true" class="footer-filet"></span>
+  <span aria-hidden="true" class="footer-filet" data-in-view="is-in-view"></span>
 
   <Container size="wide" class="py-section-sm">
     <div class="flex flex-wrap items-center justify-between gap-x-10 gap-y-6">
@@ -229,13 +229,14 @@ const topLabel = footer.backToTopLabel;
   }
   /* En pause hors écran (audit du 16/09/2026) : le filet anime `background-position`, repeinte à
      chaque image, alors que le pied de page est hors de l'écran l'essentiel du temps.
-     `data-in-view` sur le <footer> pose `is-in-view` tant qu'il traverse l'écran (motion.ts). */
+     `data-in-view` sur le FILET lui-même (passe motion du 25/09/2026 ; il était sur le <footer>, et le
+     filet tournait encore quand, en bas de page, seul le bas du pied de page restait à l'écran). */
   @media (prefers-reduced-motion: no-preference) {
     .footer-filet {
       animation: footer-filet 18s linear infinite;
       animation-play-state: paused;
     }
-    .is-in-view .footer-filet {
+    .footer-filet.is-in-view {
       animation-play-state: running;
     }
   }

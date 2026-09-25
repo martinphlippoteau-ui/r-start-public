@@ -30,10 +30,16 @@ const init = (): void => {
   const gabaritUn = compte?.dataset.gabaritUn ?? gabarit;
   const vide = compte?.dataset.vide ?? '';
 
-  /* Un nom par question, posé par le CSSOM (aucun attribut `style` inséré, la CSP n'a rien à dire). */
-  lignes.forEach((li, i) => {
-    li.style.setProperty('view-transition-name', `faq-question-${i}`);
-  });
+  /* Un nom par question, posé par le CSSOM (aucun attribut `style` inséré, la CSP n'a rien à dire),
+     LE TEMPS DU FILTRAGE SEULEMENT (passe motion du 25/09/2026). Posés en permanence, les noms
+     suivaient aussi la navigation entre pages : en quittant /faq, chaque question visible était
+     capturée à part et restait peinte PAR-DESSUS la page qui arrivait. */
+  const nommer = (oui: boolean): void => {
+    lignes.forEach((li, i) => {
+      if (oui) li.style.setProperty('view-transition-name', `faq-question-${i}`);
+      else li.style.removeProperty('view-transition-name');
+    });
+  };
   const sobre = window.matchMedia('(prefers-reduced-motion: reduce)');
   const doc = document as Document & {
     startViewTransition?: (mise: () => void) => { finished: Promise<void> };
@@ -82,19 +88,24 @@ const init = (): void => {
       return;
     }
     enCours += 1;
+    nommer(true);
     document.documentElement.classList.add('vt-filtre');
     const transition = doc.startViewTransition(appliquer);
     void transition.finished
       .catch(() => undefined)
       .finally(() => {
         enCours -= 1;
-        if (enCours === 0) document.documentElement.classList.remove('vt-filtre');
+        if (enCours > 0) return;
+        document.documentElement.classList.remove('vt-filtre');
+        nommer(false);
       });
   };
 
   enveloppe.hidden = false;
   champ.addEventListener('input', filtrer);
-  filtrer();
+  /* Au chargement, un champ prérempli (retour arrière) est appliqué SANS transition : il n'y a rien
+     à animer, et la page est encore dans sa transition d'arrivée. */
+  appliquer();
 };
 
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
