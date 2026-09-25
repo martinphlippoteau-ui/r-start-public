@@ -7,8 +7,8 @@
  *                        et Opportuniste (ex-Quoi, Où et Comment) EN ONGLETS depuis le 25/09/2026,
  *                        une liste à gauche et un panneau à droite (dessin StrategySelect,
  *                        StrategyDiversify ou StrategyTiming, et tout le texte) ; ancres
- *                        #volet-quoi, #volet-ou, #volet-comment. Une canalisation relie le bloc aux
- *                        deux moteurs sur grand écran.
+ *                        #volet-quoi, #volet-ou, #volet-comment. La canalisation qui reliait le bloc aux
+ *                        deux moteurs a été retirée le 25/09/2026 (demande de Martin).
  *
  * Texte fourni par l'équipe le 14/09/2026, « ni plus ni moins » ; le 16/09/2026 les trois derniers
  * chapitres ont fusionné en tuiles à détail, photos, globe et carte ont cédé la place aux dessins.
@@ -25,8 +25,8 @@
  *
  * Motion (src/scripts/motion.ts, tout par attributs) : aucun rideau ici, la section suit
  * directement l'en-tête ; H2 du premier chapitre mot à mot (data-reveal-text), celui des volets en
- * fade-up court ; le bloc des volets entre en fondu (les tuiles en bascule sont parties le 25/09) ;
- * la canalisation ne s'anime qu'à l'écran (`data-in-view`). Ni `data-draw` ni parallaxe. Les
+ * fade-up court ; le bloc des volets entre en fondu (les tuiles en bascule sont parties le 25/09).
+ * Ni `data-draw` ni parallaxe. Les
  * dessins s'animent dans leurs composants. Contenu : src/content/fr/strategy.ts. Aucune prop.
  */
 import Container from '@/components/ui/Container.astro';
@@ -48,57 +48,6 @@ const ids = { what: 'quoi', where: 'ou', how: 'comment' };
 /** Titre suivi d'un paragraphe visible d'emblée : fade-up court pour ne pas chevaucher sa première ligne. */
 const QUIET_TITLE_Y = 12;
 
-/*
- * LA CANALISATION (16/09/2026, demande de l'équipe : « une sorte de canalisation qui va des 3
- * volets vers les deux moteurs pour montrer que les 3 volets alimentent les moteurs »).
- * DEUX TRACÉS, PAS UN : le titre « Une approche en 3 volets pour les alimenter » est planté entre
- * les cartes moteurs et les tuiles, un trait d'un seul tenant lui passerait dessus. On dessine de
- * part et d'autre, rien derrière lui, et l'œil recolle les deux.
- * LES ABSCISSES SONT CALCULÉES, JAMAIS MESURÉES. Les deux listes vivent dans le même
- * <Container size="wide"> : même boîte de contenu, donc un seul repère horizontal, exprimé en pour
- * mille dans un viewBox de 1000 de large. Un observateur de redimensionnement coûterait un reflow à
- * chaque poignée de pixels pour gagner les deux que les gouttières en pixels font dériver sous 1280.
- * LES HAUTEURS NE SONT PAS ÉCRITES EN DUR NON PLUS : du bas des cartes au haut du titre il y a la
- * marge basse de la section des moteurs plus la marge haute de celle des volets
- * (`--spacing-section` et `--spacing-section-sm`), et du bas du titre au haut des tuiles exactement
- * `--spacing-chapter`, le `mt-chapter` de la liste. Le CSS reprend ces variables : tout est ancré
- * sur des BORDS, un titre qui passe d'une à deux lignes ne déplace rien.
- * NE JAMAIS POSER `overflow-hidden` SUR LA SECTION DES VOLETS : c'est son débordement vers le haut
- * qui va chercher les cartes moteurs.
- */
-const LARGEUR_REF = 1216; // max-w-7xl (1280 px) moins deux fois sm:px-8
-const centreColonne = (i: number, n: number, gouttiere: number): number => {
-  const colonne = (LARGEUR_REF - (n - 1) * gouttiere) / n;
-  return Math.round(((i * (colonne + gouttiere) + colonne / 2) / LARGEUR_REF) * 10000) / 10;
-};
-/** Deux moteurs : `sm:grid-cols-2` et `lg:gap-12` (48 px). */
-const MOTEUR_G = centreColonne(0, 2, 48);
-const MOTEUR_D = centreColonne(1, 2, 48);
-/** Trois volets : `lg:grid-cols-3` et `sm:gap-5` (20 px). */
-const VOLET_G = centreColonne(0, 3, 20);
-const VOLET_C = centreColonne(1, 3, 20);
-const VOLET_D = centreColonne(2, 3, 20);
-const NOEUD_X = 500;
-const NOEUD_Y = 150;
-
-/*
- * Tous les chemins sont écrits du BAS vers le HAUT : le sens du tracé est le sens du flux, que suit
- * l'impulsion. Les trois volets rejoignent un nœud unique, d'où repartent deux conduites vers les
- * deux moteurs ; un nœud plutôt que cinq brins appariés, apparier dirait « ce volet-là alimente ce
- * moteur-là », ce que personne n'a écrit. Les deux derniers points de contrôle d'une conduite
- * partagent l'abscisse de son moteur : elle y arrive à la verticale, jamais en biais.
- */
-const montees = [
-  { d: `M${VOLET_G} 300C${VOLET_G} 250 ${NOEUD_X} 210 ${NOEUD_X} ${NOEUD_Y}`, rang: 0 },
-  { d: `M${VOLET_C} 300V${NOEUD_Y}`, rang: 1 },
-  { d: `M${VOLET_D} 300C${VOLET_D} 250 ${NOEUD_X} 210 ${NOEUD_X} ${NOEUD_Y}`, rang: 2 },
-];
-const departs = [
-  `M${NOEUD_X} ${NOEUD_Y}C${NOEUD_X} 110 ${MOTEUR_G} 80 ${MOTEUR_G} 0`,
-  `M${NOEUD_X} ${NOEUD_Y}C${NOEUD_X} 110 ${MOTEUR_D} 80 ${MOTEUR_D} 0`,
-];
-/** Les trois amorces, du haut des tuiles au bas du titre. Même rang que leur montée : un seul fil. */
-const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang: i }));
 
 ---
 
@@ -107,8 +56,7 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
     (global.css), une dalle claire qui mord sur l'en-tête sombre (qui reçoit `sousPlan`) ; en bas,
     elle s'arrête à plat sur les Risques. Une enveloppe et non `plan` sur la première section :
     l'arrondi et l'ombre valent pour la dalle entière. `overflow-hidden` : c'est lui qui arrondit
-    les coins des fonds papier des sections ; la canalisation, qui déborde de la section des volets
-    vers celle des moteurs, reste à l'intérieur de l'enveloppe. */
+    les coins des fonds papier des sections. */
 }
 <div class="plan-haut overflow-hidden">
 {/* 1. Les deux moteurs de performance */}
@@ -236,33 +184,10 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
 {
   /* `pt-section-sm` à la place du `py-section` de la section (16/09/2026, « rapproche un peu le
     titre et les blocs du dessus ») ; la marge basse ne bouge pas, c'est elle qui sépare les volets
-    des risques. ATTENTION : la hauteur de la canalisation se calcule sur ces deux marges
-    (`--pont-bande`, plus bas) ; changer l'une sans l'autre décolle le tracé du bas des cartes. */
+    des risques. */
 }
 <Section id={ids.what} tone="paper" labelledBy="volets-title" class="pt-section-sm">
   <Container size="wide">
-    {
-      /* La confluence occupe la bande vide qui sépare les deux sections, sans rien y ajouter : la boîte
-        fait zéro pixel de haut et le tracé est en absolu. Hauteur de la section inchangée. */
-    }
-    <div class="pont pont--confluence" aria-hidden="true">
-      <svg viewBox="0 0 1000 300" preserveAspectRatio="none" fill="none" data-in-view="pont-en-vue">
-        {montees.map((m) => <path class="pont-fil" d={m.d} />)}
-        {departs.map((d) => <path class="pont-fil" d={d} />)}
-        {montees.map((m) => (
-          <path class="pont-flux pont-flux--montee" pathLength="100" d={m.d} style={`--rang:${m.rang}`} />
-        ))}
-        {departs.map((d) => <path class="pont-flux pont-flux--depart" pathLength="100" d={d} />)}
-      </svg>
-      {
-        /* Nœud en CSS, hors du viewBox : celui-ci est étiré horizontalement d'environ un quart, un
-          cercle y deviendrait un ovale. PLUS DE CHEVRONS à l'arrivée (24/09/2026, Martin : « ne
-          fais pas finir par des flèches mais sous les cards ») : les conduites filent jusqu'au bord
-          des cartes et semblent passer dessous ; c'est le nœud et l'impulsion qui portent le sens. */
-      }
-      <span class="pont-noeud" />
-    </div>
-
     {
       /* En-tête propre au bloc, désigné par `labelledBy` ; les titres de volet sont des H3, trois
         H2 sous un H2 qui les annonce feraient quatre sections de même niveau dans le plan du
@@ -281,20 +206,6 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
         {strategy.tilesTitle}
       </h2>
     </header>
-
-    {
-      /* Les trois amorces tiennent dans le `mt-chapter` de la liste sans l'agrandir. Elles ne peuvent
-        pas être posées DANS le <ul> : la cascade `data-animate="stagger"` révèle tous ses enfants, elles
-        compteraient pour une quatrième tuile, et un <ul> n'admet que des <li>. */
-    }
-    <div class="pont pont--tiges" aria-hidden="true">
-      <svg viewBox="0 0 1000 60" preserveAspectRatio="none" fill="none" data-in-view="pont-en-vue">
-        {tiges.map((t) => <path class="pont-fil" d={t.d} />)}
-        {tiges.map((t) => (
-          <path class="pont-flux pont-flux--tige" pathLength="100" d={t.d} style={`--rang:${t.rang}`} />
-        ))}
-      </svg>
-    </div>
 
     {
       /* Une seule entrée en fondu pour le bloc (l'entrée en bascule des tuiles, 16/09/2026, est
@@ -471,205 +382,6 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
     }
   }
 
-  /*
-   * LA CANALISATION. Deux tracés en absolu dans des bandes DÉJÀ VIDES : les deux marges de section
-   * entre les moteurs et les volets, puis le `mt-chapter` sous le titre. Aucun pixel ajouté à la page,
-   * la hauteur de la section est identique avec et sans.
-   */
-  .pont {
-    /* Sous `lg`, les cinq cartes sont empilées en une seule colonne : trois traits qui convergeraient
-       vers deux n'auraient plus rien à relier, et surtout rien à tenter à 390 px. Rendu supprimé, pas
-       masqué : aucune surface, aucun calcul, aucun risque de débordement. */
-    display: none;
-  }
-
-  @media (min-width: 64rem) {
-    .pont {
-      display: block;
-      /* Boîte de HAUTEUR NULLE : elle ne sert que de repère, elle ne pousse rien. */
-      position: relative;
-      --pont-cycle: 8s;
-      /*
-       * HAUTEUR DE LA BANDE, écrite UNE SEULE FOIS parce que deux règles en dépendent : le tracé et
-       * le nœud à mi-hauteur. C'est la marge basse de la section des moteurs plus la marge haute
-       * (`pt-section-sm`) de celle des volets : les conduites arrivent AU BORD des cartes
-       * (24/09/2026), plus un rem en dessous comme avant les chevrons.
-       */
-      --pont-bande: calc(var(--spacing-section) + var(--spacing-section-sm));
-    }
-    .pont svg {
-      position: absolute;
-      /* La boîte de contenu du Container : les colonnes des deux listes tombent aux mêmes abscisses. */
-      inset-inline: 0;
-      display: block;
-      width: 100%;
-      pointer-events: none;
-    }
-    /* Du bas des cartes moteurs au haut du titre. */
-    .pont--confluence svg {
-      bottom: 0;
-      height: var(--pont-bande);
-    }
-    .pont--tiges svg {
-      top: 0;
-      height: var(--spacing-chapter);
-    }
-
-    /* ÉLARGIS (24/09/2026, Martin) : trait de 3 à 22 % contre 1,5 à 13 % ; l'impulsion reste un
-       court segment. `non-scaling-stroke` : le viewBox est étiré, sans lui le trait serait plus
-       épais dans un sens que dans l'autre. */
-    .pont-fil {
-      stroke: rgb(2 75 103 / 0.22);
-      stroke-width: 3;
-      vector-effect: non-scaling-stroke;
-    }
-    .pont-flux {
-      stroke: var(--color-teal-400);
-      stroke-width: 3.5;
-      vector-effect: non-scaling-stroke;
-      stroke-linecap: round;
-      stroke-opacity: 0.7;
-      /* `pathLength="100"` normalise chaque tracé : la même impulsion met le même temps sur une courbe
-         longue et sur une amorce courte, et les longueurs ci-dessous sont des pour-cent. */
-      stroke-dasharray: 11 100;
-      /* Au repos, le segment est AVANT le départ du tracé, donc hors de lui : rien ne se voit tant que
-         l'animation n'a pas commencé. C'est aussi l'état sans JavaScript et en mouvement réduit. */
-      stroke-dashoffset: 14;
-    }
-
-    .pont-noeud {
-      position: absolute;
-      pointer-events: none;
-    }
-    /*
-     * Le nœud est à mi-hauteur de la bande de confluence, là où les trois montées se rejoignent, soit
-     * y = 150 sur les 300 du viewBox.
-     * ANCRÉ PAR LE BAS, ET NON EN POURCENTAGE : son parent `.pont` a une hauteur NULLE, un `top: 50 %`
-     * s'y calculerait sur zéro et poserait le nœud au bas de la bande. C'est la hauteur du tracé qu'il
-     * faut reprendre, la même expression que celle du SVG, divisée par deux.
-     */
-    .pont-noeud {
-      left: 50%;
-      bottom: calc(var(--pont-bande) / 2);
-      width: 0.6rem;
-      height: 0.6rem;
-      border-radius: 9999px;
-      background: rgb(2 75 103 / 0.3);
-      transform: translate(-50%, 50%);
-    }
-  }
-
-  /*
-   * LES ANIMATIONS SONT POSÉES SEULEMENT SI LE MOUVEMENT EST ACCEPTÉ, au lieu d'être annulées
-   * ensuite : en `reduce`, rien n'est déclaré, donc rien à défaire. Il reste alors le dessin
-   * complet (trois amorces, trois montées, un nœud, deux conduites) et le sens est porté par la
-   * forme, pas par le mouvement.
-   */
-  @media (min-width: 64rem) and (prefers-reduced-motion: no-preference) {
-    .pont-flux {
-      animation-duration: var(--pont-cycle);
-      animation-timing-function: ease-in-out;
-      animation-iteration-count: infinite;
-      animation-delay: calc(var(--rang, 0) * 0.12s);
-      /* En pause hors écran : `data-in-view` pose la classe sur le SVG lui-même, et non sur la section.
-         La bande de confluence est peinte deux marges de section AU-DESSUS de la section des volets :
-         quand le lecteur regarde les cartes moteurs, elle est à l'écran alors que la section ne l'est
-         pas encore. C'est le SVG qu'il faut surveiller. */
-      animation-play-state: paused;
-    }
-    .pont-en-vue .pont-flux {
-      animation-play-state: running;
-    }
-    .pont-flux--tige {
-      animation-name: pont-tige;
-    }
-    .pont-flux--montee {
-      animation-name: pont-montee;
-    }
-    .pont-flux--depart {
-      animation-name: pont-depart;
-    }
-    .pont-noeud::after {
-      content: '';
-      position: absolute;
-      inset: -0.35rem;
-      border-radius: 9999px;
-      border: 2px solid var(--color-teal-400);
-      opacity: 0;
-      animation: pont-eclat var(--pont-cycle) ease-out infinite;
-      animation-play-state: paused;
-    }
-    .pont-en-vue ~ .pont-noeud::after {
-      animation-play-state: running;
-    }
-  }
-
-  /*
-   * UN SEUL CYCLE DE HUIT SECONDES, celui des cinq dessins des cartes, pour que la page n'ait pas
-   * deux pouls. Les proportions suivent les distances réelles, environ 110 px par seconde partout :
-   *   0 à 6 %    l'amorce, de la tuile au bas du titre ;
-   *   6 à 16 %   le temps de passer derrière le titre, où rien n'est dessiné ;
-   *   16 à 40 %  la montée, du haut du titre au nœud ;
-   *   38 à 46 %  le nœud s'allume, les trois viennent d'arriver ;
-   *   44 à 68 %  les deux conduites, du nœud aux cartes ;
-   *   68 à 100 % silence. Une page qui vend un placement ne clignote pas.
-   * Le pas de 0,01 % après chaque fin remet le segment hors du tracé d'un coup : sans lui, il
-   * remonterait lentement à sa place de départ, en sens inverse du flux.
-   */
-  @keyframes pont-tige {
-    0% {
-      stroke-dashoffset: 14;
-    }
-    6% {
-      stroke-dashoffset: -100;
-    }
-    6.01%,
-    100% {
-      stroke-dashoffset: 14;
-    }
-  }
-  @keyframes pont-montee {
-    0%,
-    16% {
-      stroke-dashoffset: 14;
-    }
-    40% {
-      stroke-dashoffset: -100;
-    }
-    40.01%,
-    100% {
-      stroke-dashoffset: 14;
-    }
-  }
-  @keyframes pont-depart {
-    0%,
-    44% {
-      stroke-dashoffset: 14;
-    }
-    68% {
-      stroke-dashoffset: -100;
-    }
-    68.01%,
-    100% {
-      stroke-dashoffset: 14;
-    }
-  }
-  @keyframes pont-eclat {
-    0%,
-    38% {
-      opacity: 0;
-      transform: scale(0.5);
-    }
-    42% {
-      opacity: 0.55;
-      transform: scale(1);
-    }
-    46%,
-    100% {
-      opacity: 0;
-      transform: scale(1.35);
-    }
-  }
 </style>
 
 <script>
