@@ -301,7 +301,16 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
         partie avec elles). CETTE PAGE EST SERVIE PAR LE MOTEUR GSAP (titres mot à mot), voir
         tests/performance.spec.ts. */
     }
-    <div class="mt-chapter" data-volets data-animate="fade-up" data-animate-y="24">
+    {
+      /* UNE SEULE CARTE (25/09/2026, Martin : « ces éléments dans les cards ») : la rangée des
+        onglets en tête, le panneau du volet choisi dessous, dans la même carte blanche. */
+    }
+    <div
+      class="carte-recto mt-chapter rounded-3xl bg-white p-4 text-ink shadow-card ring-1 ring-navy/5 sm:p-6 lg:p-8"
+      data-volets
+      data-animate="fade-up"
+      data-animate-y="24"
+    >
       {
         /* La liste, AU-DESSUS des panneaux (25/09/2026, Martin : « les sélecteurs au-dessus des
           cards, les cards sur toute la largeur ») : une rangée de trois onglets qui se partagent
@@ -321,7 +330,7 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
                     href={'#volet-' + ancre}
                     data-volet-onglet
                     aria-selected={z === 0 ? 'true' : 'false'}
-                    class="volet-onglet flex h-full items-center gap-3 rounded-2xl px-4 py-3 text-ink no-underline transition-colors hover:bg-white focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-navy sm:px-5 sm:py-4"
+                    class="volet-onglet flex h-full items-center gap-3 rounded-2xl px-4 py-3 text-ink no-underline transition-colors hover:bg-paper focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-navy sm:px-5 sm:py-4"
                     style={`--volet-point:${['var(--color-teal-400)', 'var(--color-teal-700)', 'var(--color-navy)'][z]}`}
                   >
                     <span aria-hidden="true" class="volet-point size-2.5 shrink-0 rounded-full" />
@@ -343,7 +352,7 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
           (`data-volets-pret`, CSS plus bas) : la hauteur est celle du plus haut et ne saute pas au
           changement, le panneau qui arrive entre en fondu. */
       }
-      <div class="volets-pile mt-6" data-volets-panneaux>
+      <div class="volets-pile mt-4 border-t border-navy/10 sm:mt-6" data-volets-panneaux>
         {
           [strategy.what, strategy.where, strategy.how].map((zone, z) => {
             const ancre = [ids.what, ids.where, ids.how][z];
@@ -351,7 +360,7 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
               <section
                 id={'volet-' + ancre}
                 data-volet-panneau
-                class="volet-panneau carte-recto rounded-3xl bg-white p-6 text-ink shadow-card ring-1 ring-navy/5 not-first:mt-6 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-navy sm:p-8 lg:p-10"
+                class="volet-panneau px-2 pt-6 not-first:mt-2 not-first:border-t not-first:border-navy/10 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-navy sm:px-4 sm:pt-8 lg:px-6"
               >
                 <div class="grid gap-8 lg:grid-cols-[1fr_20rem] lg:items-center lg:gap-14">
                   <div>
@@ -395,7 +404,7 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
                     script), que le script intercepte. Libellés de navigation, pas du contenu. Un
                     simple bloc, pas un <nav> : trois repères de même nom, la validation les refuse. */
                 }
-                <div class="mt-8 flex flex-wrap items-center justify-between gap-4 border-t border-navy/10 pt-5 text-sm font-semibold">
+                <div class="mt-8 flex flex-wrap items-center justify-between gap-4 border-t border-navy/10 py-5 text-sm font-semibold">
                   {z > 0 ? (
                     <a href={'#volet-' + [ids.what, ids.where, ids.how][z - 1]} data-volet-vers class="link-underline inline-flex items-center gap-2 text-navy">
                       <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="size-4"><path d="M13 8H4M7.5 4.5 4 8l3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
@@ -439,6 +448,7 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
   [data-volets-pret] .volet-panneau {
     grid-area: 1 / 1;
     margin-top: 0;
+    border-top: 0;
   }
   [data-volets-pret] .volet-panneau[data-inactif] {
     visibility: hidden;
