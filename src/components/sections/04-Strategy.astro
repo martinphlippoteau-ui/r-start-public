@@ -33,6 +33,7 @@ import Container from '@/components/ui/Container.astro';
 import MarqueR from '@/components/ui/MarqueR.astro';
 import Picto from '@/components/ui/Picto.astro';
 import Section from '@/components/ui/Section.astro';
+import Immeuble from '@/components/sections/03a-Immeuble.astro';
 import EngineGain from '@/components/EngineGain.astro';
 import EngineRent from '@/components/EngineRent.astro';
 import StrategyDiversify from '@/components/StrategyDiversify.astro';
@@ -168,6 +169,14 @@ const QUIET_TITLE_Y = 12;
   </Container>
 </Section>
 
+{
+  /* Bande d'illustration entre les moteurs et les volets (25/09/2026, Martin : « une bande pas trop
+    grande en hauteur d'illustration comme on a sur la home », à la place de la canalisation). Le
+    composant de la bande de l'accueil, en version basse, avec l'illustration des bureaux éclairés
+    (media.corum). */
+}
+<Immeuble id="illustration-strategie" image="corum" basse />
+
 {/* 2. Les trois volets : Sélective, Diversifiée, Opportuniste (ex-Quoi, Où, Comment) */}
 {
   /*
@@ -182,11 +191,11 @@ const QUIET_TITLE_Y = 12;
    */
 }
 {
-  /* `pt-section-sm` à la place du `py-section` de la section (16/09/2026, « rapproche un peu le
-    titre et les blocs du dessus ») ; la marge basse ne bouge pas, c'est elle qui sépare les volets
-    des risques. */
+  /* `py-section` : la bande d'illustration (25/09/2026) sépare désormais les volets des moteurs, le
+    `pt-section-sm` du 16/09/2026 (« rapproche un peu le titre et les blocs du dessus ») n'a plus
+    lieu d'être. */
 }
-<Section id={ids.what} tone="paper" labelledBy="volets-title" class="pt-section-sm">
+<Section id={ids.what} tone="paper" labelledBy="volets-title">
   <Container size="wide">
     {
       /* En-tête propre au bloc, désigné par `labelledBy` ; les titres de volet sont des H3, trois
