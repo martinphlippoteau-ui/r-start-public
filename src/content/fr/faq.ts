@@ -74,7 +74,7 @@ const rawItems: FaqContent['items'] = [
         ['Frais de travaux', '0 %'],
         ['Frais de gestion (prélevés sur les loyers)', '15 %'],
         [
-          'Frais sur les plus-values (à la revente)',
+          'Frais à la revente d’immeubles (en % du prix net vendeur)',
           '0 % / 6 % / 12 % selon la plus-value réalisée (voir ci-dessous)',
         ],
         ['Frais de retrait anticipé (avant 8 ans)', 'dégressifs (voir plus bas)'],
@@ -89,7 +89,7 @@ const rawItems: FaqContent['items'] = [
       'Quand CORUM revend un immeuble, elle ne prend une commission que si une plus-value est réalisée. Et plus la plus-value est importante, plus la commission l’est aussi :',
     ],
     table: {
-      head: ['Plus-value réalisée', 'Commission (TTC)'],
+      head: ['Plus-value réalisée', 'Commission (TTC, en % du prix net vendeur)'],
       rows: [
         ['Moins de 7 % du prix de vente', '0 %'],
         ['Entre 7 % et 13 %', '6 %'],

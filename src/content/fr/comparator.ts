@@ -170,7 +170,8 @@ const ROWS: ComparatorRow[] = [
       key: 'disposal' as const,
       info: 'L’épargnant paie des frais de cession d’immeubles quand il perçoit des revenus issus de la vente d’immeuble. La plupart des SCPI ne prélèvent des frais qu’à partir d’un certain niveau de plus-value. Autrement dit, ces frais ne sont dus que lorsque l’épargnant gagne de l’argent.',
       label: 'Frais sur vente d’immeubles',
-      basis: 'en % du prix de vente',
+      /* Prix net vendeur (25/09/2026, Martin) : la commission porte sur lui, pas sur la plus-value. */
+      basis: 'en % du prix net vendeur',
       rstartTiers: disposalTiers,
     },
     {

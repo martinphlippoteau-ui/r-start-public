@@ -64,7 +64,8 @@ export const fees = {
      * lit, « 0 / 6 / 12 % » se déchiffre. Les trois paliers restent dans `tiers`.
      */
     label: 'de 0 % à 12 %',
-    base: 'prélevés sur le montant HT de la vente',
+    /* Sur le prix net vendeur, pas sur la plus-value (25/09/2026, Martin). */
+    base: 'prélevés sur le prix net vendeur',
     /** `from` : plus-value à partir de laquelle le palier s'applique, en % du prix de vente (DIC, brochure p.4). */
     tiers: [
       { condition: 'si la plus-value est inférieure à 7 %', rate: '0 %', from: 0 },
