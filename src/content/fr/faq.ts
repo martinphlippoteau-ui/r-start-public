@@ -130,9 +130,9 @@ const rawItems: FaqContent['items'] = [
   {
     category: RUB.frais,
     question:
-      'R Start donne-t-elle droit aux offres promotionnelles CORUM (Coup de Pouce, parrainage) ?',
+      'R Start donne-t-elle droit aux offres promotionnelles CORUM L’Épargne (Coup de Pouce, parrainage) ?',
     answer: [
-      'Non, R Start n’est pas éligible aux offres promotionnelles de CORUM (comme le Coup de Pouce ou le parrainage).',
+      'Non, R Start n’est pas éligible aux offres promotionnelles de CORUM L’Épargne (comme le Coup de Pouce ou le parrainage).',
     ],
   },
   {
