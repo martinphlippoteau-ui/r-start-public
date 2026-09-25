@@ -12,9 +12,14 @@
  * trois épargnants en personnes, légendés « Épargnants ».
  * Plus-values : l'immeuble reçoit son panneau « Vendu », un seul versement gagne R Start, qui le
  * partage de même. Les trois épargnants sont des personnes, comme les locataires (25/09/2026,
- * Martin). Les dessins lisent la palette du recto (`.carte-recto`, global.css). Pas de
- * `data-in-view` : sur cette page d'essai, les dessins tournent sans le moteur de mouvement. À
- * REPORTER dans EngineRent.astro et EngineGain.astro, puis à supprimer avec la page.
+ * Martin). Les dessins lisent la palette du recto (`.carte-recto`, global.css) ; la marque est
+ * une goutte teal au R blanc, comme le logo sur l'écran de l'application (DA transmise par Martin
+ * le 25/09/2026). En pause hors écran (`data-in-view`, motion.ts).
+ * AUDIT DU 25/09/2026 (« quelque chose de 100 % abouti ») : repos = image complète avec les
+ * versements posés À MI-CHEMIN (et non sur les personnes) ; le loyer part APRÈS l'équipe, jamais
+ * dessus ; les parts s'arrêtent au bord des épargnants ; sur la carte des plus-values, les
+ * épargnants battent À L'ARRIVÉE des parts (6,2 s) et non avant. À REPORTER dans EngineRent.astro
+ * et EngineGain.astro, puis à supprimer avec la page.
  */
 import Container from '@/components/ui/Container.astro';
 import Section from '@/components/ui/Section.astro';
@@ -52,7 +57,7 @@ const RANGS = [28, 56, 84];
               <p class="text-eyebrow text-teal-700">{k === 0 ? 'D’abord' : 'Et ensuite'}</p>
               <p class="text-display-sm mt-3 text-navy">{titre}</p>
               <div class="flex w-full flex-1 items-center py-6" style={`--illus-decalage:${k * 0.35}s`}>
-                <figure class="essai-figure" aria-hidden="true">
+                <figure class="essai-figure" aria-hidden="true" data-in-view="illus-en-vue">
                   <svg viewBox="0 0 236 100" fill="none" class="essai-svg">
                     {k === 0 ? (
                       <>
@@ -69,8 +74,8 @@ const RANGS = [28, 56, 84];
                           <path d="M27 70c0-6.5 5.5-11 12-11s12 4.5 12 11" class="cadre-plein" />
                         </g>
                         <text x="39" y="86" class="libelle">Locataires</text>
-                        <path d="M62 56h30" class="chemin" />
-                        <circle cx="60" cy="56" r="3.2" class="piece loyer-unique" />
+                        <path d="M66 56h26" class="chemin" />
+                        <circle cx="66" cy="56" r="3.2" class="piece loyer-unique" />
                       </>
                     ) : (
                       <>
@@ -164,8 +169,10 @@ const RANGS = [28, 56, 84];
     text-anchor: middle;
     dominant-baseline: central;
   }
+  /* La marque comme sur l'écran de l'application : goutte teal, R blanc. Le tracé du dessus est la
+     goutte au R évidé, peinte teal ; la goutte pleine du dessous est blanche et se voit par le R. */
   .marque {
-    fill: var(--illus-trait);
+    fill: var(--color-teal-700);
   }
   .marque-fond {
     fill: var(--illus-fond);
@@ -176,8 +183,9 @@ const RANGS = [28, 56, 84];
     transform-box: fill-box;
     transform-origin: center;
   }
-  /* Repos = image complète : locataires et épargnants en place, le panneau posé, les versements
-     arrivés (les loyers chez la marque, les parts chez les épargnants), les pièces en vol effacées. */
+  /* Repos = image complète : locataire et épargnants en place, le panneau posé, chaque versement
+     À MI-CHEMIN de son trajet (le loyer entre le locataire et la marque, la vente entre l'immeuble et
+     la marque, les parts sur leurs courbes), jamais sur une personne. */
   .libelle {
     fill: rgb(var(--illus-trait-rgb) / 0.7);
     font-family: inherit;
@@ -199,17 +207,19 @@ const RANGS = [28, 56, 84];
     stroke-width: 1.4;
   }
   .part {
-    transform: translate(54px, var(--dy));
+    transform: translate(27px, calc(var(--dy) / 2));
   }
-  .loyer-unique,
+  .loyer-unique {
+    transform: translateX(13px);
+  }
   .vente {
-    opacity: 0;
+    transform: translateX(21px);
   }
 
   @media (prefers-reduced-motion: no-preference) {
-    /* Loyers : trois versements partent à un souffle d'écart (0,12 s), se rejoignent, la somme
-       gagne la marque, qui partage ; les épargnants répondent d'un battement. */
-    /* Le locataire bat d'un souffle au départ du loyer ; le loyer file jusqu'à la marque. */
+    /* Loyers, sur 4 s : le locataire bat d'un souffle au départ du loyer, le loyer gagne la marque
+       (1,76 s), qui s'assombrit (1,9 s) et partage (2 s) ; les parts arrivent à 3,12 s, les
+       épargnants répondent à 3,2 s. */
     .locataire {
       animation: essai-souffle var(--tour) infinite both;
       animation-delay: var(--decal);
@@ -230,7 +240,8 @@ const RANGS = [28, 56, 84];
       animation: essai-battement var(--tour) infinite both;
       animation-delay: calc(var(--decal) + 3.2s + var(--e) * 0.08s);
     }
-    /* Plus-values : panneau à 30 % du cycle, un versement de 40 à 50 %, partage de 50 à 68 %. */
+    /* Plus-values, sur 8 s : panneau à 2,9 s, versement de 3,1 à 3,84 s, relais à 3,9 s, parts de
+       4 à 6,24 s, épargnants à 6,2 s. */
     .panneau {
       animation: essai-panneau var(--cycle) infinite both;
       animation-delay: var(--decal);
@@ -249,7 +260,7 @@ const RANGS = [28, 56, 84];
     }
     .epargnant-vente {
       animation: essai-battement var(--cycle) infinite both;
-      animation-delay: calc(var(--decal) + 5.2s + var(--e) * 0.08s);
+      animation-delay: calc(var(--decal) + 6.2s + var(--e) * 0.08s);
     }
   }
 
@@ -274,8 +285,8 @@ const RANGS = [28, 56, 84];
   @keyframes essai-part {
     0% { opacity: 0; transform: translate(0, 0) scale(0.3); animation-timing-function: var(--ease-out-expo); }
     8% { opacity: 1; transform: translate(4px, 0) scale(1); animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1); }
-    28% { opacity: 1; transform: translate(54px, var(--dy)) scale(1); animation-timing-function: cubic-bezier(0.7, 0, 0.84, 0); }
-    34%, 100% { opacity: 0; transform: translate(58px, var(--dy)) scale(0.3); }
+    28% { opacity: 1; transform: translate(50px, var(--dy)) scale(1); animation-timing-function: cubic-bezier(0.7, 0, 0.84, 0); }
+    34%, 100% { opacity: 0; transform: translate(52px, var(--dy)) scale(0.3); }
   }
   @keyframes essai-battement {
     0%, 4% { transform: scale(1); animation-timing-function: var(--ease-out-expo); }
