@@ -301,37 +301,33 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
         partie avec elles). CETTE PAGE EST SERVIE PAR LE MOTEUR GSAP (titres mot à mot), voir
         tests/performance.spec.ts. */
     }
-    <div
-      class="mt-chapter lg:grid lg:grid-cols-12 lg:items-start lg:gap-10"
-      data-volets
-      data-animate="fade-up"
-      data-animate-y="24"
-    >
+    <div class="mt-chapter" data-volets data-animate="fade-up" data-animate-y="24">
       {
-        /* La liste : un lien par volet, le mot d'ordre en gras et le titre dessous (masqué sous
-          `lg`, où la liste est une rangée de pastilles qui passe à la ligne au besoin). Le volet
-          actif est surligné en sable ; la
-          pastille de couleur numérote sans chiffre, trois teintes du site. */
+        /* La liste, AU-DESSUS des panneaux (25/09/2026, Martin : « les sélecteurs au-dessus des
+          cards, les cards sur toute la largeur ») : une rangée de trois onglets qui se partagent
+          la largeur, le mot d'ordre en gras et le titre dessous ; sous `sm`, ils passent à la
+          ligne. Le volet actif est surligné en sable ; la pastille de couleur numérote sans
+          chiffre, trois teintes du site. */
       }
-      <nav data-volets-liste aria-label={strategy.tilesTitle} class="lg:col-span-4">
-        <ul role="list" class="flex flex-wrap gap-2 lg:flex-col lg:gap-3">
+      <nav data-volets-liste aria-label={strategy.tilesTitle}>
+        <ul role="list" class="flex flex-wrap gap-2 sm:gap-3">
           {
             [strategy.what, strategy.where, strategy.how].map((zone, z) => {
               const ancre = [ids.what, ids.where, ids.how][z];
               return (
-                <li class="shrink-0 lg:shrink">
+                <li class="sm:flex-1 sm:basis-0">
                   <a
                     id={'onglet-' + ancre}
                     href={'#volet-' + ancre}
                     data-volet-onglet
                     aria-selected={z === 0 ? 'true' : 'false'}
-                    class="volet-onglet flex items-center gap-3 rounded-2xl px-4 py-3 text-ink no-underline transition-colors hover:bg-white lg:px-5 lg:py-4"
+                    class="volet-onglet flex h-full items-center gap-3 rounded-2xl px-4 py-3 text-ink no-underline transition-colors hover:bg-white sm:px-5 sm:py-4"
                     style={`--volet-point:${['var(--color-teal-400)', 'var(--color-teal-700)', 'var(--color-navy)'][z]}`}
                   >
                     <span aria-hidden="true" class="volet-point size-2.5 shrink-0 rounded-full" />
                     <span>
                       <span class="block text-base font-semibold whitespace-nowrap sm:text-lg">{zone.eyebrow}</span>
-                      <span class="mt-0.5 hidden text-sm text-slate-700 lg:block">{zone.title}</span>
+                      <span class="mt-0.5 hidden text-sm text-slate-700 sm:block">{zone.title}</span>
                     </span>
                   </a>
                 </li>
@@ -341,8 +337,8 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
         </ul>
       </nav>
 
-      {/* Les panneaux : le dessin et tout le texte du volet. Ids `volet-*` : la section porte déjà `quoi`. */}
-      <div class="mt-6 lg:col-span-8 lg:mt-0">
+      {/* Les panneaux, pleine largeur : le dessin et tout le texte du volet. Ids `volet-*` : la section porte déjà `quoi`. */}
+      <div class="mt-6">
         {
           [strategy.what, strategy.where, strategy.how].map((zone, z) => {
             const ancre = [ids.what, ids.where, ids.how][z];
@@ -352,7 +348,7 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
                 data-volet-panneau
                 class="carte-recto rounded-3xl bg-white p-6 text-ink shadow-card ring-1 ring-navy/5 not-first:mt-6 sm:p-8 lg:p-10"
               >
-                <div class="grid gap-8 lg:grid-cols-[1fr_15rem] lg:items-center lg:gap-10">
+                <div class="grid gap-8 lg:grid-cols-[1fr_20rem] lg:items-center lg:gap-14">
                   <div>
                     {zone.eyebrow && <p class="text-eyebrow text-teal-700">{zone.eyebrow}</p>}
                     <h3 id={ancre + '-title'} class="text-display-sm mt-3 text-navy">
@@ -383,7 +379,7 @@ const tiges = [VOLET_G, VOLET_C, VOLET_D].map((x, i) => ({ d: `M${x} 60V0`, rang
                     /* Le dessin du volet (grammaire en tête de StrategySelect.astro), à droite du texte
                       sur grand écran, dessous sinon. */
                   }
-                  <div class="mx-auto w-full max-w-[18rem] lg:max-w-none" style={`--illus-decalage:${z * 0.35}s`}>
+                  <div class="mx-auto w-full max-w-[20rem] lg:max-w-none" style={`--illus-decalage:${z * 0.35}s`}>
                     {z === 0 && <StrategySelect />}
                     {z === 1 && <StrategyDiversify />}
                     {z === 2 && <StrategyTiming />}
