@@ -47,6 +47,9 @@ export const strategy: StrategyContent = {
         /* Textes de Martin du 24/09/2026, mot pour mot (le point final du bénéfice retiré, comme sur
            la carte des loyers). La comparaison « plus systématique que d'autres SCPI » est partie
            avec l'ancien texte. */
+        /* Second paragraphe du dos (25/09/2026, texte de Martin, mot pour mot) : la règle de détention. */
+        restMore:
+          'R Start investit dans des immeubles qu’elle conserve dans la durée. En principe, elle ne peut pas revendre un immeuble avant de l’avoir détenu pendant 5 ans. Elle peut toutefois revendre certains immeubles avant ce délai, dans une limite fixée par la réglementation à 2 % de la valeur de son patrimoine immobilier.',
         rest: 'R Start met au cœur de sa démarche la recherche de plus-values sur les ventes d’immeubles. Ces plus-values potentielles sont redistribuées aux épargnants sous forme de dividendes après frais. C’est la deuxième source de revenus potentiels pour les clients de la SCPI R Start.',
       },
     ],

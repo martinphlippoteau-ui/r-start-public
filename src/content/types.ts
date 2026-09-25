@@ -103,7 +103,15 @@ export interface StrategyChapter {
    * l'épargnant, en une ligne sous le titre de la carte, côté recto. `sequence` : mot d'ordre
    * chronologique des moteurs (« D'abord », « Et ensuite »), leur surtitre.
    */
-  items: { lead: string; rest?: string; icon?: PictoKey; benefit?: string; sequence?: string }[];
+  items: {
+    lead: string;
+    rest?: string;
+    /** Second paragraphe du dos de carte, après `rest` (moteurs, 25/09/2026). */
+    restMore?: string;
+    icon?: PictoKey;
+    benefit?: string;
+    sequence?: string;
+  }[];
   /** Phrase qui referme le chapitre, sous la liste. Les moteurs n'en ont pas. */
   outro?: string;
 }
