@@ -46,7 +46,7 @@ const rawItems: FaqContent['items'] = [
     /* Réécrite le 22/09/2026 (demande de Martin) : « revenus (dividendes) potentiels », et plus de
        second paragraphe sur les deux moteurs. */
     answer: [
-      'R Start verse chaque mois des revenus (dividendes) potentiels issus des loyers, comme les autres SCPI CORUM. En revanche, elle n’a pas d’objectif de rendement fixé.',
+      'R Start a vocation à verser chaque mois des revenus (dividendes) potentiels issus des loyers, comme les autres SCPI CORUM. En revanche, elle n’a pas d’objectif de rendement fixé.',
     ],
   },
   {
@@ -162,7 +162,7 @@ const rawItems: FaqContent['items'] = [
     category: RUB.performance,
     question: 'Sur quoi repose la performance de R Start ?',
     answer: [
-      'La performance de R Start s’appuie sur deux moteurs : d’une part, les loyers versés par les locataires des immeubles ; d’autre part, les plus-values réalisées lorsque CORUM revend des immeubles plus cher qu’ils n’ont été achetés. Les loyers sont distribués chaque mois ; les plus-values, elles, arrivent ponctuellement, lors des reventes.',
+      'La performance de R Start s’appuie sur deux moteurs : d’une part, les loyers versés par les locataires des immeubles ; d’autre part, les plus-values réalisées lorsque CORUM revend des immeubles plus cher qu’ils n’ont été achetés. Les loyers ont vocation à être distribués chaque mois ; les plus-values, elles, à arriver ponctuellement, lors des reventes.',
     ],
   },
   {
@@ -224,7 +224,7 @@ const rawItems: FaqContent['items'] = [
     category: RUB.pratique,
     question: 'À quelle fréquence les revenus sont-ils versés ?',
     answer: [
-      'Les revenus issus des loyers sont versés chaque mois. Les plus-values, elles, sont versées ponctuellement, au moment de la revente d’immeubles.',
+      'Les revenus issus des loyers ont vocation à être versés chaque mois. Les plus-values, elles, à être versées ponctuellement, au moment de la revente d’immeubles.',
     ],
   },
   {
@@ -301,6 +301,12 @@ if (homeItems.length !== HOME_FAQ.length) {
   }
 }
 
+/*
+ * TEMPS DES VERSEMENTS (25/09/2026, Martin) : aucun versement n'a encore eu lieu, le présent n'est
+ * pas justifiable. Les réponses qui parlaient de versements ou de distributions au présent disent
+ * « a vocation à verser », « ont vocation à être distribués / versés ». À repasser au présent le
+ * jour où R Start aura versé.
+ */
 export const faq = {
   title: 'Vos questions sur la SCPI R Start.',
   /* Pas d'introduction depuis le 16/09/2026 (demande de l'équipe), ni ici ni sur /faq. */
