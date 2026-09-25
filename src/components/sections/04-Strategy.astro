@@ -60,7 +60,11 @@ const QUIET_TITLE_Y = 12;
 }
 <div class="plan-haut overflow-hidden">
 {/* 1. Les deux moteurs de performance */}
-<Section id={id} tone="paper" class="overflow-hidden">
+{
+  /* Marge basse resserrée (25/09/2026, Martin : « rapproche un peu les blocs du bas des blocs du
+    haut ») : `pb-section-sm` au lieu de `py-section`, les volets suivent à `pt-section-sm`. */
+}
+<Section id={id} tone="paper" spacing="none" class="overflow-hidden pt-section pb-section-sm">
   <Container size="wide">
     {
       /* PLEINE LARGEUR, comme le titre des volets (24/09/2026, Martin : « titre sur une seule
