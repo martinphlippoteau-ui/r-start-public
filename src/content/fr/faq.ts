@@ -61,6 +61,9 @@ const rawItems: FaqContent['items'] = [
     question: 'Quels sont les frais de R Start ?',
     answer: [
       'R Start ne prélève aucun frais quand vous investissez : chaque euro placé est réellement investi. CORUM se rémunère uniquement sur les loyers encaissés et sur les plus-values réalisées lors de la revente d’immeubles.',
+      /* Second paragraphe (25/09/2026, texte de Martin, mot pour mot, point final ajouté) : le
+         contre-poids du modèle, avant le tableau. */
+      'R Start n’est pas une SCPI sans frais. Ce modèle n’existe pas. R Start n’est pas non plus moins chère qu’une SCPI traditionnelle. Son modèle de frais est différent : si les reventes d’immeubles génèrent de fortes plus-values, les commissions peuvent dépasser ce qu’aurait coûté une commission de souscription classique.',
     ],
     table: {
       head: ['Type de frais', 'Montant'],
