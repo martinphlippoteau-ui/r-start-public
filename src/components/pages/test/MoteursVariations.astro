@@ -1,0 +1,435 @@
+---
+/**
+ * ESSAI (24/09/2026, Martin : « fais-moi 10 autres propositions, variations ») : dix variations
+ * de la piste retenue (MoteursEssais.astro, la répartition avec des locataires), rendues SUR
+ * /test SEULEMENT. Chaque variation ne change qu'un ou deux réglages du même dessin, pour que la
+ * différence se voie : la forme des locataires (personnes, enseignes, en éventail, dans
+ * l'immeuble), celle des épargnants (cercles, personnes), le flux (par salves, continu), les
+ * pointillés, la pièce (pleine, « € »), la marque (petite, grande à onde), les libellés. Même
+ * grammaire, mêmes interdits : aucune courbe, aucun axe, rien qui monte. À supprimer une fois
+ * tranché.
+ */
+import Container from '@/components/ui/Container.astro';
+import Section from '@/components/ui/Section.astro';
+import { fenetres } from '@/lib/immeuble';
+
+const MARQUE =
+  'M68.21.17C36.7,3.24,5.47,23.07,2.44,29.88c-11.59,26.1,21.48,52.52,27.22,55.34,21.52,10.59,48.04-1.99,59.51-27.5C93.5,48.09,104.2-3.34,68.21.17ZM64.76,69.76c-1.25,0-2.36-.57-3.09-1.47l-2.84-3.52c-4.06-4.98-10.05-12.1-12.26-13.54-1.92-1.22-4.48-1.84-7.59-1.84l-7.96.02c-2.02,0-3.66-1.64-3.66-3.66s1.64-3.66,3.66-3.66h18.33c3.05-.01,5.54-2.14,5.54-4.76s-2.49-4.74-5.54-4.74h-18.34c-2.02,0-3.66-1.63-3.66-3.65s1.64-3.66,3.66-3.66h18.34c7.58,0,13.73,5.4,13.73,12.05,0,4.74-3.2,9.03-8.07,10.97,3.22,3.36,7.64,8.61,11.3,13.08l1.52,1.86c.57.69.91,1.57.91,2.54,0,2.2-1.79,3.99-3.99,3.99Z';
+
+type Locataires = 'personnes' | 'enseignes' | 'eventail' | 'immeuble';
+type Epargnants = 'cercles' | 'personnes';
+interface Reglages {
+  titre: string;
+  note: string;
+  locataires: Locataires;
+  epargnants: Epargnants;
+  flux: 'salves' | 'continu';
+  pointilles: boolean;
+  euro: boolean;
+  marque: 'petite' | 'grande';
+  libelles: boolean;
+}
+const BASE: Omit<Reglages, 'titre' | 'note'> = {
+  locataires: 'personnes',
+  epargnants: 'cercles',
+  flux: 'salves',
+  pointilles: true,
+  euro: false,
+  marque: 'petite',
+  libelles: false,
+};
+const VARIATIONS: Reglages[] = [
+  { ...BASE, titre: 'Les enseignes', note: 'Les locataires sont des entreprises : trois vitrines à enseigne, plutôt que trois personnes.', locataires: 'enseignes' },
+  { ...BASE, titre: 'Les épargnants en personnes', note: 'À droite, trois personnes comme à gauche, et non trois cercles : ceux qui reçoivent ont un visage.', epargnants: 'personnes' },
+  { ...BASE, titre: 'L’éventail', note: 'Les trois locataires en éventail, écartés, pour que les trois loyers se voient converger.', locataires: 'eventail' },
+  { ...BASE, titre: 'Les locataires dans l’immeuble', note: 'L’immeuble reste, mais ce sont ses trois locataires, derrière leurs portes, qui versent.', locataires: 'immeuble' },
+  { ...BASE, titre: 'Le flux continu', note: 'Les loyers ne partent plus par salves : ils circulent en continu, la régularité est le sujet.', flux: 'continu' },
+  { ...BASE, titre: 'Sans pointillés', note: 'Plus de chemins tracés : seules les pièces dessinent le trajet.', pointilles: false },
+  { ...BASE, titre: 'Les pièces « € »', note: 'Chaque versement porte le signe « € » : c’est de l’argent, pas un point.', euro: true },
+  { ...BASE, titre: 'La marque et son onde', note: 'La marque R Start, plus grande, répond à chaque réception par une onde.', marque: 'grande' },
+  { ...BASE, titre: 'Les libellés', note: '« Loyers » sous les locataires, « Dividendes » sous les épargnants (et « Vente » sur l’autre carte) : le dessin se lit sans la légende.', libelles: true },
+  { ...BASE, titre: 'Tout en personnes, pièces « € »', note: 'Locataires en éventail, épargnants en personnes, pièces « € », marque à onde : la combinaison la plus parlante.', locataires: 'eventail', epargnants: 'personnes', euro: true, marque: 'grande' },
+];
+
+/** Positions des locataires selon leur forme : centre et point de départ des loyers. */
+const positions = (forme: Locataires): { cx: number; cy: number; sx: number }[] => {
+  if (forme === 'eventail') return [{ cx: 36, cy: 26, sx: 52 }, { cx: 46, cy: 56, sx: 62 }, { cx: 36, cy: 86, sx: 52 }];
+  if (forme === 'immeuble') return [{ cx: 50, cy: 36, sx: 78 }, { cx: 50, cy: 56, sx: 78 }, { cx: 50, cy: 76, sx: 78 }];
+  return [{ cx: 39, cy: 30, sx: 56 }, { cx: 39, cy: 56, sx: 56 }, { cx: 39, cy: 82, sx: 56 }];
+};
+const EPARGNANTS = [30, 56, 82];
+const CADRE = { x: 22, y: 22, w: 56, h: 68 };
+const FEN = fenetres({ x: 22, y: 26, w: 56, h: 60 }, { colonnes: 3, rangees: 4, taille: 8, ecart: 4 });
+---
+
+<Section id="moteurs-variations" tone="white">
+  <Container size="wide">
+    <p class="text-eyebrow text-teal-700">Essai du 24/09/2026</p>
+    <h2 id="moteurs-variations-title" class="text-display-md mt-3 text-ink">Dix variations</h2>
+    <p class="mt-4 max-w-3xl text-lg text-slate-700">
+      Chacune ne change qu’un ou deux réglages de la piste retenue, la dernière les combine.
+    </p>
+    <ol class="mt-6 max-w-3xl space-y-1 text-base text-ink">
+      {VARIATIONS.map((v, i) => (
+        <li>
+          <a href={`#variation-${i + 1}`} class="font-semibold">{`${i + 1}. ${v.titre}`}</a>
+        </li>
+      ))}
+    </ol>
+  </Container>
+</Section>
+
+{
+  VARIATIONS.map((v, i) => {
+    const n = i + 1;
+    const locs = positions(v.locataires);
+    const rayon = v.euro ? 4 : 2.4;
+    const rayonSomme = v.euro ? 4.5 : 3.2;
+    const marqueW = v.marque === 'grande' ? 30 : 22;
+    const marqueX = 129 - marqueW / 2;
+    const marqueY = 56 - (marqueW * 88.98) / 94.08 / 2;
+    return (
+      <Section id={`variation-${n}`} tone={n % 2 ? 'paper' : 'white'} class="pt-section-sm">
+        <Container size="wide">
+          <h2 id={`variation-${n}-title`} class="text-display-sm text-ink">{`Variation ${n} : ${v.titre}`}</h2>
+          <p class="mt-3 max-w-3xl text-base text-slate-700">{v.note}</p>
+          <ul role="list" class="mt-8 grid gap-8 sm:grid-cols-2 lg:gap-12">
+            {['Les loyers', 'Les plus-values'].map((titre, k) => (
+              <li>
+                <article class="carte-recto relative flex min-h-[20rem] flex-col rounded-3xl bg-white p-6 text-ink shadow-card ring-1 ring-navy/5 sm:p-8">
+                  <p class="text-eyebrow text-teal-700">{k === 0 ? 'D’abord' : 'Et ensuite'}</p>
+                  <p class="text-display-sm mt-3 text-navy">{titre}</p>
+                  <div class="flex w-full flex-1 items-center py-6" style={`--illus-decalage:${k * 0.35}s`}>
+                    <figure class="var-figure" aria-hidden="true">
+                      <svg viewBox="0 0 236 100" fill="none" class="var-svg">
+                        {k === 0 ? (
+                          <>
+                            {v.locataires === 'immeuble' && (
+                              <rect x={CADRE.x} y={CADRE.y} width={CADRE.w} height={CADRE.h} rx="5" class="cadre" />
+                            )}
+                            {locs.map(({ cx, cy }, e) => (
+                              <g class="locataire" style={`--e:${e}`}>
+                                {v.locataires === 'enseignes' ? (
+                                  <>
+                                    <rect x={cx - 13} y={cy - 12} width="26" height="24" rx="3" class="cadre" />
+                                    <path d={`M${cx - 13} ${cy - 5}h26`} class="cadre" />
+                                    <rect x={cx - 9} y={cy - 10} width="18" height="3" rx="1.5" class="enseigne" />
+                                    <rect x={cx - 3} y={cy + 1} width="6" height="11" rx="1" class="porte" />
+                                  </>
+                                ) : (
+                                  <>
+                                    {v.locataires !== 'immeuble' && (
+                                      <rect x={cx - 13} y={cy - 12} width="26" height="24" rx="4" class="cadre" />
+                                    )}
+                                    {v.locataires === 'immeuble' && (
+                                      <rect x={cx - 11} y={cy - 8} width="22" height="16" rx="3" class="porte-fine" />
+                                    )}
+                                    {v.locataires === 'immeuble' ? (
+                                      <>
+                                        <circle cx={cx} cy={cy - 3.5} r="2.5" class="cadre" />
+                                        <path d={`M${cx - 6} ${cy + 7}c0-4 2.5-6 6-6s6 2 6 6`} class="cadre" />
+                                      </>
+                                    ) : (
+                                      <>
+                                        <circle cx={cx} cy={cy - 3} r="4" class="cadre" />
+                                        <path d={`M${cx - 8} ${cy + 10}c0-5 3.5-8 8-8s8 3 8 8`} class="cadre" />
+                                      </>
+                                    )}
+                                  </>
+                                )}
+                              </g>
+                            ))}
+                            {v.pointilles && locs.map(({ sx, cy }) => (
+                              <path d={`M${sx} ${cy}C${sx + 22} ${cy} ${sx + 26} 56 92 56`} class="chemin" />
+                            ))}
+                            {locs.map(({ sx, cy }, e) => (
+                              <>
+                                {(v.flux === 'continu' ? [0, 1] : [0]).map((r) => (
+                                  <g class={`loyer ${v.flux === 'continu' ? 'loyer-continu' : ''}`} style={`--e:${e};--r:${r};--dx:${92 - sx}px;--dy:${56 - cy}px`}>
+                                    <circle cx={sx} cy={cy} r={rayon} class="piece" />
+                                    {v.euro && <text x={sx} y={cy + 0.4} class="euro">€</text>}
+                                  </g>
+                                ))}
+                              </>
+                            ))}
+                            {v.flux === 'salves' && (
+                              <g class="somme">
+                                <circle cx="92" cy="56" r={rayonSomme} class="piece" />
+                                {v.euro && <text x="92" y="56.4" class="euro">€</text>}
+                              </g>
+                            )}
+                            {v.libelles && (
+                              <text x={v.locataires === 'immeuble' ? 50 : 39} y="10" class="libelle">Loyers</text>
+                            )}
+                          </>
+                        ) : (
+                          <>
+                            <rect x="22" y="26" width="56" height="60" rx="5" class="cadre" />
+                            {FEN.map((f) => (
+                              <rect x={f.x} y={f.y} width={f.w} height={f.h} rx="1.5" class="fenetre" />
+                            ))}
+                            <g class="panneau">
+                              <rect x="30" y="14" width="40" height="16" rx="4" class="panneau-fond" />
+                              <text x="50" y="22.5" class="etiquette">{v.libelles ? 'Vente' : 'Vendu'}</text>
+                            </g>
+                            <g class="vente">
+                              <circle cx="90" cy="56" r={rayonSomme} class="piece" />
+                              {v.euro && <text x="90" y="56.4" class="euro">€</text>}
+                            </g>
+                          </>
+                        )}
+                        {v.pointilles && <path d="M92 56h40" class="chemin" />}
+                        {v.pointilles && EPARGNANTS.map((y) => (
+                          <path d={`M146 56C170 56 176 ${y} 200 ${y}`} class="chemin" />
+                        ))}
+                        {EPARGNANTS.map((y, e) => (
+                          <>
+                            <g class={`part ${k === 0 ? 'part-loyers' : 'part-vente'}`} style={`--e:${e};--dy:${y - 56}px`}>
+                              <circle cx="146" cy="56" r={rayon} class="piece" />
+                              {v.euro && <text x="146" y="56.4" class="euro">€</text>}
+                            </g>
+                            {v.epargnants === 'personnes' ? (
+                              <g class={`epargnant ${k === 0 ? 'epargnant-loyers' : 'epargnant-vente'}`} style={`--e:${e}`}>
+                                <circle cx="208" cy={y - 4} r="3.5" class="cadre" />
+                                <path d={`M201 ${y + 8}c0-4.5 3-7 7-7s7 2.5 7 7`} class="cadre" />
+                              </g>
+                            ) : (
+                              <circle cx="206" cy={y} r="5" class={`cadre epargnant ${k === 0 ? 'epargnant-loyers' : 'epargnant-vente'}`} style={`--e:${e}`} />
+                            )}
+                          </>
+                        ))}
+                        {v.libelles && <text x="207" y="10" class="libelle">Dividendes</text>}
+                        {v.marque === 'grande' && (
+                          <circle cx="129" cy="56" r="17" class={`onde ${k === 0 ? 'onde-loyers' : 'onde-vente'}`} />
+                        )}
+                        <svg x={marqueX} y={marqueY} width={marqueW} height={(marqueW * 88.98) / 94.08} viewBox="0 0 94.08 88.98" class={`marque ${k === 0 ? 'marque-loyers' : 'marque-vente'}`}>
+                          <path d={MARQUE} />
+                        </svg>
+                      </svg>
+                    </figure>
+                  </div>
+                </article>
+              </li>
+            ))}
+          </ul>
+        </Container>
+      </Section>
+    );
+  })
+}
+
+<style>
+  .var-figure {
+    margin: 0;
+    width: 100%;
+    --cycle: 8s;
+    --tour: 4s;
+    --decal: var(--illus-decalage, 0s);
+  }
+  .var-svg {
+    display: block;
+    width: 100%;
+    aspect-ratio: 236 / 100;
+  }
+  .cadre {
+    stroke: rgb(var(--illus-trait-rgb) / 0.38);
+    stroke-width: 1.6;
+  }
+  .porte-fine {
+    stroke: rgb(var(--illus-trait-rgb) / 0.3);
+    stroke-width: 1.2;
+  }
+  .chemin {
+    stroke: rgb(var(--illus-trait-rgb) / 0.22);
+    stroke-width: 1.2;
+    stroke-dasharray: 3 7;
+    stroke-linecap: round;
+  }
+  .fenetre,
+  .enseigne,
+  .porte {
+    fill: var(--illus-trait);
+    opacity: 0.5;
+  }
+  .piece {
+    fill: var(--illus-trait);
+  }
+  .euro {
+    fill: var(--illus-fond);
+    font-family: inherit;
+    font-size: 5.5px;
+    font-weight: 700;
+    text-anchor: middle;
+    dominant-baseline: central;
+  }
+  .libelle {
+    fill: rgb(var(--illus-trait-rgb) / 0.7);
+    font-family: inherit;
+    font-size: 6.5px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-anchor: middle;
+  }
+  .panneau-fond {
+    fill: var(--illus-fond);
+    stroke: var(--illus-accent);
+    stroke-width: 1.4;
+  }
+  .etiquette {
+    fill: var(--illus-trait);
+    font-family: inherit;
+    font-size: 8.5px;
+    font-weight: 700;
+    text-anchor: middle;
+    dominant-baseline: central;
+  }
+  .marque {
+    fill: var(--illus-trait);
+  }
+  .onde {
+    stroke: var(--illus-accent);
+    stroke-width: 1.2;
+    opacity: 0;
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+  .loyer,
+  .part,
+  .somme,
+  .vente,
+  .epargnant,
+  .locataire {
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+  .epargnant,
+  .locataire {
+    fill: var(--illus-fond);
+  }
+  /* Repos = image complète. */
+  .loyer {
+    transform: translate(var(--dx), var(--dy));
+  }
+  .part {
+    transform: translate(54px, var(--dy));
+  }
+  .somme,
+  .vente,
+  .loyer-continu {
+    opacity: 0;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .locataire {
+      animation: var-battement var(--tour) infinite both;
+      animation-delay: calc(var(--decal) + var(--e) * 0.12s);
+    }
+    .loyer {
+      animation: var-loyer var(--tour) infinite both;
+      animation-delay: calc(var(--decal) + var(--e) * 0.12s);
+    }
+    /* Flux continu : deux pièces par locataire, à deux secondes d'écart, chacune allant jusqu'à la
+       marque ; pas de somme, le partage suit son propre tempo. */
+    .loyer-continu {
+      animation: var-loyer-continu var(--tour) linear infinite both;
+      animation-delay: calc(var(--decal) + var(--e) * 0.3s + var(--r) * -2s);
+    }
+    .somme {
+      animation: var-somme var(--tour) infinite both;
+      animation-delay: var(--decal);
+    }
+    .marque-loyers {
+      animation: var-relais var(--tour) infinite both;
+      animation-delay: calc(var(--decal) + 1.9s);
+    }
+    .onde-loyers {
+      animation: var-onde var(--tour) infinite both;
+      animation-delay: calc(var(--decal) + 1.9s);
+    }
+    .part-loyers {
+      animation: var-part var(--tour) infinite both;
+      animation-delay: calc(var(--decal) + 2s);
+    }
+    .epargnant-loyers {
+      animation: var-battement var(--tour) infinite both;
+      animation-delay: calc(var(--decal) + 3.2s + var(--e) * 0.08s);
+    }
+    .panneau {
+      animation: var-panneau var(--cycle) infinite both;
+      animation-delay: var(--decal);
+    }
+    .vente {
+      animation: var-vente var(--cycle) infinite both;
+      animation-delay: var(--decal);
+    }
+    .marque-vente {
+      animation: var-relais var(--cycle) infinite both;
+      animation-delay: calc(var(--decal) + 3.9s);
+    }
+    .onde-vente {
+      animation: var-onde var(--cycle) infinite both;
+      animation-delay: calc(var(--decal) + 3.9s);
+    }
+    .part-vente {
+      animation: var-part var(--cycle) infinite both;
+      animation-delay: calc(var(--decal) + 4s);
+    }
+    .epargnant-vente {
+      animation: var-battement var(--cycle) infinite both;
+      animation-delay: calc(var(--decal) + 5.2s + var(--e) * 0.08s);
+    }
+  }
+
+  @keyframes var-loyer {
+    0% { opacity: 0; transform: translate(0, 0) scale(0.3); animation-timing-function: var(--ease-out-expo); }
+    6% { opacity: 1; transform: translate(3px, 0) scale(1); animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1); }
+    24% { opacity: 1; transform: translate(var(--dx), var(--dy)) scale(1); animation-timing-function: cubic-bezier(0.7, 0, 0.84, 0); }
+    28%, 100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(0.3); }
+  }
+  @keyframes var-loyer-continu {
+    0% { opacity: 0; transform: translate(0, 0); }
+    6% { opacity: 1; }
+    84% { opacity: 1; }
+    100% { opacity: 0; transform: translate(calc(var(--dx) + 36px), var(--dy)); }
+  }
+  @keyframes var-somme {
+    0%, 26% { opacity: 0; transform: translateX(0) scale(0.3); animation-timing-function: var(--ease-out-expo); }
+    30% { opacity: 1; transform: translateX(2px) scale(1); animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1); }
+    44% { opacity: 1; transform: translateX(34px) scale(1); animation-timing-function: cubic-bezier(0.7, 0, 0.84, 0); }
+    50%, 100% { opacity: 0; transform: translateX(40px) scale(0.3); }
+  }
+  @keyframes var-panneau {
+    0%, 28% { opacity: 0; transform: translateY(6px); animation-timing-function: var(--ease-out-expo); }
+    36% { opacity: 1; transform: translateY(0); }
+    84% { opacity: 1; animation-timing-function: cubic-bezier(0.7, 0, 0.84, 0); }
+    94%, 100% { opacity: 0; transform: translateY(0); }
+  }
+  @keyframes var-vente {
+    0%, 38% { opacity: 0; transform: translateX(0) scale(0.3); animation-timing-function: var(--ease-out-expo); }
+    41% { opacity: 1; transform: translateX(4px) scale(1); animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1); }
+    48% { opacity: 1; transform: translateX(36px) scale(1); animation-timing-function: cubic-bezier(0.7, 0, 0.84, 0); }
+    51%, 100% { opacity: 0; transform: translateX(42px) scale(0.3); }
+  }
+  @keyframes var-part {
+    0% { opacity: 0; transform: translate(0, 0) scale(0.3); animation-timing-function: var(--ease-out-expo); }
+    8% { opacity: 1; transform: translate(4px, 0) scale(1); animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1); }
+    28% { opacity: 1; transform: translate(54px, var(--dy)) scale(1); animation-timing-function: cubic-bezier(0.7, 0, 0.84, 0); }
+    34%, 100% { opacity: 0; transform: translate(58px, var(--dy)) scale(0.3); }
+  }
+  @keyframes var-battement {
+    0%, 4% { transform: scale(1); animation-timing-function: var(--ease-out-expo); }
+    10% { transform: scale(1.25); animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1); }
+    30%, 100% { transform: scale(1); }
+  }
+  @keyframes var-relais {
+    0% { opacity: 1; }
+    4% { opacity: 0.55; }
+    14%, 100% { opacity: 1; }
+  }
+  @keyframes var-onde {
+    0% { opacity: 0; transform: scale(0.6); animation-timing-function: var(--ease-out-expo); }
+    6% { opacity: 0.7; animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1); }
+    30%, 100% { opacity: 0; transform: scale(1.5); }
+  }
+</style>

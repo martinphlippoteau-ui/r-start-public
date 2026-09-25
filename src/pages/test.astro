@@ -10,12 +10,15 @@ import Base from '@/layouts/Base.astro';
 import SiteNav from '@/components/SiteNav.astro';
 import Footer from '@/components/Footer.astro';
 import MoteursEssais from '@/components/pages/test/MoteursEssais.astro';
+import MoteursVariations from '@/components/pages/test/MoteursVariations.astro';
 ---
 
 <Base title="Essai des moteurs" description="Page d’essai interne, hors menu." path="/test" noindex>
   <SiteNav />
   <main id="contenu">
     <MoteursEssais />
+    {/* Dix variations de la piste retenue (24/09/2026). */}
+    <MoteursVariations />
   </main>
   <Footer />
 </Base>
