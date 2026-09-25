@@ -124,7 +124,7 @@ const rawItems: FaqContent['items'] = [
       ],
     },
     tableAfter: [
-      'Ils protègent votre épargne et celle des autres associés, en évitant les retraits précipités qui fragiliseraient la SCPI. R Start est un placement à conserver dans la durée.',
+      'Ils protègent la liquidité de la SCPI, en évitant les retraits précipités qui la fragiliseraient au détriment de l’ensemble des associés. R Start est un placement à conserver dans la durée.',
     ],
   },
   {
