@@ -71,6 +71,7 @@ export const media = {
   // peine. Vue prise de haut, seule du lot à montrer une ville entière plutôt qu'une rue.
   documents: {
     src: 'immeubles/toits-depuis-balcon.png',
-    alt: 'Illustration : vue depuis un balcon sur les toits d’une ville et une avenue en contrebas au lever du jour',
+    /* Raccourci sous 100 caractères (25/09/2026, audit Screaming Frog). */
+      alt: 'Illustration : toits d’une ville et avenue vus d’un balcon au lever du jour',
   },
 } as const satisfies MediaContent;

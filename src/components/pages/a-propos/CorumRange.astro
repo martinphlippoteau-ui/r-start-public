@@ -90,7 +90,9 @@ const QUIET_TITLE_Y = 12;
       `sm` : quel que soit le nombre de lignes du texte, qui varie entre 640 et 1024 px, le logo
       reste au milieu. */}
     <div class="mt-section-sm flex flex-col gap-5 sm:flex-row sm:items-center sm:gap-8">
-      <Image src={brandLogo} alt="" width={142} height={44} class="h-11 w-auto shrink-0" />
+      {/* Texte alternatif « R Start » pour les robots (audit Screaming Frog, 25/09/2026), mais
+        `aria-hidden` : la phrase voisine commence par « R Start », un lecteur d'écran le lirait deux fois. */}
+      <Image src={brandLogo} alt="R Start" aria-hidden="true" width={142} height={44} class="h-11 w-auto shrink-0" />
       <p class="max-w-3xl text-base leading-snug text-slate-700">{trust.amf.aboutSentence}</p>
     </div>
 
