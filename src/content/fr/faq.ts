@@ -65,8 +65,9 @@ const rawItems: FaqContent['items'] = [
          contre-poids du modèle, avant le tableau. */
       'R Start n’est pas une SCPI sans frais. Ce modèle n’existe pas. R Start n’est pas non plus moins chère qu’une SCPI traditionnelle. Son modèle de frais est différent : si les reventes d’immeubles génèrent de fortes plus-values, les commissions peuvent dépasser ce qu’aurait coûté une commission de souscription classique.',
     ],
+    /* « TTC » dans l'en-tête et renvoi vers le comparateur (25/09/2026, Martin). */
     table: {
-      head: ['Type de frais', 'Montant'],
+      head: ['Type de frais', 'Montant (TTC)'],
       rows: [
         ['Frais de souscription (à l’entrée)', '0 %'],
         ['Frais d’acquisition des immeubles', '0 %'],
@@ -79,6 +80,7 @@ const rawItems: FaqContent['items'] = [
         ['Frais de retrait anticipé (avant 8 ans)', 'dégressifs (voir plus bas)'],
       ],
     },
+    link: { label: 'Voir le comparateur de frais', href: pages.fees.path },
   },
   {
     category: RUB.frais,

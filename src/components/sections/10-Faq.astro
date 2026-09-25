@@ -259,6 +259,13 @@ const items = rendus.map((item) => {
                       {item.tableAfter?.map((paragraph) => (
                         <p class="text-base leading-snug text-ink">{paragraph}</p>
                       ))}
+                      {item.link && (
+                        <p>
+                          <a href={withBase(item.link.href)} class="link-underline text-base font-semibold text-navy">
+                            {item.link.label}
+                          </a>
+                        </p>
+                      )}
                     </div>
                   </div>
                 </details>

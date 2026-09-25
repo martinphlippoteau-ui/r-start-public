@@ -235,6 +235,8 @@ export interface FaqItem {
   /** Paragraphes rendus APRÈS le tableau ou les puces : des conclusions qui ne se lisent qu'une
       fois le tableau vu ; dans `answer`, elles seraient placées avant lui. */
   tableAfter?: string[];
+  /** Lien interne rendu en dernier, sous la réponse (25/09/2026 : renvoi vers le comparateur). */
+  link?: { label: string; href: string };
 }
 
 export interface FaqContent {
