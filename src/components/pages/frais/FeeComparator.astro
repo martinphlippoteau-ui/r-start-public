@@ -44,6 +44,20 @@ interface Props {
   plan?: 'haut';
 }
 const { id, heading, intro, plan } = Astro.props as Props;
+/** Le nombre derrière « 12 % », pour la seule teinte des segments de la frise. */
+const tauxDe = (rate: string): number => parseFloat(rate.replace(',', '.')) || 0;
+const tauxMax = (tiers: readonly { rate: string }[]): number =>
+  Math.max(...tiers.map((t) => tauxDe(t.rate)), 1);
+/**
+ * La condition d'un palier en DEUX LIGNES dans la frise (25/09/2026, Martin : « Si plus-value
+ * < 7 % sur deux lignes aussi »), coupée avant son dernier signe de comparaison : « Si plus-value »
+ * puis « < 7 % », « Si 7 % < plus-value » puis « < 13 % », « Si sortie » puis « > 8 ans ». Le texte
+ * ne change pas, seule la coupe est imposée ; sans signe, une seule ligne.
+ */
+const couper = (when: string): [string, string | null] => {
+  const i = Math.max(when.lastIndexOf(' < '), when.lastIndexOf(' > '));
+  return i < 0 ? [when, null] : [when.slice(0, i), when.slice(i + 1)];
+};
 const titleId = id + '-title';
 const selectId = id + '-select';
 const { rows } = comparator;
@@ -195,34 +209,38 @@ const data = scpis.map((s) => ({
                 </th>
                 <td role="cell" class="px-3 py-5 text-center align-top sm:px-5">
                   {
-                    /* Un taux unique, ou un BARÈME À PALIERS (22/09/2026, à la présentation de la
-                      brochure, la même pour la vente d'immeubles et la sortie anticipée) : un palier
-                      par ligne, en deux colonnes alignées, le taux à gauche et sa condition à côté
-                      (une grille : sur téléphone, la condition ne passe pas sous le taux). `data-fee-value` enveloppe le
-                      barème entier : c'est l'élément dont le contrôle de taille lit le corps
-                      (text-display-sm, le même que les autres taux), et son texte n'est pas un taux
-                      unique, donc jamais comparé (voir le script). */
+                    /* Un taux unique, ou un BARÈME À PALIERS EN FRISE (25/09/2026, proposition
+                      retenue par Martin parmi dix essayées ; ex-grille à deux colonnes du
+                      22/09/2026) : les paliers côte à côte, le taux au-dessus, un segment de
+                      couleur, la condition dessous ; la teinte du segment s'assombrit avec le taux
+                      affiché, rien d'autre n'est proportionné. Sous `lg`, la case est trop étroite
+                      pour cinq paliers : la frise redevient une liste, taux à gauche et condition
+                      à côté (les `li` en `contents`, le segment masqué). `data-fee-value` (un
+                      <div> : une liste ne peut pas vivre dans un <span>) enveloppe le barème
+                      entier : c'est l'élément dont le contrôle de taille lit le corps
+                      (text-display-sm, le même que les autres taux, hérité par chaque taux de la
+                      frise), et son texte n'est pas un taux unique, donc jamais comparé (voir le
+                      script). */
                   }
                   {row.rstartTiers ? (
-                    <span data-fee-value class="text-display-sm w-full text-navy">
-                      {/* La grille est DANS l'élément `data-fee-value` : global.css force celui-ci en
-                        `inline-block` pour la pastille du gagnant, une grille posée dessus était
-                        écrasée. Deux colonnes, les taux alignés à gauche entre eux ; la grille a une
-                        largeur FIXE, pour que les taux des deux barèmes (vente, sortie) tombent sur
-                        le même axe d'une ligne à l'autre. CALÉE À DROITE de la colonne et non
-                        centrée (demande de Martin) : les taux se rapprochent des valeurs centrées
-                        des lignes du dessus. Seize rem : la ligne la plus longue (« 12 % Si 7 % <
-                        plus-value < 13 % ») y tient sans se replier ; sur téléphone, `max-w-full`
-                        ramène la grille à la largeur de la case. */}
-                      <span class="ml-auto grid w-[16rem] max-w-full grid-cols-[auto_1fr] items-baseline gap-x-2 gap-y-1 text-left">
+                    <div data-fee-value class="text-display-sm w-full text-navy">
+                      <ol class="grid grid-cols-[auto_1fr] items-baseline gap-x-2 gap-y-1 text-left lg:flex lg:items-stretch lg:gap-1 lg:text-center">
                         {row.rstartTiers.map((tier) => (
-                          <>
+                          <li class="contents lg:flex lg:flex-1 lg:flex-col lg:items-center">
                             <span>{tier.rate}</span>
-                            <span class="text-caption font-normal text-slate-700">{tier.when}</span>
-                          </>
+                            <span
+                              aria-hidden="true"
+                              class="segment hidden h-1.5 w-full lg:mt-1.5 lg:block"
+                              style={`background: color-mix(in srgb, var(--color-navy) ${20 + (80 * tauxDe(tier.rate)) / tauxMax(row.rstartTiers!)}%, var(--color-teal-100))`}
+                            />
+                            <span class="text-caption font-normal text-slate-700 lg:mt-1.5 lg:px-0.5 lg:leading-tight">
+                              {couper(tier.when)[0]}
+                              {couper(tier.when)[1] && <span class="lg:block"> {couper(tier.when)[1]}</span>}
+                            </span>
+                          </li>
                         ))}
-                      </span>
-                    </span>
+                      </ol>
+                    </div>
                   ) : (
                     <span data-fee-value class="text-display-sm text-navy">
                       {row.rstart}
@@ -462,3 +480,15 @@ const data = scpis.map((s) => ({
      une seule fois même quand les deux composants coexistent sur une page (c'est le cas de l'accueil). */
   import '@/scripts/infoToggle';
 </script>
+
+<style>
+  /* La frise des barèmes : bouts arrondis au premier et au dernier segment seulement. */
+  li:first-child > .segment {
+    border-start-start-radius: 9999px;
+    border-end-start-radius: 9999px;
+  }
+  li:last-child > .segment {
+    border-start-end-radius: 9999px;
+    border-end-end-radius: 9999px;
+  }
+</style>

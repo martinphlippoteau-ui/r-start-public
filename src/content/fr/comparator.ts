@@ -79,7 +79,8 @@ export type ComparatorRowKey =
   'subscription' | 'acquisition' | 'broker' | 'management' | 'works' | 'disposal' | 'withdrawal';
 
 /**
- * BARÈMES À PALIERS (22/09/2026, demande de Martin, à la présentation de la brochure) : la vente
+ * BARÈMES À PALIERS (22/09/2026, demande de Martin, à la présentation de la brochure ; en FRISE
+ * depuis le 25/09/2026, FeeComparator.astro) : la vente
  * d'immeubles et la sortie anticipée affichent leurs paliers, taux et condition, au lieu d'une
  * fourchette. Taux et bornes viennent de facts.ts ; seule la tournure est écrite ici. ET AUCUNE
  * COMPARAISON sur ces lignes (« pour les frais où il y a des fourchettes ne mets pas de
