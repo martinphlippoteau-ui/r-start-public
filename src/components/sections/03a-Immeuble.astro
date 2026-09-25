@@ -14,28 +14,16 @@
  * (enveloppe -top-[12%] h-[124%], data-parallax 0.08, déclencheur = cadre parent) sans jamais
  * découvrir le bord. Sans JS ou en reduced-motion : image statique complète.
  * Chargement lazy (loin du LCP), formats avif/webp, largeurs jusqu'à 2400 px pour les écrans denses.
- * RÉUTILISÉE SUR /strategie (25/09/2026, Martin : « une bande pas trop grande en hauteur
- * d'illustration comme sur la home », à la place de la canalisation entre les moteurs et les volets) :
- * `id`, `image` (clé de media.ts) et `basse` (cadre clamp(14rem, 32vh, 22rem)) en props ; sans
- * props, la bande de l'accueil est inchangée.
  */
 import { Picture } from 'astro:assets';
 import { media } from '@/content/fr/media';
 import { resolveImage } from '@/lib/images';
 
-interface Props {
-  id?: string;
-  /** Clé de media.ts : `hero` (media.hero.main, par défaut) ou `corum`. */
-  image?: 'hero' | 'corum';
-  /** Bande basse : clamp(14rem, 32vh, 22rem) au lieu de clamp(24rem, 60vh, 44rem). */
-  basse?: boolean;
-}
-const { id = 'immeuble', image: cle = 'hero', basse = false } = Astro.props as Props;
-const visuel = cle === 'corum' ? media.corum : media.hero.main;
+const id = 'immeuble';
 /** Libellé lu par les lecteurs d'écran pour cette région sans titre. */
 const label = 'Illustration';
-const image = await resolveImage(visuel.src);
-const alt = visuel.alt;
+const image = await resolveImage(media.hero.main.src);
+const alt = media.hero.main.alt;
 /** Parallaxe douce d'un seul sens ; l'enveloppe surdimensionnée de ±12 % absorbe la course. */
 const PARALLAX = 0.08;
 const sizes = '100vw';
@@ -43,7 +31,7 @@ const sizes = '100vw';
 
 <section id={id} data-section={id} aria-label={label} class="relative bg-white text-ink">
   <figure>
-    <div class:list={['relative overflow-hidden', basse ? 'h-[clamp(14rem,32vh,22rem)]' : 'h-[clamp(24rem,60vh,44rem)]']}>
+    <div class="relative h-[clamp(24rem,60vh,44rem)] overflow-hidden">
       <div
         class="absolute inset-x-0 -top-[12%] h-[124%]"
         data-parallax={String(PARALLAX)}
