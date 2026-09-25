@@ -119,10 +119,17 @@ const data = scpis.map((s) => ({
             <th role="columnheader" scope="col" class="w-[34%] p-0">
               <span class="visually-hidden">{comparator.feeColumnLabel}</span>
             </th>
+            {
+              /* COLLÉ À LA BARRE (25/09/2026, Martin) : la barre flottante se contracte au défilement
+                par `scale(0.95)` depuis son bord haut (global.css, `[data-stuck]`), son bas visible
+                remonte donc de 5 % de sa hauteur ; l'en-tête se colle à ce bas visible et non à sa
+                boîte, sinon une bande de page défilait entre les deux. En mouvement réduit, la barre
+                ne se contracte pas et l'en-tête passe 3 px sous elle, sans que rien ne se voie. */
+            }
             <th
               role="columnheader"
               scope="col"
-              class="sticky top-nav-total z-10 w-[33%] border-b border-navy/12 bg-white px-3 pb-3 align-bottom sm:px-5 md:pb-5"
+              class="sticky top-[calc(var(--spacing-nav-gap)+var(--spacing-subnav)*0.95)] z-10 w-[33%] border-b border-navy/12 bg-white px-3 pb-3 align-bottom sm:px-5 md:pb-5"
             >
               {
                 /* Le logo prend la hauteur de la colonne de droite, intitulé plus liste déroulante : les
@@ -142,7 +149,7 @@ const data = scpis.map((s) => ({
             <th
               role="columnheader"
               scope="col"
-              class="sticky top-nav-total z-10 w-[33%] border-b border-navy/12 bg-white px-3 pb-3 align-bottom sm:px-5 md:pb-5"
+              class="sticky top-[calc(var(--spacing-nav-gap)+var(--spacing-subnav)*0.95)] z-10 w-[33%] border-b border-navy/12 bg-white px-3 pb-3 align-bottom sm:px-5 md:pb-5"
             >
               {
                 /* Intitulé VISIBLE : il nomme ce que la colonne oppose à R Start, là où « SCPI à
