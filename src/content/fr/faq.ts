@@ -139,7 +139,7 @@ const rawItems: FaqContent['items'] = [
     category: RUB.investir,
     question: 'Quelle est la stratégie d’investissement ?',
     answer: [
-      'R Start cherche à acheter des immeubles au bon prix, à les louer pour percevoir des loyers réguliers, à les valoriser si besoin, puis à les revendre avec une plus-value quand le marché s’y prête. Ses deux moteurs de performance sont ainsi activés : les loyers pendant la détention et la plus-value à la revente. Elle vise plutôt des immeubles de taille moyenne (entre 5 et 10 millions d’euros), souvent moins convoités et donc plus faciles à négocier à l’achat.',
+      'R Start cherche à acheter des immeubles au bon prix selon l’analyse de nos gérants, à les louer pour percevoir des loyers réguliers, à les valoriser si besoin, puis à les revendre avec une plus-value quand le marché s’y prête. Ses deux moteurs de performance sont ainsi activés : les loyers pendant la détention et la plus-value à la revente. Elle vise plutôt des immeubles de taille moyenne (entre 5 et 10 millions d’euros), souvent moins convoités et donc plus faciles à négocier à l’achat.',
     ],
   },
   {
