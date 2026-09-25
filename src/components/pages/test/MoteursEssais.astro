@@ -29,8 +29,9 @@ const MARQUE_FOND = MARQUE.slice(0, MARQUE.indexOf('Z') + 1);
 /** L'immeuble vendu (carte des plus-values) : cadre et grille (src/lib/immeuble.ts). */
 const CADRE = { x: 22, y: 26, w: 56, h: 60 };
 const FEN = fenetres(CADRE, { colonnes: 3, rangees: 4, taille: 8, ecart: 4 });
-/** Trois entreprises à gauche, trois épargnants à droite, aux mêmes hauteurs. */
-const RANGS = [30, 56, 82];
+/** Trois entreprises à gauche, trois épargnants à droite, aux mêmes hauteurs. Vingt-huit unités
+    d'écart : l'icône d'entreprise fait vingt-deux de haut, il reste six entre deux. */
+const RANGS = [28, 56, 84];
 ---
 
 <Section id="moteurs-essais" tone="paper">
@@ -60,14 +61,14 @@ const RANGS = [30, 56, 82];
                           immeuble derrière, une équipe de trois personnes devant. */}
                         {RANGS.map((y, e) => (
                           <g class="locataire" style={`--e:${e}`}>
-                            <rect x="28" y={y - 12} width="22" height="15" rx="2" class="cadre" />
-                            <path d={`M32 ${y - 8}h8M32 ${y - 5}h8`} class="trait-fin" />
-                            <circle cx="33" cy={y + 3} r="2.6" class="cadre-plein" />
-                            <circle cx="45" cy={y + 3} r="2.6" class="cadre-plein" />
-                            <circle cx="39" cy={y + 2} r="3" class="cadre-plein" />
-                            <path d={`M27 ${y + 12}c0-3.5 2.5-5.5 6-5.5s6 2 6 5.5`} class="cadre-plein" />
-                            <path d={`M39 ${y + 12}c0-3.5 2.5-5.5 6-5.5s6 2 6 5.5`} class="cadre-plein" />
-                            <path d={`M32 ${y + 12}c0-4 3-6.5 7-6.5s7 2.5 7 6.5`} class="cadre-plein" />
+                            <rect x="29" y={y - 11} width="20" height="13" rx="2" class="cadre" />
+                            <path d={`M33 ${y - 7.5}h7M33 ${y - 4.5}h7`} class="trait-fin" />
+                            <circle cx="33.5" cy={y + 3} r="2.4" class="cadre-plein" />
+                            <circle cx="44.5" cy={y + 3} r="2.4" class="cadre-plein" />
+                            <circle cx="39" cy={y + 2} r="2.8" class="cadre-plein" />
+                            <path d={`M28 ${y + 11}c0-3 2.5-5 5.5-5s5.5 2 5.5 5`} class="cadre-plein" />
+                            <path d={`M39 ${y + 11}c0-3 2.5-5 5.5-5s5.5 2 5.5 5`} class="cadre-plein" />
+                            <path d={`M32.5 ${y + 11}c0-3.5 3-6 6.5-6s6.5 2.5 6.5 6`} class="cadre-plein" />
                           </g>
                         ))}
                         {RANGS.map((y) => (
