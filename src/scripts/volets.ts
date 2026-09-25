@@ -22,7 +22,12 @@ const init = (): void => {
     const pile = bloc.querySelector<HTMLElement>('[data-volets-panneaux]');
     if (!liste || !pile || !onglets.length || onglets.length !== panneaux.length) continue;
 
-    liste.setAttribute('role', 'tablist');
+    /* Le rôle `tablist` va sur la LISTE elle-même, ses <li> deviennent neutres : posé sur le <nav>,
+       les onglets avaient un <ul> et des <li> entre eux et leur tablist, ce que l'ARIA refuse
+       (audit Lighthouse du 25/09/2026). */
+    const ul = liste.querySelector('ul');
+    (ul ?? liste).setAttribute('role', 'tablist');
+    if (ul) for (const li of ul.children) li.setAttribute('role', 'presentation');
     onglets.forEach((onglet, i) => {
       const panneau = panneaux[i]!;
       onglet.setAttribute('role', 'tab');
