@@ -21,13 +21,24 @@ import Quotes from '@/components/pages/presse/Quotes.astro';
 import Contacts from '@/components/pages/presse/Contacts.astro';
 import { pages } from '@/config/pages';
 import { press } from '@/content/fr/press';
-import { breadcrumbJsonLd, organizationJsonLd, webPageJsonLd } from '@/lib/seo';
+import { breadcrumbJsonLd, listeJsonLd, socleJsonLd, webPageJsonLd } from '@/lib/seo';
 
 const path = pages.press.path;
 const jsonLd = [
-  organizationJsonLd(),
-  webPageJsonLd({ path, title: press.seo.title, description: press.seo.description }),
+  ...socleJsonLd(),
+  webPageJsonLd({ path, title: press.seo.title, description: press.seo.description, type: 'CollectionPage' }),
   breadcrumbJsonLd('press'),
+  /* La revue de presse affichée, article par article (titre, média, date, lien). */
+  listeJsonLd(
+    press.coverage.title,
+    press.coverage.items.map((a) => ({
+      '@type': 'NewsArticle',
+      headline: a.title,
+      publisher: { '@type': 'Organization', name: a.media },
+      datePublished: a.dateIso,
+      url: a.url,
+    }))
+  ),
 ];
 ---
 

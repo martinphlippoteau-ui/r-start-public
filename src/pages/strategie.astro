@@ -20,13 +20,13 @@ import Risks from '@/components/sections/08-Risks.astro';
 import Faq from '@/components/sections/10-Faq.astro';
 import { pages } from '@/config/pages';
 import { strategyPage } from '@/content/fr/strategyPage';
-import { breadcrumbJsonLd, organizationJsonLd, webPageJsonLd } from '@/lib/seo';
+import { breadcrumbJsonLd, socleJsonLd, webPageJsonLd } from '@/lib/seo';
 
 const page = pages.strategy;
 const { seo, hero } = strategyPage;
 
 const jsonLd = [
-  organizationJsonLd(),
+  ...socleJsonLd(),
   webPageJsonLd({ path: page.path, title: seo.title, description: seo.description }),
   breadcrumbJsonLd('strategy'),
 ];

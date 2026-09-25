@@ -19,13 +19,13 @@ import StickyCta from '@/components/StickyCta.astro';
 import Faq from '@/components/sections/10-Faq.astro';
 import { pages } from '@/config/pages';
 import { faq } from '@/content/fr/faq';
-import { breadcrumbJsonLd, faqJsonLd, organizationJsonLd, webPageJsonLd } from '@/lib/seo';
+import { breadcrumbJsonLd, faqJsonLd, socleJsonLd, webPageJsonLd } from '@/lib/seo';
 
 const page = pages.faq;
 const titre = faq.pageTitle ?? faq.title;
 
 const jsonLd = [
-  organizationJsonLd(),
+  ...socleJsonLd(),
   webPageJsonLd({ path: page.path, title: titre, description: faq.pageDescription }),
   breadcrumbJsonLd('faq'),
   /* Le JSON-LD porte les DIX-HUIT questions, et non les quatre de l'accueil : c'est cette page que les

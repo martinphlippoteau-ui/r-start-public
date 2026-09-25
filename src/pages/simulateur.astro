@@ -22,15 +22,16 @@ import Simulator from '@/components/pages/simulateur/Simulator.astro';
 import SimulatorGate from '@/components/pages/simulateur/SimulatorGate.astro';
 import { pages } from '@/config/pages';
 import { simulator } from '@/content/fr/simulator';
-import { breadcrumbJsonLd, organizationJsonLd, webPageJsonLd } from '@/lib/seo';
+import { applicationJsonLd, breadcrumbJsonLd, socleJsonLd, webPageJsonLd } from '@/lib/seo';
 
 const page = pages.simulator;
 const { seo, hero } = simulator;
 
 const jsonLd = [
-  organizationJsonLd(),
+  ...socleJsonLd(),
   webPageJsonLd({ path: page.path, title: seo.title, description: seo.description }),
   breadcrumbJsonLd('simulator'),
+  applicationJsonLd({ path: page.path, name: hero.title, description: seo.description }),
 ];
 ---
 

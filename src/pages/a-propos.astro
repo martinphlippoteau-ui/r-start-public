@@ -25,14 +25,14 @@ import CorumRange from '@/components/pages/a-propos/CorumRange.astro';
 import Risks from '@/components/sections/08-Risks.astro';
 import { pages } from '@/config/pages';
 import { aboutPage } from '@/content/fr/aboutPage';
-import { breadcrumbJsonLd, organizationJsonLd, webPageJsonLd } from '@/lib/seo';
+import { breadcrumbJsonLd, socleJsonLd, webPageJsonLd } from '@/lib/seo';
 
 const page = pages.about;
 const { seo, hero } = aboutPage;
 
 const jsonLd = [
-  organizationJsonLd(),
-  webPageJsonLd({ path: page.path, title: seo.title, description: seo.description }),
+  ...socleJsonLd(),
+  webPageJsonLd({ path: page.path, title: seo.title, description: seo.description, type: 'AboutPage' }),
   breadcrumbJsonLd('about'),
 ];
 ---

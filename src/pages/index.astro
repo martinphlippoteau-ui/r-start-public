@@ -16,7 +16,7 @@ import { seo } from '@/content/fr/seo';
 import { faq } from '@/content/fr/faq';
 import { difference } from '@/content/fr/difference';
 import { subscribe } from '@/content/fr/subscribe';
-import { faqJsonLd, organizationJsonLd, webPageJsonLd } from '@/lib/seo';
+import { faqJsonLd, socleJsonLd, webPageJsonLd } from '@/lib/seo';
 /* 04-Strategy EST EXCLUE DU MOTIF (audit du 18/09/2026) : elle n'est rendue que par /strategie, qui
    l'importe directement. Astro rattache à une page la CSS de tout module qu'elle importe : l'accueil
    chargeait donc en bloquant les 20 Ko de sa feuille (31 @keyframes), dont aucun sélecteur n'existe
@@ -43,7 +43,7 @@ const rest = HOME_ORDER.slice(1)
   .filter((s): s is NonNullable<typeof s> => s !== undefined);
 
 const jsonLd = [
-  organizationJsonLd(),
+  ...socleJsonLd(),
   webPageJsonLd({
     path: '/',
     title: seo.title,

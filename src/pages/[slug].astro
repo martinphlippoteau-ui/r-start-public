@@ -16,7 +16,7 @@ import { legalPages } from '@/content/fr/pages';
 import { consent } from '@/content/fr/consent';
 import { pages, type PageKey } from '@/config/pages';
 import { slug } from '@/lib/ancre';
-import { breadcrumbJsonLd, organizationJsonLd, webPageJsonLd } from '@/lib/seo';
+import { breadcrumbJsonLd, socleJsonLd, webPageJsonLd } from '@/lib/seo';
 
 export const getStaticPaths = (() =>
   legalPages.map((page) => ({
@@ -29,7 +29,7 @@ const pageKey = ((Object.keys(pages) as PageKey[]).find((k) => pages[k].path ===
   'legal') as PageKey;
 const noindex = pageKey === 'cookies';
 const jsonLd = [
-  organizationJsonLd(),
+  ...socleJsonLd(),
   webPageJsonLd({ path: page.path, title: page.title, description: page.description }),
   breadcrumbJsonLd(pageKey),
 ];

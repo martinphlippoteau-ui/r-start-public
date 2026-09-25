@@ -25,13 +25,13 @@ import PageHero from '@/components/ui/PageHero.astro';
 import FeeComparator from '@/components/pages/frais/FeeComparator.astro';
 import { pages } from '@/config/pages';
 import { feesPage } from '@/content/fr/feesPage';
-import { breadcrumbJsonLd, organizationJsonLd, webPageJsonLd } from '@/lib/seo';
+import { breadcrumbJsonLd, socleJsonLd, webPageJsonLd } from '@/lib/seo';
 
 const page = pages.fees;
 const { seo, hero, cta } = feesPage;
 
 const jsonLd = [
-  organizationJsonLd(),
+  ...socleJsonLd(),
   webPageJsonLd({ path: page.path, title: seo.title, description: seo.description }),
   breadcrumbJsonLd('fees'),
   /* PAS DE FAQPage ICI (audit du 18/09/2026) : la section Questions de la page a été retirée, mais

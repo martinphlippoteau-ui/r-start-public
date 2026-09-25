@@ -24,16 +24,30 @@ import DocumentsNav from '@/components/pages/documentation/DocumentsNav.astro';
 import HowTo from '@/components/pages/documentation/HowTo.astro';
 import { pages } from '@/config/pages';
 import { documentation } from '@/content/fr/documentation';
-import { breadcrumbJsonLd, organizationJsonLd, webPageJsonLd } from '@/lib/seo';
+import { absoluteUrl, breadcrumbJsonLd, listeJsonLd, socleJsonLd, webPageJsonLd } from '@/lib/seo';
 
 const { seo, hero, groups, howTo, faq, corumLink, mention, cta } = documentation;
 const labels = documentation.labels ?? {};
 const path = pages.documentation.path;
 
 const jsonLd = [
-  organizationJsonLd(),
-  webPageJsonLd({ path, title: seo.title, description: seo.description }),
+  ...socleJsonLd(),
+  webPageJsonLd({ path, title: seo.title, description: seo.description, type: 'CollectionPage' }),
   breadcrumbJsonLd('documentation'),
+  /* Les documents publiés, tels qu'affichés (titre, description, PDF). */
+  listeJsonLd(
+    hero.title,
+    groups.flatMap((g) =>
+      g.items.map((d) => ({
+        '@type': 'DigitalDocument',
+        name: d.title,
+        description: d.description,
+        url: absoluteUrl(d.file),
+        encodingFormat: 'application/pdf',
+        inLanguage: 'fr',
+      }))
+    )
+  ),
 ];
 
 /** Détail lu par les lecteurs d'écran après le titre de chaque lien de document (ex. « PDF, nouvelle fenêtre »). */
