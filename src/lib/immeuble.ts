@@ -1,6 +1,6 @@
 /**
  * Fenêtres d'un immeuble dessiné au trait, pour les illustrations des cartes de /strategie
- * (EngineGain, StrategySelect, StrategyTiming ; EngineRent garde ses fenêtres écrites en dur). UN
+ * (EngineGain, StrategySelect, StrategyTiming ; EngineRent dessine un locataire, pas un immeuble). UN
  * IMMEUBLE, C'EST UN CADRE ET UNE GRILLE DE FENÊTRES : c'est ce qui le fait lire comme un immeuble
  * à n'importe quelle taille, là où trois traits dans un carré se lisaient comme un graphique
  * (« remplace les carrés qui ressemblent à des graphes par quelque chose qui ressemble à des

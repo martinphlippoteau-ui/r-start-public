@@ -1,238 +1,123 @@
 ---
 /**
- * Illustration du moteur 01, « Les loyers versés par les entreprises locataires ». Même grammaire
- * que les quatre autres dessins des cartes (StrategySelect.astro la décrit en tête) ; format 236 ×
- * 100 ; décorative (aria-hidden). CE QU'ELLE DIT : des entreprises occupent l'immeuble, et il en
- * sort un flux RÉGULIER vers R Start, pendant exact du moteur 02 qui montre un gain ponctuel. Les
- * fenêtres s'allument dans un ordre mélangé et fixe, les deux tiers restant allumées à tout
- * instant : l'immeuble est OCCUPÉ, il ne clignote pas. Trois versements en vol, à intervalles
- * égaux, chacun ABSORBÉ par la marque qui répond par une onde et un éclat : c'est l'arrivée qui
- * fait battre, pas une horloge. Le vol reste LINÉAIRE, la régularité est le sujet ; seuls le départ
- * et l'arrivée sont courbés (mouvement repris le 16/09/2026, demande de l'équipe).
- * AUCUN CHIFFRE, aucune échelle, rien qui monte : le flux est régulier, pas croissant. L'image ne
- * dit rien du montant ni de la régularité future des loyers, elle nomme le mécanisme.
+ * Illustration du moteur 01, « Les loyers ». Même grammaire que les quatre autres dessins des
+ * cartes (StrategySelect.astro la décrit en tête) ; format 236 × 100 ; décorative (aria-hidden).
+ * Dessin retenu par Martin le 24/09/2026 (« la répartition », après cinq pistes et dix variations
+ * sur /test, audité et reporté le 25/09/2026) à la place du flux immeuble → marque du 16/09/2026.
+ * CE QU'ELLE DIT : UN locataire, une entreprise (un immeuble derrière, son équipe devant, d'après
+ * l'exemple de Martin), légendé « Locataires » ; son loyer gagne R Start, qui le partage entre
+ * trois épargnants (EnginePartage.astro, commun au moteur 02). Le loyer part toutes les 4 s,
+ * deux fois par cycle de 8 s : la RÉGULARITÉ est le sujet, pendant exact du moteur 02 où le
+ * versement est ponctuel. AUCUN CHIFFRE, aucune échelle, rien qui monte : le flux est régulier,
+ * pas croissant. L'image ne dit rien du montant ni de la régularité future des loyers, elle nomme
+ * le mécanisme.
+ * Repos = image complète, le loyer à mi-chemin ; en pause hors écran (`data-in-view`).
  */
-
-/* Trois versements en vol, à intervalles égaux. Retards NÉGATIFS : au premier regard, le flux est déjà
-   installé, la ligne n'attend pas son premier point. */
-const versements = [0, 1, 2];
-/* Trois colonnes de quatre fenêtres, index = colonne × 4 + ligne. */
-const fenetres = [0, 1, 2].flatMap((colonne) => [0, 1, 2, 3].map((ligne) => ({ colonne, ligne })));
-/* Ordre d'allumage, mélangé une fois pour toutes (une permutation de 0 à 11, une phase par
-   fenêtre). Deux voisines n'ont jamais deux phases voisines : l'œil ne doit lire ni colonne ni
-   ligne, seulement un immeuble qui vit. */
-const PHASES = [5, 0, 9, 3, 11, 7, 1, 8, 4, 10, 2, 6];
+import EnginePartage from '@/components/EnginePartage.astro';
 ---
 
 <figure class="rent-figure" aria-hidden="true" data-in-view="illus-en-vue">
   <svg viewBox="0 0 236 100" fill="none" class="rent-svg">
-    {/* L'immeuble : les entreprises locataires que la ligne nomme. */}
-    <rect x="24" y="22" width="60" height="62" rx="5" class="rent-cadre" />
-    {
-      fenetres.map(({ colonne, ligne }, i) => (
-        <rect
-          x={35 + colonne * 15}
-          y={32 + ligne * 13}
-          width="9"
-          height="8"
-          rx="1.5"
-          class="rent-fenetre"
-          style={`--phase:${PHASES[i]}`}
-        />
-      ))
-    }
+    {/* Le locataire : l'immeuble derrière, l'équipe devant (fond blanc pour passer devant). */}
+    <g class="rent-locataire">
+      <rect x="22" y="26" width="34" height="24" rx="3" class="rent-trait" />
+      <path d="M28 32h12M28 37h12M28 42h12" class="rent-trait-fin" />
+      <circle cx="29" cy="55" r="4.2" class="rent-personne" />
+      <circle cx="49" cy="55" r="4.2" class="rent-personne" />
+      <circle cx="39" cy="53" r="5" class="rent-personne" />
+      <path d="M19 70c0-5.5 4.5-9 10-9s10 3.5 10 9" class="rent-personne" />
+      <path d="M39 70c0-5.5 4.5-9 10-9s10 3.5 10 9" class="rent-personne" />
+      <path d="M27 70c0-6.5 5.5-11 12-11s12 4.5 12 11" class="rent-personne" />
+    </g>
+    <text x="39" y="86" class="rent-libelle">Locataires</text>
 
-    {/* Le chemin des versements, de l'immeuble vers la marque. */}
-    <path d="M92 56h94" class="rent-ligne" />
-    {
-      /* Deux niveaux par versement : le groupe VOLE (translation linéaire, d'un bout à l'autre), le
-        disque NAÎT ET S'ÉTEINT (échelle et opacité, courbées). Une seule propriété `transform` par
-        élément : les deux mouvements ne se disputent pas la même courbe. */
-    }
-    {
-      versements.map((i) => (
-        <g class="rent-versement" style={`--rang:${i}`}>
-          <circle cx="90" cy="56" r="3.2" class="rent-versement-corps" />
-        </g>
-      ))
-    }
+    {/* Le loyer, du locataire à la marque. */}
+    <path d="M66 56h26" class="rent-chemin" />
+    <circle cx="66" cy="56" r="3.2" class="rent-loyer" />
 
-    {/* L'onde de réception : un anneau qui naît sous la marque et s'élargit à chaque arrivée. */}
-    <circle cx="206" cy="55" r="18" class="rent-onde" />
-
-    {
-      /* Ce qui reçoit : la marque R Start (16/09/2026, demande de l'équipe : « le rond tout à
-        droite doit être le logo avec que le R »), la première forme de
-        src/assets/logos/r-start-blanc.svg, la goutte au R évidé. `<svg>` imbriqué et non `<use>` :
-        le fichier est un `astro:assets`, il n'est pas servi tel quel à une URL stable. Son propre
-        viewBox (94,08 × 88,98, la boîte exacte du tracé, mesurée) le recale sans le déformer. Elle
-        S'ÉCLAIRE à chaque versement reçu, sans changer de taille : une marque qui grossit et
-        rapetisse a l'air d'un bouton. */
-    }
-    <svg x="190" y="40" width="32" height="30" viewBox="0 0 94.08 88.98" class="rent-marque">
-      <path d="M68.21.17C36.7,3.24,5.47,23.07,2.44,29.88c-11.59,26.1,21.48,52.52,27.22,55.34,21.52,10.59,48.04-1.99,59.51-27.5C93.5,48.09,104.2-3.34,68.21.17ZM64.76,69.76c-1.25,0-2.36-.57-3.09-1.47l-2.84-3.52c-4.06-4.98-10.05-12.1-12.26-13.54-1.92-1.22-4.48-1.84-7.59-1.84l-7.96.02c-2.02,0-3.66-1.64-3.66-3.66s1.64-3.66,3.66-3.66h18.33c3.05-.01,5.54-2.14,5.54-4.76s-2.49-4.74-5.54-4.74h-18.34c-2.02,0-3.66-1.63-3.66-3.65s1.64-3.66,3.66-3.66h18.34c7.58,0,13.73,5.4,13.73,12.05,0,4.74-3.2,9.03-8.07,10.97,3.22,3.36,7.64,8.61,11.3,13.08l1.52,1.86c.57.69.91,1.57.91,2.54,0,2.2-1.79,3.99-3.99,3.99Z" />
-    </svg>
+    <EnginePartage />
   </svg>
 </figure>
 
 <style>
   .rent-figure {
     margin: 0;
-    /* Pleine largeur de la carte : enfant d\'une boîte flex, la figure retomberait sinon à la largeur
+    /* Pleine largeur de la carte : enfant d'une boîte flex, la figure retomberait sinon à la largeur
        intrinsèque du SVG, 300 px. */
     width: 100%;
-    /* Un versement vit quatre secondes, de l'émission à l'absorption ; il en part un toutes les
-       1,333 s, d'où trois en vol. Les fenêtres tournent sur le cycle commun des cinq dessins, 8 s. */
-    --vol: 4s;
-    --intervalle: calc(var(--vol) / 3);
-    --cycle: 8s;
-    /* Décalage posé par la section (--illus-decalage) : deux cartes voisines ne battent pas à l'unisson. */
+    /* Un loyer toutes les 4 s, deux par cycle commun de 8 s. Le loyer atteint la marque à 1,76 s :
+       c'est l'instant que le partage prend pour repère. */
+    --tour: 4s;
     --decal: var(--illus-decalage, 0s);
+    --partage-duree: var(--tour);
+    --partage-retard: 2s;
   }
   .rent-svg {
     display: block;
     width: 100%;
     aspect-ratio: 236 / 100;
   }
-  .rent-cadre {
+  .rent-trait {
     stroke: rgb(var(--illus-trait-rgb) / 0.38);
     stroke-width: 1.6;
   }
-  .rent-ligne {
+  .rent-trait-fin {
+    stroke: rgb(var(--illus-trait-rgb) / 0.3);
+    stroke-width: 1.2;
+    stroke-linecap: round;
+  }
+  .rent-personne {
+    fill: var(--illus-fond);
+    stroke: rgb(var(--illus-trait-rgb) / 0.55);
+    stroke-width: 1.4;
+  }
+  .rent-locataire {
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+  .rent-libelle {
+    fill: rgb(var(--illus-trait-rgb) / 0.7);
+    font-family: inherit;
+    font-size: 6.5px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-anchor: middle;
+  }
+  .rent-chemin {
     stroke: rgb(var(--illus-trait-rgb) / 0.22);
     stroke-width: 1.2;
     stroke-dasharray: 3 7;
     stroke-linecap: round;
   }
-
-  /* État de repos = image complète : l'immeuble occupé, les versements posés le long du chemin à
-     intervalles égaux, la marque pleine. */
-  .rent-fenetre {
-    fill: var(--illus-trait);
-    opacity: 0.5;
-  }
-  .rent-versement {
-    transform: translateX(calc(14px + var(--rang) * 34px));
-  }
-  .rent-versement-corps {
+  .rent-loyer {
     fill: var(--illus-trait);
     transform-box: fill-box;
     transform-origin: center;
-  }
-  .rent-onde {
-    stroke: var(--illus-accent);
-    stroke-width: 1.2;
-    opacity: 0;
-    transform-box: fill-box;
-    transform-origin: center;
-  }
-  .rent-marque {
-    fill: var(--illus-trait);
+    /* Repos : à mi-chemin. */
+    transform: translateX(13px);
   }
 
   @media (prefers-reduced-motion: no-preference) {
-    /* Douze fenêtres, douze phases réparties sur le cycle : retard négatif, l'immeuble est déjà
-       habité au premier regard. Allumée 58 % du temps, chacune s'allume vite et s'éteint lentement. */
-    .rent-fenetre {
-      animation: rent-occupation var(--cycle) infinite both;
-      animation-delay: calc(var(--decal) + var(--phase) * (var(--cycle) / -12));
+    /* Le locataire bat d'un souffle (6 %) au départ du loyer, qui gagne la marque à 1,76 s. */
+    .rent-locataire {
+      animation: rent-souffle var(--tour) infinite both;
+      animation-delay: var(--decal);
     }
-    .rent-versement {
-      animation: rent-vol var(--vol) linear infinite both;
-      animation-delay: calc(var(--decal) + var(--rang) * -1 * var(--intervalle));
-    }
-    .rent-versement-corps {
-      animation: rent-versement var(--vol) infinite both;
-      animation-delay: calc(var(--decal) + var(--rang) * -1 * var(--intervalle));
-    }
-    /* L'onde et l'éclat sont calés sur les ARRIVÉES : un versement arrive toutes les 1,333 s, le
-       premier à 1,333 s. Même période, même retard, et l'accord ne dérive jamais. */
-    .rent-onde {
-      animation: rent-onde var(--intervalle) infinite both;
-      animation-delay: calc(var(--decal) + var(--intervalle));
-    }
-    .rent-marque {
-      animation: rent-eclat var(--intervalle) infinite both;
-      animation-delay: calc(var(--decal) + var(--intervalle));
+    .rent-loyer {
+      animation: rent-loyer var(--tour) infinite both;
+      animation-delay: var(--decal);
     }
   }
-
-  @keyframes rent-occupation {
-    0% {
-      opacity: 0.16;
-      animation-timing-function: var(--ease-out-expo);
-    }
-    7% {
-      opacity: 0.62;
-      animation-timing-function: linear;
-    }
-    58% {
-      opacity: 0.62;
-      animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1);
-    }
-    72%,
-    100% {
-      opacity: 0.16;
-    }
+  @keyframes rent-loyer {
+    0% { opacity: 0; transform: translateX(0) scale(0.3); animation-timing-function: var(--ease-out-expo); }
+    6% { opacity: 1; transform: translateX(3px) scale(1); animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1); }
+    44% { opacity: 1; transform: translateX(66px) scale(1); animation-timing-function: cubic-bezier(0.7, 0, 0.84, 0); }
+    50%, 100% { opacity: 0; transform: translateX(72px) scale(0.3); }
   }
-  /* Le vol : 98 unités, du flanc de l'immeuble au bord de la marque, à vitesse constante. */
-  @keyframes rent-vol {
-    from {
-      transform: translateX(0);
-    }
-    to {
-      transform: translateX(98px);
-    }
-  }
-  /* Émission puis absorption : le disque naît en grandissant, vole plein, puis se résorbe dans la
-     marque au lieu de s'évanouir en chemin. */
-  @keyframes rent-versement {
-    0% {
-      opacity: 0;
-      transform: scale(0.3);
-      animation-timing-function: var(--ease-out-expo);
-    }
-    9% {
-      opacity: 1;
-      transform: scale(1);
-      animation-timing-function: linear;
-    }
-    86% {
-      opacity: 1;
-      transform: scale(1);
-      animation-timing-function: cubic-bezier(0.7, 0, 0.84, 0);
-    }
-    100% {
-      opacity: 0;
-      transform: scale(0.3);
-    }
-  }
-  @keyframes rent-onde {
-    0% {
-      opacity: 0;
-      transform: scale(0.7);
-      animation-timing-function: var(--ease-out-expo);
-    }
-    12% {
-      opacity: 0.6;
-      animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1);
-    }
-    100% {
-      opacity: 0;
-      transform: scale(1.45);
-    }
-  }
-  @keyframes rent-eclat {
-    0% {
-      fill-opacity: 0.55;
-      animation-timing-function: var(--ease-out-expo);
-    }
-    8% {
-      fill-opacity: 1;
-      animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1);
-    }
-    100% {
-      fill-opacity: 0.55;
-    }
+  @keyframes rent-souffle {
+    0%, 4% { transform: scale(1); animation-timing-function: var(--ease-out-expo); }
+    10% { transform: scale(1.06); animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1); }
+    30%, 100% { transform: scale(1); }
   }
 </style>

@@ -1,427 +1,107 @@
 ---
 /**
- * Illustration du moteur 02, « Les plus-values réalisées sur les ventes d'immeuble ». Même
- * grammaire que les quatre autres dessins des cartes (StrategySelect.astro la décrit en tête) ;
- * format 236 × 100, pleine largeur de la carte ; décorative (aria-hidden). Forme choisie par
- * l'équipe après trois versions écartées (16 et 17/09/2026 : « utilise une courbe de prix € qui
- * monte », puis « un petit logo avec le R de R Start qui monte et qui se transforme en € à la
- * fin »).
- * CE QU'ELLE MONTRE : l'immeuble du moteur 01 ; à sa droite un point d'achat, puis une courbe de
- * prix qui monte, révélée de gauche à droite avec la surface qu'elle couvre, la marque R Start à
- * son extrémité ; au sommet, la marque se retourne comme une pièce et la pastille « € » s'ouvre sur
- * l'autre face : la vente. SES LIMITES, tenues à la lettre : AUCUN CHIFFRE, aucun axe gradué,
- * aucune échelle, aucune date, aucune durée. La courbe MONTE ET DESCEND (24/09/2026, Martin : « je
- * veux qu'il y ait des hausses et des baisses ») : deux creux sur une tendance qui finit plus haut
- * qu'elle ne part ; elle montrait auparavant une montée sans creux. Elle nomme le mécanisme que le
- * texte de la carte décrit, elle ne dessine ni un historique ni une promesse. Le bloc Risques de la
- * page porte l'avertissement correspondant. Le signe « € » est un symbole, pas un montant.
- * LA RÉVÉLATION EST UN DÉCOUPAGE (`clip-path: inset`) qui avance à vitesse constante, sur la courbe
- * ET sa surface ensemble : les deux ont toujours le même bord. La marque est portée par
- * `offset-path`, dont la vitesse est celle du CHEMIN, pas de l'abscisse : pour rester au bord du
- * découpage, sa courbe de temps est une fonction `linear()` CALCULÉE ci-dessous à partir de la
- * géométrie. Un navigateur sans `linear()` la remplace par une progression uniforme : la marque
- * dérive de quelques unités au plus, toujours sur la courbe.
+ * Illustration du moteur 02, « Les plus-values ». Même grammaire que les quatre autres dessins des
+ * cartes (StrategySelect.astro la décrit en tête) ; format 236 × 100 ; décorative (aria-hidden).
+ * Dessin retenu par Martin le 24/09/2026 (« la répartition », après cinq pistes et dix variations
+ * sur /test ; « pas de courbe qui monte, l'AMF n'aime pas ça »), audité et reporté le 25/09/2026,
+ * à la place de la courbe de prix des 16 et 17/09/2026.
+ * CE QU'ELLE DIT : l'immeuble reçoit son panneau « Vendu », UN versement gagne R Start, qui le
+ * partage entre trois épargnants (EnginePartage.astro, commun au moteur 01). Une fois par cycle de
+ * 8 s : le versement est PONCTUEL, pendant exact du moteur 01 où le loyer est régulier. AUCUN
+ * CHIFFRE, aucun axe, aucune échelle, rien qui monte : l'image nomme le mécanisme, elle ne dessine
+ * ni un historique ni une promesse ; le bloc Risques de la page porte l'avertissement.
+ * Repos = image complète, panneau posé, versement à mi-chemin ; en pause hors écran (`data-in-view`).
  */
+import EnginePartage from '@/components/EnginePartage.astro';
 import { fenetres } from '@/lib/immeuble';
 
-/** L'immeuble du moteur 01, un peu plus étroit pour laisser la place à la courbe. */
-const CADRE = { x: 18, y: 30, w: 48, h: 54 };
-const FENETRES = fenetres(CADRE, { colonnes: 3, rangees: 4, taille: 7, ecart: 4 });
-const SOL = 84;
-
-/* La courbe : cinq cubiques raccordées tangentes à tangentes (aucun angle), du point d'achat au
-   sommet : hausse, baisse, hausse, baisse, hausse. Chaque raccord est un sommet ou un creux à
-   tangente horizontale (ses deux points de contrôle voisins sur sa propre ordonnée), les creux
-   restent au-dessus du point d'achat et chaque sommet dépasse le précédent. L'ABSCISSE NE RECULE
-   JAMAIS, points de contrôle compris : le découpage avance en x et l'échantillonnage ci-dessous
-   cherche la première abscisse atteinte. */
-type Pt = [number, number];
-const SEGMENTS: [Pt, Pt, Pt, Pt][] = [
-  [[84, 76], [92, 74], [100, 58], [108, 58]],
-  [[108, 58], [116, 58], [119, 68], [126, 68]],
-  [[126, 68], [134, 68], [144, 44], [152, 44]],
-  [[152, 44], [160, 44], [163, 52], [170, 52]],
-  [[170, 52], [178, 52], [190, 30], [204, 26]],
-];
-const DEPART = SEGMENTS[0]![0];
-const SOMMET = SEGMENTS[SEGMENTS.length - 1]![3];
-const COURBE =
-  `M${DEPART[0]} ${DEPART[1]}` +
-  SEGMENTS.map(([, p1, p2, p3]) => `C${p1[0]} ${p1[1]} ${p2[0]} ${p2[1]} ${p3[0]} ${p3[1]}`).join('');
-const SURFACE = `${COURBE}V${SOL}H${DEPART[0]}Z`;
-
-/* Échantillonnage de la courbe : pour chaque abscisse (32 pas uniformes du départ au sommet), la
-   fraction de LONGUEUR de chemin parcourue. C'est la courbe de temps de la marque : découpage à u %
-   de la largeur, marque à s(u) % du chemin. */
-const bezier = ([p0, p1, p2, p3]: [Pt, Pt, Pt, Pt], t: number): Pt => {
-  const u = 1 - t;
-  return [
-    u * u * u * p0[0] + 3 * u * u * t * p1[0] + 3 * u * t * t * p2[0] + t * t * t * p3[0],
-    u * u * u * p0[1] + 3 * u * u * t * p1[1] + 3 * u * t * t * p2[1] + t * t * t * p3[1],
-  ];
-};
-const echantillons: { x: number; l: number }[] = [{ x: DEPART[0], l: 0 }];
-let longueur = 0;
-let precedent: Pt = DEPART;
-for (const seg of SEGMENTS) {
-  for (let i = 1; i <= 100; i += 1) {
-    const p = bezier(seg, i / 100);
-    longueur += Math.hypot(p[0] - precedent[0], p[1] - precedent[1]);
-    echantillons.push({ x: p[0], l: longueur });
-    precedent = p;
-  }
-}
-const PAS = 32;
-const fractions = Array.from({ length: PAS + 1 }, (_, k) => {
-  const x = DEPART[0] + ((SOMMET[0] - DEPART[0]) * k) / PAS;
-  const e = echantillons.find((s) => s.x >= x) ?? echantillons[echantillons.length - 1]!;
-  return Math.round((e.l / longueur) * 1000) / 1000;
-});
-const TEMPS_POINTE = `linear(${fractions.join(', ')})`;
-
-/* La marque qui monte : le tracé de src/assets/logos/r-start-blanc.svg, la goutte au R évidé, le
-   même qu'EngineRent.astro et ui/MarqueR.astro. Boîte mesurée 94,08 × 88,98 ; dessinée ici à 16
-   unités de large, centrée sur (0, 0), l'ancre que le chemin déplace. À peu près le diamètre de la
-   pastille « € » (18) : une pièce qui se retourne garde sa taille. */
-const MARQUE =
-  'M68.21.17C36.7,3.24,5.47,23.07,2.44,29.88c-11.59,26.1,21.48,52.52,27.22,55.34,21.52,10.59,48.04-1.99,59.51-27.5C93.5,48.09,104.2-3.34,68.21.17ZM64.76,69.76c-1.25,0-2.36-.57-3.09-1.47l-2.84-3.52c-4.06-4.98-10.05-12.1-12.26-13.54-1.92-1.22-4.48-1.84-7.59-1.84l-7.96.02c-2.02,0-3.66-1.64-3.66-3.66s1.64-3.66,3.66-3.66h18.33c3.05-.01,5.54-2.14,5.54-4.76s-2.49-4.74-5.54-4.74h-18.34c-2.02,0-3.66-1.63-3.66-3.65s1.64-3.66,3.66-3.66h18.34c7.58,0,13.73,5.4,13.73,12.05,0,4.74-3.2,9.03-8.07,10.97,3.22,3.36,7.64,8.61,11.3,13.08l1.52,1.86c.57.69.91,1.57.91,2.54,0,2.2-1.79,3.99-3.99,3.99Z';
-/* Le R en couleur pleine, pas en trou (17/09/2026, demande de l'équipe : « pas de transparence dans
-   le R du logo »). Le R est évidé dans le tracé : on voyait la courbe au travers. Un second tracé,
-   la seule silhouette de la goutte (le premier sous-chemin), est posé EN NAVY sous la goutte sable,
-   même contour au pixel près. Navy et non ink, la teinte de la carte : un R de la couleur du fond
-   redeviendrait un trou. */
-const MARQUE_FOND = MARQUE.slice(0, MARQUE.indexOf('Z') + 1);
-const MARQUE_L = 16;
-const MARQUE_H = Math.round((MARQUE_L * 88.98) / 94.08 * 100) / 100;
+const CADRE = { x: 22, y: 26, w: 56, h: 60 };
+const FENETRES = fenetres(CADRE, { colonnes: 3, rangees: 4, taille: 8, ecart: 4 });
 ---
 
 <figure class="gain-figure" aria-hidden="true" data-in-view="illus-en-vue">
   <svg viewBox="0 0 236 100" fill="none" class="gain-svg">
-    {/* L'immeuble vendu, et le sol qu'il partage avec la courbe. */}
-    <rect x={CADRE.x} y={CADRE.y} width={CADRE.w} height={CADRE.h} rx="5" class="gain-cadre" />
+    {/* L'immeuble vendu. */}
+    <rect x={CADRE.x} y={CADRE.y} width={CADRE.w} height={CADRE.h} rx="5" class="gain-trait" />
     {FENETRES.map((f) => <rect x={f.x} y={f.y} width={f.w} height={f.h} rx="1.5" class="gain-fenetre" />)}
-    <path d={`M${CADRE.x} ${SOL + 0.5}H218`} class="gain-sol" />
-
-    {/* La courbe et sa surface, révélées ensemble par le même découpage. */}
-    <g class="gain-courbe">
-      <path d={SURFACE} class="gain-surface" />
-      <path d={COURBE} class="gain-trait" />
+    <g class="gain-panneau">
+      <rect x="30" y="14" width="40" height="16" rx="4" class="gain-panneau-fond" />
+      <text x="50" y="22.5" class="gain-panneau-texte">Vendu</text>
     </g>
 
-    {/* Le point d'achat, au départ de la courbe. */}
-    <circle cx={DEPART[0]} cy={DEPART[1]} r="3" class="gain-achat" />
+    {/* Le versement de la vente, de l'immeuble à la marque. */}
+    <circle cx="90" cy="56" r="3.2" class="gain-vente" />
 
-    {
-      /* La marque qui mène la courbe, dessinée autour de (0, 0) : le groupe extérieur est porté par
-        le chemin, le groupe intérieur (« jeton ») se retourne au sommet. Deux éléments, parce que
-        `offset-path` et `transform` se composent sur un même élément dans un ordre qu'on ne
-        choisit pas. */
-    }
-    <g class="gain-pointe">
-      <g class="gain-jeton">
-        <circle r="7" class="gain-pointe-lueur" />
-        <svg
-          x={-MARQUE_L / 2}
-          y={-MARQUE_H / 2}
-          width={MARQUE_L}
-          height={MARQUE_H}
-          viewBox="0 0 94.08 88.98"
-          class="gain-marque"
-        >
-          <path d={MARQUE_FOND} class="gain-marque-fond" />
-          <path d={MARQUE} />
-        </svg>
-      </g>
-    </g>
-
-    {/* La vente, au sommet : l'onde, puis la pastille et son signe, l'autre face de la pièce. */}
-    <circle cx={SOMMET[0]} cy={SOMMET[1]} r="13" class="gain-onde" />
-    <g class="gain-vente">
-      <circle cx={SOMMET[0]} cy={SOMMET[1]} r="9" class="gain-vente-fond" />
-      <text x={SOMMET[0]} y={SOMMET[1] + 0.5} class="gain-euro">€</text>
-    </g>
+    <EnginePartage />
   </svg>
 </figure>
 
-<style define:vars={{ courbe: `path("${COURBE}")`, tempsPointe: TEMPS_POINTE }}>
+<style>
   .gain-figure {
     margin: 0;
-    /* Pleine largeur de la carte : enfant d'une boîte flex, la figure retomberait sinon à la largeur
-       intrinsèque du SVG, 300 px. */
     width: 100%;
+    /* Une vente par cycle commun de 8 s. Le versement atteint la marque à 3,84 s : c'est l'instant
+       que le partage prend pour repère. */
     --cycle: 8s;
     --decal: var(--illus-decalage, 0s);
+    --partage-duree: var(--cycle);
+    --partage-retard: 4s;
   }
   .gain-svg {
     display: block;
     width: 100%;
     aspect-ratio: 236 / 100;
   }
-  .gain-cadre {
+  .gain-trait {
     stroke: rgb(var(--illus-trait-rgb) / 0.38);
     stroke-width: 1.6;
   }
   .gain-fenetre {
-    fill: rgb(var(--illus-trait-rgb) / 0.3);
+    fill: var(--illus-trait);
+    opacity: 0.5;
   }
-  .gain-sol {
-    stroke: rgb(var(--illus-trait-rgb) / 0.2);
-    stroke-width: 1;
-  }
-  .gain-surface {
-    fill: var(--illus-accent);
-    fill-opacity: 0.14;
-  }
-  .gain-trait {
-    stroke: var(--illus-trait);
-    stroke-width: 2;
-    stroke-linecap: round;
-  }
-  .gain-achat {
+  .gain-panneau-fond {
     fill: var(--illus-fond);
-    stroke: var(--illus-trait);
-    stroke-width: 1.4;
-    transform-box: fill-box;
-    transform-origin: center;
-  }
-  .gain-pointe-lueur {
-    fill: var(--illus-accent);
-    opacity: 0.3;
-  }
-  /* En sable (17/09/2026, demande de l'équipe : « mets-le en sable pour qu'il ressorte ») : en
-     teal-200, la goutte se fondait dans la courbe ; le sable est la seule teinte chaude du dessin,
-     celle des titres des cartes. La pastille « € » reste en bleu : c'est l'autre face. */
-  .gain-marque {
-    fill: var(--color-sand);
-    overflow: visible;
-  }
-  .gain-marque-fond {
-    fill: var(--color-navy);
-  }
-  .gain-jeton {
-    transform-box: fill-box;
-    transform-origin: center;
-  }
-  .gain-vente-fond {
-    fill: var(--illus-fond);
-    stroke: var(--illus-trait);
+    stroke: var(--illus-accent);
     stroke-width: 1.4;
   }
-  .gain-euro {
+  .gain-panneau-texte {
     fill: var(--illus-trait);
     font-family: inherit;
-    font-size: 10px;
+    font-size: 8.5px;
     font-weight: 700;
     text-anchor: middle;
     dominant-baseline: central;
   }
-
-  /* État de repos = image complète : la courbe et sa surface entières, le point d'achat, la
-     pastille au sommet ; ni marque en route ni onde. */
-  .gain-courbe {
-    clip-path: inset(0 0 0 0);
-    opacity: 1;
-  }
-  .gain-pointe {
-    offset-path: var(--courbe);
-    offset-rotate: 0deg;
-    offset-distance: 100%;
-    opacity: 0;
-  }
-  @supports not (offset-path: path('M0 0h1')) {
-    .gain-pointe {
-      display: none;
-    }
-  }
-  .gain-onde {
-    stroke: var(--illus-accent);
-    stroke-width: 1.2;
-    opacity: 0;
-    transform-box: fill-box;
-    transform-origin: center;
-  }
   .gain-vente {
-    opacity: 1;
+    fill: var(--illus-trait);
     transform-box: fill-box;
     transform-origin: center;
+    /* Repos : à mi-chemin. */
+    transform: translateX(21px);
   }
 
-  /*
-   * LE CYCLE, 8 s comme les quatre autres dessins :
-   *    0 – 10 %  silence (l'immeuble, le sol), puis le point d'achat se pose ;
-   *   10 – 42 %  la courbe se révèle de gauche à droite à vitesse constante, la marque à son bord ;
-   *   42 – 50 %  au sommet, la marque se retourne sur son axe en accélérant, et la pastille « € »
-   *              s'ouvre à sa place en freinant ; l'onde s'élargit ;
-   *   50 – 78 %  on lit ; 78 – 88 % tout s'efface ; 88 – 100 % silence.
-   */
   @media (prefers-reduced-motion: no-preference) {
-    .gain-courbe,
-    .gain-achat,
-    .gain-pointe,
-    .gain-jeton,
-    .gain-onde,
-    .gain-vente {
-      animation-duration: var(--cycle);
-      animation-iteration-count: infinite;
-      animation-fill-mode: both;
+    /* Panneau à 2,9 s, versement de 3,1 à 3,84 s ; le partage suit (EnginePartage.astro). */
+    .gain-panneau {
+      animation: gain-panneau var(--cycle) infinite both;
       animation-delay: var(--decal);
     }
-    .gain-courbe {
-      animation-name: gain-courbe;
-    }
-    .gain-achat {
-      animation-name: gain-achat;
-    }
-    .gain-pointe {
-      animation-name: gain-pointe;
-      /* La courbe de temps calculée est posée ICI, SUR L'ÉLÉMENT, et non dans l'image-clé : une
-         règle `@keyframes` est analysée sans élément, `var()` n'y est pas résolu pour
-         `animation-timing-function`, et la marque retombait sur `ease`, loin devant le bord
-         (16/09/2026). Sur l'élément, elle vaut pour tout segment qui n'en déclare pas une autre :
-         le parcours. Les autres segments écrivent la leur dans l'image-clé. */
-      animation-timing-function: var(--tempsPointe);
-    }
-    .gain-jeton {
-      animation-name: gain-jeton;
-    }
-    .gain-onde {
-      animation-name: gain-onde;
-    }
     .gain-vente {
-      animation-name: gain-vente;
+      animation: gain-vente var(--cycle) infinite both;
+      animation-delay: var(--decal);
     }
   }
-
-  @keyframes gain-courbe {
-    0%,
-    10% {
-      clip-path: inset(0 100% 0 0);
-      opacity: 1;
-      animation-timing-function: linear;
-    }
-    42% {
-      clip-path: inset(0 0 0 0);
-      animation-timing-function: linear;
-    }
-    78% {
-      clip-path: inset(0 0 0 0);
-      opacity: 1;
-      animation-timing-function: cubic-bezier(0.7, 0, 0.84, 0);
-    }
-    88%,
-    100% {
-      clip-path: inset(0 0 0 0);
-      opacity: 0;
-    }
+  @keyframes gain-panneau {
+    0%, 28% { opacity: 0; transform: translateY(6px); animation-timing-function: var(--ease-out-expo); }
+    36% { opacity: 1; transform: translateY(0); }
+    84% { opacity: 1; animation-timing-function: cubic-bezier(0.7, 0, 0.84, 0); }
+    94%, 100% { opacity: 0; transform: translateY(0); }
   }
-  @keyframes gain-achat {
-    0%,
-    5% {
-      opacity: 0;
-      transform: scale(0.4);
-      animation-timing-function: cubic-bezier(0.34, 1.3, 0.64, 1);
-    }
-    10% {
-      opacity: 1;
-      transform: scale(1);
-      animation-timing-function: linear;
-    }
-    78% {
-      opacity: 1;
-      transform: scale(1);
-      animation-timing-function: cubic-bezier(0.7, 0, 0.84, 0);
-    }
-    88%,
-    100% {
-      opacity: 0;
-      transform: scale(1);
-    }
-  }
-  /* Mêmes bornes que le découpage ; la courbe de temps de l'élément tient la marque à son bord.
-     Après le retournement, le jeton est fermé (largeur nulle) : le groupe s'éteint d'un coup, sans
-     que personne le voie, prêt pour le prochain départ. */
-  @keyframes gain-pointe {
-    0%,
-    10% {
-      offset-distance: 0%;
-      opacity: 0;
-    }
-    12% {
-      opacity: 1;
-    }
-    42% {
-      offset-distance: 100%;
-      opacity: 1;
-      animation-timing-function: linear;
-    }
-    46% {
-      offset-distance: 100%;
-      opacity: 1;
-      animation-timing-function: linear;
-    }
-    47%,
-    100% {
-      offset-distance: 100%;
-      opacity: 0;
-    }
-  }
-  /* Première moitié de la pièce qui tourne : la largeur se referme sur l'axe vertical, en accélérant,
-     comme le bord d'une pièce qui s'éloigne du regard. */
-  @keyframes gain-jeton {
-    0%,
-    42% {
-      transform: scaleX(1);
-      animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45);
-    }
-    46%,
-    100% {
-      transform: scaleX(0);
-    }
-  }
-  @keyframes gain-onde {
-    0%,
-    42% {
-      opacity: 0;
-      transform: scale(0.5);
-      animation-timing-function: var(--ease-out-expo);
-    }
-    47% {
-      opacity: 0.7;
-      animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1);
-    }
-    66%,
-    100% {
-      opacity: 0;
-      transform: scale(1.8);
-    }
-  }
-  /* Seconde moitié : l'autre face s'ouvre, en freinant. L'opacité passe à 1 dès les premiers
-     instants, quand la largeur est encore presque nulle : aucun fondu ne se voit, la face apparaît
-     bien par rotation. */
   @keyframes gain-vente {
-    0%,
-    46% {
-      opacity: 0;
-      transform: scaleX(0);
-      animation-timing-function: cubic-bezier(0, 0.55, 0.45, 1);
-    }
-    46.5% {
-      opacity: 1;
-    }
-    50% {
-      opacity: 1;
-      transform: scaleX(1);
-      animation-timing-function: linear;
-    }
-    78% {
-      opacity: 1;
-      transform: scale(1);
-      animation-timing-function: cubic-bezier(0.7, 0, 0.84, 0);
-    }
-    88%,
-    100% {
-      opacity: 0;
-      transform: scale(0.9);
-    }
+    0%, 38% { opacity: 0; transform: translateX(0) scale(0.3); animation-timing-function: var(--ease-out-expo); }
+    41% { opacity: 1; transform: translateX(4px) scale(1); animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1); }
+    48% { opacity: 1; transform: translateX(36px) scale(1); animation-timing-function: cubic-bezier(0.7, 0, 0.84, 0); }
+    51%, 100% { opacity: 0; transform: translateX(42px) scale(0.3); }
   }
 </style>

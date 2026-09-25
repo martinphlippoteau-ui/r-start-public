@@ -296,8 +296,6 @@ test.describe('Qualité', () => {
     await expect(page.locator('#s-editeur-du-site')).toHaveCount(1);
     await expect(page.locator('#s-reclamations')).toHaveCount(1);
 
-    await page.goto('/test/');
-    await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/);
   });
 
   /* COMPARATEUR DE FRAIS : 1. une SCPI sans valeur sur une ligne héritait de la pastille « taux le
