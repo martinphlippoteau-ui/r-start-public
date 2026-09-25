@@ -37,12 +37,12 @@ const rawItems: FaqContent['items'] = [
     question: 'Qu’est-ce que R Start ?',
     answer: [
       'R Start est la 5ᵉ SCPI (société civile de placement immobilier) du groupe CORUM. Sa grande particularité : vous ne payez aucun frais quand vous investissez.',
-      'Concrètement, vous placez votre argent dans l’immobilier professionnel (bureaux, commerces, etc.). La performance de R Start repose sur deux moteurs complémentaires : d’une part les loyers payés par les locataires des immeubles, versés régulièrement ; d’autre part les plus-values réalisées lorsque CORUM revend un immeuble plus cher qu’il ne l’a acheté. CORUM ne se rémunère que lorsque R Start rapporte de l’argent : sur ces loyers et sur ces plus-values.',
+      'Concrètement, vous placez votre argent dans l’immobilier professionnel (bureaux, commerces, etc.). La performance de R Start repose sur deux moteurs complémentaires : d’une part les loyers payés par les locataires des immeubles, versés régulièrement ; d’autre part les plus-values potentielles réalisées lorsque CORUM revend un immeuble plus cher qu’il ne l’a acheté. CORUM ne se rémunère que lorsque R Start rapporte de l’argent : sur ces loyers et sur ces plus-values.',
     ],
   },
   {
     category: RUB.comprendre,
-    question: 'R Start verse-t-elle des revenus réguliers ?',
+    question: 'R Start verse-t-elle des revenus potentiels réguliers ?',
     /* Réécrite le 22/09/2026 (demande de Martin) : « revenus (dividendes) potentiels », et plus de
        second paragraphe sur les deux moteurs. */
     answer: [
@@ -162,14 +162,14 @@ const rawItems: FaqContent['items'] = [
     category: RUB.performance,
     question: 'Quel est l’objectif de performance de R Start ?',
     answer: [
-      'R Start n’affiche aucun objectif de rendement chiffré. C’est une différence importante avec les autres SCPI CORUM. Sa performance repose sur deux moteurs : les loyers encaissés et les plus-values réalisées à la revente des immeubles. Elle dépendra de la capacité de CORUM à percevoir des loyers réguliers et à revendre les immeubles avec une plus-value ; elle est par nature incertaine et ne peut pas être garantie.',
+      'R Start n’affiche aucun objectif de rendement chiffré. C’est une différence importante avec les autres SCPI CORUM. Sa performance repose sur deux moteurs : les loyers encaissés et les plus-values potentielles réalisées à la revente des immeubles. Elle dépendra de la capacité de CORUM à percevoir des loyers réguliers et à revendre les immeubles avec une plus-value ; elle est par nature incertaine et ne peut pas être garantie.',
     ],
   },
   {
     category: RUB.performance,
     question: 'Sur quoi repose la performance de R Start ?',
     answer: [
-      'La performance de R Start s’appuie sur deux moteurs : d’une part, les loyers versés par les locataires des immeubles ; d’autre part, les plus-values réalisées lorsque CORUM revend des immeubles plus cher qu’ils n’ont été achetés. Les loyers ont vocation à être distribués chaque mois ; les plus-values, elles, à arriver ponctuellement, lors des reventes.',
+      'La performance de R Start s’appuie sur deux moteurs : d’une part, les loyers versés par les locataires des immeubles ; d’autre part, les plus-values potentielles réalisées lorsque CORUM revend des immeubles plus cher qu’ils n’ont été achetés. Les loyers ont vocation à être distribués chaque mois ; les plus-values potentielles, elles, à arriver ponctuellement, lors des reventes.',
     ],
   },
   {
@@ -179,7 +179,7 @@ const rawItems: FaqContent['items'] = [
       'R Start affiche un niveau de risque de 4 sur 7 (contre 3 pour CORUM Origin ou Eurion, par exemple). Pourquoi un peu plus élevé ?',
     ],
     bullets: [
-      'une partie de ses revenus potentiels provient de plus-values, moins prévisibles que les loyers ;',
+      'une partie de ses revenus potentiels provient de plus-values potentielles, moins prévisibles que les loyers ;',
       'elle peut investir hors zone euro, ce qui expose à l’évolution des monnaies étrangères ;',
       'sa gestion est active, avec des achats et reventes plus fréquents, donc plus sensible aux mouvements du marché immobilier.',
     ],
@@ -222,23 +222,23 @@ const rawItems: FaqContent['items'] = [
   },
   {
     category: RUB.pratique,
-    question: 'À partir de quand touche-t-on les premiers revenus (délai de jouissance) ?',
+    question: 'À partir de quand touche-t-on les premiers revenus potentiels (délai de jouissance) ?',
     answer: [
       'Vos parts commencent à produire des revenus potentiels le 1ᵉʳ jour du 6ᵉ mois suivant votre souscription. Ce délai est le même que pour les autres SCPI CORUM.',
     ],
   },
   {
     category: RUB.pratique,
-    question: 'À quelle fréquence les revenus sont-ils versés ?',
+    question: 'À quelle fréquence les revenus potentiels sont-ils versés ?',
     answer: [
-      'Les revenus potentiels issus des loyers ont vocation à être versés chaque mois. Les plus-values, elles, à être versées ponctuellement, au moment de la revente d’immeubles.',
+      'Les revenus potentiels issus des loyers ont vocation à être versés chaque mois. Les plus-values potentielles, elles, à être versées ponctuellement, au moment de la revente d’immeubles.',
     ],
   },
   {
     category: RUB.pratique,
-    question: 'Comment sont imposés les revenus de R Start ?',
+    question: 'Comment sont imposés les revenus potentiels de R Start ?',
     answer: [
-      'Les loyers versés sont imposés comme des revenus fonciers, comme pour toute SCPI. Les plus-values versées lors des reventes d’immeubles relèvent du régime des plus-values immobilières des particuliers.',
+      'Les loyers versés sont imposés comme des revenus fonciers, comme pour toute SCPI. Les plus-values potentielles versées lors des reventes d’immeubles relèvent du régime des plus-values immobilières des particuliers.',
     ],
   },
   {
@@ -256,7 +256,7 @@ const rawItems: FaqContent['items'] = [
  */
 const HOME_FAQ = [
   'Qu’est-ce que R Start ?',
-  'R Start verse-t-elle des revenus réguliers ?',
+  'R Start verse-t-elle des revenus potentiels réguliers ?',
   'Quels sont les frais de R Start ?',
   'Quel est le prix d’une part ?',
 ];

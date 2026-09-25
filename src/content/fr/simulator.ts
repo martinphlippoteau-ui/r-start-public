@@ -189,7 +189,7 @@ export const simulator = {
       bulletinWarning,
       'Le résultat présenté sur l’illustration graphique ne constitue pas un indicateur fiable quant aux performances futures de vos investissements. Il a seulement pour but d’illustrer les mécanismes de votre investissement sur la durée de placement. L’évolution de la valeur de votre investissement pourra s’écarter de ce qui est affiché, à la hausse comme à la baisse.',
       nb(
-        `Le résultat de cette simulation est brut : il ne tient compte ni de la fiscalité étrangère prélevée avant le versement des revenus, ni de votre imposition personnelle. ${product.name} ne prélève pas de frais de souscription : la totalité de votre versement est prise en compte. Le taux que vous testez est un taux de distribution, qui s’entend après frais de gestion. La simulation applique le délai de jouissance de ${income.enjoymentDelayLabel} (période pendant laquelle vous ne percevez aucun revenu). Elle ne déduit pas la commission de retrait anticipé, due si vous demandez le retrait de vos parts avant ${dernierPalier.before} ans : ${paliersEnClair}.`
+        `Le résultat de cette simulation est brut : il ne tient compte ni de la fiscalité étrangère prélevée avant le versement des revenus potentiels, ni de votre imposition personnelle. ${product.name} ne prélève pas de frais de souscription : la totalité de votre versement est prise en compte. Le taux que vous testez est un taux de distribution, qui s’entend après frais de gestion. La simulation applique le délai de jouissance de ${income.enjoymentDelayLabel} (période pendant laquelle vous ne percevez aucun revenu). Elle ne déduit pas la commission de retrait anticipé, due si vous demandez le retrait de vos parts avant ${dernierPalier.before} ans : ${paliersEnClair}.`
       ),
     ],
     accept: 'J’ai compris',
@@ -321,7 +321,7 @@ export const simulator = {
         label: 'Revenus potentiels bruts',
         unit: 'par mois',
         sub: nb(
-          `Après le délai de jouissance : premiers revenus au ${income.enjoymentDelayMonths}e mois.`
+          `Après le délai de jouissance : premiers revenus potentiels au ${income.enjoymentDelayMonths}e mois.`
         ),
         rule: '{annual} par an, avant fiscalité',
       },
@@ -341,7 +341,7 @@ export const simulator = {
       second: {
         label: 'Gain potentiel cumulé',
         sub: nb('Soit {pct} des sommes versées, cumulés sur {years} ans (non annualisé).'),
-        rulePaid: nb('Dont revenus perçus : {paid}'),
+        rulePaid: nb('Dont revenus potentiels perçus : {paid}'),
         ruleNone: 'Capital projeté moins les sommes versées',
       },
     },
@@ -377,7 +377,7 @@ export const simulator = {
     titleIncome: 'Revenus potentiels cumulés',
     titleCapital: 'Composition du capital projeté',
     toggleLabel: 'Type de graphique',
-    toggleIncome: 'Revenus',
+    toggleIncome: 'Revenus potentiels',
     toggleCapital: 'Capital',
     description:
       'Graphique. Utilisez les flèches gauche et droite pour lire les valeurs année par année. Les mêmes données figurent dans le tableau ci-dessous.',
@@ -387,20 +387,20 @@ export const simulator = {
     layers: {
       initial: 'Investissement initial',
       programmes: 'Versements programmés',
-      reinvestis: 'Revenus réinvestis',
+      reinvestis: 'Revenus potentiels réinvestis',
       cumGross: 'Revenus potentiels cumulés',
       invested: 'Total versé',
     },
     tipCapital: nb('Capital projeté : {v}'),
-    tipCumulative: nb('Revenus cumulés : {v}'),
+    tipCumulative: nb('Revenus potentiels cumulés : {v}'),
     tipMonthly: nb('Revenu mensuel : {v}'),
     table: {
       summary: 'Voir les données année par année',
       year: 'Année',
       capital: 'Capital projeté',
       invested: 'Total investi',
-      reinvested: 'Revenus réinvestis',
-      cumulative: 'Revenus cumulés',
+      reinvested: 'Revenus potentiels réinvestis',
+      cumulative: 'Revenus potentiels cumulés',
       monthly: 'Revenu mensuel',
     },
   },
@@ -410,10 +410,10 @@ export const simulator = {
     items: [
       'Valeur de la part supposée inchangée sur toute la durée. Elle peut en réalité monter ou baisser.',
       nb(
-        `Délai de jouissance : chaque versement produit des revenus à partir du ${income.enjoymentDelayMonths}e mois qui suit.`
+        `Délai de jouissance : chaque versement produit des revenus potentiels à partir du ${income.enjoymentDelayMonths}e mois qui suit.`
       ),
-      'Taux de distribution constant, revenus versés chaque mois, montants bruts avant fiscalité.',
-      'Les revenus réinvestis achètent des fractions de parts, sans minimum.',
+      'Taux de distribution constant, revenus potentiels versés chaque mois, montants bruts avant fiscalité.',
+      'Les revenus potentiels réinvestis achètent des fractions de parts, sans minimum.',
       nb(
         `Commission de retrait anticipé non déduite des résultats : ${paliersEnClair}, puis aucune. Elle s’apprécie versement par versement.`
       ),

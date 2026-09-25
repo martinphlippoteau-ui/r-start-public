@@ -176,7 +176,7 @@ export const documentation = {
       {
         title: 'Suivre votre épargne',
         description: nb(
-          `Vous retrouvez vos parts, vos dividendes potentiels et vos documents dans votre espace en ligne, sur corum.fr. Ces revenus ne sont pas garantis : ils varient à la hausse comme à la baisse. Durée de placement recommandée : ${risk.recommendedHoldingLabel}. Un retrait avant ${zeroAfter} ans de détention entraîne une commission dégressive.`
+          `Vous retrouvez vos parts, vos dividendes potentiels et vos documents dans votre espace en ligne, sur corum.fr. Ces revenus potentiels ne sont pas garantis : ils varient à la hausse comme à la baisse. Durée de placement recommandée : ${risk.recommendedHoldingLabel}. Un retrait avant ${zeroAfter} ans de détention entraîne une commission dégressive.`
         ),
       },
     ],

@@ -161,14 +161,14 @@ const ROWS: ComparatorRow[] = [
     },
     {
       key: 'management' as const,
-      info: 'L’épargnant paie des frais de gestion quand il perçoit des revenus issus des loyers. Autrement dit, ces frais ne sont dus que lorsque l’épargnant gagne de l’argent.',
+      info: 'L’épargnant paie des frais de gestion quand il perçoit des revenus potentiels issus des loyers. Autrement dit, ces frais ne sont dus que lorsque l’épargnant gagne de l’argent.',
       label: 'Frais de gestion',
       basis: 'en % des loyers encaissés',
       rstart: fees.management.label,
     },
     {
       key: 'disposal' as const,
-      info: 'L’épargnant paie des frais de cession d’immeubles quand il perçoit des revenus issus de la vente d’immeuble. La plupart des SCPI ne prélèvent des frais qu’à partir d’un certain niveau de plus-value. Autrement dit, ces frais ne sont dus que lorsque l’épargnant gagne de l’argent.',
+      info: 'L’épargnant paie des frais de cession d’immeubles quand il perçoit des revenus potentiels issus de la vente d’immeuble. La plupart des SCPI ne prélèvent des frais qu’à partir d’un certain niveau de plus-value. Autrement dit, ces frais ne sont dus que lorsque l’épargnant gagne de l’argent.',
       label: 'Frais sur vente d’immeubles',
       /* Prix net vendeur (25/09/2026, Martin) : la commission porte sur lui, pas sur la plus-value. */
       basis: 'en % du prix net vendeur',

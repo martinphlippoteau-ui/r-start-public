@@ -38,7 +38,7 @@ export const difference = {
   ],
   /* Sous la liste (24/09/2026, Martin, mot pour mot) : « potentiels » dit que les revenus ne sont
      pas acquis. */
-  outro: 'Les loyers et les plus-values vous sont versés sous forme de dividendes potentiels.',
+  outro: 'Les loyers et les plus-values potentielles vous sont versés sous forme de dividendes potentiels.',
   counterweight: {
     /**
      * Conclusion de l'équipe, mot pour mot (11/09/2026), MISE EN VALEUR (24/09/2026, Martin : « à

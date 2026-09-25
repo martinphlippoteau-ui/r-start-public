@@ -80,7 +80,7 @@ test.describe('Recherche du site', () => {
     await champ.fill('impôts');
     await expect
       .poll(() => titres(page, 'questions'))
-      .toContain('Comment sont imposés les revenus de R Start ?');
+      .toContain('Comment sont imposés les revenus potentiels de R Start ?');
   });
 
   /* LA HAUTEUR NE BOUGE PAS (demande de Martin) : le panneau ouvert a la hauteur du panneau vide,

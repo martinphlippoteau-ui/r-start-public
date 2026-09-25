@@ -20,7 +20,7 @@ export const search = {
     { page: 'fees' },
     { question: 'Quels sont les frais de R Start ?' },
     { question: 'Quel est le niveau de risque de R Start ?' },
-    { question: 'À partir de quand touche-t-on les premiers revenus (délai de jouissance) ?' },
+    { question: 'À partir de quand touche-t-on les premiers revenus potentiels (délai de jouissance) ?' },
     { page: 'press', label: 'La presse en parle' },
   ],
   groups: { pages: 'Pages', questions: 'Questions' },
