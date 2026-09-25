@@ -690,7 +690,7 @@ async function checkWholeSite() {
   for (const file of pages) {
     const html = await readHtml(file);
 
-    /* 3. TOUTES LES PAGES, pas une liste (/test et 404.html échappaient à tout contrôle). Celles
+    /* 3. TOUTES LES PAGES, pas une liste (404.html échappait à tout contrôle). Celles
        qui ont leur contrôle dédié ne sont pas relues deux fois. */
     if (!PAGES_DEJA_CONTROLEES.has(file)) {
       const texte = toText(html);

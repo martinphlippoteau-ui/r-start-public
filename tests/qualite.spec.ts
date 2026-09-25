@@ -271,9 +271,8 @@ test.describe('Qualité', () => {
 
   /* DONNÉES STRUCTURÉES ET ANCRES : la réponse balisée reprend TOUT ce que la page affiche (le
      tableau des frais manquait) ; /frais ne balise pas une FAQ que personne ne peut lire ; les
-     ancres des pages légales plient les accents au lieu de les remplacer par des tirets ; /test
-     n'est jamais indexable. */
-  test('données structurées fidèles à la page, ancres légales lisibles, page d’essai hors index', async ({
+     ancres des pages légales plient les accents au lieu de les remplacer par des tirets. */
+  test('données structurées fidèles à la page, ancres légales lisibles', async ({
     page,
   }) => {
     const faqPages = () =>

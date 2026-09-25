@@ -36,7 +36,7 @@ export const hero = {
   /** Invitation à descendre, sous le bandeau Trustpilot ; libellé VISIBLE au-dessus du chevron, il
       nomme le lien pour tout le monde, à l'écran comme au clavier. */
   /* Sous le bandeau Trustpilot (24/09/2026, formulation et emplacement de Martin, choisis
-     parmi cinq variantes essayées sur /test). CORUM L'Épargne DISTRIBUE R Start ; CORUM Asset
+     parmi cinq variantes essayées). CORUM L'Épargne DISTRIBUE R Start ; CORUM Asset
      Management la conçoit et la gère, d'où le surtitre « CORUM invente », qui parle du groupe. */
   distributor: 'La SCPI R Start est distribuée par CORUM L’Épargne',
   scrollHint: { label: 'Découvrir R Start' },
